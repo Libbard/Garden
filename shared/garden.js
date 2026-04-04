@@ -2593,7 +2593,14 @@
       let node;
       while ((node = iter.nextNode())) {
         if (node.nodeValue.includes('DIAGRAM[')) {
-          return node.nodeValue.replace(/[\s\S]*DIAGRAM\[\d+\]:\s*/, '').trim();
+          
+          let raw = node.nodeValue.replace(/[\s\S]*DIAGRAM\[\d+\]:\s*/, '').trim();
+          
+          raw = raw.replace(/^Detailed SVG generation prompt:\s*/i, '');
+          raw = raw.replace(/^Create\s+a\s+\w[\w\s-]*showing\s+/i, '');
+          
+          raw = raw.replace(/Style:[^.]+\./gi, '').replace(/viewBox[^.]+\./gi, '').trim();
+          return raw;
         }
       }
     } catch (e) { }
@@ -2611,13 +2618,6 @@
     const result = { title: '', content: '', type: 'concept', hasSVG: false, hasAlgo: false };
 
     
-    const h2 = card.querySelector('.concept-header h2, h2, h3');
-    if (h2) {
-      const tpl = h2.closest('[data-bilingual]')?.querySelector(`.content-${L}`);
-      result.title = stripHTML(tpl?.innerHTML || h2.textContent || '');
-    }
-
-    
     if (card.classList.contains('vault-section') || card.closest('.vault-section')) {
       result.type = 'vault';
     } else if (card.id === 'professor' || card.classList.contains('professor-card')) {
@@ -2626,6 +2626,26 @@
       result.type = 'quiz';
     } else if (card.closest('.flashcard-section')) {
       result.type = 'flashcard';
+    } else if (card.classList.contains('accordion-item') || card.closest('.accordion')) {
+      result.type = 'accordion';
+    } else if (card.classList.contains('objectives-card')) {
+      result.type = 'objectives';
+    }
+
+    
+    if (result.type === 'accordion') {
+      
+      const triggerSpan = card.querySelector('.accordion-trigger [data-bilingual]');
+      if (triggerSpan) {
+        const tpl = triggerSpan.querySelector(`.content-${L}`) || triggerSpan.querySelector('.content-ar');
+        result.title = stripHTML(tpl?.innerHTML || triggerSpan.textContent || '');
+      }
+    } else {
+      const h2 = card.querySelector('.concept-header h2, h2, h3');
+      if (h2) {
+        const tpl = h2.closest('[data-bilingual]')?.querySelector(`.content-${L}`);
+        result.title = stripHTML(tpl?.innerHTML || h2.textContent || '');
+      }
     }
 
     
@@ -2647,6 +2667,27 @@
 
     if (parts.length) {
       result.content = parts.join('\n\n');
+    } else if (result.type === 'vault') {
+      
+      const entries = [];
+      card.querySelectorAll('.vault-entry').forEach(entry => {
+        const typeLabel = entry.querySelector('.vault-type')?.textContent?.trim() || '';
+        const bodyEl = entry.querySelector('[data-bilingual]');
+        const tpl = bodyEl?.querySelector(`.content-${L}`) || bodyEl?.querySelector('.content-ar');
+        const text = tpl ? stripHTML(tpl.innerHTML) : '';
+        if (text) entries.push(`${typeLabel}\n${text}`);
+      });
+      result.content = entries.join('\n\n').substring(0, 3000);
+    } else if (result.type === 'accordion') {
+      
+      const qEl = card.querySelector('.accordion-trigger [data-bilingual]');
+      const aEl = card.querySelector('.accordion-body [data-bilingual]');
+      const qTpl = qEl?.querySelector(`.content-${L}`) || qEl?.querySelector('.content-ar');
+      const aTpl = aEl?.querySelector(`.content-${L}`) || aEl?.querySelector('.content-ar');
+      const q = qTpl ? stripHTML(qTpl.innerHTML) : '';
+      const a = aTpl ? stripHTML(aTpl.innerHTML) : '';
+      if (q) result.content += (L === 'ar' ? `[السؤال]: ${q}` : `[Question]: ${q}`);
+      if (a) result.content += '\n' + (L === 'ar' ? `[الإجابة]: ${a}` : `[Answer]: ${a}`);
     } else {
       
       const texts = [];
@@ -2664,7 +2705,8 @@
     if (card.querySelector('.svg-diagram, .concept-diagram')) {
       const svgDesc = extractSVGComment(card);
       if (svgDesc) {
-        result.content += `\n\n[وصف الرسمة]:\n${svgDesc}`;
+        
+        result.content += `\n\n[سياق الرسمة — للفهم المفاهيمي فقط، لا تُعد وصفها]:\n${svgDesc}`;
         result.hasSVG = true;
       }
     }
@@ -2701,8 +2743,21 @@
 - No intro or closing sentence
 - If multiple points exist, connect them under one unifying idea`;
 
+  
+  const _BASE_RULES_AR_RICH = `قواعد صارمة:
+- اكتب بالعربية الفصحى البسيطة حصراً
+- لا تتجاوز 200 كلمة نهائياً (حد صارم)
+- لا تكرر المحتوى حرفياً
+- لا تضف مقدمة أو خاتمة`;
+
+  const _BASE_RULES_EN_RICH = `Rules (strict):
+- Write in English only
+- Max 180 words total (hard cap)
+- Never copy text verbatim
+- No intro or closing sentence`;
+
    
-  function buildPrompt(cardData) {
+  function buildPrompt(cardData, regenVariant) {
     const subjectCode = document.documentElement.getAttribute('data-subject') || '';
     const moduleNum = document.documentElement.getAttribute('data-module') || '';
     const L = currentLang;
@@ -2725,75 +2780,176 @@
     
     const baseRules = L === 'ar' ? _BASE_RULES_AR : _BASE_RULES_EN;
 
+    
+    const regenSuffix = regenVariant
+      ? (L === 'ar'
+        ? `\n\n[إعادة توليد — منظور مختلف تماماً: إذا استخدمت تشبيهاً، استخدم الآن مثالاً رقمياً أو سياقاً تطبيقياً آخر. غيّر ترتيب الأقسام وأسلوب الربط كلياً. لا تعيد نفس الجمل.]`
+        : `\n\n[Regeneration — completely different angle: if you used an analogy, now use a numerical example or a different applied context. Fully change the section ordering and framing. Do not repeat any previous sentences.]`)
+      : '';
+
     let systemPrompt, userMsg;
 
     
+    
+    
     if (cardData.hasSVG) {
-      systemPrompt = L === 'ar'
-        ? `أستاذ CS متخصص. اشرح الرسمة في 3 أقسام مرقمة:
-🗺️ اقرأ الرسمة: ما الذي تراه ووظيفة كل عنصر
-🔄 تتبع التدفق: كيف تسير البيانات/العملية (جملتان)
-📌 ربط سريع: جملة واحدة تربط هذا بمفهوم سبق دراسته
+      systemPrompt = (L === 'ar'
+        ? `أستاذ CS متخصص. الطالب يرى الرسمة أمامه مباشرةً — لا تعد وصف عناصرها البصرية مطلقاً.
+استخدم سياق الرسمة المرفق كمرجع فقط لتبني عليه الشرح المفاهيمي.
+اشرح في 3 أقسام مرقمة:
+💡 المفهوم الجوهري: ما المشكلة التي تحلها هذه الرسمة أو ما الفكرة التي تجسّدها (جملتان)
+🔄 الآلية بكلماتك: اشرح كيف تعمل بمثال بسيط أو تشبيه واقعي — لا تصف الأشكال أو الأسهم
+📌 نقطة الامتحان: جملة واحدة دقيقة جاهزة تُكتب في ورقة المراجعة
 ${baseRules}`
-        : `CS professor. Explain the diagram in 3 sections:
-🗺️ Read the Diagram: what you see and each element's role
-🔄 Trace the Flow: how data/operations move (2 sentences max)
-📌 Quick Link: connect this to a previously studied concept in one sentence
-${baseRules}`;
+        : `CS professor. The student sees this diagram directly — do NOT redescribe its visual elements.
+Use the diagram context only as a reference to build a conceptual explanation.
+Explain in 3 numbered sections:
+💡 Core Concept: what problem this diagram solves or what idea it embodies (2 sentences)
+🔄 How it Works: explain the mechanism using a simple example or analogy — no shape or arrow descriptions
+📌 Exam Note: one precise, exam-ready sentence for the review sheet
+${baseRules}`) + regenSuffix;
 
       userMsg = L === 'ar'
-        ? `${ctxLine}\nالرسم: ${cardData.title}\n\n${content}`
-        : `${ctxLine}\nDiagram: ${cardData.title}\n\n${content}`;
+        ? `${ctxLine}\nالمفهوم: ${cardData.title}\n\n${content}`
+        : `${ctxLine}\nConcept: ${cardData.title}\n\n${content}`;
 
-      
-    } else if (cardData.hasAlgo || cardData.type === 'algo' || subjectCode === 'CS353') {
-      systemPrompt = L === 'ar'
-        ? `أستاذ خوارزميات CS353. اشرح في 3 أقسام مرقمة:
-⚙️ الآلية: خطوتان بمثال رقمي صغير [3،5،1،4]
-📊 التعقيد: جملة واحدة تفسر لماذا هذا الـ Big-O
-⚡ متى تستخدم: ميزة وعيب مقارنة ببديل واحد
+    
+    
+    
+    } else if (cardData.hasAlgo || cardData.type === 'algo') {
+      systemPrompt = (L === 'ar'
+        ? `أستاذ خوارزميات CS. اشرح في 3 أقسام مرقمة:
+⚙️ الآلية: خطوتان بمثال رقمي صغير مناسب للخوارزمية
+📊 التعقيد: جملة واحدة تفسر لماذا هذا الـ Big-O بالتحديد
+⚡ متى تستخدم: ميزة وعيب واحد مقارنة ببديل واحد
 ${baseRules}`
-        : `CS353 algorithms professor. Explain in 3 sections:
-⚙️ Mechanism: 2 steps with tiny example [3,5,1,4]
-📊 Complexity: 1 sentence explaining why this Big-O
-⚡ When to use: 1 pro vs 1 alternative algorithm
-${baseRules}`;
+        : `CS algorithms professor. Explain in 3 numbered sections:
+⚙️ Mechanism: 2 steps with a small numerical example appropriate to the algorithm
+📊 Complexity: 1 sentence explaining why exactly this Big-O
+⚡ When to use: 1 advantage and 1 drawback compared to one alternative
+${baseRules}`) + regenSuffix;
 
       userMsg = L === 'ar'
         ? `${ctxLine}\nالموضوع: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nTopic: ${cardData.title}\n\n${content}`;
 
-      
+    
+    
+    
+    } else if (cardData.type === 'professor') {
+      systemPrompt = (L === 'ar'
+        ? `أستاذ CS. هذا النص سردي امتحاني من أستاذ الوحدة. اشرح في 3 أقسام مرقمة:
+🎯 الفكرة المحورية: ما النقطة الأهم التي يريد البروفيسور ترسيخها في ذهن الطالب (جملة واحدة)
+🔗 السبب والمنطق: لماذا هذه النقطة مهمة من منظور الامتحان والتطبيق العملي
+📌 نصيحة الامتحان: صِغ في جملة واحدة ما يجب أن يكتبه الطالب لو سُئل عن هذا
+${baseRules}`
+        : `CS professor. This is a narrative exam-oriented text from the module's professor. Explain in 3 numbered sections:
+🎯 Central Point: what key idea the professor most wants to cement in the student's mind (1 sentence)
+🔗 Why it Matters: why this is important from an exam and practical application perspective
+📌 Exam Tip: formulate in one sentence what the student should write if asked about this
+${baseRules}`) + regenSuffix;
+
+      userMsg = L === 'ar'
+        ? `${ctxLine}\nحديث البروفيسور — الوحدة ${moduleNum}\n\n${content}`
+        : `${ctxLine}\nProfessor's narrative — Module ${moduleNum}\n\n${content}`;
+
+    
+    
+    
+    } else if (cardData.type === 'vault') {
+      const baseRulesVault = L === 'ar' ? _BASE_RULES_AR_RICH : _BASE_RULES_EN_RICH;
+      systemPrompt = (L === 'ar'
+        ? `أستاذ CS متخصص في أخطاء الطلاب. هذه مادة من خزنة الامتحان (فخ أو مفهوم أساسي أو سر). اشرح كل نقطة في 3 أقسام مرقمة:
+⚠️ لماذا هذا مهم: ما الذي يجعل هذا فخاً أو نقطةً حرجة بالتحديد (جملتان)
+🔍 الخطأ الشائع: كيف يقع الطالب المتوسط في هذا الخطأ بالضبط — صِف سيناريو الوقوع فيه
+✅ القاعدة الذهبية: جملة واحدة واضحة تصحح الفهم وتُثبَّت في الذاكرة
+${baseRulesVault}`
+        : `CS professor specializing in student mistakes. This is from the exam vault (trap, key concept, or secret). Explain each point in 3 numbered sections:
+⚠️ Why it Matters: what makes this a trap or critical point specifically (2 sentences)
+🔍 The Common Mistake: how exactly an average student falls into this — describe the scenario
+✅ The Golden Rule: one clear sentence that corrects the understanding and sticks in memory
+${baseRulesVault}`) + regenSuffix;
+
+      userMsg = L === 'ar'
+        ? `${ctxLine}\nمحتوى الخزنة: ${cardData.title}\n\n${content}`
+        : `${ctxLine}\nVault content: ${cardData.title}\n\n${content}`;
+
+    
+    
+    
+    } else if (cardData.type === 'accordion') {
+      systemPrompt = (L === 'ar'
+        ? `أستاذ CS. هذا سؤال وإجابته من قسم "اسأل البروفيسور". لا تعد كتابة الإجابة. اشرح في 3 أقسام مرقمة:
+🤔 لماذا هذا السؤال يُطرح: ما الإشكالية الحقيقية وراء السؤال (جملة واحدة)
+💡 منطق الإجابة: لماذا الإجابة هي ما هي — الخطوات المنطقية وليس الحفظ
+📌 كيف تكتبها في الامتحان: أعد صياغة الإجابة في جملة جاهزة للكتابة مباشرة
+${baseRules}`
+        : `CS professor. This is a Q&A from "Ask the Professor". Do not rewrite the answer. Explain in 3 numbered sections:
+🤔 Why this question is asked: what the real underlying problem is (1 sentence)
+💡 Logic of the Answer: why the answer is what it is — reasoning steps, not memorization
+📌 How to write it in an exam: rephrase the answer in one sentence ready to write directly
+${baseRules}`) + regenSuffix;
+
+      userMsg = L === 'ar'
+        ? `${ctxLine}\nسؤال وإجابة: ${cardData.title}\n\n${content}`
+        : `${ctxLine}\nQ&A: ${cardData.title}\n\n${content}`;
+
+    
+    
+    
+    } else if (cardData.type === 'objectives') {
+      const baseRulesObj = L === 'ar' ? _BASE_RULES_AR_RICH : _BASE_RULES_EN_RICH;
+      systemPrompt = (L === 'ar'
+        ? `أستاذ CS. هذه أهداف تعلم الوحدة. ساعد الطالب على فهم ما يجب إتقانه. اشرح في 3 أقسام مرقمة:
+🗺️ خريطة الوحدة: جملتان تربطان كل الأهداف تحت فكرة واحدة تجمعها
+⚡ الأهداف الأصعب: حدد أي الأهداف تحتاج جهداً أكبر ولماذا
+📋 اختبار الإتقان: لكل هدف، سؤال واحد يعرف الطالب به أنه أتقن الهدف
+${baseRulesObj}`
+        : `CS professor. These are the module's learning objectives. Help the student understand what to master. Explain in 3 numbered sections:
+🗺️ Module Map: 2 sentences connecting all objectives under one unifying idea
+⚡ Hardest Objectives: identify which objectives need the most effort and why
+📋 Mastery Test: for each objective, one question the student can use to verify mastery
+${baseRulesObj}`) + regenSuffix;
+
+      userMsg = L === 'ar'
+        ? `${ctxLine}\nأهداف الوحدة ${moduleNum}\n\n${content}`
+        : `${ctxLine}\nModule ${moduleNum} objectives\n\n${content}`;
+
+    
+    
+    
     } else if (rawContent.length > 900) {
-      systemPrompt = L === 'ar'
+      systemPrompt = (L === 'ar'
         ? `أستاذ CS. اشرح في 3 أقسام مرقمة:
 🏗️ الصورة الكبيرة: جملتان تجمعان كل النقاط تحت فكرة واحدة
 🔗 الترابط: جملة توضح كيف تفترض النقطة A معرفة B لتعمل
 📌 للمراجعة: 3 نقاط بصيغة "إذا... فـ" بترتيب منطقي
 ${baseRules}`
-        : `CS professor. Explain in 3 sections:
+        : `CS professor. Explain in 3 numbered sections:
 🏗️ Big Picture: 2 sentences uniting all points under one idea
 🔗 Connection: how point A requires knowing B to function
 📌 For Review: 3 bullet points using "If...then" logic
-${baseRules}`;
+${baseRules}`) + regenSuffix;
 
       userMsg = L === 'ar'
         ? `${ctxLine}\nالموضوع: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nTopic: ${cardData.title}\n\n${content}`;
 
-      
+    
+    
+    
     } else {
-      systemPrompt = L === 'ar'
+      systemPrompt = (L === 'ar'
         ? `أستاذ CS. اشرح في 3 أقسام مرقمة:
 💡 الفكرة الجوهرية: جملتان بلغتك أنت كأنك تشرح لزميلك (ابتعد تماماً عن الحفظ الحرفي)
 🔗 ربط بالواقع: جملة تربط هذا بشيء يعرفه الطالب من حياته أو من مادة سابقة
 📌 نقطة الامتحان: جملة واحدة جاهزة للكتابة في ورقة مراجعة
 ${baseRules}`
-        : `CS professor. Explain in 3 sections:
+        : `CS professor. Explain in 3 numbered sections:
 💡 Core Idea: 2 sentences as if explaining to a classmate (no rote rephrasing)
 🔗 Connect: one sentence linking this to real life or a prior concept
 📌 Exam Note: one concise exam-ready sentence
-${baseRules}`;
+${baseRules}`) + regenSuffix;
 
       userMsg = L === 'ar'
         ? `${ctxLine}\nالموضوع: ${cardData.title}\n\n${content}`
@@ -2804,10 +2960,14 @@ ${baseRules}`;
   }
 
    
-  function aiCacheKey(title) {
+  function aiCacheKey(title, content) {
     const s = document.documentElement.getAttribute('data-subject') || '';
     const m = document.documentElement.getAttribute('data-module') || '';
-    return AI_CACHE_PREFIX + s + '_' + m + '_' + currentLang + '_' + title.substring(0, 50).replace(/\s+/g, '_');
+    
+    const keyBase = (title && title.length > 5)
+      ? title.substring(0, 50)
+      : (content || '').substring(0, 60);
+    return AI_CACHE_PREFIX + s + '_' + m + '_' + currentLang + '_' + keyBase.replace(/\s+/g, '_');
   }
 
   function getAiCache(key) {
@@ -2881,7 +3041,7 @@ ${baseRules}`;
 
     const { systemPrompt, userMsg } = buildPrompt(cardData);
     const fullPromptText = systemPrompt + '\n\n' + userMsg;
-    const cacheKey = aiCacheKey(cardData.title);
+    const cacheKey = aiCacheKey(cardData.title, cardData.content);
     const cached = getAiCache(cacheKey);
 
     const overlay = document.createElement('div');
@@ -2956,7 +3116,9 @@ ${baseRules}`;
         regenBtn.innerHTML = `<span class="ai-regen-spin">↻</span> ${aiT('جاري التوليد...', 'Generating...')}`;
       }
       body.innerHTML = `<div class="ai-loading"><div class="ai-loading-spinner"></div><span>${aiT('جاري توليد شرح جديد...', 'Generating a fresh explanation...')}</span></div>`;
-      callAI(systemPrompt, userMsg).then(result => {
+      
+      const regenPrompt = buildPrompt(cardData, true);
+      callAI(regenPrompt.systemPrompt, regenPrompt.userMsg).then(result => {
         if (!body) return;
         if (regenBtn) {
           regenBtn.disabled = false;
