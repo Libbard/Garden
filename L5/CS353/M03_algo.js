@@ -1999,7 +1999,7 @@ window.AlgoWidgets[8] = function(container) {
       '<div class="algo-canvas" id="w8-graph-canvas" style="width:60%; height:500px; border:1px solid var(--algo-border); border-radius:8px; background:var(--algo-canvas-bg);"></div>' +
       '<div id="w8-stack-viz" style="width:35%; height:500px; border:1px solid var(--algo-border); border-radius:8px; padding:10px; background:var(--algo-canvas-bg); display:flex; flex-direction:column; align-items:center;">' +
       '<h5 style="margin-top:0; color:var(--algo-text);" data-algo-text="w8-stack-title">Stack</h5>' +
-      '<div id="w8-stack-items" style="display:flex; flex-direction:column-reverse; gap:5px; width:80%; flex-grow:1;"></div>' +
+      '<div id="w8-stack-items" style="display:flex; flex-direction:column-reverse; gap:5px; width:80%; flex-grow:1; overflow-y:auto; align-content:flex-start; justify-content:flex-start;"></div>' +
       '</div>' +
       '</div>' +
       '<div class="algo-legend" style="display:flex;justify-content:center;gap:15px;margin-top:12px;font-size:0.9em;">' +
@@ -2304,26 +2304,43 @@ window.AlgoWidgets[8] = function(container) {
   
       graphCanvas.appendChild(svg);
   
-      
       stackItemsEl.innerHTML = '';
-      s.stack.forEach(function (nodeId, index) {
-        var stackItem = document.createElement('div');
-        stackItem.className = 'algo-node'; 
-        stackItem.style.width = '40px';
-        stackItem.style.height = '40px';
-        stackItem.style.lineHeight = '40px';
-        stackItem.style.borderRadius = '5px';
-        stackItem.style.textAlign = 'center';
-        stackItem.style.background = 'var(--brand-500)';
-        stackItem.style.color = 'var(--algo-text)';
-        stackItem.style.border = '1px solid var(--algo-border)';
-        stackItem.textContent = nodes[nodeId].label;
-        if (index === s.stack.length - 1) { 
-          stackItem.style.background = 'var(--algo-active)';
-          stackItem.classList.add('current');
-        }
-        stackItemsEl.appendChild(stackItem);
-      });
+      if (s.stack.length === 0) {
+        var emptyMsg = document.createElement('div');
+        emptyMsg.style.cssText = 'color:var(--text-muted); font-size:13px; text-align:center; padding:10px; font-family:"Cairo",sans-serif;';
+        emptyMsg.textContent = _AL.lang() === 'ar' ? 'فارغ' : 'Empty';
+        stackItemsEl.appendChild(emptyMsg);
+      } else {
+        s.stack.forEach(function (nodeId, index) {
+          var stackItem = document.createElement('div');
+          var isTop = index === s.stack.length - 1;
+          stackItem.style.cssText = [
+            'display:flex',
+            'align-items:center',
+            'justify-content:center',
+            'width:100%',
+            'min-height:40px',
+            'border-radius:6px',
+            'font-family:"JetBrains Mono",monospace',
+            'font-size:16px',
+            'font-weight:800',
+            'color:#ffffff',
+            'box-shadow:0 2px 6px rgba(0,0,0,0.15)',
+            'position:relative',
+            'flex-shrink:0',
+            'background:' + (isTop ? 'var(--algo-active)' : 'var(--brand-500)'),
+            'border:2px solid ' + (isTop ? 'rgba(255,255,255,0.5)' : 'transparent')
+          ].join(';');
+          stackItem.textContent = nodes[nodeId].label;
+          if (isTop) {
+            var topLabel = document.createElement('span');
+            topLabel.style.cssText = 'position:absolute; right:6px; font-size:10px; font-weight:600; opacity:0.85; font-family:"Cairo",sans-serif;';
+            topLabel.textContent = _AL.lang() === 'ar' ? 'قمة' : 'TOP';
+            stackItem.appendChild(topLabel);
+          }
+          stackItemsEl.appendChild(stackItem);
+        });
+      }
     }
   
     function startPlay() {
