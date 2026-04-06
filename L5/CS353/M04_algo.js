@@ -771,9 +771,9 @@ window.AlgoWidgets[3] = function(container) {
         lb.className = 'algo-bar-label';
         lb.textContent = val;
         lb.style.position = 'absolute';
-        lb.style.top = '-20px'; 
-        lb.style.color = 'var(--algo-text)';
+        lb.style.top = '-20px';
         lb.style.fontSize = '0.8em';
+        lb.style.setProperty('color', 'var(--text-primary)', 'important');
   
         var idxLabel = document.createElement('div');
         idxLabel.className = 'algo-bar-index';
