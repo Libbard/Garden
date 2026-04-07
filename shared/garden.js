@@ -3668,3 +3668,325 @@ ${baseRules}`) + regenSuffix;
   })();
 })();
 
+
+ 
+;(function () {
+  'use strict';
+
+   
+  function isQuizPage() {
+    return !!document.getElementById('mcq-engine');
+  }
+
+   
+  function _hashStr(str) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h;
+  }
+
+   
+  function _shuffleQuestionOptions(qArr) {
+    if (!qArr || !Array.isArray(qArr)) return;
+    qArr.forEach(function (q) {
+      if (q._shuffled) return;                        
+      var opts = q.options;
+      if (!opts) { q._shuffled = true; return; }
+      var langs = Object.keys(opts);
+      var numOpts = (opts[langs[0]] || []).length;
+      if (numOpts < 2) { q._shuffled = true; return; }
+
+       
+      var order = [];
+      for (var i = 0; i < numOpts; i++) order.push(i);
+      var s = _hashStr(String(q.id !== undefined ? q.id : Math.random()));
+      for (var i = order.length - 1; i > 0; i--) {
+        s = (s * 1664525 + 1013904223) >>> 0;
+        var j = s % (i + 1);
+        var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+      }
+
+       
+      langs.forEach(function (lang) {
+        var orig = opts[lang].slice();
+        opts[lang] = order.map(function (idx) { return orig[idx]; });
+      });
+
+       
+      q.correctIndex = order.indexOf(q.correctIndex);
+      q._shuffled = true;
+    });
+  }
+
+   
+  function _fixHintButtonTranslation() {
+    var btn = document.getElementById('mcq-hint-btn');
+    if (!btn) return;
+    btn.querySelectorAll('span').forEach(function (sp) {
+      if (sp.querySelector('template.content-ar') && !sp.hasAttribute('data-bilingual')) {
+        sp.setAttribute('data-bilingual', '');
+      }
+    });
+  }
+
+   
+  function _addEssayModuleFilter() {
+    var essaySection = document.getElementById('essay-section');
+    if (!essaySection) return;
+    if (document.getElementById('essay-module-toolbar')) return; 
+
+     
+    var essayArr = (typeof sessionEssay !== 'undefined') ? sessionEssay : [];
+    if (!essayArr || !essayArr.length) {
+      
+      essayArr = (typeof essayBank !== 'undefined') ? essayBank : [];
+    }
+    var modSet = {};
+    essayArr.forEach(function (q) { modSet[q.module] = true; });
+    var modules = Object.keys(modSet).map(Number).sort(function (a, b) { return a - b; });
+    if (!modules.length) return;
+
+    var lang = document.documentElement.getAttribute('lang') || 'ar';
+    var allText   = lang === 'ar' ? 'الكل' : 'All';
+    var labelText = lang === 'ar' ? 'تصفية الوحدة:' : 'Filter Module:';
+
+     
+    essayArr.forEach(function (q, i) {
+      var item = document.getElementById('essay-item-' + i);
+      if (item) item.setAttribute('data-essay-module', q.module);
+    });
+
+     
+    var toolbar = document.createElement('div');
+    toolbar.id = 'essay-module-toolbar';
+    toolbar.style.cssText = [
+      'display:flex','flex-wrap:wrap','gap:0.5rem','align-items:center',
+      'margin-bottom:1.25rem','padding:0.75rem 1rem',
+      'background:var(--bg-surface)','border-radius:var(--radius-lg)',
+      'border:1px solid var(--border-color)','box-shadow:0 4px 10px var(--shadow-base)'
+    ].join(';');
+
+    var html = '<span style="font-size:0.78rem;font-weight:700;color:var(--text-muted);margin-inline-end:0.4rem">' + labelText + '</span>';
+    html += '<button class="tag tag--accent" id="essay-filter-0" onclick="_quizPatch.filterEssay(0)">' + allText + '</button>';
+    modules.forEach(function (m) {
+      html += '<button class="tag" id="essay-filter-' + m + '" onclick="_quizPatch.filterEssay(' + m + ')">M' + m + '</button>';
+    });
+    toolbar.innerHTML = html;
+
+    var container = document.getElementById('essay-questions-container');
+    if (container) container.parentNode.insertBefore(toolbar, container);
+  }
+
+   
+  var _selectedMCQModules = []; 
+
+  function _buildMultiModuleSession() {
+    if (typeof mcqBank === 'undefined' || typeof seededRNG === 'undefined') return;
+
+    var seed = Date.now().toString(36);
+    var pool;
+
+    if (!_selectedMCQModules.length) {
+       
+      var total = (typeof MCQ_SESSION !== 'undefined') ? MCQ_SESSION : 70;
+      var groups = (typeof MODULE_GROUPS !== 'undefined') ? MODULE_GROUPS : [[1,2,3],[4,5,6]];
+      pool = (typeof pickSessionMCQ === 'function')
+        ? pickSessionMCQ(mcqBank, groups, total, seed)
+        : shuffleArr(mcqBank, seededRNG(seed)).slice(0, total);
+    } else {
+       
+      var total = (typeof MCQ_SESSION !== 'undefined') ? MCQ_SESSION : 70;
+      var mods = _selectedMCQModules.slice();
+      var base = Math.floor(total / mods.length);
+      var rem  = total % mods.length;
+      pool = [];
+      mods.forEach(function (mod, i) {
+        var quota = base + (i < rem ? 1 : 0);
+        var subset = mcqBank.filter(function (q) { return q.module === mod; });
+        var picked = shuffleArr(subset, seededRNG(seed + 'm' + mod)).slice(0, quota);
+        pool = pool.concat(picked);
+      });
+      pool = shuffleArr(pool, seededRNG(seed + 'final'));
+    }
+
+     
+    sessionMCQ = pool;
+    TOTAL      = pool.length;
+    cur        = 0;
+    score      = 0;
+    answered.length = 0;
+
+     
+    pool.forEach(function (q) { q._shuffled = false; });
+    _shuffleQuestionOptions(pool);
+
+     
+    var qTotal = document.getElementById('q-total');
+    var lScore = document.getElementById('live-score');
+    var card   = document.getElementById('mcq-card');
+    var finScr = document.getElementById('final-score-screen');
+    var fb     = document.getElementById('mcq-feedback');
+    if (qTotal) qTotal.textContent = TOTAL;
+    if (lScore) lScore.textContent = '0';
+    if (card)   card.classList.remove('hidden');
+    if (finScr) finScr.classList.add('hidden');
+    if (fb)     fb.className = 'mcq-feedback-panel';
+
+    if (typeof renderMcq === 'function') renderMcq(0);
+  }
+
+  function _updateModuleButtonStyles() {
+    document.querySelectorAll('.module-filter-btn').forEach(function (btn) {
+      var mod = parseInt(btn.dataset.module, 10);
+      if (mod === 0) {
+        btn.classList.toggle('tag--accent', _selectedMCQModules.length === 0);
+        btn.classList.toggle('btn-primary',  _selectedMCQModules.length === 0);
+      } else {
+        var selected = _selectedMCQModules.indexOf(mod) !== -1;
+        btn.classList.toggle('tag--accent', selected);
+        btn.classList.toggle('btn-primary',  selected);
+      }
+    });
+  }
+
+  function _patchSetModuleFocus() {
+     
+    window.setModuleFocus = function (mod) {
+      if (mod === 0) {
+         
+        _selectedMCQModules = [];
+      } else {
+        var idx = _selectedMCQModules.indexOf(mod);
+        if (idx === -1) {
+          _selectedMCQModules.push(mod);   
+        } else {
+          _selectedMCQModules.splice(idx, 1); 
+        }
+      }
+      currentModuleFocus = _selectedMCQModules.length === 1 ? _selectedMCQModules[0] : 0;
+      _updateModuleButtonStyles();
+      _buildMultiModuleSession();
+    };
+  }
+
+  function _patchRetryFunctions() {
+     
+    if (typeof retryWithNewQuestions === 'function') {
+      window.retryWithNewQuestions = function () {
+        _buildMultiModuleSession();
+         
+        var seed2 = Date.now().toString(36) + 'e';
+        var groups = (typeof MODULE_GROUPS !== 'undefined') ? MODULE_GROUPS : [[1,2,3],[4,5,6]];
+        var essCnt = (typeof ESSAY_SESSION !== 'undefined') ? ESSAY_SESSION : 10;
+        if (typeof pickSessionEssay === 'function' && typeof essayBank !== 'undefined') {
+          sessionEssay = pickSessionEssay(essayBank, groups, essCnt, seed2);
+        }
+        essayScore = 0;
+        if (typeof renderEssays === 'function') {
+          renderEssays();
+          setTimeout(_addEssayModuleFilter, 10);
+        }
+      };
+    }
+
+     
+    if (typeof shuffleCurrentQuestions === 'function') {
+      window.shuffleCurrentQuestions = function () {
+        if (!_selectedMCQModules.length && typeof seededRNG !== 'undefined') {
+           
+          sessionMCQ = shuffleArr(sessionMCQ, seededRNG(Date.now().toString()));
+          TOTAL = sessionMCQ.length; cur = 0; score = 0; answered.length = 0;
+          sessionMCQ.forEach(function (q) { q._shuffled = false; });
+          _shuffleQuestionOptions(sessionMCQ);
+          var qTotal = document.getElementById('q-total');
+          var lScore = document.getElementById('live-score');
+          if (qTotal) qTotal.textContent = TOTAL;
+          if (lScore) lScore.textContent = '0';
+          document.getElementById('mcq-card').classList.remove('hidden');
+          document.getElementById('final-score-screen').classList.add('hidden');
+          if (typeof renderMcq === 'function') renderMcq(0);
+        } else {
+          _buildMultiModuleSession();
+        }
+         
+        var seed3 = Date.now().toString(36) + 'sh';
+        var groups = (typeof MODULE_GROUPS !== 'undefined') ? MODULE_GROUPS : [[1,2,3],[4,5,6]];
+        var essCnt = (typeof ESSAY_SESSION !== 'undefined') ? ESSAY_SESSION : 10;
+        if (typeof pickSessionEssay === 'function' && typeof essayBank !== 'undefined') {
+          sessionEssay = pickSessionEssay(essayBank, groups, essCnt, seed3);
+          essayScore = 0;
+          if (typeof renderEssays === 'function') {
+            renderEssays();
+            setTimeout(_addEssayModuleFilter, 10);
+          }
+        }
+      };
+    }
+  }
+
+   
+  window._quizPatch = {
+    filterEssay: function (mod) {
+       
+      document.querySelectorAll('[id^="essay-filter-"]').forEach(function (btn) {
+        var bm = parseInt(btn.id.replace('essay-filter-', ''), 10);
+        btn.classList.toggle('tag--accent', bm === mod);
+      });
+
+       
+      document.querySelectorAll('[data-essay-module]').forEach(function (item) {
+        var m = parseInt(item.getAttribute('data-essay-module'), 10);
+        item.style.display = (mod === 0 || m === mod) ? '' : 'none';
+      });
+    }
+  };
+
+   
+  function _applyAllPatches() {
+    if (!isQuizPage()) return;
+
+     
+    if (typeof sessionMCQ !== 'undefined') {
+      _shuffleQuestionOptions(sessionMCQ);
+    }
+
+     
+    _fixHintButtonTranslation();
+
+     
+    _patchSetModuleFocus();
+    _patchRetryFunctions();
+
+     
+    var lang = document.documentElement.getAttribute('lang') || 'ar';
+    var tip  = lang === 'ar' ? 'انقر لتفعيل/إلغاء الوحدة (متعدد)' : 'Click to toggle module (multi-select)';
+    document.querySelectorAll('.module-filter-btn[data-module]').forEach(function (btn) {
+      var mod = parseInt(btn.dataset.module, 10);
+      if (mod !== 0) btn.title = tip;
+    });
+  }
+
+  function _applyDOMReadyPatches() {
+    if (!isQuizPage()) return;
+
+     
+    _addEssayModuleFilter();
+  }
+
+   
+  _applyAllPatches();
+
+   
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(_applyDOMReadyPatches, 50);
+    });
+  } else {
+    setTimeout(_applyDOMReadyPatches, 50);
+  }
+
+})();
+ 
