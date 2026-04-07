@@ -3736,7 +3736,6 @@ ${baseRules}`) + regenSuffix;
   function _addEssayModuleFilter() {
     var essaySection = document.getElementById('essay-section');
     if (!essaySection) return;
-    if (document.getElementById('essay-module-toolbar')) return; 
 
      
     var essayArr = (typeof sessionEssay !== 'undefined') ? sessionEssay : [];
@@ -3749,15 +3748,18 @@ ${baseRules}`) + regenSuffix;
     var modules = Object.keys(modSet).map(Number).sort(function (a, b) { return a - b; });
     if (!modules.length) return;
 
-    var lang = document.documentElement.getAttribute('lang') || 'ar';
-    var allText   = lang === 'ar' ? 'الكل' : 'All';
-    var labelText = lang === 'ar' ? 'تصفية الوحدة:' : 'Filter Module:';
-
      
     essayArr.forEach(function (q, i) {
       var item = document.getElementById('essay-item-' + i);
       if (item) item.setAttribute('data-essay-module', q.module);
     });
+
+     
+    if (document.getElementById('essay-module-toolbar')) return;
+
+    var lang = document.documentElement.getAttribute('lang') || 'ar';
+    var allText   = lang === 'ar' ? 'الكل' : 'All';
+    var labelText = lang === 'ar' ? 'تصفية الوحدة:' : 'Filter Module:';
 
      
     var toolbar = document.createElement('div');
@@ -3887,6 +3889,9 @@ ${baseRules}`) + regenSuffix;
         essayScore = 0;
         if (typeof renderEssays === 'function') {
           renderEssays();
+           
+          document.querySelectorAll('#essay-questions-container .fade-up')
+            .forEach(function (el) { el.classList.add('visible'); });
           setTimeout(_addEssayModuleFilter, 10);
         }
       };
@@ -3920,6 +3925,9 @@ ${baseRules}`) + regenSuffix;
           essayScore = 0;
           if (typeof renderEssays === 'function') {
             renderEssays();
+             
+            document.querySelectorAll('#essay-questions-container .fade-up')
+              .forEach(function (el) { el.classList.add('visible'); });
             setTimeout(_addEssayModuleFilter, 10);
           }
         }
