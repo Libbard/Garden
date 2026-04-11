@@ -11,7 +11,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>المنطق التوافقي · CS231 · الحديقة الرقمية</title>
+  <title>الوحدة 05: أنواع التنفيذ ثنائي المستوى للتعبيرات المنطقية · CS231 · الحديقة الرقمية</title>
 
   
   <script>
@@ -68,7 +68,6 @@
   <aside class="sidebar">
     <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
     <nav class="toc-list">
-      
       <a href="#hero" class="toc-link" data-bilingual>
         <template class="content-ar">مقدمة الوحدة</template>
         <template class="content-en">Module Intro</template>
@@ -80,36 +79,39 @@
         <span class="content-target">أهداف التعلم</span>
       </a>
 
-      
-      <a href="#combinational-circuits" class="toc-link" data-bilingual>
-        <template class="content-ar">الدوائر التوافقية</template>
-        <template class="content-en">Combinational Circuits</template>
-        <span class="content-target">الدوائر التوافقية</span>
+      <a href="#pos-simplification" class="toc-link" data-bilingual>
+        <template class="content-ar">تبسيط مضروب المجاميع (POS)</template>
+        <template class="content-en">Product-of-Sums (POS) Simplification</template>
+        <span class="content-target">تبسيط مضروب المجاميع (POS)</span>
       </a>
-      <a href="#analysis-procedure" class="toc-link" data-bilingual>
-        <template class="content-ar">إجراءات التحليل</template>
-        <template class="content-en">Analysis Procedure</template>
-        <span class="content-target">إجراءات التحليل</span>
+      <a href="#dont-care-conditions" class="toc-link" data-bilingual>
+        <template class="content-ar">حالات عدم الاكتراث (Don't Care)</template>
+        <template class="content-en">Don't Care Conditions</template>
+        <span class="content-target">حالات عدم الاكتراث (Don't Care)</span>
       </a>
-      <a href="#design-procedure" class="toc-link" data-bilingual>
-        <template class="content-ar">إجراءات التصميم</template>
-        <template class="content-en">Design Procedure</template>
-        <span class="content-target">إجراءات التصميم</span>
+      <a href="#universal-gates" class="toc-link" data-bilingual>
+        <template class="content-ar">البوابات الشاملة (NAND و NOR)</template>
+        <template class="content-en">Universal Gates (NAND and NOR)</template>
+        <span class="content-target">البوابات الشاملة (NAND و NOR)</span>
       </a>
-      <a href="#code-conversion" class="toc-link" data-bilingual>
-        <template class="content-ar">تحويل الأكواد (مثال: BCD إلى Excess-3)</template>
-        <template class="content-en">Code Conversion (BCD to Excess-3)</template>
-        <span class="content-target">تحويل الأكواد (مثال: BCD إلى Excess-3)</span>
+      <a href="#all-nand-conversion" class="toc-link" data-bilingual>
+        <template class="content-ar">التحويل إلى دوائر NAND بالكامل</template>
+        <template class="content-en">Conversion to all-NAND Circuits</template>
+        <span class="content-target">التحويل إلى دوائر NAND بالكامل</span>
       </a>
-      <a href="#binary-adder-subtractor" class="toc-link" data-bilingual>
-        <template class="content-ar">الجامع-الطرح الثنائي (نصف الجامع والجامع الكامل)</template>
-        <template class="content-en">Binary Adder-Subtractor (Half & Full Adder)</template>
-        <span class="content-target">الجامع-الطرح الثنائي (نصف الجامع والجامع الكامل)</span>
+      <a href="#nondegenerate-forms" class="toc-link" data-bilingual>
+        <template class="content-ar">النماذج غير المتدهورة (Nondegenerate Forms)</template>
+        <template class="content-en">Nondegenerate Forms</template>
+        <span class="content-target">النماذج غير المتدهورة (Nondegenerate Forms)</span>
+      </a>
+      <a href="#xor-and-parity" class="toc-link" data-bilingual>
+        <template class="content-ar">بوابة الاستبعاد (XOR) والتكافؤ</template>
+        <template class="content-en">Exclusive OR (XOR) and Parity</template>
+        <span class="content-target">بوابة الاستبعاد (XOR) والتكافؤ</span>
       </a>
 
       <div class="toc-divider"></div>
 
-      
       <a href="#professor" class="toc-link" data-bilingual>
         <template class="content-ar">حديث البروفيسور</template>
         <template class="content-en">Professor's Narrative</template>
@@ -154,24 +156,24 @@
   </div>
   <div data-bilingual>
     <template class="content-ar">
-      <h1 class="text-gradient">المنطق التوافقي</h1>
-      <p class="hero-description">مقدمة في الدوائر التوافقية، إجراءات التحليل والتصميم، تحويل الأكواد، والجامعات الثنائية (نصف الجامع والجامع الكامل).</p>
+      <h1 class="text-gradient">الوحدة 05: أنواع التنفيذ ثنائي المستوى للتعبيرات المنطقية</h1>
+      <p class="hero-description">تغطي هذه الوحدة تبسيط مضروب المجاميع (POS)، وحالات عدم الاكتراث (Don't Care)، والبوابات الشاملة (NAND و NOR)، وتحويل الدوائر، وبوابات XOR مع تطبيقاتها في اكتشاف الأخطاء.</p>
     </template>
     <template class="content-en">
-      <h1 class="text-gradient">Combinational Logic</h1>
-      <p class="hero-description">Introduction to combinational circuits, analysis and design procedures, code conversion, and binary adders (Half Adder and Full Adder).</p>
+      <h1 class="text-gradient">Module 05: Two-Level Implementation types of Boolean expressions</h1>
+      <p class="hero-description">This module covers Product-of-Sums (POS) simplification, Don't Care conditions, Universal Gates (NAND & NOR), circuit conversion, and XOR gates with error detection applications.</p>
     </template>
     <div class="content-target"></div>
   </div>
   <div class="tag-list" data-bilingual>
     <template class="content-ar">
-      <span class="tag">الدوائر التوافقية</span>
       <span class="tag">التصميم المنطقي</span>
+      <span class="tag">خرائط كارنوف</span>
       <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
     </template>
     <template class="content-en">
-      <span class="tag">Combinational Circuits</span>
       <span class="tag">Logic Design</span>
+      <span class="tag">Karnaugh Maps</span>
       <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
     </template>
     <div class="content-target"></div>
@@ -182,27 +184,27 @@
   <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
-      <li><span class="obj-icon">✦</span><span>وصف الدوائر التوافقية وخصائصها.</span></li>
-      <li><span class="obj-icon">✦</span><span>تحليل الدوائر التوافقية واستنتاج دوالها البولينية.</span></li>
-      <li><span class="obj-icon">✦</span><span>تصميم الدوائر التوافقية بناءً على المواصفات المطلوبة.</span></li>
-      <li><span class="obj-icon">✦</span><span>تحليل دائرة منطقية توافقية من خلال مخططها المنطقي.</span></li>
-      <li><span class="obj-icon">✦</span><span>تصميم الجامع والطرح الثنائي (نصف الجامع).</span></li>
+      <li><span class="obj-icon">✦</span><span>استنتاج صيغتي مجموع المضاريب (SOP) ومضروب المجاميع (POS) مباشرة من خريطة كارنوف.</span></li>
+      <li><span class="obj-icon">✦</span><span>إنشاء خريطة كارنوف لدالة منطقية انطلاقاً من جدول الحقيقة الخاص بها.</span></li>
+      <li><span class="obj-icon">✦</span><span>تبسيط الدوال المنطقية باستخدام حالات عدم الاكتراث (Don't-Care conditions).</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ الدوائر الرقمية باستخدام تركيبات مختلفة من البوابات المنطقية (مثل NAND و NOR).</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم بوابات XOR (الاستبعاد المنطقي) واستخداماتها في الأنظمة الرقمية.</span></li>
     </template>
     <template class="content-en">
-      <li><span class="obj-icon">✦</span><span>Describe Combinational Circuits.</span></li>
-      <li><span class="obj-icon">✦</span><span>Analyze Combinational Circuits.</span></li>
-      <li><span class="obj-icon">✦</span><span>Design Combinational Circuits.</span></li>
-      <li><span class="obj-icon">✦</span><span>Given its logic diagram, know how to analyze a combinational logic circuit.</span></li>
-      <li><span class="obj-icon">✦</span><span>Design Binary Adder-Subtractor (Half-adder).</span></li>
+      <li><span class="obj-icon">✦</span><span>Obtain the sum of products and the product of sums forms of a Boolean function directly from its Karnaugh map.</span></li>
+      <li><span class="obj-icon">✦</span><span>Create the Karnaugh map of a Boolean function from its truth table.</span></li>
+      <li><span class="obj-icon">✦</span><span>Simplify a Boolean function using Don’t-Care conditions.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement digital circuits (Boolean functions) using various combinations of logic gates.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the XOR gates and its usage.</span></li>
     </template>
     <div class="content-target"></div>
   </ul>
 </section>
 
-<section id="combinational-circuits" class="concept-card glass-card fade-up">
+<section id="pos-simplification" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">1</span> الدوائر التوافقية</h2></template>
-    <template class="content-en"><h2><span class="concept-number">1</span> Combinational Circuits</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تبسيط مضروب المجاميع (POS)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Product-of-Sums (POS) Simplification</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -213,165 +215,186 @@
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>دوائر منطقية تعتمد مخرجاتها فقط على المدخلات الحالية، مثل آلة حاسبة بسيطة لا تتذكر العمليات السابقة.</p></template>
-    <template class="content-en"><p>Logic circuits whose outputs depend ONLY on the present combination of inputs, like a simple calculator with no memory.</p></template>
+    <template class="content-ar"><p>تجميع الأصفار في خريطة كارنوف يعطينا متمم الدالة، وبتطبيق <span class="smart-term" data-term-en="DeMorgan's Theorem" data-ar="نظرية دي مورغان" data-en-def="A rule stating that the complement of a sum is the product of complements, and vice versa.">نظرية دي مورغان<span class="smart-term-tooltip"></span></span> نحصل على صيغة مضروب المجاميع.</p></template>
+    <template class="content-en"><p>Grouping 0s in a K-map gives the complement function; applying <span class="smart-term" data-term-en="DeMorgan's Theorem" data-ar="نظرية دي مورغان" data-en-def="A rule stating that the complement of a sum is the product of complements, and vice versa.">DeMorgan's theorem<span class="smart-term-tooltip"></span></span> yields the POS form.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تتكون الدائرة التوافقية من بوابات منطقية تتفاعل مع قيم الإشارات عند مدخلاتها لإنتاج قيمة إشارة المخرج، مما يحول المعلومات الثنائية من بيانات الإدخال المعطاة إلى بيانات الإخراج المطلوبة.</p><p>لا تحتوي هذه الدوائر على <span class="smart-term" data-term-en="Feedback Path" data-ar="مسار التغذية الراجعة" data-en-def="A connection from the output of one gate to the input of a second gate whose output forms part of the input to the first gate.">مسارات تغذية راجعة</span> (Feedback paths) أو عناصر ذاكرة.</p><p>بالنسبة لـ n من متغيرات الإدخال، هناك 2^n من المجموعات الممكنة، ويمكن تحديد الدائرة باستخدام جدول الحقيقة أو m من الدوال البولينية.</p></template>
-    <template class="content-en"><p>A combinational circuit consists of logic gates whose outputs at any time are determined from only the present combination of inputs.</p><p>It performs an operation that can be specified logically by a set of Boolean functions.</p><p>It has no <span class="smart-term" data-term-en="Feedback Path" data-ar="مسار التغذية الراجعة" data-en-def="A connection from the output of one gate to the input of a second gate whose output forms part of the input to the first gate.">feedback paths</span> or memory elements.</p><p>For n input variables, there are 2^n possible combinations, and the circuit can be specified with a truth table or m Boolean functions.</p></template>
+    <template class="content-ar"><p>في خريطة كارنوف، تمثل المربعات التي تحتوي على '1' <span class="smart-term" data-term-en="Minterm" data-ar="حد المضروب" data-en-def="A product term in a Boolean expression where all variables appear exactly once.">حدود المضروب (minterms)<span class="smart-term-tooltip"></span></span> للدالة. أما المربعات الفارغة (أو التي تحتوي على '0') فتمثل متمم الدالة (F').</p><p>إذا قمنا بتجميع الأصفار، نحصل على تعبير مبسط بصيغة مجموع المضاريب (SOP) لمتمم الدالة.</p><p>للحصول على الدالة الأصلية F بصيغة مضروب المجاميع (POS)، نقوم بأخذ المتمم للنتيجة باستخدام <span class="smart-term" data-term-en="DeMorgan's Theorem" data-ar="نظرية دي مورغان" data-en-def="A rule stating that the complement of a sum is the product of complements, and vice versa.">نظرية دي مورغان (DeMorgan's theorem)<span class="smart-term-tooltip"></span></span>.</p></template>
+    <template class="content-en"><p>In a K-map, the 1s represent the <span class="smart-term" data-term-en="Minterm" data-ar="حد المضروب" data-en-def="A product term in a Boolean expression where all variables appear exactly once.">minterms<span class="smart-term-tooltip"></span></span> of the function. The empty squares (marked with 0s) represent the minterms not included in F, denoting its complement (F').</p><p>By combining the 0s, we obtain a simplified sum-of-products expression for F'.</p><p>Taking the complement of F' using <span class="smart-term" data-term-en="DeMorgan's Theorem" data-ar="نظرية دي مورغان" data-en-def="A rule stating that the complement of a sum is the product of complements, and vice versa.">DeMorgan's theorem<span class="smart-term-tooltip"></span></span> gives us back the function F in product-of-sums form.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>الغياب التام ل<span class="smart-term" data-term-en="Feedback Path" data-ar="مسار التغذية الراجعة" data-en-def="A connection from the output of one gate to the input of a second gate whose output forms part of the input to the first gate.">مسارات التغذية الراجعة</span> هو ما يميز الدوائر التوافقية عن الدوائر التتابعية.</p><p>في الواقع المادي، توجد الإشارات كإشارات تناظرية، ولكن يتم تفسيرها كإشارات ثنائية (0 و 1).</p><p>أجهزة المحاكاة المنطقية تظهر فقط الأصفار والآحاد ولا تظهر الإشارات التناظرية الفعلية.</p></template>
-    <template class="content-en"><p>The strict absence of <span class="smart-term" data-term-en="Feedback Path" data-ar="مسار التغذية الراجعة" data-en-def="A connection from the output of one gate to the input of a second gate whose output forms part of the input to the first gate.">feedback paths</span> is what distinguishes combinational circuits from sequential ones.</p><p>Physically, inputs and outputs exist as analog signals, but they are interpreted as binary logic 1 and 0.</p><p>Logic simulators abstract this away, showing only 0s and 1s.</p></template>
+    <template class="content-ar"><p>لماذا نستخدم هذه الطريقة؟ في بعض الأحيان، ينتج عن تجميع الأصفار تعبير منطقي يتطلب بوابات أقل أو مدخلات أقل مقارنة بتجميع الآحاد.</p><p>يمنح هذا مصممي الدوائر الرقمية مرونة لاختيار التنفيذ الأقل تكلفة (SOP أو POS) بناءً على طبيعة الدالة.</p></template>
+    <template class="content-en"><p>Why use POS? Sometimes the complement of a function yields fewer terms or literals than the function itself.</p><p>By evaluating both SOP (grouping 1s) and POS (grouping 0s and complementing), designers can choose the hardware implementation that requires the fewest gates and inputs, optimizing cost and delay.</p></template>
     <div class="content-target"></div>
   </div>
 
   <div class="formula-block">
     <div data-bilingual>
-      <template class="content-ar"><strong>عدد المجموعات الممكنة لـ n من متغيرات الإدخال.</strong></template>
-      <template class="content-en"><strong>Number of possible combinations for n input variables.</strong></template>
+      <template class="content-ar"><strong>تطبيق نظرية دي مورغان للحصول على الدالة الأصلية من متممها.</strong></template>
+      <template class="content-en"><strong>Applying DeMorgan's theorem to get the original function from its complement.</strong></template>
       <div class="content-target"></div>
     </div>
-    <div class="math-block">$$2^n$$</div>
+    <div class="math-block">$$F = (F')'$$</div>
   </div>
 
   
-<div class="svg-diagram" data-diagram-id="3">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
-    </marker>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="var(--text-primary)" flood-opacity="0.15"/>
-    </filter>
-  </defs>
+<div class="svg-diagram" data-diagram-id="6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="var(--brand-500)" />
+        </marker>
+    </defs>
 
-  
-  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+    
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
-  <text x="400" y="50" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Combinational Circuit Block Diagram</text>
-  <text x="400" y="80" font-size="20" fill="var(--text-secondary)" text-anchor="middle">المخطط الصندوقي العام للدائرة التوافقية</text>
+    
+    <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Product of Sums (PoS) Derivation / اشتقاق مضروب المجاميع</text>
 
-  
-  <rect x="280" y="130" width="240" height="160" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
-  <text x="400" y="195" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Combinational</text>
-  <text x="400" y="225" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Circuit</text>
-  <text x="400" y="260" font-size="18" fill="var(--text-secondary)" text-anchor="middle">دائرة توافقية</text>
+    
+    
+    
 
-  
-  <g stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)">
-    <line x1="140" y1="160" x2="270" y2="160"/>
-    <line x1="140" y1="190" x2="270" y2="190"/>
-    <line x1="140" y1="260" x2="270" y2="260"/>
-  </g>
-  
-  
-  <text x="205" y="152" font-size="15" fill="var(--text-muted)" text-anchor="middle" font-style="italic" font-weight="bold">x₁</text>
-  <text x="205" y="182" font-size="15" fill="var(--text-muted)" text-anchor="middle" font-style="italic" font-weight="bold">x₂</text>
-  <text x="205" y="252" font-size="15" fill="var(--text-muted)" text-anchor="middle" font-style="italic" font-weight="bold">xₙ</text>
+    
+    
+    <rect x="105" y="225" width="190" height="40" rx="8" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
+    
+    
+    <rect x="205" y="125" width="40" height="190" rx="8" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
+    
+    
+    
+    <path d="M 100 175 L 135 175 Q 145 175 145 185 L 145 255 Q 145 265 135 265 L 100 265" fill="var(--brand-400)" fill-opacity="0.1" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4"/>
+    
+    <path d="M 300 175 L 265 175 Q 255 175 255 185 L 255 255 Q 255 265 265 265 L 300 265" fill="var(--brand-400)" fill-opacity="0.1" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4"/>
 
-  
-  <circle cx="205" cy="215" r="2.5" fill="var(--brand-400)"/>
-  <circle cx="205" cy="225" r="2.5" fill="var(--brand-400)"/>
-  <circle cx="205" cy="235" r="2.5" fill="var(--brand-400)"/>
+    
+    <rect x="100" y="120" width="200" height="200" fill="none" stroke="var(--border-color)" stroke-width="2"/>
+    
+    <line x1="150" y1="120" x2="150" y2="320" stroke="var(--border-color)" stroke-width="1"/>
+    <line x1="200" y1="120" x2="200" y2="320" stroke="var(--border-color)" stroke-width="1"/>
+    <line x1="250" y1="120" x2="250" y2="320" stroke="var(--border-color)" stroke-width="1"/>
+    
+    <line x1="100" y1="170" x2="300" y2="170" stroke="var(--border-color)" stroke-width="1"/>
+    <line x1="100" y1="220" x2="300" y2="220" stroke="var(--border-color)" stroke-width="1"/>
+    <line x1="100" y1="270" x2="300" y2="270" stroke="var(--border-color)" stroke-width="1"/>
 
-  
-  <text x="70" y="205" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">n inputs</text>
-  <text x="70" y="235" font-size="18" fill="var(--text-secondary)" text-anchor="middle">n مدخلات</text>
+    
+    <line x1="60" y1="80" x2="95" y2="115" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="65" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">AB</text>
+    <text x="85" y="90" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">CD</text>
 
-  
-  <g stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)">
-    <line x1="520" y1="160" x2="650" y2="160"/>
-    <line x1="520" y1="190" x2="650" y2="190"/>
-    <line x1="520" y1="260" x2="650" y2="260"/>
-  </g>
+    
+    <text x="125" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">00</text>
+    <text x="175" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">01</text>
+    <text x="225" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">11</text>
+    <text x="275" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">10</text>
 
-  
-  <text x="585" y="152" font-size="15" fill="var(--text-muted)" text-anchor="middle" font-style="italic" font-weight="bold">y₁</text>
-  <text x="585" y="182" font-size="15" fill="var(--text-muted)" text-anchor="middle" font-style="italic" font-weight="bold">y₂</text>
-  <text x="585" y="252" font-size="15" fill="var(--text-muted)" text-anchor="middle" font-style="italic" font-weight="bold">yₘ</text>
+    
+    <text x="90" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">00</text>
+    <text x="90" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">01</text>
+    <text x="90" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">11</text>
+    <text x="90" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">10</text>
 
-  
-  <circle cx="585" cy="215" r="2.5" fill="var(--brand-400)"/>
-  <circle cx="585" cy="225" r="2.5" fill="var(--brand-400)"/>
-  <circle cx="585" cy="235" r="2.5" fill="var(--brand-400)"/>
+    
+    
+    <text x="125" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+    <text x="175" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+    <text x="225" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="275" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+    
+    <text x="125" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="175" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+    <text x="225" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="275" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    
+    <text x="125" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="175" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="225" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="275" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    
+    <text x="125" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+    <text x="175" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+    <text x="225" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
+    <text x="275" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
 
-  
-  <text x="730" y="205" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">m outputs</text>
-  <text x="730" y="235" font-size="18" fill="var(--text-secondary)" text-anchor="middle">m مخرجات</text>
+    
+    <text x="310" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-500)" dominant-baseline="middle">AB</text>
+    <text x="225" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">CD</text>
+    <text x="70" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-400)" text-anchor="middle">BD'</text>
+
+
+    
+    
+    
+
+    
+    <rect x="420" y="100" width="340" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="590" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">1. Group 0s to find F' / تجميع الأصفار لإيجاد F'</text>
+    <text x="590" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">F' = AB + CD + BD'</text>
+
+    
+    <rect x="420" y="230" width="340" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="590" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">2. Apply DeMorgan's Law / تطبيق قانون دي مورغان</text>
+    <text x="590" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-primary)" text-anchor="middle">F = (F')' = (AB + CD + BD')'</text>
+    <text x="590" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">F = (A'+B')(C'+D')(B'+D)</text>
+
+
+    
+    
+    
+
+    
+    <path d="M 340 245 C 380 245, 380 140, 410 140" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+    
+    <path d="M 590 185 L 590 220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="600" y="207" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">DeMorgan</text>
+
+    
+    <text x="400" y="380" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">Grouping 0s yields the complement F'. DeMorgan's Law converts it to Product of Sums (PoS).</text>
 
 </svg>
 </div>
 
   <table class="comparison-table">
-    <thead>
-      <tr>
-        <th></th>
-        <th data-bilingual>
-          <template class="content-ar">الدوائر التوافقية</template>
-          <template class="content-en">Combinational Circuits</template>
-          <span class="content-target"></span>
-        </th>
-        <th data-bilingual>
-          <template class="content-ar">الدوائر التتابعية</template>
-          <template class="content-en">Sequential Circuits</template>
-          <span class="content-target"></span>
-        </th>
-      </tr>
-    </thead>
+    <thead><tr><th></th><th>SOP</th><th>POS</th></tr></thead>
     <tbody>
       <tr>
         <td data-bilingual>
-          <template class="content-ar">الاعتمادية على المدخلات</template>
-          <template class="content-en">Input Dependency</template>
+          <template class="content-ar">التجميع في خريطة كارنوف</template>
+          <template class="content-en">Grouping in K-map</template>
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">تعتمد على المدخلات الحالية فقط</template>
-          <template class="content-en">Depends ONLY on present inputs</template>
+          <template class="content-ar">تجميع الآحاد (1s)</template>
+          <template class="content-en">Grouping 1s</template>
           <span class="content-target"></span>
         </td>
-        <td class="td-bad" data-bilingual>
-          <template class="content-ar">تعتمد على المدخلات الحالية والحالة السابقة</template>
-          <template class="content-en">Depends on present inputs AND past state</template>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تجميع الأصفار (0s) ثم أخذ المتمم</template>
+          <template class="content-en">Grouping 0s then complementing</template>
           <span class="content-target"></span>
         </td>
       </tr>
       <tr>
         <td data-bilingual>
-          <template class="content-ar">مسارات التغذية الراجعة</template>
-          <template class="content-en">Feedback Paths</template>
+          <template class="content-ar">البوابات الأساسية المستخدمة</template>
+          <template class="content-en">Basic Gates Used</template>
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">لا توجد</template>
-          <template class="content-en">None</template>
-          <span class="content-target"></span>
-        </td>
-        <td class="td-bad" data-bilingual>
-          <template class="content-ar">موجودة</template>
-          <template class="content-en">Present</template>
-          <span class="content-target"></span>
-        </td>
-      </tr>
-      <tr>
-        <td data-bilingual>
-          <template class="content-ar">عناصر الذاكرة</template>
-          <template class="content-en">Memory Elements</template>
+          <template class="content-ar">AND ثم OR</template>
+          <template class="content-en">AND then OR</template>
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">لا تحتوي على ذاكرة</template>
-          <template class="content-en">No memory</template>
-          <span class="content-target"></span>
-        </td>
-        <td class="td-bad" data-bilingual>
-          <template class="content-ar">تحتوي على ذاكرة</template>
-          <template class="content-en">Contains memory</template>
+          <template class="content-ar">OR ثم AND</template>
+          <template class="content-en">OR then AND</template>
           <span class="content-target"></span>
         </td>
       </tr>
@@ -380,22 +403,22 @@
 
   <details class="thinking-question">
     <summary data-bilingual>
-      <template class="content-ar">لماذا لا يمكن استخدام الدوائر التوافقية لبناء عداد (Counter)؟</template>
-      <template class="content-en">Why can't combinational circuits be used to build a counter?</template>
+      <template class="content-ar">إذا كانت خريطة كارنوف تحتوي على عدد أصفار أقل بكثير من الآحاد، فأي صيغة ستكون الأبسط غالباً: SOP أم POS؟</template>
+      <template class="content-en">If a K-map has significantly fewer 0s than 1s, which form will likely be simpler: SOP or POS?</template>
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>لأن العداد يحتاج إلى تذكر حالته السابقة لزيادة القيمة، والدوائر التوافقية لا تحتوي على ذاكرة أو مسارات تغذية راجعة.</p></template>
-      <template class="content-en"><p>Because a counter needs to remember its previous state to increment it, and combinational circuits lack memory or feedback paths.</p></template>
+      <template class="content-ar"><p>صيغة POS ستكون الأبسط، لأن تجميع عدد قليل من الأصفار سينتج عنه حدود أقل في F'، مما يؤدي إلى تعبير POS أقصر.</p></template>
+      <template class="content-en"><p>The POS form will likely be simpler. Fewer 0s mean fewer groups for F', resulting in a shorter POS expression after applying DeMorgan's.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
 </section>
 
-<section id="analysis-procedure" class="concept-card glass-card fade-up">
+<section id="dont-care-conditions" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">2</span> إجراءات التحليل</h2></template>
-    <template class="content-en"><h2><span class="concept-number">2</span> Analysis Procedure</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">2</span> حالات عدم الاكتراث (Don't Care)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Don't Care Conditions</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -406,406 +429,39 @@
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>عملية هندسة عكسية تبدأ من المخطط المنطقي للوصول إلى الدوال البولينية وجدول الحقيقة لفهم وظيفة الدائرة.</p></template>
-    <template class="content-en"><p>A reverse-engineering process starting from a logic diagram to derive Boolean functions and truth tables to understand the circuit's behavior.</p></template>
+    <template class="content-ar"><p>حالات لا يمكن أن تحدث في الواقع (مثل الأرقام 10-15 في <span class="smart-term" data-term-en="BCD (Binary Coded Decimal)" data-ar="النظام العشري المشفر ثنائياً" data-en-def="A class of binary encodings of decimal numbers where each decimal digit is represented by a fixed number of bits, usually four.">نظام BCD<span class="smart-term-tooltip"></span></span>)، نرمز لها بـ 'X' ونستخدمها كـ 0 أو 1 لتبسيط الدائرة.</p></template>
+    <template class="content-en"><p>Input combinations that never occur are marked as 'X' and can be treated as 0 or 1 to optimize logic gates.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الخطوة الأولى في التحليل هي التأكد من أن الدائرة توافقية وليست تتابعية (لا توجد مسارات تغذية راجعة). ثم يتم اتباع الخطوات التالية:</p><ol><li>تسمية جميع مخرجات البوابات التي تعتمد على المدخلات بأسماء ذات معنى وإيجاد دوالها.</li><li>تسمية البوابات التي تعتمد على المدخلات والبوابات السابقة وإيجاد دوالها.</li><li>تكرار العملية حتى يتم الحصول على مخرجات الدائرة النهائية.</li><li>التعويض المتكرر للحصول على دوال المخرجات بدلالة متغيرات الإدخال فقط.</li></ol></template>
-    <template class="content-en"><p>The first step is to ensure the circuit is combinational (no feedback paths). Then:</p><ol><li>Label all gate outputs that are a function of input variables.</li><li>Label gates that are a function of inputs and previously labeled gates.</li><li>Repeat until circuit outputs are obtained.</li><li>By repeated substitution, obtain output Boolean functions in terms of input variables.</li></ol></template>
+    <template class="content-ar"><p>في بعض الأنظمة الرقمية، هناك تركيبات من المدخلات لا تحدث أبداً. على سبيل المثال، في <span class="smart-term" data-term-en="BCD (Binary Coded Decimal)" data-ar="النظام العشري المشفر ثنائياً" data-en-def="A class of binary encodings of decimal numbers where each decimal digit is represented by a fixed number of bits, usually four.">نظام BCD<span class="smart-term-tooltip"></span></span> (الذي يستخدم 4 بتات لتمثيل الأرقام من 0 إلى 9)، الحالات من 1010 إلى 1111 لا تظهر أبداً.</p><p>نطلق على هذه الحالات اسم <strong>'حالات عدم الاكتراث'</strong> ونرمز لها بالحرف 'X' في خريطة كارنوف.</p><p>عند التبسيط، يمكننا اختيار اعتبار الـ 'X' كـ 1 إذا كان ذلك سيساعدنا في تكوين مجموعة أكبر (وبالتالي تبسيط أكثر)، أو نعتبره 0 إذا لم يكن مفيداً.</p></template>
+    <template class="content-en"><p>In some digital systems, certain input conditions never occur. For example, dealing with <span class="smart-term" data-term-en="BCD (Binary Coded Decimal)" data-ar="النظام العشري المشفر ثنائياً" data-en-def="A class of binary encodings of decimal numbers where each decimal digit is represented by a fixed number of bits, usually four.">BCD (Binary Coded Decimal)<span class="smart-term-tooltip"></span></span>, 4 bits can encode 16 items, but we only care about the first 10 (0000 to 1001).</p><p>The remaining states (1010 to 1111) are <strong>'don't care' conditions</strong>, marked with an 'X' in the K-map.</p><p>We can treat an 'X' as either a 1 or a 0, whichever leads to a simpler implementation by allowing larger groupings.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>مجرد إيجاد الدالة البولينية لا يوفر دائمًا رؤية واضحة لسلوك الدائرة، لذا يُفضل استنتاج جدول الحقيقة مباشرة من المخطط المنطقي عن طريق تقييم المخرجات لكل مجموعة ممكنة من المدخلات.</p></template>
-    <template class="content-en"><p>Merely finding a Boolean representation doesn't always provide insight into behavior.</p><p>Obtaining the truth table directly from the logic diagram by evaluating outputs for all 2^n input combinations gives a complete behavioral map.</p></template>
-    <div class="content-target"></div>
-  </div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">ماذا يحدث إذا اكتشفت مسار تغذية راجعة أثناء الخطوة الأولى من التحليل؟</template>
-      <template class="content-en">What happens if you discover a feedback path during the first step of analysis?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>يجب التوقف عن استخدام إجراءات تحليل الدوائر التوافقية، لأن الدائرة في هذه الحالة هي دائرة تتابعية تتطلب طرق تحليل مختلفة.</p></template>
-      <template class="content-en"><p>You must stop using combinational analysis procedures, as the circuit is sequential and requires different analysis methods involving state tables.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-<section id="design-procedure" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">3</span> إجراءات التصميم</h2></template>
-    <template class="content-en"><h2><span class="concept-number">3</span> Design Procedure</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>تحويل المواصفات المطلوبة إلى مخطط منطقي فعلي ينجز المهمة.</p></template>
-    <template class="content-en"><p>Transforming required specifications into an actual logic diagram that performs the task.</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يبدأ تصميم الدوائر التوافقية من تحديد الهدف وينتهي بمخطط الدائرة المنطقية. الخطوات هي:</p><ol><li>من المواصفات، حدد عدد المدخلات والمخرجات المطلوبة وقم بتعيين رمز لكل منها.</li><li>استنتج جدول الحقيقة الذي يحدد العلاقة المطلوبة بين المدخلات والمخرجات.</li><li>احصل على الدوال البولينية المبسطة لكل مخرج بدلالة متغيرات الإدخال.</li><li>ارسم المخطط المنطقي وتحقق من صحة التصميم (يدويًا أو بالمحاكاة).</li></ol></template>
-    <template class="content-en"><p>The design starts from specifications and culminates in a logic diagram. Steps:</p><ol><li>Determine required number of inputs and outputs and assign symbols.</li><li>Derive the truth table defining the relationship.</li><li>Obtain simplified Boolean functions for each output.</li><li>Draw the logic diagram and verify correctness.</li></ol></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>الخطوة الثالثة (التبسيط) حاسمة لتقليل تكلفة الأجهزة (Hardware cost).</p><p>استخدام خرائط كارنوف (K-maps) أو الطرق الجبرية يضمن استخدام أقل عدد ممكن من البوابات المنطقية.</p></template>
-    <template class="content-en"><p>Step 3 (simplification) is critical for minimizing hardware cost.</p><p>Utilizing K-maps or algebraic methods ensures the logic diagram uses the minimum number of gates and literals.</p></template>
-    <div class="content-target"></div>
-  </div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">لماذا نعتبر خطوة التحقق (Verification) ضرورية في نهاية التصميم؟</template>
-      <template class="content-en">Why is the verification step essential at the end of the design?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>لضمان أن التبسيط الجبري أو رسم البوابات لم يغير الوظيفة الأصلية المحددة في جدول الحقيقة.</p></template>
-      <template class="content-en"><p>To ensure that algebraic simplification or gate drawing did not alter the original functionality specified in the truth table.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-<section id="code-conversion" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">4</span> تحويل الأكواد (مثال: BCD إلى Excess-3)</h2></template>
-    <template class="content-en"><h2><span class="concept-number">4</span> Code Conversion (BCD to Excess-3)</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>دائرة تترجم البيانات من لغة ثنائية (مثل BCD) إلى لغة ثنائية أخرى (مثل Excess-3).</p></template>
-    <template class="content-en"><p>A circuit that translates data from one binary code (like BCD) to another (like Excess-3).</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>للتحويل من كود ثنائي A إلى كود ثنائي B، يجب أن توفر خطوط الإدخال تركيبة البتات للكود A وتولد خطوط الإخراج تركيبة البتات للكود B.</p><p>في مثال تحويل BCD إلى Excess-3، نستخدم 4 متغيرات إدخال (A, B, C, D) و 4 متغيرات إخراج (w, x, y, z).</p><p>نظرًا لأن BCD يستخدم فقط الأرقام من 0 إلى 9، فإن الحالات الست المتبقية (10 إلى 15) تعتبر <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">حالات عدم اكتراث</span> (Don't-care conditions).</p></template>
-    <template class="content-en"><p>To convert from code A to code B, input lines supply the bit combination of code A, and output lines generate code B.</p><p>In the BCD to Excess-3 example, there are 4 inputs (A, B, C, D) and 4 outputs (w, x, y, z).</p><p>Since BCD only represents decimal digits 0-9, the remaining 6 combinations (10-15) are <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">don't-care conditions</span>.</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>استخدام <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">حالات عدم الاكتراث</span> (X) في خرائط كارنوف يسمح بتبسيط الدوال البولينية بشكل كبير، حيث يمكن افتراض قيمتها 1 أو 0 بما يخدم تكوين مجموعات أكبر في الخريطة، مما يقلل من عدد البوابات المطلوبة.</p></template>
-    <template class="content-en"><p>Leveraging <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">don't-care conditions</span> (X) in K-maps allows for significant simplification of the Boolean functions.</p><p>By treating X as 1 or 0 strategically, larger groupings can be formed, reducing the final gate count.</p></template>
-    <div class="content-target"></div>
-  </div>
-
-  
-<div class="svg-diagram" data-diagram-id="2">
-<svg viewBox="0 0 1200 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
-  
-  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
-
-  
-  <text x="600" y="40" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">BCD to Excess-3 Logic Simplification / تبسيط المنطق لـ BCD إلى Excess-3</text>
-  <text x="600" y="65" font-size="16" text-anchor="middle" fill="var(--text-secondary)">K-Maps for outputs w, x, y, z (Cells 10-15 are Don't Cares 'X')</text>
-
-  <defs>
-    
-    <g id="kmap-grid">
-      
-      <rect x="45" y="45" width="180" height="180" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
-      
-      
-      <line x1="90" y1="45" x2="90" y2="225" stroke="var(--border-color)" stroke-width="1"/>
-      <line x1="135" y1="45" x2="135" y2="225" stroke="var(--border-color)" stroke-width="1"/>
-      <line x1="180" y1="45" x2="180" y2="225" stroke="var(--border-color)" stroke-width="1"/>
-      
-      
-      <line x1="45" y1="90" x2="225" y2="90" stroke="var(--border-color)" stroke-width="1"/>
-      <line x1="45" y1="135" x2="225" y2="135" stroke="var(--border-color)" stroke-width="1"/>
-      <line x1="45" y1="180" x2="225" y2="180" stroke="var(--border-color)" stroke-width="1"/>
-      
-      
-      <rect x="0" y="0" width="45" height="45" fill="none" stroke="var(--border-color)" stroke-width="2"/>
-      <line x1="0" y1="0" x2="45" y2="45" stroke="var(--border-color)" stroke-width="1"/>
-      <text x="12" y="35" font-size="13" font-weight="bold" fill="var(--text-secondary)">AB</text>
-      <text x="32" y="15" font-size="13" font-weight="bold" fill="var(--text-secondary)">CD</text>
-      
-      
-      <text x="67.5" y="30" font-size="14" text-anchor="middle" fill="var(--text-secondary)">00</text>
-      <text x="112.5" y="30" font-size="14" text-anchor="middle" fill="var(--text-secondary)">01</text>
-      <text x="157.5" y="30" font-size="14" text-anchor="middle" fill="var(--text-secondary)">11</text>
-      <text x="202.5" y="30" font-size="14" text-anchor="middle" fill="var(--text-secondary)">10</text>
-      
-      
-      <text x="22.5" y="72.5" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)">00</text>
-      <text x="22.5" y="117.5" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)">01</text>
-      <text x="22.5" y="162.5" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)">11</text>
-      <text x="22.5" y="207.5" font-size="14" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)">10</text>
-    </g>
-  </defs>
-
-  
-  
-  
-  <g transform="translate(60, 100)">
-    
-    <text x="135" y="-10" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">w = A + BC + BD</text>
-    
-    
-    <use href="#kmap-grid" x="0" y="0"/>
-    
-    
-    
-    <rect x="50" y="140" width="170" height="80" rx="15" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    <rect x="140" y="95" width="80" height="80" rx="15" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2"/>
-    
-    <rect x="95" y="95" width="80" height="80" rx="15" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="2 4"/>
-
-    
-    <text x="135" y="240" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">A</text>
-    <text x="230" y="120" font-size="14" font-weight="bold" text-anchor="start" fill="var(--brand-500)">BC</text>
-    <text x="230" y="150" font-size="14" font-weight="bold" text-anchor="start" fill="var(--brand-500)">BD</text>
-
-    
-    <g font-size="18" text-anchor="middle" dominant-baseline="central">
-      
-      <text x="67.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="112.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="202.5" y="67.5" fill="var(--text-muted)">0</text>
-      
-      <text x="67.5" y="112.5" fill="var(--text-muted)">0</text>
-      <text x="112.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="157.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="202.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      
-      <text x="67.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="112.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="157.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="157.5" fill="var(--text-secondary)">X</text>
-      
-      <text x="67.5" y="202.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="202.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="157.5" y="202.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="202.5" fill="var(--text-secondary)">X</text>
-    </g>
-  </g>
-
-  
-  
-  
-  <g transform="translate(345, 100)">
-    
-    <text x="135" y="-10" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">x = B'C + B'D + BC'D'</text>
-    
-    
-    <use href="#kmap-grid" x="0" y="0"/>
-    
-    
-    
-    <rect x="140" y="40" width="80" height="45" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-    <rect x="140" y="185" width="80" height="45" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    <rect x="95" y="40" width="80" height="45" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2"/>
-    <rect x="95" y="185" width="80" height="45" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2"/>
-    
-    <rect x="50" y="95" width="35" height="80" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-
-    
-    <text x="230" y="60" font-size="14" font-weight="bold" text-anchor="start" fill="var(--brand-500)">B'C</text>
-    <text x="230" y="210" font-size="14" font-weight="bold" text-anchor="start" fill="var(--brand-500)">B'D</text>
-    <text x="40" y="140" font-size="14" font-weight="bold" text-anchor="end" fill="var(--brand-500)">BC'D'</text>
-
-    
-    <g font-size="18" text-anchor="middle" dominant-baseline="central">
-      
-      <text x="67.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="112.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="157.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="202.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      
-      <text x="67.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="112.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="112.5" fill="var(--text-muted)">0</text>
-      <text x="202.5" y="112.5" fill="var(--text-muted)">0</text>
-      
-      <text x="67.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="112.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="157.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="157.5" fill="var(--text-secondary)">X</text>
-      
-      <text x="67.5" y="202.5" fill="var(--text-muted)">0</text>
-      <text x="112.5" y="202.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="157.5" y="202.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="202.5" fill="var(--text-secondary)">X</text>
-    </g>
-  </g>
-
-  
-  
-  
-  <g transform="translate(630, 100)">
-    
-    <text x="135" y="-10" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">y = CD + C'D'</text>
-    
-    
-    <use href="#kmap-grid" x="0" y="0"/>
-    
-    
-    
-    <rect x="140" y="50" width="35" height="170" rx="15" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    <rect x="50" y="50" width="35" height="170" rx="15" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-
-    
-    <text x="157.5" y="240" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">CD</text>
-    <text x="67.5" y="240" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">C'D'</text>
-
-    
-    <g font-size="18" text-anchor="middle" dominant-baseline="central">
-      
-      <text x="67.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="202.5" y="67.5" fill="var(--text-muted)">0</text>
-      
-      <text x="67.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="112.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="202.5" y="112.5" fill="var(--text-muted)">0</text>
-      
-      <text x="67.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="112.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="157.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="157.5" fill="var(--text-secondary)">X</text>
-      
-      <text x="67.5" y="202.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="202.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="202.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="202.5" fill="var(--text-secondary)">X</text>
-    </g>
-  </g>
-
-  
-  
-  
-  <g transform="translate(915, 100)">
-    
-    <text x="135" y="-10" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">z = D'</text>
-    
-    
-    <use href="#kmap-grid" x="0" y="0"/>
-    
-    
-    
-    <rect x="40" y="50" width="45" height="170" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-    <rect x="185" y="50" width="45" height="170" rx="10" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
-
-    
-    <text x="135" y="240" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">D'</text>
-
-    
-    <g font-size="18" text-anchor="middle" dominant-baseline="central">
-      
-      <text x="67.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="67.5" fill="var(--text-muted)">0</text>
-      <text x="202.5" y="67.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      
-      <text x="67.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="112.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="112.5" fill="var(--text-muted)">0</text>
-      <text x="202.5" y="112.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      
-      <text x="67.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="112.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="157.5" y="157.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="157.5" fill="var(--text-secondary)">X</text>
-      
-      <text x="67.5" y="202.5" font-weight="bold" fill="var(--text-primary)">1</text>
-      <text x="112.5" y="202.5" fill="var(--text-muted)">0</text>
-      <text x="157.5" y="202.5" fill="var(--text-secondary)">X</text>
-      <text x="202.5" y="202.5" fill="var(--text-secondary)">X</text>
-    </g>
-  </g>
-
-</svg>
-</div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">ماذا سيحدث إذا اعتبرنا الحالات من 10 إلى 15 أصفارًا بدلاً من حالات عدم اكتراث؟</template>
-      <template class="content-en">What would happen if we treated combinations 10-15 as zeros instead of don't-cares?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>ستصبح الدوال البولينية أكثر تعقيدًا وستتطلب الدائرة بوابات منطقية أكثر، مما يزيد من التكلفة.</p></template>
-      <template class="content-en"><p>The Boolean functions would be more complex, requiring more logic gates and increasing hardware cost.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-<section id="binary-adder-subtractor" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">5</span> الجامع-الطرح الثنائي (نصف الجامع والجامع الكامل)</h2></template>
-    <template class="content-en"><h2><span class="concept-number">5</span> Binary Adder-Subtractor (Half & Full Adder)</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>نصف الجامع يجمع بتين فقط، بينما الجامع الكامل يجمع ثلاثة بتات (بتين + حمل سابق).</p></template>
-    <template class="content-en"><p>A Half Adder adds two bits, while a Full Adder adds three bits (two bits + previous carry).</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>العملية الحسابية الأساسية هي جمع رقمين ثنائيين.</p><p>الدائرة التوافقية التي تقوم بجمع بتين تسمى <span class="smart-term" data-term-en="Half Adder" data-ar="نصف الجامع" data-en-def="A combinational circuit that adds two bits and produces a sum and a carry.">نصف الجامع</span> (Half Adder). تحتاج إلى مدخلين (x, y) ومخرجين: المجموع (S) والحمل (C). المخرج C يكون 1 فقط عندما يكون كلا المدخلين 1.</p><p>الدائرة التي تجمع ثلاثة بتات (بتين أساسيين وحمل سابق) تسمى <span class="smart-term" data-term-en="Full Adder" data-ar="الجامع الكامل" data-en-def="A combinational circuit that adds three bits (two bits and a previous carry).">الجامع الكامل</span> (Full Adder).</p></template>
-    <template class="content-en"><p>The most basic arithmetic operation is the addition of two binary digits.</p><p>A combinational circuit that performs the addition of two bits is a <span class="smart-term" data-term-en="Half Adder" data-ar="نصف الجامع" data-en-def="A combinational circuit that adds two bits and produces a sum and a carry.">Half Adder</span>. It has two inputs (x, y) and two outputs: Sum (S) and Carry (C). C is 1 only when both inputs are 1.</p><p>A circuit that adds three bits (two significant bits and a previous carry) is a <span class="smart-term" data-term-en="Full Adder" data-ar="الجامع الكامل" data-en-def="A combinational circuit that adds three bits (two bits and a previous carry).">Full Adder</span>.</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>يمكن تنفيذ <span class="smart-term" data-term-en="Half Adder" data-ar="نصف الجامع" data-en-def="A combinational circuit that adds two bits and produces a sum and a carry.">نصف الجامع</span> باستخدام بوابة XOR للمجموع (S = x ⊕ y) وبوابة AND للحمل (C = xy).</p><p>هذا التنفيذ هو الأكثر كفاءة من حيث عدد البوابات مقارنة باستخدام بوابات AND و OR و NOT الأساسية.</p></template>
-    <template class="content-en"><p>The <span class="smart-term" data-term-en="Half Adder" data-ar="نصف الجامع" data-en-def="A combinational circuit that adds two bits and produces a sum and a carry.">Half Adder</span> can be efficiently implemented using an XOR gate for the Sum (S = x ⊕ y) and an AND gate for the Carry (C = xy).</p><p>This is much more hardware-efficient than using standard sum-of-products with AND/OR/NOT gates.</p></template>
+    <template class="content-ar"><p>من الناحية الفيزيائية، الدائرة لا تخرج 'X'؛ بل ستخرج دائماً إما 0 أو 1.</p><p>الـ 'X' هي مجرد أداة تصميمية تمنح المهندس حرية اختيار المخرج الذي يقلل من تعقيد الأجهزة.</p><p>بمجرد بناء الدائرة، ستأخذ حالات الـ 'X' التي تم تضمينها في المجموعات قيمة 1، والتي تم تجاهلها قيمة 0.</p></template>
+    <template class="content-en"><p>Physically, logic gates do not output an 'X'; they always output a deterministic 0 or 1.</p><p>The 'X' is purely a design abstraction that gives the engineer the freedom to assign an output that minimizes hardware complexity.</p><p>Once the circuit is built, the 'X's included in K-map groups will physically output 1, and those left out will output 0.</p></template>
     <div class="content-target"></div>
   </div>
 
   <div class="formula-block">
     <div data-bilingual>
-      <template class="content-ar"><strong>المعادلات البولينية لمخرجات نصف الجامع.</strong></template>
-      <template class="content-en"><strong>Boolean equations for the Half Adder outputs.</strong></template>
+      <template class="content-ar"><strong>دالة منطقية تحتوي على حدود أساسية (m) وحالات عدم اكتراث (d).</strong></template>
+      <template class="content-en"><strong>A Boolean function with minterms (m) and don't care conditions (d).</strong></template>
       <div class="content-target"></div>
     </div>
-    <div class="math-block">$$S = x \oplus y, \quad C = xy$$</div>
+    <div class="math-block">$$F(A,B,C,D) = \sum m(1,3,7,11,15) + d(0,2,5)$$</div>
   </div>
 
   
-<div class="svg-diagram" data-diagram-id="1">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--brand-500)" />
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
     </marker>
-    
-    
-    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
-      <circle cx="5" cy="5" r="3" fill="var(--brand-500)" />
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
     </marker>
   </defs>
 
@@ -813,132 +469,938 @@
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
   
-  <g text-anchor="middle">
-    <text x="400" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)">Half Adder Logic Diagram</text>
-    <text x="400" y="65" font-size="18" fill="var(--text-secondary)">مخطط منطقي للجامع النصفي</text>
-  </g>
+  <text x="450" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Karnaugh Maps: Don't Care Conditions (X)</text>
+  <text x="450" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-secondary)" text-anchor="middle">خرائط كارنوف: حالات عدم الاكتراث</text>
 
   
-  <g fill="none" stroke="var(--brand-500)" stroke-width="3">
+  <g>
     
-    <path d="M 90 130 L 348 130" />
-    
-    <path d="M 90 270 L 360 270" />
+    <rect x="40" y="90" width="400" height="420" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
     
     
-    <path d="M 150 130 L 150 230 L 360 230" />
-    
-    <path d="M 250 270 L 250 170 L 348 170" />
-    
-    
-    <path d="M 450 150 L 530 150" marker-end="url(#arrow)" />
-    <path d="M 440 250 L 530 250" marker-end="url(#arrow)" />
-  </g>
+    <text x="240" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Optimal Grouping / تجميع مثالي</text>
 
-  
-  <circle cx="150" cy="130" r="5" fill="var(--brand-500)" />
-  <circle cx="250" cy="270" r="5" fill="var(--brand-500)" />
+    
+    <g transform="translate(0, 0)">
+      
+      <path d="M 100 140 L 140 140 L 140 180 L 100 180 Z" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
+      <line x1="100" y1="140" x2="140" y2="180" stroke="var(--border-color)" stroke-width="1.5" />
+      <text x="115" y="172" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">AB</text>
+      <text x="132" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">CD</text>
 
-  
-  <g stroke="var(--brand-500)" stroke-width="3">
-    
-    
-    <path d="M 345 110 Q 365 150 345 190" fill="none" />
-    
-    <path d="M 355 110 Q 375 150 355 190 Q 410 190 450 150 Q 410 110 355 110 Z" fill="var(--bg-elevated)" />
-    
-    
-    <path d="M 360 210 L 400 210 A 40 40 0 0 1 400 290 L 360 290 Z" fill="var(--bg-elevated)" />
-  </g>
+      
+      <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="165" y="170">00</text>
+        <text x="215" y="170">01</text>
+        <text x="265" y="170">11</text>
+        <text x="315" y="170">10</text>
+      </g>
 
-  
-  <g text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">
-    <text x="395" y="155">XOR</text>
-    <text x="390" y="255">AND</text>
-  </g>
+      
+      <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" dominant-baseline="central">
+        <text x="120" y="205">00</text>
+        <text x="120" y="255">01</text>
+        <text x="120" y="305">11</text>
+        <text x="120" y="355">10</text>
+      </g>
 
-  
-  <g text-anchor="end">
-    <text x="80" y="125" font-size="20" font-weight="bold" fill="var(--brand-500)">X</text>
-    <text x="80" y="145" font-size="14" fill="var(--text-secondary)">Input 1 / المدخل 1</text>
-    
-    <text x="80" y="265" font-size="20" font-weight="bold" fill="var(--brand-500)">Y</text>
-    <text x="80" y="285" font-size="14" fill="var(--text-secondary)">Input 2 / المدخل 2</text>
-  </g>
+      
+      <rect x="140" y="180" width="200" height="200" fill="none" stroke="var(--border-color)" stroke-width="2" />
+      <path d="M 140 230 L 340 230 M 140 280 L 340 280 M 140 330 L 340 330 M 190 180 L 190 380 M 240 180 L 240 380 M 290 180 L 290 380" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
 
-  
-  <g text-anchor="start">
-    <text x="545" y="145" font-size="20" font-weight="bold" fill="var(--brand-500)">S</text>
-    <text x="545" y="165" font-size="14" fill="var(--text-secondary)">Sum / المجموع</text>
+      
+      
+      <rect x="145" y="185" width="40" height="190" rx="15" fill="var(--brand-500)" opacity="0.2" />
+      <rect x="145" y="185" width="40" height="190" rx="15" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2" />
+      
+      
+      <rect x="245" y="185" width="90" height="90" rx="15" fill="var(--brand-500)" opacity="0.2" />
+      <rect x="245" y="185" width="90" height="90" rx="15" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+
+      
+      <g font-family="monospace" font-size="20" font-weight="bold" text-anchor="middle" dominant-baseline="central">
+        
+        <text x="165" y="205" fill="var(--brand-500)">X</text>
+        <text x="215" y="205" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="265" y="205" fill="var(--text-primary)">1</text>
+        <text x="315" y="205" fill="var(--text-primary)">1</text>
+        
+        <text x="165" y="255" fill="var(--text-primary)">1</text>
+        <text x="215" y="255" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="265" y="255" fill="var(--brand-500)">X</text>
+        <text x="315" y="255" fill="var(--brand-500)">X</text>
+        
+        <text x="165" y="305" fill="var(--text-primary)">1</text>
+        <text x="215" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="265" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="315" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
+        
+        <text x="165" y="355" fill="var(--brand-500)">X</text>
+        <text x="215" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="265" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="315" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
+      </g>
+    </g>
+
     
-    <text x="545" y="245" font-size="20" font-weight="bold" fill="var(--brand-500)">C</text>
-    <text x="545" y="265" font-size="14" fill="var(--text-secondary)">Carry / المحمول</text>
+    <path d="M 85 250 Q 85 205 135 205" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="85" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle">Treat X as 1</text>
+    <text x="85" y="290" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">اعتبار X كـ 1</text>
+
+    
+    <rect x="140" y="400" width="200" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="240" y="425" font-family="monospace" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">F = C'D' + A'C</text>
+    
+    
+    <text x="240" y="465" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Larger groups (4 cells) = Simpler terms</text>
+    <text x="240" y="485" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">مجموعات أكبر (4 خلايا) = حدود أبسط</text>
   </g>
 
   
   <g>
-    <text x="695" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)">Truth Table / جدول الحقيقة</text>
     
-    <rect x="620" y="120" width="150" height="160" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
-    
-    
-    <line x1="620" y1="155" x2="770" y2="155" stroke="var(--border-color)" stroke-width="2" />
-    <line x1="695" y1="120" x2="695" y2="280" stroke="var(--border-color)" stroke-width="2" />
+    <rect x="460" y="90" width="400" height="420" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
     
     
-    <g text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">
-      <text x="645" y="145">X</text>
-      <text x="675" y="145">Y</text>
-      <text x="715" y="145">S</text>
-      <text x="745" y="145">C</text>
+    <text x="660" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Suboptimal Grouping / تجميع غير مثالي</text>
+
+    
+    <g transform="translate(0, 0)">
+      
+      <path d="M 520 140 L 560 140 L 560 180 L 520 180 Z" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
+      <line x1="520" y1="140" x2="560" y2="180" stroke="var(--border-color)" stroke-width="1.5" />
+      <text x="535" y="172" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">AB</text>
+      <text x="552" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">CD</text>
+
+      
+      <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="585" y="170">00</text>
+        <text x="635" y="170">01</text>
+        <text x="685" y="170">11</text>
+        <text x="735" y="170">10</text>
+      </g>
+
+      
+      <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" dominant-baseline="central">
+        <text x="540" y="205">00</text>
+        <text x="540" y="255">01</text>
+        <text x="540" y="305">11</text>
+        <text x="540" y="355">10</text>
+      </g>
+
+      
+      <rect x="560" y="180" width="200" height="200" fill="none" stroke="var(--border-color)" stroke-width="2" />
+      <path d="M 560 230 L 760 230 M 560 280 L 760 280 M 560 330 L 760 330 M 610 180 L 610 380 M 660 180 L 660 380 M 710 180 L 710 380" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
+
+      
+      
+      <rect x="565" y="235" width="40" height="90" rx="15" fill="var(--text-muted)" opacity="0.2" />
+      <rect x="565" y="235" width="40" height="90" rx="15" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="4 2" />
+      
+      
+      <rect x="665" y="185" width="90" height="40" rx="15" fill="var(--text-muted)" opacity="0.2" />
+      <rect x="665" y="185" width="90" height="40" rx="15" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+
+      
+      <g font-family="monospace" font-size="20" font-weight="bold" text-anchor="middle" dominant-baseline="central">
+        
+        <text x="585" y="205" fill="var(--brand-500)">X</text>
+        <text x="635" y="205" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="685" y="205" fill="var(--text-primary)">1</text>
+        <text x="735" y="205" fill="var(--text-primary)">1</text>
+        
+        <text x="585" y="255" fill="var(--text-primary)">1</text>
+        <text x="635" y="255" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="685" y="255" fill="var(--brand-500)">X</text>
+        <text x="735" y="255" fill="var(--brand-500)">X</text>
+        
+        <text x="585" y="305" fill="var(--text-primary)">1</text>
+        <text x="635" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="685" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="735" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
+        
+        <text x="585" y="355" fill="var(--brand-500)">X</text>
+        <text x="635" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="685" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
+        <text x="735" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
+      </g>
     </g>
+
+    
+    <path d="M 505 250 Q 505 205 555 205" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+    <text x="505" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle">Treat X as 0</text>
+    <text x="505" y="290" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">اعتبار X كـ 0</text>
+
+    
+    <rect x="560" y="400" width="200" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="660" y="425" font-family="monospace" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">F = BC'D' + A'B'C</text>
     
     
-    <g text-anchor="middle" font-size="15" fill="var(--text-primary)">
+    <text x="660" y="465" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Smaller groups (2 cells) = Complex terms</text>
+    <text x="660" y="485" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">مجموعات أصغر (خليتين) = حدود معقدة</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يجب علينا تجميع كل علامات 'X' في خريطة كارنوف؟</template>
+      <template class="content-en">Do we have to group all the 'X's in a K-map?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، نجمع فقط علامات 'X' التي تساعدنا في تكوين مجموعات أكبر مع الآحاد. أي 'X' لا يفيد في التبسيط نتركه (ونعتبره 0).</p></template>
+      <template class="content-en"><p>No, we only group the 'X's that help us form larger groups with the 1s. Any 'X' that doesn't help simplify the expression is left ungrouped (treated as 0).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="universal-gates" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> البوابات الشاملة (NAND و NOR)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Universal Gates (NAND and NOR)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بوابات NAND و NOR تسمى بوابات شاملة لأنه يمكن بناء أي دائرة رقمية باستخدام نوع واحد منها فقط.</p></template>
+    <template class="content-en"><p>NAND and NOR are universal gates because any digital circuit can be built using only one of these types.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتبر بوابة NAND وبوابة NOR بوابات 'شاملة' (Universal). هذا يعني أن أي دائرة رقمية يمكن تصميمها وتنفيذها باستخدام بوابات NAND فقط، أو بوابات NOR فقط.</p><p>لإثبات ذلك، يكفي أن نثبت أن بوابة NAND قادرة على محاكاة عمل بوابات AND و OR و NOT الأساسية.</p><p>تُفضل هذه البوابات في الصناعة لأنها أسهل وأرخص في التصنيع باستخدام <span class="smart-term" data-term-en="CMOS Technology" data-ar="تقنية سيموس" data-en-def="Complementary Metal-Oxide-Semiconductor, a technology for constructing integrated circuits.">تقنية CMOS<span class="smart-term-tooltip"></span></span>.</p></template>
+    <template class="content-en"><p>NAND and NOR gates are considered 'Universal'. This means any digital circuit can be designed and realized using only NAND gates, or only NOR gates.</p><p>To prove a gate is universal, we only need to show it can emulate the basic AND, OR, and NOT gates.</p><p>Digital circuits are frequently constructed with only NAND or NOR implementations because they are easier to fabricate using <span class="smart-term" data-term-en="CMOS Technology" data-ar="تقنية سيموس" data-en-def="Complementary Metal-Oxide-Semiconductor, a technology for constructing integrated circuits.">CMOS technology<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في <span class="smart-term" data-term-en="CMOS Technology" data-ar="تقنية سيموس" data-en-def="Complementary Metal-Oxide-Semiconductor, a technology for constructing integrated circuits.">تقنية CMOS<span class="smart-term-tooltip"></span></span>، الترانزستورات تعكس الإشارة بشكل طبيعي. بناء بوابة NAND يتطلب 4 ترانزستورات فقط، بينما بناء بوابة AND يتطلب 6 ترانزستورات (بوابة NAND متبوعة بعاكس NOT).</p><p>لذلك، استخدام منطق NAND بالكامل يوفر مساحة السيليكون ويقلل من استهلاك الطاقة وتأخير الإشارة.</p></template>
+    <template class="content-en"><p>In <span class="smart-term" data-term-en="CMOS Technology" data-ar="تقنية سيموس" data-en-def="Complementary Metal-Oxide-Semiconductor, a technology for constructing integrated circuits.">CMOS technology<span class="smart-term-tooltip"></span></span>, transistors naturally act as inverters. A NAND gate requires only 4 transistors, whereas an AND gate requires 6 (a NAND gate followed by a NOT gate).</p><p>Therefore, mapping a circuit entirely to NAND logic saves silicon area, reduces power consumption, and minimizes propagation delay.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>ربط مدخلي بوابة NAND معاً يحولها إلى بوابة عاكسة (NOT).</strong></template>
+      <template class="content-en"><strong>Tying the inputs of a NAND gate together turns it into an inverter (NOT).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$X \cdot X = X' \quad (NAND \text{ as NOT})$$</div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+
+    
+    <g id="nand">
       
-      <text x="645" y="180">0</text>
-      <text x="675" y="180">0</text>
-      <text x="715" y="180">0</text>
-      <text x="745" y="180">0</text>
+      <path d="M 0,0 L 30,0 A 30,30 0 0,1 30,60 L 0,60 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
       
+      <circle cx="66" cy="30" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
       
-      <text x="645" y="210">0</text>
-      <text x="675" y="210">1</text>
-      <text x="715" y="210">1</text>
-      <text x="745" y="210">0</text>
+      <line x1="-15" y1="15" x2="0" y2="15" stroke="var(--brand-500)" stroke-width="2" />
+      <line x1="-15" y1="45" x2="0" y2="45" stroke="var(--brand-500)" stroke-width="2" />
       
-      
-      <text x="645" y="240">1</text>
-      <text x="675" y="240">0</text>
-      <text x="715" y="240">1</text>
-      <text x="745" y="240">0</text>
-      
-      
-      <text x="645" y="270">1</text>
-      <text x="675" y="270">1</text>
-      <text x="715" y="270">0</text>
-      <text x="745" y="270">1</text>
+      <line x1="72" y1="30" x2="87" y2="30" stroke="var(--brand-500)" stroke-width="2" />
     </g>
+  </defs>
+
+  
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  
+  <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)">Universal Property of NAND Gate (بوابة NAND كبوابة شاملة)</text>
+  <text x="400" y="65" text-anchor="middle" font-size="16" fill="var(--text-secondary)">Building basic logic gates using only NAND gates</text>
+
+  
+  
+  
+  <rect x="50" y="90" width="700" height="110" rx="8" fill="none" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="400" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">1. NOT Gate (بوابة نفي)</text>
+  
+  
+  <text x="170" y="165" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A</text>
+  
+  
+  <path d="M 190,160 L 290,160 M 290,145 L 290,175 M 290,145 L 335,145 M 290,175 L 335,175" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="290" cy="160" r="4" fill="var(--text-primary)" />
+  
+  
+  <text x="365" y="120" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
+  <use href="#nand" x="350" y="130" />
+  
+  
+  <line x1="437" y1="160" x2="510" y2="160" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="580" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">NOT A (A')</text>
+
+
+  
+  
+  
+  <rect x="50" y="220" width="700" height="140" rx="8" fill="none" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="400" y="245" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">2. AND Gate (بوابة و)</text>
+  
+  
+  <text x="170" y="290" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A</text>
+  <text x="170" y="320" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">B</text>
+  
+  
+  <path d="M 190,285 L 275,285 M 190,315 L 275,315" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  
+  
+  <use href="#nand" x="290" y="270" />
+  
+  
+  <text x="425" y="260" text-anchor="middle" font-size="14" fill="var(--text-secondary)">(A NAND B)</text>
+  
+  
+  <path d="M 377,300 L 410,300 M 410,285 L 410,315 M 410,285 L 455,285 M 410,315 L 455,315" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="410" cy="300" r="4" fill="var(--text-primary)" />
+  
+  
+  <text x="485" y="260" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
+  <use href="#nand" x="470" y="270" />
+  
+  
+  <line x1="557" y1="300" x2="610" y2="300" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="690" y="305" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">A AND B (A • B)</text>
+
+
+  
+  
+  
+  <rect x="50" y="380" width="700" height="190" rx="8" fill="none" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="400" y="405" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">3. OR Gate (بوابة أو)</text>
+  
+  
+  <text x="170" y="465" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A</text>
+  <text x="170" y="545" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">B</text>
+  
+  
+  <path d="M 190,460 L 230,460 M 230,445 L 230,475 M 230,445 L 275,445 M 230,475 L 275,475" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="230" cy="460" r="4" fill="var(--text-primary)" />
+  
+  <path d="M 190,540 L 230,540 M 230,525 L 230,555 M 230,525 L 275,525 M 230,555 L 275,555" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="230" cy="540" r="4" fill="var(--text-primary)" />
+  
+  
+  <text x="305" y="420" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
+  <use href="#nand" x="290" y="430" />
+  
+  <text x="305" y="500" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
+  <use href="#nand" x="290" y="510" />
+  
+  
+  <text x="410" y="450" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A'</text>
+  <text x="410" y="560" text-anchor="middle" font-size="14" fill="var(--text-secondary)">B'</text>
+  
+  
+  <path d="M 377,460 L 430,460 L 430,485 L 475,485" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+  <path d="M 377,540 L 430,540 L 430,515 L 475,515" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+  
+  
+  <use href="#nand" x="490" y="470" />
+  
+  
+  <line x1="577" y1="500" x2="610" y2="500" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="690" y="505" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">A OR B (A + B)</text>
+  
+  
+  <text x="690" y="535" text-anchor="middle" font-size="13" fill="var(--text-muted)">De Morgan's Law:</text>
+  <text x="690" y="555" text-anchor="middle" font-size="13" fill="var(--text-muted)">(A' • B')' = A + B</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>NAND</th><th>NOR</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">العملية المنطقية</template>
+          <template class="content-en">Logical Operation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">NOT AND</template>
+          <template class="content-en">NOT AND</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">NOT OR</template>
+          <template class="content-en">NOT OR</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الشمولية (Universality)</template>
+          <template class="content-en">Universality</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">شاملة (يمكن بناء أي دائرة بها)</template>
+          <template class="content-en">Universal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">شاملة (يمكن بناء أي دائرة بها)</template>
+          <template class="content-en">Universal</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لبوابة NAND أن تعمل كبوابة OR؟</template>
+      <template class="content-en">How can a NAND gate function as an OR gate?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بناءً على نظرية دي مورغان، إذا قمنا بعكس المدخلات قبل إدخالها إلى بوابة NAND، فإن النتيجة تكافئ بوابة OR.</p></template>
+      <template class="content-en"><p>Based on DeMorgan's theorem, inverting the inputs before feeding them into a NAND gate produces an OR function.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="all-nand-conversion" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> التحويل إلى دوائر NAND بالكامل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Conversion to all-NAND Circuits</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لتحويل دائرة AND-OR إلى NAND، نستبدل البوابات ونضيف فقاعات (Bubbles)، ثم نلغي الفقاعات المتقابلة ونضيف عواكس للفقاعات الفردية.</p></template>
+    <template class="content-en"><p>To convert AND-OR to all-NAND, replace gates with NAND equivalents, check for uncompensated bubbles, and add inverters where needed.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الإجراء العام لتحويل مخطط AND-OR متعدد المستويات إلى مخطط NAND بالكامل هو:</p><ol><li>تحويل جميع بوابات AND إلى بوابات NAND (باستخدام رمز AND-NOT).</li><li>تحويل جميع بوابات OR إلى بوابات NAND (باستخدام رمز NOT-OR).</li><li>فحص جميع الفقاعات (Bubbles) في المخطط؛ كل فقاعة لا يتم تعويضها بفقاعة أخرى على نفس الخط تتطلب إدراج عاكس (Inverter) أو عكس المتغير المدخل.</li></ol></template>
+    <template class="content-en"><p>The general procedure for converting a multi-level AND-OR diagram into an all-NAND diagram is:</p><ol><li>Convert all AND gates to NAND gates with AND-NOT graphic symbols.</li><li>Convert all OR gates to NAND gates with NOT-OR graphic symbols.</li><li>Check all the bubbles in the diagram. Every bubble that is not compensated by another along the same line will require the insertion of an inverter or complementing the input literal.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه الطريقة البصرية ('<span class="smart-term" data-term-en="Bubble Pushing" data-ar="دفع الفقاعات" data-en-def="A visual technique used in logic design to apply DeMorgan's theorem by moving inversion bubbles across logic gates.">دفع الفقاعات<span class="smart-term-tooltip"></span></span>') هي تطبيق مباشر لنظرية دي مورغان.</p><p>عندما نضع فقاعة على مخرج AND (لتصبح NAND) وفقاعة على مدخل OR (لتصبح NOT-OR، وهي تكافئ NAND)، فإن هاتين الفقاعتين على نفس السلك تلغيان بعضهما البعض (نفي النفي إثبات)، مما يحافظ على المنطق الأصلي للدائرة دون تغيير.</p></template>
+    <template class="content-en"><p>This visual '<span class="smart-term" data-term-en="Bubble Pushing" data-ar="دفع الفقاعات" data-en-def="A visual technique used in logic design to apply DeMorgan's theorem by moving inversion bubbles across logic gates.">bubble pushing<span class="smart-term-tooltip"></span></span>' method is a direct application of DeMorgan's theorem.</p><p>When we place a bubble on the output of an AND gate (making it NAND) and a bubble on the input of an OR gate (making it NOT-OR, which is equivalent to NAND), the two bubbles on the same wire cancel each other out (double negation), preserving the original Boolean logic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 850" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+  <defs>
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0,1 L 8,5 L 0,9 Z" fill="var(--brand-500)"/>
+    </marker>
+
+    
+    <g id="and-gate">
+      <path d="M 0,-30 L 30,-30 A 30,30 0 0,1 30,30 L 0,30 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
+    </g>
+
+    
+    <g id="or-gate">
+      <path d="M 0,-30 Q 40,-30 60,0 Q 40,30 0,30 Q 15,0 0,-30 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
+    </g>
+
+    
+    <g id="not-gate">
+      <path d="M 0,-15 L 30,0 L 0,15 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="35" cy="0" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
+    </g>
+
+    
+    <g id="bubble">
+      <circle cx="0" cy="0" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
+    </g>
+  </defs>
+
+  
+  <rect width="100%" height="100%" fill="var(--bg-surface)" rx="16" />
+
+  
+  
+  
+  <g transform="translate(0, 60)">
+    
+    <text x="400" y="0" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">Original AND-OR Circuit</text>
+    <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-secondary)">دارة AND-OR الأصلية</text>
+
+    
+    <g stroke="var(--text-primary)" stroke-width="2" fill="none" stroke-linejoin="round">
+      
+      <line x1="100" y1="105" x2="250" y2="105" />
+      <line x1="100" y1="135" x2="250" y2="135" />
+      
+      <line x1="100" y1="205" x2="250" y2="205" />
+      <line x1="100" y1="235" x2="250" y2="235" />
+      
+      <path d="M 100,280 L 440,280 L 440,185 L 506,185" />
+      
+      <path d="M 310,120 L 400,120 L 400,155 L 506,155" />
+      
+      <path d="M 310,220 L 420,220 L 420,170 L 508,170" />
+      
+      <line x1="560" y1="170" x2="650" y2="170" />
+    </g>
+
+    
+    <use href="#and-gate" x="250" y="120" />
+    <use href="#and-gate" x="250" y="220" />
+    <use href="#or-gate" x="500" y="170" />
+
+    
+    <text x="265" y="125" font-size="14" fill="var(--text-primary)" font-weight="bold">AND</text>
+    <text x="265" y="225" font-size="14" fill="var(--text-primary)" font-weight="bold">AND</text>
+    <text x="520" y="175" font-size="14" fill="var(--text-primary)" font-weight="bold">OR</text>
+
+    
+    <g font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
+      <text x="80" y="110">A</text>
+      <text x="80" y="140">B</text>
+      <text x="80" y="210">C</text>
+      <text x="80" y="240">D</text>
+      <text x="80" y="285">E</text>
+      <text x="670" y="175">Y</text>
+    </g>
+    <text x="650" y="145" font-size="14" fill="var(--text-secondary)">Y = AB + CD + E</text>
   </g>
 
   
-  <g>
-    <rect x="250" y="330" width="300" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
-    <text x="325" y="362" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">S = X ⊕ Y</text>
-    <text x="475" y="362" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">C = X · Y</text>
+  <line x1="100" y1="400" x2="700" y2="400" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 8" opacity="0.3" />
+
+  
+  
+  
+  <g transform="translate(0, 440)">
+    
+    <text x="400" y="0" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">Equivalent All-NAND Circuit</text>
+    <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-secondary)">دارة NAND المكافئة</text>
+
+    
+    
+    <path d="M 315,120 L 400,120 L 400,155 L 501,155" fill="none" stroke="var(--brand-500)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity="0.15"/>
+    <path d="M 315,120 L 400,120 L 400,155 L 501,155" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    
+    <path d="M 315,220 L 420,220 L 420,170 L 503,170" fill="none" stroke="var(--brand-500)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity="0.15"/>
+    <path d="M 315,220 L 420,220 L 420,170 L 503,170" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    
+    <circle cx="501" cy="185" r="14" fill="var(--brand-500)" opacity="0.15" />
+    <circle cx="501" cy="185" r="14" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
+    
+    
+    <rect x="235" y="255" width="65" height="50" rx="8" fill="var(--brand-500)" opacity="0.15" />
+    <rect x="235" y="255" width="65" height="50" rx="8" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
+
+    
+    <g stroke="var(--text-primary)" stroke-width="2" fill="none" stroke-linejoin="round">
+      
+      <line x1="100" y1="105" x2="250" y2="105" />
+      <line x1="100" y1="135" x2="250" y2="135" />
+      
+      <line x1="100" y1="205" x2="250" y2="205" />
+      <line x1="100" y1="235" x2="250" y2="235" />
+      
+      <line x1="100" y1="280" x2="250" y2="280" />
+      
+      <path d="M 320,120 L 400,120 L 400,155 L 496,155" />
+      
+      <path d="M 320,220 L 420,220 L 420,170 L 498,170" />
+      
+      <path d="M 290,280 L 440,280 L 440,185 L 496,185" />
+      
+      <line x1="560" y1="170" x2="650" y2="170" />
+    </g>
+
+    
+    <use href="#and-gate" x="250" y="120" />
+    <use href="#and-gate" x="250" y="220" />
+    <use href="#or-gate" x="500" y="170" />
+    <use href="#not-gate" x="250" y="280" />
+
+    
+    
+    <use href="#bubble" x="315" y="120" />
+    <use href="#bubble" x="315" y="220" />
+    
+    <use href="#bubble" x="501" y="155" />
+    <use href="#bubble" x="503" y="170" />
+    <use href="#bubble" x="501" y="185" />
+
+    
+    <text x="265" y="125" font-size="14" fill="var(--text-primary)" font-weight="bold">NAND</text>
+    <text x="265" y="225" font-size="14" fill="var(--text-primary)" font-weight="bold">NAND</text>
+    <text x="520" y="170" font-size="14" fill="var(--text-primary)" font-weight="bold">NAND</text>
+    <text x="520" y="185" font-size="11" fill="var(--text-secondary)">(Neg-OR)</text>
+    <text x="265" y="270" font-size="12" fill="var(--text-primary)" font-weight="bold">NOT</text>
+
+    
+    <g font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
+      <text x="80" y="110">A</text>
+      <text x="80" y="140">B</text>
+      <text x="80" y="210">C</text>
+      <text x="80" y="240">D</text>
+      <text x="80" y="285">E</text>
+      <text x="670" y="175">Y</text>
+    </g>
+    <text x="650" y="145" font-size="14" fill="var(--text-secondary)">Y = ((AB)'(CD)'E')'</text>
+
+    
+    
+    <text x="410" y="65" text-anchor="middle" font-size="15" fill="var(--brand-500)" font-weight="bold">Bubbles cancel out / الفقاعات تلغي بعضها</text>
+    <path d="M 410,75 L 400,105" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 410,75 L 420,155" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    
+    <text x="400" y="345" text-anchor="middle" font-size="15" fill="var(--brand-500)" font-weight="bold">Uncompensated bubble requires added NOT gate</text>
+    <text x="400" y="365" text-anchor="middle" font-size="15" fill="var(--brand-500)" font-weight="bold">فقاعة غير معوضة تتطلب إضافة بوابة نفي</text>
+    <path d="M 450,325 L 495,205" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 350,325 L 280,310" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
   </g>
 </svg>
 </div>
 
   <details class="thinking-question">
     <summary data-bilingual>
-      <template class="content-ar">لماذا لا يمكننا بناء آلة حاسبة لجمع أرقام من 8 بت باستخدام أنصاف الجامعات فقط؟</template>
-      <template class="content-en">Why can't we build an 8-bit calculator using only Half Adders?</template>
+      <template class="content-ar">ماذا نفعل إذا وجدنا فقاعة (Bubble) واحدة فقط على سلك يربط بين بوابتين؟</template>
+      <template class="content-en">What do we do if we find only a single uncompensated bubble on a wire connecting two gates?</template>
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>لأن نصف الجامع لا يمتلك مدخلاً لاستقبال الحمل (Carry-in) من الخانة السابقة، وهو أمر ضروري عند جمع أرقام متعددة البتات.</p></template>
-      <template class="content-en"><p>Because a Half Adder lacks a carry-in input to receive the carry from the previous lower-order bit addition, which is necessary for multi-bit addition.</p></template>
+      <template class="content-ar"><p>يجب علينا إضافة بوابة عاكس (NOT) على ذلك السلك، أو عكس المتغير المدخل إذا كان السلك متصلاً مباشرة بمدخل الدائرة، للحفاظ على المنطق الصحيح.</p></template>
+      <template class="content-en"><p>We must insert an inverter (NOT gate) on that line, or complement the input literal if it's an external input, to maintain the correct logic.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="nondegenerate-forms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> النماذج غير المتدهورة (Nondegenerate Forms)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Nondegenerate Forms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>من بين 16 تركيبة لبوابات المستوى الأول والثاني، هناك 8 تركيبات لا تنهار إلى عملية واحدة، وتسمى النماذج غير المتدهورة.</p></template>
+    <template class="content-en"><p>Out of 16 possible two-level gate combinations, 8 do not collapse into a single operation; these are called nondegenerate forms.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بالنظر إلى 4 أنواع من البوابات (AND, OR, NAND, NOR)، لدينا 16 تركيبة ممكنة لمستويين من البوابات.</p><ul><li>بعض هذه التركيبات <strong>'تتدهور' (Degenerate)</strong> إلى عملية واحدة (مثلاً AND-AND هي مجرد بوابة AND كبيرة).</li><li>التركيبات الأخرى <strong>'غير متدهورة' (Nondegenerate)</strong> وعددها 8، مثل AND-OR-INVERT و OR-AND-INVERT.</li></ul><p>هذه النماذج مفيدة جداً في التنفيذ الفعلي للدوائر، خاصة عند استخدام 'المنطق السلكي' (Wired Logic) حيث يتم ربط مخارج البوابات معاً فيزيائياً.</p></template>
+    <template class="content-en"><p>Considering four types of gates (AND, OR, NAND, NOR), we have 16 combinations for first-level and second-level gates.</p><ul><li>Some combinations will <strong>degenerate</strong> to a single operation (e.g., AND-AND degenerates to just an AND operation).</li><li>Other combinations are <strong>nondegenerate</strong> (cannot be folded into a single operation); we have 8 such combinations.</li></ul><p>Examples include AND-OR-INVERT and OR-AND-INVERT, which are highly relevant in implementations using <span class="smart-term" data-term-en="Wired Logic" data-ar="المنطق السلكي" data-en-def="A logic design technique where the outputs of two or more logic gates are physically connected together to perform an implicit AND or OR operation.">Wired Logic<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><ul><li><strong>تنفيذ AND-OR-INVERT (AOI)</strong> يتطلب إيجاد صيغة مجموع المضاريب (SOP) لمتمم الدالة.</li><li>بينما <strong>تنفيذ OR-AND-INVERT (OAI)</strong> يتطلب إيجاد صيغة مضروب المجاميع (POS) لمتمم الدالة.</li></ul><p>المنطق السلكي (Wired Logic) يسمح بتنفيذ هذه النماذج بعدد بوابات أقل عن طريق ربط المخارج معاً (مثل Wired-AND في بوابات TTL ذات المجمع المفتوح).</p></template>
+    <template class="content-en"><ul><li><strong>The AND-OR-INVERT (AOI) implementation</strong> requires the Sum-of-Products (SOP) expression of the complement of the function.</li><li>Conversely, <strong>OR-AND-INVERT (OAI)</strong> requires the Product-of-Sums (POS) expression of the complement.</li></ul><p>Wired logic allows these forms to be implemented with fewer physical gates by tying outputs together (e.g., Wired-AND in open-collector TTL gates).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تمثل نموذج AND-OR-INVERT.</strong></template>
+      <template class="content-en"><strong>Equation representing the AND-OR-INVERT form.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$F = ((AB) + (CD))'$$</div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+  <defs>
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    
+    <g id="oc-symbol" stroke="var(--brand-500)" stroke-width="1.5" fill="none">
+      <path d="M -5 0 L 0 -5 L 5 0 L 0 5 Z" />
+      <path d="M -5 8 L 5 8" />
+    </g>
+  </defs>
+
+  
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  
+  <text x="400" y="40" fill="var(--text-primary)" font-size="22" font-weight="bold" text-anchor="middle">Wired-AND in open-collector TTL NAND gates</text>
+  <text x="400" y="65" fill="var(--text-secondary)" font-size="16" text-anchor="middle">بوابات NAND ذات المجمع المفتوح (اتصال سلكي)</text>
+
+  
+  <path d="M 150 165 L 200 165 M 150 195 L 200 195 M 150 305 L 200 305 M 150 335 L 200 335" stroke="var(--brand-500)" stroke-width="2.5" fill="none" stroke-linecap="round" />
+
+  
+  <text x="135" y="171" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">A</text>
+  <text x="135" y="201" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">B</text>
+  <text x="135" y="311" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">C</text>
+  <text x="135" y="341" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">D</text>
+
+  
+  <path d="M 200 150 L 230 150 A 30 30 0 0 1 230 210 L 200 210 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
+  <circle cx="266" cy="180" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
+  <use href="#oc-symbol" x="245" y="180" />
+  
+  <text x="245" y="125" fill="var(--text-muted)" font-size="13" text-anchor="middle">مجمع مفتوح</text>
+  <text x="245" y="142" fill="var(--text-muted)" font-size="12" text-anchor="middle">Open-Collector</text>
+
+  
+  <path d="M 200 290 L 230 290 A 30 30 0 0 1 230 350 L 200 350 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
+  <circle cx="266" cy="320" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
+  <use href="#oc-symbol" x="245" y="320" />
+
+  <text x="245" y="265" fill="var(--text-muted)" font-size="13" text-anchor="middle">مجمع مفتوح</text>
+  <text x="245" y="282" fill="var(--text-muted)" font-size="12" text-anchor="middle">Open-Collector</text>
+
+  
+  <text x="335" y="170" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle">X = (AB)'</text>
+  <text x="335" y="310" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle">Y = (CD)'</text>
+
+  
+  <path d="M 272 180 L 400 180 L 400 320 L 272 320" stroke="var(--brand-500)" stroke-width="2.5" fill="none" stroke-linejoin="round" />
+  <path d="M 400 250 L 560 250" stroke="var(--brand-500)" stroke-width="2.5" fill="none" />
+  
+  
+  <circle cx="400" cy="250" r="5" fill="var(--brand-500)" />
+  <circle cx="450" cy="250" r="5" fill="var(--brand-500)" />
+
+  
+  <rect x="385" y="235" width="80" height="30" fill="var(--brand-500)" fill-opacity="0.05" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" rx="4" />
+
+  
+  <path d="M 450 250 L 450 160 L 440 155 L 460 145 L 440 135 L 460 125 L 440 115 L 460 105 L 450 100 L 450 70" stroke="var(--brand-500)" stroke-width="2.5" fill="none" stroke-linejoin="round" />
+  
+  
+  <circle cx="450" cy="65" r="5" fill="none" stroke="var(--brand-500)" stroke-width="2.5" />
+  <text x="450" y="50" fill="var(--text-primary)" font-size="15" font-weight="bold" text-anchor="middle">V<tspan baseline-shift="sub" font-size="11">CC</tspan></text>
+
+  
+  
+  <text x="290" y="245" fill="var(--text-secondary)" font-size="14" font-weight="bold" text-anchor="middle">Wired-AND Junction</text>
+  <text x="290" y="265" fill="var(--text-muted)" font-size="14" text-anchor="middle">وصلة سلكية</text>
+  <path d="M 355 250 L 375 250" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+
+  
+  <text x="540" y="120" fill="var(--text-secondary)" font-size="14" font-weight="bold" text-anchor="middle">Pull-up Resistor (R<tspan baseline-shift="sub" font-size="10">p</tspan>)</text>
+  <text x="540" y="140" fill="var(--text-muted)" font-size="14" text-anchor="middle">مقاومة رفع</text>
+  <path d="M 485 120 L 465 120" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
+
+  
+  <rect x="560" y="210" width="200" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text x="660" y="240" fill="var(--brand-500)" font-size="20" font-weight="bold" text-anchor="middle">F = (AB + CD)'</text>
+  <text x="660" y="270" fill="var(--text-secondary)" font-size="14" text-anchor="middle">Derivation: F = X · Y</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نعتبر تركيبة OR-OR تركيبة متدهورة (Degenerate)؟</template>
+      <template class="content-en">Why is the OR-OR combination considered degenerate?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مستويين من بوابات OR المتتالية يقومان بنفس وظيفة بوابة OR واحدة كبيرة، فلا يقدمان منطقاً ثنائي المستوى حقيقياً.</p></template>
+      <template class="content-en"><p>Because two successive levels of OR gates perform the exact same function as a single, larger OR gate, offering no true two-level logic capability.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="xor-and-parity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> بوابة الاستبعاد (XOR) والتكافؤ</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Exclusive OR (XOR) and Parity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بوابة XOR تخرج 1 إذا كان عدد الآحاد في المدخلات فردياً، وتستخدم بشكل أساسي لاكتشاف الأخطاء عبر <span class="smart-term" data-term-en="Parity Bit" data-ar="بت التكافؤ" data-en-def="An extra bit added to a string of binary code to ensure that the total number of 1-bits is either even or odd, used for error detection.">بت التكافؤ<span class="smart-term-tooltip"></span></span>.</p></template>
+    <template class="content-en"><p>The XOR gate outputs 1 if an odd number of inputs are 1; it is primarily used for error detection via <span class="smart-term" data-term-en="Parity Bit" data-ar="بت التكافؤ" data-en-def="An extra bit added to a string of binary code to ensure that the total number of 1-bits is either even or odd, used for error detection.">parity bit<span class="smart-term-tooltip"></span></span>s.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بوابة الاستبعاد المنطقي (XOR) هي عملية منطقية تخرج 1 إذا اختلفت المدخلات. لثلاثة متغيرات أو أكثر، تُعرف XOR بـ 'الدالة الفردية' (Odd Function)، حيث تساوي 1 فقط إذا كان عدد المتغيرات التي تساوي 1 فردياً.</p><p>هذه الخاصية تجعلها مثالية في الأنظمة الرقمية للعمليات الحسابية واكتشاف الأخطاء.</p><p>'<span class="smart-term" data-term-en="Parity Bit" data-ar="بت التكافؤ" data-en-def="An extra bit added to a string of binary code to ensure that the total number of 1-bits is either even or odd, used for error detection.">بت التكافؤ<span class="smart-term-tooltip"></span></span>' هو بت إضافي يُضاف إلى الرسالة لجعل إجمالي عدد الآحاد زوجياً (أو فردياً). يتم استخدام بوابات XOR لبناء 'مولد التكافؤ' عند الإرسال، و'فاحص التكافؤ' عند الاستقبال.</p></template>
+    <template class="content-en"><p>The Exclusive OR (XOR) is a logical operation that outputs 1 if the inputs differ. For three or more variables, XOR acts as an 'odd function', equaling 1 only if an odd number of variables are equal to 1.</p><p>This makes it highly useful in digital system design for arithmetic operations and error detection/correction.</p><p>A '<span class="smart-term" data-term-en="Parity Bit" data-ar="بت التكافؤ" data-en-def="An extra bit added to a string of binary code to ensure that the total number of 1-bits is either even or odd, used for error detection.">parity bit<span class="smart-term-tooltip"></span></span>' is an extra bit added to a message to make the total number of 1s even (or odd). XOR gates are used to build parity generators (at the transmitter) and parity checkers (at the receiver).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>نظام التكافؤ البسيط يمكنه اكتشاف أخطاء البت الواحد (Single-bit errors).</p><p>إذا انقلب بت واحد بسبب تشويش، سيتغير عدد الآحاد من زوجي إلى فردي، وسيقوم فاحص التكافؤ (المكون من بوابات XOR) بإخراج 1 للإشارة إلى وجود خطأ.</p><p>ومع ذلك، إذا انقلب بتان في نفس الوقت، سيبقى العدد زوجياً ولن يكتشف النظام الخطأ.</p></template>
+    <template class="content-en"><p>A simple parity system is excellent for detecting single-bit errors.</p><p>If noise flips one bit, the count of 1s changes from even to odd, and the parity checker (a cascade of XOR gates) will output a 1, flagging an error.</p><p>However, it cannot detect two-bit errors, because flipping two bits maintains the original even/odd parity state.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة XOR لثلاثة متغيرات (الدالة الفردية).</strong></template>
+      <template class="content-en"><strong>XOR equation for three variables (the odd function).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$A \oplus B \oplus C = \sum m(1, 2, 4, 7)$$</div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 8 5 L 0 9 Z" fill="var(--brand-500)"/>
+        </marker>
+
+        
+        <g id="xor">
+            
+            <path d="M 0,0 C 10,10 10,30 0,40" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+            
+            <path d="M 10,0 C 30,0 50,10 60,20 C 50,30 30,40 10,40 C 20,30 20,10 10,0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+            
+            <text x="32" y="24" font-size="13" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">XOR</text>
+        </g>
+    </defs>
+
+    
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    
+    <text x="450" y="40" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">3-Bit Even Parity Generator &amp; 4-Bit Checker</text>
+    <text x="450" y="70" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--text-secondary)">مُولد ومدقق التكافؤ الزوجي</text>
+
+    
+    
+    
+    
+    
+    <rect x="30" y="100" width="370" height="210" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 4" opacity="0.5"/>
+    <text x="215" y="130" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">Parity Generator (مُولد)</text>
+
+    
+    <text x="40" y="185" font-size="16" font-weight="bold" fill="var(--text-primary)">x</text>
+    <text x="40" y="205" font-size="16" font-weight="bold" fill="var(--text-primary)">y</text>
+    <text x="40" y="265" font-size="16" font-weight="bold" fill="var(--text-primary)">z</text>
+
+    
+    <path d="M 60,180 L 145,180" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 60,200 L 145,200" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 60,260 L 285,260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    
+    <use href="#xor" x="150" y="170"/>
+    
+    
+    <path d="M 210,190 L 250,190 L 250,240 L 285,240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="230" y="180" font-size="14" fill="var(--text-secondary)">x &#x2295; y</text>
+
+    
+    <use href="#xor" x="290" y="230"/>
+
+    
+    <path d="M 350,250 L 375,250" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="385" y="255" font-size="16" font-weight="bold" fill="var(--text-primary)">P</text>
+    <text x="385" y="275" font-size="13" fill="var(--text-muted)">Parity Bit</text>
+    <text x="350" y="295" font-size="14" text-anchor="middle" fill="var(--text-secondary)">P = x &#x2295; y &#x2295; z</text>
+
+
+    
+    
+    
+
+    
+    <rect x="430" y="100" width="440" height="210" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 4" opacity="0.5"/>
+    <text x="650" y="130" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">Parity Checker (مدقق)</text>
+
+    
+    <text x="450" y="155" font-size="16" font-weight="bold" fill="var(--text-primary)">x</text>
+    <text x="450" y="175" font-size="16" font-weight="bold" fill="var(--text-primary)">y</text>
+    <text x="450" y="275" font-size="16" font-weight="bold" fill="var(--text-primary)">z</text>
+    <text x="450" y="295" font-size="16" font-weight="bold" fill="var(--text-primary)">P</text>
+
+    
+    <path d="M 470,150 L 545,150" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 470,170 L 545,170" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 470,270 L 545,270" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 470,290 L 545,290" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    
+    <use href="#xor" x="550" y="140"/>
+    
+    
+    <use href="#xor" x="550" y="260"/>
+
+    
+    <path d="M 610,160 L 650,160 L 650,210 L 685,210" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="630" y="150" font-size="14" fill="var(--text-secondary)">x &#x2295; y</text>
+
+    <path d="M 610,280 L 650,280 L 650,230 L 685,230" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="630" y="270" font-size="14" fill="var(--text-secondary)">z &#x2295; P</text>
+
+    
+    <use href="#xor" x="690" y="200"/>
+
+    
+    <path d="M 750,220 L 775,220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="785" y="225" font-size="16" font-weight="bold" fill="var(--text-primary)">C</text>
+    <text x="785" y="245" font-size="13" fill="var(--text-muted)">Check Bit</text>
+
+
+    
+    
+    
+    <rect x="250" y="340" width="400" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="450" y="365" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Error Check Logic (منطق التحقق)</text>
+    <text x="450" y="395" font-size="15" text-anchor="middle" fill="var(--text-secondary)">C = 0 : Data Valid (بيانات صحيحة)  |  C = 1 : Error (يوجد خطأ)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا استقبلنا البيانات 1011 مع بت تكافؤ زوجي (Even Parity)، هل يوجد خطأ؟</template>
+      <template class="content-en">If we receive the data 1011 in an Even Parity system, is there an error?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، يوجد خطأ. البيانات 1011 تحتوي على ثلاثة آحاد (عدد فردي)، بينما يتطلب التكافؤ الزوجي أن يكون إجمالي عدد الآحاد زوجياً.</p></template>
+      <template class="content-en"><p>Yes, there is an error. The data 1011 contains three 1s (an odd number), whereas an even parity system requires the total number of 1s to be even.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
@@ -950,8 +1412,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في وحدة المنطق التوافقي. هذه الوحدة هي حجر الأساس لكل ما سنبنيه لاحقاً. تخيلوا الدائرة التوافقية كآلة حاسبة بسيطة: تعطيها أرقاماً، تعطيك النتيجة فوراً، ولا تتذكر ما فعلته في العملية السابقة. السر هنا هو 'لا توجد تغذية راجعة'. في الامتحان، ركزوا جيداً على التمييز بين التحليل (حيث نعطيك الرسمة ونطلب المعادلة) والتصميم (حيث نعطيك الفكرة ونطلب الرسمة). لا تنسوا خطوات التصميم الأربع: المدخلات/المخرجات، جدول الحقيقة، التبسيط (وهنا تبرز أهمية حالات عدم الاكتراث كما رأينا في BCD)، وأخيراً الرسم. وأخيراً، الجامعات الثنائية: نصف الجامع هو صديقكم البسيط ببوابتي XOR و AND، لكن تذكروا أنه لا يكفي لجمع أرقام كبيرة لأنه يفتقر لمدخل الحمل السابق، وهنا يأتي دور الجامع الكامل. راجعوا هذه المفاهيم جيداً، فهي مضمونة في الاختبار!</template>
-    <template class="content-en">Welcome, future engineers, to Combinational Logic. This module is the bedrock of digital design. Think of a combinational circuit as a simple calculator: it processes current inputs instantly with zero memory of the past. The golden rule? 'No feedback paths'. For the exam, clearly distinguish between Analysis (we give the diagram, you find the equation) and Design (we give the spec, you draw the diagram). Master the 4 design steps: I/O definition, Truth Table, Simplification (don't-cares are your best friends here, like in BCD), and Logic Diagram. Finally, the adders: the Half Adder is elegant with its XOR and AND gates, but remember its fatal flaw—no carry-in. That's why we need Full Adders for real arithmetic. Review these core concepts; they are guaranteed exam points!</template>
+    <template class="content-ar">أهلاً بكم في الوحدة الخامسة. اليوم ننتقل من الجانب النظري البحت للجبر البولياني إلى الجانب العملي لتصميم الأجهزة. لقد تعلمنا سابقاً كيف نبسط المعادلات باستخدام الآحاد (SOP)، لكن ماذا لو كان تجميع الأصفار أسهل؟ هنا يأتي دور تبسيط POS. كما أننا في العالم الحقيقي لا نهتم ببعض المدخلات (Don't Cares)، مما يعطينا حرية أكبر في التبسيط. الأهم في هذه الوحدة هو فهم 'البوابات الشاملة' (NAND و NOR). في المصانع، من الأرخص بكثير طباعة ملايين البوابات من نفس النوع (NAND) بدلاً من خلط AND و OR. لذلك، مهارة تحويل أي دائرة إلى NAND بالكامل هي مهارة أساسية لأي مهندس حاسب. أخيراً، تعرفنا على بوابة XOR، وهي الحارس الأمين للبيانات، حيث تستخدم في توليد وفحص بتات التكافؤ لاكتشاف الأخطاء أثناء نقل البيانات. ركزوا على طريقة 'دفع الفقاعات' وفهم الدالة الفردية لـ XOR، فهذه مواضيع مفضلة في الامتحانات!</template>
+    <template class="content-en">Welcome to Module 5. Today we transition from pure Boolean algebra to practical hardware design. We previously learned SOP simplification, but what if grouping 0s is easier? That's where POS simplification comes in. We also introduced Don't Cares, which give us design flexibility for impossible states. The crown jewel of this module is 'Universal Gates' (NAND and NOR). In silicon fabrication, it's vastly cheaper to print millions of identical NAND gates rather than mixing ANDs and ORs. Thus, converting any circuit to all-NAND is a critical engineering skill. Finally, we met the XOR gate, the guardian of data integrity, used for parity generation and error detection. Focus heavily on the 'bubble pushing' conversion method and the odd-function nature of XOR—these are classic exam favorites!</template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -962,16 +1424,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هو الشرط الأساسي لتصنيف الدائرة على أنها توافقية؟</template>
-          <template class="content-en">What is the primary condition for a circuit to be classified as combinational?</template>
-          <span class="content-target">ما هو الشرط الأساسي لتصنيف الدائرة على أنها توافقية؟</span>
+          <template class="content-ar">لماذا نستخدم صيغة POS إذا كانت صيغة SOP تفي بالغرض؟</template>
+          <template class="content-en">Why do we use the POS form if the SOP form works fine?</template>
+          <span class="content-target">لماذا نستخدم صيغة POS إذا كانت صيغة SOP تفي بالغرض؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">يجب ألا تحتوي على أي مسارات تغذية راجعة (Feedback paths) أو عناصر ذاكرة. المخرجات تعتمد فقط على المدخلات الحالية.</template>
-          <template class="content-en">It must not contain any feedback paths or memory elements. Outputs depend strictly on present inputs.</template>
+          <template class="content-ar">في بعض الدوال، يكون عدد الأصفار أقل بكثير من الآحاد، مما يجعل تجميع الأصفار (POS) ينتج دائرة أصغر وأرخص وأسرع من تجميع الآحاد (SOP).</template>
+          <template class="content-en">For some functions, there are far fewer 0s than 1s. Grouping 0s (POS) results in a smaller, cheaper, and faster circuit than grouping 1s (SOP).</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -979,16 +1441,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هي الخطوة الأولى والأهم قبل البدء في تحليل أي دائرة منطقية؟</template>
-          <template class="content-en">What is the first and most important step before analyzing any logic circuit?</template>
-          <span class="content-target">ما هي الخطوة الأولى والأهم قبل البدء في تحليل أي دائرة منطقية؟</span>
+          <template class="content-ar">هل يمكن أن تأخذ حالة عدم الاكتراث 'X' قيمة 1 في مجموعة وقيمة 0 في مجموعة أخرى لنفس الدائرة؟</template>
+          <template class="content-en">Can a Don't Care 'X' take a value of 1 in one group and 0 in another for the same circuit?</template>
+          <span class="content-target">هل يمكن أن تأخذ حالة عدم الاكتراث 'X' قيمة 1 في مجموعة وقيمة 0 في مجموعة أخرى لنفس الدائرة؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">التأكد من أن الدائرة توافقية وليست تتابعية من خلال فحص المخطط للتأكد من عدم وجود تغذية راجعة.</template>
-          <template class="content-en">Verify that the circuit is combinational and not sequential by checking the diagram for the absence of feedback paths.</template>
+          <template class="content-ar">لا، كل 'X' محددة في الخريطة يجب أن تُعامل إما كـ 1 (إذا ضممناها لمجموعة) أو كـ 0 (إذا تركناها). بمجرد بناء الدائرة، ستكون قيمتها ثابتة فيزيائياً.</template>
+          <template class="content-en">No, each specific 'X' in the map must be treated as either a 1 (if included in a group) or a 0 (if left out). Once the circuit is built, its physical output is fixed.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -996,16 +1458,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">لماذا نستخدم التعويض المتكرر في إجراء التحليل؟</template>
-          <template class="content-en">Why do we use repeated substitution in the analysis procedure?</template>
-          <span class="content-target">لماذا نستخدم التعويض المتكرر في إجراء التحليل؟</span>
+          <template class="content-ar">لماذا تعتبر بوابات NAND أسهل في التصنيع من بوابات AND؟</template>
+          <template class="content-en">Why are NAND gates easier to fabricate than AND gates?</template>
+          <span class="content-target">لماذا تعتبر بوابات NAND أسهل في التصنيع من بوابات AND؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">للتخلص من المتغيرات الوسيطة (مخرجات البوابات الداخلية) والتعبير عن المخرج النهائي بدلالة المدخلات الأصلية فقط.</template>
-          <template class="content-en">To eliminate intermediate variables (internal gate outputs) and express the final output solely in terms of the original input variables.</template>
+          <template class="content-ar">تقنية CMOS تعكس الإشارات بطبيعتها. بوابة NAND تتطلب 4 ترانزستورات، بينما بوابة AND تتطلب 6 (لأنها NAND متبوعة بعاكس NOT).</template>
+          <template class="content-en">CMOS technology naturally inverts signals. A NAND gate requires 4 transistors, while an AND gate requires 6 (it's a NAND followed by a NOT inverter).</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1013,16 +1475,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هي الخطوات الأربع لتصميم دائرة توافقية؟</template>
-          <template class="content-en">What are the four steps to design a combinational circuit?</template>
-          <span class="content-target">ما هي الخطوات الأربع لتصميم دائرة توافقية؟</span>
+          <template class="content-ar">ما هي أسرع طريقة لتحويل دائرة AND-OR إلى NAND بالكامل؟</template>
+          <template class="content-en">What is the fastest way to convert an AND-OR circuit to all-NAND?</template>
+          <span class="content-target">ما هي أسرع طريقة لتحويل دائرة AND-OR إلى NAND بالكامل؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">1. تحديد المدخلات والمخرجات. 2. استنتاج جدول الحقيقة. 3. الحصول على الدوال البولينية المبسطة. 4. رسم المخطط المنطقي.</template>
-          <template class="content-en">1. Determine inputs/outputs. 2. Derive truth table. 3. Obtain simplified Boolean functions. 4. Draw logic diagram.</template>
+          <template class="content-ar">استخدم طريقة 'دفع الفقاعات'. ضع فقاعة على مخرج AND (لتصبح NAND) وفقاعة على مدخل OR (لتصبح NOT-OR = NAND). الفقاعتان على نفس السلك تلغيان بعضهما.</template>
+          <template class="content-en">Use 'bubble pushing'. Place a bubble on the AND output (making it NAND) and a bubble on the OR input (making it NOT-OR = NAND). Two bubbles on the same wire cancel out.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1030,16 +1492,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">في مثال تحويل BCD إلى Excess-3، لماذا نستخدم حالات عدم الاكتراث (Don't-cares)؟</template>
-          <template class="content-en">In the BCD to Excess-3 example, why do we use don't-care conditions?</template>
-          <span class="content-target">في مثال تحويل BCD إلى Excess-3، لماذا نستخدم حالات عدم الاكتراث (Don't-cares)؟</span>
+          <template class="content-ar">ماذا لو لم تلغِ الفقاعات بعضها البعض؟</template>
+          <template class="content-en">What if the bubbles don't cancel each other out?</template>
+          <span class="content-target">ماذا لو لم تلغِ الفقاعات بعضها البعض؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لأن كود BCD يستخدم فقط الأرقام من 0 إلى 9. الحالات من 10 إلى 15 لن تحدث أبداً، لذا نستخدمها كحالات عدم اكتراث لتبسيط الدوال البولينية وتقليل البوابات.</template>
-          <template class="content-en">Because BCD only uses digits 0-9. Combinations 10-15 will never occur, so we use them as don't-cares to simplify the Boolean functions and reduce gate count.</template>
+          <template class="content-ar">إذا بقيت فقاعة مفردة على سلك، يجب عليك إضافة بوابة عاكس (NOT) على ذلك السلك للحفاظ على المنطق الصحيح.</template>
+          <template class="content-en">If a single bubble remains uncompensated on a wire, you must add an inverter (NOT gate) to that wire to maintain the correct logic.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1047,16 +1509,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هو نصف الجامع (Half Adder)؟</template>
-          <template class="content-en">What is a Half Adder?</template>
-          <span class="content-target">ما هو نصف الجامع (Half Adder)؟</span>
+          <template class="content-ar">ما هو المنطق السلكي (Wired Logic)؟</template>
+          <template class="content-en">What is Wired Logic?</template>
+          <span class="content-target">ما هو المنطق السلكي (Wired Logic)؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">دائرة توافقية تجمع بتين ثنائيين وتنتج مخرجين: المجموع (Sum) والحمل (Carry).</template>
-          <template class="content-en">A combinational circuit that adds two binary bits and produces two outputs: Sum and Carry.</template>
+          <template class="content-ar">هو ربط مخارج بوابتين فيزيائياً بسلك واحد. في بعض التقنيات (مثل TTL)، هذا الربط يعمل كبوابة AND أو OR إضافية مجانية بدون الحاجة لعتاد إضافي.</template>
+          <template class="content-en">It's physically tying the outputs of two gates together with a wire. In certain technologies (like TTL), this connection acts as a free AND or OR gate without extra hardware.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1064,16 +1526,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف يتم تنفيذ دالة المجموع (Sum) في نصف الجامع بأكثر الطرق كفاءة؟</template>
-          <template class="content-en">How is the Sum function in a Half Adder most efficiently implemented?</template>
-          <span class="content-target">كيف يتم تنفيذ دالة المجموع (Sum) في نصف الجامع بأكثر الطرق كفاءة؟</span>
+          <template class="content-ar">ماذا يعني 'نموذج متدهور' (Degenerate form)؟</template>
+          <template class="content-en">What does a 'Degenerate form' mean?</template>
+          <span class="content-target">ماذا يعني 'نموذج متدهور' (Degenerate form)؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">باستخدام بوابة XOR واحدة (S = x ⊕ y).</template>
-          <template class="content-en">Using a single XOR gate (S = x ⊕ y).</template>
+          <template class="content-ar">يعني أن استخدام مستويين من البوابات لا يضيف قيمة منطقية جديدة، بل ينهار لعملية واحدة. مثلاً، ربط بوابات AND ببوابة AND أخرى هو مجرد بوابة AND كبيرة.</template>
+          <template class="content-en">It means using two levels of gates adds no new logical value and collapses into a single operation. For example, feeding AND gates into another AND gate is just one big AND gate.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1081,16 +1543,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف يتم تنفيذ دالة الحمل (Carry) في نصف الجامع؟</template>
-          <template class="content-en">How is the Carry function in a Half Adder implemented?</template>
-          <span class="content-target">كيف يتم تنفيذ دالة الحمل (Carry) في نصف الجامع؟</span>
+          <template class="content-ar">لماذا تسمى بوابة XOR بـ 'الدالة الفردية'؟</template>
+          <template class="content-en">Why is the XOR gate called the 'Odd Function'?</template>
+          <span class="content-target">لماذا تسمى بوابة XOR بـ 'الدالة الفردية'؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">باستخدام بوابة AND واحدة (C = xy).</template>
-          <template class="content-en">Using a single AND gate (C = xy).</template>
+          <template class="content-ar">لأنه عند استخدام 3 مدخلات أو أكثر، فإن مخرج XOR يكون 1 فقط إذا كان عدد المدخلات التي قيمتها 1 هو عدد فردي (1، 3، 5...).</template>
+          <template class="content-en">Because with 3 or more inputs, the XOR output is 1 only if the count of inputs that are 1 is an odd number (1, 3, 5...).</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1098,16 +1560,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هو العيب الرئيسي لنصف الجامع الذي يمنع استخدامه وحده لجمع أرقام كبيرة؟</template>
-          <template class="content-en">What is the main drawback of a Half Adder that prevents its sole use in adding large numbers?</template>
-          <span class="content-target">ما هو العيب الرئيسي لنصف الجامع الذي يمنع استخدامه وحده لجمع أرقام كبيرة؟</span>
+          <template class="content-ar">كيف يعمل بت التكافؤ (Parity Bit)؟</template>
+          <template class="content-en">How does a Parity Bit work?</template>
+          <span class="content-target">كيف يعمل بت التكافؤ (Parity Bit)؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لا يحتوي على مدخل لاستقبال الحمل (Carry-in) من عملية الجمع السابقة.</template>
-          <template class="content-en">It lacks an input to receive a carry (Carry-in) from a previous addition stage.</template>
+          <template class="content-ar">نحسب عدد الآحاد في البيانات. إذا كنا نستخدم تكافؤ زوجي، نضيف 0 أو 1 كبت إضافي لضمان أن المجموع الكلي للآحاد يصبح زوجياً. المستقبل يتحقق من ذلك.</template>
+          <template class="content-en">We count the 1s in the data. If using even parity, we add a 0 or 1 as an extra bit to ensure the total count of 1s is even. The receiver verifies this.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1115,16 +1577,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هو الجامع الكامل (Full Adder)؟</template>
-          <template class="content-en">What is a Full Adder?</template>
-          <span class="content-target">ما هو الجامع الكامل (Full Adder)؟</span>
+          <template class="content-ar">هل يمكن لبت التكافؤ تصحيح الخطأ؟</template>
+          <template class="content-en">Can a parity bit correct the error?</template>
+          <span class="content-target">هل يمكن لبت التكافؤ تصحيح الخطأ؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">دائرة توافقية تجمع ثلاثة بتات: بتين أساسيين وحمل قادم من مرحلة سابقة.</template>
-          <template class="content-en">A combinational circuit that adds three bits: two significant bits and a carry from a previous stage.</template>
+          <template class="content-ar">لا، التكافؤ البسيط يكتشف وجود الخطأ فقط (ويطلب إعادة الإرسال). لتصحيح الأخطاء، نحتاج إلى خوارزميات أعقد مثل كود هامينغ (Hamming Code).</template>
+          <template class="content-en">No, simple parity only detects the presence of an error (prompting a retransmission). To correct errors, more complex algorithms like Hamming Code are needed.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1141,255 +1603,340 @@
   {
     "id": 1,
     "front": {
-      "ar": "ما هي الدائرة التوافقية (Combinational Circuit)؟",
-      "en": "What is a Combinational Circuit?"
+      "ar": "كيف نحصل على صيغة POS من خريطة كارنوف؟",
+      "en": "How do we obtain the POS form from a K-map?"
     },
     "back": {
       "definition": {
-        "ar": "دائرة منطقية تعتمد مخرجاتها في أي وقت على المدخلات الحالية فقط.",
-        "en": "A logic circuit whose outputs at any time are determined from only the present combination of inputs."
+        "ar": "نجمع الأصفار للحصول على متمم الدالة (F')، ثم نطبق نظرية دي مورغان.",
+        "en": "Group the 0s to get the complement function (F'), then apply DeMorgan's theorem."
       },
       "example": {
-        "ar": "نصف الجامع (Half Adder).",
-        "en": "Half Adder."
+        "ar": "إذا كان F' = AB، فإن F = A' + B'",
+        "en": "If F' = AB, then F = A' + B'"
       }
     }
   },
   {
     "id": 2,
     "front": {
-      "ar": "ما الذي يميز الدائرة التتابعية عن التوافقية؟",
-      "en": "What distinguishes a sequential circuit from a combinational one?"
+      "ar": "ماذا تمثل الأصفار في خريطة كارنوف؟",
+      "en": "What do the 0s represent in a K-map?"
     },
     "back": {
       "definition": {
-        "ar": "وجود مسارات تغذية راجعة (Feedback paths) وعناصر ذاكرة.",
-        "en": "The presence of feedback paths and memory elements."
+        "ar": "تمثل حدود المضروب (minterms) غير المشمولة في الدالة، أي متمم الدالة.",
+        "en": "They represent the minterms not included in the function, i.e., the complement of the function."
       },
       "example": {
-        "ar": "العدادات (Counters).",
-        "en": "Counters."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 3,
     "front": {
-      "ar": "ما هو مسار التغذية الراجعة (Feedback Path)؟",
-      "en": "What is a Feedback Path?"
+      "ar": "ما هي حالة عدم الاكتراث (Don't Care)؟",
+      "en": "What is a Don't Care condition?"
     },
     "back": {
       "definition": {
-        "ar": "اتصال من مخرج بوابة إلى مدخل بوابة أخرى يشكل مخرجها جزءًا من مدخل البوابة الأولى.",
-        "en": "A connection from the output of one gate to the input of a second gate whose output forms part of the input to the first gate."
+        "ar": "حالة مدخلات لا تحدث أبداً في النظام، نرمز لها بـ 'X' ويمكن اعتبارها 0 أو 1 للتبسيط.",
+        "en": "An input condition that never occurs, marked as 'X', which can be treated as 0 or 1 for simplification."
       },
       "example": {
-        "ar": "موجود في الدوائر التتابعية.",
-        "en": "Found in sequential circuits."
+        "ar": "الأرقام من 10 إلى 15 في نظام BCD.",
+        "en": "Numbers 10 to 15 in a BCD system."
       }
     }
   },
   {
     "id": 4,
     "front": {
-      "ar": "كم عدد المجموعات الممكنة لـ n من متغيرات الإدخال؟",
-      "en": "How many possible combinations exist for n input variables?"
+      "ar": "هل يجب تجميع كل علامات 'X' في خريطة كارنوف؟",
+      "en": "Must all 'X's be grouped in a K-map?"
     },
     "back": {
       "definition": {
-        "ar": "2^n مجموعة.",
-        "en": "2^n combinations."
+        "ar": "لا، نجمع فقط الـ 'X' التي تساعد في تكوين مجموعات أكبر لتبسيط الدالة.",
+        "en": "No, only group the 'X's that help form larger groups to simplify the function."
       },
       "example": {
-        "ar": "لـ 4 مدخلات، يوجد 16 مجموعة.",
-        "en": "For 4 inputs, there are 16 combinations."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 5,
     "front": {
-      "ar": "ما هي الخطوة الأولى في إجراء تحليل الدوائر التوافقية؟",
-      "en": "What is the first step in the Analysis Procedure of combinational circuits?"
+      "ar": "ما هي البوابات الشاملة (Universal Gates)؟",
+      "en": "What are Universal Gates?"
     },
     "back": {
       "definition": {
-        "ar": "التأكد من أن الدائرة توافقية وليست تتابعية (لا توجد مسارات تغذية راجعة).",
-        "en": "Make sure that the given circuit is combinational and not sequential (no feedback paths)."
+        "ar": "بوابات يمكن استخدامها بمفردها لبناء أي دائرة رقمية (NAND و NOR).",
+        "en": "Gates that can be used alone to build any digital circuit (NAND and NOR)."
       },
       "example": {
-        "ar": "فحص المخطط بحثًا عن أي خط يعود من المخرج إلى المدخل.",
-        "en": "Checking the diagram for any line returning from output to input."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 6,
     "front": {
-      "ar": "ما هي الخطوة الأولى في إجراء تصميم الدوائر التوافقية؟",
-      "en": "What is the first step in the Design Procedure?"
+      "ar": "لماذا تُفضل بوابات NAND و NOR في الصناعة؟",
+      "en": "Why are NAND and NOR gates preferred in industry?"
     },
     "back": {
       "definition": {
-        "ar": "تحديد عدد المدخلات والمخرجات المطلوبة وتعيين رمز لكل منها من المواصفات.",
-        "en": "Determine the required number of inputs and outputs and assign a symbol to each from the specifications."
+        "ar": "لأنها أسهل وأرخص في التصنيع باستخدام تقنية CMOS.",
+        "en": "Because they are easier and cheaper to fabricate using CMOS technology."
       },
       "example": {
-        "ar": "في محول BCD، تحديد 4 مدخلات و 4 مخرجات.",
-        "en": "In a BCD converter, identifying 4 inputs and 4 outputs."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 7,
     "front": {
-      "ar": "كم عدد المدخلات والمخرجات في محول BCD إلى Excess-3؟",
-      "en": "How many inputs and outputs are in a BCD to Excess-3 converter?"
+      "ar": "كيف نصنع بوابة NOT باستخدام بوابة NAND؟",
+      "en": "How do we make a NOT gate using a NAND gate?"
     },
     "back": {
       "definition": {
-        "ar": "4 متغيرات إدخال و 4 متغيرات إخراج.",
-        "en": "Four input variables and four output variables."
+        "ar": "عن طريق ربط جميع مدخلات بوابة NAND معاً.",
+        "en": "By tying all the inputs of the NAND gate together."
       },
       "example": {
-        "ar": "المدخلات A,B,C,D والمخرجات w,x,y,z.",
-        "en": "Inputs A,B,C,D and outputs w,x,y,z."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 8,
     "front": {
-      "ar": "ما هي الحالات غير المستخدمة في كود BCD؟",
-      "en": "What are the unused combinations in BCD code?"
+      "ar": "ما هو مكافئ بوابة NAND حسب نظرية دي مورغان؟",
+      "en": "What is the equivalent of a NAND gate according to DeMorgan's theorem?"
     },
     "back": {
       "definition": {
-        "ar": "المجموعات الست من 10 إلى 15، وتعتبر حالات عدم اكتراث (Don't-cares).",
-        "en": "The six bit combinations from 10 to 15, treated as don't-care combinations."
+        "ar": "بوابة OR مع مدخلات معكوسة (NOT-OR).",
+        "en": "An OR gate with inverted inputs (NOT-OR)."
       },
       "example": {
-        "ar": "1010, 1011, 1100, 1101, 1110, 1111.",
-        "en": "1010, 1011, 1100, 1101, 1110, 1111."
+        "ar": "(XY)' = X' + Y'",
+        "en": "(XY)' = X' + Y'"
       }
     }
   },
   {
     "id": 9,
     "front": {
-      "ar": "ما هو نصف الجامع (Half Adder)؟",
-      "en": "What is a Half Adder?"
+      "ar": "ما هي الخطوة الأولى لتحويل دائرة AND-OR إلى NAND بالكامل؟",
+      "en": "What is the first step to convert an AND-OR circuit to all-NAND?"
     },
     "back": {
       "definition": {
-        "ar": "دائرة توافقية تقوم بجمع بتين ثنائيين وتنتج مجموعًا وحملاً.",
-        "en": "A combinational circuit that performs the addition of two bits, producing a sum and a carry."
+        "ar": "تحويل جميع بوابات AND إلى بوابات NAND.",
+        "en": "Convert all AND gates to NAND gates."
       },
       "example": {
-        "ar": "جمع 1 + 1 يعطي المجموع 0 والحمل 1.",
-        "en": "Adding 1 + 1 gives Sum 0 and Carry 1."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 10,
     "front": {
-      "ar": "ما هو الجامع الكامل (Full Adder)؟",
-      "en": "What is a Full Adder?"
+      "ar": "ماذا نفعل بالفقاعات (Bubbles) غير المعوضة عند التحويل إلى NAND؟",
+      "en": "What do we do with uncompensated bubbles when converting to NAND?"
     },
     "back": {
       "definition": {
-        "ar": "دائرة توافقية تقوم بجمع ثلاثة بتات (بتين أساسيين وحمل سابق).",
-        "en": "A combinational circuit that performs the addition of three bits (two significant bits and a previous carry)."
+        "ar": "نضيف بوابة عاكس (Inverter) أو نعكس المتغير المدخل.",
+        "en": "Insert an inverter or complement the input literal."
       },
       "example": {
-        "ar": "يستخدم في جمع الأرقام متعددة البتات.",
-        "en": "Used in multi-bit addition."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 11,
     "front": {
-      "ar": "ما هي الدالة البولينية لمجموع (Sum) نصف الجامع؟",
-      "en": "What is the Boolean function for the Sum (S) of a Half Adder?"
+      "ar": "ما هو المنطق السلكي (Wired Logic)؟",
+      "en": "What is Wired Logic?"
     },
     "back": {
       "definition": {
-        "ar": "S = x'y + xy' (والتي تكافئ x ⊕ y).",
-        "en": "S = x'y + xy' (which is equivalent to x ⊕ y)."
+        "ar": "ربط مخارج بوابتين أو أكثر معاً فيزيائياً لتنفيذ عملية AND أو OR بدون بوابة إضافية.",
+        "en": "Physically connecting the outputs of two or more gates together to perform an AND or OR operation without an extra gate."
       },
       "example": {
-        "ar": "تنفذ باستخدام بوابة XOR.",
-        "en": "Implemented using an XOR gate."
+        "ar": "Wired-AND في بوابات TTL.",
+        "en": "Wired-AND in TTL gates."
       }
     }
   },
   {
     "id": 12,
     "front": {
-      "ar": "ما هي الدالة البولينية لحمل (Carry) نصف الجامع؟",
-      "en": "What is the Boolean function for the Carry (C) of a Half Adder?"
+      "ar": "كم عدد النماذج غير المتدهورة (Nondegenerate forms) لمستويين من البوابات؟",
+      "en": "How many nondegenerate forms exist for two-level gates?"
     },
     "back": {
       "definition": {
-        "ar": "C = xy",
-        "en": "C = xy"
+        "ar": "8 نماذج.",
+        "en": "8 forms."
       },
       "example": {
-        "ar": "تنفذ باستخدام بوابة AND.",
-        "en": "Implemented using an AND gate."
+        "ar": "AND-OR-INVERT, OR-AND-INVERT",
+        "en": "AND-OR-INVERT, OR-AND-INVERT"
       }
     }
   },
   {
     "id": 13,
     "front": {
-      "ar": "كيف تظهر الإشارات في أجهزة المحاكاة المنطقية مقارنة بالواقع؟",
-      "en": "How do signals appear in logic simulators compared to reality?"
+      "ar": "ماذا يتطلب تنفيذ AND-OR-INVERT؟",
+      "en": "What does AND-OR-INVERT implementation require?"
     },
     "back": {
       "definition": {
-        "ar": "تظهر كأصفار وآحاد (0 و 1) فقط، بينما في الواقع هي إشارات تناظرية.",
-        "en": "They show only 0s and 1s, whereas physically they exist as analog signals."
+        "ar": "يتطلب إيجاد صيغة مجموع المضاريب (SOP) لمتمم الدالة.",
+        "en": "It requires the Sum-of-Products (SOP) expression of the complement of the function."
       },
       "example": {
-        "ar": "5 فولت تمثل 1، و 0 فولت تمثل 0.",
-        "en": "5V represents 1, 0V represents 0."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 14,
     "front": {
-      "ar": "ما هو الهدف من استنتاج جدول الحقيقة أثناء التحليل؟",
-      "en": "What is the purpose of obtaining the truth table during analysis?"
+      "ar": "ماذا يتطلب تنفيذ OR-AND-INVERT؟",
+      "en": "What does OR-AND-INVERT implementation require?"
     },
     "back": {
       "definition": {
-        "ar": "لتفسير وفهم عملية وسلوك الدائرة بشكل كامل.",
-        "en": "To interpret and fully understand the operation and behavior of the circuit."
+        "ar": "يتطلب إيجاد صيغة مضروب المجاميع (POS) لمتمم الدالة.",
+        "en": "It requires the Product-of-Sums (POS) expression of the complement of the function."
       },
       "example": {
-        "ar": "رؤية المخرجات لكل حالة إدخال ممكنة.",
-        "en": "Seeing outputs for every possible input state."
+        "ar": null,
+        "en": null
       }
     }
   },
   {
     "id": 15,
     "front": {
-      "ar": "ما هي الخطوة التي تسبق رسم المخطط المنطقي في إجراء التصميم؟",
-      "en": "What step precedes drawing the logic diagram in the design procedure?"
+      "ar": "متى تخرج بوابة XOR القيمة 1؟",
+      "en": "When does an XOR gate output 1?"
     },
     "back": {
       "definition": {
-        "ar": "الحصول على الدوال البولينية المبسطة لكل مخرج.",
-        "en": "Obtaining the simplified Boolean functions for each output."
+        "ar": "عندما تكون المدخلات مختلفة (أو عندما يكون عدد الآحاد فردياً لثلاثة متغيرات أو أكثر).",
+        "en": "When the inputs differ (or when an odd number of inputs are 1 for 3+ variables)."
       },
       "example": {
-        "ar": "استخدام خرائط كارنوف للتبسيط.",
-        "en": "Using K-maps for simplification."
+        "ar": "1 XOR 0 = 1",
+        "en": "1 XOR 0 = 1"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "لماذا تسمى XOR بـ 'الدالة الفردية' (Odd Function)؟",
+      "en": "Why is XOR called an 'Odd Function'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنها تخرج 1 فقط إذا كان عدد المتغيرات التي تساوي 1 عدداً فردياً.",
+        "en": "Because it outputs 1 only if an odd number of variables are equal to 1."
+      },
+      "example": {
+        "ar": "1 XOR 1 XOR 1 = 1",
+        "en": "1 XOR 1 XOR 1 = 1"
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هو الغرض من بت التكافؤ (Parity Bit)؟",
+      "en": "What is the purpose of a Parity Bit?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يُضاف لاكتشاف الأخطاء عن طريق جعل إجمالي عدد الآحاد زوجياً أو فردياً.",
+        "en": "Added for error detection by making the total number of 1s even or odd."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هي البوابة المستخدمة لبناء مولد وفاحص التكافؤ؟",
+      "en": "Which gate is used to build parity generators and checkers?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بوابة XOR.",
+        "en": "XOR gate."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "هل يمكن لنظام التكافؤ البسيط اكتشاف خطأين في نفس الوقت؟",
+      "en": "Can a simple parity system detect two simultaneous errors?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، يمكنه فقط اكتشاف الأخطاء الفردية (بت واحد).",
+        "en": "No, it can only detect single-bit (odd-numbered) errors."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "ما هو مكافئ بوابة NOR حسب نظرية دي مورغان؟",
+      "en": "What is the equivalent of a NOR gate according to DeMorgan's theorem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بوابة AND مع مدخلات معكوسة.",
+        "en": "An AND gate with inverted inputs."
+      },
+      "example": {
+        "ar": "(X+Y)' = X'Y'",
+        "en": "(X+Y)' = X'Y'"
       }
     }
   }
@@ -1426,322 +1973,322 @@
   {
     "id": 1,
     "question": {
-      "ar": "أي مما يلي يصف الدائرة التوافقية بشكل صحيح؟",
-      "en": "Which of the following correctly describes a combinational circuit?"
+      "ar": "للحصول على صيغة مضروب المجاميع (POS) من خريطة كارنوف، ماذا يجب أن نجمع؟",
+      "en": "To obtain the Product-of-Sums (POS) form from a Karnaugh map, what should we group?"
     },
     "options": {
       "ar": [
-        "تعتمد مخرجاتها على المدخلات الحالية فقط.",
-        "تحتوي على عناصر ذاكرة.",
-        "تعتمد مخرجاتها على المدخلات الحالية والسابقة.",
-        "تحتوي على مسارات تغذية راجعة."
+        "الآحاد (1s) فقط",
+        "الأصفار (0s) ثم نطبق نظرية دي مورغان",
+        "حالات عدم الاكتراث (X) فقط",
+        "الآحاد والأصفار معاً"
       ],
       "en": [
-        "Its outputs depend only on the present combination of inputs.",
-        "It contains memory elements.",
-        "Its outputs depend on present and past inputs.",
-        "It contains feedback paths."
+        "Only the 1s",
+        "The 0s, then apply DeMorgan's theorem",
+        "Only the Don't Cares (X)",
+        "Both 1s and 0s together"
       ]
     },
-    "correctIndex": 0,
+    "correctIndex": 1,
     "explanation": {
-      "ar": "الدوائر التوافقية لا تحتوي على ذاكرة أو تغذية راجعة، وتعتمد فقط على المدخلات الحالية.",
-      "en": "Combinational circuits have no memory or feedback and depend solely on present inputs."
+      "ar": "تجميع الأصفار يعطينا متمم الدالة. بتطبيق نظرية دي مورغان على المتمم، نحصل على الدالة الأصلية بصيغة POS.",
+      "en": "Grouping 0s gives the complement of the function. Applying DeMorgan's theorem to the complement yields the original function in POS form."
     },
     "hint": {
-      "ar": "تذكر كلمة 'حالية'.",
-      "en": "Remember the word 'present'."
+      "ar": "تذكر أن الأصفار تمثل F'.",
+      "en": "Remember that 0s represent F'."
     },
-    "difficulty": "easy",
-    "conceptId": "combinational-circuits"
+    "difficulty": "medium",
+    "conceptId": "pos-simplification"
   },
   {
     "id": 2,
     "question": {
-      "ar": "ما هي الخطوة الأولى في تحليل الدائرة المنطقية؟",
-      "en": "What is the first step in analyzing a logic circuit?"
+      "ar": "كيف يتم التعامل مع حالات عدم الاكتراث (X) في خريطة كارنوف؟",
+      "en": "How are Don't Care conditions (X) treated in a Karnaugh map?"
     },
     "options": {
       "ar": [
-        "رسم جدول الحقيقة.",
-        "التأكد من أن الدائرة توافقية وليست تتابعية.",
-        "تبسيط الدوال البولينية.",
-        "تسمية البوابات."
+        "يجب اعتبارها دائماً 0",
+        "يجب اعتبارها دائماً 1",
+        "يمكن اعتبارها 0 أو 1 لزيادة حجم المجموعات وتبسيط الدالة",
+        "يجب تجاهلها تماماً ولا يمكن تجميعها"
       ],
       "en": [
-        "Drawing the truth table.",
-        "Making sure the circuit is combinational and not sequential.",
-        "Simplifying Boolean functions.",
-        "Labeling the gates."
+        "They must always be treated as 0",
+        "They must always be treated as 1",
+        "They can be treated as 0 or 1 to increase group size and simplify the function",
+        "They must be completely ignored and cannot be grouped"
       ]
     },
-    "correctIndex": 1,
+    "correctIndex": 2,
     "explanation": {
-      "ar": "يجب التأكد من عدم وجود مسارات تغذية راجعة قبل تطبيق إجراءات التحليل التوافقي.",
-      "en": "You must ensure there are no feedback paths before applying combinational analysis procedures."
+      "ar": "حالات عدم الاكتراث تمنح المصمم مرونة لضمها مع الآحاد إذا كانت ستكبر المجموعة، أو تركها كأصفار إذا لم تكن مفيدة.",
+      "en": "Don't Cares give the designer flexibility to include them with 1s if it makes the group larger, or leave them as 0s if they aren't helpful."
     },
     "hint": {
-      "ar": "ابحث عن التغذية الراجعة أولاً.",
-      "en": "Look for feedback first."
+      "ar": "الهدف هو الحصول على أبسط تعبير ممكن.",
+      "en": "The goal is to get the simplest possible expression."
     },
-    "difficulty": "medium",
-    "conceptId": "analysis-procedure"
+    "difficulty": "easy",
+    "conceptId": "dont-care-conditions"
   },
   {
     "id": 3,
     "question": {
-      "ar": "في تصميم الدوائر التوافقية، ماذا نفعل بعد تحديد المدخلات والمخرجات؟",
-      "en": "In combinational circuit design, what do we do after determining inputs and outputs?"
+      "ar": "أي من البوابات التالية تعتبر 'بوابة شاملة' (Universal Gate)؟",
+      "en": "Which of the following gates is considered a 'Universal Gate'?"
     },
     "options": {
       "ar": [
-        "نرسم المخطط المنطقي.",
-        "نستنتج جدول الحقيقة.",
-        "نبسط الدوال البولينية.",
-        "نختبر الدائرة."
+        "AND",
+        "OR",
+        "XOR",
+        "NAND"
       ],
       "en": [
-        "Draw the logic diagram.",
-        "Derive the truth table.",
-        "Simplify Boolean functions.",
-        "Test the circuit."
+        "AND",
+        "OR",
+        "XOR",
+        "NAND"
       ]
     },
-    "correctIndex": 1,
+    "correctIndex": 3,
     "explanation": {
-      "ar": "بعد تحديد المدخلات والمخرجات، يجب استنتاج جدول الحقيقة الذي يحدد العلاقة بينهما.",
-      "en": "After defining inputs and outputs, you must derive the truth table that defines their relationship."
+      "ar": "بوابات NAND و NOR هي بوابات شاملة لأنه يمكن بناء أي دائرة رقمية باستخدامها فقط.",
+      "en": "NAND and NOR are universal gates because any digital circuit can be built using only them."
     },
     "hint": {
-      "ar": "نحتاج إلى خريطة للسلوك قبل كتابة المعادلات.",
-      "en": "We need a map of behavior before writing equations."
+      "ar": "ابحث عن البوابة التي تحتوي على نفي (NOT) مدمج.",
+      "en": "Look for the gate that has a built-in inversion (NOT)."
     },
-    "difficulty": "medium",
-    "conceptId": "design-procedure"
+    "difficulty": "easy",
+    "conceptId": "universal-gates"
   },
   {
     "id": 4,
     "question": {
-      "ar": "كم عدد حالات عدم الاكتراث (Don't-cares) عند تحويل BCD إلى Excess-3؟",
-      "en": "How many don't-care conditions are there when converting BCD to Excess-3?"
+      "ar": "لماذا تُستخدم بوابات NAND و NOR بكثرة في الدوائر المتكاملة؟",
+      "en": "Why are NAND and NOR gates frequently used in integrated circuits?"
     },
     "options": {
       "ar": [
-        "4",
-        "6",
-        "8",
-        "10"
+        "لأنها تستهلك طاقة أعلى",
+        "لأنها أسهل في التصنيع باستخدام تقنية CMOS",
+        "لأنها لا تستطيع أداء عمليات AND و OR",
+        "لأنها تتطلب ترانزستورات أكثر من بوابات AND"
       ],
       "en": [
-        "4",
-        "6",
-        "8",
-        "10"
+        "Because they consume more power",
+        "Because they are easier to fabricate using CMOS technology",
+        "Because they cannot perform AND and OR operations",
+        "Because they require more transistors than AND gates"
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "BCD يستخدم 10 حالات (0-9) من أصل 16 حالة ممكنة لـ 4 بت، مما يترك 6 حالات غير مستخدمة.",
-      "en": "BCD uses 10 combinations (0-9) out of 16 possible for 4 bits, leaving 6 unused combinations."
+      "ar": "في تقنية CMOS، البوابات العاكسة (مثل NAND و NOR) تتطلب ترانزستورات أقل وأسهل في التصنيع من البوابات غير العاكسة.",
+      "en": "In CMOS technology, inverting gates (like NAND and NOR) require fewer transistors and are easier to fabricate than non-inverting gates."
     },
     "hint": {
-      "ar": "16 ناقص 10.",
-      "en": "16 minus 10."
+      "ar": "يتعلق الأمر بكفاءة التصنيع.",
+      "en": "It relates to manufacturing efficiency."
     },
     "difficulty": "medium",
-    "conceptId": "code-conversion"
+    "conceptId": "universal-gates"
   },
   {
     "id": 5,
     "question": {
-      "ar": "ما هي مخرجات نصف الجامع (Half Adder)؟",
-      "en": "What are the outputs of a Half Adder?"
+      "ar": "عند تحويل دائرة AND-OR إلى دائرة NAND بالكامل، ماذا يجب أن نفعل إذا وجدنا فقاعة (Bubble) غير معوضة على خط الإشارة؟",
+      "en": "When converting an AND-OR circuit to an all-NAND circuit, what must be done if there is an uncompensated bubble on a signal line?"
     },
     "options": {
       "ar": [
-        "المجموع فقط",
-        "الحمل فقط",
-        "المجموع والحمل",
-        "المجموع والفرق"
+        "نتجاهلها",
+        "نضيف بوابة AND",
+        "ندرج بوابة عاكس (Inverter) أو نعكس المتغير المدخل",
+        "نحذف الخط بالكامل"
       ],
       "en": [
-        "Sum only",
-        "Carry only",
-        "Sum and Carry",
-        "Sum and Difference"
+        "Ignore it",
+        "Add an AND gate",
+        "Insert an inverter or complement the input literal",
+        "Delete the line entirely"
       ]
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "نصف الجامع يجمع بتين وينتج المجموع (Sum) والحمل (Carry).",
-      "en": "A Half Adder adds two bits and produces a Sum and a Carry."
+      "ar": "الفقاعة تمثل عملية نفي (NOT). إذا لم تلغها فقاعة أخرى، يجب إضافة عاكس للحفاظ على المنطق الصحيح للدائرة.",
+      "en": "A bubble represents a NOT operation. If it's not canceled by another bubble, an inverter must be added to maintain the correct logic."
     },
     "hint": {
-      "ar": "S و C.",
-      "en": "S and C."
+      "ar": "الفقاعة تعني 'عكس'.",
+      "en": "A bubble means 'invert'."
     },
-    "difficulty": "easy",
-    "conceptId": "binary-adder-subtractor"
+    "difficulty": "medium",
+    "conceptId": "all-nand-conversion"
   },
   {
     "id": 6,
     "question": {
-      "ar": "أي بوابة منطقية تستخدم لتنفيذ دالة المجموع (Sum) في نصف الجامع بشكل مثالي؟",
-      "en": "Which logic gate is ideally used to implement the Sum function in a Half Adder?"
+      "ar": "كم عدد النماذج غير المتدهورة (Nondegenerate forms) الممكنة لمستويين من البوابات؟",
+      "en": "How many nondegenerate forms are possible for two levels of gates?"
     },
     "options": {
       "ar": [
-        "AND",
-        "OR",
-        "XOR",
-        "NAND"
+        "4",
+        "8",
+        "12",
+        "16"
       ],
       "en": [
-        "AND",
-        "OR",
-        "XOR",
-        "NAND"
+        "4",
+        "8",
+        "12",
+        "16"
       ]
     },
-    "correctIndex": 2,
+    "correctIndex": 1,
     "explanation": {
-      "ar": "دالة المجموع هي S = x'y + xy' والتي تكافئ بوابة XOR.",
-      "en": "The sum function is S = x'y + xy', which is equivalent to an XOR gate."
+      "ar": "من أصل 16 تركيبة ممكنة، هناك 8 تركيبات تتدهور إلى عملية واحدة، و 8 تركيبات غير متدهورة (مثل AND-OR-INVERT).",
+      "en": "Out of 16 possible combinations, 8 degenerate into a single operation, leaving 8 nondegenerate forms (like AND-OR-INVERT)."
     },
     "hint": {
-      "ar": "تكون 1 عندما يكون المدخلان مختلفين.",
-      "en": "It is 1 when inputs are different."
+      "ar": "نصف التركيبات الممكنة (16) هي غير متدهورة.",
+      "en": "Half of the possible combinations (16) are nondegenerate."
     },
-    "difficulty": "medium",
-    "conceptId": "binary-adder-subtractor"
+    "difficulty": "hard",
+    "conceptId": "nondegenerate-forms"
   },
   {
     "id": 7,
     "question": {
-      "ar": "ما هو الفرق الرئيسي بين نصف الجامع والجامع الكامل؟",
-      "en": "What is the main difference between a Half Adder and a Full Adder?"
+      "ar": "لتنفيذ دالة باستخدام نموذج AND-OR-INVERT، ما هي الصيغة التي يجب أن نبسط الدالة إليها؟",
+      "en": "To implement a function using the AND-OR-INVERT form, to which form must we simplify the function?"
     },
     "options": {
       "ar": [
-        "نصف الجامع يجمع 3 بتات، والجامع الكامل يجمع 4 بتات.",
-        "نصف الجامع يجمع بتين، والجامع الكامل يجمع 3 بتات.",
-        "الجامع الكامل لا ينتج حملاً (Carry).",
-        "نصف الجامع يحتوي على ذاكرة."
+        "SOP للدالة الأصلية",
+        "POS للدالة الأصلية",
+        "SOP لمتمم الدالة",
+        "POS لمتمم الدالة"
       ],
       "en": [
-        "Half Adder adds 3 bits, Full Adder adds 4 bits.",
-        "Half Adder adds 2 bits, Full Adder adds 3 bits.",
-        "Full Adder does not produce a carry.",
-        "Half Adder contains memory."
-      ]
-    },
-    "correctIndex": 1,
-    "explanation": {
-      "ar": "الجامع الكامل يضيف مدخلاً ثالثًا للحمل السابق (Carry-in).",
-      "en": "A Full Adder adds a third input for the previous carry (Carry-in)."
-    },
-    "hint": {
-      "ar": "الجامع الكامل يتعامل مع الحمل القادم من الخانة السابقة.",
-      "en": "Full adder handles the carry from the previous stage."
-    },
-    "difficulty": "easy",
-    "conceptId": "binary-adder-subtractor"
-  },
-  {
-    "id": 8,
-    "question": {
-      "ar": "ما هي الدالة البولينية لحمل (Carry) نصف الجامع؟",
-      "en": "What is the Boolean function for the Carry of a Half Adder?"
-    },
-    "options": {
-      "ar": [
-        "C = x + y",
-        "C = x ⊕ y",
-        "C = xy",
-        "C = x'y'"
-      ],
-      "en": [
-        "C = x + y",
-        "C = x ⊕ y",
-        "C = xy",
-        "C = x'y'"
+        "SOP of the original function",
+        "POS of the original function",
+        "SOP of the complement of the function",
+        "POS of the complement of the function"
       ]
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "الحمل يكون 1 فقط عندما يكون كلا المدخلين 1، وهو ما يمثل بوابة AND (C = xy).",
-      "en": "Carry is 1 only when both inputs are 1, which represents an AND gate (C = xy)."
+      "ar": "نموذج AND-OR-INVERT يتطلب إيجاد صيغة مجموع المضاريب (SOP) لمتمم الدالة، لأن الانعكاس النهائي (INVERT) سيعيدها للدالة الأصلية.",
+      "en": "The AND-OR-INVERT form requires the SOP expression of the complement of the function, because the final INVERT will restore the original function."
     },
     "hint": {
-      "ar": "الضرب المنطقي.",
-      "en": "Logical multiplication."
+      "ar": "فكر في الجزء 'INVERT' في النهاية.",
+      "en": "Think about the 'INVERT' part at the end."
+    },
+    "difficulty": "hard",
+    "conceptId": "nondegenerate-forms"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي البوابة التي تُعرف بـ 'الدالة الفردية' (Odd Function) عند استخدام 3 متغيرات أو أكثر؟",
+      "en": "Which gate is known as the 'Odd Function' when using 3 or more variables?"
+    },
+    "options": {
+      "ar": [
+        "AND",
+        "OR",
+        "NAND",
+        "XOR"
+      ],
+      "en": [
+        "AND",
+        "OR",
+        "NAND",
+        "XOR"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "بوابة XOR تخرج 1 فقط إذا كان عدد المتغيرات التي تساوي 1 هو عدد فردي.",
+      "en": "The XOR gate outputs 1 only if an odd number of variables are equal to 1."
+    },
+    "hint": {
+      "ar": "تستخدم لاكتشاف الأخطاء.",
+      "en": "It is used for error detection."
     },
     "difficulty": "easy",
-    "conceptId": "binary-adder-subtractor"
+    "conceptId": "xor-and-parity"
   },
   {
     "id": 9,
     "question": {
-      "ar": "ما الذي يحدد الدائرة التتابعية (Sequential Circuit)؟",
-      "en": "What defines a sequential circuit?"
+      "ar": "في نظام التكافؤ الزوجي (Even Parity)، إذا كانت البيانات المرسلة هي 101، فما هي قيمة بت التكافؤ الذي يجب إضافته؟",
+      "en": "In an Even Parity system, if the transmitted data is 101, what is the value of the parity bit that must be added?"
     },
     "options": {
       "ar": [
-        "استخدام بوابات AND فقط.",
-        "وجود مسارات تغذية راجعة.",
-        "عدم وجود ذاكرة.",
-        "الاعتماد على المدخلات الحالية فقط."
+        "0",
+        "1",
+        "X",
+        "لا يمكن تحديده"
       ],
       "en": [
-        "Using only AND gates.",
-        "The presence of feedback paths.",
-        "Lack of memory.",
-        "Depending only on present inputs."
-      ]
-    },
-    "correctIndex": 1,
-    "explanation": {
-      "ar": "مسارات التغذية الراجعة وعناصر الذاكرة هي ما يميز الدوائر التتابعية.",
-      "en": "Feedback paths and memory elements are what distinguish sequential circuits."
-    },
-    "hint": {
-      "ar": "المخرجات تعود لتصبح مدخلات.",
-      "en": "Outputs loop back to become inputs."
-    },
-    "difficulty": "easy",
-    "conceptId": "combinational-circuits"
-  },
-  {
-    "id": 10,
-    "question": {
-      "ar": "في إجراء التحليل، لماذا نقوم بالتعويض المتكرر (Repeated substitution)؟",
-      "en": "In the analysis procedure, why do we perform repeated substitution?"
-    },
-    "options": {
-      "ar": [
-        "للحصول على دوال المخرجات بدلالة متغيرات الإدخال فقط.",
-        "لإزالة حالات عدم الاكتراث.",
-        "لتحويل الدائرة إلى دائرة تتابعية.",
-        "لرسم خريطة كارنوف."
-      ],
-      "en": [
-        "To obtain output functions in terms of input variables only.",
-        "To remove don't-care conditions.",
-        "To convert the circuit to a sequential one.",
-        "To draw a K-map."
+        "0",
+        "1",
+        "X",
+        "Cannot be determined"
       ]
     },
     "correctIndex": 0,
     "explanation": {
-      "ar": "التعويض المتكرر يسمح لنا بالتخلص من المتغيرات الوسيطة والتعبير عن المخرج النهائي بناءً على المدخلات الأصلية فقط.",
-      "en": "Repeated substitution allows us to eliminate intermediate variables and express the final output solely based on original inputs."
+      "ar": "البيانات 101 تحتوي على وحدتين (عدد زوجي). للحفاظ على العدد الزوجي، يجب أن يكون بت التكافؤ 0.",
+      "en": "The data 101 contains two 1s (an even number). To maintain an even count, the parity bit must be 0."
     },
     "hint": {
-      "ar": "نريد ربط النهاية بالبداية مباشرة.",
-      "en": "We want to link the end directly to the beginning."
+      "ar": "الهدف هو جعل إجمالي عدد الآحاد زوجياً.",
+      "en": "The goal is to make the total number of 1s even."
     },
     "difficulty": "medium",
-    "conceptId": "analysis-procedure"
+    "conceptId": "xor-and-parity"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو العيب الرئيسي لنظام اكتشاف الأخطاء باستخدام بت التكافؤ البسيط؟",
+      "en": "What is the main drawback of a simple parity bit error detection system?"
+    },
+    "options": {
+      "ar": [
+        "يتطلب بوابات AND كثيرة",
+        "لا يمكنه اكتشاف الأخطاء الفردية",
+        "لا يمكنه اكتشاف الأخطاء المزدوجة (انقلاب بتين في نفس الوقت)",
+        "يبطئ سرعة المعالج بشكل كبير"
+      ],
+      "en": [
+        "It requires many AND gates",
+        "It cannot detect single-bit errors",
+        "It cannot detect double-bit errors (two bits flipping simultaneously)",
+        "It significantly slows down the processor speed"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إذا انقلب بتان في نفس الوقت، فإن التكافؤ (الزوجي أو الفردي) سيبقى كما هو، ولن يكتشف النظام وجود خطأ.",
+      "en": "If two bits flip simultaneously, the parity (even or odd) remains the same, and the system will not detect the error."
+    },
+    "hint": {
+      "ar": "ماذا يحدث لعدد الآحاد إذا تغير بت من 0 إلى 1 وآخر من 1 إلى 0؟",
+      "en": "What happens to the count of 1s if one bit changes from 0 to 1 and another from 1 to 0?"
+    },
+    "difficulty": "medium",
+    "conceptId": "xor-and-parity"
   }
 ]
 </script>
@@ -1749,34 +2296,42 @@
 <section id="vault" class="vault-section glass-card fade-up">
   <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفتاح أساسي / Key Concept</div>
+    <div class="vault-type vault-type--trap">⚠️ فخ (Trap)</div>
     <div data-bilingual>
-      <template class="content-ar">الدوائر التوافقية لا تمتلك ذاكرة. مخرجاتها هي انعكاس فوري لمدخلاتها الحالية. غياب مسارات التغذية الراجعة هو الشرط الأساسي.</template>
-      <template class="content-en">Combinational circuits have no memory. Their outputs are an immediate reflection of their current inputs. The absence of feedback paths is the absolute prerequisite.</template>
+      <template class="content-ar">الاعتقاد بأن حالة عدم الاكتراث 'X' يجب أن تكون دائماً 0 أو دائماً 1 في كل الخريطة. الحقيقة: يمكنك اختيار قيمة مختلفة لكل 'X' بشكل مستقل بناءً على ما يخدم التبسيط.</template>
+      <template class="content-en">Thinking that a Don't Care 'X' must be universally 0 or universally 1 across the K-map. Reality: You can independently choose the value of each 'X' based on what best simplifies the groups.</template>
       <div class="content-target"></div>
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ شائع / Common Trap</div>
+    <div class="vault-type vault-type--key">🔑 مفهوم أساسي (Key Concept)</div>
     <div data-bilingual>
-      <template class="content-ar">الخلط بين نصف الجامع والجامع الكامل. تذكر: نصف الجامع يجمع بتين (بدون حمل سابق)، الجامع الكامل يجمع ثلاثة بتات (يتضمن الحمل السابق).</template>
-      <template class="content-en">Confusing Half Adder with Full Adder. Remember: Half Adder adds 2 bits (no carry-in), Full Adder adds 3 bits (includes carry-in).</template>
+      <template class="content-ar">البوابات الشاملة (NAND و NOR) تعني أنك لست بحاجة لشراء أنواع مختلفة من الرقائق لبناء حاسوب؛ شريحة واحدة تحتوي على بوابات NAND تكفي لبناء أي منطق.</template>
+      <template class="content-en">Universal gates (NAND and NOR) mean you don't need to buy different types of chips to build a computer; a single chip type with NAND gates is sufficient to build any logic.</template>
       <div class="content-target"></div>
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 سر المهنة / Pro Secret</div>
+    <div class="vault-type vault-type--secret">🤫 سر (Secret)</div>
     <div data-bilingual>
-      <template class="content-ar">في تحويل الأكواد (مثل BCD)، حالات عدم الاكتراث (Don't-cares) ليست مجرد مساحات فارغة، بل هي أداة قوية لتبسيط الدائرة وتقليل التكلفة بشكل كبير عند استخدام خرائط كارنوف.</template>
-      <template class="content-en">In code conversion (like BCD), don't-care conditions aren't just empty spaces; they are a powerful tool to drastically simplify the circuit and reduce hardware cost using K-maps.</template>
+      <template class="content-ar">طريقة 'دفع الفقاعات' (Bubble Pushing) في تحويل الدوائر ليست سحراً، بل هي مجرد تطبيق بصري سريع لنظرية دي مورغان لتجنب كتابة المعادلات الطويلة.</template>
+      <template class="content-en">The 'Bubble Pushing' method in circuit conversion isn't magic; it's just a fast, visual application of DeMorgan's theorem to avoid writing out long equations.</template>
       <div class="content-target"></div>
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ شائع / Common Trap</div>
+    <div class="vault-type vault-type--trap">⚠️ فخ (Trap)</div>
     <div data-bilingual>
-      <template class="content-ar">البدء في تحليل دائرة دون التحقق أولاً مما إذا كانت تحتوي على تغذية راجعة. إذا كان هناك تغذية راجعة، فإن طرق التحليل التوافقي ستفشل.</template>
-      <template class="content-en">Starting to analyze a circuit without first checking for feedback paths. If feedback exists, combinational analysis methods will fail.</template>
+      <template class="content-ar">الاعتقاد بأن بت التكافؤ (Parity Bit) يضمن وصول البيانات خالية من الأخطاء بنسبة 100%. الحقيقة: هو يكتشف الأخطاء الفردية فقط، ويفشل إذا حدث خطأ مزدوج.</template>
+      <template class="content-en">Believing that a Parity Bit guarantees 100% error-free data. Reality: It only detects single-bit (odd) errors and fails completely if a double-bit error occurs.</template>
+      <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key">🔑 مفهوم أساسي (Key Concept)</div>
+    <div data-bilingual>
+      <template class="content-ar">تبسيط POS هو ببساطة إجراء تبسيط SOP على الأصفار بدلاً من الآحاد، ثم عكس النتيجة النهائية.</template>
+      <template class="content-en">POS simplification is simply performing SOP simplification on the 0s instead of the 1s, and then inverting the final result.</template>
       <div class="content-target"></div>
     </div>
   </div>
@@ -1788,9 +2343,9 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-links">
-        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
-        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
         <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
       </div>
       <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>

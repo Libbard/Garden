@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="9">
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="8">
 <head>
   
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
@@ -11,7 +11,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تحليل الدوائر التتابعية · CS231 · الحديقة الرقمية</title>
+  <title>المنطق التتابعي · CS231 · الحديقة الرقمية</title>
 
   
   <script>
@@ -81,25 +81,25 @@
       </a>
 
       
-      <a href="#analysis-vs-design" class="toc-link" data-bilingual>
-        <template class="content-ar">التحليل مقابل التصميم</template>
-        <template class="content-en">Analysis vs. Design</template>
-        <span class="content-target">التحليل مقابل التصميم</span>
+      <a href="#sequential-circuits" class="toc-link" data-bilingual>
+        <template class="content-ar">الدوائر التتابعية</template>
+        <template class="content-en">Sequential Circuits</template>
+        <span class="content-target">الدوائر التتابعية</span>
       </a>
-      <a href="#characteristic-tables" class="toc-link" data-bilingual>
-        <template class="content-ar">الجداول المميزة للقلابات</template>
-        <template class="content-en">Characteristic Tables of Flip-Flops</template>
-        <span class="content-target">الجداول المميزة للقلابات</span>
+      <a href="#latches" class="toc-link" data-bilingual>
+        <template class="content-ar">المواسك (Latches)</template>
+        <template class="content-en">Latches</template>
+        <span class="content-target">المواسك (Latches)</span>
       </a>
-      <a href="#analysis-steps" class="toc-link" data-bilingual>
-        <template class="content-ar">خطوات تحليل الدوائر التتابعية</template>
-        <template class="content-en">Steps of Sequential Circuit Analysis</template>
-        <span class="content-target">خطوات تحليل الدوائر التتابعية</span>
+      <a href="#d-latch" class="toc-link" data-bilingual>
+        <template class="content-ar">ماسك D (D Latch)</template>
+        <template class="content-en">D Latch</template>
+        <span class="content-target">ماسك D (D Latch)</span>
       </a>
-      <a href="#mealy-vs-moore" class="toc-link" data-bilingual>
-        <template class="content-ar">نموذج ميلي مقابل نموذج مور</template>
-        <template class="content-en">Mealy Model vs. Moore Model</template>
-        <span class="content-target">نموذج ميلي مقابل نموذج مور</span>
+      <a href="#edge-triggered-flip-flops" class="toc-link" data-bilingual>
+        <template class="content-ar">النطاطات التي تعمل بحافة النبضة (Edge-Triggered Flip-Flops)</template>
+        <template class="content-en">Edge-Triggered Flip-Flops</template>
+        <span class="content-target">النطاطات التي تعمل بحافة النبضة (Edge-Triggered Flip-Flops)</span>
       </a>
 
       <div class="toc-divider"></div>
@@ -149,24 +149,24 @@
   </div>
   <div data-bilingual>
     <template class="content-ar">
-      <h1 class="text-gradient">تحليل الدوائر التتابعية</h1>
-      <p class="hero-description">دراسة تحليل الدوائر المنطقية التتابعية، بما في ذلك استنتاج معادلات الإدخال، جداول الحالة، ومخططات الحالة، مع مقارنة بين نماذج ميلي ومور.</p>
+      <h1 class="text-gradient">المنطق التتابعي</h1>
+      <p class="hero-description">مقدمة في الدوائر التتابعية، المواسك (Latches)، والنطاطات (Flip-Flops) بما في ذلك تصميمها ومبادئ عملها.</p>
     </template>
     <template class="content-en">
-      <h1 class="text-gradient">Sequential Circuits Analysis</h1>
-      <p class="hero-description">Study of sequential logic circuits analysis, including deriving input equations, state tables, and state diagrams, with a comparison between Mealy and Moore models.</p>
+      <h1 class="text-gradient">Sequential Logic</h1>
+      <p class="hero-description">Introduction to sequential circuits, latches, and flip-flops including their design and working principles.</p>
     </template>
     <div class="content-target"></div>
   </div>
   <div class="tag-list" data-bilingual>
     <template class="content-ar">
       <span class="tag">الدوائر التتابعية</span>
-      <span class="tag">جدول الحالة</span>
+      <span class="tag">المواسك</span>
       <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
     </template>
     <template class="content-en">
       <span class="tag">Sequential Circuits</span>
-      <span class="tag">State Table</span>
+      <span class="tag">Latches</span>
       <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
     </template>
     <div class="content-target"></div>
@@ -177,24 +177,23 @@
   <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
-      <li><span class="obj-icon">✦</span><span>وصف الدائرة التتابعية بدلالة معادلة الحالة.</span></li>
-      <li><span class="obj-icon">✦</span><span>تعلم كيفية كتابة جدول الحالة لدائرة تتابعية.</span></li>
-      <li><span class="obj-icon">✦</span><span>تعلم كيفية رسم مخطط الحالة لدائرة تتابعية.</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين الدائرة التتابعية والدائرة التوافقية.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم وظيفة ماسك SR، الماسك الشفاف، ونطاط D.</span></li>
+      <li><span class="obj-icon">✦</span><span>معرفة كيفية استخدام الجدول المميز والمعادلة المميزة للنطاط.</span></li>
     </template>
     <template class="content-en">
-      <li><span class="obj-icon">✦</span><span>Describe a sequential circuit in terms of a state equation.</span></li>
-      <li><span class="obj-icon">✦</span><span>Learn how to write a state table for a sequential circuit.</span></li>
-      <li><span class="obj-icon">✦</span><span>Learn how to draw a state diagram for a sequential circuit.</span></li>
+      <li><span class="obj-icon">✦</span><span>Know how to distinguish a sequential circuit from a combinational circuit.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the functionality of a SR latch, transparent latch, and D flip-flop.</span></li>
+      <li><span class="obj-icon">✦</span><span>Know how to use the characteristic table and characteristic equation of a flip-flop.</span></li>
     </template>
     <div class="content-target"></div>
   </ul>
 </section>
 
-
-<section id="analysis-vs-design" class="concept-card glass-card fade-up">
+<section id="sequential-circuits" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">1</span> التحليل مقابل التصميم</h2></template>
-    <template class="content-en"><h2><span class="concept-number">1</span> Analysis vs. Design</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الدوائر التتابعية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Sequential Circuits</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -206,621 +205,119 @@
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
     <template class="content-ar">
-      <p><span class="smart-term" data-term-en="Analysis" data-ar="التحليل" data-en-def="Deriving the behavior (state table/diagram) from a given circuit.">التحليل</span> يبدأ من الدائرة وينتهي بجدول/مخطط الحالة، بينما <span class="smart-term" data-term-en="Design" data-ar="التصميم" data-en-def="Creating a circuit diagram from a set of behavioral specifications.">التصميم</span> يبدأ بالمواصفات وينتهي بالدائرة.</p>
+      <p>دوائر رقمية تمتلك ذاكرة؛ تعتمد مخرجاتها على المدخلات الحالية والحالة السابقة.</p>
     </template>
     <template class="content-en">
-      <p><span class="smart-term" data-term-en="Analysis" data-ar="التحليل" data-en-def="Deriving the behavior (state table/diagram) from a given circuit.">Analysis</span> starts with a circuit and ends with a state table/diagram, while <span class="smart-term" data-term-en="Design" data-ar="التصميم" data-en-def="Creating a circuit diagram from a set of behavioral specifications.">design</span> starts with specifications and ends with a circuit.</p>
+      <p>Digital circuits with memory; their outputs depend on both current inputs and past states.</p>
     </template>
     <div class="content-target"></div>
   </div>
   
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في الدوائر التتابعية، <strong>التحليل (Analysis)</strong> هو عملية عكسية للتصميم. يبدأ <span class="smart-term" data-term-en="Analysis" data-ar="التحليل" data-en-def="Deriving the behavior (state table/diagram) from a given circuit.">التحليل</span> من مخطط الدائرة المنطقية (Circuit Diagram) المعطى، ويهدف إلى فهم سلوك الدائرة من خلال استنتاج جدول الحالة (State Table) أو مخطط الحالة (State Diagram).</p><p>على العكس من ذلك، <strong>التصميم (Design)</strong> يبدأ من مجموعة من المواصفات المطلوبة، ومنها يتم إنشاء مخطط الحالة، ثم جدول الحالة، وأخيراً رسم الدائرة المنطقية التي تحقق هذه المواصفات.</p></template>
-    <template class="content-en"><p>In sequential circuits, <strong><span class="smart-term" data-term-en="Analysis" data-ar="التحليل" data-en-def="Deriving the behavior (state table/diagram) from a given circuit.">Analysis</span></strong> is the reverse process of design. The analysis of a sequential circuit starts from a given circuit diagram and finishes with a state table or a state diagram to understand its behavior.</p><p>Conversely, the <strong><span class="smart-term" data-term-en="Design" data-ar="التصميم" data-en-def="Creating a circuit diagram from a set of behavioral specifications.">Design</span></strong> of a sequential circuit starts from a set of specifications from which a state diagram is obtained, and finally, the circuit diagram is constructed.</p></template>
+    <template class="content-ar"><p>على عكس الدوائر التوافقية التي تعتمد مخرجاتها فورياً على المدخلات فقط، تعمل الدوائر التتابعية كعناصر تخزين تمتلك ذاكرة.</p><p>تتكون من دائرة توافقية متصلة بعناصر تخزين لتشكيل <span class="smart-term" data-term-en="Feedback Path" data-ar="مسار التغذية الراجعة" data-en-def="A connection from the output of the memory elements back to the input of the combinational circuit.">مسار تغذية راجعة<span class="smart-term-tooltip"></span></span> (Feedback path).</p><p>المعلومات الثنائية المخزنة في هذه العناصر في أي وقت معين تحدد 'حالة' (State) الدائرة التتابعية.</p></template>
+    <template class="content-en"><p>Unlike combinational circuits whose outputs depend only and immediately on their inputs, sequential circuits act as storage elements and have memory.</p><p>They consist of a combinational circuit to which storage elements are connected to form a <span class="smart-term" data-term-en="Feedback Path" data-ar="مسار التغذية الراجعة" data-en-def="A connection from the output of the memory elements back to the input of the combinational circuit.">feedback path<span class="smart-term-tooltip"></span></span>.</p><p>The binary information stored in these elements at any given time defines the 'state' of the sequential circuit.</p></template>
     <div class="content-target"></div>
   </div>
   
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>فهم الفرق بين التحليل والتصميم أساسي لمهندسي الحاسوب. التحليل يستخدم لاكتشاف الأخطاء (Debugging) أو الهندسة العكسية (Reverse Engineering) للأنظمة الحالية.</p><p>يعتمد التحليل بشكل كبير على استخراج معادلات الإدخال للقلابات (Flip-Flops) واستخدام الجداول المميزة (Characteristic Tables) لتحديد الحالة التالية.</p></template>
-    <template class="content-en"><p>Understanding the difference between analysis and design is fundamental for computer engineers. Analysis is often used for debugging or reverse engineering existing systems.</p><p>It relies heavily on extracting the input equations for the flip-flops and using their characteristic tables to determine the next state of the system deterministically.</p></template>
-    <div class="content-target"></div>
-  </div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">إذا أعطيت دائرة مجهولة الوظيفة، هل ستقوم بعملية تحليل أم تصميم لمعرفة ما تفعله؟</template>
-      <template class="content-en">If you are given a circuit with an unknown function, would you perform analysis or design to figure out what it does?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>سأقوم بعملية التحليل، لأنني سأبدأ من الدائرة لاستنتاج مخطط الحالة وفهم سلوكها.</p></template>
-      <template class="content-en"><p>I would perform analysis, because I am starting from the circuit diagram to derive the state diagram and understand its behavior.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-
-<section id="characteristic-tables" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">2</span> الجداول المميزة للقلابات</h2></template>
-    <template class="content-en"><h2><span class="concept-number">2</span> Characteristic Tables of Flip-Flops</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar">
-      <p><span class="smart-term" data-term-en="Characteristic Table" data-ar="الجدول المميز" data-en-def="A table that defines the next state of a flip-flop based on its inputs.">الجداول المميزة</span> تحدد الحالة التالية للقلاب بناءً على مدخلاته الحالية.</p>
-    </template>
-    <template class="content-en">
-      <p><span class="smart-term" data-term-en="Characteristic Table" data-ar="الجدول المميز" data-en-def="A table that defines the next state of a flip-flop based on its inputs.">Characteristic tables</span> determine the next state of a flip-flop based on its current inputs.</p>
-    </template>
-    <div class="content-target"></div>
-  </div>
-  
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لتحليل سلوك الدوائر التتابعية، نحتاج إلى معرفة <span class="smart-term" data-term-en="Characteristic Table" data-ar="الجدول المميز" data-en-def="A table that defines the next state of a flip-flop based on its inputs.">الجداول المميزة</span> (Characteristic Tables) للقلابات المستخدمة. هذه الجداول تعطينا <strong>الحالة التالية (Next State)</strong> بناءً على <strong>المدخلات (Inputs)</strong> الحالية.</p><ul><li><strong>قلاب D:</strong> الحالة التالية تساوي المدخل D مباشرة ($Q(t+1) = D$).</li><li><strong>قلاب JK:</strong> يعتمد على J و K. إذا كانا 00 (لا تغيير)، 01 (تصفير Reset)، 10 (تعيين Set)، 11 (عكس Complement).</li><li><strong>قلاب T:</strong> إذا كان T=0 (لا تغيير)، وإذا كان T=1 (عكس الحالة).</li></ul></template>
-    <template class="content-en"><p>To analyze the behavior of sequential circuits, we need the <span class="smart-term" data-term-en="Characteristic Table" data-ar="الجدول المميز" data-en-def="A table that defines the next state of a flip-flop based on its inputs.">characteristic tables</span> of the flip-flops used. These tables define the <strong>next state</strong> given the <strong>current inputs</strong>.</p><ul><li><strong>D Flip-Flop:</strong> The next state is exactly the input D ($Q(t+1) = D$).</li><li><strong>JK Flip-Flop:</strong> Depends on J and K. 00 (No change), 01 (Reset), 10 (Set), 11 (Complement).</li><li><strong>T Flip-Flop:</strong> If T=0 (No change), if T=1 (Complement).</li></ul></template>
-    <div class="content-target"></div>
-  </div>
-  
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>الجداول المميزة هي الجسر الرياضي بين الدائرة التوافقية (التي تولد إشارات الإدخال للقلابات) والدائرة التتابعية (التي تخزن الحالة).</p><p>بدون هذه الجداول، لا يمكننا الانتقال من معادلات الإدخال إلى جدول الحالة.</p></template>
-    <template class="content-en"><p>Characteristic tables act as the mathematical bridge between the combinational logic (which generates the inputs to the flip-flops) and the sequential logic (which stores the state).</p><p>Without these tables, we cannot transition from input equations to the state table.</p></template>
+    <template class="content-ar"><p>تُصنف الدوائر التتابعية إلى متزامنة (Synchronous) وغير متزامنة (Asynchronous).</p><p>الدوائر المتزامنة تستخدم إشارة توقيت (Clock) لتحديث الحالة في لحظات زمنية محددة، مما يسهل تصميمها وتحليلها ويمنع مشاكل التزامن التي قد تحدث في الدوائر غير المتزامنة التي تتأثر بترتيب تغير المدخلات في أي لحظة.</p></template>
+    <template class="content-en"><p>Sequential circuits are classified into synchronous and asynchronous.</p><ul><li><strong>Synchronous circuits</strong> use a timing device called a clock generator to update states at discrete instants of time, making them easier to design and analyze.</li><li><strong>Asynchronous circuits</strong> depend on input signals at any instant and the order in which they change, which can lead to race conditions.</li></ul></template>
     <div class="content-target"></div>
   </div>
 
   <div class="formula-block">
     <div data-bilingual>
-      <template class="content-ar"><strong>معادلة الحالة العامة حيث تعتمد الحالة التالية على المدخلات والحالة الحالية.</strong></template>
-      <template class="content-en"><strong>General state equation where the next state depends on inputs and current state.</strong></template>
+      <template class="content-ar"><strong>الحالة التالية هي دالة تعتمد على المدخلات الخارجية والحالة الحالية.</strong></template>
+      <template class="content-en"><strong>The next state is a function of external inputs and the present state.</strong></template>
       <div class="content-target"></div>
     </div>
-    <div class="math-block">$$Q(t+1) = f(Inputs, Q(t))$$</div>
+    <div class="math-block">$$Next\ State = f(Inputs, Present\ State)$$</div>
   </div>
 
   
-<div class="svg-diagram" data-diagram-id="2">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
-  <defs>
-    
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.15"/>
-    </filter>
-
-    
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M 0 1 L 9 5 L 0 9 Z" fill="var(--brand-500)"/>
-    </marker>
-
-    
-    <clipPath id="jk-clip">
-      <rect x="45" y="120" width="280" height="210" rx="8"/>
-    </clipPath>
-    <clipPath id="d-clip">
-      <rect x="375" y="160" width="220" height="130" rx="8"/>
-    </clipPath>
-    <clipPath id="t-clip">
-      <rect x="645" y="160" width="220" height="130" rx="8"/>
-    </clipPath>
-  </defs>
-
-  
-  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
-
-  
-  <text x="450" y="45" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="26" font-weight="800" fill="var(--text-primary)" text-anchor="middle">Flip-Flop Characteristic Tables</text>
-  <text x="450" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="500" fill="var(--text-secondary)" text-anchor="middle">جداول خصائص القلابات</text>
-
-  
-  
-  
-
-  
-  <rect x="45" y="120" width="280" height="210" rx="8" fill="var(--bg-elevated)" filter="url(#shadow)"/>
-  
-  
-  <rect x="125" y="170" width="70" height="160" fill="var(--brand-500)" opacity="0.05"/>
-
-  
-  <rect x="45" y="120" width="280" height="50" fill="var(--brand-500)" opacity="0.15" clip-path="url(#jk-clip)"/>
-
-  
-  <line x1="45" y1="170" x2="325" y2="170" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="45" y1="210" x2="325" y2="210" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="45" y1="250" x2="325" y2="250" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="45" y1="290" x2="325" y2="290" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="85" y1="120" x2="85" y2="330" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="125" y1="120" x2="125" y2="330" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="195" y1="120" x2="195" y2="330" stroke="var(--border-color)" stroke-width="1"/>
-
-  
-  <rect x="45" y="120" width="280" height="210" rx="8" fill="none" stroke="var(--border-color)" stroke-width="2"/>
-
-  
-  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">
-    <text x="65" y="150">J</text>
-    <text x="105" y="150">K</text>
-    <text x="160" y="150">Q(t+1)</text>
-    <text x="260" y="142">Operation</text>
-    <text x="260" y="160" font-size="13">العملية</text>
-  </g>
-
-  
-  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle">
-    
-    <text x="65" y="195">0</text>
-    <text x="105" y="195">0</text>
-    <text x="160" y="195" font-weight="bold">Q(t)</text>
-    <text x="260" y="188">No Change</text>
-    <text x="260" y="204" font-size="13" fill="var(--text-secondary)">حالة سابقة</text>
-    
-    <text x="65" y="235">0</text>
-    <text x="105" y="235">1</text>
-    <text x="160" y="235" font-weight="bold">0</text>
-    <text x="260" y="228">Reset</text>
-    <text x="260" y="244" font-size="13" fill="var(--text-secondary)">تصفير</text>
-    
-    <text x="65" y="275">1</text>
-    <text x="105" y="275">0</text>
-    <text x="160" y="275" font-weight="bold">1</text>
-    <text x="260" y="268">Set</text>
-    <text x="260" y="284" font-size="13" fill="var(--text-secondary)">ضبط</text>
-    
-    <text x="65" y="315">1</text>
-    <text x="105" y="315">1</text>
-    <text x="160" y="315" font-weight="bold">Q'(t)</text>
-    <text x="260" y="308">Toggle</text>
-    <text x="260" y="324" font-size="13" fill="var(--text-secondary)">عكس</text>
-  </g>
-
-  
-  <text x="185" y="365" font-family="monospace" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Q(t+1) = J·Q'(t) + K'·Q(t)</text>
-
-  
-  <g>
-    
-    <line x1="100" y1="410" x2="141" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="100" y1="430" x2="141" y2="430" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="100" y1="450" x2="141" y2="450" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="225" y1="410" x2="270" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="233" y1="450" x2="270" y2="450" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    
-    
-    <rect x="145" y="390" width="80" height="80" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
-    
-    
-    <path d="M 145 424 L 153 430 L 145 436" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    
-    <circle cx="229" cy="450" r="4" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    
-    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">
-      <text x="157" y="415">J</text>
-      <text x="157" y="455">K</text>
-      <text x="213" y="415">Q</text>
-      <text x="213" y="455">Q'</text>
-    </g>
-    <text x="95" y="434" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="end">CLK</text>
-    
-    
-    <text x="185" y="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">JK Flip-Flop</text>
-    <text x="185" y="520" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">قلاب JK</text>
-  </g>
-
-
-  
-  
-  
-
-  
-  <rect x="375" y="160" width="220" height="130" rx="8" fill="var(--bg-elevated)" filter="url(#shadow)"/>
-  
-  
-  <rect x="425" y="210" width="70" height="80" fill="var(--brand-500)" opacity="0.05"/>
-
-  
-  <rect x="375" y="160" width="220" height="50" fill="var(--brand-500)" opacity="0.15" clip-path="url(#d-clip)"/>
-
-  
-  <line x1="375" y1="210" x2="595" y2="210" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="375" y1="250" x2="595" y2="250" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="425" y1="160" x2="425" y2="290" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="495" y1="160" x2="495" y2="290" stroke="var(--border-color)" stroke-width="1"/>
-
-  
-  <rect x="375" y="160" width="220" height="130" rx="8" fill="none" stroke="var(--border-color)" stroke-width="2"/>
-
-  
-  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">
-    <text x="400" y="190">D</text>
-    <text x="460" y="190">Q(t+1)</text>
-    <text x="545" y="182">Operation</text>
-    <text x="545" y="200" font-size="13">العملية</text>
-  </g>
-
-  
-  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle">
-    
-    <text x="400" y="235">0</text>
-    <text x="460" y="235" font-weight="bold">0</text>
-    <text x="545" y="228">Reset</text>
-    <text x="545" y="244" font-size="13" fill="var(--text-secondary)">تصفير</text>
-    
-    <text x="400" y="275">1</text>
-    <text x="460" y="275" font-weight="bold">1</text>
-    <text x="545" y="268">Set</text>
-    <text x="545" y="284" font-size="13" fill="var(--text-secondary)">ضبط</text>
-  </g>
-
-  
-  <text x="485" y="365" font-family="monospace" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Q(t+1) = D</text>
-
-  
-  <g>
-    
-    <line x1="400" y1="410" x2="441" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="400" y1="430" x2="441" y2="430" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="525" y1="410" x2="570" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="533" y1="450" x2="570" y2="450" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    
-    
-    <rect x="445" y="390" width="80" height="80" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
-    
-    
-    <path d="M 445 424 L 453 430 L 445 436" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    
-    <circle cx="529" cy="450" r="4" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    
-    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">
-      <text x="457" y="415">D</text>
-      <text x="513" y="415">Q</text>
-      <text x="513" y="455">Q'</text>
-    </g>
-    <text x="395" y="434" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="end">CLK</text>
-    
-    
-    <text x="485" y="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">D Flip-Flop</text>
-    <text x="485" y="520" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">قلاب D</text>
-  </g>
-
-
-  
-  
-  
-
-  
-  <rect x="645" y="160" width="220" height="130" rx="8" fill="var(--bg-elevated)" filter="url(#shadow)"/>
-  
-  
-  <rect x="695" y="210" width="70" height="80" fill="var(--brand-500)" opacity="0.05"/>
-
-  
-  <rect x="645" y="160" width="220" height="50" fill="var(--brand-500)" opacity="0.15" clip-path="url(#t-clip)"/>
-
-  
-  <line x1="645" y1="210" x2="865" y2="210" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="645" y1="250" x2="865" y2="250" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="695" y1="160" x2="695" y2="290" stroke="var(--border-color)" stroke-width="1"/>
-  <line x1="765" y1="160" x2="765" y2="290" stroke="var(--border-color)" stroke-width="1"/>
-
-  
-  <rect x="645" y="160" width="220" height="130" rx="8" fill="none" stroke="var(--border-color)" stroke-width="2"/>
-
-  
-  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">
-    <text x="670" y="190">T</text>
-    <text x="730" y="190">Q(t+1)</text>
-    <text x="815" y="182">Operation</text>
-    <text x="815" y="200" font-size="13">العملية</text>
-  </g>
-
-  
-  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle">
-    
-    <text x="670" y="235">0</text>
-    <text x="730" y="235" font-weight="bold">Q(t)</text>
-    <text x="815" y="228">No Change</text>
-    <text x="815" y="244" font-size="13" fill="var(--text-secondary)">حالة سابقة</text>
-    
-    <text x="670" y="275">1</text>
-    <text x="730" y="275" font-weight="bold">Q'(t)</text>
-    <text x="815" y="268">Toggle</text>
-    <text x="815" y="284" font-size="13" fill="var(--text-secondary)">عكس</text>
-  </g>
-
-  
-  <text x="755" y="365" font-family="monospace" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Q(t+1) = T ⊕ Q(t)</text>
-
-  
-  <g>
-    
-    <line x1="670" y1="410" x2="711" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="670" y1="430" x2="711" y2="430" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="795" y1="410" x2="840" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="803" y1="450" x2="840" y2="450" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
-    
-    
-    <rect x="715" y="390" width="80" height="80" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
-    
-    
-    <path d="M 715 424 L 723 430 L 715 436" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    
-    <circle cx="799" cy="450" r="4" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
-    
-    
-    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">
-      <text x="727" y="415">T</text>
-      <text x="783" y="415">Q</text>
-      <text x="783" y="455">Q'</text>
-    </g>
-    <text x="665" y="434" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="end">CLK</text>
-    
-    
-    <text x="755" y="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">T Flip-Flop</text>
-    <text x="755" y="520" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">قلاب T</text>
-  </g>
-
-</svg>
-</div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">لماذا يعتبر تحليل الدوائر التي تستخدم قلابات D أسهل من تلك التي تستخدم قلابات JK؟</template>
-      <template class="content-en">Why is analyzing circuits with D flip-flops easier than those with JK flip-flops?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>لأن الحالة التالية في قلاب D تساوي مباشرة معادلة الإدخال، بينما في قلاب JK يجب استخدام الجدول المميز لدمج قيم J و K مع الحالة الحالية.</p></template>
-      <template class="content-en"><p>Because the next state in a D flip-flop is directly equal to the input equation, whereas for a JK flip-flop, you must use the characteristic table to combine J and K values with the current state.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-
-<section id="analysis-steps" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">3</span> خطوات تحليل الدوائر التتابعية</h2></template>
-    <template class="content-en"><h2><span class="concept-number">3</span> Steps of Sequential Circuit Analysis</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar">
-      <p>الخطوات الثلاث: 1. استنتاج <span class="smart-term" data-term-en="Input Equation" data-ar="معادلة الإدخال" data-en-def="A Boolean equation describing the logic driving a flip-flop's input terminal.">معادلات الإدخال</span>، 2. بناء <span class="smart-term" data-term-en="State Table" data-ar="جدول الحالة" data-en-def="A tabular representation showing present states, inputs, next states, and outputs.">جدول الحالة</span>، 3. رسم مخطط الحالة.</p>
-    </template>
-    <template class="content-en">
-      <p>The three steps: 1. Derive <span class="smart-term" data-term-en="Input Equation" data-ar="معادلة الإدخال" data-en-def="A Boolean equation describing the logic driving a flip-flop's input terminal.">Input Equations</span>, 2. Build <span class="smart-term" data-term-en="State Table" data-ar="جدول الحالة" data-en-def="A tabular representation showing present states, inputs, next states, and outputs.">State Table</span>, 3. Draw State Diagram.</p>
-    </template>
-    <div class="content-target"></div>
-  </div>
-  
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يتكون تحليل الدائرة التتابعية من ثلاث خطوات رئيسية متسلسلة:</p><ol><li><strong>استنتاج <span class="smart-term" data-term-en="Input Equation" data-ar="معادلة الإدخال" data-en-def="A Boolean equation describing the logic driving a flip-flop's input terminal.">معادلات الإدخال</span> (Deriving Input Equations):</strong> كتابة المعادلات المنطقية البولينية التي تصف الإشارات الداخلة إلى كل قلاب بناءً على المدخلات الخارجية والحالة الحالية.</li><li><strong>الحصول على <span class="smart-term" data-term-en="State Table" data-ar="جدول الحالة" data-en-def="A tabular representation showing present states, inputs, next states, and outputs.">جدول الحالة</span> (Getting the State Table):</strong> إنشاء جدول يوضح الحالة الحالية، المدخلات، الحالة التالية، والمخرجات. يتم حساب الحالة التالية باستخدام معادلات الإدخال والجداول المميزة.</li><li><strong>الحصول على مخطط الحالة (Obtaining the State Diagram):</strong> تحويل جدول الحالة إلى رسم بياني مرئي يوضح تسلسل الحالات والمخرجات بمرور الوقت.</li></ol></template>
-    <template class="content-en"><p>The analysis of a sequential circuit consists of three main sequential steps:</p><ol><li><strong>Deriving <span class="smart-term" data-term-en="Input Equation" data-ar="معادلة الإدخال" data-en-def="A Boolean equation describing the logic driving a flip-flop's input terminal.">Input Equations</span>:</strong> Writing the Boolean logic equations that describe the signals entering each flip-flop based on external inputs and the present state.</li><li><strong>Getting the <span class="smart-term" data-term-en="State Table" data-ar="جدول الحالة" data-en-def="A tabular representation showing present states, inputs, next states, and outputs.">State Table</span>:</strong> Creating a table that shows the present state, inputs, next state, and outputs. The next state is calculated using the input equations and characteristic tables.</li><li><strong>Obtaining the State Diagram:</strong> Converting the state table into a visual graph that demonstrates the time sequence of inputs, outputs, and states.</li></ol></template>
-    <div class="content-target"></div>
-  </div>
-  
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>هذه المنهجية تضمن تحويلاً دقيقاً من مستوى المكونات المادية (Hardware) إلى مستوى التجريد السلوكي (Behavioral Abstraction).</p><p>جدول الحالة يحتوي على $2^{m+n}$ صفاً، حيث $m$ هو عدد القلابات و $n$ هو عدد المدخلات الخارجية، مما يضمن تغطية جميع الاحتمالات الممكنة للنظام.</p></template>
-    <template class="content-en"><p>This methodology ensures an accurate translation from the hardware component level to behavioral abstraction.</p><p>The state table contains $2^{m+n}$ rows, where $m$ is the number of flip-flops and $n$ is the number of external inputs, ensuring all possible system states and input combinations are covered.</p></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="formula-block">
-    <div data-bilingual>
-      <template class="content-ar"><strong>عدد الصفوف في جدول الحالة، حيث m عدد القلابات و n عدد المدخلات.</strong></template>
-      <template class="content-en"><strong>Number of rows in a state table, where m is the number of flip-flops and n is the number of inputs.</strong></template>
-      <div class="content-target"></div>
-    </div>
-    <div class="math-block">$$Rows = 2^{m+n}$$</div>
-  </div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">إذا كان لديك دائرة تحتوي على 3 قلابات ومدخلين خارجيين، كم عدد الصفوف في جدول الحالة؟</template>
-      <template class="content-en">If you have a circuit with 3 flip-flops and 2 external inputs, how many rows will the state table have?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>عدد الصفوف = 2^(3+2) = 2^5 = 32 صفاً.</p></template>
-      <template class="content-en"><p>Number of rows = 2^(3+2) = 2^5 = 32 rows.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-
-<section id="mealy-vs-moore" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">4</span> نموذج ميلي مقابل نموذج مور</h2></template>
-    <template class="content-en"><h2><span class="concept-number">4</span> Mealy Model vs. Moore Model</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar">
-      <p>في <span class="smart-term" data-term-en="Mealy Machine" data-ar="آلة ميلي" data-en-def="A state machine where outputs depend on both current state and inputs.">آلة ميلي</span>، تعتمد المخرجات على الحالة والمدخلات معاً. في <span class="smart-term" data-term-en="Moore Machine" data-ar="آلة مور" data-en-def="A state machine where outputs depend only on the current state.">آلة مور</span>، تعتمد المخرجات على الحالة فقط.</p>
-    </template>
-    <template class="content-en">
-      <p>In a <span class="smart-term" data-term-en="Mealy Machine" data-ar="آلة ميلي" data-en-def="A state machine where outputs depend on both current state and inputs.">Mealy machine</span>, outputs depend on both state and inputs. In a <span class="smart-term" data-term-en="Moore Machine" data-ar="آلة مور" data-en-def="A state machine where outputs depend only on the current state.">Moore machine</span>, outputs depend ONLY on the state.</p>
-    </template>
-    <div class="content-target"></div>
-  </div>
-  
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تصنف الدوائر التتابعية المتزامنة إلى نوعين رئيسيين بناءً على كيفية توليد المخرجات:</p><ol><li><strong>نموذج ميلي (Mealy Model):</strong> المخرجات هي دالة في كل من الحالة الحالية (Present State) والمدخلات (Inputs). في مخطط الحالة، تُكتب المخرجات على أسهم الانتقال بصيغة (Input/Output).</li><li><strong>نموذج مور (Moore Model):</strong> المخرجات هي دالة في الحالة الحالية فقط (States only). في مخطط الحالة، تُكتب المخرجات داخل دوائر الحالة نفسها.</li></ol></template>
-    <template class="content-en"><p>Synchronous sequential circuits are classified into two main types based on how outputs are generated:</p><ol><li><strong>Mealy Model:</strong> Outputs are a function of both the present state and the inputs. In a state diagram, outputs are written on the transition arrows in the format (Input/Output).</li><li><strong>Moore Model:</strong> Outputs are a function of the present state only. In a state diagram, outputs are written inside the state circles.</li></ol></template>
-    <div class="content-target"></div>
-  </div>
-  
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>آلة ميلي عادة ما تكون أكثر تعقيداً لأن المخرجات يمكن أن تتغير فور تغير المدخلات (غير متزامنة تماماً مع النبضة في بعض التصاميم)، ولكنها تتطلب عدد حالات أقل (مكونات مادية أقل).</p><p>آلة مور أسهل في الفهم والتنفيذ البرمجي، ومخرجاتها متزامنة تماماً مع الساعة، لكنها قد تتطلب حالات إضافية لإنجاز نفس المهمة.</p></template>
-    <template class="content-en"><p>A Mealy machine is generally more complex because outputs can change asynchronously if inputs change between clock edges, but it typically requires fewer states (less hardware).</p><p>A Moore machine is easier to understand and implement, and its outputs are strictly synchronous, but it may require more states to accomplish the same task.</p></template>
-    <div class="content-target"></div>
-  </div>
-
-  
-<div class="svg-diagram" data-diagram-id="1">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
         
-        <marker id="arrow-mealy" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
         </marker>
+
         
-        <marker id="arrow-moore" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
-        </marker>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25"/>
+        </filter>
+
+        
+        <pattern id="dotGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="var(--text-muted)" opacity="0.15"/>
+        </pattern>
     </defs>
 
     
-    <rect width="100%" height="100%" fill="var(--bg-surface)" />
-
-    
-    <line x1="400" y1="60" x2="400" y2="440" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6 6" />
-
-    
-    
-    
-
-    
-    <text x="200" y="40" fill="var(--text-primary)" font-size="22" font-weight="bold" text-anchor="middle">Mealy Machine / آلة ميلي</text>
-
-    
-    <text x="200" y="75" fill="var(--text-muted)" font-size="14" text-anchor="middle">
-        <tspan x="200" dy="0">Transition: Input / Output</tspan>
-        <tspan x="200" dy="20">الانتقال: الدخل / الخرج</tspan>
-    </text>
-
-    
-    <path d="M 20 190 L 60 190" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-mealy)" />
-    <text x="40" y="175" fill="var(--text-muted)" font-size="13" text-anchor="middle">
-        <tspan x="40" dy="0">Start</tspan>
-        <tspan x="40" dy="16">البداية</tspan>
-    </text>
-
-    
-    
-    <path d="M 85 164 C 60 100, 140 100, 115 164" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-mealy)" />
-    <text x="100" y="110" fill="var(--brand-500)" font-size="16" font-weight="bold" text-anchor="middle">0 / 0</text>
-
-    
-    <path d="M 130 190 L 260 190" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-mealy)" />
-    <text x="195" y="180" fill="var(--brand-500)" font-size="16" font-weight="bold" text-anchor="middle">1 / 0</text>
-
-    
-    <path d="M 283 215 Q 270 270 225 305" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-mealy)" />
-    <text x="275" y="270" fill="var(--brand-500)" font-size="16" font-weight="bold" text-anchor="middle">0 / 1</text>
-
-    
-    <path d="M 183 315 Q 130 270 112 215" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-mealy)" />
-    <text x="125" y="270" fill="var(--brand-500)" font-size="16" font-weight="bold" text-anchor="middle">1 / 1</text>
-
-    
-    
-    <circle cx="100" cy="190" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
-    <text x="100" y="190" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="middle" dy="6">00</text>
-
-    
-    <circle cx="300" cy="190" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
-    <text x="300" y="190" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="middle" dy="6">01</text>
-
-    
-    <circle cx="200" cy="340" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
-    <text x="200" y="340" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="middle" dy="6">10</text>
-
-    
-    <text x="200" y="420" fill="var(--text-secondary)" font-size="15" text-anchor="middle">
-        <tspan x="200" dy="0">Output depends on State + Input</tspan>
-        <tspan x="200" dy="22">الخرج يعتمد على الحالة والدخل</tspan>
-    </text>
-
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+    <rect width="100%" height="100%" fill="url(#dotGrid)"/>
 
     
     
     
+    <path d="M 40 100 L 205 100" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    
+    
+    <path d="M 580 130 L 745 130" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    
+    
+    <circle cx="680" cy="130" r="5" fill="var(--brand-500)"/>
 
     
-    <text x="600" y="40" fill="var(--text-primary)" font-size="22" font-weight="bold" text-anchor="middle">Moore Machine / آلة مور</text>
+    <path d="M 680 130 L 680 295 Q 680 305 670 305 L 555 305" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
 
     
-    <text x="600" y="75" fill="var(--text-muted)" font-size="14" text-anchor="middle">
-        <tspan x="600" dy="0">State: Name / Output</tspan>
-        <tspan x="600" dy="20">الحالة: الاسم / الخرج</tspan>
-    </text>
+    <path d="M 260 305 L 130 305 Q 120 305 120 295 L 120 170 Q 120 160 130 160 L 205 160" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
 
     
-    <path d="M 410 190 L 455 190" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow-moore)" />
-    <text x="430" y="175" fill="var(--text-muted)" font-size="13" text-anchor="middle">
-        <tspan x="430" dy="0">Start</tspan>
-        <tspan x="430" dy="16">البداية</tspan>
-    </text>
+    <path d="M 400 390 L 400 350" fill="none" stroke="var(--text-muted)" stroke-width="2"/>
 
     
-    
-    <path d="M 482 160 C 450 90, 550 90, 518 160" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow-moore)" />
-    <text x="500" y="105" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle">0</text>
 
     
-    <path d="M 535 190 L 655 190" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow-moore)" />
-    <text x="595" y="180" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle">1</text>
+    <rect x="220" y="60" width="360" height="140" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
+    
+    
+    <rect x="260" y="260" width="280" height="90" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
 
     
-    <path d="M 680 219 Q 670 270 625 305" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow-moore)" />
-    <text x="675" y="270" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle">0</text>
+    <polygon points="390,350 410,350 400,338" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
 
     
-    <path d="M 581 311 Q 530 270 514 219" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow-moore)" />
-    <text x="525" y="270" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle">1</text>
 
     
-    
-    <circle cx="500" cy="190" r="35" fill="var(--bg-elevated)" stroke="var(--text-secondary)" stroke-width="3" />
-    <line x1="465" y1="190" x2="535" y2="190" stroke="var(--text-secondary)" stroke-width="2" />
-    <text x="500" y="190" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle" dy="-5">00</text>
-    <text x="500" y="190" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle" dy="18">0</text>
+    <text x="400" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Combinational Circuit</text>
+    <text x="400" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-secondary)" text-anchor="middle">دائرة توافقية</text>
 
     
-    <circle cx="700" cy="190" r="35" fill="var(--bg-elevated)" stroke="var(--text-secondary)" stroke-width="3" />
-    <line x1="665" y1="190" x2="735" y2="190" stroke="var(--text-secondary)" stroke-width="2" />
-    <text x="700" y="190" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle" dy="-5">01</text>
-    <text x="700" y="190" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle" dy="18">0</text>
+    <text x="400" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Memory Elements</text>
+    <text x="400" y="330" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">عناصر الذاكرة</text>
 
     
-    <circle cx="600" cy="340" r="35" fill="var(--bg-elevated)" stroke="var(--text-secondary)" stroke-width="3" />
-    <line x1="565" y1="340" x2="635" y2="340" stroke="var(--text-secondary)" stroke-width="2" />
-    <text x="600" y="340" fill="var(--text-primary)" font-size="16" font-weight="bold" text-anchor="middle" dy="-5">10</text>
-    <text x="600" y="340" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle" dy="18">1</text>
+    <text x="120" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Inputs</text>
+    <text x="120" y="95" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">مدخلات</text>
 
     
-    <text x="600" y="420" fill="var(--text-secondary)" font-size="15" text-anchor="middle">
-        <tspan x="600" dy="0">Output depends on State only</tspan>
-        <tspan x="600" dy="22">الخرج يعتمد على الحالة فقط</tspan>
-    </text>
+    <text x="720" y="95" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Outputs</text>
+    <text x="720" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">مخرجات</text>
+
+    
+    <text x="735" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">Next State</text>
+    <text x="735" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">الحالة التالية</text>
+
+    
+    <text x="65" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">Current State</text>
+    <text x="65" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">الحالة الحالية</text>
+
+    
+    <text x="445" y="375" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">Clock</text>
+    <text x="445" y="395" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">الساعة</text>
 
 </svg>
 </div>
@@ -829,59 +326,59 @@
     <thead>
       <tr>
         <th></th>
-        <th>Mealy Machine</th>
-        <th>Moore Machine</th>
+        <th>Combinational Circuits</th>
+        <th>Sequential Circuits</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td data-bilingual>
-          <template class="content-ar">اعتماد المخرجات</template>
-          <template class="content-en">Output Dependency</template>
+          <template class="content-ar">الاعتمادية على المخرجات</template>
+          <template class="content-en">Output Dependence</template>
           <span class="content-target"></span>
         </td>
-        <td class="td-neutral" data-bilingual>
-          <template class="content-ar">الحالة الحالية والمدخلات</template>
-          <template class="content-en">Present state and inputs</template>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تعتمد على المدخلات الحالية فقط</template>
+          <template class="content-en">Depends only on current inputs</template>
           <span class="content-target"></span>
         </td>
-        <td class="td-neutral" data-bilingual>
-          <template class="content-ar">الحالة الحالية فقط</template>
-          <template class="content-en">Present state only</template>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تعتمد على المدخلات الحالية والحالة السابقة</template>
+          <template class="content-en">Depends on current inputs and past state</template>
           <span class="content-target"></span>
         </td>
       </tr>
       <tr>
         <td data-bilingual>
-          <template class="content-ar">عدد الحالات (المكونات المادية)</template>
-          <template class="content-en">Number of States (Hardware)</template>
-          <span class="content-target"></span>
-        </td>
-        <td class="td-good" data-bilingual>
-          <template class="content-ar">أقل عادةً</template>
-          <template class="content-en">Usually less</template>
+          <template class="content-ar">الذاكرة</template>
+          <template class="content-en">Memory</template>
           <span class="content-target"></span>
         </td>
         <td class="td-bad" data-bilingual>
-          <template class="content-ar">أكثر عادةً</template>
-          <template class="content-en">Usually more</template>
+          <template class="content-ar">لا توجد ذاكرة</template>
+          <template class="content-en">No memory</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تحتوي على عناصر تخزين (ذاكرة)</template>
+          <template class="content-en">Contains storage elements (memory)</template>
           <span class="content-target"></span>
         </td>
       </tr>
       <tr>
         <td data-bilingual>
-          <template class="content-ar">التعقيد والفهم</template>
-          <template class="content-en">Complexity & Understanding</template>
+          <template class="content-ar">مسار التغذية الراجعة</template>
+          <template class="content-en">Feedback Path</template>
           <span class="content-target"></span>
         </td>
         <td class="td-bad" data-bilingual>
-          <template class="content-ar">أكثر تعقيداً</template>
-          <template class="content-en">More complex</template>
+          <template class="content-ar">غير موجود</template>
+          <template class="content-en">Absent</template>
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">أسهل للفهم والتنفيذ</template>
-          <template class="content-en">Easy to understand and implement</template>
+          <template class="content-ar">موجود</template>
+          <template class="content-en">Present</template>
           <span class="content-target"></span>
         </td>
       </tr>
@@ -890,13 +387,591 @@
 
   <details class="thinking-question">
     <summary data-bilingual>
-      <template class="content-ar">إذا أردت تصميم دائرة تتفاعل بأسرع وقت ممكن مع تغير المدخلات، أي النموذجين تختار؟</template>
-      <template class="content-en">If you want to design a circuit that reacts as quickly as possible to input changes, which model would you choose?</template>
+      <template class="content-ar">لماذا لا يمكننا بناء جهاز حاسوب باستخدام الدوائر التوافقية فقط؟</template>
+      <template class="content-en">Why can't we build a computer using only combinational circuits?</template>
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>نموذج ميلي، لأن المخرجات مرتبطة مباشرة بالمدخلات ويمكن أن تتغير فور تغيرها دون انتظار النبضة التالية للساعة (في الجزء التوافقي).</p></template>
-      <template class="content-en"><p>The Mealy model, because the outputs are directly connected to the inputs and can change immediately when inputs change, without waiting for the next clock edge (in the combinational part).</p></template>
+      <template class="content-ar"><p>لأن الحواسيب تحتاج إلى تخزين البيانات والتعليمات (الذاكرة) وتتبع تسلسل العمليات، وهو ما يتطلب دوائر تتابعية تحتفظ بالحالة.</p></template>
+      <template class="content-en"><p>Because computers need to store data and instructions (memory) and keep track of the sequence of operations, which requires sequential circuits that retain state.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="latches" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> المواسك (Latches)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Latches</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar">
+      <p>عناصر تخزين أساسية تعمل بمستوى الإشارة (Level-sensitive) بدلاً من حافة النبضة.</p>
+    </template>
+    <template class="content-en">
+      <p>Basic storage elements that operate with signal levels (level-sensitive) rather than clock transitions.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الماسك هو عنصر تخزين يمكنه الحفاظ على حالة ثنائية إلى أجل غير مسمى (طالما توفرت الطاقة) حتى يتم توجيهه بواسطة إشارة إدخال لتغيير حالته.</p><p>المواسك هي اللبنات الأساسية لبناء النطاطات (Flip-flops).</p><p>من أشهر أنواعها ماسك SR الذي يُبنى باستخدام بوابتي NOR أو NAND <span class="smart-term" data-term-en="Cross-coupled" data-ar="متقاطع التوصيل" data-en-def="A circuit configuration where the output of one gate is connected to the input of another, and vice versa.">متقاطعتين<span class="smart-term-tooltip"></span></span>.</p></template>
+    <template class="content-en"><p>A latch is a storage element that can maintain a binary state indefinitely (as long as power is delivered) until directed by an input signal to switch states.</p><p>Latches are the building blocks for flip-flops.</p><p>A common type is the SR latch, constructed with two <span class="smart-term" data-term-en="Cross-coupled" data-ar="متقاطع التوصيل" data-en-def="A circuit configuration where the output of one gate is connected to the input of another, and vice versa.">cross-coupled<span class="smart-term-tooltip"></span></span> NOR or NAND gates.</p></template>
+    <div class="content-target"></div>
+  </div>
+  
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المشكلة الرئيسية في المواسك هي أنها تستجيب لتغيرات المدخلات طوال فترة تفعيل إشارة التمكين (Enable) أو مستوى الساعة.</p><p>هذا يعني أن أي تغيير في المدخلات خلال هذه الفترة سينعكس فوراً على المخرجات، مما يجعلها غير مناسبة للدوائر التتابعية المعقدة التي تتطلب تزامناً دقيقاً.</p></template>
+    <template class="content-en"><p>The main issue with latches is that they respond to input changes as long as the enable signal or clock level is active.</p><p>This transparency means any input change during this period immediately affects the output, making them unsuitable for complex sequential circuits that require precise synchronization.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  
+  <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">SR Latch (Cross-Coupled NOR Gates)</text>
+  <text x="400" y="60" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" fill="var(--text-secondary)">قلاب SR (بوابات NOR المتقاطعة)</text>
+
+  
+  <g stroke="var(--brand-500)" stroke-width="2" fill="none">
+    
+    
+    <path d="M 120 130 L 265 130" marker-end="url(#arrow)" />
+    <path d="M 120 270 L 265 270" marker-end="url(#arrow)" />
+
+    
+    <path d="M 450 150 L 450 190 L 200 190 L 200 230 L 265 230" marker-end="url(#arrow)" />
+    
+    
+    <path d="M 430 250 L 430 210 L 230 210 L 230 196 A 6 6 0 0 1 230 184 L 230 170 L 265 170" marker-end="url(#arrow)" />
+
+    
+    <path d="M 386 150 L 530 150" marker-end="url(#arrow)" />
+    <path d="M 386 250 L 530 250" marker-end="url(#arrow)" />
+
+    
+    <circle cx="450" cy="150" r="4" fill="var(--brand-500)" stroke="none" />
+    <circle cx="430" cy="250" r="4" fill="var(--brand-500)" stroke="none" />
+
+    
+    <g>
+      <path d="M 270 110 C 310 110, 350 120, 370 150 C 350 180, 310 190, 270 190 C 290 170, 290 130, 270 110 Z" fill="var(--bg-elevated)" />
+      <circle cx="378" cy="150" r="8" fill="var(--bg-elevated)" />
+      <text x="310" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" stroke="none">NOR</text>
+    </g>
+
+    
+    <g>
+      <path d="M 270 210 C 310 210, 350 220, 370 250 C 350 280, 310 290, 270 290 C 290 270, 290 230, 270 210 Z" fill="var(--bg-elevated)" />
+      <circle cx="378" cy="250" r="8" fill="var(--bg-elevated)" />
+      <text x="310" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" stroke="none">NOR</text>
+    </g>
+  </g>
+
+  
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    
+    <text x="110" y="125" font-size="16" font-weight="bold" text-anchor="end" fill="var(--text-primary)">R (Reset)</text>
+    <text x="110" y="145" font-size="14" text-anchor="end" fill="var(--text-secondary)">إعادة تعيين</text>
+    
+    
+    <text x="110" y="265" font-size="16" font-weight="bold" text-anchor="end" fill="var(--text-primary)">S (Set)</text>
+    <text x="110" y="285" font-size="14" text-anchor="end" fill="var(--text-secondary)">تعيين</text>
+    
+    
+    <text x="545" y="145" font-size="16" font-weight="bold" text-anchor="start" fill="var(--text-primary)">Q</text>
+    <text x="545" y="165" font-size="14" text-anchor="start" fill="var(--text-secondary)">المخرج</text>
+    
+    
+    <text x="545" y="245" font-size="16" font-weight="bold" text-anchor="start" fill="var(--text-primary)">Q'</text>
+    <text x="545" y="265" font-size="14" text-anchor="start" fill="var(--text-secondary)">المخرج المعكوس</text>
+  </g>
+
+  
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <text x="685" y="85" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Truth Table / جدول الحقيقة</text>
+    
+    <rect x="575" y="100" width="220" height="145" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="575" y1="130" x2="795" y2="130" stroke="var(--border-color)" stroke-width="1" />
+    
+    
+    <text x="595" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">S</text>
+    <text x="625" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">R</text>
+    <text x="655" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Q</text>
+    <text x="685" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Q'</text>
+    <text x="745" y="120" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">State / الحالة</text>
+
+    
+    <text x="595" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="625" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="655" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">Q</text>
+    <text x="685" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">Q'</text>
+    <text x="745" y="150" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Hold (احتفاظ)</text>
+
+    
+    <text x="595" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="625" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
+    <text x="655" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="685" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
+    <text x="745" y="175" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Reset (تصفير)</text>
+
+    
+    <text x="595" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
+    <text x="625" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="655" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
+    <text x="685" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="745" y="200" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Set (تعيين)</text>
+
+    
+    <text x="595" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
+    <text x="625" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
+    <text x="655" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="685" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
+    <text x="745" y="225" font-size="13" text-anchor="middle" fill="var(--brand-500)">Invalid (غير صالح)</text>
+  </g>
+
+  
+  <text x="400" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)">Cross-coupling creates a feedback loop that allows the circuit to store state.</text>
+  <text x="400" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)">التقاطع يخلق حلقة تغذية راجعة تسمح للدائرة بتخزين الحالة.</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>NOR SR Latch</th>
+        <th>NAND SR Latch</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المدخلات النشطة</template>
+          <template class="content-en">Active Inputs</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نشط عند المستوى العالي (1)</template>
+          <template class="content-en">Active High (1)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نشط عند المستوى المنخفض (0) - يُسمى S'R'</template>
+          <template class="content-en">Active Low (0) - called S'R'</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الحالة غير المحددة (الممنوعة)</template>
+          <template class="content-en">Indeterminate (Forbidden) State</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">S=1, R=1</template>
+          <template class="content-en">S=1, R=1</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">S=0, R=0</template>
+          <template class="content-en">S=0, R=0</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث في ماسك SR (المبني بـ NOR) إذا كانت المدخلات S=1 و R=1؟</template>
+      <template class="content-en">What happens in a NOR-based SR latch if inputs S=1 and R=1?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تحدث حالة غير محددة (Indeterminate state) حيث يصبح كل من Q و Q' صفراً، وهو ما ينتهك قاعدة أن أحدهما يجب أن يكون عكس الآخر.</p></template>
+      <template class="content-en"><p>An indeterminate state occurs where both Q and Q' become 0, violating the rule that they must be complements of each other.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="d-latch" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> ماسك D (D Latch)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> D Latch</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar">
+      <p>ماسك يمنع الحالة غير المحددة عن طريق ضمان عدم تساوي مدخلي S و R أبداً.</p>
+    </template>
+    <template class="content-en">
+      <p>A latch that eliminates the indeterminate state by ensuring S and R inputs are never equal.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لحل مشكلة الحالة غير المحددة في ماسك SR، تم ابتكار ماسك D. يحتوي هذا الماسك على مدخلين فقط:</p><ul><li><strong>D</strong> (البيانات)</li><li>و <strong>En</strong> (التمكين).</li></ul><p>يذهب المدخل D مباشرة إلى مدخل S، بينما يمر عبر بوابة نفي (Inverter) ليذهب إلى مدخل R.</p><ul><li><strong>عندما يكون En=1</strong>، فإن المخرج Q يتبع المدخل D.</li><li><strong>وعندما يكون En=0</strong>، يحتفظ الماسك بحالته السابقة.</li></ul></template>
+    <template class="content-en"><p>To eliminate the undesirable indeterminate state in the SR latch, the D latch ensures inputs S and R are never equal to 1 at the same time. It has two inputs:</p><ul><li><strong>D</strong> (data)</li><li>and <strong>En</strong> (enable).</li></ul><p>The D input goes directly to S, and its complement goes to R.</p><ul><li><strong>When En=1</strong>, output Q follows D.</li><li><strong>When En=0</strong>, it retains its previous state.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُعرف ماسك D أيضاً ب<span class="smart-term" data-term-en="Transparent Latch" data-ar="الماسك الشفاف" data-en-def="Another name for a D latch, referring to how data passes directly to the output when enabled.">الماسك الشفاف<span class="smart-term-tooltip"></span></span> (Transparent Latch) لأنه عندما يكون التمكين نشطاً، تظهر التغييرات في D مباشرة على Q.</p><p>هذه الشفافية مفيدة في بعض التطبيقات ولكنها تسبب مشاكل (Race conditions) إذا تم استخدامها في مسارات التغذية الراجعة المتزامنة، مما يستدعي استخدام النطاطات التي تعمل بحافة النبضة.</p></template>
+    <template class="content-en"><p>The D latch is also known as a <span class="smart-term" data-term-en="Transparent Latch" data-ar="الماسك الشفاف" data-en-def="Another name for a D latch, referring to how data passes directly to the output when enabled.">transparent latch<span class="smart-term-tooltip"></span></span> because when the enable is active, changes in D flow directly to Q.</p><p>While useful in certain applications, this transparency causes race conditions in synchronous feedback loops, necessitating the use of edge-triggered flip-flops.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--brand-500)"/>
+        </marker>
+        <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+            <circle cx="5" cy="5" r="3" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    
+    <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">D Latch Logic Diagram / مخطط القلاب D</text>
+
+    
+    <rect x="430" y="55" width="200" height="290" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" rx="12"/>
+    <text x="530" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">SR Latch (قلاب SR)</text>
+
+    
+    <g fill="none" stroke="var(--brand-500)" stroke-width="2">
+        
+        <polyline points="80,100 280,100" marker-end="url(#arrow)"/>
+        <polyline points="120,100 120,300 180,300" marker-end="url(#arrow)"/>
+        <polyline points="220,300 280,300" marker-end="url(#arrow)"/>
+        
+        
+        <polyline points="80,200 240,200"/>
+        <polyline points="240,200 240,120 280,120" marker-end="url(#arrow)"/>
+        <polyline points="240,200 240,280 280,280" marker-end="url(#arrow)"/>
+
+        
+        
+        <polyline points="340,110 370,110 370,310 490,310" marker-end="url(#arrow)"/>
+        
+        <polyline points="340,290 410,290 410,90 490,90" marker-end="url(#arrow)"/>
+
+        
+        <polyline points="570,110 680,110" marker-end="url(#arrow)"/>
+        <polyline points="570,290 680,290" marker-end="url(#arrow)"/>
+
+        
+        
+        <polyline points="610,110 610,200 450,200 450,270 490,270" marker-end="url(#arrow)"/>
+        
+        <polyline points="590,290 590,180 460,180 460,130 490,130" marker-end="url(#arrow)"/>
+    </g>
+
+    
+    <g fill="var(--brand-500)">
+        <circle cx="120" cy="100" r="4"/>
+        <circle cx="240" cy="200" r="4"/>
+        <circle cx="610" cy="110" r="4"/>
+        <circle cx="590" cy="290" r="4"/>
+    </g>
+
+    
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+        
+        <path d="M 180,285 L 210,300 L 180,315 Z"/>
+        <circle cx="215" cy="300" r="5"/>
+
+        
+        <path d="M 280,80 L 310,80 A 30,30 0 0,1 310,140 L 280,140 Z"/>
+        
+        
+        <path d="M 280,260 L 310,260 A 30,30 0 0,1 310,320 L 280,320 Z"/>
+
+        
+        <path d="M 480,70 C 500,70 540,90 560,110 C 540,130 500,150 480,150 C 495,130 495,90 480,70 Z"/>
+        <circle cx="565" cy="110" r="5"/>
+
+        
+        <path d="M 480,250 C 500,250 540,270 560,290 C 540,310 500,330 480,330 C 495,310 495,270 480,250 Z"/>
+        <circle cx="565" cy="290" r="5"/>
+    </g>
+
+    
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" fill="var(--text-primary)">
+        
+        <text x="195" y="275" font-size="13" font-weight="bold" text-anchor="middle">NOT</text>
+        <text x="300" y="115" font-size="14" font-weight="bold" text-anchor="middle">AND</text>
+        <text x="300" y="295" font-size="14" font-weight="bold" text-anchor="middle">AND</text>
+        <text x="515" y="115" font-size="14" font-weight="bold" text-anchor="middle">NOR</text>
+        <text x="515" y="295" font-size="14" font-weight="bold" text-anchor="middle">NOR</text>
+
+        
+        <text x="70" y="95" font-size="18" font-weight="bold" text-anchor="end">D</text>
+        <text x="70" y="115" font-size="13" fill="var(--text-secondary)" text-anchor="end">Data / بيانات</text>
+        
+        <text x="70" y="195" font-size="18" font-weight="bold" text-anchor="end">En</text>
+        <text x="70" y="215" font-size="13" fill="var(--text-secondary)" text-anchor="end">Enable / تمكين</text>
+
+        
+        <text x="690" y="105" font-size="18" font-weight="bold" text-anchor="start">Q</text>
+        <text x="690" y="125" font-size="13" fill="var(--text-secondary)" text-anchor="start">State / الحالة</text>
+        
+        <text x="690" y="285" font-size="18" font-weight="bold" text-anchor="start">Q'</text>
+        <text x="690" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="start">Inverted / معكوس</text>
+
+        
+        <text x="265" y="95" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end">D</text>
+        <text x="265" y="115" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end">En</text>
+        
+        <text x="265" y="275" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end">En</text>
+        <text x="265" y="315" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end">D'</text>
+
+        <text x="355" y="100" font-size="15" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">S</text>
+        <text x="355" y="280" font-size="15" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">R</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يحل ماسك D مشكلة الحالة غير المحددة الموجودة في ماسك SR؟</template>
+      <template class="content-en">How does the D latch solve the indeterminate state problem of the SR latch?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>باستخدام بوابة نفي (Inverter) بين مدخلي S و R، يضمن ماسك D أن المدخلين لا يمكن أن يكونا 1 في نفس الوقت أبداً.</p></template>
+      <template class="content-en"><p>By using an inverter between the S and R inputs, the D latch ensures that both inputs can never be 1 simultaneously.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="edge-triggered-flip-flops" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> النطاطات التي تعمل بحافة النبضة (Edge-Triggered Flip-Flops)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Edge-Triggered Flip-Flops</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
+    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
+    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar">
+      <p>عناصر ذاكرة تغير حالتها فقط عند لحظة انتقال إشارة الساعة (من 0 إلى 1 أو العكس).</p>
+    </template>
+    <template class="content-en">
+      <p>Memory elements that change state only during a clock signal transition (0 to 1, or 1 to 0).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>النطاط (Flip-Flop) هو جهاز تخزين ثنائي مصمم للعمل بشكل صحيح داخل الدوائر التتابعية المتزامنة. مفتاح عمله هو أنه <span class="smart-term" data-term-en="Trigger" data-ar="الاستفزاز / القدح" data-en-def="The momentary change in the control input that causes a flip-flop to switch states.">يُستفز<span class="smart-term-tooltip"></span></span> (Triggered) فقط خلال انتقال الإشارة (حافة النبضة).</p><ul><li><strong>الانتقال من 0 إلى 1</strong> يسمى الحافة الموجبة (Positive edge)،</li><li><strong>والانتقال من 1 إلى 0</strong> يسمى الحافة السالبة (Negative edge).</li></ul></template>
+    <template class="content-en"><p>A flip-flop is a binary storage device designed to operate properly in synchronous sequential circuits. The key to its operation is that it <span class="smart-term" data-term-en="Trigger" data-ar="الاستفزاز / القدح" data-en-def="The momentary change in the control input that causes a flip-flop to switch states.">triggers<span class="smart-term-tooltip"></span></span> only during a signal transition (edge).</p><ul><li><strong>The transition from 0 to 1</strong> is the positive edge,</li><li><strong>and from 1 to 0</strong> is the negative edge.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>إحدى طرق بناء نطاط D يعمل بالحافة هي تكوين '<span class="smart-term" data-term-en="Master-Slave" data-ar="السيد والتابع" data-en-def="A flip-flop configuration using two latches to isolate the output from the input during a clock pulse.">السيد والتابع<span class="smart-term-tooltip"></span></span>' (Master-Slave). يتكون من ماسكي D وعاكس لإشارة الساعة.</p><ul><li><strong>عندما تكون الساعة 1</strong>، يُفعل السيد ويأخذ قيمة D، بينما يُعطل التابع.</li><li><strong>وعندما تنزل الساعة إلى 0 (الحافة السالبة)</strong>، يُعطل السيد وتُنقل قيمته إلى التابع ليظهر على المخرج Q.</li></ul><p>هذا يعزل المخرج عن المدخل أثناء تغير الإشارة.</p></template>
+    <template class="content-en"><p>One way to build an edge-triggered D flip-flop is the <span class="smart-term" data-term-en="Master-Slave" data-ar="السيد والتابع" data-en-def="A flip-flop configuration using two latches to isolate the output from the input during a clock pulse.">Master-Slave<span class="smart-term-tooltip"></span></span> configuration, using two D latches and an inverter on the clock.</p><ul><li><strong>When Clk=1</strong>, the master is enabled and tracks D, while the slave is disabled.</li><li><strong>On the negative edge (Clk goes to 0)</strong>, the master is disabled (locking its value) and the slave is enabled, transferring the master's value to output Q.</li></ul><p>This isolates input from output.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="3" fill="var(--text-primary)" />
+    </marker>
+  </defs>
+
+  
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  
+  <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
+    Master-Slave D Flip-Flop
+  </text>
+  <text x="400" y="60" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">
+    قلاب دي الرئيسي والتابع
+  </text>
+
+  
+  <rect x="190" y="85" width="460" height="285" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,8" rx="12" />
+  <text x="420" y="360" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">
+    Master-Slave Configuration (إعداد رئيسي-تابع)
+  </text>
+
+  
+  <rect x="230" y="100" width="140" height="180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" rx="8" />
+  <text x="300" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Master</text>
+  <text x="300" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">رئيسي</text>
+  
+  
+  <text x="245" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">D</text>
+  <text x="245" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">En</text>
+  <text x="355" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q</text>
+  <text x="355" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q'</text>
+
+  
+  <rect x="470" y="100" width="140" height="180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" rx="8" />
+  <text x="540" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Slave</text>
+  <text x="540" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">تابع</text>
+
+  
+  <text x="485" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">D</text>
+  <text x="485" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">En</text>
+  <text x="595" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q</text>
+  <text x="595" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q'</text>
+
+  
+  
+  
+  <line x1="90" y1="180" x2="226" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="60" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">D</text>
+  <text x="60" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(الدخل)</text>
+
+  
+  <line x1="370" y1="180" x2="466" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="420" y="165" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Y</text>
+
+  
+  <line x1="370" y1="240" x2="390" y2="240" stroke="var(--brand-500)" stroke-width="2" />
+
+  
+  <line x1="610" y1="180" x2="710" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="740" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Q</text>
+  <text x="740" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(الخرج)</text>
+
+  
+  <line x1="610" y1="240" x2="710" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="740" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Q'</text>
+  <text x="740" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(عكس الخرج)</text>
+
+  
+  <text x="60" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Clk</text>
+  <text x="60" y="355" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(النبضة)</text>
+  
+  
+  <line x1="90" y1="340" x2="395" y2="340" stroke="var(--brand-500)" stroke-width="2" />
+  
+  
+  <circle cx="180" cy="340" r="4" fill="var(--text-primary)" />
+  
+  
+  <path d="M 180 340 L 180 240 L 226 240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  
+  <polygon points="395,330 395,350 415,340" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <circle cx="420" cy="340" r="5" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="410" y="375" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Inverter (عكس)</text>
+
+  
+  <path d="M 425 340 L 450 340 L 450 240 L 466 240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Latches</th>
+        <th>Flip-Flops</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة الاستجابة (Triggering)</template>
+          <template class="content-en">Triggering Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">حساسة لمستوى الإشارة (Level-sensitive)</template>
+          <template class="content-en">Level-sensitive</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حساسة لحافة النبضة (Edge-triggered)</template>
+          <template class="content-en">Edge-triggered</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاستخدام في الدوائر المتزامنة</template>
+          <template class="content-en">Use in Synchronous Circuits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">صعبة الإدارة بسبب الشفافية</template>
+          <template class="content-en">Difficult to manage due to transparency</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مثالية للدوائر المتزامنة</template>
+          <template class="content-en">Ideal for synchronous circuits</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في نطاط D من نوع السيد والتابع (يعمل بالحافة السالبة)، هل يمكن أن يتغير المخرج Q إذا تغير المدخل D بينما إشارة الساعة تساوي 0؟</template>
+      <template class="content-en">In a negative-edge triggered Master-Slave D flip-flop, can output Q change if input D changes while the clock is 0?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لأن عندما تكون الساعة 0، يكون ماسك السيد معطلاً (معزولاً عن المدخل D)، وبالتالي لا يمكن لأي تغيير في D أن يصل إلى التابع أو المخرج Q.</p></template>
+      <template class="content-en"><p>No, because when the clock is 0, the master latch is disabled (isolated from input D), so no changes in D can reach the slave or output Q.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
@@ -908,8 +983,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الوحدة العاشرة. لقد انتقلنا الآن من الدوائر التوافقية البسيطة إلى عالم الدوائر التتابعية، حيث تمتلك الدائرة 'ذاكرة'. في هذا الاختبار، التركيز الأساسي سيكون على قدرتك على 'التحليل'. إذا أعطيتك رسمة لدائرة، هل يمكنك إخباري بما تفعله؟ للقيام بذلك، عليك اتباع الخطوات الثلاث المقدسة: أولاً، استخرج معادلات الإدخال (ما هي البوابات المتصلة بمدخلات القلابات؟). ثانياً، استخدم هذه المعادلات مع الجداول المميزة للقلابات لبناء جدول الحالة. ثالثاً، حول هذا الجدول إلى مخطط حالة مرئي. انتبهوا جداً للفرق بين آلة ميلي وآلة مور؛ هذا سؤال كلاسيكي في الاختبارات. آلة ميلي تتأثر بالمدخلات فوراً (المخرجات على الأسهم)، بينما آلة مور هادئة وتعتمد فقط على حالتها الحالية (المخرجات داخل الدوائر). تدربوا جيداً على استخراج المعادلات لقلابات JK، فهي تتطلب تركيزاً أكثر من قلابات D المباشرة. بالتوفيق!</template>
-    <template class="content-en">Welcome to Module 10. We have now transitioned from simple combinational circuits to the world of sequential circuits, where the circuit has 'memory'. For the exam, the main focus will be on your ability to 'analyze'. If I give you a circuit diagram, can you tell me what it does? To do this, follow the three sacred steps: First, extract the input equations (what gates are connected to the flip-flop inputs?). Second, use these equations with the flip-flops' characteristic tables to build the state table. Third, convert this table into a visual state diagram. Pay close attention to the difference between Mealy and Moore machines; this is a classic exam question. Mealy machines react to inputs immediately (outputs on arrows), while Moore machines are steady and depend only on their current state (outputs inside circles). Practice extracting equations for JK flip-flops, as they require more focus than the straightforward D flip-flops. Good luck!</template>
+    <template class="content-ar">مرحباً بكم في الوحدة التاسعة: المنطق التتابعي. حتى الآن، درسنا الدوائر التوافقية التي تعتمد مخرجاتها فقط على المدخلات الحالية. لكن الأجهزة الحقيقية تحتاج إلى ذاكرة! هنا يأتي دور الدوائر التتابعية التي تستخدم مسارات التغذية الراجعة لتخزين الحالة. نبدأ بالمواسك (Latches) الأساسية مثل SR و D، والتي تستجيب لمستوى الإشارة. ومع ذلك، قد تكون المواسك معقدة عند توصيلها بتسلسل بسبب 'شفافيتها'، مما يقودنا إلى النطاطات (Flip-Flops). النطاطات تعمل بحافة النبضة (Edge-triggered)، أي أنها تغير حالتها فقط في اللحظة الدقيقة التي تتغير فيها إشارة الساعة. انتبهوا جيداً لنطاط D من نوع السيد والتابع (Master-Slave) وكيف يعزل المدخل عن المخرج، وكذلك الحالات غير المحددة لمواسك SR — فهذه مواضيع كلاسيكية ومهمة جداً في الامتحانات! ركزوا على فهم متى تتغير الحالة (مستوى مقابل حافة).</template>
+    <template class="content-en">Welcome to Module 9: Sequential Logic. Up until now, we've looked at combinational circuits where outputs depend only on current inputs. But real-world devices need memory! That's where sequential circuits come in, using feedback loops to store state. We start with basic Latches (SR and D), which are level-sensitive. However, latches can be tricky when connected in sequence due to their 'transparency', which leads us to Flip-Flops. Flip-flops are edge-triggered, meaning they only change state at the exact moment the clock ticks (goes from 0 to 1, or 1 to 0). Pay special attention to the Master-Slave D Flip-Flop and how it isolates input from output, as well as the indeterminate states of SR latches—these are classic exam topics! Focus on understanding *when* the state changes (level vs. edge).</template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -920,16 +995,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هو الهدف الرئيسي من تحليل الدائرة التتابعية؟</template>
-          <template class="content-en">What is the main goal of analyzing a sequential circuit?</template>
-          <span class="content-target">ما هو الهدف الرئيسي من تحليل الدائرة التتابعية؟</span>
+          <template class="content-ar">ما هو الفرق الجوهري بين الدائرة التوافقية والدائرة التتابعية؟</template>
+          <template class="content-en">What is the fundamental difference between a combinational and a sequential circuit?</template>
+          <span class="content-target">ما هو الفرق الجوهري بين الدائرة التوافقية والدائرة التتابعية؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">الهدف هو فهم سلوك الدائرة من خلال استنتاج جدول الحالة أو مخطط الحالة الخاص بها انطلاقاً من مخطط الدائرة المادية.</template>
-          <template class="content-en">The goal is to understand the circuit's behavior by deriving its state table or state diagram starting from the hardware circuit diagram.</template>
+          <template class="content-ar">الدائرة التوافقية تعتمد مخرجاتها فورياً على المدخلات الحالية فقط (لا توجد ذاكرة). الدائرة التتابعية تحتوي على مسار تغذية راجعة (ذاكرة) وتعتمد مخرجاتها على المدخلات الحالية والحالة السابقة.</template>
+          <template class="content-en">A combinational circuit's output depends immediately and only on current inputs (no memory). A sequential circuit has a feedback path (memory) and its output depends on current inputs and past states.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -937,16 +1012,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف نحدد الحالة التالية لقلاب D أثناء التحليل؟</template>
-          <template class="content-en">How do we determine the next state for a D flip-flop during analysis?</template>
-          <span class="content-target">كيف نحدد الحالة التالية لقلاب D أثناء التحليل؟</span>
+          <template class="content-ar">ما هي وظيفة إشارة الساعة (Clock) في الدوائر المتزامنة؟</template>
+          <template class="content-en">What is the function of the clock signal in synchronous circuits?</template>
+          <span class="content-target">ما هي وظيفة إشارة الساعة (Clock) في الدوائر المتزامنة؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">الأمر بسيط جداً، الحالة التالية تساوي مباشرة قيمة معادلة الإدخال D (أي Q(t+1) = D).</template>
-          <template class="content-en">It is very simple; the next state is directly equal to the value of the input equation D (i.e., Q(t+1) = D).</template>
+          <template class="content-ar">إشارة الساعة توفر نبضات دورية تحدد 'متى' يُسمح لعناصر الذاكرة بتحديث حالتها، مما يضمن التزامن في النظام بأكمله.</template>
+          <template class="content-en">The clock signal provides periodic pulses that determine 'when' memory elements are allowed to update their state, ensuring synchronization across the entire system.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -954,16 +1029,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">لماذا نحتاج إلى الجداول المميزة (Characteristic Tables)؟</template>
-          <template class="content-en">Why do we need characteristic tables?</template>
-          <span class="content-target">لماذا نحتاج إلى الجداول المميزة (Characteristic Tables)؟</span>
+          <template class="content-ar">لماذا نعتبر الحالة S=1 و R=1 في ماسك NOR SR حالة ممنوعة؟</template>
+          <template class="content-en">Why is the state S=1 and R=1 considered forbidden in a NOR SR latch?</template>
+          <span class="content-target">لماذا نعتبر الحالة S=1 و R=1 في ماسك NOR SR حالة ممنوعة؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">نحتاجها لمعرفة الحالة التالية للقلابات (مثل JK و T) بناءً على المدخلات الحالية والحالة الحالية، حيث أن العلاقة ليست مباشرة كما في قلاب D.</template>
-          <template class="content-en">We need them to find the next state for flip-flops (like JK and T) based on current inputs and the present state, since the relationship isn't direct like in a D flip-flop.</template>
+          <template class="content-ar">لأنها تجبر كلا المخرجين Q و Q' على أن يكونا 0، وهذا ينتهك القاعدة المنطقية التي تنص على أن أحدهما يجب أن يكون عكس الآخر. كما أن الحالة التالية تصبح غير قابلة للتنبؤ.</template>
+          <template class="content-en">Because it forces both outputs Q and Q' to be 0, violating the logical rule that they must be complements. Also, the next state becomes unpredictable.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -971,16 +1046,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما الفرق بين جدول الحالة (State Table) وجدول الحقيقة (Truth Table) العادي؟</template>
-          <template class="content-en">What is the difference between a state table and a regular truth table?</template>
-          <span class="content-target">ما الفرق بين جدول الحالة (State Table) وجدول الحقيقة (Truth Table) العادي؟</span>
+          <template class="content-ar">كيف يختلف ماسك NAND SR عن ماسك NOR SR؟</template>
+          <template class="content-en">How does a NAND SR latch differ from a NOR SR latch?</template>
+          <span class="content-target">كيف يختلف ماسك NAND SR عن ماسك NOR SR؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">جدول الحالة يتضمن عنصر الزمن (الذاكرة)؛ فهو يحتوي على 'الحالة الحالية' و'الحالة التالية'، بينما جدول الحقيقة يربط المدخلات بالمخرجات اللحظية فقط.</template>
-          <template class="content-en">A state table includes the element of time (memory); it contains 'present state' and 'next state', whereas a truth table only links instantaneous inputs to outputs.</template>
+          <template class="content-ar">ماسك NAND نشط عند المستوى المنخفض (Active Low)، مما يعني أنه يحتاج إلى 0 لتغيير حالته، وتكون الحالة الممنوعة فيه هي S=0 و R=0.</template>
+          <template class="content-en">A NAND latch is active low, meaning it requires a 0 to change state, and its forbidden state is S=0 and R=0.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -988,16 +1063,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف تتعرف على آلة مور (Moore Machine) من خلال النظر إلى مخطط الدائرة؟</template>
-          <template class="content-en">How do you identify a Moore machine by looking at the circuit diagram?</template>
-          <span class="content-target">كيف تتعرف على آلة مور (Moore Machine) من خلال النظر إلى مخطط الدائرة؟</span>
+          <template class="content-ar">ما هي المشكلة التي يحلها ماسك D؟</template>
+          <template class="content-en">What problem does the D latch solve?</template>
+          <span class="content-target">ما هي المشكلة التي يحلها ماسك D؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">إذا كانت البوابات المنطقية التي تولد المخرجات النهائية متصلة فقط بمخارج القلابات (الحالات) ولا تتصل بأي مدخلات خارجية مباشرة، فهي آلة مور.</template>
-          <template class="content-en">If the logic gates generating the final outputs are connected ONLY to the flip-flop outputs (states) and not to any external inputs directly, it is a Moore machine.</template>
+          <template class="content-ar">يحل مشكلة الحالة غير المحددة (الممنوعة) في ماسك SR عن طريق استخدام عاكس يضمن أن المدخلين S و R لا يمكن أن يكونا 1 في نفس الوقت أبداً.</template>
+          <template class="content-en">It solves the indeterminate (forbidden) state problem of the SR latch by using an inverter to ensure inputs S and R can never be 1 at the same time.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1005,16 +1080,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف تتعرف على آلة ميلي (Mealy Machine) من مخطط الدائرة؟</template>
-          <template class="content-en">How do you identify a Mealy machine from the circuit diagram?</template>
-          <span class="content-target">كيف تتعرف على آلة ميلي (Mealy Machine) من مخطط الدائرة؟</span>
+          <template class="content-ar">ما هو الفرق بين الماسك (Latch) والنطاط (Flip-Flop)؟</template>
+          <template class="content-en">What is the difference between a Latch and a Flip-Flop?</template>
+          <span class="content-target">ما هو الفرق بين الماسك (Latch) والنطاط (Flip-Flop)؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">إذا كانت بوابات المخرجات تأخذ إشارات من مخارج القلابات وأيضاً من المدخلات الخارجية للدائرة، فهي آلة ميلي.</template>
-          <template class="content-en">If the output gates take signals from both the flip-flop outputs and the external inputs of the circuit, it is a Mealy machine.</template>
+          <template class="content-ar">الماسك حساس لمستوى الإشارة (Level-sensitive)، بينما النطاط حساس لحافة النبضة (Edge-triggered)، أي أنه يغير حالته فقط لحظة انتقال إشارة الساعة.</template>
+          <template class="content-en">A latch is level-sensitive, while a flip-flop is edge-triggered, meaning it only changes state at the exact moment of a clock transition.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1022,16 +1097,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">في مخطط الحالة، ماذا تمثل الدوائر والأسهم؟</template>
-          <template class="content-en">In a state diagram, what do the circles and arrows represent?</template>
-          <span class="content-target">في مخطط الحالة، ماذا تمثل الدوائر والأسهم؟</span>
+          <template class="content-ar">كيف يعمل نطاط السيد والتابع (Master-Slave)؟</template>
+          <template class="content-en">How does a Master-Slave flip-flop work?</template>
+          <span class="content-target">كيف يعمل نطاط السيد والتابع (Master-Slave)؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">الدوائر تمثل الحالات المختلفة التي يمكن أن يكون فيها النظام، والأسهم تمثل الانتقالات بين هذه الحالات والتي تحدث بسبب تغير المدخلات ونبضات الساعة.</template>
-          <template class="content-en">Circles represent the different states the system can be in, and arrows represent the transitions between these states triggered by inputs and clock pulses.</template>
+          <template class="content-ar">يتكون من ماسكين. عند مستوى الساعة العالي، يأخذ السيد البيانات بينما يكون التابع معطلاً. عند نزول الساعة (الحافة السالبة)، يُعطل السيد (يُقفل) ويُنقل محتواه إلى التابع ليظهر على المخرج.</template>
+          <template class="content-en">It consists of two latches. On a high clock, the master takes data while the slave is disabled. On the clock's falling edge, the master is disabled (locked) and its content is transferred to the slave to appear at the output.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1039,16 +1114,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">لماذا قد يفضل المصمم استخدام نموذج ميلي؟</template>
-          <template class="content-en">Why might a designer prefer to use the Mealy model?</template>
-          <span class="content-target">لماذا قد يفضل المصمم استخدام نموذج ميلي؟</span>
+          <template class="content-ar">ماذا نعني بـ 'الماسك الشفاف' (Transparent Latch)؟</template>
+          <template class="content-en">What is meant by a 'Transparent Latch'?</template>
+          <span class="content-target">ماذا نعني بـ 'الماسك الشفاف' (Transparent Latch)؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لأنه غالباً ما يتطلب عدد حالات أقل لإنجاز نفس المهمة، مما يعني استخدام قلابات ومكونات مادية أقل.</template>
-          <template class="content-en">Because it often requires fewer states to accomplish the same task, which means using fewer flip-flops and hardware components.</template>
+          <template class="content-ar">هو اسم يطلق على ماسك D، لأنه عندما تكون إشارة التمكين نشطة، فإن أي تغيير في المدخل D يظهر فوراً على المخرج Q.</template>
+          <template class="content-en">It is a name for the D latch, because when the enable signal is active, any change in input D immediately appears at output Q.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1056,16 +1131,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">لماذا قد يفضل المصمم استخدام نموذج مور؟</template>
-          <template class="content-en">Why might a designer prefer to use the Moore model?</template>
-          <span class="content-target">لماذا قد يفضل المصمم استخدام نموذج مور؟</span>
+          <template class="content-ar">ما هي الحافة الموجبة والحافة السالبة؟</template>
+          <template class="content-en">What are positive and negative edges?</template>
+          <span class="content-target">ما هي الحافة الموجبة والحافة السالبة؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لأنه أسهل في التصميم والفهم، ومخرجاته تكون متزامنة تماماً مع إشارة الساعة ولا تتأثر بالتغيرات اللحظية (Glitches) في المدخلات.</template>
-          <template class="content-en">Because it is easier to design and understand, and its outputs are strictly synchronous with the clock signal and unaffected by momentary input glitches.</template>
+          <template class="content-ar">الحافة الموجبة هي لحظة انتقال إشارة الساعة من 0 إلى 1. الحافة السالبة هي لحظة انتقالها من 1 إلى 0.</template>
+          <template class="content-en">The positive edge is the moment the clock signal transitions from 0 to 1. The negative edge is the transition from 1 to 0.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1073,16 +1148,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هي المعادلة لمعرفة عدد الصفوف المطلوبة في جدول الحالة؟</template>
-          <template class="content-en">What is the formula to know the required number of rows in a state table?</template>
-          <span class="content-target">ما هي المعادلة لمعرفة عدد الصفوف المطلوبة في جدول الحالة؟</span>
+          <template class="content-ar">لماذا نفضل استخدام النطاطات (Flip-Flops) على المواسك (Latches) في الدوائر التتابعية المعقدة؟</template>
+          <template class="content-en">Why do we prefer Flip-Flops over Latches in complex sequential circuits?</template>
+          <span class="content-target">لماذا نفضل استخدام النطاطات (Flip-Flops) على المواسك (Latches) في الدوائر التتابعية المعقدة؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">عدد الصفوف يساوي 2 مرفوعة للقوة (m+n)، حيث m هو عدد القلابات و n هو عدد المدخلات الخارجية.</template>
-          <template class="content-en">The number of rows equals 2 raised to the power of (m+n), where m is the number of flip-flops and n is the number of external inputs.</template>
+          <template class="content-ar">لأن النطاطات تغير حالتها فقط عند حافة النبضة، مما يمنع المخرجات من التأثير على المدخلات خلال نفس دورة الساعة (يمنع Race conditions)، مما يجعل التزامن دقيقاً وموثوقاً.</template>
+          <template class="content-en">Because flip-flops change state only at the clock edge, preventing outputs from affecting inputs during the same clock cycle (prevents race conditions), making synchronization precise and reliable.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1099,272 +1174,272 @@
   {
     "id": 1,
     "front": {
-      "ar": "ما هي نقطة البداية في تحليل الدوائر التتابعية؟",
-      "en": "What is the starting point of sequential circuit analysis?"
+      "ar": "الدائرة التوافقية (Combinational Circuit)",
+      "en": "Combinational Circuit"
     },
     "back": {
       "definition": {
-        "ar": "مخطط الدائرة (Circuit Diagram).",
-        "en": "The circuit diagram."
+        "ar": "دائرة رقمية تعتمد مخرجاتها فقط وبشكل فوري على مدخلاتها الحالية، ولا تمتلك ذاكرة.",
+        "en": "A digital circuit whose output depends only and immediately on its current inputs, having no memory."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "الجامع الكامل (Full Adder)",
+        "en": "Full Adder"
       }
     }
   },
   {
     "id": 2,
     "front": {
-      "ar": "ما هي النتيجة النهائية لتحليل الدوائر التتابعية؟",
-      "en": "What is the end product of sequential circuit analysis?"
+      "ar": "الدائرة التتابعية (Sequential Circuit)",
+      "en": "Sequential Circuit"
     },
     "back": {
       "definition": {
-        "ar": "جدول الحالة أو مخطط الحالة.",
-        "en": "A state table or a state diagram."
+        "ar": "دائرة رقمية تحتوي على عناصر ذاكرة، وتعتمد مخرجاتها على المدخلات الحالية والحالة السابقة.",
+        "en": "A digital circuit with memory elements, whose outputs depend on current inputs and past states."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "العدادات (Counters)",
+        "en": "Counters"
       }
     }
   },
   {
     "id": 3,
     "front": {
-      "ar": "ما هي نقطة البداية في تصميم الدوائر التتابعية؟",
-      "en": "What is the starting point of sequential circuit design?"
+      "ar": "الدائرة التتابعية المتزامنة (Synchronous Sequential Circuit)",
+      "en": "Synchronous Sequential Circuit"
     },
     "back": {
       "definition": {
-        "ar": "مجموعة من المواصفات (Specifications).",
-        "en": "A set of specifications."
+        "ar": "نظام يمكن تحديد سلوكه من خلال إشاراته في لحظات زمنية محددة باستخدام نبضات الساعة.",
+        "en": "A system whose behavior can be defined from the knowledge of its signals at discrete instants of time using clock pulses."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "المعالجات الدقيقة (Microprocessors)",
+        "en": "Microprocessors"
       }
     }
   },
   {
     "id": 4,
     "front": {
-      "ar": "ما هي وظيفة الجدول المميز (Characteristic Table)؟",
-      "en": "What is the function of a characteristic table?"
+      "ar": "الدائرة التتابعية غير المتزامنة (Asynchronous Sequential Circuit)",
+      "en": "Asynchronous Sequential Circuit"
     },
     "back": {
       "definition": {
-        "ar": "تحديد الحالة التالية بناءً على المدخلات الحالية للقلاب.",
-        "en": "To determine the next state given the current inputs of the flip-flop."
+        "ar": "نظام يعتمد سلوكه على إشارات الإدخال في أي لحظة زمنية وترتيب تغيرها.",
+        "en": "A system whose behavior depends upon input signals at any instant of time and the order in which inputs change."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
       }
     }
   },
   {
     "id": 5,
     "front": {
-      "ar": "ما هي الخطوات الثلاث لتحليل دائرة تتابعية؟",
-      "en": "What are the three steps to analyze a sequential circuit?"
+      "ar": "مولد الساعة (Clock Generator)",
+      "en": "Clock Generator"
     },
     "back": {
       "definition": {
-        "ar": "1. استنتاج معادلات الإدخال، 2. الحصول على جدول الحالة، 3. رسم مخطط الحالة.",
-        "en": "1. Deriving Input Equations, 2. Getting the State Table, 3. Obtaining the State Diagram."
+        "ar": "جهاز توقيت يوفر إشارة على شكل سلسلة دورية من النبضات لتحقيق التزامن.",
+        "en": "A timing device that provides a clock signal having the form of a periodic train of clock pulses to achieve synchronization."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "مذبذب الكوارتز في الحواسيب",
+        "en": "Quartz oscillator in computers"
       }
     }
   },
   {
     "id": 6,
     "front": {
-      "ar": "ما هي معادلة الإدخال (Input Equation)؟",
-      "en": "What is an input equation?"
+      "ar": "الماسك (Latch)",
+      "en": "Latch"
     },
     "back": {
       "definition": {
-        "ar": "معادلة منطقية تصف الدائرة التوافقية التي تغذي مدخلات القلاب.",
-        "en": "A logic equation describing the combinational circuit that drives the flip-flop inputs."
+        "ar": "عنصر تخزين يعمل بمستوى الإشارة (Level-sensitive) ويمكنه الحفاظ على حالة ثنائية إلى أجل غير مسمى.",
+        "en": "A storage element that operates with signal levels and can maintain a binary state indefinitely."
       },
       "example": {
-        "ar": "JA = XB + Y'C",
-        "en": "JA = XB + Y'C"
+        "ar": "ماسك SR، ماسك D",
+        "en": "SR Latch, D Latch"
       }
     }
   },
   {
     "id": 7,
     "front": {
-      "ar": "كيف تحسب عدد الصفوف في جدول الحالة؟",
-      "en": "How do you calculate the number of rows in a state table?"
+      "ar": "النطاط (Flip-Flop)",
+      "en": "Flip-Flop"
     },
     "back": {
       "definition": {
-        "ar": "2 أس (عدد القلابات + عدد المدخلات الخارجية) -> 2^(m+n).",
-        "en": "2 to the power of (number of flip-flops + number of external inputs) -> 2^(m+n)."
+        "ar": "عنصر تخزين ثنائي يتم التحكم فيه بواسطة انتقال إشارة الساعة (Edge-triggered).",
+        "en": "A binary storage device controlled by a clock transition (edge-triggered)."
       },
       "example": {
-        "ar": "دائرة بقلابين ومدخل واحد تحتاج 2^(2+1) = 8 صفوف.",
-        "en": "A circuit with 2 FFs and 1 input needs 2^(2+1) = 8 rows."
+        "ar": "نطاط D من نوع السيد والتابع",
+        "en": "Master-Slave D Flip-Flop"
       }
     }
   },
   {
     "id": 8,
     "front": {
-      "ar": "على ماذا تعتمد المخرجات في نموذج ميلي (Mealy Model)؟",
-      "en": "What do the outputs depend on in a Mealy Model?"
+      "ar": "حالة الضبط (Set State) في ماسك SR",
+      "en": "Set State in SR Latch"
     },
     "back": {
       "definition": {
-        "ar": "على المدخلات والحالات الحالية معاً.",
-        "en": "On both inputs and present states."
+        "ar": "الحالة التي يكون فيها المخرج Q = 1 و Q' = 0.",
+        "en": "The state when output Q = 1 and Q' = 0."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "يحدث عندما S=1 و R=0 في ماسك NOR.",
+        "en": "Occurs when S=1 and R=0 in a NOR latch."
       }
     }
   },
   {
     "id": 9,
     "front": {
-      "ar": "على ماذا تعتمد المخرجات في نموذج مور (Moore Model)؟",
-      "en": "What do the outputs depend on in a Moore Model?"
+      "ar": "حالة إعادة الضبط (Reset State) في ماسك SR",
+      "en": "Reset State in SR Latch"
     },
     "back": {
       "definition": {
-        "ar": "على الحالات الحالية فقط.",
-        "en": "On present states only."
+        "ar": "الحالة التي يكون فيها المخرج Q = 0 و Q' = 1.",
+        "en": "The state when output Q = 0 and Q' = 1."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "يحدث عندما S=0 و R=1 في ماسك NOR.",
+        "en": "Occurs when S=0 and R=1 in a NOR latch."
       }
     }
   },
   {
     "id": 10,
     "front": {
-      "ar": "أي نموذج (ميلي أم مور) يتطلب عادةً عدد حالات أقل؟",
-      "en": "Which model (Mealy or Moore) typically requires fewer states?"
+      "ar": "الحالة غير المحددة (Indeterminate State)",
+      "en": "Indeterminate State"
     },
     "back": {
       "definition": {
-        "ar": "نموذج ميلي (Mealy Model).",
-        "en": "Mealy Model."
+        "ar": "حالة غير مرغوب فيها في ماسك SR حيث تصبح المخرجات غير صالحة ولا يمكن التنبؤ بالحالة التالية.",
+        "en": "An undesirable condition in an SR latch where outputs become invalid and the next state cannot be conclusively determined."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "تحدث عندما S=1 و R=1 في ماسك NOR.",
+        "en": "Occurs when S=1 and R=1 in a NOR latch."
       }
     }
   },
   {
     "id": 11,
     "front": {
-      "ar": "أي نموذج (ميلي أم مور) يعتبر أسهل للفهم والتنفيذ؟",
-      "en": "Which model (Mealy or Moore) is generally easier to understand and implement?"
+      "ar": "ماسك S'R' (NAND Latch)",
+      "en": "S'R' Latch (NAND Latch)"
     },
     "back": {
       "definition": {
-        "ar": "نموذج مور (Moore Model).",
-        "en": "Moore Model."
+        "ar": "ماسك SR مبني باستخدام بوابات NAND، يتطلب إشارة 0 لتغيير حالته (نشط عند المستوى المنخفض).",
+        "en": "An SR latch built with NAND gates, requiring a 0 signal to change its state (active low)."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "الحالة غير المحددة تحدث عند S=0 و R=0.",
+        "en": "Indeterminate state occurs at S=0 and R=0."
       }
     }
   },
   {
     "id": 12,
     "front": {
-      "ar": "لماذا يعتبر تحليل الدوائر باستخدام قلابات D أسهل؟",
-      "en": "Why is analysis with D flip-flops easier?"
+      "ar": "الماسك الشفاف (Transparent Latch)",
+      "en": "Transparent Latch"
     },
     "back": {
       "definition": {
-        "ar": "لأن الحالة التالية يتم الحصول عليها مباشرة من معادلات الإدخال.",
-        "en": "Because the next state is obtained directly from the input equations."
+        "ar": "اسم آخر لماسك D، حيث تظهر التغييرات في المدخل D مباشرة على المخرج Q طالما أن إشارة التمكين نشطة.",
+        "en": "Another name for a D latch, where changes in input D flow directly to output Q as long as the enable signal is active."
       },
       "example": {
-        "ar": "Q(t+1) = D",
-        "en": "Q(t+1) = D"
+        "ar": "عندما En=1، فإن Q يتبع D.",
+        "en": "When En=1, Q follows D."
       }
     }
   },
   {
     "id": 13,
     "front": {
-      "ar": "ما هي المعادلة المميزة لقلاب D؟",
-      "en": "What is the characteristic equation for a D flip-flop?"
+      "ar": "الاستفزاز (Trigger)",
+      "en": "Trigger"
     },
     "back": {
       "definition": {
-        "ar": "Q(t+1) = D",
-        "en": "Q(t+1) = D"
+        "ar": "التغيير اللحظي في إشارة التحكم الذي يتسبب في تغيير حالة الماسك أو النطاط.",
+        "en": "The momentary change in the control input that causes the latch or flip-flop to switch states."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "انتقال إشارة الساعة من 0 إلى 1.",
+        "en": "Clock signal transition from 0 to 1."
       }
     }
   },
   {
     "id": 14,
     "front": {
-      "ar": "ما هي المعادلة المميزة لقلاب JK؟",
-      "en": "What is the characteristic equation for a JK flip-flop?"
+      "ar": "الحافة الموجبة (Positive Edge)",
+      "en": "Positive Edge"
     },
     "back": {
       "definition": {
-        "ar": "Q(t+1) = JQ' + K'Q",
-        "en": "Q(t+1) = JQ' + K'Q"
+        "ar": "الانتقال في إشارة الساعة من المستوى المنخفض (0) إلى المستوى العالي (1).",
+        "en": "The transition of a clock pulse from 0 to 1."
       },
       "example": {
-        "ar": null,
-        "en": null
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
       }
     }
   },
   {
     "id": 15,
     "front": {
-      "ar": "كيف تُمثل المخرجات في مخطط الحالة لآلة ميلي؟",
-      "en": "How are outputs represented in a Mealy machine state diagram?"
+      "ar": "الحافة السالبة (Negative Edge)",
+      "en": "Negative Edge"
     },
     "back": {
       "definition": {
-        "ar": "تُكتب على أسهم الانتقال بصيغة (المدخل / المخرج).",
-        "en": "They are written on the transition arrows in the format (Input / Output)."
+        "ar": "الانتقال في إشارة الساعة من المستوى العالي (1) إلى المستوى المنخفض (0).",
+        "en": "The transition of a clock pulse from 1 to 0."
       },
       "example": {
-        "ar": "0/1 تعني المدخل 0 والمخرج 1.",
-        "en": "0/1 means Input 0 and Output 1."
+        "ar": "اللحظة التي ينقل فيها نطاط السيد والتابع البيانات إلى المخرج.",
+        "en": "The moment a Master-Slave flip-flop transfers data to the output."
       }
     }
   },
   {
     "id": 16,
     "front": {
-      "ar": "كيف تُمثل المخرجات في مخطط الحالة لآلة مور؟",
-      "en": "How are outputs represented in a Moore machine state diagram?"
+      "ar": "نطاط السيد والتابع (Master-Slave Flip-Flop)",
+      "en": "Master-Slave Flip-Flop"
     },
     "back": {
       "definition": {
-        "ar": "تُكتب داخل دائرة الحالة نفسها.",
-        "en": "They are written inside the state circle itself."
+        "ar": "تكوين يستخدم ماسكين لعزل المخرج عن المدخل أثناء تغير الإشارة، مما يمنع التأثيرات غير المرغوب فيها.",
+        "en": "A configuration using two latches to isolate the output from the input while the input is changing."
       },
       "example": {
-        "ar": "حالة 00 والمخرج 1 تُكتب معاً داخل الدائرة.",
-        "en": "State 00 and Output 1 are written together inside the circle."
+        "ar": "نطاط D المبني من ماسكي D وعاكس.",
+        "en": "D flip-flop built with two D latches and an inverter."
       }
     }
   }
@@ -1401,361 +1476,357 @@
   {
     "id": 1,
     "question": {
-      "ar": "ما هي نقطة البداية في عملية تحليل الدوائر التتابعية؟",
-      "en": "What is the starting point in the process of sequential circuit analysis?"
+      "ar": "ما هو الفرق الرئيسي بين الدوائر التوافقية والدوائر التتابعية؟",
+      "en": "What is the main difference between combinational and sequential circuits?"
     },
     "options": {
       "ar": [
-        "مخطط الحالة",
-        "المواصفات",
-        "مخطط الدائرة",
-        "جدول الحالة"
+        "الدوائر التتابعية لا تحتوي على بوابات منطقية.",
+        "الدوائر التوافقية تعتمد على الحالة السابقة.",
+        "الدوائر التتابعية تحتوي على عناصر ذاكرة وتعتمد على الحالة السابقة.",
+        "الدوائر التوافقية تستخدم إشارة الساعة دائماً."
       ],
       "en": [
-        "State diagram",
-        "Specifications",
-        "Circuit diagram",
-        "State table"
+        "Sequential circuits do not have logic gates.",
+        "Combinational circuits depend on past states.",
+        "Sequential circuits have memory elements and depend on past states.",
+        "Combinational circuits always use a clock signal."
       ]
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "التحليل يبدأ دائماً من الدائرة الموجودة (Circuit diagram) لمعرفة كيف تعمل.",
-      "en": "Analysis always starts from the existing circuit diagram to figure out how it works."
+      "ar": "الدوائر التتابعية تمتلك ذاكرة وتعتمد مخرجاتها على المدخلات الحالية والحالة السابقة، بينما الدوائر التوافقية تعتمد على المدخلات الحالية فقط.",
+      "en": "Sequential circuits have memory and their outputs depend on current inputs and past states, whereas combinational circuits depend only on current inputs."
     },
     "hint": {
-      "ar": "عكس التصميم الذي يبدأ بالمواصفات.",
-      "en": "The opposite of design, which starts with specifications."
+      "ar": "تذكر كلمة 'ذاكرة'.",
+      "en": "Think about the word 'memory'."
     },
     "difficulty": "easy",
-    "conceptId": "analysis-vs-design"
+    "conceptId": "sequential-circuits"
   },
   {
     "id": 2,
     "question": {
-      "ar": "كم عدد الصفوف في جدول الحالة لدائرة تحتوي على 3 قلابات ومدخل واحد؟",
-      "en": "How many rows are in a state table for a circuit with 3 flip-flops and 1 input?"
+      "ar": "في ماسك SR المبني باستخدام بوابات NOR، ما هي المدخلات التي تسبب الحالة غير المحددة (Indeterminate state)؟",
+      "en": "In an SR latch constructed with NOR gates, which inputs cause the indeterminate state?"
     },
     "options": {
       "ar": [
-        "8",
-        "16",
-        "4",
-        "32"
+        "S=0, R=0",
+        "S=1, R=0",
+        "S=0, R=1",
+        "S=1, R=1"
       ],
       "en": [
-        "8",
-        "16",
-        "4",
-        "32"
-      ]
-    },
-    "correctIndex": 1,
-    "explanation": {
-      "ar": "عدد الصفوف = 2^(m+n) = 2^(3+1) = 2^4 = 16.",
-      "en": "Number of rows = 2^(m+n) = 2^(3+1) = 2^4 = 16."
-    },
-    "hint": {
-      "ar": "استخدم القاعدة 2^(m+n).",
-      "en": "Use the formula 2^(m+n)."
-    },
-    "difficulty": "medium",
-    "conceptId": "analysis-steps"
-  },
-  {
-    "id": 3,
-    "question": {
-      "ar": "في أي نموذج تعتمد المخرجات على الحالة الحالية والمدخلات معاً؟",
-      "en": "In which model do the outputs depend on both the present state and the inputs?"
-    },
-    "options": {
-      "ar": [
-        "نموذج مور",
-        "نموذج ميلي",
-        "كلاهما",
-        "لا شيء مما سبق"
-      ],
-      "en": [
-        "Moore model",
-        "Mealy model",
-        "Both",
-        "None of the above"
-      ]
-    },
-    "correctIndex": 1,
-    "explanation": {
-      "ar": "نموذج ميلي يربط المخرجات بالمدخلات والحالة، بينما مور يربطها بالحالة فقط.",
-      "en": "The Mealy model links outputs to both inputs and state, while Moore links them only to the state."
-    },
-    "hint": {
-      "ar": "تذكر أن هذا النموذج عادة ما يحتاج حالات أقل ولكنه أكثر تعقيداً.",
-      "en": "Remember this model usually requires fewer states but is more complex."
-    },
-    "difficulty": "easy",
-    "conceptId": "mealy-vs-moore"
-  },
-  {
-    "id": 4,
-    "question": {
-      "ar": "ما هي الخطوة الأولى في تحليل الدائرة التتابعية؟",
-      "en": "What is the first step in analyzing a sequential circuit?"
-    },
-    "options": {
-      "ar": [
-        "رسم مخطط الحالة",
-        "بناء جدول الحالة",
-        "استنتاج معادلات الإدخال",
-        "تحديد نوع القلاب"
-      ],
-      "en": [
-        "Drawing the state diagram",
-        "Building the state table",
-        "Deriving the input equations",
-        "Determining the flip-flop type"
-      ]
-    },
-    "correctIndex": 2,
-    "explanation": {
-      "ar": "يجب أولاً استنتاج معادلات الإدخال من الدائرة قبل التمكن من بناء جدول الحالة.",
-      "en": "You must first derive the input equations from the circuit before you can build the state table."
-    },
-    "hint": {
-      "ar": "كيف ستعرف الحالة التالية بدون معرفة ما يدخل للقلاب؟",
-      "en": "How will you know the next state without knowing what enters the flip-flop?"
-    },
-    "difficulty": "medium",
-    "conceptId": "analysis-steps"
-  },
-  {
-    "id": 5,
-    "question": {
-      "ar": "لماذا يعتبر تحليل الدوائر بقلابات D أسهل من غيرها؟",
-      "en": "Why is analyzing circuits with D flip-flops easier than others?"
-    },
-    "options": {
-      "ar": [
-        "لأنها لا تحتاج إلى إشارة ساعة",
-        "لأن الحالة التالية تساوي معادلة الإدخال مباشرة",
-        "لأنها تستخدم بوابات منطقية أقل",
-        "لأنها تعمل بنموذج مور فقط"
-      ],
-      "en": [
-        "Because they don't need a clock signal",
-        "Because the next state directly equals the input equation",
-        "Because they use fewer logic gates",
-        "Because they only work with the Moore model"
-      ]
-    },
-    "correctIndex": 1,
-    "explanation": {
-      "ar": "في قلاب D، Q(t+1) = D، لذا لا حاجة لاستخدام جدول مميز معقد.",
-      "en": "In a D flip-flop, Q(t+1) = D, so there is no need to use a complex characteristic table."
-    },
-    "hint": {
-      "ar": "تذكر المعادلة المميزة لقلاب D.",
-      "en": "Remember the characteristic equation for a D flip-flop."
-    },
-    "difficulty": "easy",
-    "conceptId": "characteristic-tables"
-  },
-  {
-    "id": 6,
-    "question": {
-      "ar": "في مخطط الحالة لآلة مور، أين تُكتب المخرجات؟",
-      "en": "In a Moore machine state diagram, where are the outputs written?"
-    },
-    "options": {
-      "ar": [
-        "على أسهم الانتقال",
-        "خارج المخطط",
-        "داخل دوائر الحالة",
-        "لا تُكتب المخرجات في مخطط مور"
-      ],
-      "en": [
-        "On the transition arrows",
-        "Outside the diagram",
-        "Inside the state circles",
-        "Outputs are not written in a Moore diagram"
-      ]
-    },
-    "correctIndex": 2,
-    "explanation": {
-      "ar": "لأن مخرجات آلة مور تعتمد على الحالة فقط، يتم كتابتها داخل دائرة الحالة.",
-      "en": "Because Moore machine outputs depend only on the state, they are written inside the state circle."
-    },
-    "hint": {
-      "ar": "المخرجات مرتبطة بالحالة بشكل حصري.",
-      "en": "Outputs are exclusively tied to the state."
-    },
-    "difficulty": "medium",
-    "conceptId": "mealy-vs-moore"
-  },
-  {
-    "id": 7,
-    "question": {
-      "ar": "إذا كان قلاب JK يمتلك المدخلات J=1 و K=1، ما هي الحالة التالية؟",
-      "en": "If a JK flip-flop has inputs J=1 and K=1, what is the next state?"
-    },
-    "options": {
-      "ar": [
-        "0 (تصفير)",
-        "1 (تعيين)",
-        "نفس الحالة الحالية (لا تغيير)",
-        "عكس الحالة الحالية (Complement)"
-      ],
-      "en": [
-        "0 (Reset)",
-        "1 (Set)",
-        "Same as present state (No change)",
-        "Complement of present state"
+        "S=0, R=0",
+        "S=1, R=0",
+        "S=0, R=1",
+        "S=1, R=1"
       ]
     },
     "correctIndex": 3,
     "explanation": {
-      "ar": "حسب الجدول المميز لقلاب JK، عندما J=1 و K=1، يتم عكس الحالة الحالية (Toggle/Complement).",
-      "en": "According to the JK flip-flop characteristic table, when J=1 and K=1, the present state is complemented (toggled)."
+      "ar": "عندما يكون S=1 و R=1 في ماسك NOR، يصبح كل من Q و Q' صفراً، وهي حالة غير محددة وممنوعة.",
+      "en": "When S=1 and R=1 in a NOR latch, both Q and Q' become 0, which is an indeterminate and forbidden state."
     },
     "hint": {
-      "ar": "هذه هي الحالة التي تميز قلاب JK عن قلاب SR.",
-      "en": "This is the state that distinguishes a JK flip-flop from an SR flip-flop."
+      "ar": "ما هي الحالة التي تجعل كلا المخرجين متساويين؟",
+      "en": "Which state makes both outputs equal?"
     },
     "difficulty": "medium",
-    "conceptId": "characteristic-tables"
+    "conceptId": "latches"
   },
   {
-    "id": 8,
+    "id": 3,
     "question": {
-      "ar": "أي من التالي يصف العلاقة بين جدول الحالة ومخطط الحالة؟",
-      "en": "Which of the following describes the relationship between a state table and a state diagram?"
+      "ar": "كيف يحل ماسك D مشكلة الحالة غير المحددة في ماسك SR؟",
+      "en": "How does the D latch solve the indeterminate state problem of the SR latch?"
     },
     "options": {
       "ar": [
-        "مخطط الحالة يحتوي على معلومات أقل من جدول الحالة",
-        "جدول الحالة أسهل في الفهم البصري من مخطط الحالة",
-        "كلاهما يقدم نفس المعلومات ولكن المخطط أسهل للفهم",
-        "لا توجد علاقة بينهما"
+        "بإضافة إشارة ساعة (Clock).",
+        "بضمان أن المدخلين S و R لا يمكن أن يكونا 1 في نفس الوقت باستخدام عاكس.",
+        "باستخدام بوابات NAND بدلاً من NOR.",
+        "بإزالة مسار التغذية الراجعة."
       ],
       "en": [
-        "State diagram contains less information than state table",
-        "State table is visually easier to understand than state diagram",
-        "Both provide the same information but the diagram is easier to understand",
-        "There is no relationship between them"
-      ]
-    },
-    "correctIndex": 2,
-    "explanation": {
-      "ar": "جدول الحالة ومخطط الحالة هما تمثيلان مختلفان لنفس السلوك، لكن المخطط يوفر رؤية بصرية أسهل للتتبع.",
-      "en": "The state table and state diagram are different representations of the exact same behavior, but the diagram provides an easier visual tracking."
-    },
-    "hint": {
-      "ar": "هل تفقد أي معلومات عند التحويل من جدول إلى مخطط؟",
-      "en": "Do you lose any information when converting from a table to a diagram?"
-    },
-    "difficulty": "easy",
-    "conceptId": "analysis-steps"
-  },
-  {
-    "id": 9,
-    "question": {
-      "ar": "ما هو العيب الرئيسي لآلة مور مقارنة بآلة ميلي؟",
-      "en": "What is the main disadvantage of a Moore machine compared to a Mealy machine?"
-    },
-    "options": {
-      "ar": [
-        "صعوبة الفهم",
-        "تتطلب عادةً عدد حالات أكبر (مكونات أكثر)",
-        "المخرجات غير متزامنة",
-        "لا يمكن استخدامها مع قلابات D"
-      ],
-      "en": [
-        "Harder to understand",
-        "Usually requires more states (more hardware)",
-        "Outputs are asynchronous",
-        "Cannot be used with D flip-flops"
+        "By adding a clock signal.",
+        "By ensuring inputs S and R can never be 1 at the same time using an inverter.",
+        "By using NAND gates instead of NOR gates.",
+        "By removing the feedback path."
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "لأن مخرجات آلة مور تعتمد على الحالة فقط، قد نحتاج إلى إضافة حالات جديدة لتمثيل تغيرات المخرجات، مما يزيد من المكونات المادية.",
-      "en": "Because Moore machine outputs depend only on the state, we might need to add new states to represent output changes, increasing hardware."
+      "ar": "ماسك D يمرر المدخل D إلى S وعكسه إلى R، مما يضمن عدم تساوي S و R أبداً.",
+      "en": "The D latch passes input D to S and its complement to R, ensuring S and R are never equal."
     },
     "hint": {
-      "ar": "فكر في حجم الدائرة الناتجة.",
-      "en": "Think about the size of the resulting circuit."
+      "ar": "فكر في كيفية توصيل المدخل D بالمدخلين S و R.",
+      "en": "Think about how input D is connected to S and R."
     },
-    "difficulty": "hard",
-    "conceptId": "mealy-vs-moore"
+    "difficulty": "medium",
+    "conceptId": "d-latch"
   },
   {
-    "id": 10,
+    "id": 4,
     "question": {
-      "ar": "ما الذي يحدد الحالة التالية في الدائرة التتابعية؟",
-      "en": "What determines the next state in a sequential circuit?"
+      "ar": "ما هو الفرق الأساسي بين الماسك (Latch) والنطاط (Flip-Flop)؟",
+      "en": "What is the primary difference between a latch and a flip-flop?"
     },
     "options": {
       "ar": [
-        "المدخلات الحالية فقط",
-        "الحالة الحالية فقط",
-        "المدخلات الحالية والحالة الحالية معاً",
-        "إشارة الساعة فقط"
+        "الماسك يخزن بتين، والنطاط يخزن بت واحد.",
+        "الماسك يعمل بمستوى الإشارة، والنطاط يعمل بحافة النبضة.",
+        "الماسك يستخدم في الدوائر التوافقية، والنطاط في التتابعية.",
+        "لا يوجد فرق، هما اسمان لنفس العنصر."
       ],
       "en": [
-        "Present inputs only",
-        "Present state only",
-        "Present inputs and present state together",
-        "Clock signal only"
+        "A latch stores two bits, a flip-flop stores one bit.",
+        "A latch is level-sensitive, a flip-flop is edge-triggered.",
+        "A latch is used in combinational circuits, a flip-flop in sequential.",
+        "There is no difference, they are names for the same element."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المواسك تستجيب لمستويات الإشارة (Level-sensitive)، بينما النطاطات تستجيب فقط عند انتقال الإشارة أو حافة النبضة (Edge-triggered).",
+      "en": "Latches respond to signal levels (level-sensitive), while flip-flops respond only during signal transitions (edge-triggered)."
+    },
+    "hint": {
+      "ar": "متى يغير كل منهما حالته؟",
+      "en": "When does each change its state?"
+    },
+    "difficulty": "medium",
+    "conceptId": "edge-triggered-flip-flops"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في نطاط D من نوع السيد والتابع (Master-Slave) الموضح في المحاضرة، متى يتم نقل البيانات إلى المخرج Q؟",
+      "en": "In the Master-Slave D flip-flop shown in the lecture, when is data transferred to output Q?"
+    },
+    "options": {
+      "ar": [
+        "عندما تكون الساعة 1.",
+        "عند الحافة الموجبة للساعة (من 0 إلى 1).",
+        "عند الحافة السالبة للساعة (من 1 إلى 0).",
+        "بشكل مستمر طالما أن الساعة 0."
+      ],
+      "en": [
+        "When the clock is 1.",
+        "At the positive edge of the clock (0 to 1).",
+        "At the negative edge of the clock (1 to 0).",
+        "Continuously as long as the clock is 0."
       ]
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "الحالة التالية تُحسب باستخدام معادلات الإدخال التي تعتمد على كل من المدخلات الخارجية والحالة الحالية للقلابات.",
-      "en": "The next state is calculated using input equations which depend on both external inputs and the present state of the flip-flops."
+      "ar": "في التصميم المذكور، يتم تمكين التابع (Slave) ونقل قيمة السيد إليه عندما تعود نبضة الساعة إلى 0 (الحافة السالبة).",
+      "en": "In the described design, the slave is enabled and the master's value is transferred to it when the clock returns to 0 (negative edge)."
     },
     "hint": {
-      "ar": "انظر إلى الجانب الأيسر من جدول الحالة.",
-      "en": "Look at the left side of the state table."
+      "ar": "تذكر دور العاكس (Inverter) المتصل بالتابع.",
+      "en": "Remember the role of the inverter connected to the slave."
+    },
+    "difficulty": "hard",
+    "conceptId": "edge-triggered-flip-flops"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ماذا يحدث في ماسك SR المبني بـ NAND إذا كانت المدخلات S=0 و R=0؟",
+      "en": "What happens in a NAND-based SR latch if inputs S=0 and R=0?"
+    },
+    "options": {
+      "ar": [
+        "يحتفظ بحالته السابقة.",
+        "يذهب إلى حالة الضبط (Set).",
+        "يذهب إلى حالة إعادة الضبط (Reset).",
+        "يدخل في حالة غير محددة (Indeterminate state)."
+      ],
+      "en": [
+        "It retains its previous state.",
+        "It goes to the Set state.",
+        "It goes to the Reset state.",
+        "It enters an indeterminate state."
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "في ماسك NAND، المدخلات نشطة عند المستوى المنخفض. إدخال 0 و 0 معاً يسبب الحالة غير المحددة.",
+      "en": "In a NAND latch, inputs are active low. Inputting 0 and 0 simultaneously causes the indeterminate state."
+    },
+    "hint": {
+      "ar": "ماسك NAND هو عكس ماسك NOR.",
+      "en": "A NAND latch is the inverse of a NOR latch."
     },
     "difficulty": "medium",
-    "conceptId": "analysis-steps"
+    "conceptId": "latches"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو الغرض من إشارة التمكين (Enable) في ماسك SR المعدل؟",
+      "en": "What is the purpose of the Enable (En) signal in a modified SR latch?"
+    },
+    "options": {
+      "ar": [
+        "تغيير الماسك إلى نطاط.",
+        "التحكم في متى يمكن للمدخلات S و R التأثير على الدائرة.",
+        "عكس قيم المخرجات.",
+        "توفير الطاقة للدائرة."
+      ],
+      "en": [
+        "To change the latch into a flip-flop.",
+        "To control when inputs S and R can affect the circuit.",
+        "To invert the output values.",
+        "To provide power to the circuit."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إشارة التمكين تحدد متى يُسمح للمدخلات بتغيير حالة الماسك. إذا كانت 0، يحتفظ الماسك بحالته بغض النظر عن S و R.",
+      "en": "The enable signal determines when inputs are allowed to change the latch's state. If 0, the latch retains its state regardless of S and R."
+    },
+    "hint": {
+      "ar": "فكر في معنى كلمة 'تمكين'.",
+      "en": "Think about the meaning of the word 'enable'."
+    },
+    "difficulty": "easy",
+    "conceptId": "latches"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في الدوائر التتابعية المتزامنة، ما الذي يحدد 'متى' تحدث العمليات الحسابية وتتغير الحالات؟",
+      "en": "In synchronous sequential circuits, what determines 'when' computational activity and state changes occur?"
+    },
+    "options": {
+      "ar": [
+        "المدخلات الخارجية فقط.",
+        "نبضات الساعة (Clock pulses).",
+        "بوابات AND.",
+        "المخرجات السابقة."
+      ],
+      "en": [
+        "External inputs only.",
+        "Clock pulses.",
+        "AND gates.",
+        "Previous outputs."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نبضات الساعة تحدد متى تحدث الأنشطة داخل الدائرة، بينما تحدد الإشارات الأخرى ماذا سيحدث.",
+      "en": "Clock pulses determine when activity occurs within the circuit, while other signals determine what changes will take place."
+    },
+    "hint": {
+      "ar": "ما هو الجهاز الذي يوفر التزامن؟",
+      "en": "What device provides synchronization?"
+    },
+    "difficulty": "easy",
+    "conceptId": "sequential-circuits"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "لماذا يُطلق على ماسك D اسم 'الماسك الشفاف' (Transparent Latch)؟",
+      "en": "Why is the D latch called a 'Transparent Latch'?"
+    },
+    "options": {
+      "ar": [
+        "لأنه لا يحتوي على بوابات منطقية مرئية.",
+        "لأنه عندما يكون التمكين 1، فإن المخرج Q يتبع المدخل D مباشرة.",
+        "لأنه يستهلك طاقة أقل.",
+        "لأنه لا يحتفظ بأي حالة."
+      ],
+      "en": [
+        "Because it has no visible logic gates.",
+        "Because when Enable is 1, output Q directly follows input D.",
+        "Because it consumes less power.",
+        "Because it does not retain any state."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "عندما يكون التمكين نشطاً، أي تغيير في المدخل D يظهر فوراً على المخرج Q، وكأن الدائرة شفافة.",
+      "en": "When enable is active, any change in input D immediately appears at output Q, making the circuit act transparently."
+    },
+    "hint": {
+      "ar": "ماذا يحدث للمخرج عندما يكون التمكين مفعلاً؟",
+      "en": "What happens to the output when enable is active?"
+    },
+    "difficulty": "medium",
+    "conceptId": "d-latch"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في نطاط D من نوع السيد والتابع، ماذا يحدث لماسك 'السيد' عندما تكون إشارة الساعة 0؟",
+      "en": "In a Master-Slave D flip-flop, what happens to the 'Master' latch when the clock signal is 0?"
+    },
+    "options": {
+      "ar": [
+        "يتم تمكينه ويأخذ قيمة D.",
+        "يتم تعطيله ويُعزل عن المدخل D.",
+        "يتم إعادة ضبطه إلى 0.",
+        "ينقل قيمته مباشرة إلى المخرج النهائي."
+      ],
+      "en": [
+        "It is enabled and takes the value of D.",
+        "It is disabled and isolated from input D.",
+        "It is reset to 0.",
+        "It transfers its value directly to the final output."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "عندما تكون الساعة 0، يُعطل ماسك السيد ويُعزل عن المدخل D، بينما يُمكن التابع لنقل قيمة السيد المحفوظة إلى المخرج.",
+      "en": "When the clock is 0, the master latch is disabled and isolated from input D, while the slave is enabled to transfer the master's saved value to the output."
+    },
+    "hint": {
+      "ar": "تذكر أن إشارة الساعة تدخل مباشرة إلى السيد.",
+      "en": "Remember that the clock signal goes directly to the master."
+    },
+    "difficulty": "hard",
+    "conceptId": "edge-triggered-flip-flops"
   }
 ]
 </script>
 
 <section id="vault" class="vault-section glass-card fade-up">
   <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
-  
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ امتحاني</div>
+    <div class="vault-type vault-type--trap">⚠️ Trap</div>
     <div data-bilingual>
-      <template class="content-ar">الخلط بين نموذج ميلي ومور في الاختبار: تذكر دائماً أن 'ميلي' (Mealy) يبدأ بحرف M مثل 'Mixed' (مختلط) لأنه يخلط بين المدخلات والحالة لتحديد المخرجات. بينما 'مور' (Moore) يعتمد على الحالة فقط.</template>
-      <template class="content-en">Confusing Mealy and Moore models in the exam: Always remember that 'Mealy' mixes both inputs and states to determine outputs, while 'Moore' depends strictly on the state.</template>
+      <template class="content-ar">الخلط بين المواسك (Latches) والنطاطات (Flip-Flops). تذكر دائماً: المواسك حساسة لمستوى الإشارة (Level-sensitive)، بينما النطاطات حساسة لحافة النبضة (Edge-triggered). هذا هو سؤال الامتحان الكلاسيكي!</template>
+      <template class="content-en">Confusing Latches and Flip-Flops. Always remember: Latches are level-sensitive, while Flip-Flops are edge-triggered. This is a classic exam question!</template>
       <div class="content-target"></div>
     </div>
   </div>
-  
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفتاح الحل</div>
+    <div class="vault-type vault-type--key">🔑 Key Concept</div>
     <div data-bilingual>
-      <template class="content-ar">الجدول المميز (Characteristic Table) هو الأداة السحرية التي تحول 'معادلات الإدخال' (ما يدخل للقلاب) إلى 'الحالة التالية' (ما سيخزنه القلاب). لا يمكنك إكمال جدول الحالة بدونه (إلا في حالة قلاب D حيث المدخل هو نفسه الحالة التالية).</template>
-      <template class="content-en">The Characteristic Table is the magic tool that converts 'input equations' (what goes into the flip-flop) into the 'next state' (what the flip-flop will store). You cannot complete a state table without it (except for D flip-flops where input = next state).</template>
+      <template class="content-ar">مسار التغذية الراجعة (Feedback Path) هو ما يمنح الدوائر التتابعية 'ذاكرتها'. بدون هذا المسار، ستكون الدائرة توافقية بحتة.</template>
+      <template class="content-en">The Feedback Path is what gives sequential circuits their 'memory'. Without it, the circuit would be purely combinational.</template>
       <div class="content-target"></div>
     </div>
   </div>
-  
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 سر</div>
+    <div class="vault-type vault-type--trap">⚠️ Trap</div>
     <div data-bilingual>
-      <template class="content-ar">عند حساب عدد صفوف جدول الحالة، ينسى الكثيرون إضافة المدخلات الخارجية (n). المعادلة هي 2^(m+n) وليس 2^m فقط. المدخلات الخارجية تضاعف عدد الاحتمالات!</template>
-      <template class="content-en">When calculating the number of rows in a state table, many forget to add the external inputs (n). The formula is 2^(m+n), not just 2^m. External inputs multiply the possibilities!</template>
+      <template class="content-ar">نسيان أن ماسك SR المبني بـ NAND يعمل بشكل عكسي (Active Low). الحالة غير المحددة فيه تحدث عند S=0 و R=0، وليس 1 و 1 كما في ماسك NOR.</template>
+      <template class="content-en">Forgetting that a NAND-based SR latch is Active Low. Its indeterminate state occurs at S=0 and R=0, not 1 and 1 like the NOR latch.</template>
       <div class="content-target"></div>
     </div>
   </div>
-  
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ امتحاني</div>
+    <div class="vault-type vault-type--secret">🤫 Secret</div>
     <div data-bilingual>
-      <template class="content-ar">في مخطط الحالة لآلة ميلي، التسمية x/y تعني (المدخل / المخرج). لا تعكس الترتيب أبداً! المدخل هو الذي يسبب الانتقال، والمخرج هو النتيجة.</template>
-      <template class="content-en">In a Mealy machine state diagram, the label x/y means (Input / Output). Never reverse the order! The input causes the transition, and the output is the result.</template>
+      <template class="content-ar">نطاط السيد والتابع (Master-Slave) هو ببساطة ماسكي D متصلين على التوالي مع عاكس على إشارة الساعة للماسك الثاني. هذا العاكس هو سر العزل بين المدخل والمخرج!</template>
+      <template class="content-en">A Master-Slave flip-flop is simply two D latches in series with an inverter on the clock signal for the second latch. That inverter is the secret to isolating input from output!</template>
       <div class="content-target"></div>
     </div>
   </div>
@@ -1767,9 +1838,9 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-links">
-        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
-        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
         <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
       </div>
       <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
