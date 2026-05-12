@@ -80,7 +80,7 @@ window._algoTitles[1] = { en: 'Transform-and-Conquer Strategy', ar: 'استرا�
 window._algoTitles[2] = { en: 'Gaussian Elimination', ar: 'الحذف الغاوسي' };
 window._algoTitles[3] = { en: 'AVL Trees', ar: 'أشجار AVL' };
 window._algoTitles[4] = { en: 'AVL Trees', ar: 'أشجار AVL: مقارنة عامل التوازن' };
-window._algoTitles[5] = { en: 'AVL Tree: Single R-Rotation', ar: 'شجرة AVL: دوران يميني أحادي' };
+window._algoTitles[5] = { en: 'AVL Tree: All Rotation', ar: 'شجرة AVL: انواع الدوران' };
 
 window.AlgoWidgets[1] = function(container) {
   container.innerHTML = '<div class="algo-widget">' +
@@ -1142,13 +1142,12 @@ window.AlgoWidgets[5] = function(container) {
   container.innerHTML = '<div class="algo-widget">' +
         _AL.titleHTML(5) +
         _AL.toolbar(5) +
-        '<div class="algo-explanation" id="w5-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
+        '<div class="algo-explanation" id="w5-exp" style="font-size: 0.95rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; min-height: 55px;"></div>' +
         
-        
-        '<div class="algo-canvas" id="w5-canvas-container" style="width:100%; max-width:800px; aspect-ratio: 2 / 1; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
-          '<svg id="w5-svg" width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
+        '<div class="algo-canvas" id="w5-canvas-container" style="width:100%; max-width:500px; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); padding: 20px 10px; overflow:visible;">' +
+          
+          '<svg id="w5-svg" width="100%" height="auto" viewBox="0 0 500 280" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
         '</div>' +
-        
         
         '<div class="algo-legend" style="margin-top:15px; display:flex; justify-content:center; flex-wrap:wrap; gap:15px; font-size:0.85rem; color:var(--text-secondary);">' +
           '<span><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--brand-500); margin-inline-end:5px;"></span><span data-algo-text="w5-normal"></span></span>' +
@@ -1164,84 +1163,148 @@ window.AlgoWidgets[5] = function(container) {
       var counter  = container.querySelector('[data-algo-counter]');
       var steps = [], cur = 0, playing = false, interval = null;
     
-      var NODE_RADIUS = 24;
+      var NODE_RADIUS = 20; 
     
       function getDelay() { return _AL.speedToDelay(parseInt(container.querySelector('.algo-speed input').value)); }
       
       function updateLabels() {
         container.querySelector('[data-algo-text="w5-normal"]').textContent = _AL.exp('Normal Node', 'عقدة طبيعية');
         container.querySelector('[data-algo-text="w5-imbalance"]').textContent = _AL.exp('Imbalanced Node', 'عقدة تخل بالتوازن');
-        container.querySelector('[data-algo-text="w5-moving"]').textContent = _AL.exp('Rotating / Moving', 'جاري الدوران');
-        container.querySelector('[data-algo-text="w5-balanced"]').textContent = _AL.exp('Balanced / New Root', 'متوازنة / الجذر الجديد');
+        container.querySelector('[data-algo-text="w5-moving"]').textContent = _AL.exp('Rotating', 'جاري الدوران');
+        container.querySelector('[data-algo-text="w5-balanced"]').textContent = _AL.exp('Balanced / Root', 'متوازنة / الجذر');
       }
     
       function generateSteps() {
         steps = [];
-    
         
-        var layoutBefore = {
-          r:  { x: 400, y: 80,  label: 'r' },
-          c:  { x: 250, y: 180, label: 'c' },
-          T3: { x: 550, y: 180, label: 'T3' },
-          T1: { x: 150, y: 280, label: 'T1' },
-          T2: { x: 350, y: 280, label: 'T2' }
+        
+        var baseLayout = function(type) {
+           if(type==='LL1') return { n30: {x:250, y:60, label:'30'}, n20: {x:170, y:130, label:'20'}, n10: {x:90, y:200, label:'10'} };
+           if(type==='LL2') return { n20: {x:250, y:60, label:'20'}, n10: {x:170, y:130, label:'10'}, n30: {x:330, y:130, label:'30'} };
+  
+           if(type==='RR1') return { n10: {x:250, y:60, label:'10'}, n20: {x:330, y:130, label:'20'}, n30: {x:410, y:200, label:'30'} };
+           if(type==='RR2') return { n20: {x:250, y:60, label:'20'}, n10: {x:170, y:130, label:'10'}, n30: {x:330, y:130, label:'30'} };
+  
+           if(type==='LR1') return { n30: {x:250, y:60, label:'30'}, n10: {x:170, y:130, label:'10'}, n20: {x:250, y:200, label:'20'} };
+           if(type==='LR2') return { n30: {x:250, y:60, label:'30'}, n20: {x:170, y:130, label:'20'}, n10: {x:90, y:200, label:'10'} };
+           if(type==='LR3') return { n20: {x:250, y:60, label:'20'}, n10: {x:170, y:130, label:'10'}, n30: {x:330, y:130, label:'30'} };
+  
+           if(type==='RL1') return { n10: {x:250, y:60, label:'10'}, n30: {x:330, y:130, label:'30'}, n20: {x:250, y:200, label:'20'} };
+           if(type==='RL2') return { n10: {x:250, y:60, label:'10'}, n20: {x:330, y:130, label:'20'}, n30: {x:410, y:200, label:'30'} };
+           if(type==='RL3') return { n20: {x:250, y:60, label:'20'}, n10: {x:170, y:130, label:'10'}, n30: {x:330, y:130, label:'30'} };
         };
-        var edgesBefore = [
-          { from: 'r', to: 'c' }, { from: 'r', to: 'T3' },
-          { from: 'c', to: 'T1' }, { from: 'c', to: 'T2' }
-        ];
-    
-        
-        var layoutAfter = {
-          c:  { x: 400, y: 80,  label: 'c' },
-          T1: { x: 250, y: 180, label: 'T1' },
-          r:  { x: 550, y: 180, label: 'r' },
-          T2: { x: 450, y: 280, label: 'T2' },
-          T3: { x: 650, y: 280, label: 'T3' }
-        };
-        var edgesAfter = [
-          { from: 'c', to: 'T1' }, { from: 'c', to: 'r' },
-          { from: 'r', to: 'T2' }, { from: 'r', to: 'T3' }
-        ];
-    
+  
         
         steps.push({
-          en: 'This is an imbalanced AVL tree (Left-Left Case). Node <strong>r</strong> has a Balance Factor of +2.',
-          ar: 'هذه شجرة AVL غير متوازنة (حالة يسار-يسار). العقدة <strong>r</strong> لديها معامل توازن +2.',
-          layout: layoutBefore,
-          edges: edgesBefore,
-          colors: { r: 'pending', c: 'pending', T1: 'pending', T2: 'pending', T3: 'pending' },
-          showArrow: false
+          en: '<strong>1. Left-Left (LL):</strong> Node <strong>30</strong> is imbalanced (+2).',
+          ar: '<strong>1. حالة يسار-يسار (LL):</strong> العقدة <strong>30</strong> غير متوازنة (+2).',
+          layout: baseLayout('LL1'), edges: [{from:'n30', to:'n20'}, {from:'n20', to:'n10'}],
+          colors: { n30: 'compare', n20: 'active', n10: 'pending' }, arrows: []
         });
-    
-        
         steps.push({
-          en: 'The imbalance is detected at root <strong>r</strong>. Because the left child <strong>c</strong> is also left-heavy, a single <strong>Right Rotation (LL-Rotation)</strong> is needed.',
-          ar: 'تم اكتشاف الخلل في الجذر <strong>r</strong>. ولأن الابن الأيسر <strong>c</strong> يميل لليسار أيضاً، نحتاج إلى <strong>دوران يميني أحادي (LL-Rotation)</strong>.',
-          layout: layoutBefore,
-          edges: edgesBefore,
-          colors: { r: 'compare', c: 'active', T1: 'pending', T2: 'pending', T3: 'pending' },
-          showArrow: false
+          en: '<strong>Right Rotation:</strong> 20 moves up, 30 moves down-right.',
+          ar: '<strong>دوران يميني:</strong> تصعد 20 لتصبح الجذر، وتنزل 30 لليمين.',
+          layout: baseLayout('LL1'), edges: [{from:'n30', to:'n20'}, {from:'n20', to:'n10'}],
+          colors: { n30: 'swap', n20: 'swap', n10: 'pending' },
+          
+          arrows: [{ path: "M 180 100 Q 250 -40 320 100", tx: 250, ty: 15, en: "Right Rotation", ar: "دوران يميني" }]
         });
-    
-        
         steps.push({
-          en: 'During rotation, <strong>c</strong> moves up to replace <strong>r</strong>. <strong>r</strong> moves down to become the right child of <strong>c</strong>. Subtree <strong>T2</strong> transfers to <strong>r</strong>.',
-          ar: 'أثناء الدوران، تصعد <strong>c</strong> لتحل محل <strong>r</strong>. وتنزل <strong>r</strong> لتصبح الابن الأيمن لـ <strong>c</strong>. وتنتقل الشجرة <strong>T2</strong> لتصبح الابن الأيسر لـ <strong>r</strong>.',
-          layout: layoutBefore,
-          edges: edgesBefore,
-          colors: { r: 'swap', c: 'swap', T1: 'pending', T2: 'compare', T3: 'pending' },
-          showArrow: true
+          en: '<strong>Balanced!</strong> Now let\'s check the next case.',
+          ar: '<strong>متوازنة!</strong> ننتقل للحالة التالية.',
+          layout: baseLayout('LL2'), edges: [{from:'n20', to:'n10'}, {from:'n20', to:'n30'}],
+          colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
         });
-    
+  
         
         steps.push({
-          en: 'The tree is now perfectly balanced! Node <strong>c</strong> is the new root, preserving the Binary Search Tree properties.',
-          ar: 'الشجرة الآن متوازنة تماماً! العقدة <strong>c</strong> أصبحت الجذر الجديد، مع الحفاظ على خصائص شجرة البحث الثنائية.',
-          layout: layoutAfter,
-          edges: edgesAfter,
-          colors: { c: 'sorted', r: 'sorted', T1: 'pending', T2: 'pending', T3: 'pending' },
-          showArrow: false
+          en: '<strong>2. Right-Right (RR):</strong> Node <strong>10</strong> is imbalanced (-2).',
+          ar: '<strong>2. حالة يمين-يمين (RR):</strong> العقدة <strong>10</strong> غير متوازنة (-2).',
+          layout: baseLayout('RR1'), edges: [{from:'n10', to:'n20'}, {from:'n20', to:'n30'}],
+          colors: { n10: 'compare', n20: 'active', n30: 'pending' }, arrows: []
+        });
+        steps.push({
+          en: '<strong>Left Rotation:</strong> 20 moves up, 10 moves down-left.',
+          ar: '<strong>دوران يساري:</strong> تصعد 20 لتصبح الجذر، وتنزل 10 لليسار.',
+          layout: baseLayout('RR1'), edges: [{from:'n10', to:'n20'}, {from:'n20', to:'n30'}],
+          colors: { n10: 'swap', n20: 'swap', n30: 'pending' },
+          arrows: [{ path: "M 320 100 Q 250 -40 180 100", tx: 250, ty: 15, en: "Left Rotation", ar: "دوران يساري" }]
+        });
+        steps.push({
+          en: '<strong>Balanced!</strong> Ready for complex cases?',
+          ar: '<strong>متوازنة!</strong> مستعد للحالات المزدوجة؟',
+          layout: baseLayout('RR2'), edges: [{from:'n20', to:'n10'}, {from:'n20', to:'n30'}],
+          colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
+        });
+  
+        
+        steps.push({
+          en: '<strong>3. Left-Right (LR):</strong> 30 is imbalanced, child 10 is right-heavy.',
+          ar: '<strong>3. حالة يسار-يمين (LR):</strong> 30 مختلة، والابن 10 يميل لليمين.',
+          layout: baseLayout('LR1'), edges: [{from:'n30', to:'n10'}, {from:'n10', to:'n20'}],
+          colors: { n30: 'compare', n10: 'compare', n20: 'active' }, arrows: []
+        });
+        steps.push({
+          en: '<strong>Step 1: Left Rot on Child (10):</strong> 20 moves up-left.',
+          ar: '<strong>الخطوة 1: دوران يساري للابن (10):</strong> 20 تصعد لليسار.',
+          layout: baseLayout('LR1'), edges: [{from:'n30', to:'n10'}, {from:'n10', to:'n20'}],
+          colors: { n30: 'pending', n10: 'swap', n20: 'swap' },
+          
+          arrows: [{ path: "M 230 210 Q 170 280 110 210", tx: 170, ty: 260, en: "1. Left Rot", ar: "1. دوران يساري" }]
+        });
+        steps.push({
+          en: 'Converted to simple <strong>LL</strong> case! Root 30 is still imbalanced.',
+          ar: 'تحولت لحالة <strong>LL</strong> بسيطة! لكن 30 ما زالت مختلة.',
+          layout: baseLayout('LR2'), edges: [{from:'n30', to:'n20'}, {from:'n20', to:'n10'}],
+          colors: { n30: 'compare', n20: 'active', n10: 'pending' }, arrows: []
+        });
+        steps.push({
+          en: '<strong>Step 2: Right Rotation on Root (30).</strong>',
+          ar: '<strong>الخطوة 2: دوران يميني للجذر (30).</strong>',
+          layout: baseLayout('LR2'), edges: [{from:'n30', to:'n20'}, {from:'n20', to:'n10'}],
+          colors: { n30: 'swap', n20: 'swap', n10: 'pending' },
+          arrows: [{ path: "M 180 100 Q 250 -40 320 100", tx: 250, ty: 15, en: "2. Right Rot", ar: "2. دوران يميني" }]
+        });
+        steps.push({
+          en: '<strong>Balanced!</strong> LR case solved.',
+          ar: '<strong>متوازنة!</strong> تم حل حالة LR.',
+          layout: baseLayout('LR3'), edges: [{from:'n20', to:'n10'}, {from:'n20', to:'n30'}],
+          colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
+        });
+  
+        
+        steps.push({
+          en: '<strong>4. Right-Left (RL):</strong> 10 is imbalanced, child 30 is left-heavy.',
+          ar: '<strong>4. حالة يمين-يسار (RL):</strong> 10 مختلة، والابن 30 يميل لليسار.',
+          layout: baseLayout('RL1'), edges: [{from:'n10', to:'n30'}, {from:'n30', to:'n20'}],
+          colors: { n10: 'compare', n30: 'compare', n20: 'active' }, arrows: []
+        });
+        steps.push({
+          en: '<strong>Step 1: Right Rot on Child (30):</strong> 20 moves up-right.',
+          ar: '<strong>الخطوة 1: دوران يميني للابن (30):</strong> 20 تصعد لليمين.',
+          layout: baseLayout('RL1'), edges: [{from:'n10', to:'n30'}, {from:'n30', to:'n20'}],
+          colors: { n10: 'pending', n30: 'swap', n20: 'swap' },
+          
+          arrows: [{ path: "M 270 210 Q 330 280 390 210", tx: 330, ty: 260, en: "1. Right Rot", ar: "1. دوران يميني" }]
+        });
+        steps.push({
+          en: 'Converted to simple <strong>RR</strong> case! Root 10 is still imbalanced.',
+          ar: 'تحولت لحالة <strong>RR</strong> بسيطة! لكن 10 ما زالت مختلة.',
+          layout: baseLayout('RL2'), edges: [{from:'n10', to:'n20'}, {from:'n20', to:'n30'}],
+          colors: { n10: 'compare', n20: 'active', n30: 'pending' }, arrows: []
+        });
+        steps.push({
+          en: '<strong>Step 2: Left Rotation on Root (10).</strong>',
+          ar: '<strong>الخطوة 2: دوران يساري للجذر (10).</strong>',
+          layout: baseLayout('RL2'), edges: [{from:'n10', to:'n20'}, {from:'n20', to:'n30'}],
+          colors: { n10: 'swap', n20: 'swap', n30: 'pending' },
+          arrows: [{ path: "M 320 100 Q 250 -40 180 100", tx: 250, ty: 15, en: "2. Left Rot", ar: "2. دوران يساري" }]
+        });
+        steps.push({
+          en: '<strong>Fully Balanced!</strong> All rotations completed.',
+          ar: '<strong>متوازنة تماماً!</strong> تمت جميع عمليات الدوران.',
+          layout: baseLayout('RL3'), edges: [{from:'n20', to:'n10'}, {from:'n20', to:'n30'}],
+          colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
         });
       }
     
@@ -1260,42 +1323,37 @@ window.AlgoWidgets[5] = function(container) {
         };
     
         var svgHTML = '<defs>';
-        
-        svgHTML += '<marker id="w5-rot-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--algo-active)" /></marker>';
+        svgHTML += '<marker id="w5-rot-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--algo-active)" /></marker>';
         svgHTML += '</defs>';
     
-        
         s.edges.forEach(edge => {
           let fromNode = s.layout[edge.from];
           let toNode = s.layout[edge.to];
           if (fromNode && toNode) {
-            svgHTML += `<line x1="${fromNode.x}" y1="${fromNode.y}" x2="${toNode.x}" y2="${toNode.y}" stroke="var(--text-muted)" stroke-width="3" opacity="0.6"></line>`;
+            svgHTML += `<line x1="${fromNode.x}" y1="${fromNode.y}" x2="${toNode.x}" y2="${toNode.y}" stroke="var(--text-muted)" stroke-width="2.5" opacity="0.6" style="transition: all 0.4s ease;"></line>`;
           }
         });
     
-        
-        if (s.showArrow) {
-          
-          let pathD = "M 270 140 Q 360 20 460 70";
-          svgHTML += `<path d="${pathD}" fill="none" stroke="var(--algo-active)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#w5-rot-arrow)"></path>`;
-          
-          let arrowText = _AL.lang() === 'ar' ? 'دوران يميني' : 'Right Rotation';
-          svgHTML += `<text x="365" y="35" text-anchor="middle" fill="var(--algo-active)" font-size="14px" font-weight="800" font-family="'Cairo', 'Inter', sans-serif">${arrowText}</text>`;
+        if (s.arrows) {
+          s.arrows.forEach(arr => {
+            let arrowText = _AL.lang() === 'ar' ? arr.ar : arr.en;
+            svgHTML += `<path d="${arr.path}" fill="none" stroke="var(--algo-active)" stroke-width="2.5" stroke-dasharray="5,4" marker-end="url(#w5-rot-arrow)"></path>`;
+            svgHTML += `<text x="${arr.tx}" y="${arr.ty}" text-anchor="middle" fill="var(--algo-active)" font-size="13px" font-weight="800" font-family="'Cairo', 'Inter', sans-serif">${arrowText}</text>`;
+          });
         }
     
-        
         Object.keys(s.layout).forEach(nodeKey => {
           let node = s.layout[nodeKey];
           let state = s.colors[nodeKey];
           let fill = colorMap[state];
           let strokeColor = (state === 'pending') ? 'var(--algo-border)' : '#ffffff';
-          let sw = (state === 'pending') ? '2' : '3';
+          let sw = (state === 'pending') ? '2' : '2.5';
           let scale = (state === 'active' || state === 'swap') ? 'scale(1.15)' : 'scale(1)';
           
           svgHTML += `
-          <g style="transform: ${scale}; transform-origin: ${node.x}px ${node.y}px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-            <circle cx="${node.x}" cy="${node.y}" r="${NODE_RADIUS}" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"></circle>
-            <text x="${node.x}" y="${node.y}" dy=".1em" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="16px" font-weight="800" font-family="'Inter', sans-serif">${node.label}</text>
+          <g style="transform: translate(${node.x}px, ${node.y}px) ${scale}; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);">
+            <circle cx="0" cy="0" r="${NODE_RADIUS}" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}" style="transition: fill 0.3s;"></circle>
+            <text x="0" y="0" dy=".1em" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="14px" font-weight="800" font-family="'Inter', sans-serif">${node.label}</text>
           </g>`;
         });
     
@@ -1305,7 +1363,7 @@ window.AlgoWidgets[5] = function(container) {
       function startPlay() {
         playing = true; btnPlay.textContent = _AL.t('pause'); btnPlay.dataset.playing = '1';
         if (cur >= steps.length - 1) cur = 0;
-        interval = setInterval(function(){ if(cur < steps.length-1){ cur++; render(); } else stopPlay(); }, getDelay());
+        interval = setInterval(function(){ if(cur < steps.length-1){ cur++; render(); } else stopPlay(); }, getDelay() + 300);
       }
       function stopPlay() {
         playing = false; clearInterval(interval); interval = null;
@@ -1319,7 +1377,7 @@ window.AlgoWidgets[5] = function(container) {
       container.querySelector('.algo-speed input').addEventListener('input', function() {
         if (playing) {
           clearInterval(interval);
-          interval = setInterval(function(){ if(cur<steps.length-1){cur++;render();}else stopPlay(); }, getDelay());
+          interval = setInterval(function(){ if(cur<steps.length-1){cur++;render();}else stopPlay(); }, getDelay() + 300);
         }
       });
     
