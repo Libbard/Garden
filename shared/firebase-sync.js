@@ -31,6 +31,9 @@
     
     /^planner_config_L\d+$/,
     
+    /^planner_v2_L\d+$/,
+    /^planner_v2_progress_L\d+$/,
+    
     /^study_plan_(midterm|final|general)$/,
     /^planner_config$/,
   ];
@@ -42,6 +45,7 @@
    
   const SYNC_KEY_LS = 'garden_sync_key';
   const SYNC_DECLINED_LS = 'garden_sync_declined'; 
+  const SYNC_SEEN_LS = 'garden_sync_modal_seen';   
   const KEY_REGEX = /^[A-Z]{3}[0-9]{5,}$/;
   const COLLECTION = 'users';
   const AUTO_PUSH_DEBOUNCE_MS = 1500; 
@@ -1032,8 +1036,11 @@
     const key = getKey();
     if (!key) {
       
+      
+      if (localStorage.getItem(SYNC_SEEN_LS))    return;
       if (localStorage.getItem(SYNC_DECLINED_LS)) return;
       
+      localStorage.setItem(SYNC_SEEN_LS, '1');
       setTimeout(showFirstRunModal, 1200);
     } else {
       initSync();

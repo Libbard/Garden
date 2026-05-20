@@ -131,6 +131,16 @@
       const key = el.getAttribute('data-i18n');
       if (i18n[lang]?.[key]) el.textContent = i18n[lang][key];
     });
+    
+    document.querySelectorAll('[data-ar][data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt != null) el.textContent = txt;
+    });
+    
+    document.querySelectorAll('[data-ar-placeholder][data-en-placeholder]').forEach(el => {
+      const ph = el.getAttribute('data-' + lang + '-placeholder');
+      if (ph != null) el.placeholder = ph;
+    });
     document.querySelectorAll('[data-bilingual]').forEach(container => {
       const tpl = container.querySelector(`.content-${lang}`);
       const target = container.querySelector('.content-target');
@@ -3284,65 +3294,123 @@ ${baseRules}`) + regenSuffix;
     }
 
     function _getPlannerBannerData() {
-      const levels = ['3', '4', '5', '6', '7', '8'];
-      const keys = [];
-      levels.forEach(function(lv) {
-        keys.push(
-          'study_plan_L' + lv + '_midterm',
-          'study_plan_L' + lv + '_final',
-          'study_plan_L' + lv + '_general'
-        );
-      });
-      
-      keys.push('study_plan_midterm', 'study_plan_final', 'study_plan_general');
-
       const today = _todayStr();
+
+      
+      
+      
+      
+      var pathMatch = location.pathname.match(/\/L(\d+)\/|\/level(\d+)\//i);
+      var currentLevel = pathMatch ? (pathMatch[1] || pathMatch[2]) : null;
+      var levels = currentLevel ? [currentLevel] : ['3', '4', '5', '6', '7', '8'];
+
       
       var combined = {
         hasPlan: false,
         todaySessions: 0, todayDone: 0,
         totalSessions: 0, doneSessions: 0,
-        progressPct: 0, planUrl: null, planType: null
+        progressPct: 0, planUrl: null, planType: null,
+        version: null,
+        level: currentLevel
       };
 
-      for (var i = 0; i < keys.length; i++) {
-        var raw = localStorage.getItem(keys[i]);
-        if (!raw) continue;
+      for (var li = 0; li < levels.length; li++) {
+        var lv = levels[li];
+        var v2Raw = localStorage.getItem('planner_v2_L' + lv);
+        if (!v2Raw) continue;
         try {
-          var plan = JSON.parse(raw);
-          if (!plan || !Array.isArray(plan.days)) continue;
+          var v2Data = JSON.parse(v2Raw);
+          if (!v2Data || v2Data.version !== 2 || !v2Data.plans) continue;
 
-          var todayDay = null;
-          for (var j = 0; j < plan.days.length; j++) {
-            if (plan.days[j].date === today) { todayDay = plan.days[j]; break; }
-          }
+          var activeType = v2Data.active_plan || 'midterm';
+          var activePlan = v2Data.plans[activeType];
+          if (!activePlan || !activePlan.entries) continue;
 
-          var todaySessions = todayDay ? (todayDay.sessions || []) : [];
-          var todayTotal = todaySessions.length;
-          var todayDone  = todaySessions.filter(function(s) { return s.completed; }).length;
+          
+          var todayEntry = activePlan.entries[today];
+          var todayMods = todayEntry && todayEntry.items
+            ? todayEntry.items.filter(function (i) { return i.type === 'module'; })
+            : [];
+          var todayTotal = todayMods.length;
+          var todayDone = todayMods.filter(function (i) { return i.completed; }).length;
 
+          
           var totalSessions = 0, doneSessions = 0;
-          plan.days.forEach(function(d) {
-            var ss = d.sessions || [];
-            totalSessions += ss.length;
-            doneSessions  += ss.filter(function(s) { return s.completed; }).length;
+          Object.keys(activePlan.entries).forEach(function (d) {
+            var mods = (activePlan.entries[d].items || []).filter(function (i) { return i.type === 'module'; });
+            totalSessions += mods.length;
+            doneSessions += mods.filter(function (i) { return i.completed; }).length;
           });
 
           if (todayTotal === 0 && totalSessions === 0) continue;
 
-          combined.hasPlan        = true;
+          combined.hasPlan = true;
+          combined.version = 2;
           combined.todaySessions += todayTotal;
-          combined.todayDone     += todayDone;
+          combined.todayDone += todayDone;
           combined.totalSessions += totalSessions;
-          combined.doneSessions  += doneSessions;
-          if (!combined.planType) combined.planType = plan.plan_type;
-          
-          if (!combined.planUrl) {
-            var lvMatch = keys[i].match(/L(\d+)/);
-            var lv = lvMatch ? lvMatch[1] : '5';
-            combined.planUrl = '/L' + lv + '/planner/index.html';
-          }
+          combined.doneSessions += doneSessions;
+          if (!combined.planType) combined.planType = activeType;
+          if (!combined.planUrl) combined.planUrl = '/L' + lv + '/planner/index.html';
         } catch (e) {   }
+      }
+
+      
+      
+      
+      if (!combined.hasPlan) {
+        const legacyKeys = [];
+        levels.forEach(function (lv) {
+          legacyKeys.push(
+            'study_plan_L' + lv + '_midterm',
+            'study_plan_L' + lv + '_final',
+            'study_plan_L' + lv + '_general'
+          );
+        });
+        
+        if (!currentLevel) {
+          legacyKeys.push('study_plan_midterm', 'study_plan_final', 'study_plan_general');
+        }
+
+        for (var i = 0; i < legacyKeys.length; i++) {
+          var raw = localStorage.getItem(legacyKeys[i]);
+          if (!raw) continue;
+          try {
+            var plan = JSON.parse(raw);
+            if (!plan || !Array.isArray(plan.days)) continue;
+
+            var todayDay = null;
+            for (var j = 0; j < plan.days.length; j++) {
+              if (plan.days[j].date === today) { todayDay = plan.days[j]; break; }
+            }
+
+            var todaySessions = todayDay ? (todayDay.sessions || []) : [];
+            var todayTotalL = todaySessions.length;
+            var todayDoneL = todaySessions.filter(function (s) { return s.completed; }).length;
+
+            var totalSessionsL = 0, doneSessionsL = 0;
+            plan.days.forEach(function (d) {
+              var ss = d.sessions || [];
+              totalSessionsL += ss.length;
+              doneSessionsL += ss.filter(function (s) { return s.completed; }).length;
+            });
+
+            if (todayTotalL === 0 && totalSessionsL === 0) continue;
+
+            combined.hasPlan = true;
+            combined.version = 1;
+            combined.todaySessions += todayTotalL;
+            combined.todayDone += todayDoneL;
+            combined.totalSessions += totalSessionsL;
+            combined.doneSessions += doneSessionsL;
+            if (!combined.planType) combined.planType = plan.plan_type;
+            if (!combined.planUrl) {
+              var lvMatch = legacyKeys[i].match(/L(\d+)/);
+              var lvL = lvMatch ? lvMatch[1] : '5';
+              combined.planUrl = '/L' + lvL + '/planner/index.html';
+            }
+          } catch (e) {   }
+        }
       }
 
       if (!combined.hasPlan) return { hasPlan: false };
@@ -3353,8 +3421,8 @@ ${baseRules}`) + regenSuffix;
       var isAr = (document.documentElement.lang || localStorage.getItem('garden_lang') || 'ar') === 'ar';
       var n = combined.todaySessions;
       combined.todaySessionsFormatted = isAr
-        ? (n === 1 ? 'جلسة واحدة' : n === 2 ? 'جلستين' : n + ' جلسات')
-        : (n + ' Sessions');
+        ? (n === 0 ? 'لا جلسات اليوم' : n === 1 ? 'جلسة واحدة' : n === 2 ? 'جلستين' : n + ' جلسات')
+        : (n + ' Session' + (n === 1 ? '' : 's'));
 
       return combined;
     }
@@ -3367,6 +3435,70 @@ ${baseRules}`) + regenSuffix;
     if (!window.Planner.getTodayBannerData) {
       window.Planner.getTodayBannerData = _getPlannerBannerData;
     }
+
+     
+    function _updateTodayBanner() {
+      var banner = document.getElementById('today-banner');
+      if (!banner) return; 
+      var data = _getPlannerBannerData();
+      var isAr = (document.documentElement.lang || localStorage.getItem('garden_lang') || 'ar') === 'ar';
+
+      if (!data.hasPlan) {
+        
+        banner.style.display = 'none';
+        var badge0 = document.getElementById('today-sessions-badge');
+        if (badge0) badge0.style.display = 'none';
+        return;
+      }
+
+      banner.style.display = '';
+
+      var planTypeLabel = '';
+      if (data.planType === 'midterm') planTypeLabel = isAr ? 'ميدتيرم' : 'Midterm';
+      else if (data.planType === 'final') planTypeLabel = isAr ? 'فاينل' : 'Final';
+      else if (data.planType === 'general') planTypeLabel = isAr ? 'عام' : 'General';
+
+      var titleEl = document.getElementById('today-banner-title');
+      if (titleEl) {
+        titleEl.textContent = data.todaySessions > 0
+          ? (isAr
+            ? ('📅 جلسة اليوم: ' + data.todayDone + ' من ' + data.todaySessions + ' مكتملة')
+            : ('📅 Today: ' + data.todayDone + ' of ' + data.todaySessions + ' sessions done'))
+          : (isAr ? '📅 خطة مذاكرة نشطة' : '📅 Active study plan');
+      }
+
+      var subEl = document.getElementById('today-banner-subtitle');
+      if (subEl) {
+        subEl.textContent = isAr
+          ? (planTypeLabel + ' · الإجمالي: ' + data.doneSessions + ' من ' + data.totalSessions + ' جلسة')
+          : (planTypeLabel + ' · Total: ' + data.doneSessions + ' of ' + data.totalSessions + ' sessions');
+      }
+
+      var pctEl = document.getElementById('today-banner-pct');
+      if (pctEl) pctEl.textContent = data.progressPct + '%';
+
+      var fillEl = document.getElementById('today-banner-bar-fill');
+      if (fillEl) fillEl.style.width = data.progressPct + '%';
+
+      var badge = document.getElementById('today-sessions-badge');
+      if (badge) {
+        var pending = data.todaySessions - data.todayDone;
+        if (pending > 0) { badge.textContent = pending; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+      }
+    }
+
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { setTimeout(_updateTodayBanner, 100); });
+    } else {
+      
+      setTimeout(_updateTodayBanner, 100);
+    }
+    
+    window.addEventListener('focus', _updateTodayBanner);
+    
+    window.Planner.refreshBanner = _updateTodayBanner;
   })();
 
   window.Garden = {
