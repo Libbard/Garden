@@ -339,7 +339,7 @@ function allCourses(){
     list.push({id,isCustom:false,isElective:!!data.is_elective,name:isAr()?(data.name||id):(data.name_en||data.name||id),color:data.color||cColor(id),mods});
   }
   for(const c of(S.data?.custom_courses||[]))
-    list.push({id:c.id,isCustom:true,isElective:false,name:c.name,color:c.color||cColor(c.id),
+    list.push({id:c.id,isCustom:true,isElective:false,name:isAr()?(c.name_ar||c.name||c.id):(c.name_en||c.name||c.id),color:c.color||cColor(c.id),
       mods:(c.modules||[]).map((m,i)=>({id:`M${pad(i+1)}`,name:typeof m==='string'?m:(m.name||`Module ${i+1}`),diff:5,hours:2,topics:[]}))});
   return list;
 }
@@ -809,11 +809,18 @@ function updateLabel(){
 
 function render(){
   applyLang();
+  
+  
+  const _drawerWasOpen = (() => { const d=document.getElementById('pv2-drawer'); return d?d.classList.contains('open'):false; })();
   if(S.appMode==='plan'){
     renderSidebar();updateLabel();
     S.viewMode==='week'?renderWeek():renderMonth();
     renderLegend();
-    if(isMobile()){renderMobileDrawer();if(S._selectedMod)_highlightTapDays();}
+    if(isMobile()){
+      renderMobileDrawer();
+      if(_drawerWasOpen){const d=document.getElementById('pv2-drawer');if(d)d.classList.add('open');}
+      if(S._selectedMod)_highlightTapDays();
+    }
   }else renderStudy();
 }
 
@@ -1090,7 +1097,8 @@ function _addEv(){
 function showAddCourseModal(){
   modal(`<div class="pv2-modal-header"><h3 class="pv2-modal-title">➕ ${tx('إضافة مادة','Add Course')}</h3><button class="pv2-modal-close" onclick="PV2.closeModal()">✕</button></div>
     <div class="pv2-form-group"><label class="pv2-label">🏷️ ${tx('رمز المادة','Course Code')}</label><input type="text" id="ac-id" class="pv2-input" placeholder="${tx('مثلاً: CS310','e.g. CS310')}" maxlength="10"></div>
-    <div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">📚 ${tx('اسم المادة','Course Name')}</label><input type="text" id="ac-name" class="pv2-input"></div>
+    <div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">📚 ${tx('الاسم بالعربية','Arabic Name')}</label><input type="text" id="ac-name-ar" class="pv2-input" placeholder="${tx('مثلاً: قواعد البيانات','e.g. قواعد البيانات')}"></div>
+    <div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">📚 ${tx('الاسم بالإنجليزية','English Name')}</label><input type="text" id="ac-name-en" class="pv2-input" placeholder="${tx('مثلاً: Databases','e.g. Databases')}"></div>
     <div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">🔢 ${tx('عدد الوحدات','Number of Modules')}</label><input type="number" id="ac-cnt" class="pv2-input" min="1" max="30" value="13"></div>
     <details style="margin-top:.75rem"><summary style="font-size:.83rem;color:var(--text-secondary);cursor:pointer;font-weight:700">✏️ ${tx('تسمية الوحدات (اختياري)','Module Names (optional)')}</summary>
     <textarea id="ac-mods" class="pv2-textarea" style="margin-top:.5rem" placeholder="${tx('وحدة 1\nوحدة 2','Module 1\nModule 2')}"></textarea></details>
@@ -1098,15 +1106,20 @@ function showAddCourseModal(){
     <div class="pv2-modal-actions"><button class="pv2-btn-primary" onclick="PV2._saveCC()">${tx('إضافة','Add')}</button><button class="pv2-btn-secondary" onclick="PV2.closeModal()">${tx('إلغاء','Cancel')}</button></div>`);
 }
 function _saveCC(){
-  const id=document.getElementById('ac-id')?.value.trim().toUpperCase();const name=document.getElementById('ac-name')?.value.trim();
+  const id=document.getElementById('ac-id')?.value.trim().toUpperCase();
+  const nameAr=document.getElementById('ac-name-ar')?.value.trim();
+  const nameEn=document.getElementById('ac-name-en')?.value.trim();
   const cnt=parseInt(document.getElementById('ac-cnt')?.value)||13;const color=document.getElementById('ac-color')?.value||'#64748b';
   const raw=document.getElementById('ac-mods')?.value.trim();
-  if(!id||!name){alert(tx('أدخل الرمز والاسم','Enter code and name'));return;}
+  if(!id||(!nameAr&&!nameEn)){alert(tx('أدخل الرمز والاسم','Enter code and name'));return;}
   if((S.data.custom_courses||[]).find(c=>c.id===id)||S.cMap?.courses?.[id]){alert(tx('الرمز موجود مسبقاً','Code already exists'));return;}
+  
+  const finalAr=nameAr||nameEn;
+  const finalEn=nameEn||nameAr;
   const modNames=raw?raw.split('\n').map(l=>l.trim()).filter(Boolean):[];
   const modules=Array.from({length:cnt},(_,i)=>({name:modNames[i]||(isAr()?`وحدة ${i+1}`:`Module ${i+1}`)}));
   if(!S.data.custom_courses)S.data.custom_courses=[];
-  S.data.custom_courses.push({id,name,color,modules});
+  S.data.custom_courses.push({id,name_ar:finalAr,name_en:finalEn,name:finalAr,color,modules});
   saveData();closeModal();render();
 }
 
@@ -2796,7 +2809,8 @@ function _printCalendar() {
       if (isExamDay) {
         const ec = examCoursesForDay[0];
         const st = courseStyles[ec.id];
-        const examLabelText = ar ? `${ec.id} ${(courses.find(c=>c.id===ec.id)?.name||'').slice(0,22)} — اختبار` : `${ec.id} ${(courses.find(c=>c.id===ec.id)?.name||'').slice(0,22)} EXAM`;
+        const examCourseName = courses.find(c=>c.id===ec.id)?.name || '';
+        const examLabelText = ar ? `${ec.id} ${examCourseName} — اختبار` : `${ec.id} ${examCourseName} EXAM`;
 
         tbodyHTML += `<tr class="exam-row" style="background:${st.examBg};">
           ${wkCell}
@@ -2993,7 +3007,14 @@ function _printCalendar() {
       direction: ${ar?'rtl':'ltr'};
       padding: 3mm 5mm;
       line-height: 1.35;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(297mm - 6mm);
+      box-sizing: border-box;
     }
+    /* table must not flex-grow; it stays at content height */
+    table { flex: 0 0 auto; }
+    .layout-spacer { flex: 1 1 auto; min-height: 0; }
 
     /* ─── Page header — centered title with decorative arrows ─── */
     .pg-header {
@@ -3125,6 +3146,7 @@ function _printCalendar() {
     /* ─── Main table — compact, dense, max readability ─── */
     table {
       width: 100%;
+      height: 1px; /* shrink-to-content; stops last row from stretching to fill page */
       table-layout: fixed;
       border-collapse: separate;
       border-spacing: 0;
@@ -3161,16 +3183,31 @@ function _printCalendar() {
       text-align: center;
     }
     tbody tr:last-child td { border-bottom: 0; }
+    /* Keep rows at natural height; prevents the last row from stretching
+       to fill the page when the schedule ends mid-week. */
+    tbody tr { height: 0; }
 
     /* Week vertical cell — colored per week (Sunrise→Sunset) */
     .wk-cell {
+      position: relative;
+      text-align: center;
+      padding: 0 !important;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+    /* Vertical text is absolutely positioned so it never forces the row
+       (or the whole table) to grow taller than its real content. */
+    .wk-cell-inner {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4pt;
       writing-mode: vertical-rl;
       transform: rotate(180deg);
-      text-align: center;
-      padding: 4pt 2pt !important;
-      vertical-align: middle;
+      white-space: nowrap;
     }
-    .wk-cell-inner { display: flex; align-items: center; justify-content: center; gap: 4pt; }
     .wk-num { font-size: 7.5pt; font-weight: 900; letter-spacing: .5pt; }
     .wk-label { font-size: 5.5pt; font-weight: 600; letter-spacing: .15pt; }
 
@@ -3390,7 +3427,7 @@ function _printCalendar() {
 
     @page { size: A4 portrait; margin: 3mm; }
     @media print {
-      body { padding: 0; }
+      body { padding: 0; min-height: calc(297mm - 6mm); }
       .pg-header { margin-top: 1pt; }
       thead { display: table-header-group !important; }
       .exam-row, .rest-row { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -3426,6 +3463,9 @@ function _printCalendar() {
     </thead>
     <tbody>${tbodyHTML}</tbody>
   </table>
+
+  <!-- Flexible spacer: absorbs leftover height so the table stays compact -->
+  <div class="layout-spacer"></div>
 
   <!-- Footer cards -->
   <div class="footer-grid">
@@ -3728,16 +3768,23 @@ function _evChipDrag(e,c,et){S.dragging={src:'evchip',c,et};e.dataTransfer.effec
 function showEditCourse(cid){
   const courses=allCourses();const course=courses.find(c=>c.id===cid);if(!course)return;
   const color=cColor(cid);
+  const cc=(S.data.custom_courses||[]).find(c=>c.id===cid);
+  
+  const rawAr = cc ? (cc.name_ar||cc.name||'') : (S.cMap?.courses?.[cid]?.name||course.name);
+  const rawEn = cc ? (cc.name_en||cc.name||'') : (S.cMap?.courses?.[cid]?.name_en||course.name);
   const paletteBtns=PALETTE.map(c=>`<button class="pv2-color-swatch${color===c?' selected':''}" style="background:${c}" onclick="PV2._pickColor('${cid}','${c}')" title="${c}"></button>`).join('');
   const modList=course.mods.map((m,i)=>`<div class="pv2-mod-edit-row"><span style="background:${color};color:#fff;padding:.15rem .35rem;border-radius:4px;font-size:.65rem;font-weight:800;flex-shrink:0">${m.id}</span><input type="text" value="${m.name}" id="modinput-${cid}-${i}" class="pv2-input" style="flex:1;padding:.3rem .5rem;font-size:.8rem"><button onclick="PV2._delMod('${cid}',${i})" class="pv2-btn-danger" style="padding:.2rem .5rem;font-size:.75rem">✕</button></div>`).join('');
+  const nameFields = `
+<div class="pv2-form-group"><label class="pv2-label">📚 ${tx('الاسم بالعربية','Arabic Name')}</label><input type="text" id="ec-name-ar" class="pv2-input" value="${rawAr.replace(/"/g,'&quot;')}"></div>
+<div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">📚 ${tx('الاسم بالإنجليزية','English Name')}</label><input type="text" id="ec-name-en" class="pv2-input" value="${rawEn.replace(/"/g,'&quot;')}"></div>`;
   modal(`<div class="pv2-modal-header"><h3 class="pv2-modal-title">✏️ ${tx(`تعديل ${course.name}`,`Edit ${course.name}`)}</h3><button class="pv2-modal-close" onclick="PV2.closeModal()">✕</button></div>
-<div class="pv2-form-group"><label class="pv2-label">${tx('اسم المادة','Course Name')}</label><input type="text" id="ec-name" class="pv2-input" value="${course.name}"></div>
+${nameFields}
 <div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">🎨 ${tx('اللون','Color')}</label><div class="pv2-palette">${paletteBtns}</div><input type="color" id="ec-color-custom" value="${color}" oninput="PV2._pickColor('${cid}',this.value)" class="pv2-input" style="width:42px;height:34px;padding:2px;cursor:pointer;margin-top:.4rem"></div>
 <div class="pv2-form-group" style="margin-top:.75rem"><label class="pv2-label">${tx('الوحدات','Modules')}</label><div id="ec-mods" style="display:flex;flex-direction:column;gap:.3rem;max-height:200px;overflow-y:auto">${modList}</div><button class="pv2-btn-secondary" style="margin-top:.4rem;width:100%" onclick="PV2._addMod('${cid}')">+ ${tx('إضافة وحدة','Add Module')}</button></div>
 <div class="pv2-modal-actions"><button class="pv2-btn-primary" onclick="PV2._saveEditCourse('${cid}')">${tx('حفظ','Save')}</button>${course.isCustom?`<button class="pv2-btn-danger" onclick="PV2._deleteCustomCourse('${cid}')">${tx('حذف المادة','Delete Course')}</button>`:''}<button class="pv2-btn-secondary" onclick="PV2.closeModal()">${tx('إلغاء','Cancel')}</button></div>`);
 }
 function _pickColor(cid,color){document.querySelectorAll('.pv2-color-swatch').forEach(b=>b.classList.toggle('selected',b.style.background===color||b.style.backgroundColor===color));const custom=document.getElementById('ec-color-custom');if(custom)custom.value=color;const cc=(S.data.custom_courses||[]).find(c=>c.id===cid);if(cc)cc.color=color;if(!cc){if(!S.data._colorOverrides)S.data._colorOverrides={};S.data._colorOverrides[cid]=color;if(S.cMap?.courses?.[cid])S.cMap.courses[cid].color=color;}saveData();}
-function _saveEditCourse(cid){const name=document.getElementById('ec-name')?.value.trim();const color=document.getElementById('ec-color-custom')?.value||cColor(cid);const cc=(S.data.custom_courses||[]).find(c=>c.id===cid);if(cc){if(name)cc.name=name;cc.color=color;const modsContainer=document.getElementById('ec-mods');if(modsContainer){const inputs=modsContainer.querySelectorAll('input[type="text"]');inputs.forEach((inp,i)=>{if(cc.modules[i]){if(typeof cc.modules[i]==='string')cc.modules[i]=inp.value;else cc.modules[i].name=inp.value;}});}}else if(S.cMap?.courses?.[cid]){if(name){if(isAr())S.cMap.courses[cid].name=name;else S.cMap.courses[cid].name_en=name;}S.cMap.courses[cid].color=color;if(!S.data._colorOverrides)S.data._colorOverrides={};S.data._colorOverrides[cid]=color;}saveData();closeModal();_coursesInitialized=false;_initOpenCourses();render();}
+function _saveEditCourse(cid){const nameAr=document.getElementById('ec-name-ar')?.value.trim();const nameEn=document.getElementById('ec-name-en')?.value.trim();const color=document.getElementById('ec-color-custom')?.value||cColor(cid);const cc=(S.data.custom_courses||[]).find(c=>c.id===cid);const finalAr=nameAr||nameEn;const finalEn=nameEn||nameAr;if(cc){if(finalAr){cc.name_ar=finalAr;cc.name_en=finalEn;cc.name=finalAr;}cc.color=color;const modsContainer=document.getElementById('ec-mods');if(modsContainer){const inputs=modsContainer.querySelectorAll('input[type="text"]');inputs.forEach((inp,i)=>{if(cc.modules[i]){if(typeof cc.modules[i]==='string')cc.modules[i]=inp.value;else cc.modules[i].name=inp.value;}});}}else if(S.cMap?.courses?.[cid]){if(finalAr)S.cMap.courses[cid].name=finalAr;if(finalEn)S.cMap.courses[cid].name_en=finalEn;S.cMap.courses[cid].color=color;if(!S.data._colorOverrides)S.data._colorOverrides={};S.data._colorOverrides[cid]=color;}saveData();closeModal();_coursesInitialized=false;_initOpenCourses();render();}
 function _addMod(cid){const cc=(S.data.custom_courses||[]).find(c=>c.id===cid);if(!cc)return;cc.modules=cc.modules||[];cc.modules.push({name:isAr()?`وحدة ${cc.modules.length+1}`:`Module ${cc.modules.length+1}`});saveData();showEditCourse(cid);}
 function _delMod(cid,idx){
   if(!confirm(tx('حذف هذه الوحدة؟','Delete this module?')))return;
@@ -3797,7 +3844,8 @@ function renderMobileDrawer(){
         </button>
         <button class="pv2-drawer-tab-edit" style="color:${color}" onclick="PV2.showEditCourse('${c.id}')" title="${tx('تعديل المادة','Edit Course')}"><i class="fas fa-pen-to-square"></i></button>
       </div>`;
-    }).join('');
+    }).join('')
+    + `<button class="pv2-drawer-tab-add" onclick="PV2.showAddCourseModal()" title="${tx('إضافة مادة','Add Course')}" style="display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .7rem;border:1.5px dashed var(--border,#cbd5e1);border-radius:8px;background:transparent;color:var(--text-secondary,#64748b);font-weight:700;font-size:.78rem;cursor:pointer;white-space:nowrap;flex-shrink:0"><i class="fas fa-plus"></i> ${tx('مادة','Course')}</button>`;
   }
 
   
@@ -3945,6 +3993,9 @@ function _tapPlaceOnDay(dateStr){
   saveData();render();
   
   
+  
+  const drawer=document.getElementById('pv2-drawer');
+  if(drawer)drawer.classList.add('open');
   renderMobileDrawer();
 }
 

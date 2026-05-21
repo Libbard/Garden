@@ -1558,35 +1558,262 @@
   }
 
    
+
+  const NOTE_COLORS = {
+    amber: { dot: '#f59e0b', label_ar: 'كهرماني', label_en: 'Amber' },
+    violet: { dot: '#a78bfa', label_ar: 'بنفسجي', label_en: 'Violet' },
+    emerald: { dot: '#10b981', label_ar: 'أخضر', label_en: 'Green' },
+    sky: { dot: '#38bdf8', label_ar: 'أزرق', label_en: 'Blue' },
+    rose: { dot: '#fb7185', label_ar: 'وردي', label_en: 'Pink' }
+  };
+
+  let _gardenSelRange = null;   
+
+  function nL(ar, en) { return currentLang === 'ar' ? ar : en; }
+
   function notesKey() {
     const s = document.documentElement.getAttribute('data-subject') || 'XX';
     const m = document.documentElement.getAttribute('data-module') || '0';
     return `garden_${s}_m${m}_notes`;
   }
-  function loadNotes() { try { return JSON.parse(localStorage.getItem(notesKey())) || []; } catch (e) { return []; } }
+  function loadNotes() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(notesKey())) || [];
+      
+      return arr.map(n => ({
+        id: n.id,
+        title: n.title || (n.highlight && !n.free ? smartTitle(n.highlight) : (n.highlight || nL('ملاحظة', 'Note'))),
+        highlight: n.highlight || '',
+        body: (n.body != null ? n.body : (n.note || '')),
+        color: n.color || 'amber',
+        free: !!n.free || !n.highlight,
+        highlightOnly: !!n.highlightOnly,
+        date: n.date || new Date().toISOString().split('T')[0],
+        lang: n.lang || currentLang,
+        anchor: n.anchor || (n.highlight && !n.free ? { text: n.highlight, occurrence: 0 } : null),
+        blockIndex: (n.blockIndex != null ? n.blockIndex : -1)
+      }));
+    } catch (e) { return []; }
+  }
   function saveNotes(notes) { try { localStorage.setItem(notesKey(), JSON.stringify(notes)); } catch (e) { } }
 
+  function smartTitle(text) {
+    const clean = (text || '').replace(/\s+/g, ' ').trim();
+    const words = clean.split(' ').slice(0, 6).join(' ');
+    return (words.length > 46 ? words.slice(0, 46) + '…' : words) || nL('ملاحظة', 'Note');
+  }
+
+   
+  function getContentRoot() { return document.querySelector('.main-content') || document.body; }
+
+   
+  function bilingualBlocks() {
+    const root = getContentRoot();
+    if (!root) return [];
+    return Array.from(root.querySelectorAll('[data-bilingual]'));
+  }
+  function blockIndexOfNode(node) {
+    if (!node) return -1;
+    const el = node.nodeType === 3 ? node.parentNode : node;
+    const block = el && el.closest ? el.closest('[data-bilingual]') : null;
+    if (!block) return -1;
+    return bilingualBlocks().indexOf(block);
+  }
+
+   
+  function charOffsetOf(root, container, offset) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let pos = 0, n;
+    while ((n = walker.nextNode())) {
+      if (n === container) return pos + offset;
+      pos += n.textContent.length;
+    }
+    return -1;
+  }
+
+   
+  function rangeFromCharOffsets(root, startChar, endChar) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let pos = 0, startNode = null, startOff = 0, endNode = null, endOff = 0, n;
+    while ((n = walker.nextNode())) {
+      const len = n.textContent.length;
+      if (startNode === null && pos + len >= startChar) { startNode = n; startOff = startChar - pos; }
+      if (endNode === null && pos + len >= endChar) { endNode = n; endOff = endChar - pos; break; }
+      pos += len;
+    }
+    if (!startNode || !endNode) return null;
+    try {
+      const r = document.createRange();
+      r.setStart(startNode, startOff);
+      r.setEnd(endNode, endOff);
+      return r;
+    } catch (e) { return null; }
+  }
+
+   
+  function computeAnchor(range) {
+    const root = getContentRoot();
+    if (!root || !range) return null;
+    const text = range.toString();
+    if (!text) return null;
+    const blockIndex = blockIndexOfNode(range.startContainer);
+    const startChar = charOffsetOf(root, range.startContainer, range.startOffset);
+    if (startChar < 0) return { text: text, occurrence: 0, blockIndex: blockIndex };
+    const full = root.textContent;
+    let occ = 0, from = 0, idx;
+    while ((idx = full.indexOf(text, from)) !== -1 && idx < startChar) { occ++; from = idx + 1; }
+    return { text: text, occurrence: occ, blockIndex: blockIndex };
+  }
+
+   
+  function highlightRange(range, id, color) {
+    const sc = range.startContainer, so = range.startOffset;
+    const ec = range.endContainer, eo = range.endOffset;
+    const nodes = [];
+    if (sc === ec && sc.nodeType === 3) {
+      nodes.push(sc);
+    } else {
+      let rootEl = range.commonAncestorContainer;
+      if (rootEl.nodeType === 3) rootEl = rootEl.parentNode;
+      const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
+      let n;
+      while ((n = walker.nextNode())) { if (range.intersectsNode(n)) nodes.push(n); }
+    }
+    nodes.forEach(node => {
+      let s = 0, e = node.textContent.length;
+      if (node === sc) s = so;
+      if (node === ec) e = eo;
+      if (s >= e) return;
+      try {
+        const r = document.createRange();
+        r.setStart(node, s); r.setEnd(node, e);
+        const mark = document.createElement('mark');
+        mark.className = 'user-highlight';
+        mark.dataset.noteId = id;
+        if (color) mark.dataset.color = color;
+        r.surroundContents(mark);
+      } catch (_) {   }
+    });
+  }
+
+   
+  function findAndHighlight(note) {
+    const root = getContentRoot();
+    if (!root) return false;
+    const text = (note.anchor && note.anchor.text) || note.highlight;
+    if (!text) return false;
+    if (root.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`)) return true;
+    const occurrence = (note.anchor && note.anchor.occurrence) || 0;
+    const full = root.textContent;
+    let idx, from = 0, count = 0, found = -1;
+    while ((idx = full.indexOf(text, from)) !== -1) {
+      if (count === occurrence) { found = idx; break; }
+      count++; from = idx + 1;
+    }
+    if (found === -1) found = full.indexOf(text);
+    if (found === -1) return false;        
+    const range = rangeFromCharOffsets(root, found, found + text.length);
+    if (!range) return false;
+    highlightRange(range, note.id, note.color);
+    return true;
+  }
+
+   
+  function clearHighlights() {
+    document.querySelectorAll('mark.user-highlight').forEach(m => {
+      const parent = m.parentNode;
+      if (!parent) return;
+      while (m.firstChild) parent.insertBefore(m.firstChild, m);
+      parent.removeChild(m);
+      parent.normalize();
+    });
+  }
+
+  function restoreHighlights() {
+    const root = getContentRoot();
+    if (!root) return;
+    clearHighlights();
+    
+    loadNotes().forEach(n => { if (!n.free) findAndHighlight(n); });
+  }
+
+   
+  function renderNoteBody(src) {
+    if (!src) return '';
+    let s = escapeHTML(src);
+    s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+    s = s.replace(/==([^=\n]+)==/g, '<mark class="md-hl">$1</mark>');
+    const lines = s.split('\n');
+    const out = [];
+    let inList = false;
+    for (const line of lines) {
+      const m = line.match(/^\s*[-•]\s+(.*)$/);
+      if (m) {
+        if (!inList) { out.push('<ul class="note-md-list">'); inList = true; }
+        out.push('<li>' + m[1] + '</li>');
+      } else {
+        if (inList) { out.push('</ul>'); inList = false; }
+        out.push(line);
+      }
+    }
+    if (inList) out.push('</ul>');
+    s = out.join('\n');
+    s = s.replace(/\n(?![ \t]*<\/?(?:ul|li))/g, '<br>').replace(/\n/g, '');
+    return s;
+  }
+
+   
+  function notesToast(msg) {
+    document.querySelector('.notes-toast')?.remove();
+    const t = document.createElement('div');
+    t.className = 'notes-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 1900);
+  }
+
+   
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        () => notesToast(nL('تم النسخ ✓', 'Copied ✓')),
+        () => fallbackCopy(text)
+      );
+    } else { fallbackCopy(text); }
+  }
+  function fallbackCopy(text) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove();
+      notesToast(nL('تم النسخ ✓', 'Copied ✓'));
+    } catch (e) { notesToast(nL('تعذّر النسخ', 'Copy failed')); }
+  }
+
+   
   function initNotes() {
     
     const tooltip = document.createElement('div');
     tooltip.className = 'notes-tooltip';
     tooltip.id = 'notes-tooltip';
-    tooltip.innerHTML = `<button id="notes-save-btn">📝 ${currentLang === 'ar' ? 'حفظ ملاحظة' : 'Save Note'}</button>`;
     document.body.appendChild(tooltip);
+    buildSelectionTooltip(tooltip);
 
-    
     const widget = document.querySelector('.sidebar-widget');
     if (widget) {
       const notesBtn = document.createElement('button');
       notesBtn.className = 'sidebar-notes-btn';
       notesBtn.id = 'sidebar-notes-btn';
       const notes = loadNotes();
-      notesBtn.innerHTML = `📝 <span data-i18n="notes.btn">${currentLang === 'ar' ? 'ملاحظاتي' : 'My Notes'}</span> <span class="notes-count" id="notes-count">${notes.length}</span>`;
+      notesBtn.innerHTML = `📝 <span data-i18n="notes.btn">${nL('ملاحظاتي', 'My Notes')}</span> <span class="notes-count" id="notes-count">${notes.length}</span>`;
       notesBtn.addEventListener('click', openNotesPanel);
       widget.parentNode.insertBefore(notesBtn, widget.nextSibling);
     }
 
-    
     let selectionTimeout;
     const mainContent = document.querySelector('.main-content');
     mainContent?.addEventListener('mouseup', (e) => {
@@ -1595,17 +1822,13 @@
         const sel = window.getSelection();
         const text = sel?.toString().trim();
         if (text && text.length > 3 && text.length < 500) {
-          
-          
-          const rect = sel.rangeCount > 0
-            ? sel.getRangeAt(0).getBoundingClientRect()
-            : null;
-          showNotesTooltip(e.clientX, rect ? rect.top : e.clientY, text);
+          _gardenSelRange = sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+          const rect = _gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null;
+          showNotesTooltip(rect, text);
         } else { hideNotesTooltip(); }
       }, 200);
     });
 
-    
     let mobileSelTimeout;
     document.addEventListener('selectionchange', () => {
       clearTimeout(mobileSelTimeout);
@@ -1614,42 +1837,149 @@
         const sel = window.getSelection();
         const text = sel?.toString().trim();
         if (text && text.length > 3 && text.length < 500 && mainContent?.contains(sel.anchorNode)) {
+          _gardenSelRange = sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
           showMobileNoteSaveBar(text);
         } else { hideMobileNoteSaveBar(); }
       }, 800);
     });
 
+    
+    mainContent?.addEventListener('click', (e) => {
+      const mark = e.target.closest('mark.user-highlight');
+      if (!mark) return;
+      
+      if ((window.getSelection()?.toString() || '').trim().length > 3) return;
+      const id = mark.dataset.noteId;
+      const note = loadNotes().find(n => String(n.id) === String(id));
+      if (note) { e.stopPropagation(); showNotePop(note, mark.getBoundingClientRect()); }
+    });
+
+    
     document.addEventListener('mousedown', (e) => {
       if (!e.target.closest('.notes-tooltip') && !e.target.closest('.notes-panel') && !e.target.closest('.mobile-note-bar')) {
         hideNotesTooltip();
       }
+      if (!e.target.closest('.note-pop') && !e.target.closest('mark.user-highlight') && !e.target.closest('.notes-panel')) {
+        hideNotePop();
+      }
     });
 
     
-    document.getElementById('notes-save-btn')?.addEventListener('click', () => {
-      const text = window._gardenNotesSelection;
-      if (!text) return;
-      promptNoteText(text);
+    document.addEventListener('garden:languageChanged', () => {
+      hideNotePop();
+      clearTimeout(window._notesRestoreT);
+      window._notesRestoreT = setTimeout(restoreHighlights, 120);
     });
 
-    
     restoreHighlights();
   }
 
-  function showNotesTooltip(x, rectTop, text) {
+   
+  function buildSelectionTooltip(tip) {
+    tip.innerHTML = `
+      <div class="notes-tip-main">
+        <button class="notes-tip-btn notes-tip-color" id="tip-color" title="${nL('تلوين النص', 'Highlight')}"><i class="fa-solid fa-highlighter"></i><span>${nL('تلوين', 'Highlight')}</span></button>
+        <button class="notes-tip-btn notes-tip-copy" id="tip-copy" title="${nL('نسخ النص', 'Copy')}"><i class="fa-solid fa-copy"></i><span>${nL('نسخ', 'Copy')}</span></button>
+        <button class="notes-tip-btn notes-tip-note" id="tip-note" title="${nL('إضافة ملاحظة', 'Add note')}"><i class="fa-solid fa-pen-to-square"></i><span>${nL('ملاحظة', 'Note')}</span></button>
+      </div>
+      <div class="notes-tip-colors" id="tip-colors" style="display:none;">
+        ${Object.keys(NOTE_COLORS).map(k => `<button type="button" class="notes-tip-dot" data-color="${k}" style="--dot:${NOTE_COLORS[k].dot}" title="${nL(NOTE_COLORS[k].label_ar, NOTE_COLORS[k].label_en)}"></button>`).join('')}
+        <button type="button" class="notes-tip-dot-back" id="tip-color-back" title="${nL('رجوع', 'Back')}"><i class="fa-solid fa-xmark"></i></button>
+      </div>`;
+
+    const main = tip.querySelector('.notes-tip-main');
+    const colors = tip.querySelector('#tip-colors');
+
+    tip.querySelector('#tip-copy').addEventListener('click', () => {
+      const text = (_gardenSelRange ? _gardenSelRange.toString() : (window._gardenNotesSelection || '')).trim();
+      if (text) copyText(text);
+      hideNotesTooltip();
+      window.getSelection()?.removeAllRanges();
+    });
+
+    tip.querySelector('#tip-note').addEventListener('click', () => {
+      const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+      const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
+      if (!text) return;
+      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
+      hideNotesTooltip();
+      window.getSelection()?.removeAllRanges();
+      openNoteEditor({ free: false, highlightText: text, anchor: anchor });
+    });
+
+    
+    tip.querySelector('#tip-color').addEventListener('click', () => {
+      main.style.display = 'none';
+      colors.style.display = 'flex';
+    });
+    tip.querySelector('#tip-color-back').addEventListener('click', () => {
+      colors.style.display = 'none';
+      main.style.display = 'flex';
+    });
+    colors.querySelectorAll('.notes-tip-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+        const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
+        if (!text) return;
+        const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
+        createHighlightOnly(text, anchor, dot.getAttribute('data-color'));
+        hideNotesTooltip();
+        window.getSelection()?.removeAllRanges();
+      });
+    });
+  }
+
+   
+  function createHighlightOnly(text, anchor, color) {
+    const notes = loadNotes();
+    notes.unshift({
+      id: Date.now(),
+      title: smartTitle(text),
+      highlight: text,
+      body: '',
+      color: color || 'amber',
+      free: false,
+      highlightOnly: true,
+      date: new Date().toISOString().split('T')[0],
+      lang: currentLang,
+      anchor: anchor
+    });
+    saveNotes(notes);
+    restoreHighlights();
+    updateNotesCount();
+    if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+    notesToast(nL('تم التلوين ✓', 'Highlighted ✓'));
+  }
+
+   
+  function placeFloating(el, rect, gap) {
+    gap = gap || 10;
+    const pad = 12;
+    el.style.visibility = 'hidden';
+    el.style.display = 'block';
+    el.style.left = '0'; el.style.top = '0';
+    const w = el.offsetWidth, h = el.offsetHeight;
+    el.style.visibility = '';
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let top;
+    if (rect && rect.top - h - gap >= pad) top = rect.top - h - gap;
+    else if (rect) top = Math.min(rect.bottom + gap, vh - h - pad);
+    else top = Math.max(pad, (vh - h) / 2);
+    let idealLeft = rect ? (rect.left + rect.width / 2 - w / 2) : (vw - w) / 2;
+    let left = Math.max(pad, Math.min(idealLeft, vw - w - pad));
+    el.style.top = Math.max(pad, top) + 'px';
+    el.style.left = left + 'px';
+  }
+
+  function showNotesTooltip(rect, text) {
     const tip = document.getElementById('notes-tooltip');
     if (!tip) return;
     window._gardenNotesSelection = text;
-    tip.style.display = 'block';
     
-    
-    
-    const tipHeight = tip.offsetHeight || 42;
-    const topPx = Math.max(rectTop - tipHeight - 8, 8);
-    tip.style.left = `${Math.min(x, window.innerWidth - 180)}px`;
-    tip.style.top = `${topPx}px`;
-    const btn = tip.querySelector('button');
-    if (btn) btn.textContent = `📝 ${currentLang === 'ar' ? 'حفظ ملاحظة' : 'Save Note'}`;
+    const main = tip.querySelector('.notes-tip-main');
+    const colors = tip.querySelector('#tip-colors');
+    if (main && colors) { main.style.display = 'flex'; colors.style.display = 'none'; }
+    placeFloating(tip, rect, 8);
   }
 
   function hideNotesTooltip() {
@@ -1666,16 +1996,41 @@
       document.body.appendChild(bar);
     }
     window._gardenNotesSelection = text;
-    const L = currentLang;
-    const preview = text.length > 50 ? text.substring(0, 50) + '...' : text;
+    const preview = text.length > 42 ? text.substring(0, 42) + '…' : text;
     bar.innerHTML =
       '<div class="mnb-text">' + escapeHTML(preview) + '</div>' +
-      '<button class="mnb-save" id="mnb-save">\ud83d\udcdd ' + (L === 'ar' ? '\u062d\u0641\u0638' : 'Save') + '</button>';
+      '<div class="mnb-actions">' +
+      '<button class="mnb-btn mnb-color" id="mnb-color" title="' + nL('تلوين', 'Highlight') + '"><i class="fa-solid fa-highlighter"></i></button>' +
+      '<button class="mnb-btn mnb-copy" id="mnb-copy" title="' + nL('نسخ', 'Copy') + '"><i class="fa-solid fa-copy"></i></button>' +
+      '<button class="mnb-btn mnb-save" id="mnb-save"><i class="fa-solid fa-pen-to-square"></i> ' + nL('ملاحظة', 'Note') + '</button>' +
+      '</div>' +
+      '<div class="mnb-colors" id="mnb-colors" style="display:none;">' +
+      Object.keys(NOTE_COLORS).map(k => '<button type="button" class="notes-tip-dot" data-color="' + k + '" style="--dot:' + NOTE_COLORS[k].dot + '"></button>').join('') +
+      '</div>';
     bar.style.display = 'flex';
+
+    const getRange = () => _gardenSelRange ? _gardenSelRange.cloneRange() : null;
     bar.querySelector('#mnb-save').onclick = () => {
+      const range = getRange();
+      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
       hideMobileNoteSaveBar();
-      promptNoteText(text);
+      window.getSelection()?.removeAllRanges();
+      openNoteEditor({ free: false, highlightText: text, anchor: anchor });
     };
+    bar.querySelector('#mnb-copy').onclick = () => { copyText(text); hideMobileNoteSaveBar(); window.getSelection()?.removeAllRanges(); };
+    bar.querySelector('#mnb-color').onclick = () => {
+      const c = bar.querySelector('#mnb-colors');
+      c.style.display = c.style.display === 'none' ? 'flex' : 'none';
+    };
+    bar.querySelectorAll('#mnb-colors .notes-tip-dot').forEach(dot => {
+      dot.onclick = () => {
+        const range = getRange();
+        const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
+        createHighlightOnly(text, anchor, dot.getAttribute('data-color'));
+        hideMobileNoteSaveBar();
+        window.getSelection()?.removeAllRanges();
+      };
+    });
   }
 
   function hideMobileNoteSaveBar() {
@@ -1683,105 +2038,300 @@
     if (bar) bar.style.display = 'none';
   }
 
-  function promptNoteText(highlightText) {
-    hideNotesTooltip();
-    window.getSelection()?.removeAllRanges();
+   
+  function ensureNotePop() {
+    let pop = document.getElementById('note-pop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'note-pop';
+      pop.className = 'note-pop';
+      document.body.appendChild(pop);
+    }
+    return pop;
+  }
+
+  function showNotePop(note, rect) {
+    const pop = ensureNotePop();
+    const L = currentLang;
+    pop.setAttribute('data-color', note.color || 'amber');
+
+    const hasBody = !!(note.body && note.body.trim());
+    const quote = note.highlight ? `
+      <div class="note-pop-quote"><i class="fa-solid fa-quote-right"></i><span>${escapeHTML(note.highlight.substring(0, 160))}${note.highlight.length > 160 ? '…' : ''}</span></div>` : '';
+    const bodyHtml = hasBody
+      ? `<div class="note-pop-body">${renderNoteBody(note.body)}</div>`
+      : `<div class="note-pop-empty">${L === 'ar' ? 'لا يوجد نص للملاحظة بعد.' : 'No note text yet.'}</div>`;
+
+    pop.innerHTML = `
+      <div class="note-pop-head">
+        <span class="note-pop-dot"></span>
+        <span class="note-pop-title">${escapeHTML(note.title || nL('ملاحظة', 'Note'))}</span>
+        <button class="note-pop-x" id="note-pop-x" title="${L === 'ar' ? 'إغلاق' : 'Close'}"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      ${quote}
+      ${bodyHtml}
+      <div class="note-pop-actions">
+        <button class="note-pop-act" id="note-pop-edit"><i class="fa-solid fa-pen"></i> ${hasBody ? (L === 'ar' ? 'تعديل' : 'Edit') : (L === 'ar' ? 'أضف ملاحظة' : 'Add note')}</button>
+        <button class="note-pop-act note-pop-del" id="note-pop-del"><i class="fa-solid fa-trash-can"></i> ${L === 'ar' ? 'حذف' : 'Delete'}</button>
+      </div>`;
+
+    placeFloating(pop, rect, 12);
+    requestAnimationFrame(() => pop.classList.add('visible'));
+
+    pop.querySelector('#note-pop-x').onclick = hideNotePop;
+    pop.querySelector('#note-pop-edit').onclick = () => {
+      hideNotePop();
+      const fresh = loadNotes().find(n => String(n.id) === String(note.id)) || note;
+      openNoteEditor({ note: fresh });
+    };
+    pop.querySelector('#note-pop-del').onclick = () => {
+      const notes = loadNotes().filter(n => String(n.id) !== String(note.id));
+      saveNotes(notes);
+      restoreHighlights();
+      updateNotesCount();
+      if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+      hideNotePop();
+      notesToast(L === 'ar' ? 'تم الحذف' : 'Deleted');
+    };
+
+    document.addEventListener('keydown', function escP(e) {
+      if (e.key === 'Escape') { hideNotePop(); document.removeEventListener('keydown', escP); }
+    });
+  }
+
+  function hideNotePop() {
+    const pop = document.getElementById('note-pop');
+    if (!pop) return;
+    pop.classList.remove('visible');
+    setTimeout(() => { if (pop && !pop.classList.contains('visible')) pop.style.display = 'none'; }, 180);
+  }
+
+   
+  function openNoteEditor(opts) {
+    opts = opts || {};
+    const editing = !!opts.note;
+    const note = opts.note || null;
+    const isFree = editing ? !!note.free : !!opts.free;
+    const highlightText = editing ? note.highlight : (opts.highlightText || '');
+    const anchor = editing ? note.anchor : (opts.anchor || null);
+    let color = editing ? (note.color || 'amber') : (opts.color || 'amber');
 
     const L = currentLang;
-    
     document.querySelector('.garden-modal-overlay')?.remove();
+
+    const titleVal = editing ? (note.title || '') : (highlightText ? smartTitle(highlightText) : '');
+    const bodyVal = editing ? (note.body || '') : '';
+
+    const colorSwatches = isFree ? '' : `
+      <div class="note-color-row">
+        <span class="note-color-label">${L === 'ar' ? 'لون التظليل' : 'Highlight color'}</span>
+        <div class="note-color-swatches">
+          ${Object.keys(NOTE_COLORS).map(k => `
+            <button type="button" class="note-color-dot ${k === color ? 'active' : ''}" data-color="${k}"
+              style="--dot:${NOTE_COLORS[k].dot}" title="${L === 'ar' ? NOTE_COLORS[k].label_ar : NOTE_COLORS[k].label_en}"></button>`).join('')}
+        </div>
+      </div>`;
+
+    const quoteBox = (!isFree && highlightText) ? `
+      <div class="note-editor-quote">
+        <i class="fa-solid fa-quote-right"></i>
+        <span>${escapeHTML(highlightText.substring(0, 200))}${highlightText.length > 200 ? '…' : ''}</span>
+      </div>` : '';
+
     const overlay = document.createElement('div');
     overlay.className = 'garden-modal-overlay';
     overlay.innerHTML = `
-      <div class="garden-modal" style="max-width:450px;">
-        <div class="garden-modal-icon">📝</div>
-        <div class="garden-modal-title">${L === 'ar' ? 'أضف ملاحظتك' : 'Add Your Note'}</div>
-        <div style="text-align:start;margin-bottom:1rem;">
-          <div style="font-size:0.8rem;color:var(--brand-500);font-style:italic;border-inline-start:3px solid var(--brand-500);padding-inline-start:0.6rem;margin-bottom:0.75rem;line-height:1.5;font-weight:600;">"${highlightText.substring(0, 120)}${highlightText.length > 120 ? '...' : ''}"</div>
-          <textarea id="note-input" rows="3" placeholder="${L === 'ar' ? 'اكتب ملاحظتك هنا...' : 'Write your note here...'}" style="width:100%;padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);font-family:inherit;font-size:0.9rem;font-weight:600;resize:vertical;"></textarea>
+      <div class="garden-modal note-editor" style="max-width:520px;">
+        <div class="note-editor-head">
+          <div class="note-editor-title">
+            <span class="note-editor-icon">${isFree ? '🗒️' : '📝'}</span>
+            ${editing ? (L === 'ar' ? 'تعديل الملاحظة' : 'Edit Note')
+        : (isFree ? (L === 'ar' ? 'ملاحظة جديدة' : 'New Note') : (L === 'ar' ? 'أضف ملاحظتك' : 'Add Your Note'))}
+          </div>
         </div>
+        ${quoteBox}
+        <label class="note-field-label">${L === 'ar' ? 'العنوان' : 'Title'}</label>
+        <input id="note-title-input" type="text" class="note-title-input"
+          placeholder="${L === 'ar' ? 'عنوان الملاحظة...' : 'Note title...'}" value="${escapeHTML(titleVal).replace(/"/g, '&quot;')}">
+
+        <label class="note-field-label">${L === 'ar' ? 'المحتوى' : 'Content'}</label>
+        <div class="note-format-toolbar" id="note-format-toolbar">
+          <button type="button" data-md="bold"      title="${L === 'ar' ? 'عريض' : 'Bold'}"><i class="fa-solid fa-bold"></i></button>
+          <button type="button" data-md="italic"    title="${L === 'ar' ? 'مائل' : 'Italic'}"><i class="fa-solid fa-italic"></i></button>
+          <button type="button" data-md="code"       title="${L === 'ar' ? 'كود' : 'Code'}"><i class="fa-solid fa-code"></i></button>
+          <button type="button" data-md="hl"         title="${L === 'ar' ? 'تظليل' : 'Highlight'}"><i class="fa-solid fa-highlighter"></i></button>
+          <button type="button" data-md="list"       title="${L === 'ar' ? 'قائمة' : 'List'}"><i class="fa-solid fa-list-ul"></i></button>
+          <span class="note-toolbar-sep"></span>
+          <button type="button" id="note-preview-toggle" class="note-preview-toggle" title="${L === 'ar' ? 'معاينة' : 'Preview'}"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <textarea id="note-body-input" class="note-body-input" rows="5"
+          placeholder="${L === 'ar' ? 'اكتب ملاحظتك... يمكنك استخدام **عريض** و*مائل* و- قوائم' : 'Write your note... use **bold**, *italic*, - lists'}">${escapeHTML(bodyVal)}</textarea>
+        <div class="note-preview" id="note-preview" style="display:none;"></div>
+
+        ${colorSwatches}
+
         <div class="garden-modal-actions">
           <button class="garden-modal-btn garden-modal-btn--cancel" id="note-cancel">${L === 'ar' ? 'إلغاء' : 'Cancel'}</button>
-          <button class="garden-modal-btn" id="note-confirm" style="background:var(--brand-500);color:#fff;border-color:var(--brand-500);">${L === 'ar' ? 'حفظ' : 'Save'}</button>
+          <button class="garden-modal-btn note-save-btn" id="note-confirm">${L === 'ar' ? 'حفظ' : 'Save'}</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
 
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-    overlay.querySelector('#note-cancel').addEventListener('click', () => overlay.remove());
-    overlay.querySelector('#note-confirm').addEventListener('click', () => {
-      const input = document.getElementById('note-input');
-      const userNote = input?.value?.trim() || '';
-      const note = {
-        id: Date.now(),
-        highlight: highlightText,
-        note: userNote,
-        date: new Date().toISOString().split('T')[0],
-        lang: L
-      };
-      const notes = loadNotes();
-      notes.unshift(note);
-      saveNotes(notes);
-      updateNotesCount();
-      overlay.remove();
+    const titleInput = overlay.querySelector('#note-title-input');
+    const bodyInput = overlay.querySelector('#note-body-input');
+    const preview = overlay.querySelector('#note-preview');
+    const previewToggle = overlay.querySelector('#note-preview-toggle');
+
+    
+    const wraps = { bold: ['**', '**'], italic: ['*', '*'], code: ['`', '`'], hl: ['==', '=='] };
+    overlay.querySelector('#note-format-toolbar').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-md]');
+      if (!btn) return;
+      const kind = btn.getAttribute('data-md');
+      if (kind === 'list') {
+        insertAtLineStart(bodyInput, '- ');
+      } else if (wraps[kind]) {
+        wrapTextarea(bodyInput, wraps[kind][0], wraps[kind][1]);
+      }
+      if (preview.style.display !== 'none') preview.innerHTML = renderNoteBody(bodyInput.value);
     });
 
     
-    setTimeout(() => document.getElementById('note-input')?.focus(), 100);
+    previewToggle.addEventListener('click', () => {
+      const showing = preview.style.display !== 'none';
+      if (showing) {
+        preview.style.display = 'none';
+        bodyInput.style.display = '';
+        previewToggle.classList.remove('active');
+      } else {
+        preview.innerHTML = renderNoteBody(bodyInput.value) || `<span class="note-preview-empty">${L === 'ar' ? 'لا يوجد محتوى للمعاينة' : 'Nothing to preview'}</span>`;
+        preview.style.display = '';
+        bodyInput.style.display = 'none';
+        previewToggle.classList.add('active');
+      }
+    });
+
+    
+    overlay.querySelectorAll('.note-color-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        color = dot.getAttribute('data-color');
+        overlay.querySelectorAll('.note-color-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    const close = () => overlay.remove();
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.querySelector('#note-cancel').addEventListener('click', close);
+
+    overlay.querySelector('#note-confirm').addEventListener('click', () => {
+      const title = (titleInput.value || '').trim();
+      const body = (bodyInput.value || '').trim();
+      if (!title && !body) { titleInput.focus(); return; }
+
+      let notes = loadNotes();
+      if (editing) {
+        const i = notes.findIndex(n => n.id === note.id);
+        if (i !== -1) {
+          notes[i].title = title || smartTitle(notes[i].highlight) || nL('ملاحظة', 'Note');
+          notes[i].body = body;
+          notes[i].color = color;
+          notes[i].lang = currentLang;
+          if (body) notes[i].highlightOnly = false;   
+        }
+      } else {
+        const newNote = {
+          id: Date.now(),
+          title: title || (highlightText ? smartTitle(highlightText) : nL('ملاحظة عامة', 'General note')),
+          highlight: isFree ? '' : highlightText,
+          body: body,
+          color: color,
+          free: isFree,
+          highlightOnly: false,
+          date: new Date().toISOString().split('T')[0],
+          lang: currentLang,
+          anchor: isFree ? null : anchor
+        };
+        notes.unshift(newNote);
+      }
+      saveNotes(notes);
+      restoreHighlights();
+      updateNotesCount();
+      close();
+      if (document.querySelector('.notes-panel')) renderNotesPanelBody();
+    });
+
+    setTimeout(() => { (titleVal ? bodyInput : titleInput).focus(); }, 100);
   }
 
-  function promptFreeNote() {
-    const L = currentLang;
-    document.querySelector('.garden-modal-overlay')?.remove();
-    const ov = document.createElement('div');
-    ov.className = 'garden-modal-overlay';
-    ov.innerHTML = `
-      <div class="garden-modal" style="max-width:450px;">
-        <div class="garden-modal-icon">📝</div>
-        <div class="garden-modal-title">${L === 'ar' ? 'ملاحظة جديدة' : 'New Note'}</div>
-        <div style="text-align:start;margin-bottom:0.75rem;">
-          <input id="free-note-title" type="text" placeholder="${L === 'ar' ? 'عنوان الملاحظة...' : 'Note title...'}" style="width:100%;padding:0.6rem 0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);font-family:inherit;font-size:0.9rem;font-weight:700;margin-bottom:0.5rem;">
-          <textarea id="free-note-body" rows="4" placeholder="${L === 'ar' ? 'اكتب ملاحظتك...' : 'Write your note...'}" style="width:100%;padding:0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);font-family:inherit;font-size:0.9rem;font-weight:600;resize:vertical;"></textarea>
-        </div>
-        <div class="garden-modal-actions">
-          <button class="garden-modal-btn garden-modal-btn--cancel" id="free-note-cancel">${L === 'ar' ? 'إلغاء' : 'Cancel'}</button>
-          <button class="garden-modal-btn" id="free-note-save" style="background:var(--brand-500);color:#fff;border-color:var(--brand-500);">${L === 'ar' ? 'حفظ' : 'Save'}</button>
-        </div>
-      </div>`;
-    document.body.appendChild(ov);
-    ov.addEventListener('click', (e) => { if (e.target === ov) ov.remove(); });
-    ov.querySelector('#free-note-cancel').onclick = () => ov.remove();
-    ov.querySelector('#free-note-save').onclick = () => {
-      const title = document.getElementById('free-note-title')?.value?.trim() || '';
-      const body = document.getElementById('free-note-body')?.value?.trim() || '';
-      if (!title && !body) return;
-      const note = { id: Date.now(), highlight: title || (L === 'ar' ? 'ملاحظة عامة' : 'General note'), note: body, date: new Date().toISOString().split('T')[0], lang: L, free: true };
-      const notes = loadNotes();
-      notes.unshift(note);
-      saveNotes(notes);
-      updateNotesCount();
-      ov.remove();
-    };
-    setTimeout(() => document.getElementById('free-note-title')?.focus(), 100);
+   
+  function wrapTextarea(ta, before, after) {
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const val = ta.value;
+    const sel = val.slice(start, end) || (currentLang === 'ar' ? 'نص' : 'text');
+    ta.value = val.slice(0, start) + before + sel + after + val.slice(end);
+    ta.focus();
+    ta.selectionStart = start + before.length;
+    ta.selectionEnd = start + before.length + sel.length;
   }
+  function insertAtLineStart(ta, prefix) {
+    const start = ta.selectionStart;
+    const val = ta.value;
+    let lineStart = val.lastIndexOf('\n', start - 1) + 1;
+    ta.value = val.slice(0, lineStart) + prefix + val.slice(lineStart);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = start + prefix.length;
+  }
+
+  function promptNoteText(highlightText) { openNoteEditor({ free: false, highlightText: highlightText, anchor: { text: highlightText, occurrence: 0, blockIndex: -1 } }); }
+  function promptFreeNote() { openNoteEditor({ free: true }); }
 
   function updateNotesCount() {
     const el = document.getElementById('notes-count');
     if (el) el.textContent = loadNotes().length;
   }
 
-  function restoreHighlights() {
-    
-    
+   
+  function gotoNoteSource(note) {
+    if (note.free) { showNotePop(note, null); return; }       
+    closeNotesPanel();
+    setTimeout(() => {
+      
+      let mark = document.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`);
+      if (!mark) { findAndHighlight(note); mark = document.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`); }
+      if (mark) {
+        mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        mark.classList.add('flash');
+        setTimeout(() => mark.classList.remove('flash'), 1700);
+        setTimeout(() => showNotePop(note, mark.getBoundingClientRect()), 360);
+        return;
+      }
+      
+      const blocks = bilingualBlocks();
+      const bi = note.anchor && note.anchor.blockIndex != null ? note.anchor.blockIndex : (note.blockIndex != null ? note.blockIndex : -1);
+      const block = (bi >= 0 && bi < blocks.length) ? blocks[bi] : null;
+      if (block) {
+        block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        block.classList.add('note-block-flash');
+        setTimeout(() => block.classList.remove('note-block-flash'), 1700);
+        setTimeout(() => showNotePop(note, block.getBoundingClientRect()), 360);
+        notesToast(nL('عُرضت الملاحظة عند فقرتها (النص بلغة أخرى)', 'Shown at its paragraph (text is in the other language)'));
+        return;
+      }
+      
+      showNotePop(note, null);
+    }, 240);
+  }
+
+   
+  function closeNotesPanel() {
+    document.querySelector('.notes-panel-overlay')?.remove();
+    document.querySelector('.notes-panel')?.remove();
   }
 
   function openNotesPanel() {
-    
-    document.querySelector('.notes-panel-overlay')?.remove();
-    document.querySelector('.notes-panel')?.remove();
-
+    closeNotesPanel();
     const L = currentLang;
-    const notes = loadNotes();
 
     const overlay = document.createElement('div');
     overlay.className = 'notes-panel-overlay';
@@ -1791,58 +2341,134 @@
     panel.className = 'notes-panel';
     panel.innerHTML = `
       <div class="notes-panel-header">
-        <h3>📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'} (${notes.length})</h3>
-        <button class="notes-add-free" id="notes-add-free" title="${L === 'ar' ? 'ملاحظة جديدة' : 'New note'}">＋</button>
-        <button class="notes-panel-close" id="notes-panel-close">✕</button>
+        <h3 id="notes-panel-title">📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'}</h3>
+        <div class="notes-panel-head-actions">
+          <button class="notes-add-free" id="notes-add-free" title="${L === 'ar' ? 'ملاحظة جديدة' : 'New note'}"><i class="fa-solid fa-plus"></i></button>
+          <button class="notes-panel-close" id="notes-panel-close" title="${L === 'ar' ? 'إغلاق' : 'Close'}">✕</button>
+        </div>
       </div>
-      <div class="notes-panel-body" id="notes-panel-body">
-        ${notes.length === 0
-        ? `<div class="notes-empty">${L === 'ar' ? 'لا توجد ملاحظات بعد.<br>حدد أي نص في المحتوى واضغط "حفظ ملاحظة"' : 'No notes yet.<br>Select any text in the content and click "Save Note"'}</div>`
-        : notes.map(n => `
-            <div class="note-card" data-note-id="${n.id}">
-              <div class="note-highlight-text">"${(n.highlight || '').substring(0, 150)}${(n.highlight || '').length > 150 ? '...' : ''}"</div>
-              ${n.note ? `<div class="note-user-text">${escapeHTML(n.note)}</div>` : ''}
-              <div class="note-meta">
-                <span>${n.date || ''}</span>
-                <button class="note-delete" data-del-id="${n.id}" title="${L === 'ar' ? 'حذف' : 'Delete'}">🗑️</button>
-              </div>
-            </div>`).join('')
-      }
-      </div>`;
+      <div class="notes-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="notes-search" class="notes-search" placeholder="${L === 'ar' ? 'ابحث في ملاحظاتك...' : 'Search your notes...'}">
+      </div>
+      <div class="notes-panel-body" id="notes-panel-body"></div>`;
 
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
 
-    
-    const closePanel = () => { overlay.remove(); panel.remove(); };
-    overlay.addEventListener('click', closePanel);
-    panel.querySelector('#notes-panel-close').addEventListener('click', closePanel);
+    overlay.addEventListener('click', closeNotesPanel);
+    panel.querySelector('#notes-panel-close').addEventListener('click', closeNotesPanel);
     document.addEventListener('keydown', function escN(e) {
-      if (e.key === 'Escape') { closePanel(); document.removeEventListener('keydown', escN); }
+      if (e.key === 'Escape') { closeNotesPanel(); document.removeEventListener('keydown', escN); }
     });
+    panel.querySelector('#notes-add-free').addEventListener('click', () => openNoteEditor({ free: true }));
+    panel.querySelector('#notes-search').addEventListener('input', (e) => renderNotesPanelBody(e.target.value));
+
+    renderNotesPanelBody();
+  }
+
+  function renderNotesPanelBody(filter) {
+    const panel = document.querySelector('.notes-panel');
+    if (!panel) return;
+    const L = currentLang;
+    const body = panel.querySelector('#notes-panel-body');
+    const titleEl = panel.querySelector('#notes-panel-title');
+    let notes = loadNotes();
+    const total = notes.length;
+
+    const q = (filter || '').trim().toLowerCase();
+    if (q) notes = notes.filter(n =>
+      (n.title || '').toLowerCase().includes(q) ||
+      (n.body || '').toLowerCase().includes(q) ||
+      (n.highlight || '').toLowerCase().includes(q));
+
+    if (titleEl) titleEl.innerHTML = `📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'} <span class="notes-title-count">${total}</span>`;
+
+    if (total === 0) {
+      body.innerHTML = `<div class="notes-empty">
+        <div class="notes-empty-icon">🗒️</div>
+        <div>${L === 'ar' ? 'لا توجد ملاحظات بعد.' : 'No notes yet.'}</div>
+        <div class="notes-empty-hint">${L === 'ar' ? 'حدّد أي نص ثم اختر «تلوين» أو «ملاحظة»، أو أنشئ ملاحظة عامة بزر +' : 'Select any text then choose "Highlight" or "Note", or create a general note with +'}</div>
+      </div>`;
+      return;
+    }
+    if (notes.length === 0) {
+      body.innerHTML = `<div class="notes-empty"><div class="notes-empty-icon">🔍</div><div>${L === 'ar' ? 'لا نتائج مطابقة' : 'No matching notes'}</div></div>`;
+      return;
+    }
+
+    body.innerHTML = notes.map(n => {
+      const navigable = !n.free && (n.anchor || n.highlight);
+      const bodyHtml = renderNoteBody(n.body);
+      const quote = (!n.free && n.highlight) ? `
+        <div class="note-quote" data-goto="${n.id}" title="${L === 'ar' ? 'اذهب إلى موضع النص' : 'Jump to source'}">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>${escapeHTML(n.highlight.substring(0, 120))}${n.highlight.length > 120 ? '…' : ''}</span>
+        </div>` : '';
+      const badge = n.free
+        ? `<span class="note-badge note-badge--free"><i class="fa-solid fa-note-sticky"></i> ${L === 'ar' ? 'عامة' : 'General'}</span>`
+        : (n.highlightOnly
+          ? `<span class="note-badge note-badge--highlight"><i class="fa-solid fa-highlighter"></i> ${L === 'ar' ? 'تلوين' : 'Highlight'}</span>`
+          : `<span class="note-badge note-badge--source"><i class="fa-solid fa-link"></i> ${L === 'ar' ? 'من النص' : 'From text'}</span>`);
+      return `
+        <div class="note-card ${navigable ? 'is-navigable' : ''}" data-note-id="${n.id}" data-color="${n.color || 'amber'}">
+          <div class="note-card-head">
+            <div class="note-card-title" ${navigable ? `data-goto="${n.id}"` : ''}>${escapeHTML(n.title || '')}</div>
+            <div class="note-card-actions">
+              <button class="note-act note-edit" data-edit-id="${n.id}" title="${L === 'ar' ? 'تعديل' : 'Edit'}"><i class="fa-solid fa-pen"></i></button>
+              <button class="note-act note-delete" data-del-id="${n.id}" title="${L === 'ar' ? 'حذف' : 'Delete'}"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+          ${quote}
+          ${bodyHtml ? `<div class="note-user-text clamp">${bodyHtml}</div>` : ''}
+          <div class="note-meta">
+            <span class="note-meta-date"><i class="fa-regular fa-calendar"></i> ${n.date || ''}</span>
+            ${badge}
+          </div>
+        </div>`;
+    }).join('');
 
     
-    panel.querySelector('#notes-add-free')?.addEventListener('click', () => {
-      closePanel();
-      promptFreeNote();
+    body.querySelectorAll('[data-goto]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(el.getAttribute('data-goto'));
+        const note = loadNotes().find(n => n.id === id);
+        if (note) gotoNoteSource(note);
+      });
     });
-
     
-    panel.querySelectorAll('.note-delete').forEach(btn => {
-      btn.addEventListener('click', () => {
+    body.querySelectorAll('.note-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.note-act') || e.target.closest('[data-goto]')) return;
+        const id = parseInt(card.getAttribute('data-note-id'));
+        const note = loadNotes().find(n => n.id === id);
+        if (!note) return;
+        if (card.classList.contains('is-navigable')) gotoNoteSource(note);
+        else showNotePop(note, null);   
+      });
+    });
+    
+    body.querySelectorAll('.note-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-edit-id'));
+        const note = loadNotes().find(n => n.id === id);
+        if (note) openNoteEditor({ note: note });
+      });
+    });
+    
+    body.querySelectorAll('.note-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = parseInt(btn.getAttribute('data-del-id'));
-        let notes = loadNotes();
-        notes = notes.filter(n => n.id !== id);
+        let notes = loadNotes().filter(n => n.id !== id);
         saveNotes(notes);
+        document.querySelector(`mark.user-highlight[data-note-id="${id}"]`) && restoreHighlights();
         updateNotesCount();
-        btn.closest('.note-card')?.remove();
-        
-        const h = panel.querySelector('h3');
-        if (h) h.textContent = `📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'} (${notes.length})`;
-        if (notes.length === 0) {
-          const body = document.getElementById('notes-panel-body');
-          if (body) body.innerHTML = `<div class="notes-empty">${L === 'ar' ? 'لا توجد ملاحظات بعد' : 'No notes yet'}</div>`;
-        }
+        const card = btn.closest('.note-card');
+        card.classList.add('removing');
+        setTimeout(() => renderNotesPanelBody(panel.querySelector('#notes-search')?.value), 200);
       });
     });
   }
@@ -1852,6 +2478,7 @@
     div.textContent = str;
     return div.innerHTML;
   }
+
 
    
   function initVideos() {
