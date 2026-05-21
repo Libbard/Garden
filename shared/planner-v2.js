@@ -120,7 +120,7 @@ function defData(){
     },
     module_notes:{}, module_status:{}, custom_courses:[],
     _deletedMods:{}, _deletedCourses:[], _seenElectives:[], _autoExcludedElectives:[],
-    settings:{view_mode:'week',chip_view:'detailed',sidebar_collapsed:false,hours_per_day:null,app_mode:'plan'}
+    settings:{view_mode:'week',chip_view:'compact',sidebar_collapsed:false,hours_per_day:null,app_mode:'plan'}
   };
 }
 function migrate(d){
@@ -131,7 +131,7 @@ function migrate(d){
     if(!d.plans[t].end_date) d.plans[t].end_date=d.plans[t].exam_date||'';
   }
   if(!d.settings)       d.settings={};
-  if(!d.settings.chip_view)     d.settings.chip_view='detailed';
+  if(!d.settings.chip_view)     d.settings.chip_view='compact';
   if(!d.module_notes)   d.module_notes={};
   if(!d.module_status)  d.module_status={};
   if(!d._deletedMods)   d._deletedMods={};
