@@ -2401,16 +2401,30 @@ ${JSON.stringify(compactDays, null, 0)}`;
       : 'Delete this plan permanently? This cannot be undone.');
     if (!confirmed) return;
 
+    const lv = getCurrentLevel();
     
-    const key = getActivePlanKey();
-    localStorage.removeItem(key);
-    localStorage.removeItem(key + '_urls_fixed');
+    
+    
+    
+    const planKeys = [
+      `study_plan_L${lv}_midterm`,
+      `study_plan_L${lv}_final`,
+      `study_plan_L${lv}_general`,
+    ];
+    if (lv === '5') {
+      planKeys.push('study_plan_midterm', 'study_plan_final', 'study_plan_general');
+    }
+    planKeys.forEach(k => {
+      localStorage.removeItem(k);
+      localStorage.removeItem(k + '_urls_fixed');
+    });
     localStorage.removeItem(getPlannerConfigKey());
+    if (lv === '5') localStorage.removeItem('planner_config');
 
     
     
     
-    try { localStorage.setItem(`planner_legacy_pref_L${getCurrentLevel()}`, 'new'); } catch (e) {}
+    try { localStorage.setItem(`planner_legacy_pref_L${lv}`, 'new'); } catch (e) {}
     location.reload();
   }
 

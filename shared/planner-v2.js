@@ -3506,7 +3506,17 @@ function _printCalendar() {
 
 
 function hasLegacyPlan(){
-  return ['study_plan_midterm','study_plan_final',`study_plan_L${LEVEL}_midterm`,`study_plan_L${LEVEL}_final`].some(k=>localStorage.getItem(k));
+  
+  
+  
+  
+  const keys=[`study_plan_L${LEVEL}_midterm`,`study_plan_L${LEVEL}_final`,`study_plan_L${LEVEL}_general`];
+  if(LEVEL==='5') keys.push('study_plan_midterm','study_plan_final','study_plan_general');
+  return keys.some(k=>{
+    const raw=localStorage.getItem(k);
+    if(!raw)return false;
+    try{const p=JSON.parse(raw);return !!(p&&(p.days||p.plan_summary));}catch(_){localStorage.removeItem(k);return false;}
+  });
 }
 function checkLegacy(){
   const hasOld=hasLegacyPlan();
