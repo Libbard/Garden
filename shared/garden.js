@@ -2413,7 +2413,15 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="notes-search" class="notes-search" placeholder="${L === 'ar' ? 'ابحث في ملاحظاتك...' : 'Search your notes...'}">
       </div>
-      <div class="notes-panel-body" id="notes-panel-body"></div>`;
+      <div class="notes-panel-body" id="notes-panel-body"></div>
+      <div class="notes-panel-footer">
+        <button class="notes-bulk-btn" id="notes-clear-highlights">
+          <i class="fa-solid fa-eraser"></i> ${L === 'ar' ? 'حذف كل التلوينات' : 'Clear all highlights'}
+        </button>
+        <button class="notes-bulk-btn notes-bulk-danger" id="notes-clear-all">
+          <i class="fa-solid fa-trash-can"></i> ${L === 'ar' ? 'حذف كل الملاحظات' : 'Delete all notes'}
+        </button>
+      </div>`;
 
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
@@ -2425,8 +2433,98 @@
     });
     panel.querySelector('#notes-add-free').addEventListener('click', () => openNoteEditor({ free: true }));
     panel.querySelector('#notes-search').addEventListener('input', (e) => renderNotesPanelBody(e.target.value));
+    panel.querySelector('#notes-clear-highlights').addEventListener('click', clearAllHighlights);
+    panel.querySelector('#notes-clear-all').addEventListener('click', clearAllNotes);
 
     renderNotesPanelBody();
+  }
+
+   
+  function notesConfirm(opts) {
+    return new Promise((resolve) => {
+      hideNotePop();
+      const overlay = document.createElement('div');
+      overlay.className = 'notes-confirm-overlay';
+      overlay.innerHTML = `
+        <div class="notes-confirm-box" role="alertdialog" aria-modal="true">
+          <div class="notes-confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="notes-confirm-title">${escapeHTML(opts.title)}</div>
+          <div class="notes-confirm-msg">${escapeHTML(opts.message)}</div>
+          <div class="notes-confirm-actions">
+            <button class="notes-confirm-cancel" id="nc-cancel">${escapeHTML(opts.cancel)}</button>
+            <button class="notes-confirm-ok" id="nc-ok">${escapeHTML(opts.confirm)}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('visible'));
+
+      const done = (val) => {
+        overlay.classList.remove('visible');
+        setTimeout(() => overlay.remove(), 180);
+        document.removeEventListener('keydown', onKey);
+        resolve(val);
+      };
+      function onKey(e) {
+        if (e.key === 'Escape') done(false);
+        if (e.key === 'Enter') done(true);
+      }
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) done(false); });
+      overlay.querySelector('#nc-cancel').addEventListener('click', () => done(false));
+      overlay.querySelector('#nc-ok').addEventListener('click', () => done(true));
+      document.addEventListener('keydown', onKey);
+    });
+  }
+
+   
+  async function clearAllHighlights() {
+    const notes = loadNotes();
+    const highlightCount = notes.filter(n => n.highlightOnly).length;
+    if (highlightCount === 0) { notesToast(nL('لا توجد تلوينات في هذه الصفحة', 'No highlights on this page')); return; }
+
+    const ok = await notesConfirm({
+      title: nL('حذف كل التلوينات؟', 'Clear all highlights?'),
+      message: nL(
+        'سيتم حذف كل التلوينات الخالصة (بدون نص) في هذه الصفحة فقط، ولن تتمكّن من التراجع. (ملاحظاتك المكتوبة تبقى كما هي بألوانها، والصفحات الأخرى لا تتأثر.)',
+        'All standalone highlights (without notes) on THIS page only will be removed and cannot be undone. (Your written notes stay exactly as they are, and other pages are unaffected.)'),
+      confirm: nL('نعم، احذف التلوينات', 'Yes, clear highlights'),
+      cancel: nL('إلغاء', 'Cancel')
+    });
+    if (!ok) return;
+
+    
+    const kept = notes.filter(n => !n.highlightOnly);
+    saveNotes(kept);
+    restoreHighlights();
+    updateNotesCount();
+    renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+    notesToast(nL('تم حذف كل التلوينات ✓', 'All highlights cleared ✓'));
+  }
+
+   
+  async function clearAllNotes() {
+    const notes = loadNotes();
+    const noteCount = notes.filter(n => !n.highlightOnly && n.body && n.body.trim()).length;
+    if (noteCount === 0) { notesToast(nL('لا توجد ملاحظات في هذه الصفحة', 'No notes on this page')); return; }
+
+    const ok = await notesConfirm({
+      title: nL('حذف كل الملاحظات؟', 'Delete all notes?'),
+      message: nL(
+        'سيتم حذف كل الملاحظات المكتوبة في هذه الصفحة فقط نهائياً، ولن تتمكّن من التراجع. (التلوينات الخالصة تبقى، وملاحظاتك في الصفحات الأخرى سليمة تماماً.)',
+        'All written notes on THIS page only will be permanently deleted and cannot be undone. (Standalone highlights are kept, and your notes on other pages remain completely intact.)'),
+      confirm: nL('نعم، احذف الملاحظات', 'Yes, delete notes'),
+      cancel: nL('إلغاء', 'Cancel')
+    });
+    if (!ok) return;
+
+    
+    const kept = notes.filter(n => n.highlightOnly || !(n.body && n.body.trim()));
+    
+    const finalKept = kept.filter(n => n.highlightOnly);
+    saveNotes(finalKept);
+    restoreHighlights();
+    updateNotesCount();
+    renderNotesPanelBody();
+    notesToast(nL('تم حذف كل الملاحظات ✓', 'All notes deleted ✓'));
   }
 
   function renderNotesPanelBody(filter) {

@@ -1971,6 +1971,9 @@ ${JSON.stringify(compactDays, null, 0)}`;
             <button class="plan-action-btn btn-new-plan" onclick="Planner.newPlan()">
               <i class="fas fa-plus"></i> ${isAr ? 'جدول جديد' : 'New Plan'}
             </button>
+            <button class="plan-action-btn btn-delete-plan" onclick="Planner.deletePlan()">
+              <i class="fas fa-trash"></i> ${isAr ? 'حذف الخطة' : 'Delete Plan'}
+            </button>
           </div>
         </div>
         ${strategy ? `<div class="plan-strategy-bar"><div class="plan-strategy-icon">💡</div><p class="plan-header-strategy">${strategy}</p></div>` : ''}
@@ -2389,6 +2392,26 @@ ${JSON.stringify(compactDays, null, 0)}`;
     _cardIndexInitialized = false;
     hideError(); hideInfo();
     showStep(1);
+  }
+
+  function deletePlan() {
+    const isAr = lang() === 'ar';
+    const confirmed = confirm(isAr
+      ? 'هل تريد حذف هذه الخطة نهائياً؟ لا يمكن التراجع.'
+      : 'Delete this plan permanently? This cannot be undone.');
+    if (!confirmed) return;
+
+    
+    const key = getActivePlanKey();
+    localStorage.removeItem(key);
+    localStorage.removeItem(key + '_urls_fixed');
+    localStorage.removeItem(getPlannerConfigKey());
+
+    
+    
+    
+    try { localStorage.setItem(`planner_legacy_pref_L${getCurrentLevel()}`, 'new'); } catch (e) {}
+    location.reload();
   }
 
   function continuePlan() {
@@ -3152,7 +3175,7 @@ ${JSON.stringify(compactDays, null, 0)}`;
     selectPlanType, nextStep, prevStep, toggleCourse, setExamDate,
     toggleModule, setRating, setConfig, toggleRestDay, addBusyDate,
     removeBusyDate, onGeneratePlan, generateLocalPlan, toggleComplete,
-    continuePlan, newPlan, regenerate, flipCard, flipSession, nextCard, prevCard,
+    continuePlan, newPlan, deletePlan, regenerate, flipCard, flipSession, nextCard, prevCard,
     setViewMode, exportPDF, buildPrintTable, toggle3D, getTodayBannerData,
     snoozeSession, markDayMissedAndRegenerate, formatDateDisplay,
     getProjectConfig: () => projectConfig,

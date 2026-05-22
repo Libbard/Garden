@@ -3505,9 +3505,19 @@ function _printCalendar() {
 }
 
 
+function hasLegacyPlan(){
+  return ['study_plan_midterm','study_plan_final',`study_plan_L${LEVEL}_midterm`,`study_plan_L${LEVEL}_final`].some(k=>localStorage.getItem(k));
+}
 function checkLegacy(){
-  if(localStorage.getItem(lgcKey())==='legacy'){activateLegacy();return true;}
-  const hasOld=['study_plan_midterm','study_plan_final',`study_plan_L${LEVEL}_midterm`,`study_plan_L${LEVEL}_final`].some(k=>localStorage.getItem(k));
+  const hasOld=hasLegacyPlan();
+  
+  
+  
+  if(localStorage.getItem(lgcKey())==='legacy'){
+    if(hasOld){activateLegacy();return true;}
+    localStorage.setItem(lgcKey(),'new');
+  }
+  
   if(hasOld){const b=document.getElementById('legacy-banner');if(b){b.style.display='';b.innerHTML=`<div class="pv2-legacy-banner-inner"><span>🗂️ ${tx('لديك خطة بالنمط القديم.','You have old format plans.')}</span><div style="display:flex;gap:.5rem"><button onclick="PV2._goLegacy()">${tx('تجربة النمط القديم','Try Old Mode')}</button><button onclick="PV2._dismissLegacy()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">✕</button></div></div>`;}}
   return false;
 }
