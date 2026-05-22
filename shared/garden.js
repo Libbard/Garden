@@ -2534,6 +2534,8 @@
     const body = panel.querySelector('#notes-panel-body');
     const titleEl = panel.querySelector('#notes-panel-title');
     let notes = loadNotes();
+    
+    notes = notes.filter(n => !n.highlightOnly);
     const total = notes.length;
 
     const q = (filter || '').trim().toLowerCase();
