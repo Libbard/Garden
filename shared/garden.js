@@ -1867,6 +1867,7 @@
     
     document.addEventListener('garden:languageChanged', () => {
       hideNotePop();
+      buildSelectionTooltip(tooltip);   
       clearTimeout(window._notesRestoreT);
       window._notesRestoreT = setTimeout(restoreHighlights, 120);
     });
@@ -2055,24 +2056,93 @@
     const L = currentLang;
     pop.setAttribute('data-color', note.color || 'amber');
 
-    const hasBody = !!(note.body && note.body.trim());
     const quote = note.highlight ? `
       <div class="note-pop-quote"><i class="fa-solid fa-quote-right"></i><span>${escapeHTML(note.highlight.substring(0, 160))}${note.highlight.length > 160 ? '…' : ''}</span></div>` : '';
+
+    const deleteNote = () => {
+      const notes = loadNotes().filter(n => String(n.id) !== String(note.id));
+      saveNotes(notes);
+      restoreHighlights();
+      updateNotesCount();
+      if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+      hideNotePop();
+      notesToast(nL('تم الحذف', 'Deleted'));
+    };
+
+    const colorDots = Object.keys(NOTE_COLORS)
+      .map(k => `<button type="button" class="notes-tip-dot" data-color="${k}" style="--dot:${NOTE_COLORS[k].dot}" title="${nL(NOTE_COLORS[k].label_ar, NOTE_COLORS[k].label_en)}"></button>`)
+      .join('');
+
+    if (note.highlightOnly) {
+      
+      pop.innerHTML = `
+        <div class="note-pop-head">
+          <span class="note-pop-dot"></span>
+          <span class="note-pop-title">${nL('نص مُلوّن', 'Highlighted text')}</span>
+          <button class="note-pop-x" id="note-pop-x" title="${nL('إغلاق', 'Close')}"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        ${quote}
+        <div class="note-pop-actions note-pop-hl-actions">
+          <button class="note-pop-act" id="hl-note"><i class="fa-solid fa-pen-to-square"></i> ${nL('ملاحظة', 'Note')}</button>
+          <button class="note-pop-act" id="hl-copy"><i class="fa-solid fa-copy"></i> ${nL('نسخ النص', 'Copy text')}</button>
+          <button class="note-pop-act" id="hl-recolor"><i class="fa-solid fa-palette"></i> ${nL('تغيير التلوين', 'Change color')}</button>
+          <button class="note-pop-act note-pop-del" id="hl-del"><i class="fa-solid fa-eraser"></i> ${nL('حذف التلوين', 'Remove highlight')}</button>
+        </div>
+        <div class="note-pop-colors" id="hl-colors" style="display:none;">${colorDots}</div>`;
+
+      placeFloating(pop, rect, 12);
+      requestAnimationFrame(() => pop.classList.add('visible'));
+
+      pop.querySelector('#note-pop-x').onclick = hideNotePop;
+      pop.querySelector('#hl-note').onclick = () => {
+        hideNotePop();
+        const fresh = loadNotes().find(n => String(n.id) === String(note.id)) || note;
+        openNoteEditor({ note: fresh });
+      };
+      pop.querySelector('#hl-copy').onclick = () => copyText(note.highlight || '');
+      const colorsRow = pop.querySelector('#hl-colors');
+      pop.querySelector('#hl-recolor').onclick = () => {
+        colorsRow.style.display = colorsRow.style.display === 'none' ? 'flex' : 'none';
+      };
+      colorsRow.querySelectorAll('.notes-tip-dot').forEach(dot => {
+        dot.onclick = () => {
+          const c = dot.getAttribute('data-color');
+          const notes = loadNotes();
+          const i = notes.findIndex(n => String(n.id) === String(note.id));
+          if (i !== -1) { notes[i].color = c; saveNotes(notes); }
+          note.color = c;
+          restoreHighlights();
+          if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+          pop.setAttribute('data-color', c);
+          colorsRow.style.display = 'none';
+          notesToast(nL('تم تغيير اللون ✓', 'Color changed ✓'));
+        };
+      });
+      pop.querySelector('#hl-del').onclick = deleteNote;
+
+      document.addEventListener('keydown', function escP(e) {
+        if (e.key === 'Escape') { hideNotePop(); document.removeEventListener('keydown', escP); }
+      });
+      return;
+    }
+
+    
+    const hasBody = !!(note.body && note.body.trim());
     const bodyHtml = hasBody
       ? `<div class="note-pop-body">${renderNoteBody(note.body)}</div>`
-      : `<div class="note-pop-empty">${L === 'ar' ? 'لا يوجد نص للملاحظة بعد.' : 'No note text yet.'}</div>`;
+      : `<div class="note-pop-empty">${nL('لا يوجد نص للملاحظة بعد.', 'No note text yet.')}</div>`;
 
     pop.innerHTML = `
       <div class="note-pop-head">
         <span class="note-pop-dot"></span>
         <span class="note-pop-title">${escapeHTML(note.title || nL('ملاحظة', 'Note'))}</span>
-        <button class="note-pop-x" id="note-pop-x" title="${L === 'ar' ? 'إغلاق' : 'Close'}"><i class="fa-solid fa-xmark"></i></button>
+        <button class="note-pop-x" id="note-pop-x" title="${nL('إغلاق', 'Close')}"><i class="fa-solid fa-xmark"></i></button>
       </div>
       ${quote}
       ${bodyHtml}
       <div class="note-pop-actions">
-        <button class="note-pop-act" id="note-pop-edit"><i class="fa-solid fa-pen"></i> ${hasBody ? (L === 'ar' ? 'تعديل' : 'Edit') : (L === 'ar' ? 'أضف ملاحظة' : 'Add note')}</button>
-        <button class="note-pop-act note-pop-del" id="note-pop-del"><i class="fa-solid fa-trash-can"></i> ${L === 'ar' ? 'حذف' : 'Delete'}</button>
+        <button class="note-pop-act" id="note-pop-edit"><i class="fa-solid fa-pen"></i> ${hasBody ? nL('تعديل', 'Edit') : nL('أضف ملاحظة', 'Add note')}</button>
+        <button class="note-pop-act note-pop-del" id="note-pop-del"><i class="fa-solid fa-trash-can"></i> ${nL('حذف', 'Delete')}</button>
       </div>`;
 
     placeFloating(pop, rect, 12);
@@ -2084,15 +2154,7 @@
       const fresh = loadNotes().find(n => String(n.id) === String(note.id)) || note;
       openNoteEditor({ note: fresh });
     };
-    pop.querySelector('#note-pop-del').onclick = () => {
-      const notes = loadNotes().filter(n => String(n.id) !== String(note.id));
-      saveNotes(notes);
-      restoreHighlights();
-      updateNotesCount();
-      if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
-      hideNotePop();
-      notesToast(L === 'ar' ? 'تم الحذف' : 'Deleted');
-    };
+    pop.querySelector('#note-pop-del').onclick = deleteNote;
 
     document.addEventListener('keydown', function escP(e) {
       if (e.key === 'Escape') { hideNotePop(); document.removeEventListener('keydown', escP); }
