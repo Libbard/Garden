@@ -3159,7 +3159,13 @@ ${JSON.stringify(compactDays, null, 0)}`;
     getCurriculumMap: () => curriculumMap
   };
 
-  document.addEventListener('DOMContentLoaded', init);
+  
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
   document.addEventListener('garden:languageChanged', () => {
     if (currentStep === 2) buildCourseList();
