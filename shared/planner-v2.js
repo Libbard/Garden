@@ -3,12 +3,49 @@
 'use strict';
 
 
-const CURRICULUM_URL   = '../data/curriculum_map.json';
-const PROJECT_CFG_URLS = [
+
+
+
+
+
+
+
+
+
+const GH_PAGES_ROOT = 'https://libbard.github.io/Garden';
+function projectRoot(){
+  const p = location.pathname;
+  
+  const lv = p.search(/\/levels\//i);
+  if(lv >= 0) return location.origin + p.slice(0, lv);
+  
+  const g = p.search(/\/Garden\//i);
+  if(g >= 0) return location.origin + p.slice(0, g) + '/Garden';
+  
+  return location.origin + p.replace(/\/[^\/]*$/, '');
+}
+
+
+
+
+function cfgURLs(rels, relFallbacks){
+  if(typeof rels === 'string') rels = [rels];
+  const root = projectRoot();
+  const out = [];
+  if(relFallbacks) out.push(...relFallbacks);
+  for(const rel of rels){
+    out.push(`${root}/${rel}`);
+    out.push(`${GH_PAGES_ROOT}/${rel}`);
+  }
+  return [...new Set(out)]; 
+}
+
+
+
+const PROJECT_CFG_URLS = cfgURLs('config/project.json', [
   '../../../config/project.json',  
-  '../../config/project.json',     
-  '/config/project.json'           
-];
+  '../../config/project.json'      
+]);
 const AI_WORKER_URL    = 'https://garden-planner.xxli50xx.workers.dev';
 const FB_DEBOUNCE      = 2000;
 const MAX_UNDO         = 15;
@@ -3550,7 +3587,13 @@ async function init(){
   document.getElementById('pv2-loading').style.display='';
   if(checkLegacy())return;
 
-  try{const r=await fetch(CURRICULUM_URL);if(r.ok)S.cMap=await r.json();}catch(_){}
+  
+  const curriculumURLs = cfgURLs(`levels/L${LEVEL}/data/curriculum_map.json`, [
+    '../data/curriculum_map.json'  
+  ]);
+  for(const u of curriculumURLs){
+    try{const r=await fetch(u);if(r.ok){S.cMap=await r.json();break;}}catch(_){}
+  }
   
   for(const u of PROJECT_CFG_URLS){
     try{
@@ -3578,14 +3621,18 @@ async function init(){
       
       
       
-      const combinedURLs=[
-        '../../../shared/data/curriculum_map_electives.json',  
-        '../../../data/electives/curriculum_map_electives.json',
-        '../data/curriculum_map_electives.json',                
-        '../../shared/data/curriculum_map_electives.json',      
-        '/shared/data/curriculum_map_electives.json',           
-        '/data/electives/curriculum_map_electives.json'         
-      ];
+      const combinedURLs = cfgURLs(
+        [
+          'shared/data/curriculum_map_electives.json',   
+          'data/electives/curriculum_map_electives.json' 
+        ],
+        [
+          '../../../shared/data/curriculum_map_electives.json',  
+          '../../../data/electives/curriculum_map_electives.json',
+          '../data/curriculum_map_electives.json',                
+          '../../shared/data/curriculum_map_electives.json'       
+        ]
+      );
       let electiveMap=null;
       for(const u of combinedURLs){
         try{const r=await fetch(u);if(r.ok){electiveMap=await r.json();break;}}catch(_){}
@@ -3595,14 +3642,18 @@ async function init(){
       if(!electiveMap){
         electiveMap={courses:{}};
         for(const eId of electiveIds){
-          const perCourseURLs=[
-            `../../../shared/data/electives/${eId}/curriculum_map.json`,
-            `../../../data/electives/${eId}/curriculum_map.json`,
-            `../data/electives/${eId}/curriculum_map.json`,
-            `../../shared/data/electives/${eId}/curriculum_map.json`,
-            `/shared/data/electives/${eId}/curriculum_map.json`,
-            `/data/electives/${eId}/curriculum_map.json`
-          ];
+          const perCourseURLs=cfgURLs(
+            [
+              `shared/data/electives/${eId}/curriculum_map.json`,
+              `data/electives/${eId}/curriculum_map.json`
+            ],
+            [
+              `../../../shared/data/electives/${eId}/curriculum_map.json`,
+              `../../../data/electives/${eId}/curriculum_map.json`,
+              `../data/electives/${eId}/curriculum_map.json`,
+              `../../shared/data/electives/${eId}/curriculum_map.json`
+            ]
+          );
           for(const u of perCourseURLs){
             try{
               const r=await fetch(u);
@@ -3630,7 +3681,7 @@ async function init(){
         if(S.cMap.courses[eId])S.cMap.courses[eId].is_elective=true;
       }
       
-      if(S.projCfg.subjects){
+      if(S.projCfg?.subjects){
         for(const eId of electiveIds){
           if(S.cMap.courses[eId]){
             const subjMeta=S.projCfg.subjects[eId];
