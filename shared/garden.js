@@ -1559,14 +1559,354 @@
 
    
 
+  
+  
+  
   const NOTE_COLORS = {
-    amber: { dot: '#f59e0b', label_ar: 'كهرماني', label_en: 'Amber' },
-    violet: { dot: '#a78bfa', label_ar: 'بنفسجي', label_en: 'Violet' },
-    emerald: { dot: '#10b981', label_ar: 'أخضر', label_en: 'Green' },
-    sky: { dot: '#38bdf8', label_ar: 'أزرق', label_en: 'Blue' },
-    rose: { dot: '#fb7185', label_ar: 'وردي', label_en: 'Pink' }
+    yellow:  { dot: '#fde047', rgb: '253,224,71',  label_ar: 'أصفر',    label_en: 'Yellow'  },
+    amber:   { dot: '#fb923c', rgb: '251,146,60',  label_ar: 'برتقالي', label_en: 'Orange'  },
+    red:     { dot: '#f87171', rgb: '248,113,113', label_ar: 'أحمر',    label_en: 'Red'     },
+    pink:    { dot: '#f472b6', rgb: '244,114,182', label_ar: 'زهري',    label_en: 'Pink'    },
+    violet:  { dot: '#c084fc', rgb: '192,132,252', label_ar: 'بنفسجي',  label_en: 'Violet'  },
+    indigo:  { dot: '#818cf8', rgb: '129,140,248', label_ar: 'نيلي',    label_en: 'Indigo'  },
+    blue:    { dot: '#60a5fa', rgb: '96,165,250',  label_ar: 'أزرق',    label_en: 'Blue'    },
+    cyan:    { dot: '#22d3ee', rgb: '34,211,238',  label_ar: 'سيانسي',  label_en: 'Cyan'    },
+    teal:    { dot: '#2dd4bf', rgb: '45,212,191',  label_ar: 'مائي',    label_en: 'Teal'    },
+    green:   { dot: '#4ade80', rgb: '74,222,128',  label_ar: 'أخضر',    label_en: 'Green'   },
+    lime:    { dot: '#a3e635', rgb: '163,230,53',  label_ar: 'ليموني',  label_en: 'Lime'    },
+    rose:    { dot: '#fb7185', rgb: '251,113,133', label_ar: 'وردي',    label_en: 'Rose'    },
   };
 
+  const COLOR_CFG_KEY = 'garden_color_config';
+  const RECENT_KEY    = 'garden_recent_colors';
+
+  function defaultColorConfig() {
+    return {
+      primary:  ['yellow','violet','blue','green','red'],
+      extended: ['amber','pink','indigo','cyan','teal','lime','rose'],
+      custom:   []
+    };
+  }
+  function getColorConfig() {
+    try {
+      const c = JSON.parse(localStorage.getItem(COLOR_CFG_KEY) || 'null');
+      if (c && Array.isArray(c.primary) && Array.isArray(c.extended)) return c;
+    } catch {}
+    return defaultColorConfig();
+  }
+  function saveColorConfig(cfg) {
+    try { localStorage.setItem(COLOR_CFG_KEY, JSON.stringify(cfg)); } catch {}
+  }
+  function addCustomColorToCfg(hex) {
+    hex = hex.toLowerCase();
+    const cfg = getColorConfig();
+    if (!cfg.custom.includes(hex)) { cfg.custom.unshift(hex); cfg.custom = cfg.custom.slice(0, 12); }
+    if (!cfg.extended.includes(hex) && !cfg.primary.includes(hex)) cfg.extended.unshift(hex);
+    saveColorConfig(cfg);
+  }
+  function getRecentColors() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch { return []; } }
+  function addRecentColor(k) {
+    let r = getRecentColors().filter(x => x !== k); r.unshift(k); r = r.slice(0, 8);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(r)); } catch {}
+  }
+  function hexToRgb(hex) {
+    const h = hex.replace('#', '');
+    const n = parseInt(h.length === 3 ? h.split('').map(x => x+x).join('') : h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+  function isCustomColor(c) { return typeof c === 'string' && c.startsWith('#'); }
+  function getDotColor(k) { return isCustomColor(k) ? k : (NOTE_COLORS[k]?.dot || '#ccc'); }
+  function getDotLabel(k) {
+    if (isCustomColor(k)) return k;
+    const nc = NOTE_COLORS[k];
+    return nc ? nL(nc.label_ar, nc.label_en) : k;
+  }
+  function makeDotEl(colorKey, currentColor, extraClass) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    const isActive = colorKey === currentColor;
+    const isRecent = getRecentColors().includes(colorKey);
+    btn.className = 'notes-tip-dot' + (isActive ? ' active' : '') + (isRecent ? ' recent' : '') + (extraClass ? ' ' + extraClass : '');
+    btn.setAttribute('data-color', colorKey);
+    btn.style.setProperty('--dot', getDotColor(colorKey));
+    btn.title = getDotLabel(colorKey);
+    return btn;
+  }
+
+  function buildColorPickerHTML(currentColor, opts) {
+    opts = opts || {};
+    const cfg    = getColorConfig();
+    const recent = getRecentColors();
+    const dotHTML = (k) => {
+      const isA = k === currentColor, isR = recent.includes(k);
+      const ex  = isCustomColor(k) ? ' notes-tip-custom-dot' : '';
+      return '<button type="button" class="notes-tip-dot' + (isA ? ' active' : '') + (isR ? ' recent' : '') + ex +
+             '" data-color="' + k + '" style="--dot:' + getDotColor(k) + ';" title="' + getDotLabel(k) + '"></button>';
+    };
+    const backBtn = opts.showBack
+      ? '<button type="button" class="notes-tip-dot-back notes-cp-back-btn" id="cp-back-btn" title="' + nL('رجوع','Back') + '"><i class="fa-solid fa-arrow-right-to-line"></i></button>'
+      : '';
+    return (
+      '<div class="notes-cp-primary">' +
+        cfg.primary.map(dotHTML).join('') +
+        '<button type="button" class="notes-tip-more-btn" id="cp-more-btn" title="' + nL('ألوان إضافية','More colors') + '">•••</button>' +
+        '<button type="button" class="notes-tip-custom-btn" id="cp-custom-btn" title="' + nL('لون مخصص','Custom color') + '"><i class="fa-solid fa-palette"></i></button>' +
+        '<input type="color" id="cp-color-input" class="notes-cp-hidden-input" value="' + (isCustomColor(currentColor) ? currentColor : '#c084fc') + '" tabindex="-1" aria-hidden="true">' +
+        '<button type="button" class="notes-tip-manage-btn" id="cp-manage-btn" title="' + nL('تخصيص الألوان','Manage colors') + '"><i class="fa-solid fa-sliders"></i></button>' +
+        backBtn +
+      '</div>' +
+      '<div class="notes-cp-extended" id="cp-extended" style="display:none;">' +
+        cfg.extended.map(dotHTML).join('') +
+        '<button type="button" class="notes-tip-dot-back" id="cp-extended-close" title="' + nL('إغلاق','Close') + '"><i class="fa-solid fa-xmark"></i></button>' +
+      '</div>' +
+      '<div class="notes-cp-manager" id="cp-manager" style="display:none;"></div>'
+    );
+  }
+
+  function buildColorManagerUI(container, onConfigChange) {
+    const cfg = getColorConfig();
+    const mgr = container.querySelector('#cp-manager');
+    if (!mgr) return;
+    const itemHTML = (k, side) => {
+      const isCustom = isCustomColor(k);
+      const dot  = '<span class="notes-tip-dot" style="--dot:' + getDotColor(k) + ';" title="' + getDotLabel(k) + '"></span>';
+      const move = side === 'primary'
+        ? '<button class="cpm-act cpm-demote" data-color="' + k + '" title="' + nL('للفرعية','To extended') + '"><i class="fa-solid fa-arrow-down"></i></button>'
+        : '<button class="cpm-act cpm-promote" data-color="' + k + '" title="' + nL('للرئيسية','To primary') + '"><i class="fa-solid fa-arrow-up"></i></button>';
+      const del  = isCustom ? '<button class="cpm-act cpm-delete" data-color="' + k + '" title="' + nL('حذف','Delete') + '"><i class="fa-solid fa-xmark"></i></button>' : '';
+      return '<div class="cpm-item" data-color="' + k + '">' + dot + move + del + '</div>';
+    };
+    mgr.innerHTML =
+      '<div class="cpm-header">' +
+        '<button class="cpm-close-btn" id="cpm-close"><i class="fa-solid fa-xmark"></i></button>' +
+        '<span class="cpm-title">' + nL('تخصيص الألوان','Manage Colors') + '</span>' +
+        '<button class="cpm-reset-btn" id="cpm-reset" title="' + nL('إعادة الافتراضي','Reset to defaults') + '"><i class="fa-solid fa-rotate-left"></i></button>' +
+      '</div>' +
+      '<div class="cpm-section">' +
+        '<div class="cpm-label">' + nL('القائمة الرئيسية','Primary') + '</div>' +
+        '<div class="cpm-row" id="cpm-primary">' + cfg.primary.map(k => itemHTML(k,'primary')).join('') + '</div>' +
+      '</div>' +
+      '<div class="cpm-section">' +
+        '<div class="cpm-label">' + nL('القائمة الفرعية','Extended') + '</div>' +
+        '<div class="cpm-row" id="cpm-extended">' + cfg.extended.map(k => itemHTML(k,'extended')).join('') + '</div>' +
+        '<div class="cpm-add-row">' +
+          '<input type="color" id="cpm-color-input" class="notes-cp-hidden-input" value="#c084fc" aria-hidden="true">' +
+          '<button class="cpm-add-btn" id="cpm-add-btn"><i class="fa-solid fa-plus"></i> ' + nL('أضف لون','Add color') + '</button>' +
+        '</div>' +
+      '</div>';
+    mgr.addEventListener('mousedown', e => e.stopPropagation());
+    mgr.querySelector('#cpm-close').onclick = () => {
+      mgr.style.display = 'none';
+      const pr = container.querySelector('.notes-cp-primary');
+      if (pr) pr.style.display = '';
+    };
+    const resetBtn = mgr.querySelector('#cpm-reset');
+    if (resetBtn) {
+      resetBtn.onmousedown = e => e.stopPropagation();
+      resetBtn.onclick = (e) => {
+        e.stopPropagation();
+        saveColorConfig(defaultColorConfig());
+        buildColorManagerUI(container, onConfigChange);
+        onConfigChange();
+      };
+    }
+    mgr.querySelectorAll('.cpm-demote').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const k = btn.getAttribute('data-color'), cfg2 = getColorConfig();
+        cfg2.primary = cfg2.primary.filter(x => x !== k);
+        if (!cfg2.extended.includes(k)) cfg2.extended.push(k);
+        saveColorConfig(cfg2); buildColorManagerUI(container, onConfigChange); onConfigChange();
+      };
+    });
+    mgr.querySelectorAll('.cpm-promote').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const k = btn.getAttribute('data-color'), cfg2 = getColorConfig();
+        cfg2.extended = cfg2.extended.filter(x => x !== k);
+        if (!cfg2.primary.includes(k)) cfg2.primary.push(k);
+        saveColorConfig(cfg2); buildColorManagerUI(container, onConfigChange); onConfigChange();
+      };
+    });
+    mgr.querySelectorAll('.cpm-delete').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const k = btn.getAttribute('data-color'), cfg2 = getColorConfig();
+        cfg2.custom   = cfg2.custom.filter(x => x !== k);
+        cfg2.primary  = cfg2.primary.filter(x => x !== k);
+        cfg2.extended = cfg2.extended.filter(x => x !== k);
+        saveColorConfig(cfg2); buildColorManagerUI(container, onConfigChange); onConfigChange();
+      };
+    });
+    const ci = mgr.querySelector('#cpm-color-input'), ab = mgr.querySelector('#cpm-add-btn');
+    ab.onmousedown = e => e.stopPropagation();
+    ab.onclick = (e) => { e.stopPropagation(); ci.click(); };
+    ci.onmousedown = e => e.stopPropagation();
+    ci.onchange = (e) => {
+      e.stopPropagation();
+      addCustomColorToCfg(e.target.value);
+      buildColorManagerUI(container, onConfigChange); onConfigChange();
+    };
+  }
+
+  function wireColorPicker(container, onPick, onBack, previewEls, onExpand) {
+    container.addEventListener('mousedown', e => e.stopPropagation());
+
+     
+    function getRgb(colorKey) {
+      return isCustomColor(colorKey)
+        ? (() => { const {r,g,b}=hexToRgb(colorKey); return r+','+g+','+b; })()
+        : (NOTE_COLORS[colorKey]?.rgb || '253,224,71');
+    }
+    function applyPreview(colorKey) {
+      removePreview();
+      
+      if (previewEls && previewEls.length) {
+        const rgb = getRgb(colorKey);
+        previewEls.forEach(el => {
+          if (!el._previewOrig) el._previewOrig = { hl: el.style.getPropertyValue('--hl'), dc: el.getAttribute('data-color') };
+          el.style.setProperty('--hl', rgb);
+          el.setAttribute('data-color', isCustomColor(colorKey) ? 'custom' : colorKey);
+          if (isCustomColor(colorKey)) el.style.setProperty('--accent', colorKey);
+        });
+        return;
+      }
+      
+      const range = _gardenSelRange;
+      if (!range || range.collapsed) return;
+      try {
+        const rects = range.getClientRects ? Array.from(range.getClientRects()) : [];
+        if (!rects.length) { const r = range.getBoundingClientRect(); if (r && r.width) rects.push(r); }
+        if (!rects.length) return;
+        const rgb = getRgb(colorKey);
+        rects.forEach(r => {
+          const d = document.createElement('div');
+          d.className = 'notes-preview-overlay';
+          d.style.cssText = 'position:fixed;pointer-events:none;z-index:9990;' +
+            'top:'+r.top+'px;left:'+r.left+'px;width:'+r.width+'px;height:'+r.height+'px;' +
+            'background:rgba('+rgb+',0.30);border-bottom:2px solid rgba('+rgb+',0.7);border-radius:2px;';
+          document.body.appendChild(d);
+        });
+      } catch (_) {}
+    }
+    function removePreview() {
+      
+      if (previewEls && previewEls.length) {
+        previewEls.forEach(el => {
+          if (el._previewOrig) {
+            el.style.setProperty('--hl', el._previewOrig.hl || '');
+            el.setAttribute('data-color', el._previewOrig.dc || '');
+            el.style.removeProperty('--accent');
+            delete el._previewOrig;
+          }
+        });
+        return;
+      }
+      document.querySelectorAll('.notes-preview-overlay').forEach(d => d.remove());
+    }
+
+    const bindDots = () => {
+      container.querySelectorAll('.notes-tip-dot').forEach(dot => {
+        if (dot._cpBound) return; dot._cpBound = true;
+        dot.addEventListener('mousedown', e => e.stopPropagation());
+        dot.addEventListener('mouseenter', () => applyPreview(dot.getAttribute('data-color')));
+        dot.addEventListener('mouseleave', removePreview);
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removePreview();
+          const c = dot.getAttribute('data-color');
+          container.querySelectorAll('.notes-tip-dot').forEach(d => d.classList.remove('active'));
+          dot.classList.add('active');
+          addRecentColor(c); onPick(c);
+        });
+      });
+    };
+    bindDots();
+    const extPanel = container.querySelector('#cp-extended');
+    const primRow  = container.querySelector('.notes-cp-primary');
+    const manPanel = container.querySelector('#cp-manager');
+
+    const moreBtn = container.querySelector('#cp-more-btn');
+    if (moreBtn && extPanel) {
+      moreBtn.addEventListener('mousedown', e => e.stopPropagation());
+      moreBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = extPanel.style.display === 'none';
+        extPanel.style.display = opening ? 'flex' : 'none';
+        if (opening) requestAnimationFrame(() => { repositionTooltip(); if (onExpand) onExpand(); });
+      });
+    }
+    const closeExt = container.querySelector('#cp-extended-close');
+    if (closeExt) closeExt.addEventListener('click', (e) => { e.stopPropagation(); if (extPanel) extPanel.style.display = 'none'; });
+
+    const manageBtn = container.querySelector('#cp-manage-btn');
+    if (manageBtn && manPanel) {
+      manageBtn.addEventListener('mousedown', e => e.stopPropagation());
+      manageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (extPanel) extPanel.style.display = 'none';
+        if (primRow)  primRow.style.display  = 'none';
+        manPanel.style.display = 'block';
+        buildColorManagerUI(container, () => {
+          const cfg2 = getColorConfig();
+          
+          if (primRow) {
+            primRow.querySelectorAll('.notes-tip-dot').forEach(d => d.remove());
+            const firstBtn = primRow.querySelector('button:not(.notes-tip-dot)');
+            cfg2.primary.forEach(k => { const el = makeDotEl(k,null,''); primRow.insertBefore(el, firstBtn); });
+          }
+          
+          if (extPanel) {
+            extPanel.innerHTML = cfg2.extended.map(k => {
+              const ex = isCustomColor(k) ? ' notes-tip-custom-dot' : '';
+              return '<button type="button" class="notes-tip-dot' + ex + '" data-color="' + k + '" style="--dot:' + getDotColor(k) + ';" title="' + getDotLabel(k) + '"></button>';
+            }).join('') + '<button type="button" class="notes-tip-dot-back" id="cp-extended-close" title="' + nL('إغلاق','Close') + '"><i class="fa-solid fa-xmark"></i></button>';
+            extPanel.querySelector('#cp-extended-close')?.addEventListener('click', (e) => { e.stopPropagation(); extPanel.style.display = 'none'; });
+          }
+          bindDots();
+        });
+      });
+    }
+
+    const backBtn = container.querySelector('#cp-back-btn');
+    if (backBtn && onBack) {
+      backBtn.addEventListener('mousedown', e => e.stopPropagation());
+      backBtn.addEventListener('click', (e) => { e.stopPropagation(); onBack(); });
+    }
+
+    const customBtn  = container.querySelector('#cp-custom-btn');
+    const colorInput = container.querySelector('#cp-color-input');
+    if (customBtn && colorInput) {
+      customBtn.addEventListener('mousedown', e => e.stopPropagation());
+      customBtn.addEventListener('click', (e) => { e.stopPropagation(); colorInput.click(); });
+      colorInput.addEventListener('mousedown', e => e.stopPropagation());
+      colorInput.addEventListener('change', (e) => {
+        e.stopPropagation();
+        const hex = e.target.value;
+        addCustomColorToCfg(hex);
+        addRecentColor(hex);
+        
+        if (extPanel && !extPanel.querySelector('[data-color="' + hex + '"]')) {
+          const dot = makeDotEl(hex, null, 'notes-tip-custom-dot');
+          dot._cpBound = true;
+          dot.addEventListener('mousedown', ev => ev.stopPropagation());
+          dot.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            container.querySelectorAll('.notes-tip-dot').forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            addRecentColor(hex); onPick(hex);
+          });
+          const xBtn = extPanel.querySelector('#cp-extended-close');
+          extPanel.insertBefore(dot, xBtn || null);
+        }
+        if (extPanel) extPanel.style.display = 'flex';
+        container.querySelectorAll('.notes-tip-dot').forEach(d => d.classList.remove('active'));
+        const newDot = container.querySelector('.notes-tip-dot[data-color="' + hex + '"]');
+        if (newDot) newDot.classList.add('active');
+        onPick(hex);
+      });
+    }
+  }
   let _gardenSelRange = null;   
 
   function nL(ar, en) { return currentLang === 'ar' ? ar : en; }
@@ -1690,7 +2030,13 @@
         const mark = document.createElement('mark');
         mark.className = 'user-highlight';
         mark.dataset.noteId = id;
-        if (color) mark.dataset.color = color;
+        if (color) {
+          mark.dataset.color = color;
+          if (isCustomColor(color)) {
+            const { r: cr, g, b } = hexToRgb(color);
+            mark.style.setProperty('--hl', `${cr},${g},${b}`);
+          }
+        }
         r.surroundContents(mark);
       } catch (_) {   }
     });
@@ -1819,9 +2165,10 @@
     mainContent?.addEventListener('mouseup', (e) => {
       clearTimeout(selectionTimeout);
       selectionTimeout = setTimeout(() => {
+        if (sessionStorage.getItem('garden_notes_paused') === '1') return;
         const sel = window.getSelection();
         const text = sel?.toString().trim();
-        if (text && text.length > 3 && text.length < 500) {
+        if (text && text.length >= 1 && text.length < 500) {
           _gardenSelRange = sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
           const rect = _gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null;
           showNotesTooltip(rect, text);
@@ -1834,9 +2181,10 @@
       clearTimeout(mobileSelTimeout);
       if (window.innerWidth > 1024) return;
       mobileSelTimeout = setTimeout(() => {
+        if (sessionStorage.getItem('garden_notes_paused') === '1') return;
         const sel = window.getSelection();
         const text = sel?.toString().trim();
-        if (text && text.length > 3 && text.length < 500 && mainContent?.contains(sel.anchorNode)) {
+        if (text && text.length >= 1 && text.length < 500 && mainContent?.contains(sel.anchorNode)) {
           _gardenSelRange = sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
           showMobileNoteSaveBar(text);
         } else { hideMobileNoteSaveBar(); }
@@ -1856,10 +2204,10 @@
 
     
     document.addEventListener('mousedown', (e) => {
-      if (!e.target.closest('.notes-tooltip') && !e.target.closest('.notes-panel') && !e.target.closest('.mobile-note-bar')) {
+      if (!e.target.closest('.notes-tooltip, .notes-panel, .mobile-note-bar, .notes-cp-primary, .notes-cp-extended, .notes-cp-hidden-input')) {
         hideNotesTooltip();
       }
-      if (!e.target.closest('.note-pop') && !e.target.closest('mark.user-highlight') && !e.target.closest('.notes-panel')) {
+      if (!e.target.closest('.note-pop, mark.user-highlight, .notes-panel, .notes-cp-primary, .notes-cp-extended, .notes-cp-hidden-input')) {
         hideNotePop();
       }
     });
@@ -1877,15 +2225,16 @@
 
    
   function buildSelectionTooltip(tip) {
+    const isPaused = sessionStorage.getItem('garden_notes_paused') === '1';
     tip.innerHTML = `
       <div class="notes-tip-main">
-        <button class="notes-tip-btn notes-tip-color" id="tip-color" title="${nL('تلوين النص', 'Highlight')}"><i class="fa-solid fa-highlighter"></i><span>${nL('تلوين', 'Highlight')}</span></button>
-        <button class="notes-tip-btn notes-tip-copy" id="tip-copy" title="${nL('نسخ النص', 'Copy')}"><i class="fa-solid fa-copy"></i><span>${nL('نسخ', 'Copy')}</span></button>
-        <button class="notes-tip-btn notes-tip-note" id="tip-note" title="${nL('إضافة ملاحظة', 'Add note')}"><i class="fa-solid fa-pen-to-square"></i><span>${nL('ملاحظة', 'Note')}</span></button>
+        <button class="notes-tip-btn notes-tip-color" id="tip-color" title="${nL('تلوين النص','Highlight')}"><i class="fa-solid fa-highlighter"></i><span>${nL('تلوين','Highlight')}</span></button>
+        <button class="notes-tip-btn notes-tip-copy"  id="tip-copy"  title="${nL('نسخ النص','Copy')}"><i class="fa-solid fa-copy"></i><span>${nL('نسخ','Copy')}</span></button>
+        <button class="notes-tip-btn notes-tip-note"  id="tip-note"  title="${nL('إضافة ملاحظة','Add note')}"><i class="fa-solid fa-pen-to-square"></i><span>${nL('ملاحظة','Note')}</span></button>
+        <button class="notes-tip-pause" id="tip-pause" title="${nL('إخفاء مؤقت','Dismiss for session')}"><i class="fa-solid fa-eye-slash"></i></button>
       </div>
-      <div class="notes-tip-colors" id="tip-colors" style="display:none;">
-        ${Object.keys(NOTE_COLORS).map(k => `<button type="button" class="notes-tip-dot" data-color="${k}" style="--dot:${NOTE_COLORS[k].dot}" title="${nL(NOTE_COLORS[k].label_ar, NOTE_COLORS[k].label_en)}"></button>`).join('')}
-        <button type="button" class="notes-tip-dot-back" id="tip-color-back" title="${nL('رجوع', 'Back')}"><i class="fa-solid fa-xmark"></i></button>
+      <div class="notes-tip-colors notes-cp" id="tip-colors" style="display:none;">
+        ${buildColorPickerHTML(null, { showBack: true })}
       </div>`;
 
     const main = tip.querySelector('.notes-tip-main');
@@ -1897,7 +2246,6 @@
       hideNotesTooltip();
       window.getSelection()?.removeAllRanges();
     });
-
     tip.querySelector('#tip-note').addEventListener('click', () => {
       const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
       const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
@@ -1907,27 +2255,32 @@
       window.getSelection()?.removeAllRanges();
       openNoteEditor({ free: false, highlightText: text, anchor: anchor });
     });
-
-    
     tip.querySelector('#tip-color').addEventListener('click', () => {
+      
+      try { window.getSelection()?.removeAllRanges(); } catch(_) {}
       main.style.display = 'none';
-      colors.style.display = 'flex';
+      colors.style.display = 'block';
+      requestAnimationFrame(() => repositionTooltip());
     });
-    tip.querySelector('#tip-color-back').addEventListener('click', () => {
-      colors.style.display = 'none';
-      main.style.display = 'flex';
+
+    tip.querySelector('#tip-pause').addEventListener('click', (e) => {
+      e.stopPropagation();
+      sessionStorage.setItem('garden_notes_paused', '1');
+      hideNotesTooltip();
+      hideMobileNoteSaveBar();
+      notesToast(nL('تم إخفاء الشريط حتى نهاية الجلسة — يمكن تفعيله من قائمة الملاحظات ⚙', 'Toolbar hidden for this session — re-enable from the Notes panel ⚙'));
     });
-    colors.querySelectorAll('.notes-tip-dot').forEach(dot => {
-      dot.addEventListener('click', () => {
-        const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
-        const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
-        if (!text) return;
-        const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
-        createHighlightOnly(text, anchor, dot.getAttribute('data-color'));
-        hideNotesTooltip();
-        window.getSelection()?.removeAllRanges();
-      });
-    });
+
+    const goBack = () => { colors.style.display = 'none'; main.style.display = 'flex'; };
+    wireColorPicker(colors, (colorKey) => {
+      const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+      const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
+      if (!text) return;
+      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
+      createHighlightOnly(text, anchor, colorKey);
+      hideNotesTooltip();
+      window.getSelection()?.removeAllRanges();
+    }, goBack);
   }
 
    
@@ -1953,39 +2306,63 @@
   }
 
    
+  let _tooltipRect = null;
   function placeFloating(el, rect, gap) {
     gap = gap || 10;
     const pad = 12;
     el.style.visibility = 'hidden';
     el.style.display = 'block';
-    el.style.left = '0'; el.style.top = '0';
-    const w = el.offsetWidth, h = el.offsetHeight;
+    const w = el.offsetWidth  || 260;
+    const h = el.offsetHeight || 90;
     el.style.visibility = '';
-    const vw = window.innerWidth, vh = window.innerHeight;
-    let top;
-    if (rect && rect.top - h - gap >= pad) top = rect.top - h - gap;
-    else if (rect) top = Math.min(rect.bottom + gap, vh - h - pad);
-    else top = Math.max(pad, (vh - h) / 2);
-    let idealLeft = rect ? (rect.left + rect.width / 2 - w / 2) : (vw - w) / 2;
-    let left = Math.max(pad, Math.min(idealLeft, vw - w - pad));
-    el.style.top = Math.max(pad, top) + 'px';
-    el.style.left = left + 'px';
+    const vw = window.innerWidth  || 1280;
+    const vh = window.innerHeight || 800;
+    let top, left;
+    if (!rect || !rect.width) {
+      top  = Math.max(pad, (vh - h) / 2);
+      left = Math.max(pad, (vw - w) / 2);
+    } else {
+      const spaceAbove = rect.top - gap;
+      const spaceBelow = vh - rect.bottom - gap;
+      top = (spaceAbove >= 30 || spaceAbove >= spaceBelow)
+          ? rect.top - h - gap
+          : rect.bottom + gap;
+      const cx = rect.left + rect.width / 2;
+      left = Math.max(pad, Math.min(cx - w / 2, vw - w - pad));
+    }
+    el.style.top  = Math.max(pad, top)  + 'px';
+    el.style.left = Math.max(0,   left) + 'px';
   }
 
+  function repositionTooltip() {
+    const tip = document.getElementById('notes-tooltip');
+    if (!tip || tip.style.display === 'none') return;
+    if (_tooltipRect) placeFloating(tip, _tooltipRect, 8);
+  }
   function showNotesTooltip(rect, text) {
     const tip = document.getElementById('notes-tooltip');
     if (!tip) return;
     window._gardenNotesSelection = text;
-    
-    const main = tip.querySelector('.notes-tip-main');
+    if (rect && rect.width) _tooltipRect = rect;
+    const main   = tip.querySelector('.notes-tip-main');
     const colors = tip.querySelector('#tip-colors');
-    if (main && colors) { main.style.display = 'flex'; colors.style.display = 'none'; }
-    placeFloating(tip, rect, 8);
+    
+    if (main)   main.style.display   = 'flex';
+    if (colors) colors.style.display = 'none';
+    const extP = tip.querySelector('#cp-extended');
+    const manP = tip.querySelector('#cp-manager');
+    const primR = tip.querySelector('.notes-cp-primary');
+    if (extP) extP.style.display = 'none';
+    if (manP) manP.style.display = 'none';
+    if (primR) primR.style.display = '';
+    placeFloating(tip, _tooltipRect || rect, 8);
   }
 
   function hideNotesTooltip() {
     const tip = document.getElementById('notes-tooltip');
     if (tip) tip.style.display = 'none';
+    _tooltipRect = null;
+    document.querySelectorAll('.notes-preview-overlay').forEach(d => d.remove());
   }
 
   function showMobileNoteSaveBar(text) {
@@ -2005,8 +2382,8 @@
       '<button class="mnb-btn mnb-copy" id="mnb-copy" title="' + nL('نسخ', 'Copy') + '"><i class="fa-solid fa-copy"></i></button>' +
       '<button class="mnb-btn mnb-save" id="mnb-save"><i class="fa-solid fa-pen-to-square"></i> ' + nL('ملاحظة', 'Note') + '</button>' +
       '</div>' +
-      '<div class="mnb-colors" id="mnb-colors" style="display:none;">' +
-      Object.keys(NOTE_COLORS).map(k => '<button type="button" class="notes-tip-dot" data-color="' + k + '" style="--dot:' + NOTE_COLORS[k].dot + '"></button>').join('') +
+      '<div class="mnb-colors notes-cp" id="mnb-colors" style="display:none;">' +
+      buildColorPickerHTML(null) +
       '</div>';
     bar.style.display = 'flex';
 
@@ -2021,16 +2398,14 @@
     bar.querySelector('#mnb-copy').onclick = () => { copyText(text); hideMobileNoteSaveBar(); window.getSelection()?.removeAllRanges(); };
     bar.querySelector('#mnb-color').onclick = () => {
       const c = bar.querySelector('#mnb-colors');
-      c.style.display = c.style.display === 'none' ? 'flex' : 'none';
+      c.style.display = c.style.display === 'none' ? 'block' : 'none';
     };
-    bar.querySelectorAll('#mnb-colors .notes-tip-dot').forEach(dot => {
-      dot.onclick = () => {
-        const range = getRange();
-        const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
-        createHighlightOnly(text, anchor, dot.getAttribute('data-color'));
-        hideMobileNoteSaveBar();
-        window.getSelection()?.removeAllRanges();
-      };
+    wireColorPicker(bar.querySelector('#mnb-colors'), (colorKey) => {
+      const range = getRange();
+      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
+      createHighlightOnly(text, anchor, colorKey);
+      hideMobileNoteSaveBar();
+      window.getSelection()?.removeAllRanges();
     });
   }
 
@@ -2054,7 +2429,10 @@
   function showNotePop(note, rect) {
     const pop = ensureNotePop();
     const L = currentLang;
-    pop.setAttribute('data-color', note.color || 'amber');
+    const colorKey = isCustomColor(note.color) ? 'custom' : (note.color || 'amber');
+    pop.setAttribute('data-color', colorKey);
+    if (isCustomColor(note.color)) pop.style.setProperty('--accent', note.color);
+    else pop.style.removeProperty('--accent');
 
     const quote = note.highlight ? `
       <div class="note-pop-quote"><i class="fa-solid fa-quote-right"></i><span>${escapeHTML(note.highlight.substring(0, 160))}${note.highlight.length > 160 ? '…' : ''}</span></div>` : '';
@@ -2088,7 +2466,7 @@
           <button class="note-pop-act" id="hl-recolor"><i class="fa-solid fa-palette"></i> ${nL('تغيير التلوين', 'Change color')}</button>
           <button class="note-pop-act note-pop-del" id="hl-del"><i class="fa-solid fa-eraser"></i> ${nL('حذف التلوين', 'Remove highlight')}</button>
         </div>
-        <div class="note-pop-colors" id="hl-colors" style="display:none;">${colorDots}</div>`;
+        <div class="note-pop-colors notes-cp" id="hl-colors" style="display:none;">${buildColorPickerHTML(note.color)}</div>`;
 
       placeFloating(pop, rect, 12);
       requestAnimationFrame(() => pop.classList.add('visible'));
@@ -2102,22 +2480,25 @@
       pop.querySelector('#hl-copy').onclick = () => copyText(note.highlight || '');
       const colorsRow = pop.querySelector('#hl-colors');
       pop.querySelector('#hl-recolor').onclick = () => {
-        colorsRow.style.display = colorsRow.style.display === 'none' ? 'flex' : 'none';
+        const opening = colorsRow.style.display === 'none';
+        colorsRow.style.display = opening ? 'block' : 'none';
+        
+        requestAnimationFrame(() => placeFloating(pop, rect, 12));
       };
-      colorsRow.querySelectorAll('.notes-tip-dot').forEach(dot => {
-        dot.onclick = () => {
-          const c = dot.getAttribute('data-color');
-          const notes = loadNotes();
-          const i = notes.findIndex(n => String(n.id) === String(note.id));
-          if (i !== -1) { notes[i].color = c; saveNotes(notes); }
-          note.color = c;
-          restoreHighlights();
-          if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
-          pop.setAttribute('data-color', c);
-          colorsRow.style.display = 'none';
-          notesToast(nL('تم تغيير اللون ✓', 'Color changed ✓'));
-        };
-      });
+      
+      const existingMarks = Array.from(document.querySelectorAll('mark.user-highlight[data-note-id="' + note.id + '"]'));
+      wireColorPicker(colorsRow, (c) => {
+        const notes = loadNotes();
+        const i = notes.findIndex(n => String(n.id) === String(note.id));
+        if (i !== -1) { notes[i].color = c; saveNotes(notes); }
+        note.color = c;
+        restoreHighlights();
+        if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+        pop.setAttribute('data-color', isCustomColor(c) ? 'custom' : c);
+        if (isCustomColor(c)) pop.style.setProperty('--accent', c);
+        colorsRow.style.display = 'none';
+        notesToast(nL('تم تغيير اللون ✓', 'Color changed ✓'));
+      }, null, existingMarks, () => placeFloating(pop, rect, 12));
       pop.querySelector('#hl-del').onclick = deleteNote;
 
       document.addEventListener('keydown', function escP(e) {
@@ -2187,10 +2568,8 @@
     const colorSwatches = isFree ? '' : `
       <div class="note-color-row">
         <span class="note-color-label">${L === 'ar' ? 'لون التظليل' : 'Highlight color'}</span>
-        <div class="note-color-swatches">
-          ${Object.keys(NOTE_COLORS).map(k => `
-            <button type="button" class="note-color-dot ${k === color ? 'active' : ''}" data-color="${k}"
-              style="--dot:${NOTE_COLORS[k].dot}" title="${L === 'ar' ? NOTE_COLORS[k].label_ar : NOTE_COLORS[k].label_en}"></button>`).join('')}
+        <div class="note-color-swatches notes-cp" id="note-color-swatches-cp">
+          ${buildColorPickerHTML(color)}
         </div>
       </div>`;
 
@@ -2274,13 +2653,10 @@
     });
 
     
-    overlay.querySelectorAll('.note-color-dot').forEach(dot => {
-      dot.addEventListener('click', () => {
-        color = dot.getAttribute('data-color');
-        overlay.querySelectorAll('.note-color-dot').forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-      });
-    });
+    const swatchesCP = overlay.querySelector('#note-color-swatches-cp');
+    if (swatchesCP) {
+      wireColorPicker(swatchesCP, (c) => { color = c; });
+    }
 
     const close = () => overlay.remove();
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
@@ -2401,10 +2777,12 @@
 
     const panel = document.createElement('div');
     panel.className = 'notes-panel';
+    const isPaused = sessionStorage.getItem('garden_notes_paused') === '1';
     panel.innerHTML = `
       <div class="notes-panel-header">
         <h3 id="notes-panel-title">📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'}</h3>
         <div class="notes-panel-head-actions">
+          ${isPaused ? `<button class="notes-resume-btn" id="notes-resume" title="${L === 'ar' ? 'تفعيل شريط التحديد' : 'Re-enable selection toolbar'}"><i class="fa-solid fa-eye"></i></button>` : ''}
           <button class="notes-add-free" id="notes-add-free" title="${L === 'ar' ? 'ملاحظة جديدة' : 'New note'}"><i class="fa-solid fa-plus"></i></button>
           <button class="notes-panel-close" id="notes-panel-close" title="${L === 'ar' ? 'إغلاق' : 'Close'}">✕</button>
         </div>
@@ -2435,6 +2813,11 @@
     panel.querySelector('#notes-search').addEventListener('input', (e) => renderNotesPanelBody(e.target.value));
     panel.querySelector('#notes-clear-highlights').addEventListener('click', clearAllHighlights);
     panel.querySelector('#notes-clear-all').addEventListener('click', clearAllNotes);
+    panel.querySelector('#notes-resume')?.addEventListener('click', () => {
+      sessionStorage.removeItem('garden_notes_paused');
+      closeNotesPanel();
+      notesToast(nL('تم تفعيل شريط التحديد ✓', 'Selection toolbar re-enabled ✓'));
+    });
 
     renderNotesPanelBody();
   }
@@ -2572,8 +2955,10 @@
         : (n.highlightOnly
           ? `<span class="note-badge note-badge--highlight"><i class="fa-solid fa-highlighter"></i> ${L === 'ar' ? 'تلوين' : 'Highlight'}</span>`
           : `<span class="note-badge note-badge--source"><i class="fa-solid fa-link"></i> ${L === 'ar' ? 'من النص' : 'From text'}</span>`);
+      const cardColor = isCustomColor(n.color) ? 'custom' : (n.color || 'amber');
+      const cardStyle = isCustomColor(n.color) ? ` style="--accent:${n.color}"` : '';
       return `
-        <div class="note-card ${navigable ? 'is-navigable' : ''}" data-note-id="${n.id}" data-color="${n.color || 'amber'}">
+        <div class="note-card ${navigable ? 'is-navigable' : ''}" data-note-id="${n.id}" data-color="${cardColor}"${cardStyle}>
           <div class="note-card-head">
             <div class="note-card-title" ${navigable ? `data-goto="${n.id}"` : ''}>${escapeHTML(n.title || '')}</div>
             <div class="note-card-actions">
