@@ -192,6 +192,9 @@ const S={
   _touchGhost:null,_touchData:null,cardIdx:0,_cardInit:false
 };
 
+let _edgeNavTimer=null;
+let _calSwipeSX=null,_calSwipeSY=null,_calSwipeOK=false;
+
 
 async function loadData(){
   const key=sKey();
@@ -867,9 +870,9 @@ function render(){
 }
 
 
-function _chipDragStart(e,cid,mid){S.dragging={src:'chip',cid,mid};e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text/plain',JSON.stringify({src:'chip',cid,mid}));e.currentTarget.classList.add('dragging');}
-function _calDragStart(e,d,id){S.dragging={src:'cal',d,id};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',JSON.stringify({src:'cal',d,id}));e.currentTarget.classList.add('dragging');}
-function _chipDragEnd(e){S.dragging=null;e.currentTarget.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));}
+function _chipDragStart(e,cid,mid){S.dragging={src:'chip',cid,mid};e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text/plain',JSON.stringify({src:'chip',cid,mid}));e.currentTarget.classList.add('dragging');document.addEventListener('dragover',_docDragEdge);}
+function _calDragStart(e,d,id){S.dragging={src:'cal',d,id};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',JSON.stringify({src:'cal',d,id}));e.currentTarget.classList.add('dragging');document.addEventListener('dragover',_docDragEdge);}
+function _chipDragEnd(e){_clearEdgeNav();document.removeEventListener('dragover',_docDragEdge);S.dragging=null;e.currentTarget.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));}
 function _dragOver(e){e.preventDefault();const src=S.dragging?.src;e.dataTransfer.dropEffect=(src==='chip'||src==='evchip')?'copy':'move';const col=e.currentTarget.closest('[data-date]');if(col)col.classList.add('drag-over');e.currentTarget.classList.add('drag-over');}
 function _dragLeave(e){e.currentTarget.classList.remove('drag-over');e.currentTarget.closest('[data-date]')?.classList.remove('drag-over');}
 function _drop(e,targetD){
@@ -934,7 +937,92 @@ function initTouch(){
     el.removeEventListener('touchstart',_touchCalStart);el.addEventListener('touchstart',_touchCalStart,{passive:false});
   });
 }
-function initTouchDropZones(){}
+function initTouchDropZones(){ _initCalSwipe(); }
+
+
+
+
+
+
+
+
+
+
+
+
+function _clearEdgeNav(){
+  clearTimeout(_edgeNavTimer);
+  _edgeNavTimer=null;
+  const calArea=document.getElementById('calendar-area');
+  if(calArea){calArea.classList.remove('edge-left','edge-right');}
+}
+
+function _calDragEdgeCheck(clientX){
+  if(S.viewMode!=='week')return;
+  const calArea=document.getElementById('calendar-area');if(!calArea)return;
+  const rect=calArea.getBoundingClientRect();
+  const threshold=68;
+  const nearLeft=clientX-rect.left<threshold;
+  const nearRight=rect.right-clientX<threshold;
+  
+  calArea.classList.toggle('edge-left',nearLeft);
+  calArea.classList.toggle('edge-right',nearRight);
+  if(!nearLeft&&!nearRight){_clearEdgeNav();return;}
+  if(_edgeNavTimer)return;
+  _edgeNavTimer=setTimeout(()=>{
+    _edgeNavTimer=null;
+    calArea.classList.remove('edge-left','edge-right');
+    const ar=isAr();
+    
+    if(nearLeft){S.weekStart=addD(S.weekStart,ar?1:-1);}
+    else{S.weekStart=addD(S.weekStart,ar?-1:1);}
+    render();
+  },700);
+}
+
+function _initCalSwipe(){
+  const calArea=document.getElementById('calendar-area');if(!calArea)return;
+  calArea.removeEventListener('touchstart',_calSwipeTS);
+  calArea.removeEventListener('touchmove',_calSwipeTM);
+  calArea.removeEventListener('touchend',_calSwipeTE);
+  calArea.addEventListener('touchstart',_calSwipeTS,{passive:true});
+  calArea.addEventListener('touchmove',_calSwipeTM,{passive:true});
+  calArea.addEventListener('touchend',_calSwipeTE,{passive:true});
+}
+
+
+function _calSwipeTS(e){
+  if(S._touchGhost||S._touchData)return;
+  if(e.target.closest('.pv2-cal-item,.pv2-module-chip,.pv2-mod-pill,.pv2-mod-chip,.pv2-day-add-btn,.pv2-day-note-btn,.pv2-day-note-txt,.pv2-item-done-btn,.pv2-move-btn'))return;
+  _calSwipeSX=e.touches[0].clientX;
+  _calSwipeSY=e.touches[0].clientY;
+  _calSwipeOK=true;
+}
+
+function _calSwipeTM(e){
+  if(!_calSwipeOK||_calSwipeSX===null)return;
+  const dx=Math.abs(e.touches[0].clientX-_calSwipeSX);
+  const dy=Math.abs(e.touches[0].clientY-_calSwipeSY);
+  if(dy>dx+12){_calSwipeOK=false;_calSwipeSX=null;}
+}
+
+function _calSwipeTE(e){
+  if(!_calSwipeOK||_calSwipeSX===null)return;
+  const dx=e.changedTouches[0].clientX-_calSwipeSX;
+  _calSwipeOK=false;_calSwipeSX=null;
+  if(S.viewMode!=='week'||Math.abs(dx)<50)return;
+  
+  
+  const ar=isAr();
+  const shift=ar?-Math.sign(dx):Math.sign(dx);
+  S.weekStart=addD(S.weekStart,shift);
+  render();
+}
+
+
+
+function _docDragEdge(e){_calDragEdgeCheck(e.clientX);}
+
 
 function _touchChipStart(e){const el=e.currentTarget;if(el.dataset.event){S._touchData={src:'evchip',c:el.dataset.course,et:el.dataset.event};}else{S._touchData={src:'chip',cid:el.dataset.course,mid:el.dataset.module};}; _touchBegin(e,el);}
 function _touchCalStart(e){const el=e.currentTarget;S._touchData={src:'cal',d:el.dataset.date,id:el.dataset.itemId};_touchBegin(e,el);}
@@ -954,8 +1042,11 @@ function _touchMove(e){
   document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));
   const el=document.elementFromPoint(t.clientX,t.clientY);
   (el?.closest('.pv2-day-body')||el?.closest('.pv2-mo-cell'))?.classList.add('drag-over');
+  
+  if(S._touchGhost)_calDragEdgeCheck(t.clientX);
 }
 function _touchEnd(e){
+  _clearEdgeNav();
   const t=e.changedTouches[0];
   if(S._touchGhost){S._touchGhost.remove();S._touchGhost=null;}
   document.removeEventListener('touchmove',_touchMove);document.removeEventListener('touchend',_touchEnd);document.removeEventListener('touchcancel',_touchCancel);
@@ -975,7 +1066,7 @@ function _touchEnd(e){
   }else{moveItem(S._touchData.d,targetD,S._touchData.id);saveData();render();}
   S._touchData=null;
 }
-function _touchCancel(){if(S._touchGhost){S._touchGhost.remove();S._touchGhost=null;}document.removeEventListener('touchmove',_touchMove);document.removeEventListener('touchend',_touchEnd);document.removeEventListener('touchcancel',_touchCancel);S._touchData=null;}
+function _touchCancel(){_clearEdgeNav();if(S._touchGhost){S._touchGhost.remove();S._touchGhost=null;}document.removeEventListener('touchmove',_touchMove);document.removeEventListener('touchend',_touchEnd);document.removeEventListener('touchcancel',_touchCancel);S._touchData=null;}
 
 
 function showItemMenu(d,itemId){
