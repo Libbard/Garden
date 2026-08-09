@@ -1,6 +1,6 @@
-
-
-
+// M08_algo.js — Interactive algorithm widgets
+// Generated: 2026-03-04T06:58:14
+// Diagrams: 1/1
 
 window.AlgoWidgets = window.AlgoWidgets || {};
 
@@ -84,12 +84,12 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بأبعاد 2:1
       '<div class="algo-canvas" id="w1-canvas-container" style="width:100%; max-width:750px; aspect-ratio: 2 / 1; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 750 375" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w1-leg-mis"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-swap);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w1-leg-align"></span></span>' +
@@ -103,18 +103,18 @@ window.AlgoWidgets[1] = function(container) {
  
     var steps = [], cur = 0, playing = false, interval = null;
     
-    
+    // متغيرات الـ SVG لتحديثها برمجياً بدون إعادة خلقها
     var isInitialized = false;
     var textRects = [], textLabels = [];
     var patRects = [], patLabels = [], patGroups = [];
     var arrowLine, arrowLabel, arrowGroup;
  
-    
+    // الثوابت الهندسية
     var boxSize = 45;
     var gap = 8;
     var stepX = boxSize + gap;
     var totalW = (12 * boxSize) + (11 * gap);
-    var startX = (750 - totalW) / 2; 
+    var startX = (750 - totalW) / 2; // توسيط دقيق
     var textY = 90;
     var patY = 170;
     var arrowY = 270;
@@ -172,7 +172,7 @@ window.AlgoWidgets[1] = function(container) {
         },
         {
           text: ['X','Y','Z','W','V','Q','L','M','N','O','P','Q'],
-          pat:  ['B','A','R','B','E','Q'], 
+          pat:  ['B','A','R','B','E','Q'], // تم تغيير النمط خصيصاً لهذه الحالة
           patOffset: 0, highlightText: [5], highlightPat: [5],
           shiftArrow: { to: 6, en: 'Shift = 6', ar: 'إزاحة = 6' },
           en: '<strong>Case 3:</strong> The character (Q) is the last pattern character, but exists nowhere else. Shift by full length (m=6).',
@@ -206,12 +206,12 @@ window.AlgoWidgets[1] = function(container) {
     function buildSVG() {
       var ns = 'http://www.w3.org/2000/svg';
       
-      
+      // تعريف رأس السهم
       var defs = document.createElementNS(ns, 'defs');
       defs.innerHTML = `<marker id="w1-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--algo-active)" /></marker>`;
       svgEl.appendChild(defs);
  
-      
+      // بناء مربعات النص (Text Array)
       for(let i=0; i<12; i++) {
         let g = document.createElementNS(ns, 'g');
         g.style.transition = 'opacity 0.4s ease';
@@ -241,10 +241,10 @@ window.AlgoWidgets[1] = function(container) {
         textRects.push(r); textLabels.push(t);
       }
  
-      
+      // بناء مربعات النمط (Pattern Array)
       for(let i=0; i<6; i++) {
         let g = document.createElementNS(ns, 'g');
-        g.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'; 
+        g.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'; // حركة انسيابية للإزاحة
         
         let r = document.createElementNS(ns, 'rect');
         r.setAttribute('x', startX + i * stepX);
@@ -271,7 +271,7 @@ window.AlgoWidgets[1] = function(container) {
         patGroups.push(g); patRects.push(r); patLabels.push(t);
       }
  
-      
+      // بناء سهم الإزاحة
       arrowGroup = document.createElementNS(ns, 'g');
       arrowGroup.style.transition = 'opacity 0.4s ease';
       
@@ -308,7 +308,7 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
  
-      
+      // تحديث النص الأساسي
       for(let i=0; i<12; i++) {
         textLabels[i].textContent = s.text[i];
         
@@ -322,7 +322,7 @@ window.AlgoWidgets[1] = function(container) {
           textLabels[i].setAttribute('fill', 'var(--text-primary)');
         }
         
-        
+        // بهتان الأحرف خارج نافذة النمط للتركيز
         if (i < s.patOffset || i >= s.patOffset + 6) {
           textRects[i].parentNode.style.opacity = '0.3';
         } else {
@@ -330,14 +330,14 @@ window.AlgoWidgets[1] = function(container) {
         }
       }
  
-      
+      // تحديث النمط (إزاحة وتلوين)
       var patShiftX = s.patOffset * stepX;
       for(let i=0; i<6; i++) {
         patLabels[i].textContent = s.pat[i];
         patGroups[i].style.transform = `translateX(${patShiftX}px)`;
  
         if (s.highlightPat.includes(i)) {
-          
+          // الحرف الأخير نقارنه (أحمر)، الحرف الداخلي نحاذيه (أزرق/بنفسجي)
           let color = (i === 5 && s.highlightText.length > 0) ? 'var(--algo-compare)' : 'var(--algo-swap)';
           patRects[i].setAttribute('fill', color);
           patRects[i].setAttribute('stroke', '#ffffff');
@@ -349,15 +349,15 @@ window.AlgoWidgets[1] = function(container) {
         }
       }
  
-      
+      // تحديث سهم الإزاحة
       if (s.shiftArrow) {
         arrowGroup.style.opacity = '1';
-        
+        // حساب الانطلاق من مركز آخر حرف في النمط الحالي إلى مكانه الجديد
         let startArrowX = startX + (s.patOffset * stepX) + (5 * stepX) + boxSize/2;
         let endArrowX = startArrowX + (s.shiftArrow.to * stepX);
  
         arrowLine.setAttribute('x1', startArrowX);
-        arrowLine.setAttribute('x2', endArrowX - 12); 
+        arrowLine.setAttribute('x2', endArrowX - 12); // ترك مسافة لرأس السهم
         arrowLabel.setAttribute('x', (startArrowX + endArrowX) / 2);
       } else {
         arrowGroup.style.opacity = '0';

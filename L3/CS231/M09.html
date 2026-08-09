@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="8">
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="9">
 <head>
-  
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المنطق التتابعي · CS231 · الحديقة الرقمية</title>
 
-  
+  <!-- Anti-flash: MUST be first script -->
   <script>
     (function(){
       var t=localStorage.getItem('garden_theme')||'dark';
@@ -24,51 +24,40 @@
     })();
   </script>
 
+  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
+  <script src="../../shared/subject-tint.js"></script>
   <link rel="stylesheet" href="../../shared/garden.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/all.min.css">
 
-  
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
   <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#a78bfa">
+  <!-- /data-garden-icons -->
 </head>
-<body>
+<body data-page-title="CS231" data-page-title-en="CS231">
 
 <div class="reading-progress"></div>
 <div class="page-layout">
 
-<header class="site-header">
-  <div class="header-inner">
-    <nav class="header-nav">
-      <a href="index.html" class="nav-btn nav-btn--icon" title="Home"><i class="fa-solid fa-house"></i></a>
-      <a href="M08.html" class="nav-btn">
-        <i class="fa-solid fa-arrow-right"></i>
-        <span data-i18n="nav.prev">السابق</span>
-      </a>
-    </nav>
-    <div class="header-center">
-      <div class="subject-icon"><i class="fa-solid fa-microchip"></i></div>
-      <span class="module-badge font-display">MOD 9</span>
-      <span class="subject-name">CS231</span>
-    </div>
-    <div class="header-actions">
-      <a href="M10.html" class="nav-btn">
-        <span data-i18n="nav.next">التالي</span>
-        <i class="fa-solid fa-arrow-left"></i>
-      </a>
-      <div class="divider-v"></div>
-      <button class="toggle-btn" onclick="Garden.toggleLanguage()"><span id="lang-label">AR</span></button>
-      <button class="toggle-btn" onclick="Garden.cycleTheme()"><span id="theme-icon">🌙</span></button>
-    </div>
-  </div>
-</header>
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=CS231"></header>
 
 <div class="content-wrapper">
   <aside class="sidebar">
     <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
     <nav class="toc-list">
-      
+      <!-- Fixed links -->
       <a href="#hero" class="toc-link" data-bilingual>
         <template class="content-ar">مقدمة الوحدة</template>
         <template class="content-en">Module Intro</template>
@@ -80,7 +69,7 @@
         <span class="content-target">أهداف التعلم</span>
       </a>
 
-      
+      <!-- ONE PER CONCEPT from json.concepts[] -->
       <a href="#sequential-circuits" class="toc-link" data-bilingual>
         <template class="content-ar">الدوائر التتابعية</template>
         <template class="content-en">Sequential Circuits</template>
@@ -104,7 +93,7 @@
 
       <div class="toc-divider"></div>
 
-      
+      <!-- Fixed bottom links -->
       <a href="#professor" class="toc-link" data-bilingual>
         <template class="content-ar">حديث البروفيسور</template>
         <template class="content-en">Professor's Narrative</template>
@@ -174,7 +163,7 @@
 </section>
 
 <section id="objectives" class="objectives-card glass-card fade-up">
-  <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
       <li><span class="obj-icon">✦</span><span>التمييز بين الدائرة التتابعية والدائرة التوافقية.</span></li>
@@ -198,9 +187,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -234,88 +223,88 @@
     <div class="math-block">$$Next\ State = f(Inputs, Present\ State)$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[4]: Block diagram of a sequential circuit. A box labeled 'Combinational circuit' receives 'Inputs'. Its output splits: one path goes to 'Outputs', the other goes to a box labeled 'Memory elements'. The output of 'Memory elements' loops back as an input to the 'Combinational circuit'. Style: educational, dark background #0d1117, accent color #00bcd4, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="4">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Arrowhead Marker -->
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
         </marker>
 
-        
+        <!-- Drop Shadow for Boxes -->
         <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
             <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25"/>
         </filter>
 
-        
+        <!-- Subtle Dot Grid Pattern -->
         <pattern id="dotGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
             <circle cx="2" cy="2" r="1" fill="var(--text-muted)" opacity="0.15"/>
         </pattern>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
     <rect width="100%" height="100%" fill="url(#dotGrid)"/>
 
+    <!-- CONNECTION LINES (Drawn first so they appear behind boxes) -->
     
-    
-    
+    <!-- Inputs to Combinational Circuit -->
     <path d="M 40 100 L 205 100" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
     
-    
+    <!-- Combinational Circuit to Outputs -->
     <path d="M 580 130 L 745 130" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
     
-    
+    <!-- Split Node (Dot) -->
     <circle cx="680" cy="130" r="5" fill="var(--brand-500)"/>
 
-    
+    <!-- Next State: Split to Memory Elements -->
     <path d="M 680 130 L 680 295 Q 680 305 670 305 L 555 305" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
 
-    
+    <!-- Current State: Memory Elements loop back to Combinational Circuit -->
     <path d="M 260 305 L 130 305 Q 120 305 120 295 L 120 170 Q 120 160 130 160 L 205 160" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
 
-    
+    <!-- Clock Input to Memory Elements -->
     <path d="M 400 390 L 400 350" fill="none" stroke="var(--text-muted)" stroke-width="2"/>
 
-    
+    <!-- MAIN BOXES -->
 
-    
+    <!-- Combinational Circuit Box -->
     <rect x="220" y="60" width="360" height="140" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
     
-    
+    <!-- Memory Elements Box -->
     <rect x="260" y="260" width="280" height="90" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
 
-    
+    <!-- Clock Triangle Indicator -->
     <polygon points="390,350 410,350 400,338" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
 
-    
+    <!-- TEXT LABELS -->
 
-    
+    <!-- Combinational Circuit Text -->
     <text x="400" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Combinational Circuit</text>
     <text x="400" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-secondary)" text-anchor="middle">دائرة توافقية</text>
 
-    
+    <!-- Memory Elements Text -->
     <text x="400" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Memory Elements</text>
     <text x="400" y="330" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">عناصر الذاكرة</text>
 
-    
+    <!-- External Inputs Text -->
     <text x="120" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Inputs</text>
     <text x="120" y="95" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">مدخلات</text>
 
-    
+    <!-- External Outputs Text -->
     <text x="720" y="95" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Outputs</text>
     <text x="720" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">مخرجات</text>
 
-    
+    <!-- Next State Text -->
     <text x="735" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">Next State</text>
     <text x="735" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">الحالة التالية</text>
 
-    
+    <!-- Current State Text -->
     <text x="65" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">Current State</text>
     <text x="65" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">الحالة الحالية</text>
 
-    
+    <!-- Clock Text -->
     <text x="445" y="375" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">Clock</text>
     <text x="445" y="395" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">الساعة</text>
 
@@ -407,9 +396,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -434,52 +423,52 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[3]: Logic diagram of an SR Latch using two cross-coupled NOR gates. Top NOR gate receives R (reset) and the output of the bottom NOR gate. Bottom NOR gate receives S (set) and the output of the top NOR gate. Top output is Q, bottom output is Q'. Style: educational, dark background #0d1117, accent color #00bcd4. -->
 <div class="svg-diagram" data-diagram-id="3">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
     </marker>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Title -->
   <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">SR Latch (Cross-Coupled NOR Gates)</text>
   <text x="400" y="60" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" fill="var(--text-secondary)">قلاب SR (بوابات NOR المتقاطعة)</text>
 
-  
+  <!-- Circuit Group -->
   <g stroke="var(--brand-500)" stroke-width="2" fill="none">
     
-    
+    <!-- Input Lines -->
     <path d="M 120 130 L 265 130" marker-end="url(#arrow)" />
     <path d="M 120 270 L 265 270" marker-end="url(#arrow)" />
 
-    
+    <!-- Feedback Line 1: Q to Bottom NOR -->
     <path d="M 450 150 L 450 190 L 200 190 L 200 230 L 265 230" marker-end="url(#arrow)" />
     
-    
+    <!-- Feedback Line 2: Q' to Top NOR (with jump arc over Feedback 1) -->
     <path d="M 430 250 L 430 210 L 230 210 L 230 196 A 6 6 0 0 1 230 184 L 230 170 L 265 170" marker-end="url(#arrow)" />
 
-    
+    <!-- Output Lines -->
     <path d="M 386 150 L 530 150" marker-end="url(#arrow)" />
     <path d="M 386 250 L 530 250" marker-end="url(#arrow)" />
 
-    
+    <!-- Connection Dots -->
     <circle cx="450" cy="150" r="4" fill="var(--brand-500)" stroke="none" />
     <circle cx="430" cy="250" r="4" fill="var(--brand-500)" stroke="none" />
 
-    
+    <!-- Top NOR Gate -->
     <g>
       <path d="M 270 110 C 310 110, 350 120, 370 150 C 350 180, 310 190, 270 190 C 290 170, 290 130, 270 110 Z" fill="var(--bg-elevated)" />
       <circle cx="378" cy="150" r="8" fill="var(--bg-elevated)" />
       <text x="310" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" stroke="none">NOR</text>
     </g>
 
-    
+    <!-- Bottom NOR Gate -->
     <g>
       <path d="M 270 210 C 310 210, 350 220, 370 250 C 350 280, 310 290, 270 290 C 290 270, 290 230, 270 210 Z" fill="var(--bg-elevated)" />
       <circle cx="378" cy="250" r="8" fill="var(--bg-elevated)" />
@@ -487,61 +476,61 @@
     </g>
   </g>
 
-  
+  <!-- Input / Output Labels -->
   <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
-    
+    <!-- R Input -->
     <text x="110" y="125" font-size="16" font-weight="bold" text-anchor="end" fill="var(--text-primary)">R (Reset)</text>
     <text x="110" y="145" font-size="14" text-anchor="end" fill="var(--text-secondary)">إعادة تعيين</text>
     
-    
+    <!-- S Input -->
     <text x="110" y="265" font-size="16" font-weight="bold" text-anchor="end" fill="var(--text-primary)">S (Set)</text>
     <text x="110" y="285" font-size="14" text-anchor="end" fill="var(--text-secondary)">تعيين</text>
     
-    
+    <!-- Q Output -->
     <text x="545" y="145" font-size="16" font-weight="bold" text-anchor="start" fill="var(--text-primary)">Q</text>
     <text x="545" y="165" font-size="14" text-anchor="start" fill="var(--text-secondary)">المخرج</text>
     
-    
+    <!-- Q' Output -->
     <text x="545" y="245" font-size="16" font-weight="bold" text-anchor="start" fill="var(--text-primary)">Q'</text>
     <text x="545" y="265" font-size="14" text-anchor="start" fill="var(--text-secondary)">المخرج المعكوس</text>
   </g>
 
-  
+  <!-- Truth Table -->
   <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
     <text x="685" y="85" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Truth Table / جدول الحقيقة</text>
     
     <rect x="575" y="100" width="220" height="145" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
     <line x1="575" y1="130" x2="795" y2="130" stroke="var(--border-color)" stroke-width="1" />
     
-    
+    <!-- Table Headers -->
     <text x="595" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">S</text>
     <text x="625" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">R</text>
     <text x="655" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Q</text>
     <text x="685" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Q'</text>
     <text x="745" y="120" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">State / الحالة</text>
 
-    
+    <!-- Row 1: Hold -->
     <text x="595" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
     <text x="625" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
     <text x="655" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">Q</text>
     <text x="685" y="150" font-size="14" text-anchor="middle" fill="var(--text-secondary)">Q'</text>
     <text x="745" y="150" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Hold (احتفاظ)</text>
 
-    
+    <!-- Row 2: Reset -->
     <text x="595" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
     <text x="625" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
     <text x="655" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
     <text x="685" y="175" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
     <text x="745" y="175" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Reset (تصفير)</text>
 
-    
+    <!-- Row 3: Set -->
     <text x="595" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
     <text x="625" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
     <text x="655" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
     <text x="685" y="200" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
     <text x="745" y="200" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Set (تعيين)</text>
 
-    
+    <!-- Row 4: Invalid -->
     <text x="595" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
     <text x="625" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">1</text>
     <text x="655" y="225" font-size="14" text-anchor="middle" fill="var(--text-secondary)">0</text>
@@ -549,7 +538,7 @@
     <text x="745" y="225" font-size="13" text-anchor="middle" fill="var(--brand-500)">Invalid (غير صالح)</text>
   </g>
 
-  
+  <!-- Footer Note -->
   <text x="400" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)">Cross-coupling creates a feedback loop that allows the circuit to store state.</text>
   <text x="400" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)">التقاطع يخلق حلقة تغذية راجعة تسمح للدائرة بتخزين الحالة.</text>
 
@@ -624,9 +613,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -651,7 +640,7 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[2]: Logic diagram of a D Latch. Input D splits: one path goes to an AND gate (top), the other goes through an inverter to another AND gate (bottom). Both AND gates also receive the En (Enable) signal. The outputs of these AND gates feed into a cross-coupled NOR SR latch. Style: educational, dark background #0d1117, accent color #00bcd4. -->
 <div class="svg-diagram" data-diagram-id="2">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
@@ -663,46 +652,46 @@
         </marker>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Title -->
     <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">D Latch Logic Diagram / مخطط القلاب D</text>
 
-    
+    <!-- SR Latch Grouping Box -->
     <rect x="430" y="55" width="200" height="290" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" rx="12"/>
     <text x="530" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">SR Latch (قلاب SR)</text>
 
-    
+    <!-- ================= Lines & Connections ================= -->
     <g fill="none" stroke="var(--brand-500)" stroke-width="2">
-        
+        <!-- D Input Path -->
         <polyline points="80,100 280,100" marker-end="url(#arrow)"/>
         <polyline points="120,100 120,300 180,300" marker-end="url(#arrow)"/>
         <polyline points="220,300 280,300" marker-end="url(#arrow)"/>
         
-        
+        <!-- En Input Path -->
         <polyline points="80,200 240,200"/>
         <polyline points="240,200 240,120 280,120" marker-end="url(#arrow)"/>
         <polyline points="240,200 240,280 280,280" marker-end="url(#arrow)"/>
 
-        
-        
+        <!-- AND to NOR Connections (Crossed) -->
+        <!-- Top AND (S) to Bottom NOR -->
         <polyline points="340,110 370,110 370,310 490,310" marker-end="url(#arrow)"/>
-        
+        <!-- Bottom AND (R) to Top NOR -->
         <polyline points="340,290 410,290 410,90 490,90" marker-end="url(#arrow)"/>
 
-        
+        <!-- NOR Outputs -->
         <polyline points="570,110 680,110" marker-end="url(#arrow)"/>
         <polyline points="570,290 680,290" marker-end="url(#arrow)"/>
 
-        
-        
+        <!-- Cross-Coupled Feedback Loops -->
+        <!-- Top NOR (Q) to Bottom NOR -->
         <polyline points="610,110 610,200 450,200 450,270 490,270" marker-end="url(#arrow)"/>
-        
+        <!-- Bottom NOR (Q') to Top NOR -->
         <polyline points="590,290 590,180 460,180 460,130 490,130" marker-end="url(#arrow)"/>
     </g>
 
-    
+    <!-- Connection Dots -->
     <g fill="var(--brand-500)">
         <circle cx="120" cy="100" r="4"/>
         <circle cx="240" cy="200" r="4"/>
@@ -710,51 +699,51 @@
         <circle cx="590" cy="290" r="4"/>
     </g>
 
-    
+    <!-- ================= Logic Gates ================= -->
     <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
-        
+        <!-- NOT Gate -->
         <path d="M 180,285 L 210,300 L 180,315 Z"/>
         <circle cx="215" cy="300" r="5"/>
 
-        
+        <!-- Top AND Gate -->
         <path d="M 280,80 L 310,80 A 30,30 0 0,1 310,140 L 280,140 Z"/>
         
-        
+        <!-- Bottom AND Gate -->
         <path d="M 280,260 L 310,260 A 30,30 0 0,1 310,320 L 280,320 Z"/>
 
-        
+        <!-- Top NOR Gate -->
         <path d="M 480,70 C 500,70 540,90 560,110 C 540,130 500,150 480,150 C 495,130 495,90 480,70 Z"/>
         <circle cx="565" cy="110" r="5"/>
 
-        
+        <!-- Bottom NOR Gate -->
         <path d="M 480,250 C 500,250 540,270 560,290 C 540,310 500,330 480,330 C 495,310 495,270 480,250 Z"/>
         <circle cx="565" cy="290" r="5"/>
     </g>
 
-    
+    <!-- ================= Labels & Text ================= -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" fill="var(--text-primary)">
-        
+        <!-- Gate Labels -->
         <text x="195" y="275" font-size="13" font-weight="bold" text-anchor="middle">NOT</text>
         <text x="300" y="115" font-size="14" font-weight="bold" text-anchor="middle">AND</text>
         <text x="300" y="295" font-size="14" font-weight="bold" text-anchor="middle">AND</text>
         <text x="515" y="115" font-size="14" font-weight="bold" text-anchor="middle">NOR</text>
         <text x="515" y="295" font-size="14" font-weight="bold" text-anchor="middle">NOR</text>
 
-        
+        <!-- Input Labels -->
         <text x="70" y="95" font-size="18" font-weight="bold" text-anchor="end">D</text>
         <text x="70" y="115" font-size="13" fill="var(--text-secondary)" text-anchor="end">Data / بيانات</text>
         
         <text x="70" y="195" font-size="18" font-weight="bold" text-anchor="end">En</text>
         <text x="70" y="215" font-size="13" fill="var(--text-secondary)" text-anchor="end">Enable / تمكين</text>
 
-        
+        <!-- Output Labels -->
         <text x="690" y="105" font-size="18" font-weight="bold" text-anchor="start">Q</text>
         <text x="690" y="125" font-size="13" fill="var(--text-secondary)" text-anchor="start">State / الحالة</text>
         
         <text x="690" y="285" font-size="18" font-weight="bold" text-anchor="start">Q'</text>
         <text x="690" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="start">Inverted / معكوس</text>
 
-        
+        <!-- Internal Signal Labels -->
         <text x="265" y="95" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end">D</text>
         <text x="265" y="115" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end">En</text>
         
@@ -789,9 +778,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -816,24 +805,24 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[1]: Block diagram of a Master-Slave D Flip-Flop. Two D latches in series. The first is labeled 'Master', the second 'Slave'. Input D goes into Master. Master output Y goes into Slave input D. Slave output is Q. A Clock signal (Clk) connects directly to Master's En input, and goes through an inverter to connect to Slave's En input. Style: educational, dark background #0d1117, accent color #00bcd4. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
     </marker>
-    
+    <!-- Junction Dot Marker -->
     <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
       <circle cx="5" cy="5" r="3" fill="var(--text-primary)" />
     </marker>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Main Title -->
   <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
     Master-Slave D Flip-Flop
   </text>
@@ -841,77 +830,77 @@
     قلاب دي الرئيسي والتابع
   </text>
 
-  
+  <!-- Dashed Container for the entire Flip-Flop -->
   <rect x="190" y="85" width="460" height="285" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,8" rx="12" />
   <text x="420" y="360" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">
     Master-Slave Configuration (إعداد رئيسي-تابع)
   </text>
 
-  
+  <!-- Master Latch -->
   <rect x="230" y="100" width="140" height="180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" rx="8" />
   <text x="300" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Master</text>
   <text x="300" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">رئيسي</text>
   
-  
+  <!-- Master Ports -->
   <text x="245" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">D</text>
   <text x="245" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">En</text>
   <text x="355" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q</text>
   <text x="355" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q'</text>
 
-  
+  <!-- Slave Latch -->
   <rect x="470" y="100" width="140" height="180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" rx="8" />
   <text x="540" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Slave</text>
   <text x="540" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">تابع</text>
 
-  
+  <!-- Slave Ports -->
   <text x="485" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">D</text>
   <text x="485" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start">En</text>
   <text x="595" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q</text>
   <text x="595" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="end">Q'</text>
 
+  <!-- Connections & Routing -->
   
-  
-  
+  <!-- Input D to Master -->
   <line x1="90" y1="180" x2="226" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="60" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">D</text>
   <text x="60" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(الدخل)</text>
 
-  
+  <!-- Master Q to Slave D (Intermediate Y) -->
   <line x1="370" y1="180" x2="466" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="420" y="165" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Y</text>
 
-  
+  <!-- Master Q' Stub (Unused) -->
   <line x1="370" y1="240" x2="390" y2="240" stroke="var(--brand-500)" stroke-width="2" />
 
-  
+  <!-- Slave Q to Output Q -->
   <line x1="610" y1="180" x2="710" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="740" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Q</text>
   <text x="740" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(الخرج)</text>
 
-  
+  <!-- Slave Q' to Output Q' -->
   <line x1="610" y1="240" x2="710" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="740" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Q'</text>
   <text x="740" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(عكس الخرج)</text>
 
-  
+  <!-- Clock Input & Routing -->
   <text x="60" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Clk</text>
   <text x="60" y="355" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">(النبضة)</text>
   
-  
+  <!-- Main Clock Line -->
   <line x1="90" y1="340" x2="395" y2="340" stroke="var(--brand-500)" stroke-width="2" />
   
-  
+  <!-- Junction Dot for Master Branch -->
   <circle cx="180" cy="340" r="4" fill="var(--text-primary)" />
   
-  
+  <!-- Clock to Master En -->
   <path d="M 180 340 L 180 240 L 226 240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
 
-  
+  <!-- NOT Gate (Inverter) for Slave En -->
   <polygon points="395,330 395,350 415,340" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   <circle cx="420" cy="340" r="5" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   <text x="410" y="375" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Inverter (عكس)</text>
 
-  
+  <!-- Clock from NOT Gate to Slave En -->
   <path d="M 425 340 L 450 340 L 450 240 L 466 240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
 
 </svg>
@@ -979,7 +968,7 @@
 
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
-    <span class="professor-icon">🎓</span>
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
@@ -990,7 +979,7 @@
 </section>
 
 <section id="ask-professor" class="fade-up section-gap">
-  <h2 data-i18n="ask.title">❓ اسأل البروفيسور</h2>
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
   <div class="accordion">
     <div class="accordion-item">
       <button class="accordion-trigger">
@@ -1166,7 +1155,7 @@
 </section>
 
 <section id="flashcards" class="flashcard-section fade-up">
-  <h2 data-i18n="fc.title">البطاقات التعليمية</h2>
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
   <div id="fc-container"></div>
 </section>
 <script type="application/json" id="flashcard-data">
@@ -1447,16 +1436,16 @@
 </script>
 
 <section id="quiz" class="quiz-section fade-up">
-  <h2 data-i18n="quiz.title">اختبر نفسك</h2>
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
       <span id="quiz-counter">1 / 10</span>
-      <span>🎯 <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
     <div class="quiz-options" id="quiz-options-container"></div>
-    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()" data-i18n="quiz.hint">💡 تلميح</button>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
     <div class="quiz-feedback hidden" id="quiz-feedback"></div>
     <div class="quiz-nav">
       <div></div>
@@ -1466,7 +1455,7 @@
     </div>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
-    <div class="score-emoji" id="quiz-score-emoji">🏆</div>
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
     <div class="score-display" id="quiz-score-display">0 / 10</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
@@ -1797,9 +1786,9 @@
 </script>
 
 <section id="vault" class="vault-section glass-card fade-up">
-  <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ Trap</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الخلط بين المواسك (Latches) والنطاطات (Flip-Flops). تذكر دائماً: المواسك حساسة لمستوى الإشارة (Level-sensitive)، بينما النطاطات حساسة لحافة النبضة (Edge-triggered). هذا هو سؤال الامتحان الكلاسيكي!</template>
       <template class="content-en">Confusing Latches and Flip-Flops. Always remember: Latches are level-sensitive, while Flip-Flops are edge-triggered. This is a classic exam question!</template>
@@ -1807,7 +1796,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 Key Concept</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">مسار التغذية الراجعة (Feedback Path) هو ما يمنح الدوائر التتابعية 'ذاكرتها'. بدون هذا المسار، ستكون الدائرة توافقية بحتة.</template>
       <template class="content-en">The Feedback Path is what gives sequential circuits their 'memory'. Without it, the circuit would be purely combinational.</template>
@@ -1815,7 +1804,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ Trap</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">نسيان أن ماسك SR المبني بـ NAND يعمل بشكل عكسي (Active Low). الحالة غير المحددة فيه تحدث عند S=0 و R=0، وليس 1 و 1 كما في ماسك NOR.</template>
       <template class="content-en">Forgetting that a NAND-based SR latch is Active Low. Its indeterminate state occurs at S=0 and R=0, not 1 and 1 like the NOR latch.</template>
@@ -1823,7 +1812,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 Secret</div>
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
       <template class="content-ar">نطاط السيد والتابع (Master-Slave) هو ببساطة ماسكي D متصلين على التوالي مع عاكس على إشارة الساعة للماسك الثاني. هذا العاكس هو سر العزل بين المدخل والمخرج!</template>
       <template class="content-en">A Master-Slave flip-flop is simply two D latches in series with an inverter on the clock signal for the second latch. That inverter is the secret to isolating input from output!</template>
@@ -1841,14 +1830,15 @@
         <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
         <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
-        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
+        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
       </div>
-      <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
     </div>
   </footer>
 </div>
 
 <script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
 <script src="../../shared/firebase-sync.js"></script>
 </body>
 </html>

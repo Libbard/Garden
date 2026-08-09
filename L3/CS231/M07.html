@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="6">
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="7">
 <head>
-  
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المنطق التوافقي (تتمة): الجامع، الطارح، والمقارن · CS231 · الحديقة الرقمية</title>
 
-  
+  <!-- Anti-flash: MUST be first script -->
   <script>
     (function(){
       var t=localStorage.getItem('garden_theme')||'dark';
@@ -24,51 +24,40 @@
     })();
   </script>
 
+  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
+  <script src="../../shared/subject-tint.js"></script>
   <link rel="stylesheet" href="../../shared/garden.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/all.min.css">
 
-  
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
   <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#a78bfa">
+  <!-- /data-garden-icons -->
 </head>
-<body>
+<body data-page-title="CS231" data-page-title-en="CS231">
 
 <div class="reading-progress"></div>
 <div class="page-layout">
 
-<header class="site-header">
-  <div class="header-inner">
-    <nav class="header-nav">
-      <a href="index.html" class="nav-btn nav-btn--icon" title="Home"><i class="fa-solid fa-house"></i></a>
-      <a href="M06.html" class="nav-btn">
-        <i class="fa-solid fa-arrow-right"></i>
-        <span data-i18n="nav.prev">السابق</span>
-      </a>
-    </nav>
-    <div class="header-center">
-      <div class="subject-icon"><i class="fa-solid fa-microchip"></i></div>
-      <span class="module-badge font-display">MOD 7</span>
-      <span class="subject-name">CS231</span>
-    </div>
-    <div class="header-actions">
-      <a href="M08.html" class="nav-btn">
-        <span data-i18n="nav.next">التالي</span>
-        <i class="fa-solid fa-arrow-left"></i>
-      </a>
-      <div class="divider-v"></div>
-      <button class="toggle-btn" onclick="Garden.toggleLanguage()"><span id="lang-label">AR</span></button>
-      <button class="toggle-btn" onclick="Garden.cycleTheme()"><span id="theme-icon">🌙</span></button>
-    </div>
-  </div>
-</header>
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M06.html" data-gh-next="M08.html" data-gh-card="../../hub/course.html?code=CS231"></header>
 
 <div class="content-wrapper">
   <aside class="sidebar">
     <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
     <nav class="toc-list">
-      
+      <!-- Fixed links -->
       <a href="#hero" class="toc-link" data-bilingual>
         <template class="content-ar">مقدمة الوحدة</template>
         <template class="content-en">Module Intro</template>
@@ -80,7 +69,7 @@
         <span class="content-target">أهداف التعلم</span>
       </a>
 
-      
+      <!-- ONE PER CONCEPT from json.concepts[] -->
       <a href="#full-adder" class="toc-link" data-bilingual>
         <template class="content-ar">الجامع الكامل (Full Adder)</template>
         <template class="content-en">Full Adder</template>
@@ -119,7 +108,7 @@
 
       <div class="toc-divider"></div>
 
-      
+      <!-- Fixed bottom links -->
       <a href="#professor" class="toc-link" data-bilingual>
         <template class="content-ar">حديث البروفيسور</template>
         <template class="content-en">Professor's Narrative</template>
@@ -189,7 +178,7 @@
 </section>
 
 <section id="objectives" class="objectives-card glass-card fade-up">
-  <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
       <li><span class="obj-icon">✦</span><span>تصميم دائرة الجامع-الطارح الثنائي (الجامع الكامل).</span></li>
@@ -209,7 +198,7 @@
   </ul>
 </section>
 
-
+<!-- CONCEPT 1 -->
 <section id="full-adder" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">1</span> الجامع الكامل (Full Adder)</h2></template>
@@ -218,9 +207,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -252,92 +241,92 @@
     <div class="math-block">$$S = x \oplus y \oplus z \quad \text{and} \quad C = xy + xz + yz$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[6]: Detailed SVG generation prompt: A logic diagram of a Full Adder using two Half Adders. Show inputs x and y going into a first XOR and AND gate. The XOR output and input z go into a second XOR (output S) and AND gate. The outputs of the two AND gates go into an OR gate (output C). Style: educational, dark background #0d1117, accent color #00ffcc, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="6">
 <svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
     <defs>
-        
+        <!-- Arrowhead Marker -->
         <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
             <path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--brand-500)" />
         </marker>
 
-        
+        <!-- AND Gate Definition -->
         <g id="and-gate">
             <path d="M 0 0 L 30 0 A 20 20 0 0 1 30 40 L 0 40 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
         </g>
 
-        
+        <!-- OR Gate Definition -->
         <g id="or-gate">
             <path d="M 0 0 Q 15 20 0 40 Q 35 40 55 20 Q 35 0 0 0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
         </g>
 
-        
+        <!-- XOR Gate Definition -->
         <g id="xor-gate">
             <path d="M -8 0 Q 7 20 -8 40" fill="none" stroke="var(--brand-500)" stroke-width="2" />
             <path d="M 0 0 Q 15 20 0 40 Q 35 40 55 20 Q 35 0 0 0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
         </g>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-    
+    <!-- Title -->
     <text x="400" y="35" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Full Adder using Two Half Adders</text>
     <text x="400" y="60" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">جامع كامل باستخدام جامعين نصفيين</text>
 
-    
+    <!-- Half Adder Grouping Boxes -->
     <rect x="170" y="90" width="120" height="160" rx="8" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
     <text x="230" y="275" text-anchor="middle" fill="var(--text-muted)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Half Adder 1 / جامع نصفي ١</text>
 
     <rect x="420" y="100" width="120" height="190" rx="8" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
     <text x="480" y="315" text-anchor="middle" fill="var(--text-muted)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Half Adder 2 / جامع نصفي ٢</text>
 
-    
+    <!-- Connection Lines -->
     <g fill="none" stroke="var(--brand-500)" stroke-width="2">
-        
+        <!-- Inputs to HA1 -->
         <path d="M 60 120 L 198 120" marker-end="url(#arrow)" />
         <path d="M 120 120 L 120 210 L 200 210" marker-end="url(#arrow)" />
         
         <path d="M 60 160 L 160 160 L 160 140 L 198 140" marker-end="url(#arrow)" />
         <path d="M 140 160 L 140 230 L 200 230" marker-end="url(#arrow)" />
 
-        
+        <!-- Input z (Cin) to HA2 -->
         <path d="M 60 280 L 380 280 L 380 150 L 448 150" marker-end="url(#arrow)" />
         <path d="M 360 280 L 360 270 L 450 270" marker-end="url(#arrow)" />
 
-        
+        <!-- HA1 Outputs to HA2 and OR -->
         <path d="M 255 130 L 448 130" marker-end="url(#arrow)" />
         <path d="M 340 130 L 340 250 L 450 250" marker-end="url(#arrow)" />
         
         <path d="M 250 220 L 300 220 L 300 320 L 560 320 L 560 240 L 606 240" marker-end="url(#arrow)" />
 
-        
+        <!-- HA2 Outputs to Final Outputs and OR -->
         <path d="M 505 140 L 720 140" marker-end="url(#arrow)" />
         <path d="M 500 260 L 606 260" marker-end="url(#arrow)" />
 
-        
+        <!-- OR Output to Final Carry -->
         <path d="M 655 250 L 720 250" marker-end="url(#arrow)" />
     </g>
 
-    
+    <!-- Connection Dots -->
     <circle cx="120" cy="120" r="4" fill="var(--brand-500)" />
     <circle cx="140" cy="160" r="4" fill="var(--brand-500)" />
     <circle cx="340" cy="130" r="4" fill="var(--brand-500)" />
     <circle cx="360" cy="280" r="4" fill="var(--brand-500)" />
 
-    
-    
+    <!-- Logic Gates -->
+    <!-- HA1 Gates -->
     <use href="#xor-gate" x="200" y="110" />
     <use href="#and-gate" x="200" y="200" />
     
-    
+    <!-- HA2 Gates -->
     <use href="#xor-gate" x="450" y="120" />
     <use href="#and-gate" x="450" y="240" />
     
-    
+    <!-- Final OR Gate -->
     <use href="#or-gate" x="600" y="230" />
 
-    
+    <!-- Gate Labels -->
     <g text-anchor="middle" fill="var(--text-secondary)" font-size="13" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
         <text x="230" y="134">XOR</text>
         <text x="225" y="224">AND</text>
@@ -346,14 +335,14 @@
         <text x="630" y="254">OR</text>
     </g>
 
-    
+    <!-- Intermediate Signal Labels -->
     <g text-anchor="middle" fill="var(--text-muted)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
         <text x="280" y="120">S1</text>
         <text x="280" y="210">C1</text>
         <text x="530" y="250">C2</text>
     </g>
 
-    
+    <!-- Input Labels -->
     <g text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
         <text x="45" y="120" fill="var(--text-primary)" font-size="18" font-weight="bold">x</text>
         <text x="45" y="138" fill="var(--text-muted)" font-size="13">المدخل الأول</text>
@@ -365,7 +354,7 @@
         <text x="45" y="298" fill="var(--text-muted)" font-size="13">الحمل الداخلي</text>
     </g>
 
-    
+    <!-- Output Labels -->
     <g text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
         <text x="730" y="140" fill="var(--text-primary)" font-size="18" font-weight="bold">S (Sum)</text>
         <text x="730" y="158" fill="var(--text-muted)" font-size="13">المجموع</text>
@@ -390,7 +379,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 2 -->
 <section id="binary-adder" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">2</span> الجامع الثنائي (Binary Adder)</h2></template>
@@ -399,9 +388,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -424,184 +413,184 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A block diagram of a 4-bit Ripple Carry Adder. Show 4 blocks labeled 'FA' (Full Adder). Inputs A0, B0 and C0 go into the first FA, producing S0 and C1. C1 goes into the second FA along with A1, B1, producing S1 and C2. This continues up to C4 and S3. Style: educational, dark background #0d1117, accent color #ff00cc, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="5">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Standard Arrowhead -->
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--brand-500)"/>
         </marker>
-        
+        <!-- Dashed Arrowhead for Ripple Indicator -->
         <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--brand-400)"/>
         </marker>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Title -->
     <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">4-bit Ripple Carry Adder</text>
     <text x="400" y="60" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">جامع تموجي 4-بت</text>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- FA0 (LSB) - Rightmost Block                -->
+    <!-- ========================================== -->
     <g id="FA0">
-        
+        <!-- Block -->
         <rect x="590" y="140" width="100" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
         
-        
+        <!-- Block Labels -->
         <text x="640" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA0</text>
         <text x="640" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">Full Adder</text>
         <text x="640" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">جامع كامل</text>
 
-        
+        <!-- Port Labels Inside Block -->
         <text x="620" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">A</text>
         <text x="660" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">B</text>
         <text x="685" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="end">Cin</text>
         <text x="595" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="start">Cout</text>
         <text x="640" y="252" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
 
-        
+        <!-- Inputs A0, B0 -->
         <line x1="620" y1="90" x2="620" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="620" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">A0</text>
 
         <line x1="660" y1="90" x2="660" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="660" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">B0</text>
 
-        
+        <!-- Output S0 -->
         <line x1="640" y1="260" x2="640" y2="310" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="640" y="330" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">S0</text>
         <text x="640" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">المجموع</text>
     </g>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- FA1                                        -->
+    <!-- ========================================== -->
     <g id="FA1">
-        
+        <!-- Block -->
         <rect x="430" y="140" width="100" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
         
-        
+        <!-- Block Labels -->
         <text x="480" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA1</text>
         <text x="480" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">Full Adder</text>
         <text x="480" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">جامع كامل</text>
 
-        
+        <!-- Port Labels Inside Block -->
         <text x="460" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">A</text>
         <text x="500" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">B</text>
         <text x="525" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="end">Cin</text>
         <text x="435" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="start">Cout</text>
         <text x="480" y="252" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
 
-        
+        <!-- Inputs A1, B1 -->
         <line x1="460" y1="90" x2="460" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="460" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">A1</text>
 
         <line x1="500" y1="90" x2="500" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="500" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">B1</text>
 
-        
+        <!-- Output S1 -->
         <line x1="480" y1="260" x2="480" y2="310" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="480" y="330" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">S1</text>
         <text x="480" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">المجموع</text>
     </g>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- FA2                                        -->
+    <!-- ========================================== -->
     <g id="FA2">
-        
+        <!-- Block -->
         <rect x="270" y="140" width="100" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
         
-        
+        <!-- Block Labels -->
         <text x="320" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA2</text>
         <text x="320" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">Full Adder</text>
         <text x="320" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">جامع كامل</text>
 
-        
+        <!-- Port Labels Inside Block -->
         <text x="300" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">A</text>
         <text x="340" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">B</text>
         <text x="365" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="end">Cin</text>
         <text x="275" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="start">Cout</text>
         <text x="320" y="252" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
 
-        
+        <!-- Inputs A2, B2 -->
         <line x1="300" y1="90" x2="300" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="300" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">A2</text>
 
         <line x1="340" y1="90" x2="340" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="340" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">B2</text>
 
-        
+        <!-- Output S2 -->
         <line x1="320" y1="260" x2="320" y2="310" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="320" y="330" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">S2</text>
         <text x="320" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">المجموع</text>
     </g>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- FA3 (MSB) - Leftmost Block                 -->
+    <!-- ========================================== -->
     <g id="FA3">
-        
+        <!-- Block -->
         <rect x="110" y="140" width="100" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
         
-        
+        <!-- Block Labels -->
         <text x="160" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA3</text>
         <text x="160" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">Full Adder</text>
         <text x="160" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">جامع كامل</text>
 
-        
+        <!-- Port Labels Inside Block -->
         <text x="140" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">A</text>
         <text x="180" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">B</text>
         <text x="205" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="end">Cin</text>
         <text x="115" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="start">Cout</text>
         <text x="160" y="252" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
 
-        
+        <!-- Inputs A3, B3 -->
         <line x1="140" y1="90" x2="140" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="140" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">A3</text>
 
         <line x1="180" y1="90" x2="180" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="180" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">B3</text>
 
-        
+        <!-- Output S3 -->
         <line x1="160" y1="260" x2="160" y2="310" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <text x="160" y="330" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">S3</text>
         <text x="160" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">المجموع</text>
     </g>
 
+    <!-- ========================================== -->
+    <!-- Carry Lines (Right to Left)                -->
+    <!-- ========================================== -->
     
-    
-    
-    
-    
+    <!-- C0 (Initial Carry In) -->
     <line x1="750" y1="225" x2="690" y2="225" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow)"/>
     <text x="765" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">C0</text>
     <text x="765" y="240" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">(Cin)</text>
 
-    
+    <!-- C1 (FA0 to FA1) -->
     <line x1="590" y1="225" x2="530" y2="225" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow)"/>
     <text x="560" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">C1</text>
 
-    
+    <!-- C2 (FA1 to FA2) -->
     <line x1="430" y1="225" x2="370" y2="225" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow)"/>
     <text x="400" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">C2</text>
 
-    
+    <!-- C3 (FA2 to FA3) -->
     <line x1="270" y1="225" x2="210" y2="225" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow)"/>
     <text x="240" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">C3</text>
 
-    
+    <!-- C4 (Final Carry Out) -->
     <line x1="110" y1="225" x2="50" y2="225" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow)"/>
     <text x="35" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">C4</text>
     <text x="35" y="240" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">(Cout)</text>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- Ripple Direction Indicator                 -->
+    <!-- ========================================== -->
     <line x1="640" y1="380" x2="160" y2="380" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
     <text x="400" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle">Carry Propagation Direction / اتجاه انتشار الحمل</text>
 
@@ -622,7 +611,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 3 -->
 <section id="propagation-delay" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">3</span> تأخير الانتشار ومنطق استباق الحمل</h2></template>
@@ -631,9 +620,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -719,7 +708,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 4 -->
 <section id="binary-subtractor" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">4</span> الطارح الثنائي والجامع-الطارح</h2></template>
@@ -728,9 +717,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -753,76 +742,76 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A 4-bit Adder-Subtractor circuit. Show 4 Full Adders. A mode control line 'M' goes to the C0 input of the first FA, and also to one input of 4 XOR gates. The other inputs to the XOR gates are B0, B1, B2, B3. The outputs of the XOR gates go into the B inputs of the FAs. A0-A3 go directly into the A inputs of the FAs. Style: educational, dark background #0d1117, accent color #ffcc00, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="4">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Arrowhead Marker -->
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
         </marker>
-        
+        <!-- Dot Marker for Junctions -->
         <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
             <circle cx="5" cy="5" r="3" fill="var(--brand-500)"/>
         </marker>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Title -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" text-anchor="middle">
         <text x="450" y="35" font-size="22" font-weight="bold" fill="var(--text-primary)">4-bit Adder-Subtractor Circuit / دارة جمع وطرح 4 بت</text>
     </g>
 
-    
+    <!-- Grouping Box for XORs (1's Complement) -->
     <rect x="110" y="115" width="680" height="80" rx="8" fill="none" stroke="var(--brand-400)" stroke-dasharray="6,4" opacity="0.4"/>
     <text x="450" y="135" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">Conditional Inversion (1's Complement when M=1) / عاكس مشروط (المتمم الأحادي عندما M=1)</text>
 
-    
+    <!-- Wires and Connections -->
     <g stroke="var(--brand-500)" stroke-width="2" fill="none">
-        
+        <!-- Mode (M) Line -->
         <path d="M 850,85 L 850,100 L 140,100" />
         <path d="M 140,100 L 140,124" marker-end="url(#arrow)"/>
         <path d="M 340,100 L 340,124" marker-end="url(#arrow)"/>
         <path d="M 540,100 L 540,124" marker-end="url(#arrow)"/>
         <path d="M 740,100 L 740,124" marker-end="url(#arrow)"/>
         
-        
+        <!-- M to FA0 Cin (for 2's Complement +1) -->
         <path d="M 850,100 L 850,300 L 776,300" marker-end="url(#arrow)"/>
 
-        
+        <!-- B Inputs -->
         <path d="M 760,70 L 760,124" marker-end="url(#arrow)"/>
         <path d="M 560,70 L 560,124" marker-end="url(#arrow)"/>
         <path d="M 360,70 L 360,124" marker-end="url(#arrow)"/>
         <path d="M 160,70 L 160,124" marker-end="url(#arrow)"/>
 
-        
+        <!-- XOR Outputs to FA B-inputs -->
         <path d="M 750,175 L 750,254" marker-end="url(#arrow)"/>
         <path d="M 550,175 L 550,254" marker-end="url(#arrow)"/>
         <path d="M 350,175 L 350,254" marker-end="url(#arrow)"/>
         <path d="M 150,175 L 150,254" marker-end="url(#arrow)"/>
 
-        
+        <!-- A Inputs to FA A-inputs -->
         <path d="M 710,220 L 710,254" marker-end="url(#arrow)"/>
         <path d="M 510,220 L 510,254" marker-end="url(#arrow)"/>
         <path d="M 310,220 L 310,254" marker-end="url(#arrow)"/>
         <path d="M 110,220 L 110,254" marker-end="url(#arrow)"/>
 
-        
+        <!-- Carry Lines (Right to Left) -->
         <path d="M 690,300 L 576,300" marker-end="url(#arrow)"/>
         <path d="M 490,300 L 376,300" marker-end="url(#arrow)"/>
         <path d="M 290,300 L 176,300" marker-end="url(#arrow)"/>
         <path d="M 90,300 L 46,300" marker-end="url(#arrow)"/>
 
-        
+        <!-- Sum Outputs -->
         <path d="M 730,340 L 730,414" marker-end="url(#arrow)"/>
         <path d="M 530,340 L 530,414" marker-end="url(#arrow)"/>
         <path d="M 330,340 L 330,414" marker-end="url(#arrow)"/>
         <path d="M 130,340 L 130,414" marker-end="url(#arrow)"/>
     </g>
 
-    
+    <!-- Junction Dots -->
     <g fill="var(--brand-500)">
         <circle cx="850" cy="100" r="4"/>
         <circle cx="740" cy="100" r="4"/>
@@ -830,37 +819,37 @@
         <circle cx="340" cy="100" r="4"/>
     </g>
 
-    
+    <!-- Components -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
         
-        
-        
+        <!-- XOR Gates -->
+        <!-- XOR 0 -->
         <g transform="translate(750, 150)">
             <path d="M -20,-20 Q 0,-5 20,-20 Q 20,10 0,25 Q -20,10 -20,-20 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <path d="M -20,-26 Q 0,-11 20,-26" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="5" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">XOR</text>
         </g>
-        
+        <!-- XOR 1 -->
         <g transform="translate(550, 150)">
             <path d="M -20,-20 Q 0,-5 20,-20 Q 20,10 0,25 Q -20,10 -20,-20 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <path d="M -20,-26 Q 0,-11 20,-26" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="5" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">XOR</text>
         </g>
-        
+        <!-- XOR 2 -->
         <g transform="translate(350, 150)">
             <path d="M -20,-20 Q 0,-5 20,-20 Q 20,10 0,25 Q -20,10 -20,-20 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <path d="M -20,-26 Q 0,-11 20,-26" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="5" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">XOR</text>
         </g>
-        
+        <!-- XOR 3 -->
         <g transform="translate(150, 150)">
             <path d="M -20,-20 Q 0,-5 20,-20 Q 20,10 0,25 Q -20,10 -20,-20 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <path d="M -20,-26 Q 0,-11 20,-26" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="5" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">XOR</text>
         </g>
 
-        
-        
+        <!-- Full Adders -->
+        <!-- FA 0 (LSB) -->
         <g transform="translate(730, 300)">
             <rect x="-40" y="-40" width="80" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="-5" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA0</text>
@@ -871,7 +860,7 @@
             <text x="-20" y="4" font-size="13" fill="var(--text-muted)" text-anchor="middle">Cout</text>
             <text x="0" y="34" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
         </g>
-        
+        <!-- FA 1 -->
         <g transform="translate(530, 300)">
             <rect x="-40" y="-40" width="80" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="-5" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA1</text>
@@ -882,7 +871,7 @@
             <text x="-20" y="4" font-size="13" fill="var(--text-muted)" text-anchor="middle">Cout</text>
             <text x="0" y="34" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
         </g>
-        
+        <!-- FA 2 -->
         <g transform="translate(330, 300)">
             <rect x="-40" y="-40" width="80" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="-5" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA2</text>
@@ -893,7 +882,7 @@
             <text x="-20" y="4" font-size="13" fill="var(--text-muted)" text-anchor="middle">Cout</text>
             <text x="0" y="34" font-size="13" fill="var(--text-muted)" text-anchor="middle">S</text>
         </g>
-        
+        <!-- FA 3 (MSB) -->
         <g transform="translate(130, 300)">
             <rect x="-40" y="-40" width="80" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="-5" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">FA3</text>
@@ -906,45 +895,45 @@
         </g>
     </g>
 
-    
+    <!-- External Labels -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" text-anchor="middle">
         
-        
+        <!-- Mode Input -->
         <text x="850" y="45" font-size="18" font-weight="bold" fill="var(--text-primary)">M</text>
         <text x="850" y="65" font-size="14" fill="var(--text-secondary)">Mode / الوضع</text>
         <text x="850" y="82" font-size="13" fill="var(--text-muted)">0=Add, 1=Sub</text>
 
-        
+        <!-- B Inputs -->
         <text x="760" y="60" font-size="18" font-weight="bold" fill="var(--text-primary)">B0</text>
         <text x="560" y="60" font-size="18" font-weight="bold" fill="var(--text-primary)">B1</text>
         <text x="360" y="60" font-size="18" font-weight="bold" fill="var(--text-primary)">B2</text>
         <text x="160" y="60" font-size="18" font-weight="bold" fill="var(--text-primary)">B3</text>
 
-        
+        <!-- A Inputs -->
         <text x="710" y="210" font-size="18" font-weight="bold" fill="var(--text-primary)">A0</text>
         <text x="510" y="210" font-size="18" font-weight="bold" fill="var(--text-primary)">A1</text>
         <text x="310" y="210" font-size="18" font-weight="bold" fill="var(--text-primary)">A2</text>
         <text x="110" y="210" font-size="18" font-weight="bold" fill="var(--text-primary)">A3</text>
 
-        
+        <!-- Sum Outputs -->
         <text x="730" y="440" font-size="18" font-weight="bold" fill="var(--text-primary)">S0</text>
         <text x="530" y="440" font-size="18" font-weight="bold" fill="var(--text-primary)">S1</text>
         <text x="330" y="440" font-size="18" font-weight="bold" fill="var(--text-primary)">S2</text>
         <text x="130" y="440" font-size="18" font-weight="bold" fill="var(--text-primary)">S3</text>
         <text x="430" y="475" font-size="16" fill="var(--text-secondary)">Sum Outputs / مخارج المجموع</text>
 
-        
+        <!-- Carry Out -->
         <text x="25" y="295" font-size="18" font-weight="bold" fill="var(--text-primary)">C4</text>
         <text x="25" y="315" font-size="13" fill="var(--text-secondary)">Carry Out</text>
         <text x="25" y="330" font-size="13" fill="var(--text-secondary)">حمل الخروج</text>
 
-        
+        <!-- Internal Carry Labels -->
         <text x="630" y="290" font-size="14" font-weight="bold" fill="var(--text-muted)">C1</text>
         <text x="430" y="290" font-size="14" font-weight="bold" fill="var(--text-muted)">C2</text>
         <text x="230" y="290" font-size="14" font-weight="bold" fill="var(--text-muted)">C3</text>
         <text x="810" y="290" font-size="14" font-weight="bold" fill="var(--text-muted)">C0</text>
 
-        
+        <!-- Educational Note for 2's Complement -->
         <text x="810" y="320" font-size="13" fill="var(--brand-500)">+1 for 2's Comp</text>
         <text x="810" y="338" font-size="13" fill="var(--brand-500)">للمتمم الثنائي</text>
     </g>
@@ -965,7 +954,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 5 -->
 <section id="decimal-bcd-adder" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">5</span> الجامع العشري (BCD Adder)</h2></template>
@@ -974,9 +963,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1008,36 +997,36 @@
     <div class="math-block">$$C = K + Z_8 Z_4 + Z_8 Z_2$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Block diagram of a BCD Adder. Top block is a '4-bit binary adder' taking Augend and Addend, outputting Z8, Z4, Z2, Z1 and Carry out K. Logic gates (two ANDs, one OR) compute the correction signal C = K + Z8Z4 + Z8Z2. The signal C goes to the output carry and also feeds into the middle two bits of a second '4-bit binary adder' (adding 0110 when C=1). The second adder outputs the final BCD sum S8, S4, S2, S1. Style: educational, dark background #0d1117, accent color #00ffcc, viewBox 0 0 800 500, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="3">
 <svg viewBox="0 0 840 720" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
     </marker>
-    
+    <!-- Junction Dot Marker -->
     <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
       <circle cx="5" cy="5" r="3" fill="var(--brand-500)" />
     </marker>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Title -->
   <text x="420" y="40" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">BCD Adder / جامع BCD</text>
 
+  <!-- ========================================== -->
+  <!-- ADDER 1 (TOP)                              -->
+  <!-- ========================================== -->
   
-  
-  
-  
-  
+  <!-- Adder 1 Block -->
   <rect x="220" y="100" width="380" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   <text x="410" y="135" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">4-bit Binary Adder</text>
   <text x="410" y="160" font-size="15" text-anchor="middle" fill="var(--text-secondary)">جامع ثنائي 4-بت</text>
 
-  
+  <!-- Adder 1 Inputs (Augend & Addend) -->
   <path d="M 320 60 L 320 100" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 315 85 L 325 75" fill="none" stroke="var(--brand-500)" stroke-width="2" />
   <text x="305" y="75" font-size="13" fill="var(--text-primary)">4</text>
@@ -1050,7 +1039,7 @@
   <text x="480" y="30" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Addend</text>
   <text x="480" y="50" font-size="13" text-anchor="middle" fill="var(--text-secondary)">المضاف</text>
 
-  
+  <!-- Adder 1 Outputs (Z8, Z4, Z2, Z1) -->
   <path d="M 280 180 L 280 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 320 180 L 320 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 360 180 L 360 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
@@ -1061,54 +1050,54 @@
   <text x="345" y="200" font-size="14" font-weight="bold" fill="var(--text-primary)">Z2</text>
   <text x="385" y="200" font-size="14" font-weight="bold" fill="var(--text-primary)">Z1</text>
 
-  
+  <!-- Adder 1 Carry Out (K) -->
   <path d="M 600 140 L 690 140 L 690 260 L 725 260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="615" y="130" font-size="15" font-weight="bold" fill="var(--brand-500)">K</text>
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- CORRECTION LOGIC                           -->
+  <!-- ========================================== -->
 
-  
+  <!-- Logic Grouping Box -->
   <rect x="600" y="180" width="190" height="200" fill="none" stroke="var(--brand-400)" stroke-dasharray="6,4" rx="8" />
   <text x="695" y="170" font-size="14" text-anchor="middle" fill="var(--text-muted)">Correction Logic / منطق التصحيح</text>
   <text x="695" y="405" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">C = K + Z8·Z4 + Z8·Z2</text>
 
-  
+  <!-- Taps from Z outputs to Logic Gates -->
   <path d="M 280 230 L 620 230" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)" />
   <path d="M 320 250 L 620 250" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)" />
   
   <path d="M 280 310 L 620 310" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)" />
   <path d="M 360 330 L 620 330" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)" />
 
-  
+  <!-- AND Gate 1 (Z8 AND Z4) -->
   <path d="M 620 220 L 645 220 A 20 20 0 0 1 645 260 L 620 260 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   <path d="M 665 240 L 700 240 L 700 280 L 735 280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
 
-  
+  <!-- AND Gate 2 (Z8 AND Z2) -->
   <path d="M 620 300 L 645 300 A 20 20 0 0 1 645 340 L 620 340 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   <path d="M 665 320 L 690 320 L 690 300 L 725 300" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
 
-  
+  <!-- OR Gate (K OR AND1 OR AND2) -->
   <path d="M 720 250 Q 735 280 720 310 Q 750 310 770 280 Q 750 250 720 250 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   
-  
+  <!-- Correction Signal C Output & Routing -->
   <path d="M 770 280 L 800 280 L 800 620" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)" />
   <path d="M 770 280 L 770 430 L 500 430 L 500 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 540 430 L 540 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#dot)" marker-end="url(#arrow)" />
   
   <text x="785" y="270" font-size="16" font-weight="bold" fill="var(--brand-500)">C</text>
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- ADDER 2 (BOTTOM)                           -->
+  <!-- ========================================== -->
 
-  
+  <!-- Adder 2 Block -->
   <rect x="220" y="480" width="380" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
   <text x="410" y="515" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">4-bit Binary Adder</text>
   <text x="410" y="540" font-size="15" text-anchor="middle" fill="var(--text-secondary)">جامع ثنائي 4-بت</text>
 
-  
+  <!-- Adder 2 B Inputs (0, C, C, 0) -->
   <path d="M 460 450 L 460 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 580 450 L 580 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   
@@ -1120,7 +1109,7 @@
   <text x="520" y="400" font-size="13" text-anchor="middle" fill="var(--text-muted)">Add 0110 if C=1</text>
   <text x="520" y="415" font-size="13" text-anchor="middle" fill="var(--text-muted)">إضافة 0110 إذا كان C=1</text>
 
-  
+  <!-- Adder 2 Outputs (S8, S4, S2, S1) -->
   <path d="M 280 560 L 280 620" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 320 560 L 320 620" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <path d="M 360 560 L 360 620" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
@@ -1131,11 +1120,11 @@
   <text x="360" y="640" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">S2</text>
   <text x="400" y="640" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">S1</text>
 
-  
+  <!-- BCD Sum Bracket -->
   <path d="M 270 655 L 270 665 L 410 665 L 410 655" fill="none" stroke="var(--text-muted)" stroke-width="2" />
   <text x="340" y="685" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">BCD Sum / مجموع BCD</text>
 
-  
+  <!-- Final Carry Out Label -->
   <text x="800" y="640" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">C_out</text>
   <text x="800" y="660" font-size="13" text-anchor="middle" fill="var(--text-secondary)">Output Carry</text>
   <text x="800" y="680" font-size="13" text-anchor="middle" fill="var(--text-secondary)">الحمل النهائي</text>
@@ -1157,7 +1146,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 6 -->
 <section id="binary-multiplier" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">6</span> الضارب الثنائي (Binary Multiplier)</h2></template>
@@ -1166,9 +1155,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1191,48 +1180,48 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A 2-bit by 2-bit binary multiplier block diagram. Inputs A1, A0 and B1, B0. Four AND gates generate partial products: A0B0, A1B0, A0B1, A1B1. A0B0 goes directly to output C0. A1B0 and A0B1 go into a Half Adder (HA) producing output C1 and a carry. The carry and A1B1 go into another HA producing C2 and C3. Style: educational, dark background #0d1117, accent color #ff00cc, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="2">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Arrowhead Marker -->
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
         </marker>
         
-        
+        <!-- AND Gate Symbol Path -->
         <g id="and-gate">
             <path d="M -20 -20 L 20 -20 L 20 0 A 20 20 0 0 1 -20 0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
             <text x="0" y="-2" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, sans-serif">&amp;</text>
         </g>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Title -->
     <text x="400" y="30" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', sans-serif">2-bit Binary Multiplier / ضارب ثنائي 2-بت</text>
 
-    
+    <!-- Input Buses -->
     <g id="input-buses">
-        
+        <!-- Lines -->
         <line x1="100" y1="60" x2="700" y2="60" stroke="var(--text-muted)" stroke-width="1.5"/>
         <line x1="100" y1="75" x2="700" y2="75" stroke="var(--text-muted)" stroke-width="1.5"/>
         <line x1="100" y1="90" x2="700" y2="90" stroke="var(--text-muted)" stroke-width="1.5"/>
         <line x1="100" y1="105" x2="700" y2="105" stroke="var(--text-muted)" stroke-width="1.5"/>
         
-        
+        <!-- Labels -->
         <text x="90" y="65" text-anchor="end" fill="var(--text-primary)" font-weight="bold" font-size="14" font-family="system-ui, sans-serif">A₁</text>
         <text x="90" y="80" text-anchor="end" fill="var(--text-primary)" font-weight="bold" font-size="14" font-family="system-ui, sans-serif">A₀</text>
         <text x="90" y="95" text-anchor="end" fill="var(--text-primary)" font-weight="bold" font-size="14" font-family="system-ui, sans-serif">B₁</text>
         <text x="90" y="110" text-anchor="end" fill="var(--text-primary)" font-weight="bold" font-size="14" font-family="system-ui, sans-serif">B₀</text>
     </g>
 
-    
+    <!-- Stage 1: Partial Products Generation -->
     <rect x="160" y="130" width="530" height="90" fill="none" stroke="var(--brand-400)" stroke-dasharray="5,5" rx="8"/>
     <text x="680" y="145" text-anchor="end" fill="var(--text-muted)" font-size="13" font-family="system-ui, 'Cairo', sans-serif">Partial Products / النواتج الجزئية</text>
 
-    
+    <!-- AND Gate 3 (A1 & B1) -->
     <g id="gate-a1b1">
         <circle cx="190" cy="60" r="3" fill="var(--text-primary)"/>
         <line x1="190" y1="60" x2="190" y2="140" stroke="var(--brand-500)" stroke-width="1.5"/>
@@ -1242,7 +1231,7 @@
         <text x="230" y="195" text-anchor="start" fill="var(--text-secondary)" font-size="14" font-family="system-ui, sans-serif">A₁B₁</text>
     </g>
 
-    
+    <!-- AND Gate 2 (A0 & B1) -->
     <g id="gate-a0b1">
         <circle cx="340" cy="75" r="3" fill="var(--text-primary)"/>
         <line x1="340" y1="75" x2="340" y2="140" stroke="var(--brand-500)" stroke-width="1.5"/>
@@ -1252,7 +1241,7 @@
         <text x="380" y="195" text-anchor="start" fill="var(--text-secondary)" font-size="14" font-family="system-ui, sans-serif">A₀B₁</text>
     </g>
 
-    
+    <!-- AND Gate 1 (A1 & B0) -->
     <g id="gate-a1b0">
         <circle cx="490" cy="60" r="3" fill="var(--text-primary)"/>
         <line x1="490" y1="60" x2="490" y2="140" stroke="var(--brand-500)" stroke-width="1.5"/>
@@ -1262,7 +1251,7 @@
         <text x="530" y="195" text-anchor="start" fill="var(--text-secondary)" font-size="14" font-family="system-ui, sans-serif">A₁B₀</text>
     </g>
 
-    
+    <!-- AND Gate 0 (A0 & B0) -->
     <g id="gate-a0b0">
         <circle cx="640" cy="75" r="3" fill="var(--text-primary)"/>
         <line x1="640" y1="75" x2="640" y2="140" stroke="var(--brand-500)" stroke-width="1.5"/>
@@ -1272,15 +1261,15 @@
         <text x="680" y="195" text-anchor="start" fill="var(--text-secondary)" font-size="14" font-family="system-ui, sans-serif">A₀B₀</text>
     </g>
 
-    
+    <!-- Stage 2: Addition Stage -->
     <rect x="260" y="240" width="280" height="190" fill="none" stroke="var(--brand-400)" stroke-dasharray="5,5" rx="8"/>
     <text x="530" y="255" text-anchor="end" fill="var(--text-muted)" font-size="13" font-family="system-ui, 'Cairo', sans-serif">Addition Stage / مرحلة الجمع</text>
 
-    
+    <!-- Routing to HA1 -->
     <path d="M 350 180 L 350 220 L 460 220 L 460 260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <line x1="500" y1="180" x2="500" y2="260" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
 
-    
+    <!-- Half Adder 1 -->
     <g id="ha1" transform="translate(440, 260)">
         <rect x="0" y="0" width="80" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
         <text x="40" y="25" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, sans-serif">HA</text>
@@ -1289,11 +1278,11 @@
         <text x="60" y="55" text-anchor="middle" fill="var(--brand-500)" font-size="13" font-weight="bold" font-family="system-ui, sans-serif">S</text>
     </g>
 
-    
+    <!-- Routing to HA2 -->
     <path d="M 460 320 L 460 340 L 350 340 L 350 360" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 200 180 L 200 320 L 310 320 L 310 360" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
 
-    
+    <!-- Half Adder 2 -->
     <g id="ha2" transform="translate(290, 360)">
         <rect x="0" y="0" width="80" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
         <text x="40" y="25" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, sans-serif">HA</text>
@@ -1302,33 +1291,33 @@
         <text x="60" y="55" text-anchor="middle" fill="var(--brand-500)" font-size="13" font-weight="bold" font-family="system-ui, sans-serif">S</text>
     </g>
 
-    
+    <!-- Final Outputs Routing -->
     <line x1="650" y1="180" x2="650" y2="480" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <line x1="500" y1="320" x2="500" y2="480" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <line x1="350" y1="420" x2="350" y2="480" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 310 420 L 310 450 L 200 450 L 200 480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
 
-    
+    <!-- Output Labels -->
     <g id="outputs" font-family="system-ui, sans-serif">
-        
+        <!-- C0 -->
         <g transform="translate(650, 495)">
             <rect x="-25" y="-15" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
             <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16">C₀</text>
             <text x="0" y="35" text-anchor="middle" fill="var(--text-muted)" font-size="13">2⁰ (1)</text>
         </g>
-        
+        <!-- C1 -->
         <g transform="translate(500, 495)">
             <rect x="-25" y="-15" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
             <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16">C₁</text>
             <text x="0" y="35" text-anchor="middle" fill="var(--text-muted)" font-size="13">2¹ (2)</text>
         </g>
-        
+        <!-- C2 -->
         <g transform="translate(350, 495)">
             <rect x="-25" y="-15" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
             <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16">C₂</text>
             <text x="0" y="35" text-anchor="middle" fill="var(--text-muted)" font-size="13">2² (4)</text>
         </g>
-        
+        <!-- C3 -->
         <g transform="translate(200, 495)">
             <rect x="-25" y="-15" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
             <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="16">C₃</text>
@@ -1336,7 +1325,7 @@
         </g>
     </g>
 
-    
+    <!-- Educational Math Block (Bottom Right) -->
     <g id="math-logic" transform="translate(590, 280)" font-family="system-ui, sans-serif">
         <rect x="0" y="0" width="160" height="170" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
         <text x="80" y="25" text-anchor="middle" fill="var(--text-secondary)" font-size="13" font-weight="bold" font-family="system-ui, 'Cairo', sans-serif">Logic / منطق الضرب</text>
@@ -1382,7 +1371,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 7 -->
 <section id="magnitude-comparator" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">7</span> مقارن المقدار (Magnitude Comparator)</h2></template>
@@ -1391,9 +1380,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1425,85 +1414,85 @@
     <div class="math-block">$$x_i = A_i B_i + A_i' B_i' \quad \text{and} \quad (A=B) = x_3 x_2 x_1 x_0$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Logic diagram of a 4-bit Magnitude Comparator. Show inputs A3, B3 down to A0, B0. Each pair goes into an XNOR gate (producing x3, x2, x1, x0). All xi go into a 4-input AND gate for the (A=B) output. Additional AND/OR logic generates the (A>B) and (A<B) outputs based on the sequential comparison logic. Style: educational, dark background #0d1117, accent color #00ffcc, viewBox 0 0 800 500, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 950" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrow Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
     </marker>
 
-    
-    
+    <!-- Logic Gates -->
+    <!-- 2-Input AND Gate (40x40) -->
     <g id="and2">
       <path d="M 0,0 L 20,0 A 20,20 0 0,1 20,40 L 0,40 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
     </g>
     
-    
+    <!-- 3-Input AND Gate (40x40) -->
     <g id="and3">
       <use href="#and2"/>
     </g>
     
-    
+    <!-- 4-Input AND Gate (40x40) -->
     <g id="and4">
       <use href="#and2"/>
     </g>
 
-    
+    <!-- 4-Input AND Gate Large (30x80) -->
     <g id="and4_large">
       <path d="M 0,0 L 30,0 A 40,40 0 0,1 30,80 L 0,80 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
     </g>
 
-    
+    <!-- 4-Input OR Gate Large (50x80) -->
     <g id="or4_large">
       <path d="M 0,0 Q 30,0 50,40 Q 30,80 0,80 Q 20,40 0,0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
     </g>
 
-    
+    <!-- XNOR Gate (48x40) -->
     <g id="xnor">
       <path d="M 6,0 Q 25,0 40,20 Q 25,40 6,40 Q 16,20 6,0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
       <path d="M 0,0 Q 10,20 0,40" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
       <circle cx="44" cy="20" r="4" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
     </g>
 
-    
+    <!-- Inversion Bubble -->
     <g id="bubble">
       <circle cx="0" cy="0" r="4" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
     </g>
 
-    
+    <!-- Connection Dot -->
     <g id="dot">
       <circle cx="0" cy="0" r="3" fill="var(--text-primary)"/>
     </g>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-  
+  <!-- Stage Bounding Boxes -->
   <g fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.5">
     <rect x="110" y="70" width="180" height="800" rx="8"/>
     <rect x="460" y="270" width="100" height="600" rx="8"/>
     <rect x="690" y="190" width="200" height="530" rx="8"/>
   </g>
 
-  
+  <!-- Stage Labels -->
   <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">
     <text x="200" y="60">1-Bit Comparisons (مقارنات 1-بت)</text>
     <text x="510" y="260">Cascading Logic (منطق متسلسل)</text>
     <text x="790" y="180">Final Output (الناتج النهائي)</text>
   </g>
 
-  
+  <!-- Title -->
   <text x="550" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
     4-Bit Magnitude Comparator Logic Diagram / مخطط منطقي لمقارن مقدار 4 بت
   </text>
 
-  
+  <!-- Wires -->
   <g fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
     
-    
+    <!-- Inputs Bit 3 -->
     <path d="M 50,170 L 200,170"/>
     <path d="M 130,170 L 130,110 L 200,110"/>
     <path d="M 150,170 L 150,230 L 196,230"/>
@@ -1511,7 +1500,7 @@
     <path d="M 140,190 L 140,130 L 196,130"/>
     <path d="M 160,190 L 160,250 L 200,250"/>
 
-    
+    <!-- Inputs Bit 2 -->
     <path d="M 50,370 L 200,370"/>
     <path d="M 130,370 L 130,310 L 200,310"/>
     <path d="M 150,370 L 150,430 L 196,430"/>
@@ -1519,7 +1508,7 @@
     <path d="M 140,390 L 140,330 L 196,330"/>
     <path d="M 160,390 L 160,450 L 200,450"/>
 
-    
+    <!-- Inputs Bit 1 -->
     <path d="M 50,570 L 200,570"/>
     <path d="M 130,570 L 130,510 L 200,510"/>
     <path d="M 150,570 L 150,630 L 196,630"/>
@@ -1527,7 +1516,7 @@
     <path d="M 140,590 L 140,530 L 196,530"/>
     <path d="M 160,590 L 160,650 L 200,650"/>
 
-    
+    <!-- Inputs Bit 0 -->
     <path d="M 50,770 L 200,770"/>
     <path d="M 130,770 L 130,710 L 200,710"/>
     <path d="M 150,770 L 150,830 L 196,830"/>
@@ -1535,13 +1524,13 @@
     <path d="M 140,790 L 140,730 L 196,730"/>
     <path d="M 160,790 L 160,850 L 200,850"/>
 
-    
+    <!-- XNOR Outputs to Vertical Bus -->
     <path d="M 248,180 L 320,180 L 320,828" stroke="var(--brand-500)"/>
     <path d="M 248,380 L 340,380 L 340,836" stroke="var(--brand-500)"/>
     <path d="M 248,580 L 360,580 L 360,844" stroke="var(--brand-500)"/>
     <path d="M 248,780 L 380,780 L 380,490" stroke="var(--brand-500)"/>
 
-    
+    <!-- G and L Outputs to Combining Gates -->
     <path d="M 240,320 L 480,320 L 480,310 L 500,310"/>
     <path d="M 240,440 L 480,440 L 480,450 L 500,450"/>
     <path d="M 240,520 L 480,520 L 480,510 L 500,510"/>
@@ -1549,7 +1538,7 @@
     <path d="M 240,720 L 480,720 L 480,708 L 500,708"/>
     <path d="M 240,840 L 480,840 L 480,852 L 500,852"/>
 
-    
+    <!-- Bus Taps to Combining Gates -->
     <path d="M 320,330 L 500,330" stroke="var(--brand-500)"/>
     <path d="M 320,430 L 500,430" stroke="var(--brand-500)"/>
     <path d="M 320,520 L 500,520" stroke="var(--brand-500)"/>
@@ -1563,34 +1552,34 @@
     <path d="M 340,836 L 500,836" stroke="var(--brand-500)"/>
     <path d="M 360,844 L 500,844" stroke="var(--brand-500)"/>
 
-    
+    <!-- Bus Taps to A=B AND4 -->
     <path d="M 320,460 L 800,460" stroke="var(--brand-500)"/>
     <path d="M 340,470 L 800,470" stroke="var(--brand-500)"/>
     <path d="M 360,480 L 800,480" stroke="var(--brand-500)"/>
     <path d="M 380,490 L 800,490" stroke="var(--brand-500)"/>
 
-    
-    
+    <!-- Combining Gates to Final ORs -->
+    <!-- A > B Routing -->
     <path d="M 240,120 L 710,120 L 710,230 L 800,230"/>
     <path d="M 540,320 L 720,320 L 720,250 L 800,250"/>
     <path d="M 540,520 L 730,520 L 730,270 L 800,270"/>
     <path d="M 540,720 L 740,720 L 740,290 L 800,290"/>
     
-    
+    <!-- A < B Routing -->
     <path d="M 540,840 L 750,840 L 750,630 L 800,630"/>
     <path d="M 540,640 L 760,640 L 760,650 L 800,650"/>
     <path d="M 540,440 L 770,440 L 770,670 L 800,670"/>
     <path d="M 240,240 L 780,240 L 780,690 L 800,690"/>
 
-    
+    <!-- Final Outputs -->
     <path d="M 850,260 L 930,260" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
     <path d="M 870,460 L 930,460" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
     <path d="M 850,660 L 930,660" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
   </g>
 
-  
+  <!-- Connection Dots -->
   <g fill="var(--text-primary)">
-    
+    <!-- Input Taps -->
     <use href="#dot" x="130" y="170"/> <use href="#dot" x="150" y="170"/>
     <use href="#dot" x="140" y="190"/> <use href="#dot" x="160" y="190"/>
     <use href="#dot" x="130" y="370"/> <use href="#dot" x="150" y="370"/>
@@ -1600,7 +1589,7 @@
     <use href="#dot" x="130" y="770"/> <use href="#dot" x="150" y="770"/>
     <use href="#dot" x="140" y="790"/> <use href="#dot" x="160" y="790"/>
 
-    
+    <!-- Bus Taps -->
     <use href="#dot" x="320" y="330"/> <use href="#dot" x="320" y="430"/>
     <use href="#dot" x="320" y="460"/> <use href="#dot" x="320" y="520"/>
     <use href="#dot" x="320" y="630"/> <use href="#dot" x="320" y="716"/>
@@ -1616,37 +1605,37 @@
     <use href="#dot" x="380" y="490"/>
   </g>
 
-  
+  <!-- Gates -->
   <g>
-    
+    <!-- Bit 3 -->
     <use href="#and2" x="200" y="100"/>
     <use href="#bubble" x="196" y="130"/>
     <use href="#xnor" x="200" y="160"/>
     <use href="#and2" x="200" y="220"/>
     <use href="#bubble" x="196" y="230"/>
 
-    
+    <!-- Bit 2 -->
     <use href="#and2" x="200" y="300"/>
     <use href="#bubble" x="196" y="330"/>
     <use href="#xnor" x="200" y="360"/>
     <use href="#and2" x="200" y="420"/>
     <use href="#bubble" x="196" y="430"/>
 
-    
+    <!-- Bit 1 -->
     <use href="#and2" x="200" y="500"/>
     <use href="#bubble" x="196" y="530"/>
     <use href="#xnor" x="200" y="560"/>
     <use href="#and2" x="200" y="620"/>
     <use href="#bubble" x="196" y="630"/>
 
-    
+    <!-- Bit 0 -->
     <use href="#and2" x="200" y="700"/>
     <use href="#bubble" x="196" y="730"/>
     <use href="#xnor" x="200" y="760"/>
     <use href="#and2" x="200" y="820"/>
     <use href="#bubble" x="196" y="830"/>
 
-    
+    <!-- Combining Gates -->
     <use href="#and2" x="500" y="300"/>
     <use href="#and2" x="500" y="420"/>
     <use href="#and3" x="500" y="500"/>
@@ -1654,16 +1643,16 @@
     <use href="#and4" x="500" y="700"/>
     <use href="#and4" x="500" y="820"/>
 
-    
+    <!-- Final Gates -->
     <use href="#or4_large" x="800" y="220"/>
     <use href="#and4_large" x="800" y="420"/>
     <use href="#or4_large" x="800" y="620"/>
   </g>
 
-  
+  <!-- Labels -->
   <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" fill="var(--text-primary)">
     
-    
+    <!-- Input Labels -->
     <g font-size="16" font-weight="bold" text-anchor="end">
       <text x="40" y="175">A<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
       <text x="40" y="195">B<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
@@ -1675,7 +1664,7 @@
       <text x="40" y="795">B<tspan baseline-shift="sub" font-size="0.7em">0</tspan></text>
     </g>
 
-    
+    <!-- Intermediate Signal Labels -->
     <g font-size="14" fill="var(--text-secondary)" text-anchor="start">
       <text x="250" y="115">G<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
       <text x="250" y="255">L<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
@@ -1687,7 +1676,7 @@
       <text x="250" y="855">L<tspan baseline-shift="sub" font-size="0.7em">0</tspan></text>
     </g>
 
-    
+    <!-- Bus Labels -->
     <g font-size="15" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">
       <text x="320" y="165">x<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
       <text x="340" y="365">x<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
@@ -1695,14 +1684,14 @@
       <text x="380" y="765">x<tspan baseline-shift="sub" font-size="0.7em">0</tspan></text>
     </g>
 
-    
+    <!-- Output Labels -->
     <g font-size="18" font-weight="bold" text-anchor="start">
       <text x="945" y="255">(A &gt; B)</text>
       <text x="945" y="455">(A = B)</text>
       <text x="945" y="655">(A &lt; B)</text>
     </g>
 
-    
+    <!-- Arabic Output Labels -->
     <g font-size="15" fill="var(--text-secondary)" text-anchor="start">
       <text x="945" y="280">أ أكبر من ب</text>
       <text x="945" y="480">أ يساوي ب</text>
@@ -1728,7 +1717,7 @@
 
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
-    <span class="professor-icon">🎓</span>
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
@@ -1739,7 +1728,7 @@
 </section>
 
 <section id="ask-professor" class="fade-up section-gap">
-  <h2 data-i18n="ask.title">❓ اسأل البروفيسور</h2>
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
   <div class="accordion">
     <div class="accordion-item">
       <button class="accordion-trigger">
@@ -1915,7 +1904,7 @@
 </section>
 
 <section id="flashcards" class="flashcard-section fade-up">
-  <h2 data-i18n="fc.title">البطاقات التعليمية</h2>
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
   <div id="fc-container"></div>
 </section>
 <script type="application/json" id="flashcard-data">
@@ -2179,16 +2168,16 @@
 </script>
 
 <section id="quiz" class="quiz-section fade-up">
-  <h2 data-i18n="quiz.title">اختبر نفسك</h2>
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
       <span id="quiz-counter">1 / 10</span>
-      <span>🎯 <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
     <div class="quiz-options" id="quiz-options-container"></div>
-    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()" data-i18n="quiz.hint">💡 تلميح</button>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
     <div class="quiz-feedback hidden" id="quiz-feedback"></div>
     <div class="quiz-nav">
       <div></div>
@@ -2198,7 +2187,7 @@
     </div>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
-    <div class="score-emoji" id="quiz-score-emoji">🏆</div>
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
     <div class="score-display" id="quiz-score-display">0 / 10</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
@@ -2529,9 +2518,9 @@
 </script>
 
 <section id="vault" class="vault-section glass-card fade-up">
-  <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ / Trap</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الاعتقاد بأن الجامع الكامل (Full Adder) يجمع رقمين فقط. في الواقع، هو يجمع ثلاثة بتات: بت من الرقم الأول، بت من الرقم الثاني، وبت الحمل (Carry-in) من المرحلة السابقة.</template>
       <template class="content-en">Thinking a Full Adder only adds two numbers. In reality, it adds THREE bits: one from A, one from B, and the Carry-in from the previous stage.</template>
@@ -2539,7 +2528,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 سر / Secret</div>
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
       <template class="content-ar">بوابة XOR في دائرة الجامع-الطارح تعمل كـ 'عاكس قابل للبرمجة'. إذا كان التحكم 0، تمرر الإشارة كما هي. إذا كان 1، تعكسها، مما يسهل إيجاد المتمم الأول بدون عتاد إضافي.</template>
       <template class="content-en">The XOR gate in an Adder-Subtractor acts as a 'programmable inverter'. If control is 0, it passes the signal. If 1, it inverts it, easily creating the 1's complement without extra hardware.</template>
@@ -2547,7 +2536,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي / Key Concept</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">منطق استباق الحمل (Carry Lookahead) يحل مشكلة التأخير الزمني عن طريق حساب جميع الحمولات بشكل متوازٍ باستخدام معادلتي التوليد (Generate) والتمرير (Propagate)، بدلاً من انتظار انتشارها.</template>
       <template class="content-en">Carry Lookahead logic solves the delay problem by computing all carries in parallel using Generate and Propagate equations, rather than waiting for them to ripple through.</template>
@@ -2555,7 +2544,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ / Trap</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">نسيان إضافة 1 عند إجراء عملية الطرح باستخدام المتمم الثاني. المتمم الثاني = المتمم الأول + 1. في العتاد، يتم إضافة هذا الـ 1 عن طريق جعل الحمل الابتدائي C0 = 1.</template>
       <template class="content-en">Forgetting to add 1 when performing 2's complement subtraction. 2's complement = 1's complement + 1. In hardware, this 1 is added by setting the initial carry C0 = 1.</template>
@@ -2563,7 +2552,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي / Key Concept</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">في الجامع العشري (BCD)، نضيف 0110 (6) لتصحيح النتيجة لأن نظام BCD يستخدم 10 حالات فقط من أصل 16 حالة ممكنة في 4 بتات. إضافة 6 تقفز فوق الحالات الست غير المستخدمة.</template>
       <template class="content-en">In a BCD Adder, we add 0110 (6) to correct the result because BCD uses only 10 out of 16 possible states in 4 bits. Adding 6 skips the 6 unused states.</template>
@@ -2581,14 +2570,15 @@
         <a href="M06.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
         <a href="M08.html" class="footer-link" data-i18n="nav.next">التالي</a>
-        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
+        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
       </div>
-      <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
     </div>
   </footer>
 </div>
 
 <script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
 <script src="../../shared/firebase-sync.js"></script>
 </body>
 </html>

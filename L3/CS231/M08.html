@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="7">
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="8">
 <head>
-  
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المنطق التوافقي (الجزء الثاني): مفككات التشفير، المشفرات، والمجمعات · CS231 · الحديقة الرقمية</title>
 
-  
+  <!-- Anti-flash: MUST be first script -->
   <script>
     (function(){
       var t=localStorage.getItem('garden_theme')||'dark';
@@ -24,51 +24,40 @@
     })();
   </script>
 
+  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
+  <script src="../../shared/subject-tint.js"></script>
   <link rel="stylesheet" href="../../shared/garden.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/all.min.css">
 
-  
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
   <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#a78bfa">
+  <!-- /data-garden-icons -->
 </head>
-<body>
+<body data-page-title="CS231" data-page-title-en="CS231">
 
 <div class="reading-progress"></div>
 <div class="page-layout">
 
-<header class="site-header">
-  <div class="header-inner">
-    <nav class="header-nav">
-      <a href="index.html" class="nav-btn nav-btn--icon" title="Home"><i class="fa-solid fa-house"></i></a>
-      <a href="M07.html" class="nav-btn">
-        <i class="fa-solid fa-arrow-right"></i>
-        <span data-i18n="nav.prev">السابق</span>
-      </a>
-    </nav>
-    <div class="header-center">
-      <div class="subject-icon"><i class="fa-solid fa-microchip"></i></div>
-      <span class="module-badge font-display">MOD 8</span>
-      <span class="subject-name">CS231</span>
-    </div>
-    <div class="header-actions">
-      <a href="M09.html" class="nav-btn">
-        <span data-i18n="nav.next">التالي</span>
-        <i class="fa-solid fa-arrow-left"></i>
-      </a>
-      <div class="divider-v"></div>
-      <button class="toggle-btn" onclick="Garden.toggleLanguage()"><span id="lang-label">AR</span></button>
-      <button class="toggle-btn" onclick="Garden.cycleTheme()"><span id="theme-icon">🌙</span></button>
-    </div>
-  </div>
-</header>
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=CS231"></header>
 
 <div class="content-wrapper">
   <aside class="sidebar">
     <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
     <nav class="toc-list">
-      
+      <!-- Fixed links -->
       <a href="#hero" class="toc-link" data-bilingual>
         <template class="content-ar">مقدمة الوحدة</template>
         <template class="content-en">Module Intro</template>
@@ -80,7 +69,7 @@
         <span class="content-target">أهداف التعلم</span>
       </a>
 
-      
+      <!-- ONE PER CONCEPT from json.concepts[] -->
       <a href="#cpu-datapath-control" class="toc-link" data-bilingual>
         <template class="content-ar">مسار البيانات ووحدة التحكم في المعالج</template>
         <template class="content-en">CPU Datapath and Control Unit</template>
@@ -114,7 +103,7 @@
 
       <div class="toc-divider"></div>
 
-      
+      <!-- Fixed bottom links -->
       <a href="#professor" class="toc-link" data-bilingual>
         <template class="content-ar">حديث البروفيسور</template>
         <template class="content-en">Professor's Narrative</template>
@@ -184,7 +173,7 @@
 </section>
 
 <section id="objectives" class="objectives-card glass-card fade-up">
-  <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
       <li><span class="obj-icon">✦</span><span>فهم أساسيات مفككات التشفير (Decoders)، استخداماتها، وكيفية تصميمها.</span></li>
@@ -202,7 +191,7 @@
   </ul>
 </section>
 
-
+<!-- CONCEPT 1 -->
 <section id="cpu-datapath-control" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">1</span> مسار البيانات ووحدة التحكم في المعالج</h2></template>
@@ -211,9 +200,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -238,106 +227,106 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[6]: Detailed SVG generation prompt: A block diagram showing a CPU interacting with Memory and Input/Output. Inside the CPU, show two main blocks: 'Control Unit' and 'Datapath'. Arrows should indicate data/instructions flowing between Memory, I/O, and the CPU. A clock signal (square wave) should be shown feeding into the CPU. Style: educational, dark background #0d1117, accent colors blue and red, viewBox 0 0 800 400. -->
 <div class="svg-diagram" data-diagram-id="6">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Standard Arrowhead -->
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/>
         </marker>
-        
+        <!-- Muted/Secondary Arrowhead -->
         <marker id="arrow-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)"/>
         </marker>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Diagram Title -->
     <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">CPU Interaction with Memory and I/O</text>
     <text x="400" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-secondary)" text-anchor="middle">تفاعل وحدة المعالجة المركزية مع الذاكرة والإدخال/الإخراج</text>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- MAIN BLOCKS                                -->
+    <!-- ========================================== -->
 
-    
+    <!-- I/O Block -->
     <rect x="20" y="150" width="140" height="160" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
     <text x="90" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Input / Output</text>
     <text x="90" y="240" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">الإدخال / الإخراج</text>
 
-    
+    <!-- Memory Block -->
     <rect x="640" y="150" width="140" height="160" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
     <text x="710" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Memory</text>
     <text x="710" y="240" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">الذاكرة</text>
 
-    
+    <!-- CPU Boundary -->
     <rect x="250" y="100" width="300" height="250" rx="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="8 6"/>
     <text x="400" y="130" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Central Processing Unit (CPU)</text>
     <text x="400" y="150" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">وحدة المعالجة المركزية</text>
 
-    
+    <!-- CPU Internal: Control Unit -->
     <rect x="270" y="170" width="260" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
     <text x="400" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Control Unit</text>
     <text x="400" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">وحدة التحكم</text>
 
-    
+    <!-- CPU Internal: Datapath -->
     <rect x="270" y="270" width="260" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
     <text x="400" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Datapath (ALU &amp; Registers)</text>
     <text x="400" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">مسار البيانات</text>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- CONNECTIONS & ARROWS                       -->
+    <!-- ========================================== -->
 
-    
-    
+    <!-- I/O <-> CPU -->
+    <!-- Input to CPU -->
     <path d="M 160 190 L 240 190" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="205" y="182" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Input / إدخال</text>
     
-    
+    <!-- Output from CPU -->
     <path d="M 240 260 L 160 260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="205" y="252" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Output / إخراج</text>
 
-    
-    
+    <!-- CPU <-> Memory -->
+    <!-- Address (CPU -> Mem) -->
     <path d="M 550 170 L 630 170" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow-muted)"/>
     <text x="590" y="162" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Address / عنوان</text>
 
-    
+    <!-- Instructions (Mem -> CPU) -->
     <path d="M 630 210 L 550 210" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="590" y="202" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Instructions / تعليمات</text>
 
-    
+    <!-- Data Write (CPU -> Mem) -->
     <path d="M 550 250 L 630 250" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="590" y="242" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Data Write / كتابة</text>
 
-    
+    <!-- Data Read (Mem -> CPU) -->
     <path d="M 630 290 L 550 290" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="590" y="282" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle">Data Read / قراءة</text>
 
-    
-    
+    <!-- Internal CPU Connections -->
+    <!-- Control Signals (CU -> Datapath) -->
     <path d="M 360 235 L 360 265" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-muted)"/>
     <text x="350" y="254" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="end">Control / تحكم</text>
 
-    
+    <!-- Status Flags (Datapath -> CU) -->
     <path d="M 440 265 L 440 235" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-muted)"/>
     <text x="450" y="254" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="start">Status / حالة</text>
 
+    <!-- ========================================== -->
+    <!-- CLOCK SIGNAL                               -->
+    <!-- ========================================== -->
     
-    
-    
-    
-    
+    <!-- Clock Arrow -->
     <path d="M 400 415 L 400 360" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     
-    
+    <!-- Clock Square Wave Graphic -->
     <path d="M 360 440 L 370 440 L 370 420 L 390 420 L 390 440 L 410 440 L 410 420 L 430 420 L 430 440 L 440 440" fill="none" stroke="var(--brand-500)" stroke-width="3"/>
     
-    
+    <!-- Clock Labels -->
     <text x="400" y="465" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Clock Signal</text>
     <text x="400" y="485" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">إشارة الساعة</text>
 
@@ -358,7 +347,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 2 -->
 <section id="decoders" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">2</span> مفككات التشفير (Decoders)</h2></template>
@@ -367,9 +356,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -403,92 +392,92 @@
     <div class="math-block">$$Outputs = 2^n$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A schematic showing how to build a 3-to-8 decoder using two 2-to-4 decoders. Inputs A0 and A1 go to both 2-to-4 decoders. Input A2 goes through a NOT gate to the Enable of the top decoder, and directly to the Enable of the bottom decoder. The top decoder outputs D0-D3, and the bottom outputs D4-D7. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 500. -->
 <div class="svg-diagram" data-diagram-id="5">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M0,1 L8,5 L0,9 Z" fill="var(--brand-500)" />
     </marker>
-    
+    <!-- No inline style - use CSS variables only -->
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Title Section -->
   <g id="title">
     <text x="400" y="35" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">3-to-8 Decoder using two 2-to-4 Decoders</text>
     <text x="400" y="60" font-size="16" fill="var(--text-secondary)" text-anchor="middle">مفكك شفرة 3 إلى 8 باستخدام مفككي 2 إلى 4</text>
   </g>
 
-  
+  <!-- System Boundary (Dashed Box) -->
   <g id="boundary">
     <rect x="190" y="80" width="420" height="380" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,8" rx="12" />
     <text x="400" y="445" font-size="16" font-weight="bold" fill="var(--brand-400)" text-anchor="middle">3-to-8 Decoder (مفكك 3 إلى 8)</text>
   </g>
 
-  
+  <!-- Routing Lines (Paths) -->
   <g id="routing" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linejoin="round">
-    
+    <!-- A0 Routing -->
     <path d="M 100 230 L 380 230" />
     <path d="M 380 130 L 380 330" />
     <path d="M 380 130 L 412 130" marker-end="url(#arrow)" />
     <path d="M 380 330 L 412 330" marker-end="url(#arrow)" />
 
-    
+    <!-- A1 Routing -->
     <path d="M 100 270 L 340 270" />
     <path d="M 340 170 L 340 370" />
     <path d="M 340 170 L 412 170" marker-end="url(#arrow)" />
     <path d="M 340 370 L 412 370" marker-end="url(#arrow)" />
 
-    
+    <!-- A2 Routing -->
     <path d="M 100 310 L 220 310" />
     <path d="M 220 210 L 220 410" />
     
-    
+    <!-- A2 to Top Decoder (via NOT gate) -->
     <path d="M 220 210 L 242 210" marker-end="url(#arrow)" />
     <path d="M 290 210 L 412 210" marker-end="url(#arrow)" />
     
-    
+    <!-- A2 to Bottom Decoder (Direct) -->
     <path d="M 220 410 L 412 410" marker-end="url(#arrow)" />
 
-    
+    <!-- Output Lines Top Decoder -->
     <path d="M 580 120 L 642 120" marker-end="url(#arrow)" />
     <path d="M 580 150 L 642 150" marker-end="url(#arrow)" />
     <path d="M 580 180 L 642 180" marker-end="url(#arrow)" />
     <path d="M 580 210 L 642 210" marker-end="url(#arrow)" />
 
-    
+    <!-- Output Lines Bottom Decoder -->
     <path d="M 580 320 L 642 320" marker-end="url(#arrow)" />
     <path d="M 580 350 L 642 350" marker-end="url(#arrow)" />
     <path d="M 580 380 L 642 380" marker-end="url(#arrow)" />
     <path d="M 580 410 L 642 410" marker-end="url(#arrow)" />
   </g>
 
-  
+  <!-- Junction Dots -->
   <g id="junctions" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1.5">
     <circle cx="380" cy="230" r="4.5" />
     <circle cx="340" cy="270" r="4.5" />
     <circle cx="220" cy="310" r="4.5" />
   </g>
 
-  
+  <!-- NOT Gate -->
   <g id="not-gate">
     <polygon points="250,195 280,210 250,225" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
     <circle cx="285" cy="210" r="5" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
     <text x="265" y="185" font-size="13" fill="var(--text-muted)" text-anchor="middle">NOT</text>
   </g>
 
-  
+  <!-- Decoders -->
   <g id="decoders">
-    
+    <!-- Top Decoder -->
     <rect x="420" y="100" width="160" height="140" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
     <text x="500" y="160" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">2-to-4 Decoder</text>
     <text x="500" y="185" font-size="14" fill="var(--text-secondary)" text-anchor="middle">مفكك 2 إلى 4</text>
     
-    
+    <!-- Top Decoder Pins -->
     <text x="430" y="135" font-size="14" fill="var(--text-secondary)">I0</text>
     <text x="430" y="175" font-size="14" fill="var(--text-secondary)">I1</text>
     <text x="430" y="215" font-size="14" font-weight="bold" fill="var(--brand-400)">E</text>
@@ -498,12 +487,12 @@
     <text x="570" y="185" font-size="14" fill="var(--text-secondary)" text-anchor="end">O2</text>
     <text x="570" y="215" font-size="14" fill="var(--text-secondary)" text-anchor="end">O3</text>
 
-    
+    <!-- Bottom Decoder -->
     <rect x="420" y="300" width="160" height="140" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
     <text x="500" y="360" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">2-to-4 Decoder</text>
     <text x="500" y="385" font-size="14" fill="var(--text-secondary)" text-anchor="middle">مفكك 2 إلى 4</text>
     
-    
+    <!-- Bottom Decoder Pins -->
     <text x="430" y="335" font-size="14" fill="var(--text-secondary)">I0</text>
     <text x="430" y="375" font-size="14" fill="var(--text-secondary)">I1</text>
     <text x="430" y="415" font-size="14" font-weight="bold" fill="var(--brand-400)">E</text>
@@ -514,9 +503,9 @@
     <text x="570" y="415" font-size="14" fill="var(--text-secondary)" text-anchor="end">O3</text>
   </g>
 
-  
+  <!-- Global Inputs & Outputs Labels -->
   <g id="io-labels">
-    
+    <!-- Inputs -->
     <text x="90" y="235" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A0</text>
     <text x="90" y="215" font-size="13" fill="var(--text-muted)" text-anchor="end">(LSB)</text>
     
@@ -525,7 +514,7 @@
     <text x="90" y="315" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A2</text>
     <text x="90" y="335" font-size="13" fill="var(--text-muted)" text-anchor="end">(MSB)</text>
 
-    
+    <!-- Outputs -->
     <text x="655" y="125" font-size="16" font-weight="bold" fill="var(--text-primary)">D0</text>
     <text x="655" y="155" font-size="16" font-weight="bold" fill="var(--text-primary)">D1</text>
     <text x="655" y="185" font-size="16" font-weight="bold" fill="var(--text-primary)">D2</text>
@@ -553,7 +542,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 3 -->
 <section id="implementing-logic-decoders" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">3</span> تنفيذ الدوال المنطقية باستخدام مفككات التشفير</h2></template>
@@ -562,9 +551,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -598,30 +587,30 @@
     <div class="math-block">$$F(x,y,z) = \sum m(1,2,4,7)$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A 3-to-8 decoder with inputs x, y, z. Outputs D1, D2, D4, D7 are highlighted and connected to a 4-input OR gate to produce output 'S'. Outputs D3, D5, D6, D7 are connected to another 4-input OR gate to produce output 'C'. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 400. -->
 <div class="svg-diagram" data-diagram-id="4">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrowhead for logic lines -->
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 Z" fill="var(--brand-500)" />
     </marker>
     
-    
+    <!-- Arrowhead for inputs -->
     <marker id="arrow-input" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 Z" fill="var(--text-secondary)" />
     </marker>
 
-    
+    <!-- Junction Dot -->
     <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
       <circle cx="5" cy="5" r="3" fill="var(--brand-500)" />
     </marker>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Title and Subtitle -->
   <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">
     Full Adder using 3-to-8 Decoder
   </text>
@@ -629,30 +618,30 @@
     جامع كامل باستخدام مفكك شفرة 3 إلى 8
   </text>
 
-  
+  <!-- 3-to-8 Decoder Box -->
   <rect x="100" y="100" width="140" height="300" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
   
-  
+  <!-- Decoder Labels -->
   <text x="170" y="130" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">3-to-8 Decoder</text>
   <text x="170" y="385" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" fill="var(--text-secondary)">مفكك شفرة</text>
 
-  
-  
+  <!-- Decoder Inputs (Left Side) -->
+  <!-- x -->
   <path d="M 40,170 L 90,170" stroke="var(--text-secondary)" stroke-width="2" fill="none" marker-end="url(#arrow-input)" />
   <text x="25" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">x</text>
   <text x="115" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x</text>
   
-  
+  <!-- y -->
   <path d="M 40,245 L 90,245" stroke="var(--text-secondary)" stroke-width="2" fill="none" marker-end="url(#arrow-input)" />
   <text x="25" y="250" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">y</text>
   <text x="115" y="250" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">y</text>
   
-  
+  <!-- z -->
   <path d="M 40,320 L 90,320" stroke="var(--text-secondary)" stroke-width="2" fill="none" marker-end="url(#arrow-input)" />
   <text x="25" y="325" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">z</text>
   <text x="115" y="325" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">z</text>
 
-  
+  <!-- Decoder Outputs (Right Side) -->
   <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="end">
     <text x="230" y="130" fill="var(--text-muted)">D0</text>
     <text x="230" y="165" fill="var(--brand-500)">D1</text>
@@ -664,36 +653,36 @@
     <text x="230" y="375" fill="var(--brand-500)">D7</text>
   </g>
 
-  
-  
+  <!-- Routing Lines -->
+  <!-- D0 (Unused) -->
   <path d="M 240,125 L 265,125" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4 4" fill="none" />
   <text x="275" y="130" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">Unused</text>
 
-  
+  <!-- D1 to S -->
   <path d="M 240,160 L 270,160 L 270,171 L 545,171" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   
-  
+  <!-- D2 to S -->
   <path d="M 240,195 L 290,195 L 290,187 L 545,187" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   
-  
+  <!-- D4 to S -->
   <path d="M 240,265 L 310,265 L 310,203 L 545,203" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   
-  
+  <!-- D3 to C -->
   <path d="M 240,230 L 330,230 L 330,311 L 545,311" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   
-  
+  <!-- D5 to C -->
   <path d="M 240,300 L 350,300 L 350,327 L 545,327" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   
-  
+  <!-- D6 to C -->
   <path d="M 240,335 L 370,335 L 370,343 L 545,343" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   
-  
+  <!-- D7 to S and C (Splits) -->
   <path d="M 240,370 L 390,370 L 390,219 L 545,219" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
   <path d="M 390,359 L 545,359" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-  
+  <!-- Junction Dot for D7 split -->
   <circle cx="390" cy="359" r="4" fill="var(--brand-500)" />
 
-  
+  <!-- OR Gate S (Sum) -->
   <g>
     <text x="600" y="135" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">S = Σ(1, 2, 4, 7)</text>
     <path d="M 555, 155 Q 575, 195 555, 235 C 585, 235 625, 215 645, 195 C 625, 175 585, 155 555, 155 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
@@ -703,7 +692,7 @@
     <text x="705" y="210" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">المجموع</text>
   </g>
 
-  
+  <!-- OR Gate C (Carry) -->
   <g>
     <text x="600" y="275" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">C = Σ(3, 5, 6, 7)</text>
     <path d="M 555, 295 Q 575, 335 555, 375 C 585, 375 625, 355 645, 335 C 625, 315 585, 295 555, 295 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
@@ -730,7 +719,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 4 -->
 <section id="encoders" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">4</span> المشفرات (Encoders)</h2></template>
@@ -739,9 +728,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -775,134 +764,134 @@
     <div class="math-block">$$z = D_1 + D_3 + D_5 + D_7$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A truth table and logic gate diagram for an Octal to Binary Encoder. Show 8 inputs (D0-D7) and 3 outputs (x, y, z). Show z connected to an OR gate taking inputs D1, D3, D5, D7. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 400. -->
 <div class="svg-diagram" data-diagram-id="3">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrowhead for standard lines -->
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
     </marker>
-    
+    <!-- Arrowhead for highlighted/brand lines -->
     <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
     </marker>
-    
+    <!-- Glow effect for the OR gate -->
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="4" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Main Title -->
   <text x="400" y="35" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle">Octal to Binary Encoder / مشفر من ثماني إلى ثنائي</text>
   <text x="400" y="60" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle">Truth Table &amp; Logic Diagram for Output 'z'</text>
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- LEFT PANE: TRUTH TABLE                     -->
+  <!-- ========================================== -->
   <g transform="translate(40, 90)">
-    
+    <!-- Table Background & Border -->
     <rect x="0" y="0" width="280" height="260" fill="var(--bg-elevated)" rx="8" stroke="var(--border-color)" stroke-width="1" />
     
-    
+    <!-- Vertical Highlight for 'z' column -->
     <rect x="210" y="0" width="70" height="260" fill="var(--brand-500)" opacity="0.1" rx="8" />
 
-    
+    <!-- Horizontal Highlights for active 'z' rows (D1, D3, D5, D7) -->
     <rect x="0" y="63" width="280" height="24" fill="var(--brand-500)" opacity="0.05" />
     <rect x="0" y="113" width="280" height="24" fill="var(--brand-500)" opacity="0.05" />
     <rect x="0" y="163" width="280" height="24" fill="var(--brand-500)" opacity="0.05" />
     <rect x="0" y="213" width="280" height="24" fill="var(--brand-500)" opacity="0.05" />
 
-    
+    <!-- Header Background -->
     <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 35 L 0 35 Z" fill="var(--border-color)" opacity="0.3" />
     
-    
+    <!-- Grid Lines -->
     <line x1="0" y1="35" x2="280" y2="35" stroke="var(--border-color)" stroke-width="1" />
     <line x1="90" y1="0" x2="90" y2="260" stroke="var(--border-color)" stroke-width="1" />
     <line x1="150" y1="0" x2="150" y2="260" stroke="var(--border-color)" stroke-width="1" />
     <line x1="210" y1="0" x2="210" y2="260" stroke="var(--border-color)" stroke-width="1" />
 
-    
+    <!-- Header Text -->
     <text x="45" y="23" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Active Input</text>
     <text x="120" y="23" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle">x</text>
     <text x="180" y="23" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle">y</text>
     <text x="245" y="23" fill="var(--brand-500)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">z</text>
 
-    
+    <!-- Data Rows -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle">
-      
+      <!-- D0 -->
       <text x="45" y="55" fill="var(--text-secondary)">D0</text>
       <text x="120" y="55" fill="var(--text-secondary)">0</text>
       <text x="180" y="55" fill="var(--text-secondary)">0</text>
       <text x="245" y="55" fill="var(--text-secondary)">0</text>
       
-      
+      <!-- D1 -->
       <text x="45" y="80" fill="var(--text-primary)" font-weight="bold">D1</text>
       <text x="120" y="80" fill="var(--text-secondary)">0</text>
       <text x="180" y="80" fill="var(--text-secondary)">0</text>
       <text x="245" y="80" fill="var(--brand-500)" font-weight="bold">1</text>
       
-      
+      <!-- D2 -->
       <text x="45" y="105" fill="var(--text-secondary)">D2</text>
       <text x="120" y="105" fill="var(--text-secondary)">0</text>
       <text x="180" y="105" fill="var(--text-secondary)">1</text>
       <text x="245" y="105" fill="var(--text-secondary)">0</text>
       
-      
+      <!-- D3 -->
       <text x="45" y="130" fill="var(--text-primary)" font-weight="bold">D3</text>
       <text x="120" y="130" fill="var(--text-secondary)">0</text>
       <text x="180" y="130" fill="var(--text-secondary)">1</text>
       <text x="245" y="130" fill="var(--brand-500)" font-weight="bold">1</text>
       
-      
+      <!-- D4 -->
       <text x="45" y="155" fill="var(--text-secondary)">D4</text>
       <text x="120" y="155" fill="var(--text-secondary)">1</text>
       <text x="180" y="155" fill="var(--text-secondary)">0</text>
       <text x="245" y="155" fill="var(--text-secondary)">0</text>
       
-      
+      <!-- D5 -->
       <text x="45" y="180" fill="var(--text-primary)" font-weight="bold">D5</text>
       <text x="120" y="180" fill="var(--text-secondary)">1</text>
       <text x="180" y="180" fill="var(--text-secondary)">0</text>
       <text x="245" y="180" fill="var(--brand-500)" font-weight="bold">1</text>
       
-      
+      <!-- D6 -->
       <text x="45" y="205" fill="var(--text-secondary)">D6</text>
       <text x="120" y="205" fill="var(--text-secondary)">1</text>
       <text x="180" y="205" fill="var(--text-secondary)">1</text>
       <text x="245" y="205" fill="var(--text-secondary)">0</text>
       
-      
+      <!-- D7 -->
       <text x="45" y="230" fill="var(--text-primary)" font-weight="bold">D7</text>
       <text x="120" y="230" fill="var(--text-secondary)">1</text>
       <text x="180" y="230" fill="var(--text-secondary)">1</text>
       <text x="245" y="230" fill="var(--brand-500)" font-weight="bold">1</text>
     </g>
 
-    
+    <!-- Table Subtitle -->
     <text x="140" y="285" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">Truth Table / جدول الحقيقة</text>
   </g>
 
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- RIGHT PANE TOP: BLOCK DIAGRAM              -->
+  <!-- ========================================== -->
   <g transform="translate(420, 90)">
-    
+    <!-- Bounding Box for Block Diagram -->
     <rect x="0" y="0" width="340" height="170" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4 4" rx="8" />
     <text x="170" y="25" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">Block Diagram / المخطط الصندوقي</text>
 
-    
+    <!-- Encoder Box -->
     <rect x="120" y="40" width="100" height="110" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
     <text x="170" y="85" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">8-to-3</text>
     <text x="170" y="105" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">Encoder</text>
     <text x="170" y="125" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle">مشفر</text>
 
-    
+    <!-- Input Lines (D0 - D7) -->
     <g stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)">
       <line x1="60" y1="50" x2="115" y2="50" />
       <line x1="60" y1="62" x2="115" y2="62" />
@@ -914,7 +903,7 @@
       <line x1="60" y1="134" x2="115" y2="134" />
     </g>
     
-    
+    <!-- Input Labels -->
     <g fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="11" text-anchor="end">
       <text x="50" y="54">D0</text>
       <text x="50" y="66">D1</text>
@@ -926,14 +915,14 @@
       <text x="50" y="138">D7</text>
     </g>
 
-    
+    <!-- Output Lines (x, y, z) -->
     <g stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow)">
       <line x1="220" y1="60" x2="280" y2="60" />
       <line x1="220" y1="95" x2="280" y2="95" />
     </g>
     <line x1="220" y1="130" x2="280" y2="130" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
 
-    
+    <!-- Output Labels -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="start">
       <text x="290" y="65" fill="var(--text-primary)">x</text>
       <text x="290" y="100" fill="var(--text-primary)">y</text>
@@ -942,15 +931,15 @@
   </g>
 
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- RIGHT PANE BOTTOM: LOGIC GATE FOR 'z'      -->
+  <!-- ========================================== -->
   <g transform="translate(420, 280)">
-    
+    <!-- Bounding Box for Logic Gate -->
     <rect x="0" y="0" width="340" height="200" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4 4" rx="8" />
     <text x="170" y="25" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">Logic for Output 'z' / المنطق للمخرج z</text>
 
-    
+    <!-- Input Lines to OR Gate -->
     <g stroke="var(--brand-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M 60 60 L 165 60" />
       <path d="M 60 90 L 175 90" />
@@ -958,7 +947,7 @@
       <path d="M 60 150 L 165 150" />
     </g>
 
-    
+    <!-- Input Labels -->
     <g fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="end">
       <text x="45" y="65">D1</text>
       <text x="45" y="95">D3</text>
@@ -966,32 +955,32 @@
       <text x="45" y="155">D7</text>
     </g>
 
-    
+    <!-- OR Gate -->
     <g transform="translate(160, 50)">
-      
+      <!-- OR Gate Path: M 0,0 C 30,0 60,10 80,55 C 60,100 30,110 0,110 C 20,80 20,30 0,0 Z -->
       <path d="M 0,0 C 30,0 60,10 80,55 C 60,100 30,110 0,110 C 20,80 20,30 0,0 Z" 
             fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" filter="url(#glow)" />
     </g>
 
-    
+    <!-- Output Line from OR Gate -->
     <line x1="240" y1="105" x2="290" y2="105" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow-brand)" />
     
-    
+    <!-- Output Label -->
     <text x="305" y="110" fill="var(--brand-500)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="start">z</text>
 
-    
+    <!-- Equation -->
     <text x="170" y="185" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">z = D1 + D3 + D5 + D7</text>
   </g>
 
 
+  <!-- ========================================== -->
+  <!-- CONNECTING ANNOTATIONS                     -->
+  <!-- ========================================== -->
   
-  
-  
-  
-  
+  <!-- Curved Arrow from Truth Table to Logic Gate -->
   <path d="M 320 220 C 370 220, 370 385, 410 385" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-brand)" opacity="0.7" />
   
-  
+  <!-- Annotation Text on Curve -->
   <rect x="335" y="285" width="130" height="40" fill="var(--bg-surface)" opacity="0.9" rx="4" />
   <text x="400" y="300" fill="var(--brand-500)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" text-anchor="middle">z is 1 when</text>
   <text x="400" y="316" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="11" text-anchor="middle">D1, D3, D5, D7 are active</text>
@@ -1053,7 +1042,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 5 -->
 <section id="multiplexors" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">5</span> المجمعات (Multiplexors / Mux)</h2></template>
@@ -1062,9 +1051,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1098,41 +1087,41 @@
     <div class="math-block">$$Y = S' \cdot I_0 + S \cdot I_1$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A block diagram of a 4-to-1 Multiplexer. Show 4 data inputs (D0, D1, D2, D3) on the left, 2 select lines (S0, S1) at the bottom, and 1 output (Y) on the right. Inside the block, write 'MUX'. Show an arrow indicating flow from inputs to output. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 600 400. -->
 <div class="svg-diagram" data-diagram-id="2">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Arrowhead for standard flow -->
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
         </marker>
         
-        
+        <!-- Arrowhead for internal dashed flow -->
         <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
         </marker>
 
-        
+        <!-- Subtle shadow for elevated elements -->
         <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
             <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15"/>
         </filter>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Title Section -->
     <text x="400" y="45" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">4-to-1 Multiplexer (MUX)</text>
     <text x="400" y="75" font-size="18" fill="var(--text-secondary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">مُجمّع بيانات 4 إلى 1</text>
 
-    
+    <!-- Main MUX Block (Trapezoid) -->
     <polygon points="320,120 320,360 480,300 480,180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
     
-    
+    <!-- MUX Internal Labels -->
     <text x="400" y="235" font-size="28" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">MUX</text>
     <text x="400" y="265" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">4 : 1</text>
 
-    
+    <!-- Internal Pin Indicators -->
     <text x="335" y="155" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
     <text x="335" y="215" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
     <text x="335" y="275" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif">2</text>
@@ -1143,10 +1132,10 @@
     
     <text x="465" y="245" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Y</text>
 
-    
+    <!-- Internal Flow Arrow -->
     <line x1="345" y1="240" x2="455" y2="240" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 
-    
+    <!-- Data Inputs (Left) -->
     <g>
         <line x1="160" y1="150" x2="320" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <line x1="160" y1="210" x2="320" y2="210" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
@@ -1162,7 +1151,7 @@
         <text x="100" y="125" font-size="14" fill="var(--text-muted)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">مداخل البيانات</text>
     </g>
 
-    
+    <!-- Select Lines (Bottom) -->
     <g>
         <line x1="373.3" y1="420" x2="373.3" y2="340" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         <line x1="426.7" y1="420" x2="426.7" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
@@ -1174,7 +1163,7 @@
         <text x="400" y="495" font-size="14" fill="var(--text-muted)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">خطوط التحديد</text>
     </g>
 
-    
+    <!-- Output (Right) -->
     <g>
         <line x1="480" y1="240" x2="630" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
         
@@ -1184,39 +1173,39 @@
         <text x="680" y="225" font-size="14" fill="var(--text-muted)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المخرج</text>
     </g>
 
-    
+    <!-- Truth Table (Educational Addition) -->
     <g transform="translate(560, 290)">
         <rect x="0" y="0" width="200" height="170" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" filter="url(#shadow)"/>
         
         <text x="100" y="25" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Truth Table</text>
         <text x="100" y="45" font-size="13" fill="var(--text-muted)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">جدول الحقيقة</text>
         
-        
+        <!-- Table Grid Lines -->
         <line x1="0" y1="55" x2="200" y2="55" stroke="var(--border-color)" stroke-width="1.5"/>
         <line x1="66" y1="55" x2="66" y2="170" stroke="var(--border-color)" stroke-width="1.5"/>
         <line x1="133" y1="55" x2="133" y2="170" stroke="var(--border-color)" stroke-width="1.5"/>
         
-        
+        <!-- Table Headers -->
         <text x="33" y="75" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">S₁</text>
         <text x="100" y="75" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">S₀</text>
         <text x="166" y="75" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Y</text>
         
-        
+        <!-- Row 1 -->
         <text x="33" y="100" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
         <text x="100" y="100" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
         <text x="166" y="100" font-size="14" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">D₀</text>
         
-        
+        <!-- Row 2 -->
         <text x="33" y="120" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
         <text x="100" y="120" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
         <text x="166" y="120" font-size="14" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">D₁</text>
         
-        
+        <!-- Row 3 -->
         <text x="33" y="140" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
         <text x="100" y="140" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
         <text x="166" y="140" font-size="14" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">D₂</text>
         
-        
+        <!-- Row 4 -->
         <text x="33" y="160" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
         <text x="100" y="160" font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
         <text x="166" y="160" font-size="14" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">D₃</text>
@@ -1238,7 +1227,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 6 -->
 <section id="implementing-logic-mux" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">6</span> تنفيذ الدوال المنطقية باستخدام المجمعات</h2></template>
@@ -1247,9 +1236,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1274,81 +1263,81 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show the optimized implementation of a 3-variable function using a 4:1 MUX. A truth table on the left shows A, B, C, and F. A 4:1 MUX on the right has A and B connected to select lines S1 and S0. The data inputs 0, 1, 2, 3 are connected to C', C', 0, and 1 respectively. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 400. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Arrowhead for dashed connection lines -->
         <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
         </marker>
-        
+        <!-- Arrowhead for solid input lines -->
         <marker id="arrow-solid" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)"/>
         </marker>
-        
+        <!-- Arrowhead for output and select lines -->
         <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
         </marker>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Main Titles -->
     <text x="425" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Optimized 3-Variable Function using 4:1 MUX</text>
     <text x="425" y="70" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-secondary)" text-anchor="middle">تنفيذ دالة بـ 3 متغيرات باستخدام 4:1 MUX</text>
 
+    <!-- ========================================== -->
+    <!-- TRUTH TABLE SECTION (LEFT)                 -->
+    <!-- ========================================== -->
     
-    
-    
-    
-    
+    <!-- Table Title -->
     <text x="170" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Truth Table / جدول الحقيقة</text>
 
-    
+    <!-- Table Outer Border -->
     <rect x="50" y="115" width="230" height="270" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
     
-    
-    
+    <!-- Column Highlights -->
+    <!-- A & B Columns Highlight (Select Lines) -->
     <rect x="52" y="145" width="98" height="238" fill="var(--brand-500)" opacity="0.05" rx="4"/>
-    
+    <!-- F Column Highlight (Output) -->
     <rect x="200" y="145" width="78" height="238" fill="var(--brand-500)" opacity="0.05" rx="4"/>
 
-    
+    <!-- Table Headers -->
     <text x="75" y="138" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">A</text>
     <text x="125" y="138" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">B</text>
     <text x="175" y="138" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">C</text>
     <text x="240" y="138" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">F</text>
 
-    
+    <!-- Header Separator Line -->
     <line x1="50" y1="145" x2="280" y2="145" stroke="var(--border-color)" stroke-width="2"/>
-    
+    <!-- Vertical Separator Line -->
     <line x1="200" y1="115" x2="200" y2="385" stroke="var(--border-color)" stroke-width="2"/>
 
-    
+    <!-- Table Rows (Data) -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle">
-        
+        <!-- Group 0: A=0, B=0 -->
         <text x="75" y="165">0</text> <text x="125" y="165">0</text> <text x="175" y="165">0</text> <text x="240" y="165" font-weight="bold" fill="var(--brand-500)">1</text>
         <text x="75" y="195">0</text> <text x="125" y="195">0</text> <text x="175" y="195">1</text> <text x="240" y="195" font-weight="bold" fill="var(--brand-500)">0</text>
         <line x1="50" y1="205" x2="280" y2="205" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
 
-        
+        <!-- Group 1: A=0, B=1 -->
         <text x="75" y="225">0</text> <text x="125" y="225">1</text> <text x="175" y="225">0</text> <text x="240" y="225" font-weight="bold" fill="var(--brand-500)">1</text>
         <text x="75" y="255">0</text> <text x="125" y="255">1</text> <text x="175" y="255">1</text> <text x="240" y="255" font-weight="bold" fill="var(--brand-500)">0</text>
         <line x1="50" y1="265" x2="280" y2="265" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
 
-        
+        <!-- Group 2: A=1, B=0 -->
         <text x="75" y="285">1</text> <text x="125" y="285">0</text> <text x="175" y="285">0</text> <text x="240" y="285" font-weight="bold" fill="var(--brand-500)">0</text>
         <text x="75" y="315">1</text> <text x="125" y="315">0</text> <text x="175" y="315">1</text> <text x="240" y="315" font-weight="bold" fill="var(--brand-500)">0</text>
         <line x1="50" y1="325" x2="280" y2="325" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
 
-        
+        <!-- Group 3: A=1, B=1 -->
         <text x="75" y="345">1</text> <text x="125" y="345">1</text> <text x="175" y="345">0</text> <text x="240" y="345" font-weight="bold" fill="var(--brand-500)">1</text>
         <text x="75" y="375">1</text> <text x="125" y="375">1</text> <text x="175" y="375">1</text> <text x="240" y="375" font-weight="bold" fill="var(--brand-500)">1</text>
     </g>
 
-    
+    <!-- Grouping Brackets & Logic Derivation -->
     <g fill="none" stroke="var(--brand-500)" stroke-width="2">
         <path d="M 285 150 L 295 150 L 295 200 L 285 200" />
         <path d="M 285 210 L 295 210 L 295 260 L 285 260" />
@@ -1363,15 +1352,15 @@
         <text x="305" y="360">D3 = 1</text>
     </g>
 
-    
+    <!-- Legend for Select Lines -->
     <rect x="50" y="410" width="230" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
     <text x="165" y="435" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">A, B used as Select Lines (S1, S0)</text>
     <text x="165" y="455" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">A, B تستخدم كخطوط اختيار</text>
 
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- CONNECTION CURVES                          -->
+    <!-- ========================================== -->
     <g fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)">
         <path d="M 365 175 C 400 175, 410 180, 445 180" />
         <path d="M 365 235 C 400 235, 410 240, 445 240" />
@@ -1380,20 +1369,20 @@
     </g>
 
 
+    <!-- ========================================== -->
+    <!-- MUX SECTION (RIGHT)                        -->
+    <!-- ========================================== -->
     
-    
-    
-    
-    
+    <!-- MUX Title -->
     <text x="610" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">4:1 Multiplexer / المبدل</text>
 
-    
+    <!-- MUX Body (Trapezoid) -->
     <polygon points="550,130 670,190 670,350 550,410" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3"/>
     
-    
+    <!-- MUX Main Label -->
     <text x="610" y="275" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">4:1 MUX</text>
 
-    
+    <!-- MUX Inputs (Data Lines) -->
     <g stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-solid)">
         <line x1="460" y1="180" x2="540" y2="180" />
         <line x1="460" y1="240" x2="540" y2="240" />
@@ -1401,7 +1390,7 @@
         <line x1="460" y1="360" x2="540" y2="360" />
     </g>
 
-    
+    <!-- Input Values (C', C', 0, 1) -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">
         <text x="480" y="172">C'</text>
         <text x="480" y="232">C'</text>
@@ -1409,7 +1398,7 @@
         <text x="480" y="352">1</text>
     </g>
 
-    
+    <!-- MUX Pin Labels (0, 1, 2, 3) -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="start">
         <text x="560" y="185">0</text>
         <text x="560" y="245">1</text>
@@ -1417,28 +1406,28 @@
         <text x="560" y="365">3</text>
     </g>
 
-    
+    <!-- MUX Select Lines (Bottom) -->
     <g stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)">
         <line x1="590" y1="460" x2="590" y2="395" />
         <line x1="630" y1="460" x2="630" y2="375" />
     </g>
 
-    
+    <!-- Select Line Labels (A, B) -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">
         <text x="590" y="480">A</text>
         <text x="630" y="480">B</text>
     </g>
 
-    
+    <!-- MUX Select Pin Labels (S1, S0) -->
     <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">
         <text x="590" y="380">S1</text>
         <text x="630" y="360">S0</text>
     </g>
 
-    
+    <!-- MUX Output Line -->
     <line x1="670" y1="270" x2="740" y2="270" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-brand)"/>
     
-    
+    <!-- Output Label -->
     <text x="760" y="276" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">F</text>
 
 </svg>
@@ -1500,7 +1489,7 @@
 
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
-    <span class="professor-icon">🎓</span>
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
@@ -1511,7 +1500,7 @@
 </section>
 
 <section id="ask-professor" class="fade-up section-gap">
-  <h2 data-i18n="ask.title">❓ اسأل البروفيسور</h2>
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
   <div class="accordion">
     <div class="accordion-item">
       <button class="accordion-trigger">
@@ -1687,7 +1676,7 @@
 </section>
 
 <section id="flashcards" class="flashcard-section fade-up">
-  <h2 data-i18n="fc.title">البطاقات التعليمية</h2>
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
   <div id="fc-container"></div>
 </section>
 <script type="application/json" id="flashcard-data">
@@ -1951,16 +1940,16 @@
 </script>
 
 <section id="quiz" class="quiz-section fade-up">
-  <h2 data-i18n="quiz.title">اختبر نفسك</h2>
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
       <span id="quiz-counter">1 / 10</span>
-      <span>🎯 <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
     <div class="quiz-options" id="quiz-options-container"></div>
-    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()" data-i18n="quiz.hint">💡 تلميح</button>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
     <div class="quiz-feedback hidden" id="quiz-feedback"></div>
     <div class="quiz-nav">
       <div></div>
@@ -1970,7 +1959,7 @@
     </div>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
-    <div class="score-emoji" id="quiz-score-emoji">🏆</div>
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
     <div class="score-display" id="quiz-score-display">0 / 10</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
@@ -2301,10 +2290,10 @@
 </script>
 
 <section id="vault" class="vault-section glass-card fade-up">
-  <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ / Trap</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الخلط بين المشفر (Encoder) ومفكك التشفير (Decoder). تذكر: مفكك التشفير 'يفك' الرمز الصغير إلى خطوط كثيرة (n إلى 2^n)، بينما المشفر 'يضغط' الخطوط الكثيرة إلى رمز صغير (2^n إلى n).</template>
       <template class="content-en">Confusing Encoder and Decoder. Remember: Decoder 'expands' a small code to many lines (n to 2^n), while Encoder 'compresses' many lines into a small code (2^n to n).</template>
@@ -2313,7 +2302,7 @@
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 سر / Secret</div>
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
       <template class="content-ar">طرف التمكين (Enable) هو السر وراء توسيع مفككات التشفير. بدونه، ستحتاج إلى تصميم شريحة جديدة بالكامل لكل حجم. باستخدامه، يمكنك بناء مفكك تشفير بأي حجم باستخدام شرائح أصغر.</template>
       <template class="content-en">The Enable pin is the secret to expanding decoders. Without it, you'd need a custom chip for every size. With it, you can build any size decoder using smaller off-the-shelf chips.</template>
@@ -2322,7 +2311,7 @@
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي / Key Concept</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">المجمع (MUX) هو في الأساس 'جدول بحث' (Lookup Table) برمجي مطبق في الأجهزة (Hardware). يمكنك تنفيذ أي دالة منطقية بمجرد توصيل الأصفار والآحاد الصحيحة بمدخلاته.</template>
       <template class="content-en">A MUX is essentially a hardware 'Lookup Table' (LUT). You can implement ANY Boolean function just by hardwiring the correct 0s and 1s to its data inputs.</template>
@@ -2331,7 +2320,7 @@
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ / Trap</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">عند تنفيذ دالة باستخدام مفكك التشفير، ينسى الطلاب إضافة بوابة OR. مفكك التشفير يولد الحدود الصغرى (Minterms) فقط؛ يجب جمعها ببوابة OR لتكوين الدالة النهائية.</template>
       <template class="content-en">When implementing logic with a decoder, students often forget the OR gate. The decoder only generates minterms; you MUST sum them with an OR gate to form the final function.</template>
@@ -2340,7 +2329,7 @@
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي / Key Concept</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">التنفيذ المحسن للمجمع (Optimized MUX) يوفر حجم المجمع للنصف. بدلاً من استخدام مجمع 8:1 لدالة من 3 متغيرات، نستخدم مجمع 4:1 وندخل المتغير الثالث مباشرة في البيانات.</template>
       <template class="content-en">Optimized MUX implementation cuts the required MUX size in half. Instead of an 8:1 MUX for a 3-variable function, use a 4:1 MUX and feed the 3rd variable directly into the data inputs.</template>
@@ -2358,14 +2347,15 @@
         <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
         <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
-        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
+        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
       </div>
-      <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
     </div>
   </footer>
 </div>
 
 <script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
 <script src="../../shared/firebase-sync.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
-
-
-
+// M07_algo.js — Interactive algorithm widgets
+// Generated: 2026-03-03T16:43:39
+// Diagrams: 2/2
 
 window.AlgoWidgets = window.AlgoWidgets || {};
 
@@ -85,16 +85,16 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بذكاء: الشجرتان بجانب بعضهما في الشاشات الكبيرة، وفوق بعضهما في الجوال
       '<div class="algo-canvas" id="w1-canvas-container" style="width:100%; min-height:300px; display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items:flex-start; padding:15px 5px; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); gap: 10px;">' +
         
-        
+        // الشجرة الأولى (Max-Heap صحيح)
         '<div style="text-align:center; flex: 1 1 45%; min-width: 240px; display:flex; flex-direction:column; align-items:center;">' +
           '<h5 data-algo-text="w1-title-left" style="color:var(--text-primary); font-weight:800; font-size:1rem; margin-bottom:5px; font-family:\'Cairo\', sans-serif;"></h5>' +
           '<svg id="w1-tree-left" viewBox="0 0 300 250" style="width:100%; max-width:300px; height:auto; overflow:visible;"></svg>' +
         '</div>' +
         
-        
+        // الشجرة الثانية (Max-Heap خاطئ)
         '<div style="text-align:center; flex: 1 1 45%; min-width: 240px; display:flex; flex-direction:column; align-items:center;">' +
           '<h5 data-algo-text="w1-title-right" style="color:var(--text-primary); font-weight:800; font-size:1rem; margin-bottom:5px; font-family:\'Cairo\', sans-serif;"></h5>' +
           '<svg id="w1-tree-right" viewBox="0 0 300 250" style="width:100%; max-width:300px; height:auto; overflow:visible;"></svg>' +
@@ -102,7 +102,7 @@ window.AlgoWidgets[1] = function(container) {
         
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color: var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-node-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-node-active"></span></span>' +
@@ -117,7 +117,7 @@ window.AlgoWidgets[1] = function(container) {
     var counter   = container.querySelector('[data-algo-counter]');
     var steps = [], cur = 0, playing = false, interval = null;
  
-    
+    // إحداثيات نسبية مبنية على viewBox(0 0 300 250) لكل شجرة
     var leftNodes = {
       'L0': { id: 'L0', val: 10, x: 150, y: 40,  children: ['L1', 'L2'] },
       'L1': { id: 'L1', val: 5,  x: 75,  y: 120, children: ['L3', 'L4'] },
@@ -131,7 +131,7 @@ window.AlgoWidgets[1] = function(container) {
       'R0': { id: 'R0', val: 10, x: 150, y: 40,  children: ['R1', 'R2'] },
       'R1': { id: 'R1', val: 5,  x: 75,  y: 120, children: ['R3', 'R4'] },
       'R2': { id: 'R2', val: 7,  x: 225, y: 120, children: ['R5'] },
-      'R3': { id: 'R3', val: 6,  x: 40,  y: 200, children: [] }, 
+      'R3': { id: 'R3', val: 6,  x: 40,  y: 200, children: [] }, // Violation
       'R4': { id: 'R4', val: 2,  x: 110, y: 200, children: [] },
       'R5': { id: 'R5', val: 1,  x: 190, y: 200, children: [] }
     };
@@ -149,7 +149,7 @@ window.AlgoWidgets[1] = function(container) {
     function generateSteps() {
       steps = [];
       
-      
+      // Step 0: Initial state
       steps.push({
         en: 'A <strong>Max-Heap</strong> requires every parent node to have a value greater than or equal to its children. Let\'s verify these two trees.',
         ar: 'تتطلب <strong>الكومة القصوى (Max-Heap)</strong> أن تكون قيمة كل عقدة أب أكبر من أو تساوي قيم أبنائها. دعنا نتحقق من هاتين الشجرتين.',
@@ -157,44 +157,44 @@ window.AlgoWidgets[1] = function(container) {
         stateR: { highlight: [], error: [], fade: false }
       });
       
-      
+      // Step 1: Valid tree check
       steps.push({
         en: 'In the Left Tree, every node satisfies the property. For example, 10 > 5 and 10 > 7. It is a valid Max-Heap.',
         ar: 'في الشجرة اليسرى، كل عقدة تحقق الخاصية. مثلاً: 10 > 5 و 10 > 7. إنها كومة قصوى صالحة.',
         stateL: { highlight: ['L0', 'L1', 'L2'], fade: false },
-        stateR: { highlight: [], error: [], fade: true } 
+        stateR: { highlight: [], error: [], fade: true } // تبهيت الشجرة اليمنى
       });
  
-      
+      // Step 2: Invalid tree focus
       steps.push({
         en: 'Now look at the Right Tree. Let\'s check node 5 and its children.',
         ar: 'الآن لننظر إلى الشجرة اليمنى. لنتحقق من العقدة 5 وأبنائها.',
-        stateL: { highlight: [], fade: true }, 
+        stateL: { highlight: [], fade: true }, // تبهيت الشجرة اليسرى للتركيز
         stateR: { highlight: ['R1', 'R3', 'R4'], error: [], fade: false }
       });
  
-      
+      // Step 3: Highlight Violation
       steps.push({
         en: 'Here is a <strong>violation!</strong> Node 6 (child) is greater than its parent 5. Therefore, the Right Tree is NOT a valid Max-Heap.',
         ar: 'يوجد هنا <strong>انتهاك للخاصية!</strong> العقدة 6 (الابن) أكبر من العقدة الأب 5. لذلك، الشجرة اليمنى ليست كومة قصوى صالحة.',
         stateL: { highlight: [], fade: true },
-        stateR: { highlight: [], error: ['R1', 'R3'], fade: false } 
+        stateR: { highlight: [], error: ['R1', 'R3'], fade: false } // إضاءة الخطأ بالأحمر
       });
     }
  
-    
+    // رسم شجرة محددة في SVG محدد بناءً على الإعدادات
     function drawTree(svg, treeData, state) {
       svg.innerHTML = '';
       var radius = 20;
       var ns = 'http://www.w3.org/2000/svg';
       
-      
+      // إعداد الشفافية العامة (تأثير الخفوت Fade)
       var treeOpacity = state.fade ? '0.2' : '1';
       var gTree = document.createElementNS(ns, 'g');
       gTree.style.opacity = treeOpacity;
       gTree.style.transition = 'opacity 0.4s ease';
 
-      
+      // 1. رسم الخطوط (في الخلفية) باستخدام حسابات رياضية لتلامس الحواف
       Object.keys(treeData).forEach(key => {
         let parent = treeData[key];
         parent.children.forEach(childKey => {
@@ -204,13 +204,13 @@ window.AlgoWidgets[1] = function(container) {
           let dy = child.y - parent.y;
           let dist = Math.hypot(dx, dy);
           
-          
+          // حساب نقطة التلامس مع الدائرة
           let x1 = parent.x + (dx / dist) * radius;
           let y1 = parent.y + (dy / dist) * radius;
           let x2 = child.x - (dx / dist) * radius;
           let y2 = child.y - (dy / dist) * radius;
 
-          
+          // هل هذا الخط هو جزء من "انتهاك"؟
           let isErrorLine = state.error && state.error.includes(parent.id) && state.error.includes(child.id);
           
           let line = document.createElementNS(ns, 'line');
@@ -227,7 +227,7 @@ window.AlgoWidgets[1] = function(container) {
         });
       });
  
-      
+      // 2. رسم العقد والنصوص (في المقدمة)
       Object.keys(treeData).forEach(key => {
         let node = treeData[key];
         
@@ -292,7 +292,7 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
       
-      
+      // رسم الشجرتين وتمرير حالة الإضاءة لكل واحدة
       drawTree(svgLeft, leftNodes, s.stateL);
       drawTree(svgRight, rightNodes, s.stateR);
     }
@@ -329,12 +329,12 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة 16:9 تضمن احتواء الشجرة والمصفوفة بشكل ممتاز
       '<div class="algo-canvas" id="w2-canvas-container" style="width:100%; max-width:800px; aspect-ratio: 16 / 9; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w2-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w2-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w2-current"></span></span>' +
@@ -350,12 +350,12 @@ window.AlgoWidgets[2] = function(container) {
 
     var steps = [], cur = 0, playing = false, interval = null;
 
-    
-    
+    // بيانات الكومة (Heap)
+    // نستخدم الفهرس من 1 لتسهيل المعادلات الرياضية (1-based index)
     const heap = [null, 9, 5, 3, 1, 4, 2];
     
-    
-    const R = 22; 
+    // إحداثيات الشجرة
+    const R = 22; // نصف القطر
     const treePos = {
       1: { x: 400, y: 50 },
       2: { x: 250, y: 140 },
@@ -365,7 +365,7 @@ window.AlgoWidgets[2] = function(container) {
       6: { x: 475, y: 230 }
     };
 
-    
+    // إحداثيات المصفوفة
     const cellW = 55;
     const cellH = 55;
     const cellGap = 6;
@@ -440,13 +440,13 @@ window.AlgoWidgets[2] = function(container) {
       };
 
       let svgHTML = '<defs>';
-      
+      // رؤوس الأسهم لتناسب ألوان الأفعال
       ['current', 'child', 'parent'].forEach(key => {
         svgHTML += `<marker id="arr-${key}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="${colorMap[key]}" /></marker>`;
       });
       svgHTML += '</defs>';
 
-      
+      // 1. رسم خطوط الشجرة الثابتة
       for (let i = 1; i <= 6; i++) {
         let leftIdx = 2 * i;
         let rightIdx = 2 * i + 1;
@@ -459,7 +459,7 @@ window.AlgoWidgets[2] = function(container) {
             let dy = p2.y - p1.y;
             let dist = Math.hypot(dx, dy);
             
-            
+            // حساب المثلثات لتلامس الحواف
             let x1 = p1.x + (dx/dist)*R;
             let y1 = p1.y + (dy/dist)*R;
             let x2 = p2.x - (dx/dist)*R;
@@ -470,7 +470,7 @@ window.AlgoWidgets[2] = function(container) {
         });
       }
 
-      
+      // 2. رسم خطوط الربط الشفافة بين الشجرة والمصفوفة (للعناصر النشطة)
       [...s.current, ...s.children, ...s.parent].forEach(idx => {
           let tP = treePos[idx];
           let aP = arrPos[idx];
@@ -480,7 +480,7 @@ window.AlgoWidgets[2] = function(container) {
           svgHTML += `<line x1="${tP.x}" y1="${tP.y + R + 5}" x2="${aP.x + cellW/2}" y2="${aP.y - 5}" stroke="${color}" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"></line>`;
       });
 
-      
+      // 3. رسم أقواس المصفوفة (القفزات)
       s.children.forEach(childIdx => {
           let cIdx = s.current[0];
           let x1 = arrPos[cIdx].x + cellW/2;
@@ -488,7 +488,7 @@ window.AlgoWidgets[2] = function(container) {
           let x2 = arrPos[childIdx].x + cellW/2;
           let y2 = arrPos[childIdx].y - 5;
           let midX = (x1 + x2) / 2;
-          let arcHeight = y1 - 40 - (Math.abs(x1 - x2) * 0.15); 
+          let arcHeight = y1 - 40 - (Math.abs(x1 - x2) * 0.15); // ارتفاع القوس بناءً على المسافة
           
           svgHTML += `<path d="M ${x1} ${y1} Q ${midX} ${arcHeight} ${x2} ${y2}" fill="none" stroke="${colorMap['child']}" stroke-width="3" marker-end="url(#arr-child)" style="transition: all 0.3s ease;"></path>`;
       });
@@ -505,7 +505,7 @@ window.AlgoWidgets[2] = function(container) {
           svgHTML += `<path d="M ${x1} ${y1} Q ${midX} ${arcHeight} ${x2} ${y2}" fill="none" stroke="${colorMap['parent']}" stroke-width="3" marker-end="url(#arr-parent)" style="transition: all 0.3s ease;"></path>`;
       });
 
-      
+      // 4. رسم العقد في الشجرة
       for (let i = 1; i <= 6; i++) {
         let pos = treePos[i];
         let val = heap[i];
@@ -527,7 +527,7 @@ window.AlgoWidgets[2] = function(container) {
         </g>`;
       }
 
-      
+      // 5. رسم خلايا المصفوفة
       for (let i = 1; i <= 6; i++) {
         let pos = arrPos[i];
         let val = heap[i];
@@ -541,7 +541,7 @@ window.AlgoWidgets[2] = function(container) {
         let strokeColor = state === 'normal' ? 'var(--border-color)' : colorMap[state];
         let textColor = state === 'normal' ? 'var(--text-primary)' : '#ffffff';
         let sw = state === 'normal' ? '1.5' : '3';
-        let transY = state === 'normal' ? '0' : '-8px'; 
+        let transY = state === 'normal' ? '0' : '-8px'; // بروز الخلية عند التحديد
 
         svgHTML += `<g style="transform: translateY(${transY}); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
           <rect x="${pos.x}" y="${pos.y}" width="${cellW}" height="${cellH}" rx="8" ry="8" fill="${fill}" stroke="${strokeColor}" stroke-width="${sw}"></rect>

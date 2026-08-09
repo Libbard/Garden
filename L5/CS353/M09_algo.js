@@ -1,6 +1,6 @@
-
-
-
+// M09_algo.js — Interactive algorithm widgets
+// Generated: 2026-03-04T09:36:17
+// Diagrams: 2/2
 
 window.AlgoWidgets = window.AlgoWidgets || {};
 
@@ -285,12 +285,12 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بأبعاد 2:1 
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio:2/1; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; justify-content: center; align-items: center; overflow:visible;">' +
         '<svg id="w2-svg" width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w2-leg-keys"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w2-leg-ptrs"></span></span>' +
@@ -306,7 +306,7 @@ window.AlgoWidgets[2] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    
+    // عناصر الـ SVG ليتم تحديثها برمجياً (للحفاظ على الأنيميشن)
     var keyRects = [], keyTexts = [];
     var ptrRects = [], ptrDots = [], ptrLines = [];
     var treeGroups = [], treePolys = [], treeLabels = [], treeConds = [];
@@ -320,19 +320,19 @@ window.AlgoWidgets[2] = function(container) {
       container.querySelector('[data-algo-text="w2-leg-target"]').textContent = _AL.exp('Search Target', 'هدف البحث');
     }
  
-    
+    // متغيرات القيم الديناميكية
     var dynamicKeys = [];
     var searchTarget = 0;
 
     function generateSteps() {
-      
+      // توليد أرقام تفاعلية وعشوائية في كل مرة يتم فيها عمل Reset
       let startVal = Math.floor(Math.random() * 20) + 10;
       dynamicKeys = [
         startVal, 
         startVal + Math.floor(Math.random() * 15) + 10, 
         startVal + Math.floor(Math.random() * 30) + 30
       ];
-      
+      // توليد هدف بحث يقع بين المفتاحين الأول والثاني كمثال
       searchTarget = dynamicKeys[0] + Math.floor(Math.random() * (dynamicKeys[1] - dynamicKeys[0] - 1)) + 1;
 
       steps = [
@@ -396,11 +396,11 @@ window.AlgoWidgets[2] = function(container) {
       `;
       svgEl.appendChild(defs);
  
-      
+      // 1. بناء الأشجار والخطوط
       for (let i = 0; i < 4; i++) {
-        let cx = 160 + (i * 160); 
+        let cx = 160 + (i * 160); // 160, 320, 480, 640
         
-        
+        // خط المؤشر
         let line = document.createElementNS(ns, 'line');
         line.setAttribute('x1', cx); line.setAttribute('y1', 100);
         line.setAttribute('x2', cx); line.setAttribute('y2', 180);
@@ -411,7 +411,7 @@ window.AlgoWidgets[2] = function(container) {
         svgEl.appendChild(line);
         ptrLines.push(line);
 
-        
+        // مجموعة الشجرة
         let g = document.createElementNS(ns, 'g');
         g.style.transition = 'all 0.4s cubic-bezier(0.4,0,0.2,1)';
         
@@ -444,9 +444,9 @@ window.AlgoWidgets[2] = function(container) {
         treeGroups.push(g); treePolys.push(poly); treeLabels.push(tLabel); treeConds.push(tCond);
       }
 
-      
+      // 2. بناء المؤشرات (Pointers) والمفاتيح (Keys)
       for (let j = 0; j < 7; j++) {
-        if (j % 2 === 0) { 
+        if (j % 2 === 0) { // المؤشرات
           let pIdx = j / 2;
           let pcx = 160 + (pIdx * 160);
           
@@ -468,7 +468,7 @@ window.AlgoWidgets[2] = function(container) {
           svgEl.appendChild(dot);
           ptrDots.push(dot);
 
-        } else { 
+        } else { // المفاتيح
           let kIdx = Math.floor(j / 2);
           let kcx = 240 + (kIdx * 160);
           
@@ -494,7 +494,7 @@ window.AlgoWidgets[2] = function(container) {
         }
       }
 
-      
+      // 3. بناء صندوق الهدف المتحرك
       targetGroup = document.createElementNS(ns, 'g');
       targetGroup.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
       targetGroup.style.opacity = '0';
@@ -525,12 +525,12 @@ window.AlgoWidgets[2] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
       
-      
+      // تحديث شروط الأشجار الفرعية بناءً على الأرقام الديناميكية الجديدة
       var conds = [`< ${dynamicKeys[0]}`, `${dynamicKeys[0]}-${dynamicKeys[1]}`, `${dynamicKeys[1]}-${dynamicKeys[2]}`, `> ${dynamicKeys[2]}`];
 
       var anyTreeActive = s.trees.length > 0;
 
-      
+      // 1. تحديث الأشجار
       for (let i = 0; i < 4; i++) {
         let isActive = s.trees.includes(i);
         let opacity = (anyTreeActive && !isActive) ? '0.2' : '1';
@@ -549,19 +549,19 @@ window.AlgoWidgets[2] = function(container) {
         treeConds[i].textContent = conds[i];
         treeConds[i].setAttribute('fill', isActive ? '#ffffff' : 'var(--text-secondary)');
 
-        
+        // تحديث خطوط المؤشرات
         let ptrActive = s.ptrs.includes(i);
         ptrLines[i].style.opacity = (s.ptrs.length > 0 && !ptrActive) ? '0.2' : '1';
         ptrLines[i].setAttribute('stroke', ptrActive ? 'var(--algo-swap)' : 'var(--text-muted)');
         ptrLines[i].setAttribute('marker-end', ptrActive ? 'url(#w2-arrow-active)' : 'url(#w2-arr-muted)');
         
-        
+        // تحديث مربعات المؤشرات
         ptrRects[i].setAttribute('fill', ptrActive ? 'var(--algo-swap)' : 'var(--bg-elevated)');
         ptrRects[i].setAttribute('stroke', ptrActive ? '#ffffff' : 'var(--text-muted)');
         ptrDots[i].setAttribute('fill', ptrActive ? '#ffffff' : 'var(--text-muted)');
       }
 
-      
+      // 2. تحديث المفاتيح
       for (let k = 0; k < 3; k++) {
         let kActive = s.keys.includes(k);
         let kCmp = s.cmp === k;
@@ -576,12 +576,12 @@ window.AlgoWidgets[2] = function(container) {
         keyTexts[k].textContent = dynamicKeys[k];
       }
 
-      
+      // 3. تحريك وتحديث صندوق الهدف (Target)
       if (s.target !== null) {
         targetGroup.style.opacity = '1';
-        let tx = 400; 
-        if (s.cmp !== -1) tx = 240 + s.cmp * 160; 
-        else if (s.ptrs.length > 0) tx = 160 + s.ptrs[0] * 160; 
+        let tx = 400; // المركز الافتراضي
+        if (s.cmp !== -1) tx = 240 + s.cmp * 160; // فوق المفتاح المقارن
+        else if (s.ptrs.length > 0) tx = 160 + s.ptrs[0] * 160; // فوق المؤشر المتبع
         
         targetGroup.style.transform = `translateX(${tx - 400}px)`;
         let label = _AL.lang() === 'ar' ? 'البحث:' : 'Target:';

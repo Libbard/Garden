@@ -6,10 +6,10 @@
       data-module="midterm">
 <head>
 
-  
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -18,7 +18,7 @@
 
     gtag('config', 'G-HGTK36LR0M');
   </script>
-  
+  <!-- ========================================== -->
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,11 +32,15 @@
       document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
     })();
   </script>
+  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
+  <script src="../../shared/subject-tint.js"></script>
   <link rel="stylesheet" href="../../shared/garden.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    
+    /* ── شريط تقدم الاختبار ── */
     .quiz-progress-container {
       width: 100%; height: 8px; background: var(--bg-surface);
       border-radius: var(--radius-pill); overflow: hidden; margin-bottom: 2rem;
@@ -48,7 +52,7 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    
+    /* ── رأس بطاقة السؤال ── */
     .quiz-card-header {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
@@ -56,7 +60,7 @@
     }
     .quiz-meta-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-    
+    /* ── لوحة النتيجة الحية ── */
     .live-score-board {
       display: inline-flex; align-items: center; gap: 0.5rem;
       background: var(--bg-body); padding: 0.4rem 1rem;
@@ -67,7 +71,7 @@
     }
     .live-score-board i { color: var(--brand-400); }
 
-    
+    /* ── خيارات الإجابة ── */
     .quiz-options-grid { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
     .quiz-option-btn {
       position: relative; text-align: right; padding: 1.2rem 1.5rem;
@@ -103,7 +107,7 @@
     .quiz-option-btn.wrong::before { background: #ef4444; color: #fff; content: '✕'; }
     .quiz-option-btn.disabled { pointer-events: none; }
 
-    
+    /* ── Timer ── */
     .quiz-timer-bar {
       display: flex; align-items: center; gap: 0.75rem;
       margin-bottom: 0.75rem; padding: 0.5rem 0.75rem;
@@ -138,7 +142,7 @@
     }
     .timer-toggle:hover { color: var(--brand-500); }
 
-    
+    /* ── ملخص الأخطاء ── */
     .summary-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
       gap: 0.5rem; margin: 1.5rem 0;
@@ -180,7 +184,7 @@
     .summary-row .row-q    { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .summary-row .row-mod  { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
 
-    
+    /* ── كارت اختصارات الكيبورد ── */
     .quiz-nav-row {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -193,20 +197,20 @@
     .quiz-nav-row .nav-left  { justify-self: start; }
     .quiz-nav-row .nav-mid   { justify-self: center; text-align: center; min-width: 0; }
     .quiz-nav-row .nav-right { justify-self: end; }
-    
+    /* على الجوال: أزرار أصغر ونص مختصر */
     @media (max-width: 480px) {
       .quiz-nav-row { gap: 0.25rem; padding-top: 1rem; margin-top: 1.25rem; }
       #q-counter { font-size: 0.8rem; letter-spacing: 0; }
     }
 
-    
+    /* زر التالي/الإنهاء — معطل حتى الإجابة */
     .nav-btn.pending {
       opacity: 0.38;
       cursor: not-allowed;
       pointer-events: none;
       filter: grayscale(0.4);
     }
-    
+    /* تلميح مرئي: نبضة خفيفة عند الانتظار */
     @keyframes pendingPulse {
       0%, 100% { box-shadow: none; }
       50%       { box-shadow: 0 0 0 3px var(--brand-glow); }
@@ -216,7 +220,7 @@
       background: linear-gradient(135deg, var(--brand-400), var(--brand-600));
       color: #fff !important; border: none; box-shadow: 0 4px 15px var(--brand-glow);
     }
-    
+    /* إصلاح: نمنع nav-btn:hover من الكتابة فوق btn-primary */
     .nav-btn.btn-primary:hover {
       background: linear-gradient(135deg, var(--brand-400), var(--brand-600)) !important;
       color: #fff !important;
@@ -228,7 +232,7 @@
       box-shadow: 0 6px 20px var(--brand-glow);
     }
 
-    
+    /* ── أيقونة الاختصارات (tooltip) ── */
     .kbd-tooltip-wrap {
       position: relative;
       display: inline-flex;
@@ -255,7 +259,7 @@
     .kbd-tooltip-panel {
       position: absolute;
       bottom: calc(100% + 10px);
-      
+      /* RTL: توجيه من اليمين لتجنب خروجه من الشاشة */
       right: 0; left: auto;
       transform: translateY(4px);
       background: var(--bg-surface);
@@ -274,7 +278,7 @@
       opacity: 1; pointer-events: auto;
       transform: translateY(0);
     }
-    
+    /* مثلث صغير */
     .kbd-tooltip-panel::after {
       content: '';
       position: absolute;
@@ -282,7 +286,7 @@
       border: 6px solid transparent;
       border-top-color: var(--border-color);
     }
-    
+    /* على الجوال: يفتح للأسفل بدلاً من الأعلى لتجنب الاقتصاص */
     @media (max-width: 640px) {
       .kbd-tooltip-panel {
         bottom: auto;
@@ -315,7 +319,7 @@
       font-weight: 700; color: var(--text-secondary); min-width: 1.4rem; text-align: center;
     }
 
-    
+    /* ── شريط أدوات الاختبار ── */
     .quiz-toolbar {
       display: flex;
       flex-direction: column;
@@ -335,14 +339,14 @@
         padding: 1rem 1.5rem;
       }
     }
-    
+    /* مجموعة الوحدات: تظهر كأسطر متعددة على الجوال بدلاً من التمرير */
     .filter-group {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
       justify-content: flex-start;
     }
-    
+    /* مجموعة الأزرار (shuffle + new): تبقى مضغوطة على اليمين */
     .filter-group--actions {
       display: flex;
       gap: 0.5rem;
@@ -355,7 +359,7 @@
       .filter-group--actions { align-self: center; }
     }
 
-    
+    /* ── تلوين درجة الصعوبة (مستخدمة ألوان مكتبة الخوارزميات) ── */
     .difficulty-easy   { background: rgba(52,211,153,0.12); color: var(--algo-sorted); border: 1px solid rgba(52,211,153,0.3); }
     .difficulty-medium { background: rgba(253,224,71,0.12);  color: var(--algo-compare); border: 1px solid rgba(253,224,71,0.3); }
     .difficulty-hard   { background: rgba(244,114,182,0.12); color: var(--algo-swap);   border: 1px solid rgba(244,114,182,0.3); }
@@ -363,7 +367,7 @@
     [data-theme="light"] .difficulty-medium { color: var(--algo-compare); }
     [data-theme="light"] .difficulty-hard   { color: var(--algo-swap); }
 
-    
+    /* ── تعليق الإجابة — خارج البطاقة، يظهر بحركة سلسة ── */
     .mcq-feedback-panel {
       overflow: hidden;
       max-height: 0;
@@ -395,7 +399,7 @@
       color: var(--text-primary);
     }
 
-    
+    /* ── نقاط المقالي — شريط عائم ثابت ── */
     .essay-score-float {
       position: sticky;
       top: 5rem;
@@ -429,7 +433,7 @@
     }
     .essay-score-float i { color: var(--brand-400); font-size: 1rem; }
 
-    
+    /* ── تنسيق المقالي ── */
     @media (min-width: 1024px) {
       .sidebar {
         position: sticky !important;
@@ -449,51 +453,30 @@
       .sidebar { display: none !important; }
     }
   </style>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#a78bfa">
+  <!-- /data-garden-icons -->
 </head>
-<body>
+<body data-page-title="CS362 · اختبار" data-page-title-en="CS362 · Quiz">
 
 <div class="reading-progress"></div>
 <div class="page-layout">
 
-<header class="site-header">
-  <div class="header-inner">
-    <div class="header-nav">
-      <a href="index.html" class="nav-btn nav-btn--icon" title="الرئيسية">
-        <i class="fa-solid fa-house"></i>
-      </a>
-      <a href="midterm-review.html" class="nav-btn">
-        <i class="fa-solid fa-book-open"></i>
-        <span data-bilingual>
-          <template class="content-ar">المراجعة الشاملة</template>
-          <template class="content-en">Full Review</template>
-          <span class="content-target">المراجعة الشاملة</span>
-        </span>
-      </a>
-    </div>
-    <a href="index.html" class="header-center">
-      <span class="subject-icon"><i class="fa-solid fa-brain"></i></span>
-      <span class="subject-name">CS362</span>
-      <span class="module-badge">MIDTERM QUIZ</span>
-    </a>
-    <div class="header-actions">
-      <div class="divider-v"></div>
-      <button class="toggle-btn" onclick="Garden.toggleLanguage()" title="تغيير اللغة">
-        <span id="lang-label">EN</span>
-      </button>
-      <button class="toggle-btn" onclick="Garden.cycleTheme()" title="تغيير الثيم">
-        <span id="theme-icon">🌙</span>
-      </button>
-    </div>
-  </div>
-</header>
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-card="../../hub/course.html?code=CS362"></header>
 
 <div class="content-wrapper">
 <aside class="sidebar fade-up">
   <div class="sidebar-title" data-i18n="toc.title">محتويات الاختبار</div>
   <ul class="toc-list">
-    <li><a href="#hero" class="toc-link">🏠 <span data-bilingual><template class="content-ar">لوحة التحكم</template><template class="content-en">Dashboard</template><span class="content-target">لوحة التحكم</span></span></a></li>
-    <li><a href="#mcq-engine" class="toc-link active">🎯 <span data-bilingual><template class="content-ar">الاختيار من متعدد</template><template class="content-en">Multiple Choice</template><span class="content-target">الاختيار من متعدد</span></span></a></li>
-    <li><a href="#essay-section" class="toc-link">📝 <span data-bilingual><template class="content-ar">الأسئلة المقالية</template><template class="content-en">Essay Questions</template><span class="content-target">الأسئلة المقالية</span></span></a></li>
+    <li><a href="#hero" class="toc-link"><i class="fa-solid fa-house" aria-hidden="true"></i> <span data-bilingual><template class="content-ar">لوحة التحكم</template><template class="content-en">Dashboard</template><span class="content-target">لوحة التحكم</span></span></a></li>
+    <li><a href="#mcq-engine" class="toc-link active"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-bilingual><template class="content-ar">الاختيار من متعدد</template><template class="content-en">Multiple Choice</template><span class="content-target">الاختيار من متعدد</span></span></a></li>
+    <li><a href="#essay-section" class="toc-link"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> <span data-bilingual><template class="content-ar">الأسئلة المقالية</template><template class="content-en">Essay Questions</template><span class="content-target">الأسئلة المقالية</span></span></a></li>
     <li><div class="toc-divider"></div></li>
   </ul>
   <div class="sidebar-widget" style="display:none"></div>
@@ -509,7 +492,7 @@
 
 <main class="main-content">
 
-
+<!-- Hero Section -->
 <section id="hero" class="hero fade-up">
   <div class="hero-eyebrow font-display">
     ⬡ <span data-bilingual>
@@ -560,7 +543,7 @@
   </div>
 </section>
 
-
+<!-- Quiz Toolbar -->
 <section class="quiz-toolbar fade-up section-gap">
   <div class="filter-group">
     <button class="tag module-filter-btn tag--accent" data-module="0" onclick="setModuleFocus(0)">
@@ -592,14 +575,14 @@
   </div>
 </section>
 
-
+<!-- MCQ Engine -->
 <section id="mcq-engine" class="fade-up section-gap">
 
   <div class="quiz-progress-container">
     <div class="quiz-progress-bar" id="q-progress-fill" style="width:0%"></div>
   </div>
 
-  
+  <!-- شريط التايمر — يظهر تلقائياً -->
   <div class="quiz-timer-bar" id="timer-bar">
     <button class="timer-toggle" id="timer-toggle-btn" onclick="toggleTimer()" title="تشغيل/إيقاف التايمر">
       <i class="fa-solid fa-pause" id="timer-toggle-icon"></i>
@@ -643,7 +626,7 @@
           <span class="content-target">إظهار تلميح</span>
         </span>
       </button>
-      
+      <!-- أيقونة i بجانب التلميح مباشرةً -->
       <div class="kbd-tooltip-wrap" style="flex-shrink:0">
         <button class="kbd-info-btn" tabindex="0" aria-label="keyboard shortcuts">i</button>
         <div class="kbd-tooltip-panel" data-bilingual>
@@ -675,7 +658,7 @@
     </div>
 
     <div class="quiz-nav-row">
-      
+      <!-- يسار: السابق -->
       <div class="nav-left">
         <button class="nav-btn" onclick="prevMcq()">
           <i class="fa-solid fa-arrow-right"></i>
@@ -687,7 +670,7 @@
         </button>
       </div>
 
-      
+      <!-- وسط: عداد السؤال — ثابت دائماً -->
       <div class="nav-mid">
         <div id="q-counter"
              style="font-weight:700;color:var(--text-muted);font-family:var(--display-font);font-size:0.9rem;letter-spacing:1px;white-space:nowrap">
@@ -699,7 +682,7 @@
         </div>
       </div>
 
-      
+      <!-- يمين: التالي أو الإنهاء — ظاهر دائماً، معطل حتى الإجابة -->
       <div class="nav-right">
         <button class="nav-btn btn-primary pending pending-hint" id="mcq-next-btn"
                 onclick="nextMcq()" disabled>
@@ -724,15 +707,15 @@
     </div>
   </article>
 
-  
+  <!-- لوحة التعليق — خارج البطاقة، ثابتة لا تحرك التصميم -->
   <div class="mcq-feedback-panel" id="mcq-feedback" role="status" aria-live="polite">
     <div class="feedback-inner"></div>
   </div>
 
-  
+  <!-- Results Screen -->
   <article id="final-score-screen" class="concept-card glass-card hidden fade-up"
            style="padding:3rem 2rem;text-align:center;margin-top:1rem">
-    <div id="final-emoji" style="font-size:2rem;margin-bottom:0.5rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.2))">🏆</div>
+    <div id="final-emoji" style="font-size:2rem;margin-bottom:0.5rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.2))"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
     <div id="final-score-num"
          style="font-size:1.75rem;font-weight:800;color:var(--brand-500);font-family:var(--display-font);line-height:1.2">
       0 / 70
@@ -740,10 +723,10 @@
     <div id="motivational-msg"
          style="margin:1rem 0;font-size:1.1rem;font-weight:600;color:var(--text-secondary);line-height:1.6"></div>
 
-    
+    <!-- ملخص لكل وحدة -->
     <div class="summary-grid" id="summary-mod-grid"></div>
 
-    
+    <!-- قائمة الأسئلة بالتفصيل -->
     <details style="text-align:right;margin-top:1rem">
       <summary style="cursor:pointer;font-weight:700;color:var(--brand-500);font-size:0.95rem;padding:0.5rem;list-style:none;display:flex;align-items:center;gap:0.5rem">
         <i class="fa-solid fa-chart-bar"></i>
@@ -785,16 +768,16 @@
               onclick="document.getElementById('essay-section').scrollIntoView({behavior:'smooth'})">
         <i class="fa-solid fa-pen-nib"></i>
         <span data-bilingual style="margin-inline-start:0.5rem">
-          <template class="content-ar">📝 المقالي</template>
-          <template class="content-en">📝 Essay</template>
-          <span class="content-target">📝 المقالي</span>
+          <template class="content-ar"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> المقالي</template>
+          <template class="content-en"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Essay</template>
+          <span class="content-target"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> المقالي</span>
         </span>
       </button>
     </div>
   </article>
 </section>
 
-
+<!-- Essay Section -->
 <section id="essay-section" class="fade-up section-gap">
   <div class="concept-header">
     <h2 data-bilingual>
@@ -824,15 +807,15 @@
     <div class="footer-links">
       <a href="midterm-review.html" class="footer-link">
         <span data-bilingual>
-          <template class="content-ar">📚 المراجعة الشاملة</template>
-          <template class="content-en">📚 Full Review</template>
-          <span class="content-target">📚 المراجعة الشاملة</span>
+          <template class="content-ar"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> المراجعة الشاملة</template>
+          <template class="content-en"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Full Review</template>
+          <span class="content-target"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> المراجعة الشاملة</span>
         </span>
       </a>
       <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
-      <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
+      <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
     </div>
-    <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
+    <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
   </div>
 </footer>
 </div>
@@ -921,7 +904,7 @@ function setModuleFocus(mod) {
   document.getElementById('final-score-screen').classList.add('hidden');
   renderMcq(0);
 }
- 
+/* essay-reshuffle-patched */
 function retryWithNewQuestions() {
   const seed = Date.now().toString(36);
   if (currentModuleFocus === 0) {
@@ -968,7 +951,7 @@ function renderMcq(idx) {
   document.getElementById('live-score').textContent = score;
   document.getElementById('q-total').textContent = TOTAL;
   document.getElementById('q-module-badge').textContent = `M${q.module}`;
-  
+  // ── difficulty: bilingual label + color class ──
   const diffEl = document.getElementById('q-difficulty-badge');
   const diffMap = { easy: {ar:'سهل', en:'Easy'}, medium: {ar:'متوسط', en:'Medium'}, hard: {ar:'صعب', en:'Hard'} };
   const diffKey = (q.difficulty||'medium').toLowerCase();
@@ -989,13 +972,13 @@ function renderMcq(idx) {
   }
   document.getElementById('mcq-feedback').className = 'mcq-feedback-panel';
   document.getElementById('mcq-feedback').querySelector('.feedback-inner').innerHTML = '';
-  
+  // زر التالي — ظاهر دائماً، معطل حتى الإجابة
   const nextBtn   = document.getElementById('mcq-next-btn');
   const finishBtn = document.getElementById('mcq-finish-btn');
   const isLast    = (idx >= TOTAL - 1);
   nextBtn.classList.toggle('hidden', isLast);
   finishBtn.classList.toggle('hidden', !isLast);
-  
+  // تعطيل الزر المرئي
   const activeBtn = isLast ? finishBtn : nextBtn;
   const otherBtn  = isLast ? nextBtn   : finishBtn;
   activeBtn.disabled = true;
@@ -1023,15 +1006,15 @@ function pickMcq(i) {
 function showFeedback(q, lang) {
   const fb = document.getElementById('mcq-feedback');
   const ok = answered[cur] === q.correctIndex;
-  const pfx = ok ? (lang==='ar' ? '✅ صحيح! ' : '✅ Correct! ')
-                 : (lang==='ar' ? '❌ خطأ! ' : '❌ Wrong! ');
+  const pfx = ok ? (lang==='ar' ? '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> صحيح! ' : '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Correct! ')
+                 : (lang==='ar' ? '<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> خطأ! ' : '<i class="fa-solid fa-circle-xmark" aria-hidden="true"></i> Wrong! ');
   fb.querySelector('.feedback-inner').innerHTML =
     `<strong>${pfx}</strong><div data-bilingual>` +
     `<template class="content-ar">${q.explanation.ar}</template>` +
     `<template class="content-en">${q.explanation.en}</template>` +
     `<span class="content-target">${q.explanation[lang]}</span></div>`;
   fb.className = `mcq-feedback-panel ${ok ? 'correct-panel' : 'wrong-panel'} visible`;
-  
+  // إعادة تطبيق data-bilingual على العناصر الجديدة
   if (typeof Garden !== 'undefined' && Garden.refreshBilingual) Garden.refreshBilingual(fb);
 }
 function showNextOrFinish() {
@@ -1058,12 +1041,12 @@ function finishExam() {
   const fs = document.getElementById('final-score-screen'); fs.classList.remove('hidden');
   document.getElementById('final-score-num').textContent = `${score} / ${TOTAL}`;
   const pct = score / TOTAL, lang = getLang();
-  let emoji = '🔄';
-  if(pct>=0.9) emoji='🏆'; else if(pct>=0.7) emoji='💪'; else if(pct>=0.5) emoji='📚';
-  document.getElementById('final-emoji').textContent = emoji;
+  let emoji = '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i>';
+  if(pct>=0.9) emoji='<i class="fa-solid fa-trophy" aria-hidden="true"></i>'; else if(pct>=0.7) emoji='<i class="fa-solid fa-hand-fist" aria-hidden="true"></i>'; else if(pct>=0.5) emoji='<i class="fa-solid fa-book-open-reader" aria-hidden="true"></i>';
+  document.getElementById('final-emoji').innerHTML = emoji;
   const msgs = {
-    ar: pct>=0.9?'أداء استثنائي! 🏆':pct>=0.7?'عمل جيد! 💪':pct>=0.5?'استمر! 📚':'راجع أكثر 🔄',
-    en: pct>=0.9?'Outstanding! 🏆':pct>=0.7?'Good job! 💪':pct>=0.5?'Keep going! 📚':'Review more 🔄'
+    ar: pct>=0.9?'أداء استثنائي!':pct>=0.7?'عمل جيد!':pct>=0.5?'استمر!':'راجع أكثر',
+    en: pct>=0.9?'Outstanding!':pct>=0.7?'Good job!':pct>=0.5?'Keep going!':'Review more'
   };
   document.getElementById('motivational-msg').textContent = msgs[lang];
   const prev = localStorage.getItem(STORAGE_KEY);
@@ -1100,7 +1083,7 @@ function renderEssays() {
                background:var(--bg-elevated);color:var(--text-primary);font-family:inherit;resize:vertical;
                margin-bottom:1rem;box-sizing:border-box"></textarea>
       <button class="nav-btn" id="essay-reveal-btn-${i}" onclick="toggleEssay(${i})">
-        💡 ${lang==='ar'?'عرض الإجابة النموذجية':'Reveal Model Answer'}
+        <i class="fa-solid fa-lightbulb" aria-hidden="true"></i> ${lang==='ar'?'عرض الإجابة النموذجية':'Reveal Model Answer'}
       </button>
       <div class="hidden" id="essay-answer-${i}" style="margin-top:1.5rem;padding:1.5rem;
            background:var(--bg-elevated);border-radius:var(--radius-lg);border:1px solid var(--border-color)">
@@ -1139,9 +1122,9 @@ function renderEssays() {
             ${lang==='ar'?'قيّم إجابتك:':'Rate:'}
           </span>
           <button class="nav-btn" onclick="gradeEssay(${i},true)"
-                  style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.2)">✅</button>
+                  style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.2)"><i class="fa-solid fa-check" aria-hidden="true"></i></button>
           <button class="nav-btn" onclick="gradeEssay(${i},false)"
-                  style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)">❌</button>
+                  style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
       </div>
     </article>`;
@@ -1158,8 +1141,8 @@ function toggleEssay(i) {
   if (btn) {
     const lang = getLang();
     btn.innerHTML = isHidden
-      ? '💡 ' + (lang==='ar' ? 'عرض الإجابة النموذجية' : 'Reveal Model Answer')
-      : '🔽 ' + (lang==='ar' ? 'إخفاء الإجابة' : 'Hide Answer');
+      ? '<i class="fa-solid fa-lightbulb" aria-hidden="true"></i> ' + (lang==='ar' ? 'عرض الإجابة النموذجية' : 'Reveal Model Answer')
+      : '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i> ' + (lang==='ar' ? 'إخفاء الإجابة' : 'Hide Answer');
   }
 }
 function gradeEssay(i, ok) {
@@ -1172,7 +1155,7 @@ function gradeEssay(i, ok) {
   if(ec) ec.textContent = essayScore;
 }
 
-
+// ── Timer ──────────────────────────────────────────────────────
 const TIMER_DURATION = 60;
 let timerSec = TIMER_DURATION, timerInterval = null, timerPaused = false, timerEnabled = true;
 
@@ -1218,13 +1201,13 @@ function updateTimerUI() {
 }
 function autoTimeOut() {
   if (answered[cur] !== undefined) return;
-  
+  // اختر إجابة خاطئة تلقائياً (تُحسب كإجابة)
   const q = sessionMCQ[cur];
   const wrongIdx = (q.correctIndex + 1) % (q.options.ar||[]).length;
   pickMcq(wrongIdx);
 }
 
-
+// ── Keyboard shortcuts ─────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
   if (document.getElementById('mcq-card')?.classList.contains('hidden')) return;
@@ -1246,10 +1229,10 @@ document.addEventListener('keydown', e => {
   if (key === 'h' || key === 'H') { showMcqHint(); }
 });
 
-
+// ── Summary builder ────────────────────────────────────────────
 function buildSummary() {
   const lang = getLang();
-  
+  // Per-module stats
   const modMap = {};
   sessionMCQ.forEach((q, i) => {
     const m = q.module;
@@ -1269,20 +1252,20 @@ function buildSummary() {
       </div>`;
     }).join('');
   }
-  
+  // Per-question list
   const list = document.getElementById('summary-q-list');
   if (list) {
     list.innerHTML = sessionMCQ.map((q, i) => {
       const ok = answered[i] === q.correctIndex;
       const qText = (q.question[lang] || q.question.ar || '').substring(0, 70);
       return `<div class="summary-row ${ok?'correct-row':'wrong-row'}" onclick="jumpToQuestion(${i})">
-        <span class="row-icon">${ok?'✅':'❌'}</span>
+        <span class="row-icon">${ok?'<i class="fa-solid fa-check" aria-hidden="true"></i>':'<i class="fa-solid fa-xmark" aria-hidden="true"></i>'}</span>
         <span class="row-q" title="${qText}">${qText}...</span>
         <span class="row-mod">M${q.module}</span>
       </div>`;
     }).join('');
   }
-  
+  // Show review-wrong button if there are mistakes
   const wrongCount = sessionMCQ.filter((q,i) => answered[i] !== q.correctIndex).length;
   const rwBtn = document.getElementById('review-wrong-btn');
   if (rwBtn) rwBtn.style.display = wrongCount > 0 ? '' : 'none';
@@ -1319,8 +1302,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startTimer();
 });
 </script>
-</script>
-
+<!-- ── Back-to-top floating button ── -->
 <button
   id="back-to-top"
   onclick="window.scrollTo({top:0,behavior:'smooth'})"
@@ -1343,6 +1325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 <script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
 <script src="../../shared/firebase-sync.js"></script>
 </body>
 </html>

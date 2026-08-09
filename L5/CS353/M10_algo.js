@@ -1,6 +1,6 @@
-
-
-
+// M10_algo.js — Interactive algorithm widgets
+// Generated: 2026-03-04T09:53:18
+// Diagrams: 5/5
 
 window.AlgoWidgets = window.AlgoWidgets || {};
 
@@ -88,12 +88,12 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بأبعاد 2:1
       '<div class="algo-canvas" id="w1-svg-container" style="width:100%; max-width:800px; aspect-ratio: 2 / 1; margin: 0 auto; display:flex; justify-content:center; align-items:center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-act"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-sorted);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-comp"></span></span>' +
@@ -108,7 +108,7 @@ window.AlgoWidgets[1] = function(container) {
  
     var steps = [], cur = 0, playing = false, interval = null;
     
-    
+    // متغيرات لبناء الشجرة التفاعلية
     var targetN = 5;
     var nextNodeId = 0;
     var nodes = []; 
@@ -127,7 +127,7 @@ window.AlgoWidgets[1] = function(container) {
       container.querySelector('[data-algo-text="w1-hit"]').textContent  = _AL.exp('Cache Hit', 'موجود بالذاكرة (Hit)');
     }
 
-    
+    // بناء شجرة فيبوناتشي بشكل هرمي (في الذاكرة فقط)
     function buildFibTree(n, parentId = null) {
       let id = nextNodeId++;
       let node = { id: id, n: n, val: `F(${n})`, parent: parentId, children: [], x: 0, y: 0 };
@@ -141,7 +141,7 @@ window.AlgoWidgets[1] = function(container) {
       return id;
     }
 
-    
+    // حساب الإحداثيات لكي تتوسط الـ SVG بشكل مثالي
     function layoutTree(rootId) {
       const vOffset = 75; 
       const hSpacing = 50;
@@ -162,7 +162,7 @@ window.AlgoWidgets[1] = function(container) {
       }
       traverse(rootId, 0);
 
-      
+      // توسيط الشجرة داخل الـ viewBox (800)
       let minX = Infinity, maxX = -Infinity;
       nodes.forEach(n => {
         if(n.x < minX) minX = n.x;
@@ -174,7 +174,7 @@ window.AlgoWidgets[1] = function(container) {
       nodes.forEach(n => { n.x += offsetX; });
     }
 
-    
+    // توليد خطوات الحل (Execution Trace)
     function traceFibonacci(id, currentSteps, currentVis, currentComp, currentMemo) {
       let node = nodeMap[id];
       let n = node.n;
@@ -187,7 +187,7 @@ window.AlgoWidgets[1] = function(container) {
         ar: `نحتاج لحساب <strong dir="ltr">F(${n})</strong>.`
       });
 
-      
+      // حالة أساسية
       if (n === 0 || n === 1) {
         currentComp.push(id);
         if (!memoMap[n]) {
@@ -202,7 +202,7 @@ window.AlgoWidgets[1] = function(container) {
         return;
       }
 
-      
+      // هل هي محسوبة مسبقاً (Cache Hit)؟
       if (memoMap[n]) {
         currentMemo.push(id); 
         currentSteps.push({
@@ -214,7 +214,7 @@ window.AlgoWidgets[1] = function(container) {
         return;
       }
 
-      
+      // حساب الأبناء
       traceFibonacci(node.children[0], currentSteps, currentVis, currentComp, currentMemo);
       
       currentSteps.push({
@@ -225,7 +225,7 @@ window.AlgoWidgets[1] = function(container) {
 
       traceFibonacci(node.children[1], currentSteps, currentVis, currentComp, currentMemo);
 
-      
+      // بعد اكتمال الأبناء
       memoMap[n] = true;
       memoOrder.push(n);
       currentComp.push(id);
@@ -238,8 +238,8 @@ window.AlgoWidgets[1] = function(container) {
     }
 
     function generateSteps() {
-      
-      targetN = Math.floor(Math.random() * 3) + 3; 
+      // تفاعلية: حد أقصى للرقم هو 5 لكي لا تفيض الشجرة خارج الشاشة
+      targetN = Math.floor(Math.random() * 3) + 3; // 3, 4, or 5
       
       nextNodeId = 0;
       nodes = [];
@@ -279,7 +279,7 @@ window.AlgoWidgets[1] = function(container) {
       svgHTML += `<marker id="arr-hit" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--algo-compare)" /></marker>`;
       svgHTML += '</defs>';
  
-      
+      // 1. رسم الخطوط
       nodes.forEach(n => {
         if (n.parent !== null) {
           let pNode = nodeMap[n.parent];
@@ -298,7 +298,7 @@ window.AlgoWidgets[1] = function(container) {
           
           let stroke = isHit ? 'var(--algo-compare)' : 'var(--text-muted)';
           
-          
+          // الإخفاء التام (0) لعدم حرق الخوارزمية
           let opacity = isVisible ? '1' : '0'; 
           
           if(isVisible && !s.act && !s.comp.includes(n.id) && !isHit && n.id !== s.act) opacity = '0.3'; 
@@ -311,7 +311,7 @@ window.AlgoWidgets[1] = function(container) {
         }
       });
  
-      
+      // 2. رسم العقد والنصوص
       nodes.forEach(n => {
         let isVisible = s.vis.includes(n.id);
         
@@ -320,7 +320,7 @@ window.AlgoWidgets[1] = function(container) {
         let textFill = 'var(--algo-text)';
         let scale = '1';
         
-        
+        // الإخفاء التام (0) بدلاً من (0.1) ليكون الاستكشاف حقيقياً
         let opacity = isVisible ? '1' : '0'; 
 
         if (isVisible) {
@@ -339,7 +339,7 @@ window.AlgoWidgets[1] = function(container) {
             strokeColor = '#ffffff';
             textFill = '#ffffff';
           } else {
-            
+            // معلقة في الـ Stack
             fill = 'var(--brand-500)';
             strokeColor = '#ffffff';
             textFill = '#ffffff';
@@ -371,7 +371,7 @@ window.AlgoWidgets[1] = function(container) {
     container.querySelector('[data-algo-btn="prev"]').addEventListener('click',  function(){ stopPlay(); if(cur>0){ cur--; render(); } });
     container.querySelector('[data-algo-btn="step"]').addEventListener('click',  function(){ stopPlay(); if(cur<steps.length-1){ cur++; render(); } });
     container.querySelector('[data-algo-btn="play"]').addEventListener('click',  function(){ playing ? stopPlay() : startPlay(); });
-    
+    // عند الضغط على إعادة، يتم توليد شجرة جديدة برقم جديد!
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function(){ stopPlay(); generateSteps(); cur=0; render(); });
     container.querySelector('.algo-speed input').addEventListener('input', function() {
       if (playing) {
@@ -381,7 +381,7 @@ window.AlgoWidgets[1] = function(container) {
     });
  
     window._algoRerenders[1] = render;
-    generateSteps(); 
+    generateSteps(); // يتضمن اختيار رقم عشوائي وبناء الشجرة
     render();
 };
 
@@ -391,15 +391,15 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.95rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; text-align: center; min-height: 48px;"></div>' +
       
-      
+      // حاوية متجاوبة هجينة (SVG + HTML Overlay)
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:700px; margin:0 auto; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:hidden; display: flex; flex-direction: column; align-items: center; padding-bottom: 60px;">' +
         '<svg id="w2-svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="overflow:visible; margin-top: 15px;"></svg>' +
         
-        
+        // صندوق المعادلة العائم (HTML للحصول على تنسيق غني)
         '<div id="w2-formula-box" style="position:absolute; bottom: 15px; width: 90%; max-width: 500px; padding: 8px 15px; background: var(--bg-elevated); border: 2px solid var(--algo-border); border-radius: 8px; text-align: center; font-family: \'JetBrains Mono\', monospace; font-size: 14px; font-weight: bold; color: var(--text-primary); opacity: 0; transition: all 0.4s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></div>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:4px;margin-right:4px;"></span><span data-algo-text="w2-target"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-swap);border-radius:4px;margin-right:4px;"></span><span data-algo-text="w2-exclude"></span></span>' +
@@ -416,18 +416,18 @@ window.AlgoWidgets[2] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    
+    // عناصر التخزين المؤقت (DOM Caching)
     var uiCells = [];
     var uiRowLabels = [];
     var uiColLabels = [];
     var arrowExclude, arrowInclude;
 
-    
+    // بيانات الخوارزمية (سيتم توليدها عشوائياً)
     var items = [];
     var W = 0;
     var numItems = 0;
 
-    
+    // الثوابت الهندسية
     const CELL_W = 48;
     const CELL_H = 40;
     const GAP = 4;
@@ -450,12 +450,12 @@ window.AlgoWidgets[2] = function(container) {
     }
 
     function generateSteps() {
-      
-      W = Math.floor(Math.random() * 3) + 5; 
+      // توليد بيانات عشوائية للحقيبة في كل Reset
+      W = Math.floor(Math.random() * 3) + 5; // سعة من 5 إلى 7
       numItems = 4;
-      items = [{ w: 0, v: 0 }]; 
+      items = [{ w: 0, v: 0 }]; // العنصر 0 وهمي
       
-      
+      // لتفادي تكرار الأوزان بشكل ممل
       let wPool = [1, 2, 3, 4, 5];
       wPool.sort(() => Math.random() - 0.5);
       
@@ -524,12 +524,12 @@ window.AlgoWidgets[2] = function(container) {
       uiRowLabels = [];
       uiColLabels = [];
 
-      
+      // ضبط الـ ViewBox ديناميكياً ليتناسب مع الجوال تماماً ولا يترك فراغات
       let totalW = PAD_LEFT + (W + 1) * (CELL_W + GAP) + 20;
       let totalH = PAD_TOP + (numItems + 1) * (CELL_H + GAP) + 20;
       svgEl.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
 
-      
+      // تعريف الأسهم
       let defs = makeSVG('defs', {});
       defs.innerHTML = `
         <marker id="w2-arr-exc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--algo-swap)"/></marker>
@@ -537,7 +537,7 @@ window.AlgoWidgets[2] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-      
+      // العناوين (الأعمدة - السعة)
       let colTitle = makeSVG('text', { x: PAD_LEFT + ((W + 1) * (CELL_W + GAP)) / 2, y: 15, 'text-anchor': 'middle', fill: 'var(--text-primary)', 'font-family': "'Cairo', sans-serif", 'font-size': '15px', 'font-weight': 'bold' });
       colTitle.textContent = _AL.exp('Capacity (j)', 'السعة المتاحة (j)');
       svgEl.appendChild(colTitle);
@@ -550,7 +550,7 @@ window.AlgoWidgets[2] = function(container) {
         uiColLabels.push(txt);
       }
 
-      
+      // العناوين (الصفوف - العناصر)
       for (let i = 0; i <= numItems; i++) {
         let y = PAD_TOP + i * (CELL_H + GAP) + CELL_H / 2;
         let txt = makeSVG('text', { x: PAD_LEFT - 10, y: y, 'text-anchor': 'end', 'dominant-baseline': 'middle', fill: 'var(--text-muted)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '13px', 'font-weight': 'bold' });
@@ -559,7 +559,7 @@ window.AlgoWidgets[2] = function(container) {
         uiRowLabels.push(txt);
       }
 
-      
+      // بناء الخلايا
       let cellsG = makeSVG('g', {});
       for (let i = 0; i <= numItems; i++) {
         uiCells[i] = [];
@@ -578,7 +578,7 @@ window.AlgoWidgets[2] = function(container) {
       }
       svgEl.appendChild(cellsG);
 
-      
+      // بناء الأسهم
       arrowExclude = makeSVG('line', { stroke: 'var(--algo-swap)', 'stroke-width': 3, 'stroke-dasharray': '5,4', 'marker-end': 'url(#w2-arr-exc)', opacity: 0 });
       arrowInclude = makeSVG('path', { fill: 'none', stroke: 'var(--brand-500)', 'stroke-width': 3, 'marker-end': 'url(#w2-arr-inc)', opacity: 0 });
       svgEl.appendChild(arrowExclude);
@@ -594,9 +594,9 @@ window.AlgoWidgets[2] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-      
+      // 1. تحديث الجدول (الخلايا)
       for (let i = 0; i <= numItems; i++) {
-        
+        // تحديث ألوان العناوين
         let isRowActive = (i === s.i);
         uiRowLabels[i].setAttribute('fill', isRowActive ? 'var(--algo-active)' : 'var(--text-muted)');
         
@@ -607,14 +607,14 @@ window.AlgoWidgets[2] = function(container) {
           let val = s.dp[i][j];
           let opacity = '1', scale = 'scale(1)', fill = 'var(--bg-elevated)', stroke = 'var(--algo-border)', txtFill = 'var(--text-primary)';
 
-          
+          // منطق الرؤية
           if (i > s.i || (i === s.i && j > s.j)) {
             if (s.phase !== 'done') { opacity = '0.1'; val = ''; }
           } else if (s.phase !== 'done' && i < s.i - 1) {
-            opacity = '0.25'; 
+            opacity = '0.25'; // تبهيت الصفوف القديمة لتركيز الانتباه
           }
 
-          
+          // الألوان والتحديد
           if (s.phase === 'done' && i === numItems && j === W) {
             fill = 'var(--algo-sorted)'; stroke = '#ffffff'; txtFill = '#ffffff'; scale = 'scale(1.15)';
           } else if (i === s.i && j === s.j) {
@@ -634,7 +634,7 @@ window.AlgoWidgets[2] = function(container) {
         }
       }
 
-      
+      // 2. تحديث الأسهم مع رياضيات دقيقة لا تخترق الخلايا
       arrowExclude.style.opacity = '0';
       arrowInclude.style.opacity = '0';
 
@@ -651,19 +651,19 @@ window.AlgoWidgets[2] = function(container) {
       if (s.phase === 'compare' && s.from2) {
         let u = uiCells[s.from2.r][s.from2.c];
         let v = uiCells[s.i][s.j];
-        
+        // رسم منحنى أنيق باستخدام (Quadratic Bezier Curve) لتجنب التداخل مع سهم الاستبعاد
         let startX = u.cx;
         let startY = u.cy + CELL_H/2;
-        let endX = v.cx - 10; 
+        let endX = v.cx - 10; // الإزاحة قليلاً لليسار عن السهم الآخر
         let endY = v.cy - CELL_H/2 - 6;
         let midX = startX + (endX - startX) / 2;
-        let midY = startY + (endY - startY) / 2 + 25; 
+        let midY = startY + (endY - startY) / 2 + 25; // انحناء لأسفل
 
         arrowInclude.setAttribute('d', `M ${startX} ${startY} Q ${midX} ${midY} ${endX} ${endY}`);
         arrowInclude.style.opacity = '1';
       }
 
-      
+      // 3. تحديث صندوق المعادلة (HTML Overlay)
       if (s.phase === 'compare' || s.phase === 'exclude') {
         formulaBox.style.opacity = '1';
         let html = `DP[${s.i}][${s.j}] = `;
@@ -714,12 +714,12 @@ window.AlgoWidgets[3] = function(container) {
       _AL.toolbar(3) +
       '<div class="algo-explanation" id="w3-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة لتوسيط الشاشة 
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:600px; margin:0 auto; aspect-ratio: 5/3; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:visible;">' +
         '<svg id="w3-svg" width="100%" height="100%" viewBox="0 0 600 360" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--text-muted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w3-prev"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w3-check"></span></span>' +
@@ -735,7 +735,7 @@ window.AlgoWidgets[3] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    
+    // إحداثيات متناسقة جداً داخل 600x360
     var nodeCoords = {
       i: { x: 150, y: 260 },
       j: { x: 450, y: 260 },
@@ -743,7 +743,7 @@ window.AlgoWidgets[3] = function(container) {
     };
     var radius = 24;
 
-    
+    // متغيرات للاحتفاظ بالعناصر لتحديثها برمجياً (Lazy Init)
     var edgesUI = {};
     var nodesUI = {};
  
@@ -811,7 +811,7 @@ window.AlgoWidgets[3] = function(container) {
       ];
     }
 
-    
+    // حساب إحداثيات الخط ليتوقف عند حافة الدائرة
     function getEdgeCoords(fromId, toId) {
       let p1 = nodeCoords[fromId];
       let p2 = nodeCoords[toId];
@@ -821,7 +821,7 @@ window.AlgoWidgets[3] = function(container) {
       return {
         x1: p1.x + (dx / dist) * radius,
         y1: p1.y + (dy / dist) * radius,
-        x2: p2.x - (dx / dist) * (radius + 4), 
+        x2: p2.x - (dx / dist) * (radius + 4), // مسافة لرأس السهم
         y2: p2.y - (dy / dist) * (radius + 4)
       };
     }
@@ -832,7 +832,7 @@ window.AlgoWidgets[3] = function(container) {
       edgesUI = {};
       nodesUI = {};
 
-      
+      // 1. تعريف رؤوس الأسهم (Markers) لكل لون نستخدمه
       var defs = document.createElementNS(ns, 'defs');
       defs.innerHTML = `
         <marker id="arr-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)"/></marker>
@@ -841,7 +841,7 @@ window.AlgoWidgets[3] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-      
+      // 2. بناء الخطوط (Edges) بشكل مسبق ومخفي
       var edgesGroup = document.createElementNS(ns, 'g');
       ['ij', 'ik', 'kj'].forEach(key => {
         let from = key[0], to = key[1];
@@ -849,7 +849,7 @@ window.AlgoWidgets[3] = function(container) {
 
         let g = document.createElementNS(ns, 'g');
         g.style.transition = 'opacity 0.4s ease';
-        g.style.opacity = '0'; 
+        g.style.opacity = '0'; // مخفي في البداية
 
         let line = document.createElementNS(ns, 'line');
         line.setAttribute('x1', c.x1); line.setAttribute('y1', c.y1);
@@ -874,7 +874,7 @@ window.AlgoWidgets[3] = function(container) {
       });
       svgEl.appendChild(edgesGroup);
 
-      
+      // 3. بناء العقد (Nodes)
       var nodesGroup = document.createElementNS(ns, 'g');
       ['i', 'j', 'k'].forEach(id => {
         let p = nodeCoords[id];
@@ -926,11 +926,11 @@ window.AlgoWidgets[3] = function(container) {
         'var(--brand-500)': 'url(#arr-brand)'
       };
 
-      
-      
+      // 1. تحديث الخطوط (Edges)
+      // إخفاء جميع الخطوط أولاً
       Object.values(edgesUI).forEach(ui => ui.g.style.opacity = '0');
 
-      
+      // إظهار وتحديث الخطوط المطلوبة في الخطوة الحالية
       s.edges.forEach(e => {
         let key = e.from + e.to;
         let ui = edgesUI[key];
@@ -941,7 +941,7 @@ window.AlgoWidgets[3] = function(container) {
           ui.line.setAttribute('marker-end', colorToMarker[e.color]);
 
           ui.text.textContent = e.label;
-          
+          // تلوين النص ليتناسب مع الخط (الرمادي نجعله كلون النص العادي ليُقرأ بوضوح)
           ui.text.setAttribute('fill', e.color === 'var(--text-muted)' ? 'var(--text-primary)' : e.color);
 
           let mx = (ui.c.x1 + ui.c.x2) / 2 + e.dx;
@@ -951,7 +951,7 @@ window.AlgoWidgets[3] = function(container) {
         }
       });
 
-      
+      // 2. تحديث العقد (Nodes)
       ['i', 'j', 'k'].forEach(id => {
         let ui = nodesUI[id];
         let isActive = s.nodes[id];
@@ -1026,12 +1026,12 @@ window.AlgoWidgets[4] = function(container) {
       _AL.toolbar(4) +
       '<div class="algo-explanation" id="w4-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بأبعاد 5:3 
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:600px; margin:0 auto; aspect-ratio: 5/3; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:visible;">' +
         '<svg id="w4-svg" width="100%" height="100%" viewBox="0 0 600 360" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--text-muted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w4-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w4-compare"></span></span>' +
@@ -1047,7 +1047,7 @@ window.AlgoWidgets[4] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    
+    // الثوابت الهندسية
     var radius = 24;
     var nodeCoords = {
       i: { x: 150, y: 240 },
@@ -1055,7 +1055,7 @@ window.AlgoWidgets[4] = function(container) {
       k: { x: 300, y: 80 }
     };
 
-    
+    // عناصر الـ UI لتحديثها برمجياً
     var edgesUI = {};
     var nodesUI = {};
     var formulaTextUI;
@@ -1070,7 +1070,7 @@ window.AlgoWidgets[4] = function(container) {
 
     function generateSteps() {
       steps = [];
-      
+      // توليد أرقام تفاعلية في كل مرة
       var dij = Math.floor(Math.random() * 15) + 5;
       var dik = Math.floor(Math.random() * 8) + 3;
       var dkj = Math.floor(Math.random() * 8) + 3;
@@ -1152,7 +1152,7 @@ window.AlgoWidgets[4] = function(container) {
       }
     }
 
-    
+    // حساب نقاط الارتكاز لكي تلامس الخطوط حواف الدوائر
     function getEdgeCoords(fromId, toId) {
       let p1 = nodeCoords[fromId];
       let p2 = nodeCoords[toId];
@@ -1162,9 +1162,9 @@ window.AlgoWidgets[4] = function(container) {
       return {
         x1: p1.x + (dx / dist) * radius,
         y1: p1.y + (dy / dist) * radius,
-        x2: p2.x - (dx / dist) * (radius + 4), 
+        x2: p2.x - (dx / dist) * (radius + 4), // مسافة لرأس السهم
         y2: p2.y - (dy / dist) * (radius + 4),
-        mx: (p1.x + p2.x) / 2, 
+        mx: (p1.x + p2.x) / 2, // نقطة المنتصف للنص
         my: (p1.y + p2.y) / 2
       };
     }
@@ -1175,7 +1175,7 @@ window.AlgoWidgets[4] = function(container) {
       edgesUI = {};
       nodesUI = {};
 
-      
+      // تعريف رؤوس الأسهم (Markers)
       var defs = document.createElementNS(ns, 'defs');
       defs.innerHTML = `
         <marker id="arr-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)"/></marker>
@@ -1185,10 +1185,10 @@ window.AlgoWidgets[4] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-      
+      // بناء الخطوط (Edges) والنصوص المرافقة لها
       var edgesGroup = document.createElementNS(ns, 'g');
       
-      
+      // إزاحات النصوص (Labels offsets)
       var offsets = {
         'ij': { dx: 0, dy: -18 },
         'ik': { dx: -25, dy: -15 },
@@ -1208,7 +1208,7 @@ window.AlgoWidgets[4] = function(container) {
         line.setAttribute('x2', c.x2); line.setAttribute('y2', c.y2);
         line.style.transition = 'all 0.4s ease';
 
-        
+        // خلفية للنص لتسهيل القراءة
         let textBg = document.createElementNS(ns, 'rect');
         textBg.setAttribute('x', c.mx + offsets[key].dx - 15);
         textBg.setAttribute('y', c.my + offsets[key].dy - 12);
@@ -1238,7 +1238,7 @@ window.AlgoWidgets[4] = function(container) {
       });
       svgEl.appendChild(edgesGroup);
 
-      
+      // بناء العقد (Nodes)
       var nodesGroup = document.createElementNS(ns, 'g');
       ['i', 'j', 'k'].forEach(id => {
         let p = nodeCoords[id];
@@ -1246,7 +1246,7 @@ window.AlgoWidgets[4] = function(container) {
         let g = document.createElementNS(ns, 'g');
         g.style.transformOrigin = `${p.x}px ${p.y}px`;
         g.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        g.style.opacity = '0'; 
+        g.style.opacity = '0'; // عقدة k تكون مخفية في البداية
 
         let circle = document.createElementNS(ns, 'circle');
         circle.setAttribute('cx', p.x);
@@ -1275,7 +1275,7 @@ window.AlgoWidgets[4] = function(container) {
       });
       svgEl.appendChild(nodesGroup);
 
-      
+      // بناء نص المعادلة (Formula) في الأسفل
       formulaTextUI = document.createElementNS(ns, 'text');
       formulaTextUI.setAttribute('x', 300);
       formulaTextUI.setAttribute('y', 330);
@@ -1305,7 +1305,7 @@ window.AlgoWidgets[4] = function(container) {
         'var(--brand-500)': 'url(#arr-brand)'
       };
 
-      
+      // 1. تحديث الخطوط
       Object.keys(edgesUI).forEach(key => {
         let ui = edgesUI[key];
         let state = s.edgeState[key];
@@ -1327,14 +1327,14 @@ window.AlgoWidgets[4] = function(container) {
         }
       });
 
-      
+      // 2. تحديث العقد
       ['i', 'j', 'k'].forEach(id => {
         let ui = nodesUI[id];
         let isVisible = s.hlNodes.includes(id);
 
         if (isVisible) {
           ui.g.style.opacity = '1';
-          let isActive = id === 'k' && s.state !== 'intro'; 
+          let isActive = id === 'k' && s.state !== 'intro'; // K is always active when visible
           let fill = isActive ? 'var(--brand-500)' : 'var(--algo-canvas-bg)';
           let stroke = isActive ? '#ffffff' : 'var(--text-muted)';
           let textFill = isActive ? '#ffffff' : 'var(--algo-text)';
@@ -1349,7 +1349,7 @@ window.AlgoWidgets[4] = function(container) {
         }
       });
 
-      
+      // 3. تحديث المعادلة الرياضية
       if (s.eq) {
         formulaTextUI.style.opacity = '1';
         formulaTextUI.textContent = s.eq;
@@ -1416,12 +1416,12 @@ window.AlgoWidgets[5] = function(container) {
       _AL.toolbar(5) +
       '<div class="algo-explanation" id="w5-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بأبعاد 16:9
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:750px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:visible;">' +
         '<svg id="w5-svg" width="100%" height="100%" viewBox="0 0 750 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-400);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w5-node"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-muted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w5-empty"></span></span>' +
@@ -1437,7 +1437,7 @@ window.AlgoWidgets[5] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    
+    // عناصر واجهة SVG برمجياً
     var ui = {
       formula: null,
       root: { g: null, circ: null, text: null },
@@ -1448,7 +1448,7 @@ window.AlgoWidgets[5] = function(container) {
       cards: {}
     };
 
-    
+    // الثوابت الهندسية
     const rootPos  = { x: 375, y: 130 };
     const leftPos  = { x: 200, y: 260 };
     const rightPos = { x: 550, y: 260 };
@@ -1498,7 +1498,7 @@ window.AlgoWidgets[5] = function(container) {
       ];
     }
 
-    
+    // دالة مساعدة لإنشاء عناصر SVG بمرونة
     function makeSVG(tag, attrs) {
       let el = document.createElementNS('http://www.w3.org/2000/svg', tag);
       for (let k in attrs) el.setAttribute(k, attrs[k]);
@@ -1509,7 +1509,7 @@ window.AlgoWidgets[5] = function(container) {
     function createChildNode(cx, cy) {
       let g = makeSVG('g', { transform: `translate(${cx}, ${cy})` });
       
-      
+      // الأشكال الثلاثة المحتملة (يتم تفعيل واحد منها فقط عبر الـ Opacity)
       let circ = makeSVG('circle', { cx: 0, cy: 0, r: R, fill: 'var(--brand-400)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
       let tri = makeSVG('polygon', { points: `0,-35 -65,35 65,35`, fill: 'var(--brand-400)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
       let rect = makeSVG('rect', { x: -25, y: -20, width: 50, height: 40, rx: 6, fill: 'var(--algo-muted)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
@@ -1534,20 +1534,20 @@ window.AlgoWidgets[5] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-      
+      // 1. المعادلة بالأعلى
       ui.formula = makeSVG('text', { x: 375, y: 40, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: 'var(--algo-text)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '18px', 'font-weight': 'bold' });
       svgEl.appendChild(ui.formula);
 
-      
+      // 2. الأسهم 
       ui.leftArrow = makeSVG('line', { 'stroke-width': 3, 'stroke': 'var(--text-muted)' });
       ui.rightArrow = makeSVG('line', { 'stroke-width': 3, 'stroke': 'var(--text-muted)' });
       svgEl.appendChild(ui.leftArrow);
       svgEl.appendChild(ui.rightArrow);
 
-      
+      // 3. العقدة الجذر
       ui.root.g = makeSVG('g', {});
       
-      
+      // إصلاح الخلل: تحديد نقطة المركز بدقة لضمان تكبير العقدة في مكانها دون انزياح
       ui.root.g.style.transformOrigin = `${rootPos.x}px ${rootPos.y}px`;
       
       ui.root.circ = makeSVG('circle', { cx: rootPos.x, cy: rootPos.y, r: R, fill: 'var(--brand-500)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
@@ -1556,15 +1556,15 @@ window.AlgoWidgets[5] = function(container) {
       ui.root.g.appendChild(ui.root.text);
       svgEl.appendChild(ui.root.g);
 
-      
+      // 4. الأبناء
       ui.leftChild = createChildNode(leftPos.x, leftPos.y);
       ui.rightChild = createChildNode(rightPos.x, rightPos.y);
       svgEl.appendChild(ui.leftChild.g);
       svgEl.appendChild(ui.rightChild.g);
 
-      
+      // 5. بطاقات التكلفة بالأسفل (Cards)
       ui.cardsGroup = makeSVG('g', { transform: 'translate(0, 340)' });
-      let cardCenters = [200, 375, 550]; 
+      let cardCenters = [200, 375, 550]; // مراكز البطاقات
       
       for (let i = 1; i <= 3; i++) {
         let cx = cardCenters[i-1];
@@ -1585,13 +1585,13 @@ window.AlgoWidgets[5] = function(container) {
       isInitialized = true;
     }
 
-    
+    // حساب انطلاق ووصول السهم بدقة
     function updateArrow(lineUI, fromPos, toPos, targetType, isResult) {
       let dx = toPos.x - fromPos.x;
       let dy = toPos.y - fromPos.y;
       let dist = Math.hypot(dx, dy);
 
-      
+      // إصلاح الخلل: أخذ التكبير (1.1) في عين الاعتبار لكي يظل السهم متصلاً بحافة الدائرة
       let currentR = isResult ? R * 1.1 : R;
       
       let sx = fromPos.x + (dx/dist) * (currentR + 2);
@@ -1639,7 +1639,7 @@ window.AlgoWidgets[5] = function(container) {
       }
 
       childUI.text.textContent = label;
-      childUI.text.setAttribute('y', type === 'tri' ? '15' : '0'); 
+      childUI.text.setAttribute('y', type === 'tri' ? '15' : '0'); // Triangle text needs offset
       childUI.text.setAttribute('font-size', type === 'null' ? '14px' : '16px');
       childUI.text.setAttribute('fill', type === 'null' ? 'var(--text-primary)' : '#ffffff');
     }
@@ -1651,27 +1651,27 @@ window.AlgoWidgets[5] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-      
+      // تحديث المعادلة العلوية
       ui.formula.textContent = s.phase === 'intro' 
         ? 'C[i,j] = min( C[i,k-1] + C[k+1,j] ) + sum(p)' 
         : 'C[1,3] = min( C[1,k-1] + C[k+1,3] ) + sum(p)';
 
-      
+      // تحديث الجذر
       let isResult = s.phase === 'result';
       ui.root.circ.setAttribute('fill', (isResult && s.min === s.k) ? 'var(--algo-sorted)' : 'var(--brand-500)');
       ui.root.circ.setAttribute('stroke', isResult ? '#ffffff' : 'var(--algo-bg)');
       ui.root.text.textContent = 'a' + s.kLabel;
       ui.root.g.style.transform = isResult ? 'scale(1.1)' : 'scale(1)';
 
-      
+      // تحديث الأبناء
       updateChildUI(ui.leftChild, s.left, s.leftL, isResult);
       updateChildUI(ui.rightChild, s.right, s.rightL, isResult);
 
-      
+      // تحديث الأسهم
       updateArrow(ui.leftArrow, rootPos, leftPos, s.left, isResult);
       updateArrow(ui.rightArrow, rootPos, rightPos, s.right, isResult);
 
-      
+      // تحديث البطاقات
       if (s.phase === 'intro') {
         ui.cardsGroup.style.opacity = '0';
       } else {
@@ -1684,7 +1684,7 @@ window.AlgoWidgets[5] = function(container) {
           let borderColor = isTarget ? 'var(--algo-sorted)' : (isCurrent ? 'var(--algo-active)' : 'var(--algo-border)');
           let borderWidth = isTarget || isCurrent ? '3' : '2';
           let valColor = isTarget ? 'var(--algo-sorted)' : (isCurrent ? 'var(--algo-active)' : 'var(--algo-text)');
-          let transY = isTarget || isCurrent ? '-5px' : '0px'; 
+          let transY = isTarget || isCurrent ? '-5px' : '0px'; // بطاقة بارزة
 
           card.rect.setAttribute('stroke', borderColor);
           card.rect.setAttribute('stroke-width', borderWidth);

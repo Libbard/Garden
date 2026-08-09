@@ -2,10 +2,10 @@
 <html lang="ar" dir="rtl" data-theme="dark" data-subject="CS353" data-module="6">
 <head>
 
-  
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -14,13 +14,13 @@
 
     gtag('config', 'G-HGTK36LR0M');
   </script>
-  
+  <!-- ========================================== -->
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>التحويل والحل (Transform-and-Conquer) · CS353 · الحديقة الرقمية</title>
 
-  
+  <!-- Anti-flash: MUST be first script -->
   <script>
     (function(){
       var t=localStorage.getItem('garden_theme')||'dark';
@@ -33,51 +33,40 @@
     })();
   </script>
 
+  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
+  <script src="../../shared/subject-tint.js"></script>
   <link rel="stylesheet" href="../../shared/garden.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/all.min.css">
 
-  
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
   <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#a78bfa">
+  <!-- /data-garden-icons -->
 </head>
-<body>
+<body data-page-title="CS353" data-page-title-en="CS353">
 
 <div class="reading-progress"></div>
 <div class="page-layout">
 
-<header class="site-header">
-  <div class="header-inner">
-    <nav class="header-nav">
-      <a href="index.html" class="nav-btn nav-btn--icon" title="Home"><i class="fa-solid fa-house"></i></a>
-      <a href="M05.html" class="nav-btn">
-        <i class="fa-solid fa-arrow-right"></i>
-        <span data-i18n="nav.prev">السابق</span>
-      </a>
-    </nav>
-    <div class="header-center">
-      <div class="subject-icon"><i class="fa-solid fa-sitemap"></i></div>
-      <span class="module-badge font-display">MOD 6</span>
-      <span class="subject-name">CS353</span>
-    </div>
-    <div class="header-actions">
-      <a href="M07.html" class="nav-btn">
-        <span data-i18n="nav.next">التالي</span>
-        <i class="fa-solid fa-arrow-left"></i>
-      </a>
-      <div class="divider-v"></div>
-      <button class="toggle-btn" onclick="Garden.toggleLanguage()"><span id="lang-label">AR</span></button>
-      <button class="toggle-btn" onclick="Garden.cycleTheme()"><span id="theme-icon">🌙</span></button>
-    </div>
-  </div>
-</header>
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=CS353"></header>
 
 <div class="content-wrapper">
   <aside class="sidebar">
     <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
     <nav class="toc-list">
-      
+      <!-- Fixed links -->
       <a href="#hero" class="toc-link" data-bilingual>
         <template class="content-ar">مقدمة الوحدة</template>
         <template class="content-en">Module Intro</template>
@@ -89,7 +78,7 @@
         <span class="content-target">أهداف التعلم</span>
       </a>
 
-      
+      <!-- ONE PER CONCEPT from json.concepts[] -->
       <a href="#transform-and-conquer-strategy" class="toc-link" data-bilingual>
         <template class="content-ar">استراتيجية التحويل والحل</template>
         <template class="content-en">Transform-and-Conquer Strategy</template>
@@ -123,7 +112,7 @@
 
       <div class="toc-divider"></div>
 
-      
+      <!-- Fixed bottom links -->
       <a href="#professor" class="toc-link" data-bilingual>
         <template class="content-ar">حديث البروفيسور</template>
         <template class="content-en">Professor's Narrative</template>
@@ -199,7 +188,7 @@
 </section>
 
 <section id="objectives" class="objectives-card glass-card fade-up">
-  <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
       <li><span class="obj-icon">✦</span><span>وصف استراتيجية التحويل والحل (Transform-and-Conquer) وأنواعها المختلفة.</span></li>
@@ -215,7 +204,7 @@
   </ul>
 </section>
 
-
+<!-- CONCEPT 1: Transform-and-Conquer Strategy -->
 <section id="transform-and-conquer-strategy" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">1</span> استراتيجية التحويل والحل</h2></template>
@@ -224,9 +213,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -267,82 +256,82 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: Show a flow diagram with three steps. Step 1: 'problem's instance' (icon of a confused person). Arrow pointing right to Step 2: 'simpler instance OR another representation OR another problem's instance' (icon of geometric shapes transforming). Arrow pointing right to Step 3: 'solution' (icon of a glowing lightbulb with a checkmark). Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="5">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" font-family="system-ui, 'Cairo', 'Inter', sans-serif" preserveAspectRatio="xMidYMid meet">
   <defs>
-    
+    <!-- Arrowhead for main flow -->
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
     </marker>
     
-    
+    <!-- Smaller arrowhead for icons -->
     <marker id="small-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
     </marker>
 
-    
+    <!-- Subtle shadow for nodes -->
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="var(--text-primary)" flood-opacity="0.05"/>
     </filter>
 
-    
+    <!-- Background Grid Pattern -->
     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
       <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border-color)" stroke-width="0.5" opacity="0.3"/>
     </pattern>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)"/>
   <rect width="100%" height="100%" fill="url(#grid)"/>
 
-  
+  <!-- Diagram Title -->
   <text x="400" y="40" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Problem Reduction (Transform &amp; Conquer)</text>
   <text x="400" y="65" font-size="14" fill="var(--text-secondary)" text-anchor="middle">تقليل المشكلة (التحويل والقهر)</text>
 
-  
+  <!-- Step 1: Problem's Instance -->
   <g filter="url(#shadow)">
     <rect x="40" y="90" width="200" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
     
-    
+    <!-- Icon: Confused Person -->
     <g transform="translate(0, 5)">
       <circle cx="120" cy="135" r="16" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
       <path d="M 95 180 C 95 160, 145 160, 145 180" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linecap="round"/>
       <path d="M 155 120 C 155 110, 170 110, 170 120 C 170 130, 162.5 132, 162.5 140 M 162.5 148 L 162.5 151" fill="none" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round"/>
     </g>
 
-    
+    <!-- Text Labels -->
     <text x="140" y="230" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Problem's Instance</text>
     <text x="140" y="255" font-size="14" fill="var(--text-secondary)" text-anchor="middle">حالة المشكلة</text>
     <text x="140" y="290" font-size="12" fill="var(--text-muted)" text-anchor="middle">Original complex</text>
     <text x="140" y="310" font-size="12" fill="var(--text-muted)" text-anchor="middle">problem state</text>
   </g>
 
-  
+  <!-- Arrow 1: Transform -->
   <g>
     <line x1="245" y1="215" x2="280" y2="215" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
     <text x="265" y="190" font-size="12" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Transform</text>
     <text x="265" y="205" font-size="11" fill="var(--text-muted)" text-anchor="middle">تحويل</text>
   </g>
 
-  
+  <!-- Step 2: Simpler Instance / Another Representation -->
   <g filter="url(#shadow)">
     <rect x="290" y="90" width="220" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
     
-    
+    <!-- Icon: Geometric Shapes Transforming -->
     <g transform="translate(0, 5)">
-      
+      <!-- Row 1: Complex to Simple -->
       <polygon points="365,120 378,128 375,145 355,145 352,128" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2.5" stroke-linejoin="round"/>
       <path d="M 390 135 L 410 135" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#small-arrow)"/>
       <circle cx="435" cy="135" r="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
       
-      
+      <!-- Row 2: Representation Change -->
       <rect x="353" y="158" width="24" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2.5"/>
       <path d="M 390 170 L 410 170" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#small-arrow)"/>
       <polygon points="435,158 447,180 423,180" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
     </g>
 
-    
+    <!-- Text Labels -->
     <text x="400" y="220" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Simpler Instance</text>
     <text x="400" y="240" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">or Another Rep.</text>
     <text x="400" y="265" font-size="14" fill="var(--text-secondary)" text-anchor="middle">حالة أبسط / تمثيل آخر</text>
@@ -350,43 +339,43 @@
     <text x="400" y="310" font-size="12" fill="var(--text-muted)" text-anchor="middle">domain or sub-problem</text>
   </g>
 
-  
+  <!-- Arrow 2: Solve -->
   <g>
     <line x1="515" y1="215" x2="550" y2="215" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
     <text x="535" y="190" font-size="12" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Solve</text>
     <text x="535" y="205" font-size="11" fill="var(--text-muted)" text-anchor="middle">حل</text>
   </g>
 
-  
+  <!-- Step 3: Solution -->
   <g filter="url(#shadow)">
     <rect x="560" y="90" width="200" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
     
-    
+    <!-- Icon: Glowing Lightbulb with Checkmark -->
     <g transform="translate(0, 5)">
-      
+      <!-- Glow Rays -->
       <line x1="660" y1="105" x2="660" y2="95" stroke="var(--brand-400)" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="640" y1="115" x2="632" y2="107" stroke="var(--brand-400)" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="680" y1="115" x2="688" y2="107" stroke="var(--brand-400)" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="630" y1="135" x2="620" y2="135" stroke="var(--brand-400)" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="690" y1="135" x2="700" y2="135" stroke="var(--brand-400)" stroke-width="2.5" stroke-linecap="round"/>
       
-      
+      <!-- Bulb -->
       <path d="M 660 115 C 645 115, 645 135, 650 145 C 654 153, 654 158, 654 165 L 666 165 C 666 158, 666 153, 670 145 C 675 135, 675 115, 660 115 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
       <path d="M 655 165 L 665 165 L 663 175 L 657 175 Z" fill="var(--brand-500)"/>
       <circle cx="660" cy="175" r="3" fill="var(--brand-500)"/>
       
-      
+      <!-- Checkmark -->
       <path d="M 653 138 L 658 143 L 668 128" fill="none" stroke="var(--text-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
 
-    
+    <!-- Text Labels -->
     <text x="660" y="230" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Solution</text>
     <text x="660" y="255" font-size="14" fill="var(--text-secondary)" text-anchor="middle">الحل</text>
     <text x="660" y="290" font-size="12" fill="var(--text-muted)" text-anchor="middle">Result mapped back</text>
     <text x="660" y="310" font-size="12" fill="var(--text-muted)" text-anchor="middle">to original problem</text>
   </g>
 
-  
+  <!-- Optional: Map Back Arrow (Bottom) -->
   <g>
     <path d="M 660 340 L 660 375 L 140 375 L 140 345" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#arrow)"/>
     <rect x="280" y="365" width="240" height="20" fill="var(--bg-surface)" rx="4"/>
@@ -396,7 +385,23 @@
 </svg>
 </div>
   
-  
+  <!--قمت بتغييرها الى رسم svg بدل الخوارزمية وذلك بحذف id="algo-widget-1"  قبل class="svg-placeholder"--!>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم التحويل والحل في جميع المشاكل الخوارزمية؟</template>
+      <template class="content-en">Why don't we use Transform-and-Conquer for all algorithmic problems?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تكلفة مرحلة التحويل (مثل الفرز) قد تكون أعلى من تكلفة حل المشكلة مباشرة بالطرق التقليدية في بعض الحالات.</p></template>
+      <template class="content-en"><p>Because the cost of the transformation stage (like sorting) might be higher than solving the problem directly using traditional methods in some cases.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<!-- CONCEPT 2: Presorting -->
 <section id="presorting" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">2</span> الفرز المسبق (Presorting)</h2></template>
@@ -405,9 +410,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -452,7 +457,7 @@
   </div>
 
   <div class="code-block">
-    <div class="code-block-header"><span>Pseudocode</span><button class="copy-btn">📋 Copy</button></div>
+    <div class="code-block-header"><span>Pseudocode</span><button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button></div>
     <pre class="pseudo-block"><code>ALGORITHM PresortElementUniqueness(A[0..n-1])
   // Sorts the array first, then checks for uniqueness
   sort the array A
@@ -491,7 +496,7 @@
   </details>
 </section>
 
-
+<!-- CONCEPT 3: Gaussian Elimination -->
 <section id="gaussian-elimination" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">3</span> الحذف الغاوسي (Gaussian Elimination)</h2></template>
@@ -500,9 +505,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -539,7 +544,7 @@
   </div>
 
   <div class="code-block">
-    <div class="code-block-header"><span>Pseudocode</span><button class="copy-btn">📋 Copy</button></div>
+    <div class="code-block-header"><span>Pseudocode</span><button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button></div>
     <pre class="pseudo-block"><code>// Stage 1: Reduction to upper-triangular matrix
 for i <- 1 to n-1 do
   for j <- i+1 to n do
@@ -554,9 +559,9 @@ for j <- n down to 1 do
   x[j] <- (A[j, n+1] - t) / A[j, j]</code></pre>
   </div>
 
-  
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Show a matrix transformation. On the left, a full 3x4 matrix with arbitrary numbers. An arrow pointing right labeled 'Gaussian Elimination (Row Operations)'. On the right, an upper triangular matrix where all elements below the main diagonal are 0. Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels. -->
 <div id="algo-widget-2" class="svg-placeholder" data-diagram-prompt="Detailed SVG generation prompt: Show a matrix transformation. On the left, a full 3x4 matrix with arbitrary numbers. An arrow pointing right labeled 'Gaussian Elimination (Row Operations)'. On the right, an upper triangular matrix where all elements below the main diagonal are 0. Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels.">
-    🗺️ Gaussian Elimination
+    <i class="fa-solid fa-map" aria-hidden="true"></i> Gaussian Elimination
   </div>
 
   <details class="thinking-question">
@@ -573,7 +578,7 @@ for j <- n down to 1 do
   </details>
 </section>
 
-
+<!-- CONCEPT 4: Binary Search Trees (BST) -->
 <section id="binary-search-trees" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">4</span> أشجار البحث الثنائية (BST)</h2></template>
@@ -582,9 +587,9 @@ for j <- n down to 1 do
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -630,7 +635,7 @@ for j <- n down to 1 do
     <div class="math-block">$$\lfloor \log_2 n \rfloor \le h \le n-1$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Show a simple Binary Search Tree node 'K'. Left child points to a subtree labeled '<K'. Right child points to a subtree labeled '>K'. Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels. -->
 <div id="algo-widget-3" class="svg-placeholder" data-diagram-prompt="Detailed SVG generation prompt: Show a simple Binary Search Tree node 'K'. Left child points to a subtree labeled '<K'. Right child points to a subtree labeled '>K'. Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels.">
     🗺️ Binary Search Trees (BST)
   </div>
@@ -649,7 +654,7 @@ for j <- n down to 1 do
   </details>
 </section>
 
-
+<!-- CONCEPT 5: AVL Trees -->
 <section id="avl-trees" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">5</span> أشجار AVL (AVL Trees)</h2></template>
@@ -658,9 +663,9 @@ for j <- n down to 1 do
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -696,9 +701,9 @@ for j <- n down to 1 do
     <div class="math-block">$$h \le 1.4404 \log_2(n + 2) - 1.3277$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show two binary trees side by side. Tree (a) is an AVL tree with balance factors (0, 1, -1) labeled next to nodes. Tree (b) is NOT an AVL tree, showing a node with a balance factor of 2 (highlighted in red). Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels. -->
 <div id="algo-widget-4" class="svg-placeholder" data-diagram-prompt="Detailed SVG generation prompt: Show two binary trees side by side. Tree (a) is an AVL tree with balance factors (0, 1, -1) labeled next to nodes. Tree (b) is NOT an AVL tree, showing a node with a balance factor of 2 (highlighted in red). Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels.">
-    🗺️ AVL Trees
+    <i class="fa-solid fa-map" aria-hidden="true"></i> AVL Trees
   </div>
 
   <table class="comparison-table">
@@ -736,7 +741,7 @@ for j <- n down to 1 do
   </details>
 </section>
 
-
+<!-- CONCEPT 6: AVL Tree Rotations -->
 <section id="avl-rotations" class="concept-card glass-card fade-up">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">6</span> دورانات شجرة AVL</h2></template>
@@ -745,9 +750,9 @@ for j <- n down to 1 do
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -782,9 +787,9 @@ for j <- n down to 1 do
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a Single R-rotation. Left side: Node 'r' with left child 'c'. 'c' has a left child. Arrow labeled 'R' pointing right. Right side: Node 'c' is now the root, with 'r' as its right child. Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels. -->
 <div id="algo-widget-5" class="svg-placeholder" data-diagram-prompt="Detailed SVG generation prompt: Show a Single R-rotation. Left side: Node 'r' with left child 'c'. 'c' has a left child. Arrow labeled 'R' pointing right. Right side: Node 'c' is now the root, with 'r' as its right child. Style: educational, dark background #0d1117, accent color #8a2be2, viewBox 0 0 800 400, Arabic + English labels.">
-    🗺️ AVL Tree Rotations
+    <i class="fa-solid fa-map" aria-hidden="true"></i> AVL Tree Rotations
   </div>
 
   <details class="thinking-question">
@@ -803,7 +808,7 @@ for j <- n down to 1 do
 
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
-    <span class="professor-icon">🎓</span>
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
@@ -814,7 +819,7 @@ for j <- n down to 1 do
 </section>
 
 <section id="ask-professor" class="fade-up section-gap">
-  <h2 data-i18n="ask.title">❓ اسأل البروفيسور</h2>
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
   <div class="accordion">
     <div class="accordion-item">
       <button class="accordion-trigger">
@@ -990,7 +995,7 @@ for j <- n down to 1 do
 </section>
 
 <section id="flashcards" class="flashcard-section fade-up">
-  <h2 data-i18n="fc.title">البطاقات التعليمية</h2>
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
   <div id="fc-container"></div>
 </section>
 <script type="application/json" id="flashcard-data">
@@ -1271,16 +1276,16 @@ for j <- n down to 1 do
 </script>
 
 <section id="quiz" class="quiz-section fade-up">
-  <h2 data-i18n="quiz.title">اختبر نفسك</h2>
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
       <span id="quiz-counter">1 / 10</span>
-      <span>🎯 <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
     <div class="quiz-options" id="quiz-options-container"></div>
-    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()" data-i18n="quiz.hint">💡 تلميح</button>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
     <div class="quiz-feedback hidden" id="quiz-feedback"></div>
     <div class="quiz-nav">
       <div></div>
@@ -1290,7 +1295,7 @@ for j <- n down to 1 do
     </div>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
-    <div class="score-emoji" id="quiz-score-emoji">🏆</div>
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
     <div class="score-display" id="quiz-score-display">0 / 10</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
@@ -1621,10 +1626,10 @@ for j <- n down to 1 do
 </script>
 
 <section id="vault" class="vault-section glass-card fade-up">
-  <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الاعتقاد بأن شجرة البحث الثنائية (BST) تضمن دائماً وقت بحث O(log n). هذا فخ! في أسوأ الحالات (مثل إدراج عناصر مرتبة)، تصبح الشجرة خطية ويكون وقت البحث O(n).</template>
       <template class="content-en">Believing that a standard BST always guarantees O(log n) search time. This is a trap! In the worst case (e.g., inserting sorted elements), the tree becomes linear and search time is O(n).</template>
@@ -1633,7 +1638,7 @@ for j <- n down to 1 do
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">الفرز المسبق (Presorting) يغير عنق الزجاجة في الخوارزمية. بدلاً من حل المشكلة بطريقة القوة الغاشمة البطيئة O(n^2)، نقوم بالفرز O(n log n) ثم نحل المشكلة في وقت خطي O(n).</template>
       <template class="content-en">Presorting shifts the algorithm's bottleneck. Instead of solving the problem with a slow O(n^2) brute force, we sort in O(n log n) and then solve the problem in linear O(n) time.</template>
@@ -1642,7 +1647,7 @@ for j <- n down to 1 do
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 سر</div>
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
       <template class="content-ar">في الحذف الغاوسي، التعقيد الزمني O(n^3) يأتي بالكامل من مرحلة الحذف الأمامي (بسبب الحلقات الثلاث المتداخلة). مرحلة التعويض العكسي سريعة جداً وتستغرق O(n^2) فقط.</template>
       <template class="content-en">In Gaussian Elimination, the O(n^3) time complexity comes entirely from the forward elimination stage (due to 3 nested loops). The back substitution stage is very fast, taking only O(n^2).</template>
@@ -1651,7 +1656,7 @@ for j <- n down to 1 do
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الخلط بين اتجاه الدوران ومكان الإدراج. الدوران لليمين (R-rotation) يُستخدم لإصلاح شجرة ثقيلة من جهة اليسار (إدراج في يسار-اليسار)، وليس العكس!</template>
       <template class="content-en">Confusing the rotation direction with the insertion location. A Right rotation (R-rotation) is used to fix a left-heavy tree (Left-Left insertion), not the other way around!</template>
@@ -1660,7 +1665,7 @@ for j <- n down to 1 do
   </div>
   
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">عامل التوازن في شجرة AVL يُحسب دائماً كـ (ارتفاع اليسار - ارتفاع اليمين). إذا تجاوزت هذه القيمة 1 أو قلت عن -1، فالشجرة تحتاج إلى دوران.</template>
       <template class="content-en">The balance factor in an AVL tree is always calculated as (Height of Left - Height of Right). If this value exceeds 1 or drops below -1, the tree requires a rotation.</template>
@@ -1678,14 +1683,15 @@ for j <- n down to 1 do
         <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
         <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
-        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
+        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
       </div>
-      <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
     </div>
   </footer>
 </div>
 
 <script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
   <script src="../../shared/firebase-sync.js"></script>
 </body>
 </html>

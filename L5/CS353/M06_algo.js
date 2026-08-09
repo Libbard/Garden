@@ -1,6 +1,6 @@
-
-
-
+// M06_algo.js — Interactive algorithm widgets
+// Generated: 2026-03-04T04:05:59
+// Diagrams: 5/4
 
 window.AlgoWidgets = window.AlgoWidgets || {};
 
@@ -132,7 +132,7 @@ window.AlgoWidgets[1] = function(container) {
         counter.textContent = _AL.stepLabel(cur, steps.length - 1);
         expEl.innerHTML = _AL.exp(s.en, s.ar);
     
-        canvasEl.innerHTML = ''; 
+        canvasEl.innerHTML = ''; // Clear previous SVG content
     
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('width', '100%');
@@ -147,7 +147,7 @@ window.AlgoWidgets[1] = function(container) {
     
         var activeColor = 'var(--algo-active)';
     
-        
+        // Helper to create SVG elements
         function createSvgElement(tag, attributes) {
           var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
           for (var key in attributes) {
@@ -156,7 +156,7 @@ window.AlgoWidgets[1] = function(container) {
           return el;
         }
     
-        
+        // --- Step 1: Problem Instance ---
         var g1 = createSvgElement('g', { id: 'w1-step1-group' });
         var rect1 = createSvgElement('rect', {
           x: '50', y: '100', width: '200', height: '200', rx: '10', ry: '10',
@@ -177,12 +177,12 @@ window.AlgoWidgets[1] = function(container) {
         g1.appendChild(rect1); g1.appendChild(icon1); g1.appendChild(label1_en); g1.appendChild(label1_ar);
         svg.appendChild(g1);
     
-        
+        // --- Arrow 1 ---
         var line1 = createSvgElement('line', { x1: '250', y1: '200', x2: '350', y2: '200', stroke: defaultArrowStroke, 'stroke-width': '3' });
         var head1 = createSvgElement('polygon', { points: '330,190 350,200 330,210', fill: defaultArrowStroke });
         svg.appendChild(line1); svg.appendChild(head1);
     
-        
+        // --- Step 2: Transformation ---
         var g2 = createSvgElement('g', { id: 'w1-step2-group' });
         var rect2 = createSvgElement('rect', {
           x: '300', y: '100', width: '200', height: '200', rx: '10', ry: '10',
@@ -203,12 +203,12 @@ window.AlgoWidgets[1] = function(container) {
         g2.appendChild(rect2); g2.appendChild(icon2); g2.appendChild(label2_en); g2.appendChild(label2_ar);
         svg.appendChild(g2);
     
-        
+        // --- Arrow 2 ---
         var line2 = createSvgElement('line', { x1: '500', y1: '200', x2: '600', y2: '200', stroke: defaultArrowStroke, 'stroke-width': '3' });
         var head2 = createSvgElement('polygon', { points: '580,190 600,200 580,210', fill: defaultArrowStroke });
         svg.appendChild(line2); svg.appendChild(head2);
     
-        
+        // --- Step 3: Solution ---
         var g3 = createSvgElement('g', { id: 'w1-step3-group' });
         var rect3 = createSvgElement('rect', {
           x: '550', y: '100', width: '200', height: '200', rx: '10', ry: '10',
@@ -229,7 +229,7 @@ window.AlgoWidgets[1] = function(container) {
         g3.appendChild(rect3); g3.appendChild(icon3); g3.appendChild(label3_en); g3.appendChild(label3_ar);
         svg.appendChild(g3);
     
-        
+        // Apply highlighting based on current step
         var currentHighlight = s.highlight;
     
         if (currentHighlight === 'step1' || currentHighlight === 'all') {
@@ -258,7 +258,7 @@ window.AlgoWidgets[1] = function(container) {
           label3_ar.setAttribute('fill', 'white');
         }
     
-        
+        // Handle language for labels
         var isArabic = _AL.lang() === 'ar';
         svg.querySelectorAll('.w1-label.en').forEach(function(el) { el.style.display = isArabic ? 'none' : 'block'; });
         svg.querySelectorAll('.w1-label.ar').forEach(function(el) { el.style.display = isArabic ? 'block' : 'none'; });
@@ -293,12 +293,12 @@ window.AlgoWidgets[2] = function(container) {
         _AL.toolbar(2) +
         '<div class="algo-explanation" id="w2-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.7; margin-bottom: 15px; text-align: center;"></div>' +
         
-        
+        // حاوية الرسم المتجاوبة (بنسبة 2:1)
         '<div class="algo-canvas" id="w2-canvas" style="width:100%; max-width:800px; aspect-ratio: 2 / 1; margin: 0 auto; display:flex; justify-content:center; align-items:center; border:1px solid var(--algo-border); border-radius:var(--radius-md); background:var(--algo-canvas-bg); overflow:visible;">' +
           '<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; overflow:visible;"></svg>' +
         '</div>' +
         
-        
+        // دليل الألوان
         '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.85rem; color: var(--text-secondary);">' +
           '<span><span style="display:inline-block;width:12px;height:12px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w2-normal"></span></span>' +
           '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w2-active"></span></span>' +
@@ -313,7 +313,7 @@ window.AlgoWidgets[2] = function(container) {
    
       var steps = [], cur = 0, playing = false, interval = null;
    
-      
+      // الثوابت الهندسية للشبكة
       const numRows = 3;
       const numCols = 4;
       const cellW = 46;
@@ -322,7 +322,7 @@ window.AlgoWidgets[2] = function(container) {
       const matW = (numCols * cellW) + ((numCols - 1) * cellGap);
       const matH = (numRows * cellH) + ((numRows - 1) * cellGap);
       
-      
+      // التوسيط الدقيق
       const matrixLeftX = 80;
       const matrixRightX = 800 - 80 - matW;
       const matrixY = (400 - matH) / 2;
@@ -341,7 +341,7 @@ window.AlgoWidgets[2] = function(container) {
         container.querySelector('[data-algo-text="w2-target"]').textContent = _AL.exp('Target to Eliminate', 'العنصر المُراد تصفيره');
       }
    
-      
+      // دالة ذكية لتنسيق الأرقام بدون أصفار عشرية مزعجة (مثل 0.50 -> 0.5)
       function formatNum(num) {
         if (Math.abs(num) < 0.0001) return "0";
         let s = num.toFixed(2);
@@ -354,9 +354,9 @@ window.AlgoWidgets[2] = function(container) {
         const matrixGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         matrixGroup.style.transition = "all 0.3s ease";
    
-        
-        const bPad = 12; 
-        const bW = 8;    
+        // 1. رسم أقواس المصفوفة [ ] (لمسة رياضية احترافية)
+        const bPad = 12; // بُعد القوس عن الخلايا
+        const bW = 8;    // عرض شفة القوس
         const bColor = 'var(--text-muted)';
         
         const leftBracket = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -370,7 +370,7 @@ window.AlgoWidgets[2] = function(container) {
         matrixGroup.appendChild(leftBracket);
         matrixGroup.appendChild(rightBracket);
    
-        
+        // 2. رسم الخلايا
         for (let r = 0; r < numRows; r++) {
           for (let c = 0; c < numCols; c++) {
             const x = startX + c * (cellW + cellGap);
@@ -401,7 +401,7 @@ window.AlgoWidgets[2] = function(container) {
             rect.setAttribute('y', y);
             rect.setAttribute('width', cellW);
             rect.setAttribute('height', cellH);
-            rect.setAttribute('rx', '6'); 
+            rect.setAttribute('rx', '6'); // زوايا ناعمة
             rect.setAttribute('ry', '6');
             rect.setAttribute('fill', bgFill);
             rect.setAttribute('stroke', strokeColor);
@@ -409,7 +409,7 @@ window.AlgoWidgets[2] = function(container) {
             rect.style.transition = 'fill 0.3s ease, stroke 0.3s ease';
             matrixGroup.appendChild(rect);
    
-            
+            // توسيط النص بدقة داخل الخلية
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', x + cellW / 2);
             text.setAttribute('y', y + cellH / 2);
@@ -427,7 +427,7 @@ window.AlgoWidgets[2] = function(container) {
           }
         }
         
-        
+        // 3. إضافة عنوان فوق كل مصفوفة
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         title.setAttribute('x', startX + matW / 2);
         title.setAttribute('y', startY - 35);
@@ -464,14 +464,14 @@ window.AlgoWidgets[2] = function(container) {
             const multiplier = valToEliminate / pivotVal;
             const multStr = formatNum(multiplier);
             
-            
+            // عرض المعادلة بشكل رياضي أنيق باستخدام LTR code blocks
             const eqEn = `<span dir="ltr" class="code-block-header" style="display:inline-block; padding:2px 8px; border-radius:4px; margin-top:4px;">R<sub>${r+1}</sub> &larr; R<sub>${r+1}</sub> - (${multStr}) &times; R<sub>${p+1}</sub></span>`;
             const eqAr = `<span dir="ltr" class="code-block-header" style="display:inline-block; padding:2px 8px; border-radius:4px; margin-top:4px;">R<sub>${r+1}</sub> &larr; R<sub>${r+1}</sub> - (${multStr}) &times; R<sub>${p+1}</sub></span>`;
   
             steps.push({
               matrix: currentMatrix.map(row => row.slice()),
-              highlightRows: [p, r], 
-              highlightCells: [[r, p]], 
+              highlightRows: [p, r], // إضاءة الصفين (المحور والمستهدف)
+              highlightCells: [[r, p]], // إضاءة العنصر المُراد تصفيره بقوة
               en: `Eliminate <strong>${formatNum(valToEliminate)}</strong> using pivot row R<sub>${p+1}</sub>.<br>${eqEn}`,
               ar: `إلغاء العنصر <strong>${formatNum(valToEliminate)}</strong> ليصبح صفراً باستخدام الصف المحوري R<sub>${p+1}</sub>.<br>${eqAr}`
             });
@@ -483,7 +483,7 @@ window.AlgoWidgets[2] = function(container) {
             steps.push({
               matrix: currentMatrix.map(row => row.slice()),
               highlightRows: [r],
-              highlightCells: [[r, p]], 
+              highlightCells: [[r, p]], // يظل مضاءً ليراه وهو صفر
               en: `Row R<sub>${r+1}</sub> has been successfully updated.`,
               ar: `تم تحديث الصف R<sub>${r+1}</sub> بنجاح.`
             });
@@ -506,18 +506,18 @@ window.AlgoWidgets[2] = function(container) {
    
         svgEl.innerHTML = ''; 
         
-        
+        // تعريف رأس السهم
         const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         defs.innerHTML = `<marker id="w2-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--text-muted)" /></marker>`;
         svgEl.appendChild(defs);
    
-        
+        // رسم المصفوفة الأصلية (يسار)
         drawMatrix(svgEl, initialMatrixData, matrixLeftX, matrixY, [], [], true);
    
-        
+        // رسم المصفوفة الحالية (يمين)
         drawMatrix(svgEl, s.matrix, matrixRightX, matrixY, s.highlightRows, s.highlightCells, false);
    
-        
+        // رسم السهم بالمنتصف
         const arrowStartX = matrixLeftX + matW + 40;
         const arrowEndX = matrixRightX - 30;
         const arrowY = matrixY + matH / 2;
@@ -532,7 +532,7 @@ window.AlgoWidgets[2] = function(container) {
         arrowLine.setAttribute('marker-end', 'url(#w2-arrow)');
         svgEl.appendChild(arrowLine);
    
-        
+        // رسم نص السهم
         const arrowLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         arrowLabel.setAttribute('x', (arrowStartX + arrowEndX) / 2);
         arrowLabel.setAttribute('y', arrowY - 15);
@@ -577,13 +577,13 @@ window.AlgoWidgets[3] = function(container) {
       _AL.toolbar(3) +
       '<div class="algo-explanation" id="w3-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة لضمان احتواء الشجرتين بشكل ممتاز
       '<div class="algo-canvas" id="w3-canvas" style="width:100%; max-width:800px; aspect-ratio: 2 / 1; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:hidden;">' +
-        
+        // تم تثبيت الـ SVG هنا بدلاً من خلقه برمجياً في كل خطوة
         '<svg id="w3-svg-canvas" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%;"></svg>' +
       '</div>' +
       
-      
+      // دليل الألوان لتوضيح الحالات
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:12px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w3-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w3-active"></span></span>' +
@@ -593,7 +593,7 @@ window.AlgoWidgets[3] = function(container) {
  
     var btnPlay = container.querySelector('[data-algo-btn="play"]');
     var expEl   = container.querySelector('#w3-exp');
-    var svgEl   = container.querySelector('#w3-svg-canvas'); 
+    var svgEl   = container.querySelector('#w3-svg-canvas'); // استخدام الـ SVG الثابت
     var counter = container.querySelector('[data-algo-counter]');
     
     var steps = [], cur = 0, playing = false, interval = null;
@@ -704,11 +704,11 @@ window.AlgoWidgets[3] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
       
-      svgEl.innerHTML = ''; 
+      svgEl.innerHTML = ''; // تنظيف المحتوى الداخلي فقط
  
       var svgNS = "http://www.w3.org/2000/svg";
  
-      
+      // عناوين الأشجار
       var titleA = document.createElementNS(svgNS, "text");
       titleA.setAttribute("x", "200"); titleA.setAttribute("y", "30");
       titleA.setAttribute("text-anchor", "middle");
@@ -729,20 +729,20 @@ window.AlgoWidgets[3] = function(container) {
       titleB.textContent = _AL.lang() === 'ar' ? 'الشجرة ب (غير متوازنة)' : 'Tree B (Unbalanced)';
       svgEl.appendChild(titleB);
  
-      
+      // رسم الخطوط أولاً لتكون خلف العقد
       edges.forEach(function(e) {
         var u = nodes[e.u], v = nodes[e.v];
         var line = document.createElementNS(svgNS, "line");
         line.setAttribute("x1", u.x); line.setAttribute("y1", u.y);
         line.setAttribute("x2", v.x); line.setAttribute("y2", v.y);
-        
+        // إصلاح لون الخطوط ليظهر بوضوح في النمط النهاري والليلي
         line.setAttribute("stroke", "var(--text-muted)");
         line.setAttribute("stroke-width", "3");
         line.setAttribute("opacity", "0.6");
         svgEl.appendChild(line);
       });
  
-      
+      // رسم العقد
       nodes.forEach(function(n) {
         var g = document.createElementNS(svgNS, "g");
         
@@ -768,17 +768,17 @@ window.AlgoWidgets[3] = function(container) {
         var text = document.createElementNS(svgNS, "text");
         text.setAttribute("x", n.x); 
         text.setAttribute("y", n.y);
-        text.setAttribute("dy", ".1em"); 
+        text.setAttribute("dy", ".1em"); // التوسيط الدقيق
         text.setAttribute("text-anchor", "middle");
         text.setAttribute("dominant-baseline", "middle");
-        text.setAttribute("fill", "#ffffff"); 
+        text.setAttribute("fill", "#ffffff"); // لون الخط دائمًا أبيض للتباين
         text.setAttribute("font-size", "15px");
         text.setAttribute("font-weight", "800");
         text.setAttribute("font-family", "'Inter', sans-serif");
         text.textContent = n.val;
         g.appendChild(text);
  
-        
+        // رسم معامل التوازن (BF)
         if (s.showBf.includes(n.id)) {
           var isHighlight = s.highlightBf.includes(n.id);
           var bfColor = isHighlight ? "var(--algo-compare)" : "var(--text-secondary)";
@@ -818,7 +818,7 @@ window.AlgoWidgets[3] = function(container) {
     container.querySelector('[data-algo-btn="play"]').addEventListener('click', function() { playing ? stopPlay() : startPlay(); });
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function() { stopPlay(); generateSteps(); cur = 0; render(); });
     
-    
+    // إصلاح ربط سرعة التشغيل
     container.querySelector('.algo-speed input').addEventListener('input', function() {
       if (playing) {
         clearInterval(interval);
@@ -840,16 +840,16 @@ window.AlgoWidgets[4] = function(container) {
         _AL.toolbar(4) +
         '<div class="algo-explanation" id="w4-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
         
-        
+        // الحاوية: تم ضبط الـ flex لضمان بقاء الشجرتين بجانب بعضهما في الشاشات العادية
         '<div class="algo-canvas" id="w4-svg-container" style="width:100%; min-height:280px; display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; padding:15px 5px; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); gap: 10px;">' +
           
-          
+          // الشجرة الأولى (AVL) - عرض 45% لضمان التواجد الجانبي
           '<div style="text-align:center; flex: 1 1 45%; min-width: 240px; display:flex; flex-direction:column; align-items:center;">' +
             '<h5 data-algo-text="w4-title-avl" style="color:var(--text-primary); font-weight:800; font-size:1rem; margin-bottom:5px; font-family:\'Cairo\', sans-serif;"></h5>' +
             '<svg id="w4-tree-avl" viewBox="0 0 280 240" style="width:100%; max-width:280px; height:auto; overflow:visible;"></svg>' +
           '</div>' +
           
-          
+          // الشجرة الثانية (غير متوازنة)
           '<div style="text-align:center; flex: 1 1 45%; min-width: 240px; display:flex; flex-direction:column; align-items:center;">' +
             '<h5 data-algo-text="w4-title-non-avl" style="color:var(--text-primary); font-weight:800; font-size:1rem; margin-bottom:5px; font-family:\'Cairo\', sans-serif;"></h5>' +
             '<svg id="w4-tree-non-avl" viewBox="0 0 280 240" style="width:100%; max-width:280px; height:auto; overflow:visible;"></svg>' +
@@ -857,7 +857,7 @@ window.AlgoWidgets[4] = function(container) {
           
         '</div>' +
         
-        
+        // دليل الألوان
         '<div class="algo-legend" style="margin-top:15px; display:flex; justify-content:center; flex-wrap:wrap; gap:15px; font-size:0.8rem; color:var(--text-secondary);">' +
           '<span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--brand-500); margin-inline-end:5px;"></span><span data-algo-text="w4-node-normal"></span></span>' +
           '<span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--algo-compare); margin-inline-end:5px;"></span><span data-algo-text="w4-node-problem"></span></span>' +
@@ -885,7 +885,7 @@ window.AlgoWidgets[4] = function(container) {
         container.querySelector('[data-algo-text="w4-node-current"]').textContent   = _AL.exp('Checking Node', 'جاري الفحص');
       }
     
-      
+      // بناء هيكل الشجرة
       function buildTree(data, parent = null) {
         if (!data) return null;
         const node = { id: data.id, value: data.value, bf: data.bf, parent: parent };
@@ -894,17 +894,17 @@ window.AlgoWidgets[4] = function(container) {
         return node;
       }
     
-      
+      // حساب إحداثيات الشجرة بطريقة مضغوطة وأنيقة
       function layoutTreeNodes(treeRoot) {
         let counter = 0;
-        const vOffset = 65; 
-        const hSpacing = 42; 
+        const vOffset = 65; // تقليل المسافة العمودية
+        const hSpacing = 42; // تقليل المسافة الأفقية
         
         function traverse(node, level) {
           if (!node) return;
           traverse(node.left, level + 1);
           node.x = counter * hSpacing;
-          node.y = level * vOffset + 25; 
+          node.y = level * vOffset + 25; // رفع الشجرة للأعلى قليلاً
           counter++;
           traverse(node.right, level + 1);
         }
@@ -913,12 +913,12 @@ window.AlgoWidgets[4] = function(container) {
         return treeRoot;
       }
     
-      
+      // دالة الرسم المستقلة تماماً
       function drawTree(svgEl, treeRoot, activeNodes = [], problematicNodes = []) {
         svgEl.innerHTML = ''; 
         if (!treeRoot) return;
     
-        
+        // تحديد أبعاد الشجرة لضبطها في المنتصف
         let minX = Infinity, maxX = -Infinity;
         function findBounds(node) {
           if (!node) return;
@@ -930,13 +930,13 @@ window.AlgoWidgets[4] = function(container) {
         findBounds(treeRoot);
     
         const treeWidth = maxX - minX;
-        const svgWidth = 280; 
+        const svgWidth = 280; // العرض المصغر للـ viewBox
         const offsetX = (svgWidth - treeWidth) / 2 - minX; 
     
-        const nodeRadius = 18; 
+        const nodeRadius = 18; // تصغير حجم الدائرة
         const svgNS = 'http://www.w3.org/2000/svg';
 
-        
+        // 1. رسم الخطوط أولاً (لتكون في الخلفية)
         function drawEdges(node) {
             if (!node) return;
             const nodeX = node.x + offsetX;
@@ -951,7 +951,7 @@ window.AlgoWidgets[4] = function(container) {
                 line.setAttribute('x2', nodeX);
                 line.setAttribute('y2', nodeY);
                 line.setAttribute('stroke', 'var(--text-muted)');
-                line.setAttribute('stroke-width', '2.5'); 
+                line.setAttribute('stroke-width', '2.5'); // خط أرفع قليلاً
                 line.setAttribute('opacity', '0.5');
                 svgEl.appendChild(line);
             }
@@ -960,7 +960,7 @@ window.AlgoWidgets[4] = function(container) {
         }
         drawEdges(treeRoot);
 
-        
+        // 2. رسم العقد والنصوص فوق الخطوط
         function drawNodes(node) {
           if (!node) return;
           const nodeX = node.x + offsetX;
@@ -992,7 +992,7 @@ window.AlgoWidgets[4] = function(container) {
           g.style.transformOrigin = `${nodeX}px ${nodeY}px`;
           g.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
 
-          
+          // الدائرة
           const circle = document.createElementNS(svgNS, 'circle');
           circle.setAttribute('cx', nodeX);
           circle.setAttribute('cy', nodeY);
@@ -1003,7 +1003,7 @@ window.AlgoWidgets[4] = function(container) {
           circle.style.transition = "fill 0.3s ease";
           g.appendChild(circle);
     
-          
+          // الرقم داخل الدائرة (مصغر)
           const valueText = document.createElementNS(svgNS, 'text');
           valueText.setAttribute('x', nodeX);
           valueText.setAttribute('y', nodeY);
@@ -1011,19 +1011,19 @@ window.AlgoWidgets[4] = function(container) {
           valueText.setAttribute('text-anchor', 'middle');
           valueText.setAttribute('dominant-baseline', 'middle');
           valueText.setAttribute('fill', '#ffffff');
-          valueText.setAttribute('font-size', '13px'); 
+          valueText.setAttribute('font-size', '13px'); // خط أصغر
           valueText.setAttribute('font-weight', '800');
           valueText.setAttribute('font-family', "'Inter', sans-serif");
           valueText.textContent = node.value;
           g.appendChild(valueText);
     
-          
+          // رقم معامل التوازن (BF) بجانب الدائرة (مصغر ومقرب)
           if (node.bf !== null) {
               const bfText = document.createElementNS(svgNS, 'text');
-              bfText.setAttribute('x', nodeX + nodeRadius + 3); 
-              bfText.setAttribute('y', nodeY - 12); 
+              bfText.setAttribute('x', nodeX + nodeRadius + 3); // أقرب للدائرة
+              bfText.setAttribute('y', nodeY - 12); // أسفل قليلاً
               bfText.setAttribute('fill', isProblem ? 'var(--algo-compare)' : 'var(--text-secondary)');
-              bfText.setAttribute('font-size', '11px'); 
+              bfText.setAttribute('font-size', '11px'); // خط أصغر
               bfText.setAttribute('font-weight', isProblem ? '900' : '700');
               bfText.setAttribute('font-family', "'Inter', sans-serif");
               bfText.textContent = 'BF=' + node.bf;
@@ -1145,7 +1145,7 @@ window.AlgoWidgets[5] = function(container) {
         '<div class="algo-explanation" id="w5-exp" style="font-size: 0.95rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; min-height: 55px;"></div>' +
         
         '<div class="algo-canvas" id="w5-canvas-container" style="width:100%; max-width:500px; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); padding: 20px 10px; overflow:visible;">' +
-          
+          // تم زيادة الارتفاع إلى 280 لتوفير مساحة للأسهم العلوية والسفلية
           '<svg id="w5-svg" width="100%" height="auto" viewBox="0 0 500 280" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
         '</div>' +
         
@@ -1177,7 +1177,7 @@ window.AlgoWidgets[5] = function(container) {
       function generateSteps() {
         steps = [];
         
-        
+        // تم ترحيل جميع العقد للأسفل قليلاً (y = 60, 130, 200) لمنع القص
         var baseLayout = function(type) {
            if(type==='LL1') return { n30: {x:250, y:60, label:'30'}, n20: {x:170, y:130, label:'20'}, n10: {x:90, y:200, label:'10'} };
            if(type==='LL2') return { n20: {x:250, y:60, label:'20'}, n10: {x:170, y:130, label:'10'}, n30: {x:330, y:130, label:'30'} };
@@ -1194,7 +1194,7 @@ window.AlgoWidgets[5] = function(container) {
            if(type==='RL3') return { n20: {x:250, y:60, label:'20'}, n10: {x:170, y:130, label:'10'}, n30: {x:330, y:130, label:'30'} };
         };
   
-        
+        // ---------------- CASE 1: LL (Left-Left) ----------------
         steps.push({
           en: '<strong>1. Left-Left (LL):</strong> Node <strong>30</strong> is imbalanced (+2).',
           ar: '<strong>1. حالة يسار-يسار (LL):</strong> العقدة <strong>30</strong> غير متوازنة (+2).',
@@ -1206,7 +1206,7 @@ window.AlgoWidgets[5] = function(container) {
           ar: '<strong>دوران يميني:</strong> تصعد 20 لتصبح الجذر، وتنزل 30 لليمين.',
           layout: baseLayout('LL1'), edges: [{from:'n30', to:'n20'}, {from:'n20', to:'n10'}],
           colors: { n30: 'swap', n20: 'swap', n10: 'pending' },
-          
+          // تم رفع مسار السهم (Q 250 -40) ورفع النص (ty: 15) ليكون فوق العقدة تماماً
           arrows: [{ path: "M 180 100 Q 250 -40 320 100", tx: 250, ty: 15, en: "Right Rotation", ar: "دوران يميني" }]
         });
         steps.push({
@@ -1216,7 +1216,7 @@ window.AlgoWidgets[5] = function(container) {
           colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
         });
   
-        
+        // ---------------- CASE 2: RR (Right-Right) ----------------
         steps.push({
           en: '<strong>2. Right-Right (RR):</strong> Node <strong>10</strong> is imbalanced (-2).',
           ar: '<strong>2. حالة يمين-يمين (RR):</strong> العقدة <strong>10</strong> غير متوازنة (-2).',
@@ -1237,7 +1237,7 @@ window.AlgoWidgets[5] = function(container) {
           colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
         });
   
-        
+        // ---------------- CASE 3: LR (Left-Right) ----------------
         steps.push({
           en: '<strong>3. Left-Right (LR):</strong> 30 is imbalanced, child 10 is right-heavy.',
           ar: '<strong>3. حالة يسار-يمين (LR):</strong> 30 مختلة، والابن 10 يميل لليمين.',
@@ -1249,7 +1249,7 @@ window.AlgoWidgets[5] = function(container) {
           ar: '<strong>الخطوة 1: دوران يساري للابن (10):</strong> 20 تصعد لليسار.',
           layout: baseLayout('LR1'), edges: [{from:'n30', to:'n10'}, {from:'n10', to:'n20'}],
           colors: { n30: 'pending', n10: 'swap', n20: 'swap' },
-          
+          // تم إنزال السهم للمستوى السفلي لتجنب التقاطع مع العقدة 10
           arrows: [{ path: "M 230 210 Q 170 280 110 210", tx: 170, ty: 260, en: "1. Left Rot", ar: "1. دوران يساري" }]
         });
         steps.push({
@@ -1272,7 +1272,7 @@ window.AlgoWidgets[5] = function(container) {
           colors: { n30: 'sorted', n20: 'sorted', n10: 'sorted' }, arrows: []
         });
   
-        
+        // ---------------- CASE 4: RL (Right-Left) ----------------
         steps.push({
           en: '<strong>4. Right-Left (RL):</strong> 10 is imbalanced, child 30 is left-heavy.',
           ar: '<strong>4. حالة يمين-يسار (RL):</strong> 10 مختلة، والابن 30 يميل لليسار.',
@@ -1284,7 +1284,7 @@ window.AlgoWidgets[5] = function(container) {
           ar: '<strong>الخطوة 1: دوران يميني للابن (30):</strong> 20 تصعد لليمين.',
           layout: baseLayout('RL1'), edges: [{from:'n10', to:'n30'}, {from:'n30', to:'n20'}],
           colors: { n10: 'pending', n30: 'swap', n20: 'swap' },
-          
+          // تم إنزال السهم للمستوى السفلي لتجنب التقاطع
           arrows: [{ path: "M 270 210 Q 330 280 390 210", tx: 330, ty: 260, en: "1. Right Rot", ar: "1. دوران يميني" }]
         });
         steps.push({

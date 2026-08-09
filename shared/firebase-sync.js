@@ -1,127 +1,513 @@
- 
+/*@3.FISJ.1*/
 
 ; (function () {
   'use strict';
 
-   
+  /*@3.FISJ.2*/
   const WORKER_URL = 'https://garden-ai.xxli50xx.workers.dev';
 
+  /*@3.FISJ.3*/
+  function syncEndpoint() {
+    const e = (window.GardenEndpoints && window.GardenEndpoints.sync) || '';
+    return String(e).replace(/\/+$/, '');
+  }
+
+  /*@3.FISJ.4*/
+  const ROOT = (function () {
+    const s = document.currentScript;
+    return (s && s.src) ? s.src.replace(/shared\/firebase-sync\.js(\?.*)?$/, '')
+                        : (location.origin + '/');
+  })();
+
+  let _endpointsP = null;
+  function ensureEndpoints() {
+    if (window.GardenEndpoints) return Promise.resolve(true);
+    if (_endpointsP) return _endpointsP;
+    _endpointsP = new Promise(resolve => {
+      /*@3.FISJ.5*/
+      let el = document.querySelector('script[data-garden-endpoints]');
+      if (!el) {
+        el = document.createElement('script');
+        el.src = ROOT + 'shared/endpoints.js';
+        el.async = false;
+        el.setAttribute('data-garden-endpoints', '1');
+        document.head.appendChild(el);
+      }
+      const done = () => resolve(!!window.GardenEndpoints);
+      el.addEventListener('load', done);
+      el.addEventListener('error', done);
+      setTimeout(done, 4000);            /*@3.FISJ.6*/
+    });
+    return _endpointsP;
+  }
+
   async function getFirebaseConfig() {
+    /*@3.FISJ.7*/
+    const own = usingOracle() ? syncEndpoint() : '';
+    if (own) {
+      const r = await fetch(own + '/v1/config');
+      if (!r.ok) throw new Error('byte-config-' + r.status);
+      return r.json();
+    }
     const res = await fetch(`${WORKER_URL}/api/firebase-config`);
     return res.json();
   }
 
   const FIREBASE_VER = '10.12.2';
 
-   
-  
+  /*@3.FISJ.8*/
   const FIXED_SYNC_KEYS = [];
 
-  
+  /*@3.FISJ.9*/
   const DYNAMIC_PATTERNS = [
-    
+    /*@3.FISJ.10*/
     /^garden_[A-Z0-9]+_m\d+_fc$/,
     /^garden_[A-Z0-9]+_m\d+_quiz$/,
     /^garden_[A-Z0-9]+_m\d+_notes$/,
     /^garden_[A-Z0-9]+_m\d+_ret$/,
     /^garden_[A-Z0-9]+_activity$/,
     /^garden_daily_new_limit$/,
-    
-    /^study_plan_L\d+_(midterm|final|general)$/,
-    
-    /^planner_config_L\d+$/,
-    
-    /^planner_v2_L\d+$/,
-    /^planner_v2_progress_L\d+$/,
-    
-    /^study_plan_(midterm|final|general)$/,
-    /^planner_config$/,
+    /*@3.FISJ.11*/
+    /^[A-Z0-9]+_(midterm|final)_score$/,
+    /*@3.FISJ.12*/
+    /^garden_[A-Z0-9]+_quizlog$/,
+    /*@3.FISJ.13*/
+    /^my_semester$/,
+    /^semester_archive$/,
+    /*@3.FISJ.14*/
+    /^gpa_grades$/,
+    /^gpa_settings$/,
+    /*@3.FISJ.15*/
+    /^weekly_schedule$/,
+    /*@3.FISJ.16*/
+    /^dashboard_prefs$/,
+    /^student_profile$/,
+    /^quick_notes$/,
+    /*@3.FISJ.17*/
+    /^course_meta_[A-Z0-9_]+$/,
+    /*@3.FISJ.18*/
+    /^my_tasks$/,
+    /*@3.FISJ.19*/
+    /^gpa_plan$/,
+    /*@3.FISJ.20*/
+    /^__tomb_[A-Za-z0-9_.:-]+$/,
+    /*@3.FISJ.21*/
+    /^garden_labs_[a-z0-9-]+:(artifact|slots|slot:[a-z0-9]+)$/,
   ];
-  
+  /*@3.FISJ.22*/
   const NEVER_SYNC = new Set([
     'garden_lang', 'garden_theme', 'garden_font_size', 'garden_mobile_3d', 'garden_sync_key',
+    'garden_semester_meta',
+    /*@3.FISJ.23*/
+    'dash_view',
+    /*@3.FISJ.24*/
+    'gpa_scenario',
   ]);
 
-   
+  /*@3.FISJ.25*/
   const SYNC_KEY_LS = 'garden_sync_key';
-  const SYNC_DECLINED_LS = 'garden_sync_declined'; 
-  const SYNC_SEEN_LS = 'garden_sync_modal_seen';   
+  const SYNC_DECLINED_LS = 'garden_sync_declined'; /*@3.FISJ.26*/
+  const SYNC_SEEN_LS = 'garden_sync_modal_seen';   /*@3.FISJ.27*/
   const KEY_REGEX = /^[A-Z]{3}[0-9]{5,}$/;
-  const COLLECTION = 'users';
-  const AUTO_PUSH_DEBOUNCE_MS = 1500; 
+  /*@3.FISJ.28*/
+  function collectionName() { return usingOracle() ? 'vaults' : 'users'; }
 
-   
+  /*@3.FISJ.29*/
+  let forceFirestore = false;
+  function usingOracle() { return !!syncEndpoint() && !forceFirestore; }
+  let storeReady = false;
+  /*@3.FISJ.30*/
+  const PUSH_PENDING_LS = '__pushPending';
+  let pushPending = (function () {
+    try { return localStorage.getItem(PUSH_PENDING_LS) === '1'; } catch (e) { return false; }
+  })();
+  function setPushPending(v) {
+    pushPending = !!v;
+    try {
+      if (v) localStorage.setItem(PUSH_PENDING_LS, '1');
+      else localStorage.removeItem(PUSH_PENDING_LS);
+    } catch (e) {}
+  }
+
+  /*@3.FISJ.31*/
+
+  function vaultUrl(docId) {
+    return syncEndpoint() + '/v1/vault/' + encodeURIComponent(docId);
+  }
+
+  /*@3.FISJ.32*/
+  const VAULT_MAP_LS = 'garden_vault_docid:';
+  const ORACLE_ID = /^v[0-9a-f]{32}$/;
+
+  async function oracleDocId(docId) {
+    const id = String(docId || '');
+    if (ORACLE_ID.test(id)) return id;                       /*@3.FISJ.33*/
+    const cached = localStorage.getItem(VAULT_MAP_LS + id);
+    if (cached && ORACLE_ID.test(cached)) return cached;
+
+    const r = await fetch(syncEndpoint() + '/v1/legacy-map', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ legacy_key: id })
+    });
+    if (!r.ok) throw new Error('legacy-map-' + r.status);
+    const j = await r.json();
+    if (!j || !ORACLE_ID.test(j.vault_id || '')) throw new Error('legacy-map-shape');
+    localStorage.setItem(VAULT_MAP_LS + id, j.vault_id);
+    return j.vault_id;
+  }
+
+  /*@3.FISJ.34*/
+  async function storeGet(docId) {
+    if (usingOracle()) {
+      const r = await fetch(vaultUrl(await oracleDocId(docId)), { cache: 'no-store' });
+      if (!r.ok) throw new Error('oracle-get-' + r.status);
+      const j = await r.json();
+      return { exists: !!j.exists, sync: j.sync || {}, data: j };
+    }
+    const snap = await db.collection(collectionName()).doc(docId).get();
+    const d = snap.exists ? (snap.data() || {}) : {};
+    return { exists: !!snap.exists, sync: d.sync || {}, data: d };
+  }
+
+  /*@3.FISJ.35*/
+  async function storeMerge(docId, payload, extra) {
+    if (usingOracle()) {
+      const r = await fetch(vaultUrl(await oracleDocId(docId)), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sync: payload })
+      });
+      if (!r.ok) throw new Error('oracle-post-' + r.status);
+      return r.json();
+    }
+    await db.collection(collectionName()).doc(docId).set(
+      Object.assign({ sync: payload, last_seen: Date.now() }, extra || {}),
+      { merge: true }
+    );
+    return null;
+  }
+  const AUTO_PUSH_DEBOUNCE_MS = 1500; /*@3.FISJ.36*/
+
+  /*@3.FISJ.37*/
+  const TS_PREFIX = '__syncT_';
+  const _rawSet = Storage.prototype.setItem;
+  function stampLocal(key, t) {
+    try { _rawSet.call(localStorage, TS_PREFIX + key, String(t || hlcNow())); } catch (e) {}
+  }
+  function localStamp(key) {
+    const v = Number(localStorage.getItem(TS_PREFIX + key) || 0);
+    return isFinite(v) ? v : 0;
+  }
+
+  /*@3.FISJ.38*/
+  const HLC_LS = '__hlc';
+  let _hlc = (function () {
+    try { const v = Number(localStorage.getItem(HLC_LS) || 0); return isFinite(v) ? v : 0; }
+    catch (e) { return 0; }
+  })();
+
+  function _hlcSave() {
+    try { _rawSet.call(localStorage, HLC_LS, String(_hlc)); } catch (e) {}
+  }
+
+  /*@3.FISJ.39*/
+  function hlcObserve(t) {
+    const n = Number(t);
+    if (isFinite(n) && n > _hlc) { _hlc = n; _hlcSave(); }
+  }
+
+  /*@3.FISJ.40*/
+  function hlcNow() {
+    const p = Date.now();
+    _hlc = (p > _hlc) ? p : _hlc + 1;
+    _hlcSave();
+    return _hlc;
+  }
+
+  /*@3.FISJ.41*/
+  function hlcObserveItems(raw) {
+    try { _hlcWalk(JSON.parse(raw || 'null')); } catch (e) {}
+  }
+  function _hlcWalk(x, depth) {
+    if (!x || typeof x !== 'object' || (depth || 0) > 6) return;
+    if (Array.isArray(x)) { x.forEach(e => _hlcWalk(e, (depth || 0) + 1)); return; }
+    if (x.updated_at != null) hlcObserve(x.updated_at);
+    for (const k in x) _hlcWalk(x[k], (depth || 0) + 1);
+  }
+
+  /*@3.FISJ.42*/
+  function hlcSeedFromLocal() {
+    if (_hlc) return;                      /*@3.FISJ.43*/
+    let hi = 0;
+    const bump = t => { const n = Number(t); if (isFinite(n) && n > hi) hi = n; };
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k.indexOf(TS_PREFIX) === 0) bump(localStorage.getItem(k));
+        else if (MERGE_BY_ID.has(k)) {
+          try {
+            const arr = JSON.parse(localStorage.getItem(k) || '[]');
+            if (Array.isArray(arr)) arr.forEach(x => { if (x) bump(x.updated_at); });
+          } catch (e) {}
+        } else if (k.indexOf(TOMB_PREFIX) === 0) {
+          const t = _readTomb(localStorage.getItem(k));
+          for (const id in t) bump(t[id]);
+        }
+      }
+    } catch (e) {}
+    if (hi > _hlc) { _hlc = hi; _hlcSave(); }
+  }
+
+  /*@3.FISJ.44*/
+  const MERGE_BY_ID = new Set(['quick_notes', 'my_tasks']);
+
+  /*@3.FISJ.45*/
+  const MERGE_DEEP = new Set([
+    'weekly_schedule',    /*@3.FISJ.46*/
+    'my_semester',
+    'semester_archive',
+    'gpa_grades',
+    'gpa_plan',
+    'gpa_settings',
+    'dashboard_prefs',
+    'student_profile',
+  ]);
+  const MERGE_DEEP_PATTERNS = [
+    /^course_meta_[A-Z0-9_]+$/,
+    /*@3.FISJ.47*/
+    /^garden_[A-Z0-9]+_m\d+_(fc|quiz|ret)$/,
+    /*@3.FISJ.48*/
+    /^garden_[A-Z0-9]+_quizlog$/,
+  ];
+  function isDeepKey(k) {
+    return MERGE_DEEP.has(k) || MERGE_DEEP_PATTERNS.some(p => p.test(k));
+  }
+
+  const TOMB_PREFIX = '__tomb_';
+  const TOMB_TTL_MS = 90 * 24 * 3600 * 1000;   /*@3.FISJ.49*/
+
+  function _itemStamp(x, fallback) {
+    const v = x && x.updated_at;
+    const n = (typeof v === 'number') ? v : (v ? Date.parse(v) : NaN);
+    return (isFinite(n) && n > 0) ? n : fallback;
+  }
+
+  function _readTomb(raw) {
+    try {
+      const o = JSON.parse(raw || '{}');
+      return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+    } catch (e) { return {}; }
+  }
+
+  /*@3.FISJ.50*/
+  function mergeTombs(aRaw, bRaw) {
+    const a = _readTomb(aRaw), b = _readTomb(bRaw);
+    const out = {}, floor = Date.now() - TOMB_TTL_MS;
+    for (const src of [a, b]) {
+      for (const id in src) {
+        const t = Number(src[id]) || 0;
+        if (t > floor && t > (out[id] || 0)) out[id] = t;
+      }
+    }
+    return out;
+  }
+
+  function _isArr(x) { return Array.isArray(x); }
+  function _isObj(x) { return !!x && typeof x === 'object' && !Array.isArray(x); }
+  /*@3.FISJ.51*/
+  function _isIdArr(x) {
+    return _isArr(x) && x.length > 0 &&
+           x.every(e => !!e && typeof e === 'object' && !Array.isArray(e) && e.id != null);
+  }
+
+  /*@3.FISJ.52*/
+  function _canon(x) {
+    if (_isArr(x)) return x.map(_canon);
+    if (_isObj(x)) {
+      const o = {};
+      Object.keys(x).sort().forEach(k => { o[k] = _canon(x[k]); });
+      return o;
+    }
+    return x;
+  }
+  function _canonStr(x) { return JSON.stringify(_canon(x)); }
+
+  /*@3.FISJ.53*/
+  function _tk(path, id) { return path ? path + '/' + id : String(id); }
+
+  function _mergeIdArr(a, b, localT, remoteT, dead, path) {
+    const map = new Map();
+    const put = (side, x) => {
+      if (!x || x.id == null) return;
+      const id = String(x.id);
+      const e = map.get(id) || {};
+      e[side] = x;
+      map.set(id, e);
+    };
+    a.forEach(x => put('l', x));
+    b.forEach(x => put('r', x));
+
+    const out = [];
+    for (const [id, e] of map) {
+      let win, at;
+      if (e.l && e.r) {
+        const lt = _itemStamp(e.l, localT), rt = _itemStamp(e.r, remoteT);
+        if (lt !== rt) {
+          win = lt > rt ? e.l : e.r;
+        } else {
+          /*@3.FISJ.54*/
+          win = _canonStr(e.l) >= _canonStr(e.r) ? e.l : e.r;
+        }
+        at = Math.max(lt, rt);
+      } else {
+        win = e.l || e.r;
+        at = _itemStamp(win, e.l ? localT : remoteT);
+      }
+      /*@3.FISJ.55*/
+      const buried = dead[_tk(path, id)];
+      if (buried != null && Number(buried) >= at) continue;
+      out.push(win);
+    }
+    out.sort((x, y) => String(x.id).localeCompare(String(y.id)));
+    return out;
+  }
+
+  function mergeById(localRaw, localT, remoteRaw, remoteT, tomb) {
+    let a, b;
+    try { a = JSON.parse(localRaw); b = JSON.parse(remoteRaw); } catch (e) { return null; }
+    if (!Array.isArray(a) || !Array.isArray(b)) return null;   /*@3.FISJ.56*/
+    return JSON.stringify(_mergeIdArr(a, b, localT, remoteT, tomb || {}, ''));
+  }
+
+  /*@3.FISJ.57*/
+  const ENV_PLAIN = 0;
+
+  /*@3.FISJ.58*/
+  function unwrap(raw) {
+    if (typeof raw !== 'string' || raw.charCodeAt(0) !== 123) return raw;   /*@3.FISJ.59*/
+    try {
+      const o = JSON.parse(raw);
+      if (o && typeof o === 'object' && typeof o.e === 'number' && 'v' in o) {
+        if (o.e === ENV_PLAIN) return o.v;
+        return null;      /*@3.FISJ.60*/
+      }
+    } catch (e) {}
+    return raw;           /*@3.FISJ.61*/
+  }
+  /*@3.FISJ.62*/
+  function wrap(raw) { return raw; }
+
+  /*@3.FISJ.63*/
+  function _deepMerge(l, r, localT, remoteT, dead, path) {
+    if (_isIdArr(l) && _isIdArr(r)) return _mergeIdArr(l, r, localT, remoteT, dead, path);
+
+    if (_isObj(l) && _isObj(r)) {
+      const out = {};
+      const keys = Object.keys(l).concat(Object.keys(r).filter(k => !(k in l))).sort();
+      for (const k of keys) {
+        const hasL = Object.prototype.hasOwnProperty.call(l, k);
+        const hasR = Object.prototype.hasOwnProperty.call(r, k);
+        const p = path ? path + '/' + k : k;
+        if (hasL && hasR) { out[k] = _deepMerge(l[k], r[k], localT, remoteT, dead, p); continue; }
+
+        /*@3.FISJ.64*/
+        const side = hasL ? l[k] : r[k];
+        const at = hasL ? localT : remoteT;
+        const gone = dead[p];   /*@3.FISJ.65*/
+        if ((_isObj(side) || _isArr(side)) && gone != null && Number(gone) >= at) continue;
+        out[k] = side;
+      }
+      return out;
+    }
+
+    if (localT !== remoteT) return localT > remoteT ? l : r;
+    return _canonStr(l) >= _canonStr(r) ? l : r;
+  }
+
+  /*@3.FISJ.66*/
+  function mergeDeep(localRaw, localT, remoteRaw, remoteT, tomb) {
+    let a, b;
+    try { a = JSON.parse(localRaw); b = JSON.parse(remoteRaw); } catch (e) { return null; }
+    if (!((_isObj(a) && _isObj(b)) || (_isIdArr(a) && _isIdArr(b)))) return null;
+    return _canonStr(_deepMerge(a, b, localT, remoteT, tomb || {}, ''));
+  }
+
+  /*@3.FISJ.67*/
   let db = null;
+  let pushLastError = null;
   let userKey = null;
-  let syncStatus = 'offline';   
+  let syncStatus = 'offline';   /*@3.FISJ.68*/
   let pushTimer = null;
-  let fabBtn = null;
   let statusDot = null;
   let isSyncing = false;
 
-   
+  /*@3.FISJ.69*/
   const T = {
     ar: {
-      firstTitle: '☁️ مزامنة الأجهزة',
+      firstTitle: 'مزامنة الأجهزة',
       firstBody: 'أنشئ مفتاحاً شخصياً لحفظ بياناتك على السحابة ومزامنتها بين أجهزتك — بدون تسجيل.',
-      keyLabel: 'مفتاحك (3 أحرف + 5 أرقام على الأقل)',
-      keyPlaceholder: 'مثال: ABD92847',
-      randomBtn: '🎲 توليد عشوائي',
-      saveBtn: '☁️ حفظ وتفعيل المزامنة',
+      keyLabel: 'مفتاح خزنتك — انسخه واحفظه',
+      keyPlaceholder: 'الصق مفتاحاً موجوداً، أو استعمل المولَّد',
+      randomBtn: 'توليد عشوائي',
+      saveBtn: 'حفظ وتفعيل المزامنة',
       skipBtn: 'تخطي — تعمل بدون مزامنة',
-      keyError: 'المفتاح يجب أن يكون 3 أحرف كبيرة + 5 أرقام على الأقل (مثال: ABD92847)',
-      modalTitle: '☁️ مزامنة الأجهزة',
+      keyError: 'مفتاح غير صالح. استعمل زرّ التوليد، أو الصق مفتاح خزنتك كاملاً.',
+      modalTitle: 'مزامنة الأجهزة',
       yourKey: 'مفتاحك الحالي',
-      copyBtn: '📋 نسخ',
-      copied: '✓ تم النسخ',
+      copyBtn: 'نسخ',
+      copied: 'تم النسخ',
       statusOnline: 'متصل',
       statusOffline: 'غير متصل',
       statusSyncing: 'جاري المزامنة...',
       statusError: 'خطأ في الاتصال',
+      statusPending: 'تغييراتٌ لم تُرفع بعد',
       lastSync: 'آخر مزامنة',
-      syncNowBtn: '🔄 مزامنة الآن',
+      syncNowBtn: 'مزامنة الآن',
       changeTitle: 'انتقل لجهاز آخر',
       changeBody: 'أدخل مفتاح جهازك الآخر لاستيراد بياناته:',
       changeInput: 'المفتاح (ABD12345)',
-      importBtn: '⬇️ استيراد من هذا المفتاح',
+      importBtn: 'استيراد من هذا المفتاح',
       importConfirm: 'هذا سيستبدل بياناتك الحالية بيانات المفتاح الآخر. تأكد؟',
-      importDone: '✅ تم الاستيراد بنجاح',
-      importFail: '❌ لم يُعثر على بيانات لهذا المفتاح',
-      changeKeyBtn: '🔑 تغيير مفتاحي',
+      importDone: 'تم الاستيراد بنجاح',
+      importFail: 'لم يُعثر على بيانات لهذا المفتاح',
+      changeKeyBtn: 'تغيير مفتاحي',
       changeKeyWarn: 'تغيير المفتاح لن يحذف بياناتك القديمة من السحابة. تأكد؟',
-      warning: '⚠️ المفتاح هو وصولك الوحيد — احفظه بأمان',
+      warning: 'المفتاح هو وصولك الوحيد — احفظه بأمان',
       closeBtn: 'إغلاق',
       never: 'لم يتم بعد',
     },
     en: {
-      firstTitle: '☁️ Device Sync',
+      firstTitle: 'Device Sync',
       firstBody: 'Create a personal key to save your data to the cloud and sync across devices — no registration needed.',
-      keyLabel: 'Your key (3 letters + 5+ digits)',
-      keyPlaceholder: 'Example: ABD92847',
-      randomBtn: '🎲 Random',
-      saveBtn: '☁️ Save & Enable Sync',
+      keyLabel: 'Your vault key — copy and keep it',
+      keyPlaceholder: 'Paste an existing key, or use the generator',
+      randomBtn: 'Random',
+      saveBtn: 'Save & Enable Sync',
       skipBtn: 'Skip — work without sync',
-      keyError: 'Key must be 3 uppercase letters + 5+ digits (e.g. ABD92847)',
-      modalTitle: '☁️ Device Sync',
+      keyError: 'Invalid key. Use the generate button, or paste your full vault key.',
+      modalTitle: 'Device Sync',
       yourKey: 'Your current key',
-      copyBtn: '📋 Copy',
-      copied: '✓ Copied',
+      copyBtn: 'Copy',
+      copied: 'Copied',
       statusOnline: 'Connected',
       statusOffline: 'Offline',
       statusSyncing: 'Syncing...',
       statusError: 'Connection error',
+      statusPending: 'Changes not uploaded yet',
       lastSync: 'Last sync',
-      syncNowBtn: '🔄 Sync Now',
+      syncNowBtn: 'Sync Now',
       changeTitle: 'Switch to another device',
       changeBody: 'Enter the key from your other device to import its data:',
       changeInput: 'Key (ABD12345)',
-      importBtn: '⬇️ Import from this key',
+      importBtn: 'Import from this key',
       importConfirm: 'This will replace your current data with data from the other key. Confirm?',
-      importDone: '✅ Import successful',
-      importFail: '❌ No data found for this key',
-      changeKeyBtn: '🔑 Change my key',
+      importDone: 'Import successful',
+      importFail: 'No data found for this key',
+      changeKeyBtn: 'Change my key',
       changeKeyWarn: 'Changing your key won\'t delete your old cloud data. Confirm?',
-      warning: '⚠️ Your key is your only access — keep it safe',
+      warning: 'Your key is your only access — keep it safe',
       closeBtn: 'Close',
       never: 'Never',
     },
@@ -132,58 +518,16 @@
   }
   function isRTL() { return (localStorage.getItem('garden_lang') || 'ar') === 'ar'; }
 
-   
+  /*@3.FISJ.70*/
   function injectCSS() {
     if (document.getElementById('garden-sync-css')) return;
     const style = document.createElement('style');
     style.id = 'garden-sync-css';
     style.textContent = `
-/* ── Sync FAB ── */
-.sync-fab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 42px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  opacity: 0.45;
-  transition: all 0.25s ease;
-  font-size: 1rem;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-  flex-shrink: 0;
-}
-[dir="rtl"] .sync-fab {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
-  border-right: none;
-  box-shadow: -2px 2px 8px var(--shadow-base);
-}
-[dir="ltr"] .sync-fab {
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  border-left: none;
-  box-shadow: 2px 2px 8px var(--shadow-base);
-}
-.sync-fab:hover, .sync-fab:active { opacity: 1; width: 46px; }
-.sync-fab .sync-status-dot {
-  position: absolute;
-  bottom: 6px;
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--gray-500);
-  transition: background 0.3s;
-}
-[dir="rtl"] .sync-fab .sync-status-dot { left: 5px; }
-[dir="ltr"] .sync-fab .sync-status-dot { right: 5px; }
-.sync-fab .sync-status-dot.synced,
 .sync-header-btn .sync-status-dot.synced { background: #10b981; }
-
-.sync-fab .sync-status-dot.loading,
 .sync-header-btn .sync-status-dot.loading { background: #fbbf24; animation: syncPulse 1s ease-in-out infinite; }
-
-.sync-fab .sync-status-dot.error,
 .sync-header-btn .sync-status-dot.error { background: #ef4444; }
+.sync-header-btn .sync-status-dot.pending { background: #f59e0b; }
 
 /* ── Desktop header sync icon ── */
 .sync-header-btn {
@@ -294,6 +638,7 @@
 .sync-status-label.synced  { color: #10b981; }
 .sync-status-label.loading { color: #fbbf24; }
 .sync-status-label.error   { color: #ef4444; }
+.sync-status-label.pending { color: #f59e0b; }
 
 /* Input */
 .sync-input {
@@ -425,11 +770,12 @@
     document.head.appendChild(style);
   }
 
-   
+  /*@3.FISJ.71*/
   function getKey() { return localStorage.getItem(SYNC_KEY_LS) || null; }
 
-  function validateKey(k) { return KEY_REGEX.test(k); }
+  function validateKey(k) { return KEY_REGEX.test(k) || VAULT_REGEX.test(normalizeVault(k)); }
 
+  /*@3.FISJ.72*/
   function generateRandomKey() {
     const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
     const digits = '0123456789';
@@ -444,9 +790,620 @@
     userKey = k;
   }
 
-   
+  /*@3.FISJ.73*/
+  const VAULT_SECRET_LS = 'garden_vault_secret';
+  const B32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  const VAULT_REGEX = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+
+  function normalizeVault(s) {
+    return String(s || '').toUpperCase().replace(/[\s-]/g, '')
+      /*@3.FISJ.74*/
+      .replace(/O/g, '0').replace(/[IL]/g, '1').replace(/U/g, 'V');
+  }
+
+  function newVaultSecret() {
+    const b = new Uint8Array(16);                 /*@3.FISJ.75*/
+    crypto.getRandomValues(b);
+    let bits = 0, val = 0, out = '';
+    for (let i = 0; i < b.length; i++) {
+      val = (val << 8) | b[i]; bits += 8;
+      while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; }
+    }
+    if (bits > 0) out += B32[(val << (5 - bits)) & 31];
+    return out.slice(0, 26);
+  }
+
+  function prettyVault(s) {
+    return normalizeVault(s).replace(/(.{5})(?=.)/g, '$1-');   /*@3.FISJ.76*/
+  }
+
+  /*@3.FISJ.77*/
+  async function vaultDocId(secret) {
+    const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('garden-vault:' + normalizeVault(secret)));
+    return 'v' + [...new Uint8Array(d)].slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  /*@3.FISJ.78*/
+  async function adoptVaultSecret(secret) {
+    const s = normalizeVault(secret);
+    if (!VAULT_REGEX.test(s)) throw new Error('bad-secret');
+    const id = await vaultDocId(s);
+    localStorage.setItem(VAULT_SECRET_LS, s);
+    saveKey(id);
+    /*@3.FISJ.79*/
+    try {
+      localStorage.removeItem('garden_device_touch');
+      touchDevice().then(ok => {
+        if (ok) localStorage.setItem('garden_device_touch', String(Date.now()));
+      }).catch(() => {});
+    } catch (e) {}
+    return { secret: s, docId: id };
+  }
+
+  function currentVaultSecret() {
+    const s = normalizeVault(localStorage.getItem(VAULT_SECRET_LS));
+    return VAULT_REGEX.test(s) ? s : null;
+  }
+
+  /*@3.FISJ.80*/
+  const PAIR_LEN = 12;
+  const PAIR_TTL_MS = 180 * 1000;
+
+  function newPairCode() {
+    const b = new Uint8Array(PAIR_LEN);
+    crypto.getRandomValues(b);
+    let out = '';
+    for (let i = 0; i < PAIR_LEN; i++) out += B32[b[i] % 32];
+    return out;
+  }
+  function prettyPair(c) { return String(c || '').replace(/(.{4})(?=.)/g, '$1-'); }
+
+  const _te = new TextEncoder();
+  function _b64u(buf) {
+    let s = '';
+    new Uint8Array(buf).forEach(b => { s += String.fromCharCode(b); });
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function _unb64u(s) {
+    const t = String(s).replace(/-/g, '+').replace(/_/g, '/');
+    const bin = atob(t + '='.repeat((4 - t.length % 4) % 4));
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  async function _sha256hex(s) {
+    const d = await crypto.subtle.digest('SHA-256', _te.encode(s));
+    return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function _pairKey(code, pid) {
+    const base = await crypto.subtle.importKey('raw', _te.encode(code), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: _te.encode(pid), iterations: 100000, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+
+  /*@3.FISJ.81*/
+  async function startPairing() {
+    const secret = currentVaultSecret();
+    if (!secret) throw new Error('no-vault');
+    await ensureEndpoints();
+    const code = newPairCode();
+    const pid = 'p' + (await _sha256hex('garden-pair:' + code)).slice(0, 32);
+    const key = await _pairKey(code, pid);
+    /*@3.FISJ.82*/
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, _te.encode(secret));
+    /*@3.FISJ.83*/
+    const blob = _b64u(iv) + _b64u(ct);
+    const r = await fetch(syncEndpoint() + '/v1/pair', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pid, blob }),
+    });
+    if (!r.ok) throw new Error('pair-store-failed');
+    return {
+      code, pretty: prettyPair(code),
+      link: location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html#pair=' + code,
+      expiresAt: Date.now() + PAIR_TTL_MS,
+    };
+  }
+
+  /*@3.FISJ.84*/
+  async function claimPairing(codeRaw) {
+    const code = normalizeVault(codeRaw);
+    if (code.length !== PAIR_LEN) throw new Error('bad-code');
+    await ensureEndpoints();
+    const pid = 'p' + (await _sha256hex('garden-pair:' + code)).slice(0, 32);
+    const r = await fetch(syncEndpoint() + '/v1/pair/' + pid, { cache: 'no-store' });
+    if (r.status === 404) throw new Error('pair-expired');
+    if (!r.ok) throw new Error('pair-failed');
+    const j = await r.json();
+    const blob = String(j.blob || '');
+    if (blob.length <= 16) throw new Error('pair-corrupt');
+    const ivs = blob.slice(0, 16), cts = blob.slice(16);
+    const key = await _pairKey(code, pid);
+    let plain;
+    try {
+      plain = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: _unb64u(ivs) }, key, _unb64u(cts));
+    } catch (e) {
+      /*@3.FISJ.85*/
+      throw new Error('bad-code');
+    }
+    return adoptVaultSecret(new TextDecoder().decode(plain));
+  }
+
+  /*@3.FISJ.86*/
+  const REC_ITER = 600000;
+
+  function normEmail(e) { return String(e || '').trim().toLowerCase(); }
+
+  async function _hkdf(keyBytes, info, bits) {
+    const k = await crypto.subtle.importKey('raw', keyBytes, 'HKDF', false, ['deriveBits']);
+    return crypto.subtle.deriveBits(
+      { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: _te.encode(info) },
+      k, bits);
+  }
+  function _hex(buf) {
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  function _unhex(h) {
+    const out = new Uint8Array(h.length / 2);
+    for (let i = 0; i < out.length; i++) out[i] = parseInt(h.substr(i * 2, 2), 16);
+    return out;
+  }
+
+  /*@3.FISJ.87*/
+  async function _recDerive(email, pass) {
+    const eidHex = await _sha256hex('garden-rec:' + normEmail(email));
+    const eid = 'e' + eidHex.slice(0, 32);
+    const salt = await _hkdf(_unhex(eidHex), 'garden-recovery-salt-v1', 256);
+    const base = await crypto.subtle.importKey('raw', _te.encode(String(pass)),
+                                               'PBKDF2', false, ['deriveBits']);
+    const K = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: new Uint8Array(salt), iterations: REC_ITER, hash: 'SHA-256' },
+      base, 256);
+    const authBits = await _hkdf(new Uint8Array(K), 'auth', 256);
+    const wrapBits = await _hkdf(new Uint8Array(K), 'wrap', 256);
+    const authHash = await crypto.subtle.digest('SHA-256', authBits);
+    const wrap = await crypto.subtle.importKey('raw', wrapBits, { name: 'AES-GCM' },
+                                               false, ['encrypt', 'decrypt']);
+    return { eid, authHash: _hex(authHash), wrap };
+  }
+
+  /*@3.FISJ.88*/
+  const WEAK = ['12345678', '123456789', '1234567890', 'password', 'qwerty123',
+                'iloveyou', 'sunshine', 'princess', 'football', 'password1',
+                'abc12345', '11111111', '00000000', 'qwertyui'];
+  function passIssue(p) {
+    const v = String(p || '');
+    if (v.length < 8) return 'short';
+    if (WEAK.indexOf(v.toLowerCase()) >= 0) return 'weak';
+    if (/^(.)\1+$/.test(v)) return 'weak';
+    return null;
+  }
+
+  /*@3.FISJ.89*/
+  async function saveRecovery(email, pass) {
+    const secret = currentVaultSecret();
+    if (!secret) throw new Error('no-vault');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(normEmail(email))) throw new Error('bad-email');
+    const issue = passIssue(pass);
+    if (issue) throw new Error('weak-pass:' + issue);
+    await ensureEndpoints();
+    const d = await _recDerive(email, pass);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, d.wrap, _te.encode(secret));
+    const r = await fetch(syncEndpoint() + '/v1/recovery', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      /*@3.FISJ.90*/
+      body: JSON.stringify({ eid: d.eid, auth_hash: d.authHash,
+                             blob: _b64u(iv) + _b64u(ct), vault_id: getKey() || '' }),
+    });
+    if (r.status === 429) throw new Error('eid-full');
+    if (!r.ok) throw new Error('save-failed');
+    localStorage.setItem('garden_recovery_set', String(Date.now()));
+    return true;
+  }
+
+  /*@3.FISJ.91*/
+  async function openRecovery(email, pass) {
+    await ensureEndpoints();
+    const d = await _recDerive(email, pass);
+    const r = await fetch(syncEndpoint() + '/v1/recovery/open', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eid: d.eid, auth_hash: d.authHash }),
+    });
+    if (r.status === 429) throw new Error('too-many');
+    /*@3.FISJ.92*/
+    if (!r.ok) throw new Error('no-match');
+    const j = await r.json();
+    const blob = String(j.blob || '');
+    if (blob.length <= 16) throw new Error('no-match');
+    let plain;
+    try {
+      plain = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: _unb64u(blob.slice(0, 16)) }, d.wrap, _unb64u(blob.slice(16)));
+    } catch (e) { throw new Error('no-match'); }
+    return adoptVaultSecret(new TextDecoder().decode(plain));
+  }
+
+  /*@3.FISJ.93*/
+  const GSI_SRC = 'https://accounts.google.com/gsi/client';
+  function googleClientId() {
+    return (window.GardenEndpoints && window.GardenEndpoints.googleClientId) || '';
+  }
+  function googleAvailable() { return !!googleClientId(); }
+
+  let _gsiP = null;
+  function ensureGSI() {
+    if (window.google && window.google.accounts) return Promise.resolve(true);
+    if (!googleAvailable()) return Promise.resolve(false);
+    if (_gsiP) return _gsiP;
+    _gsiP = new Promise(resolve => {
+      const el = document.createElement('script');
+      el.src = GSI_SRC;
+      el.async = true;
+      el.onload = () => resolve(!!(window.google && window.google.accounts));
+      el.onerror = () => resolve(false);
+      document.head.appendChild(el);
+      setTimeout(() => resolve(!!(window.google && window.google.accounts)), 8000);
+    });
+    return _gsiP;
+  }
+
+  /*@3.FISJ.94*/
+  function googleIdToken() {
+    return new Promise((resolve, reject) => {
+      if (!window.google || !window.google.accounts) return reject(new Error('gsi-unavailable'));
+      try {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId(),
+          callback: (r) => (r && r.credential) ? resolve(r.credential) : reject(new Error('gsi-cancelled')),
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+        window.google.accounts.id.prompt();
+      } catch (e) { reject(e); }
+    });
+  }
+
+  /*@3.FISJ.95*/
+  async function googleRender(box, done, opts) {
+    if (!box) return false;
+    if (!(await ensureGSI())) { done && done(new Error('gsi-unavailable')); return false; }
+    await ensureEndpoints();
+    var busy = false;
+    window.google.accounts.id.initialize({
+      client_id: googleClientId(),
+      auto_select: false,
+      cancel_on_tap_outside: true,
+      callback: function (r) {
+        if (busy) return;
+        if (!r || !r.credential) { done && done(new Error('gsi-cancelled')); return; }
+        busy = true;
+        gsiExchange(r.credential).then(function () { done && done(null); })
+          .catch(function (e) { done && done(e); })
+          .then(function () { busy = false; });
+      },
+    });
+    box.innerHTML = '';
+    window.google.accounts.id.renderButton(box, {
+      type: 'standard', shape: 'pill', size: 'large',
+      text: 'continue_with', logo_alignment: 'center',
+      theme: (opts && opts.theme) || 'filled_black',
+      locale: (localStorage.getItem('garden_lang') === 'en') ? 'en' : 'ar',
+    });
+    return true;
+  }
+
+  /*@3.FISJ.96*/
+  async function gsiExchange(token) {
+    const secret = currentVaultSecret();
+    if (secret) {
+      const r = await fetch(syncEndpoint() + '/v1/recovery/google', {
+        method: 'POST', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: token, secret }),
+      });
+      if (!r.ok) throw new Error('save-failed');
+      localStorage.setItem('garden_recovery_set', String(Date.now()));
+      return true;
+    }
+    const r = await fetch(syncEndpoint() + '/v1/recovery/google/open', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: token }),
+    });
+    if (!r.ok) throw new Error('no-match');
+    const j = await r.json();
+    if (!j.secret) throw new Error('no-match');
+    return adoptVaultSecret(j.secret);
+  }
+
+  async function saveRecoveryGoogle() {
+    const secret = currentVaultSecret();
+    if (!secret) throw new Error('no-vault');
+    if (!(await ensureGSI())) throw new Error('gsi-unavailable');
+    await ensureEndpoints();
+    const token = await googleIdToken();
+    const r = await fetch(syncEndpoint() + '/v1/recovery/google', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: token, secret }),
+    });
+    if (!r.ok) throw new Error('save-failed');
+    localStorage.setItem('garden_recovery_set', String(Date.now()));
+    return true;
+  }
+
+  async function openRecoveryGoogle() {
+    if (!(await ensureGSI())) throw new Error('gsi-unavailable');
+    await ensureEndpoints();
+    const token = await googleIdToken();
+    const r = await fetch(syncEndpoint() + '/v1/recovery/google/open', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: token }),
+    });
+    if (!r.ok) throw new Error('no-match');
+    const j = await r.json();
+    if (!j.secret) throw new Error('no-match');
+    return adoptVaultSecret(j.secret);
+  }
+
+  /*@3.FISJ.97*/
+  async function forgetRecovery() {
+    const secret = currentVaultSecret();
+    if (!secret) throw new Error('no-vault');
+    await ensureEndpoints();
+    const r = await fetch(syncEndpoint() + '/v1/recovery/forget', {
+      method: 'POST', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret, vault_id: getKey() || '' }),
+    });
+    if (!r.ok) throw new Error('forget-failed');
+    localStorage.removeItem('garden_recovery_set');
+    return true;
+  }
+
+  /*@3.FISJ.98*/
+  function disconnectDevice() {
+    try {
+      localStorage.removeItem(SYNC_KEY_LS);
+      localStorage.removeItem(VAULT_SECRET_LS);
+      localStorage.removeItem('garden_recovery_set');
+      localStorage.setItem(SYNC_DECLINED_LS, '1');
+    } catch (e) {}
+    userKey = null;
+    setStatus('offline');
+    return true;
+  }
+
+  /*@3.FISJ.99*/
+  function recoveryFileText() {
+    const s = currentVaultSecret();
+    if (!s) return null;
+    return [
+      'الحديقة الرقمية — مفتاحُ الاسترجاع',
+      '═══════════════════════════════════',
+      '',
+      '   ' + prettyVault(s),
+      '',
+      'هذا المفتاحُ هو حسابُك. من يملكه يفتح بياناتك.',
+      'ولا نملك نحن نسخةً منه — فاحتفظ بهذا الملفِّ في مكانٍ آمن.',
+      '',
+      'لاستعادة بياناتك على جهازٍ جديد: افتح الموقع ⇐ الإعدادات ⇐',
+      'المزامنة ⇐ «عندي مفتاح» ⇐ ألصق المفتاحَ أعلاه.',
+      '',
+      'أُنشئ في: ' + new Date().toISOString().slice(0, 10),
+      'https://libbard.github.io/',
+      '',
+    ].join('\n');
+  }
+  function downloadRecoveryFile() {
+    const txt = recoveryFileText();
+    if (!txt) return false;
+    /*@3.FISJ.100*/
+    const blob = new Blob(['\ufeff' + txt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'الحديقة-الرقمية-مفتاح-الاسترجاع.txt';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    return true;
+  }
+  /*@3.FISJ.101*/
+  let _qrP = null;
+  function ensureQR() {
+    if (window.GardenQR) return Promise.resolve(true);
+    if (_qrP) return _qrP;
+    _qrP = new Promise(resolve => {
+      let el = document.querySelector('script[data-garden-qr]');
+      if (!el) {
+        el = document.createElement('script');
+        el.src = ROOT + 'shared/qr.js';
+        el.setAttribute('data-garden-qr', '1');
+        document.head.appendChild(el);
+      }
+      const done = () => resolve(!!window.GardenQR);
+      el.addEventListener('load', done);
+      el.addEventListener('error', done);
+      setTimeout(done, 6000);
+    });
+    return _qrP;
+  }
+
+  /*@3.FISJ.102*/
+  async function recoveryQR(opts) {
+    const s = currentVaultSecret();
+    if (!s) return null;
+    if (!(await ensureQR())) return null;
+    return window.GardenQR.svg(
+      location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html#vault=' + s,
+      Object.assign({ label: 'مفتاح الاسترجاع' }, opts || {}));
+  }
+
+  /*@3.FISJ.103*/
+  async function pairQR(link, opts) {
+    if (!link || !(await ensureQR())) return null;
+    return window.GardenQR.svg(link, Object.assign({ label: 'رمز اقتران' }, opts || {}));
+  }
+
+  /*@3.FISJ.104*/
+  const DEVICE_LS = 'garden_device_id';
+  function deviceId() {
+    let d = localStorage.getItem(DEVICE_LS);
+    if (!/^d[0-9a-f]{16}$/.test(d || '')) {
+      const b = new Uint8Array(8);
+      crypto.getRandomValues(b);
+      d = 'd' + [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+      localStorage.setItem(DEVICE_LS, d);
+    }
+    return d;
+  }
+  /*@3.FISJ.105*/
+  function deviceName() {
+    const ua = navigator.userAgent || '';
+    const br = /Edg\//.test(ua) ? 'إيدج' : /OPR\//.test(ua) ? 'أوبرا'
+             : /Firefox\//.test(ua) ? 'فايرفوكس'
+             : /Chrome\//.test(ua) ? 'كروم'
+             : /Safari\//.test(ua) ? 'سفاري' : 'متصفّح';
+    const os = /Android/.test(ua) ? 'أندرويد'
+             : /iPhone|iPad|iPod/.test(ua) ? 'آيفون'
+             : /Windows/.test(ua) ? 'ويندوز'
+             : /Mac OS X/.test(ua) ? 'ماك'
+             : /Linux/.test(ua) ? 'لينكس' : '';
+    return os ? br + ' · ' + os : br;
+  }
+  async function touchDevice() {
+    const id = getKey();
+    if (!id || !usingOracle() || !ORACLE_ID.test(String(id))) return false;
+    try {
+      const r = await fetch(syncEndpoint() + '/v1/devices/' + id, {
+        method: 'POST', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: deviceId(), name: deviceName() }),
+      });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+  async function listDevices() {
+    const id = getKey();
+    if (!id || !usingOracle() || !ORACLE_ID.test(String(id))) return [];
+    try {
+      const r = await fetch(syncEndpoint() + '/v1/devices/' + id, { cache: 'no-store' });
+      if (!r.ok) return [];
+      const j = await r.json();
+      const me = deviceId();
+      return (j.devices || []).map(d => Object.assign({ isMe: d.device_id === me }, d));
+    } catch (e) { return []; }
+  }
+  async function forgetDevice(did) {
+    const id = getKey();
+    if (!id || !usingOracle()) return false;
+    try {
+      const r = await fetch(syncEndpoint() + '/v1/devices/' + id + '/' + did,
+                            { method: 'DELETE', cache: 'no-store' });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
+  /*@3.FISJ.106*/
+  const LEGACY_DOC_LS = 'garden_vault_legacy';
+  const LEGACY_UNTIL_LS = 'garden_vault_legacy_until';
+  const DUAL_WRITE_MS = 14 * 24 * 3600 * 1000;
+
+  function legacyMirror() {
+    const id = localStorage.getItem(LEGACY_DOC_LS);
+    const until = Number(localStorage.getItem(LEGACY_UNTIL_LS) || 0);
+    return (id && until > Date.now()) ? id : null;
+  }
+
+  async function upgradeLegacyVault() {
+    const oldId = getKey();
+    /*@3.FISJ.107*/
+    if (usingOracle()) throw new Error('not-applicable-on-oracle');
+    if (!db) throw new Error('offline');
+    if (!oldId || currentVaultSecret()) throw new Error('not-legacy');
+
+    /*@3.FISJ.108*/
+    await pullAll(oldId);
+
+    const secret = newVaultSecret();
+    const newId = await vaultDocId(secret);
+
+    /*@3.FISJ.109*/
+    const snap = await db.collection(collectionName()).doc(oldId).get();
+    const data = snap.exists ? (snap.data() || {}) : {};
+    await db.collection(collectionName()).doc(newId).set(
+      Object.assign({}, data, { migrated_from: oldId, migrated_at: Date.now() }),
+      { merge: true }
+    );
+
+    /*@3.FISJ.110*/
+    await db.collection(collectionName()).doc(oldId).set(
+      { moved_to: newId, moved_at: Date.now() }, { merge: true }
+    );
+
+    localStorage.setItem(LEGACY_DOC_LS, oldId);
+    localStorage.setItem(LEGACY_UNTIL_LS, String(Date.now() + DUAL_WRITE_MS));
+    localStorage.setItem(VAULT_SECRET_LS, secret);
+    saveKey(newId);
+    await pullAll(newId);
+
+    return { secret: secret, pretty: prettyVault(secret), docId: newId, mirrorUntil: Date.now() + DUAL_WRITE_MS };
+  }
+
+  /*@3.FISJ.111*/
+  async function pendingVaultMove() {
+    const id = getKey();
+    if (usingOracle() || !db || !id || currentVaultSecret()) return null;
+    try {
+      const snap = await db.collection(collectionName()).doc(id).get();
+      const to = snap.exists && snap.data() && snap.data().moved_to;
+      return (to && to !== id) ? String(to) : null;
+    } catch (e) { return null; }
+  }
+
+  /*@3.FISJ.112*/
+  async function consumeVaultLink() {
+    const m = String(location.hash || '').match(/vault=([0-9A-Za-z-]{20,40})/);
+    if (!m) return false;
+    try {
+      await adoptVaultSecret(m[1]);
+      history.replaceState(null, '', location.pathname + location.search);
+      return true;
+    } catch (e) {
+      history.replaceState(null, '', location.pathname + location.search);
+      return false;
+    }
+  }
+
+  /*@3.FISJ.113*/
+  async function consumePairLink() {
+    const m = String(location.hash || '').match(/[#&]pair=([0-9A-Za-z-]{10,20})/);
+    if (!m) return false;
+    history.replaceState(null, '', location.pathname + location.search);
+    try { await claimPairing(m[1]); return true; }
+    catch (e) { console.warn('[Sync] pairing failed:', e && e.message); return false; }
+  }
+
+  /*@3.FISJ.114*/
   async function loadFirebase(callback) {
-    if (window.firebase?.firestore) { callback(); return; }
+    /*@3.FISJ.115*/
+    if (usingOracle()) { storeReady = true; callback(); return; }
+
+    if (window.firebase?.firestore) { storeReady = !!db; callback(); return; }
+
+    /*@3.FISJ.116*/
+    let answered = false;
+    const answer = () => { if (!answered) { answered = true; callback(); } };
 
     const BASE = `https://www.gstatic.com/firebasejs/${FIREBASE_VER}/`;
     let loaded = 0;
@@ -463,14 +1420,16 @@
           const config = await getFirebaseConfig();
           if (!firebase.apps.length) firebase.initializeApp(config);
           db = firebase.firestore();
-          
-          
+          storeReady = true;
+          /*@3.FISJ.117*/
           db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
-          callback();
         } catch (e) {
           console.warn('[Sync] Firebase init failed:', e);
+          db = null;
+          storeReady = false;
           setStatus('error');
         }
+        answer();
       })();
     }
 
@@ -478,12 +1437,18 @@
       const s = document.createElement('script');
       s.src = src;
       s.onload = tryInit;
-      s.onerror = () => { console.warn('[Sync] Failed to load:', src); setStatus('error'); };
+      s.onerror = () => {
+        console.warn('[Sync] Failed to load:', src);
+        setStatus('error');
+        answer();                 /*@3.FISJ.118*/
+      };
       document.head.appendChild(s);
     });
+    /*@3.FISJ.119*/
+    setTimeout(answer, 15000);
   }
 
-   
+  /*@3.FISJ.120*/
   function setStatus(status) {
     syncStatus = status;
     document.querySelectorAll('.sync-status-dot').forEach(dot => {
@@ -502,9 +1467,9 @@
     setTimeout(() => el?.remove(), 2800);
   }
 
-   
+  /*@3.FISJ.121*/
 
-   
+  /*@3.FISJ.122*/
   function getSyncableKeys() {
     const result = new Set(FIXED_SYNC_KEYS);
     for (let i = 0; i < localStorage.length; i++) {
@@ -517,50 +1482,93 @@
     return [...result].filter(k => localStorage.getItem(k) !== null);
   }
 
-   
-  async function pushAll(key) {
-    if (!db || !key) return;
-    setStatus('loading');
-    try {
-      const now = Date.now();
-      const batch = db.batch();
-      const ref = db.collection(COLLECTION).doc(key);
+  /*@3.FISJ.201*/
+  const PUSH_MAX_KEYS  = 120;
+  const PUSH_MAX_BYTES = 240 * 1024;
+  const PUSH_MAX_VALUE = 200 * 1024;
 
-      const syncableKeys = getSyncableKeys();
-      if (syncableKeys.length === 0) { setStatus('synced'); return; }
-
-      const payload = {};
-      syncableKeys.forEach(k => {
-        const raw = localStorage.getItem(k);
-        if (raw !== null) {
-          payload[_fireKey(k)] = { v: raw, t: now };
-        }
-      });
-
-      
-      await ref.set({ sync: payload, last_seen: now }, { merge: true });
-      setStatus('synced');
-      localStorage.setItem('garden_sync_last', String(now));
-    } catch (e) {
-      console.warn('[Sync] Push failed:', e);
-      setStatus('error');
+  function chunkPayload(payload) {
+    const out = [];
+    let cur = {}, n = 0, b = 0;
+    const flush = () => { if (n > 0) { out.push(cur); cur = {}; n = 0; b = 0; } };
+    for (const fk of Object.keys(payload)) {
+      const size = fk.length + String(payload[fk].v).length + 32;
+      const lone = size > PUSH_MAX_VALUE;
+      if (lone || n + 1 > PUSH_MAX_KEYS || b + size > PUSH_MAX_BYTES) flush();
+      cur[fk] = payload[fk]; n++; b += size;
+      if (lone) flush();
     }
+    flush();
+    return out;
   }
 
-   
+  /*@3.FISJ.123*/
+  async function pushAll(key) {
+    if (!storeReady || !key) return;
+    setStatus('loading');
+    const now = Date.now();
+
+    const syncableKeys = getSyncableKeys();
+    if (syncableKeys.length === 0) { setStatus('synced'); return; }
+
+    /*@3.FISJ.124*/
+    const payload = {};
+    syncableKeys.forEach(k => {
+      const raw = localStorage.getItem(k);
+      if (raw === null) return;
+      let t = localStamp(k);
+      if (!t) { t = hlcNow(); stampLocal(k, t); }   /*@3.FISJ.125*/
+      payload[_fireKey(k)] = { v: wrap(raw), t: t };
+    });
+
+    const batches = chunkPayload(payload);
+    let failed = 0, lastErr = null;
+
+    for (const batch of batches) {
+      try {
+        /*@3.FISJ.126*/
+        await storeMerge(key, batch);
+
+        /*@3.FISJ.127*/
+        const mirror = legacyMirror();
+        if (mirror && mirror !== key) {
+          try {
+            await storeMerge(mirror, batch, { mirrored_from: key });
+          } catch (e) { console.warn('[Sync] legacy mirror failed:', e); }
+        }
+      } catch (e) {
+        failed++; lastErr = e;
+        console.warn('[Sync] Push batch failed:', e && e.message);
+      }
+    }
+
+    if (failed) {
+      /*@3.FISJ.128*/
+      setPushPending(true);
+      pushLastError = String((lastErr && lastErr.message) || lastErr || 'push-failed');
+      setStatus('error');
+      return;
+    }
+    pushLastError = null;
+    setStatus('synced');
+    setPushPending(false);
+    localStorage.setItem('garden_sync_last', String(now));
+  }
+
+  /*@3.FISJ.129*/
   async function pullAll(key) {
-    if (!db || !key) return;
+    if (!storeReady || !key) return;
     setStatus('loading');
     isSyncing = true;
     try {
-      const doc = await db.collection(COLLECTION).doc(key).get();
+      const doc = await storeGet(key);
       if (!doc.exists) {
-        
+        /*@3.FISJ.130*/
         await pushAll(key);
         return;
       }
 
-      const remote = doc.data()?.sync || {};
+      const remote = doc.sync || {};
       let changed = false;
       let localHasNewer = false;
 
@@ -570,49 +1578,98 @@
 
         const localRaw = localStorage.getItem(lsKey);
         const remoteT = entry.t || 0;
-        const remoteV = entry.v;
+        /*@3.FISJ.131*/
+        const remoteV = unwrap(entry.v);
+        if (remoteV === null) return;
 
-        
+        /*@3.FISJ.132*/
+        hlcObserve(remoteT);
+        if (MERGE_BY_ID.has(lsKey) || isDeepKey(lsKey)) hlcObserveItems(remoteV);
+        else if (lsKey.indexOf(TOMB_PREFIX) === 0) {
+          const rt = _readTomb(remoteV);
+          for (const id in rt) hlcObserve(rt[id]);
+        }
+
+        /*@3.FISJ.133*/
         if (localRaw === remoteV) return;
 
         if (localRaw === null) {
-          
+          /*@3.FISJ.134*/
           localStorage.setItem(lsKey, remoteV);
+          stampLocal(lsKey, remoteT);
           changed = true;
           return;
         }
 
-        
-        let localT = 0;
-        try {
-          const parsed = JSON.parse(localRaw);
-          if (parsed && typeof parsed === 'object' && parsed.updated_at) {
-            localT = new Date(parsed.updated_at).getTime();
+        /*@3.FISJ.135*/
+        let localT = localStamp(lsKey);
+        if (!localT) {
+          try {
+            const parsed = JSON.parse(localRaw);
+            if (parsed && typeof parsed === 'object' && parsed.updated_at) {
+              localT = new Date(parsed.updated_at).getTime();
+            }
+          } catch (e) { /*@3.FISJ.136*/ }
+        }
+
+        /*@3.FISJ.137*/
+        if (lsKey.indexOf(TOMB_PREFIX) === 0) {
+          const union = JSON.stringify(mergeTombs(localRaw, remoteV));
+          if (union !== localRaw) {
+            localStorage.setItem(lsKey, union);
+            stampLocal(lsKey, Math.max(localT, remoteT));
+            changed = true;
           }
-        } catch (e) {   }
+          if (union !== remoteV) localHasNewer = true;
+          return;
+        }
+
+        /*@3.FISJ.138*/
+        if (MERGE_BY_ID.has(lsKey) || isDeepKey(lsKey)) {
+          /*@3.FISJ.139*/
+          const tombRemote = (remote[_fireKey(TOMB_PREFIX + lsKey)] || {}).v;
+          const tomb = mergeTombs(localStorage.getItem(TOMB_PREFIX + lsKey), tombRemote);
+          const merged = MERGE_BY_ID.has(lsKey)
+            ? mergeById(localRaw, localT, remoteV, remoteT, tomb)
+            : mergeDeep(localRaw, localT, remoteV, remoteT, tomb);
+          if (merged !== null) {
+            if (merged !== localRaw) {
+              localStorage.setItem(lsKey, merged);
+              /*@3.FISJ.140*/
+              stampLocal(lsKey, Math.max(localT, remoteT));
+              changed = true;
+            }
+            /*@3.FISJ.141*/
+            if (merged !== remoteV) localHasNewer = true;
+            return;
+          }
+          /*@3.FISJ.142*/
+        }
 
         if (remoteT > localT) {
           localStorage.setItem(lsKey, remoteV);
+          stampLocal(lsKey, remoteT);   /*@3.FISJ.143*/
           changed = true;
         } else if (localT > remoteT) {
           localHasNewer = true;
         }
       });
 
-      
+      /*@3.FISJ.144*/
       const syncableKeys = getSyncableKeys();
       const localHasMissingRemote = syncableKeys.some(k => remote[_fireKey(k)] === undefined);
 
-      
+      /*@3.FISJ.145*/
       if (localHasNewer || localHasMissingRemote) {
         await pushAll(key);
       }
 
-      setStatus('synced');
       localStorage.setItem('garden_sync_last', String(Date.now()));
+      /*@3.FISJ.146*/
+      setStatus(pushPending ? 'pending' : 'synced');
 
       if (changed) {
-        
+        /*@3.FISJ.147*/
         window.dispatchEvent(new CustomEvent('garden:syncCompleted'));
       }
     } catch (e) {
@@ -623,24 +1680,26 @@
     }
   }
 
-   
+  /*@3.FISJ.148*/
   async function importFromKey(otherKey) {
-    if (!db || !otherKey) return false;
+    if (!storeReady || !otherKey) return false;
     setStatus('loading');
     isSyncing = true;
     try {
-      const doc = await db.collection(COLLECTION).doc(otherKey).get();
+      const doc = await storeGet(otherKey);
       if (!doc.exists) { setStatus('synced'); return false; }
 
-      const remote = doc.data()?.sync || {};
+      const remote = doc.sync || {};
       if (Object.keys(remote).length === 0) { setStatus('synced'); return false; }
 
-      
+      /*@3.FISJ.149*/
       Object.entries(remote).forEach(([fk, entry]) => {
         const lsKey = _localKey(fk);
-        if (lsKey && !NEVER_SYNC.has(lsKey) && entry.v !== undefined) {
-          if (localStorage.getItem(lsKey) !== entry.v) {
-            localStorage.setItem(lsKey, entry.v);
+        /*@3.FISJ.150*/
+        const impV = entry.v === undefined ? undefined : unwrap(entry.v);
+        if (lsKey && !NEVER_SYNC.has(lsKey) && impV !== undefined && impV !== null) {
+          if (localStorage.getItem(lsKey) !== impV) {
+            localStorage.setItem(lsKey, impV);
           }
         }
       });
@@ -657,317 +1716,171 @@
     }
   }
 
-  
+  /*@3.FISJ.151*/
   function _fireKey(k) { return k.replace(/__/g, '____').replace(/_/g, '__').replace(/-/g, '--'); }
   function _localKey(fk) { return fk.replace(/--/g, '-').replace(/____/g, '__PLACEHOLDER__').replace(/__/g, '_').replace(/__PLACEHOLDER__/g, '__'); }
 
-   
+  /*@3.FISJ.152*/
   function schedulePush() {
-    if (!userKey || !db) return;
+    if (!userKey || !storeReady) return;
     clearTimeout(pushTimer);
     pushTimer = setTimeout(() => pushAll(userKey), AUTO_PUSH_DEBOUNCE_MS);
   }
 
-   
+  /*@3.FISJ.153*/
+  function _walkTrack(before, after, now, path, tomb, ctx, depth) {
+    if ((depth || 0) > 6) return;
+
+    if (_isIdArr(after) && Array.isArray(before)) {
+      const prev = {};
+      before.forEach(x => { if (x && x.id != null) prev[String(x.id)] = _canonStr(x); });
+      const alive = new Set();
+      after.forEach(x => {
+        if (!x || x.id == null) return;
+        const id = String(x.id);
+        alive.add(id);
+        const was = prev[id];
+        if (was === undefined) {                    /*@3.FISJ.154*/
+          if (!x.updated_at) { x.updated_at = now; ctx.touched = true; }
+        } else if (_canonStr(x) !== was) {          /*@3.FISJ.155*/
+          x.updated_at = now; ctx.touched = true;
+        }
+      });
+      Object.keys(prev).forEach(id => {
+        if (!alive.has(id)) { tomb[_tk(path, id)] = now; ctx.gone = true; }
+      });
+      return;
+    }
+
+    if (_isObj(before) && _isObj(after)) {
+      for (const k in before) {
+        if (!Object.prototype.hasOwnProperty.call(before, k)) continue;
+        const p = path ? path + '/' + k : k;
+        if (!Object.prototype.hasOwnProperty.call(after, k)) {
+          /*@3.FISJ.156*/
+          if (_isObj(before[k]) || _isArr(before[k])) { tomb[p] = now; ctx.gone = true; }
+          continue;
+        }
+        _walkTrack(before[k], after[k], now, p, tomb, ctx, (depth || 0) + 1);
+      }
+    }
+  }
+
+  function trackCollection(key, nextRaw) {
+    let before, after;
+    try {
+      const raw = localStorage.getItem(key);
+      after = JSON.parse(nextRaw);
+      /*@3.FISJ.157*/
+      before = (raw === null || raw === undefined)
+        ? (Array.isArray(after) ? [] : {})
+        : JSON.parse(raw);
+    } catch (e) { return nextRaw; }
+    if (!after || typeof after !== 'object') return nextRaw;
+
+    /*@3.FISJ.158*/
+    const now = hlcNow();
+    const tk = TOMB_PREFIX + key;
+    const tomb = _readTomb(localStorage.getItem(tk));
+    const ctx = { touched: false, gone: false };
+
+    _walkTrack(before, after, now, '', tomb, ctx, 0);
+
+    if (ctx.gone) {
+      /*@3.FISJ.159*/
+      const floor = now - TOMB_TTL_MS;
+      for (const id in tomb) if ((Number(tomb[id]) || 0) <= floor) delete tomb[id];
+      try {
+        /*@3.FISJ.160*/
+        _rawSet.call(localStorage, tk, JSON.stringify(tomb));
+        stampLocal(tk, now);
+        schedulePush();
+      } catch (e) { /*@3.FISJ.161*/ }
+    }
+
+    return ctx.touched ? JSON.stringify(after) : nextRaw;
+  }
+
+  /*@3.FISJ.162*/
   function patchLocalStorage() {
     const origSet = Storage.prototype.setItem;
     const origRemove = Storage.prototype.removeItem;
 
     Storage.prototype.setItem = function (key, value) {
+      /*@3.FISJ.163*/
+      if (this === localStorage && !isSyncing && String(key).indexOf(TS_PREFIX) === 0) {
+        const want = Number(value) || 0;
+        const now = hlcNow();
+        if (want < now) value = String(now); else hlcObserve(want);
+      }
+
+      /*@3.FISJ.164*/
+      if (this === localStorage && !isSyncing && (MERGE_BY_ID.has(key) || isDeepKey(key))) {
+        value = trackCollection(key, value);
+      }
       origSet.call(this, key, value);
       if (this === localStorage && !NEVER_SYNC.has(key) && !isSyncing) {
         const isSyncable = FIXED_SYNC_KEYS.includes(key) ||
           DYNAMIC_PATTERNS.some(p => p.test(key));
-        if (isSyncable) schedulePush();
+        /*@3.FISJ.165*/
+        if (isSyncable) { stampLocal(key, hlcNow()); schedulePush(); }
       }
     };
 
     Storage.prototype.removeItem = function (key) {
       origRemove.call(this, key);
-      if (this === localStorage && !isSyncing) schedulePush();
+      if (this === localStorage && !isSyncing) {
+        /*@3.FISJ.166*/
+        if (!NEVER_SYNC.has(key) &&
+            (FIXED_SYNC_KEYS.includes(key) || DYNAMIC_PATTERNS.some(p => p.test(key)))) {
+          stampLocal(key, hlcNow());
+        }
+        schedulePush();
+      }
     };
   }
 
-   
-  function showFirstRunModal() {
-    const overlay = document.createElement('div');
-    overlay.className = 'sync-overlay';
-    overlay.id = 'sync-first-overlay';
+  /*@3.FISJ.167*/
 
-    const suggested = generateRandomKey();
-
-    overlay.innerHTML = `
-      <div class="sync-modal" role="dialog" aria-modal="true">
-        <div class="sync-modal-title">${t('firstTitle')}</div>
-        <div class="sync-modal-body">${t('firstBody')}</div>
-
-        <label class="sync-input-label">${t('keyLabel')}</label>
-        <div class="sync-first-random-row">
-          <input class="sync-input" id="sync-first-input"
-                 placeholder="${t('keyPlaceholder')}"
-                 maxlength="12" value="${suggested}"
-                 autocomplete="off" autocorrect="off" spellcheck="false">
-          <button class="sync-btn sync-btn-secondary sync-btn-sm" id="sync-random-btn">
-            ${t('randomBtn')}
-          </button>
-        </div>
-        <div class="sync-input-error" id="sync-first-error"></div>
-
-        <button class="sync-btn sync-btn-primary" id="sync-first-save">
-          ${t('saveBtn')}
-        </button>
-        <button class="sync-btn sync-btn-secondary" id="sync-first-skip">
-          ${t('skipBtn')}
-        </button>
-        <div class="sync-warning">${t('warning')}</div>
-      </div>`;
-
-    document.body.appendChild(overlay);
-
-    const input = overlay.querySelector('#sync-first-input');
-    const errorEl = overlay.querySelector('#sync-first-error');
-    const saveBtn = overlay.querySelector('#sync-first-save');
-    const skipBtn = overlay.querySelector('#sync-first-skip');
-    const randBtn = overlay.querySelector('#sync-random-btn');
-
-    input.addEventListener('input', () => {
-      input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      errorEl.textContent = '';
-      input.classList.remove('error');
-    });
-
-    randBtn.addEventListener('click', () => {
-      input.value = generateRandomKey();
-      errorEl.textContent = '';
-      input.classList.remove('error');
-    });
-
-    saveBtn.addEventListener('click', async () => {
-      const k = input.value.trim();
-      if (!validateKey(k)) {
-        errorEl.textContent = t('keyError');
-        input.classList.add('error');
-        return;
+  /*@3.FISJ.168*/
+  let _panelP = null;
+  function ensurePanel() {
+    if (window.GardenSyncPanel) return Promise.resolve(true);
+    if (_panelP) return _panelP;
+    _panelP = new Promise(resolve => {
+      let el = document.querySelector('script[data-sync-panel-js]');
+      if (!el) {
+        el = document.createElement('script');
+        el.src = ROOT + 'shared/sync-panel.js';
+        el.setAttribute('data-sync-panel-js', '1');
+        document.head.appendChild(el);
       }
-      saveKey(k);
-      overlay.remove();
-      await initSync();
+      const done = () => resolve(!!window.GardenSyncPanel);
+      el.addEventListener('load', done);
+      el.addEventListener('error', done);
+      setTimeout(done, 6000);
     });
-
-    skipBtn.addEventListener('click', () => {
-      localStorage.setItem(SYNC_DECLINED_LS, '1');
-      overlay.remove();
-    });
-
-    
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) overlay.remove();
-    });
+    return _panelP;
   }
 
-   
   function showSyncModal() {
-    const existingOverlay = document.getElementById('sync-modal-overlay');
-    if (existingOverlay) { existingOverlay.remove(); return; }
-
-    const key = getKey();
-    const lastStr = (() => {
-      const ts = localStorage.getItem('garden_sync_last');
-      if (!ts) return t('never');
-      const diff = Math.round((Date.now() - Number(ts)) / 60000);
-      if (diff < 1) return (isRTL() ? 'الآن' : 'just now');
-      if (diff < 60) return isRTL() ? `منذ ${diff} دقيقة` : `${diff}m ago`;
-      return isRTL() ? `منذ ${Math.floor(diff / 60)} ساعة` : `${Math.floor(diff / 60)}h ago`;
-    })();
-
-    const statusLabel = {
-      synced: t('statusOnline'),
-      loading: t('statusSyncing'),
-      error: t('statusError'),
-      offline: t('statusOffline'),
-    }[syncStatus] || t('statusOffline');
-
-    const keyParts = key ? [key.slice(0, 3), key.slice(3)] : ['---', '-----'];
-
-    const overlay = document.createElement('div');
-    overlay.className = 'sync-overlay';
-    overlay.id = 'sync-modal-overlay';
-
-    overlay.innerHTML = `
-      <div class="sync-modal" role="dialog" aria-modal="true">
-        <div class="sync-modal-title">${t('modalTitle')}</div>
-
-        <!-- مفتاحك -->
-        <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);margin-bottom:0.35rem">
-          ${t('yourKey')}
-        </div>
-        <div class="sync-key-box">
-          <div class="sync-key-display">
-            ${key
-        ? `<span class="sync-key-part">${keyParts[0]}</span><span class="sync-key-sep">·</span><span class="sync-key-part">${keyParts[1]}</span>`
-        : '—'}
-          </div>
-          <button class="sync-btn sync-btn-secondary sync-btn-sm" id="sync-copy-btn">
-            ${t('copyBtn')}
-          </button>
-        </div>
-
-        <!-- حالة الاتصال -->
-        <div class="sync-status-row">
-          <span class="sync-status-dot ${syncStatus}"></span>
-          <span class="sync-status-label ${syncStatus}">${statusLabel}</span>
-          <span style="font-size:0.72rem">${t('lastSync')}: ${lastStr}</span>
-        </div>
-
-        <!-- زر مزامنة فورية -->
-        <button class="sync-btn sync-btn-primary" id="sync-now-btn">
-          ${t('syncNowBtn')}
-        </button>
-
-        <div class="sync-divider">${isRTL() ? 'أو' : 'or'}</div>
-
-        <!-- استيراد من جهاز آخر -->
-        <div class="sync-import-section">
-          <label class="sync-input-label">${t('changeBody')}</label>
-          <div class="sync-first-random-row" style="margin-bottom:0.3rem">
-            <input class="sync-input" id="sync-import-input"
-                   placeholder="${t('changeInput')}"
-                   maxlength="12"
-                   autocomplete="off" autocorrect="off" spellcheck="false">
-            <button class="sync-btn sync-btn-secondary sync-btn-sm" id="sync-import-btn">
-              ${t('importBtn')}
-            </button>
-          </div>
-          <div class="sync-input-error" id="sync-import-error"></div>
-        </div>
-
-        <!-- تغيير مفتاحي -->
-        <button class="sync-btn sync-btn-danger" id="sync-change-key-btn">
-          ${t('changeKeyBtn')}
-        </button>
-
-        <button class="sync-btn sync-btn-secondary" id="sync-close-btn" style="margin-top:0.25rem">
-          ${t('closeBtn')}
-        </button>
-
-        <div class="sync-warning">${t('warning')}</div>
-      </div>`;
-
-    document.body.appendChild(overlay);
-
-    
-    overlay.querySelector('#sync-copy-btn').addEventListener('click', function () {
-      if (key) {
-        navigator.clipboard?.writeText(key).catch(() => { });
-        this.textContent = t('copied');
-        setTimeout(() => { this.textContent = t('copyBtn'); }, 2000);
-      }
+    ensurePanel().then(ok => {
+      if (ok) window.GardenSyncPanel.openModal({ allowSkip: false });
+      else showToast(t('statusError'), 'error');
     });
-
-    
-    overlay.querySelector('#sync-now-btn').addEventListener('click', async () => {
-      if (key && db) await pullAll(key);
-    });
-
-    
-    const importInput = overlay.querySelector('#sync-import-input');
-    const importError = overlay.querySelector('#sync-import-error');
-    importInput.addEventListener('input', () => {
-      importInput.value = importInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      importError.textContent = '';
-      importInput.classList.remove('error');
-    });
-    overlay.querySelector('#sync-import-btn').addEventListener('click', async () => {
-      const k = importInput.value.trim();
-      if (!validateKey(k)) {
-        importError.textContent = t('keyError');
-        importInput.classList.add('error');
-        return;
-      }
-      if (!confirm(t('importConfirm'))) return;
-      overlay.remove();
-      const ok = await importFromKey(k);
-      showToast(ok ? t('importDone') : t('importFail'), ok ? 'success' : 'error');
-      if (ok) setTimeout(() => window.location.reload(), 1000);
-    });
-
-    
-    overlay.querySelector('#sync-change-key-btn').addEventListener('click', () => {
-      if (!confirm(t('changeKeyWarn'))) return;
-      overlay.remove();
-      localStorage.removeItem(SYNC_KEY_LS);
-      localStorage.removeItem(SYNC_DECLINED_LS); 
-      userKey = null;
-      showFirstRunModal();
-    });
-
-    
-    overlay.querySelector('#sync-close-btn').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   }
 
-   
-  function addMobileFAB() {
-    if (window.innerWidth > 1024) return;
-
-    function _inject() {
-      if (document.getElementById('sync-mob-fab')) return;
-
-      const btn = document.createElement('button');
-      btn.className = 'mobile-fab sync-fab';
-      btn.id = 'sync-mob-fab';
-      btn.innerHTML = '☁️';
-      btn.title = t('modalTitle');
-
-      const dot = document.createElement('span');
-      dot.className = 'sync-status-dot ' + syncStatus;
-      btn.appendChild(dot);
-      statusDot = dot;
-      fabBtn = btn;
-
-      btn.addEventListener('click', showSyncModal);
-
-      
-      const existing = document.getElementById('mobile-fabs');
-      if (existing) {
-        existing.appendChild(btn);
-      } else {
-        
-        const ctn = document.createElement('div');
-        ctn.className = 'mobile-fab-container';
-        ctn.id = 'sync-fabs-container';
-        ctn.appendChild(btn);
-        document.body.appendChild(ctn);
-
-        
-        let lastY = window.scrollY;
-        window.addEventListener('scroll', () => {
-          const y = window.scrollY;
-          ctn.classList.toggle('scrolling-down', y > lastY && y > 150);
-          lastY = y;
-        }, { passive: true });
-      }
-    }
-
-    
-    if (document.readyState === 'complete') {
-      setTimeout(_inject, 100);
-    } else {
-      window.addEventListener('load', () => setTimeout(_inject, 100));
-    }
-  }
-
-   
+  /*@3.FISJ.169*/
   function addDesktopHeaderBtn() {
     if (window.innerWidth <= 1024) return;
     if (document.getElementById('sync-header-btn')) return;
 
-    
+    /*@3.FISJ.203*/
+    /*@3.FISJ.170*/
     const targets = [
+      '.g-tail',
       '.module-header-actions',
       '.dash-actions',
-      '.planner-header-actions',
-      '.planner-actions',
     ];
 
     let container = null;
@@ -981,7 +1894,7 @@
     btn.className = 'toggle-btn sync-header-btn';
     btn.id = 'sync-header-btn';
     btn.title = t('modalTitle');
-    btn.innerHTML = '☁️';
+    btn.innerHTML = '<i class="fa-solid fa-cloud" aria-hidden="true"></i>';
 
     const dot = document.createElement('span');
     dot.className = 'sync-status-dot ' + syncStatus;
@@ -990,61 +1903,203 @@
 
     btn.addEventListener('click', showSyncModal);
 
-    
-    const langBtn = container.querySelector('[onclick*="toggleLanguage"], #lang-label');
+    /*@3.FISJ.171*/
+    const langBtn = container.querySelector('.g-lang, [onclick*="toggleLanguage"], #lang-label');
     const refBtn = langBtn ? langBtn.closest('button') || langBtn : null;
-    if (refBtn) container.insertBefore(btn, refBtn);
+    if (refBtn && refBtn.parentNode === container) container.insertBefore(btn, refBtn);
+    else if (refBtn) refBtn.parentNode.insertBefore(btn, refBtn);
     else container.prepend(btn);
   }
 
-   
+  /*@3.FISJ.172*/
+  const MIGRATED_LS = 'garden_oracle_imported';
+  const MIGRATE_TRIES_LS = 'garden_oracle_import_tries';
+  const MIGRATE_MAX_TRIES = 5;
+
+  /*@3.FISJ.202*/
+  function legacyState() {
+    return {
+      done: localStorage.getItem(MIGRATED_LS) === '1',
+      tries: Number(localStorage.getItem(MIGRATE_TRIES_LS) || 0),
+      applicable: (function () {
+        const k = getKey();
+        return !!k && !currentVaultSecret() && KEY_REGEX.test(k);
+      })(),
+    };
+  }
+
+  async function importLegacyOnce(key) {
+    if (!usingOracle()) return false;
+    if (localStorage.getItem(MIGRATED_LS) === '1') return false;
+
+    if (!KEY_REGEX.test(String(key))) {
+      localStorage.setItem(MIGRATED_LS, '1');
+      return false;
+    }
+
+    const tries = Number(localStorage.getItem(MIGRATE_TRIES_LS) || 0);
+    if (tries >= MIGRATE_MAX_TRIES) return false;
+    localStorage.setItem(MIGRATE_TRIES_LS, String(tries + 1));
+
+    let pulled = false;
+    try {
+      forceFirestore = true;                      /*@3.FISJ.173*/
+      storeReady = false;
+      await new Promise((res) => { loadFirebase(res); });
+      if (db) {
+        await pullAll(key);                       /*@3.FISJ.174*/
+        pulled = true;
+      }
+    } catch (e) {
+      console.warn('[Sync] legacy import failed:', e && e.message);
+    } finally {
+      forceFirestore = false;
+      storeReady = true;                          /*@3.FISJ.175*/
+    }
+
+    if (pulled) {
+      localStorage.setItem(MIGRATED_LS, '1');
+      localStorage.removeItem(MIGRATE_TRIES_LS);
+    }
+    await pushAll(key);                           /*@3.FISJ.176*/
+    return pulled;
+  }
+
   async function initSync() {
+    /*@3.FISJ.177*/
+    try { await ensureEndpoints(); } catch (e) {}
+
+    /*@3.FISJ.178*/
+    try { await consumeVaultLink(); } catch (e) {}
+
     userKey = getKey();
-    if (!userKey) return; 
+    if (!userKey) return; /*@3.FISJ.179*/
+
+    /*@3.FISJ.180*/
+    hlcSeedFromLocal();
 
     loadFirebase(async () => {
       patchLocalStorage();
-      await pullAll(userKey);
+      /*@3.FISJ.181*/
+      const justImported = await importLegacyOnce(userKey);
 
-      
+      /*@3.FISJ.182*/
+      const PULL_FRESH_MS = 60 * 1000;
+      const lastPull = Number(localStorage.getItem('garden_sync_last') || 0);
+      if (justImported || pushPending || Date.now() - lastPull > PULL_FRESH_MS) {
+        await pullAll(userKey);
+      } else {
+        setStatus('synced');
+      }
+
+      /*@3.FISJ.183*/
       setInterval(() => {
-        if (document.hasFocus()) pullAll(userKey);
+        if (!document.hasFocus()) return;
+        if (pushPending) pushAll(userKey).then(() => pullAll(userKey));
+        else pullAll(userKey);
       }, 5 * 60 * 1000);
 
-      
+      /*@3.FISJ.184*/
       window.addEventListener('focus', () => {
         const last = Number(localStorage.getItem('garden_sync_last') || 0);
+        if (pushPending) { pushAll(userKey).then(() => pullAll(userKey)); return; }
         if (Date.now() - last > 60000) pullAll(userKey);
       });
+
+      /*@3.FISJ.185*/
+      window.addEventListener('online', () => {
+        if (pushPending) pushAll(userKey).then(() => pullAll(userKey));
+      });
+
+      /*@3.FISJ.186*/
+      try {
+        const DT = 'garden_device_touch';
+        if (Date.now() - Number(localStorage.getItem(DT) || 0) > 24 * 3600 * 1000) {
+          touchDevice().then(ok => { if (ok) localStorage.setItem(DT, String(Date.now())); });
+        }
+      } catch (e) {}
     });
   }
 
-   
+  /*@3.FISJ.187*/
   window.GardenSync = {
     showModal: showSyncModal,
-    syncNow: () => userKey && db && pullAll(userKey),
+    syncNow: () => userKey && storeReady && pullAll(userKey),
     getKey,
     setStatus,
+
+    /*@3.FISJ.188*/
+    status: () => syncStatus,
+    pending: () => !!pushPending,
+    lastSync: () => Number(localStorage.getItem('garden_sync_last') || 0) || null,
+
+    /*@3.FISJ.189*/
+    vaultSecret: currentVaultSecret,
+    vaultPretty: () => { const s = currentVaultSecret(); return s ? prettyVault(s) : null; },
+    newVaultSecret,
+    adoptVaultSecret,
+    /*@3.FISJ.190*/
+    saveRecovery, openRecovery, passIssue,
+    hasRecovery: () => !!localStorage.getItem('garden_recovery_set'),
+    downloadRecoveryFile, recoveryFileText, recoveryQR, pairQR,
+    forgetRecovery, disconnect: disconnectDevice,
+    googleAvailable, googleRender, saveRecoveryGoogle, openRecoveryGoogle,
+
+    /*@3.FISJ.191*/
+    startPairing, claimPairing,
+    prettyPair,
+    devices: listDevices,
+    forgetDevice,
+    deviceId, deviceName,
+
+    /*@3.FISJ.192*/
+    vaultLink: () => {
+      const s = currentVaultSecret();
+      if (!s) return null;
+      return location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html#vault=' + s;
+    },
+    isLegacyKey: () => { const k = getKey(); return !!k && !currentVaultSecret() && KEY_REGEX.test(k); },
+
+    /*@3.FISJ.193*/
+    vaultDocId: async () => {
+      const k = getKey();
+      if (!k) return null;
+      /*@3.FISJ.194*/
+      try { await ensureEndpoints(); } catch (e) {}
+      try { return await oracleDocId(k); } catch (e) { return null; }
+    },
+
+    /*@3.FISJ.195*/
+    legacyState,
+    pushError: () => pushLastError,
+
+    _test: { mergeById, mergeDeep, mergeTombs, trackCollection, isDeepKey, canon: _canonStr, wrap, unwrap,
+             patchLocalStorage, hlcNow, stampLocal, localStamp,
+             chunkPayload, pushAll, pullAll, importLegacyOnce, initSync, loadFirebase, getSyncableKeys,
+             PUSH_MAX_KEYS, PUSH_MAX_BYTES, PUSH_MAX_VALUE },
+
+    upgradeVault: upgradeLegacyVault,
+    pendingMove: pendingVaultMove,
+    followMove: async (toId) => { saveKey(String(toId)); await pullAll(getKey()); return getKey(); },
+    mirrorUntil: () => Number(localStorage.getItem(LEGACY_UNTIL_LS) || 0)
   };
 
-   
+  /*@3.FISJ.196*/
   function boot() {
     injectCSS();
-    addMobileFAB();
+    /*@3.FISJ.197*/
     addDesktopHeaderBtn();
 
-    const key = getKey();
-    if (!key) {
-      
-      
-      if (localStorage.getItem(SYNC_SEEN_LS))    return;
-      if (localStorage.getItem(SYNC_DECLINED_LS)) return;
-      
-      localStorage.setItem(SYNC_SEEN_LS, '1');
-      setTimeout(showFirstRunModal, 1200);
-    } else {
+    /*@3.FISJ.198*/
+    if (/[#&]pair=/.test(location.hash)) {
+      /*@3.FISJ.199*/
+      consumePairLink().then(() => { if (getKey()) initSync(); });
+    } else if (/vault=/.test(location.hash)) {
+      consumeVaultLink().then(ok => { if (ok || getKey()) initSync(); });
+    } else if (getKey()) {
       initSync();
     }
+    /*@3.FISJ.200*/
   }
 
   if (document.readyState === 'loading') {

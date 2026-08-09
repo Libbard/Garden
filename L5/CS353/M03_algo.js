@@ -1,6 +1,6 @@
-
-
-
+// M03_algo.js — Interactive algorithm widgets
+// Generated: 2026-03-04T00:24:20
+// Diagrams: 9/9
 
 window.AlgoWidgets = window.AlgoWidgets || {};
 
@@ -125,10 +125,10 @@ window.AlgoWidgets[1] = function(container) {
   
     function generateSteps() {
       var arr = [];
-      for (var i = 0; i < ARRAY_SIZE; i++) arr.push(Math.floor(Math.random() * 80) + 20); 
+      for (var i = 0; i < ARRAY_SIZE; i++) arr.push(Math.floor(Math.random() * 80) + 20); // Values 20-99
       steps = [];
   
-      
+      // Initial state
       steps.push({
         a: arr.slice(),
         i: -1, j: -1, minIdx: -1,
@@ -186,7 +186,7 @@ window.AlgoWidgets[1] = function(container) {
           arr[minIdx] = temp;
           steps.push({
             a: arr.slice(),
-            i: i, j: -1, minIdx: i, 
+            i: i, j: -1, minIdx: i, // minIdx is now i after swap
             sortedCount: i + 1,
             swapping: false,
             en: 'Elements swapped. Element ' + arr[i] + ' is now in its sorted position.',
@@ -204,7 +204,7 @@ window.AlgoWidgets[1] = function(container) {
         }
       }
   
-      
+      // Final state
       steps.push({
         a: arr.slice(),
         i: -1, j: -1, minIdx: -1,
@@ -221,31 +221,31 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
   
-      svgContainerEl.innerHTML = ''; 
+      svgContainerEl.innerHTML = ''; // Clear previous SVG
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('width', SVG_WIDTH);
       svg.setAttribute('height', SVG_HEIGHT);
       svg.setAttribute('viewBox', '0 0 ' + SVG_WIDTH + ' ' + SVG_HEIGHT);
-      svg.style.overflow = 'visible'; 
+      svg.style.overflow = 'visible'; // Allow arrow to extend
   
       var maxVal = Math.max.apply(null, s.a);
-      var barMaxHeight = 150; 
+      var barMaxHeight = 150; // Max height for bars
   
-      
+      // Draw bars
       s.a.forEach(function (val, idx) {
         var barHeight = (val / maxVal) * barMaxHeight;
         var x = idx * (BAR_WIDTH + BAR_GAP) + BAR_GAP;
-        var y = SVG_HEIGHT - barHeight - 30; 
+        var y = SVG_HEIGHT - barHeight - 30; // 30 for index labels below
   
         var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', x);
         rect.setAttribute('y', y);
         rect.setAttribute('width', BAR_WIDTH);
         rect.setAttribute('height', barHeight);
-        rect.setAttribute('rx', 3); 
+        rect.setAttribute('rx', 3); // Rounded corners
         rect.setAttribute('ry', 3);
   
-        var fillColor = 'var(--brand-500)'; 
+        var fillColor = 'var(--brand-500)'; // Default unsorted
         if (idx < s.sortedCount) {
           fillColor = 'var(--algo-sorted)';
         } else if (s.swapping && (idx === s.i || idx === s.minIdx)) {
@@ -258,20 +258,20 @@ window.AlgoWidgets[1] = function(container) {
         rect.setAttribute('fill', fillColor);
         svg.appendChild(rect);
   
-        
+        // Value label
         var textVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textVal.setAttribute('x', x + BAR_WIDTH / 2);
-        textVal.setAttribute('y', y + barHeight / 2 + 5); 
+        textVal.setAttribute('y', y + barHeight / 2 + 5); // Center text vertically
         textVal.setAttribute('text-anchor', 'middle');
         textVal.setAttribute('fill', 'var(--algo-text)');
         textVal.setAttribute('font-size', '14px');
         textVal.textContent = val;
         svg.appendChild(textVal);
   
-        
+        // Index label
         var textIdx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textIdx.setAttribute('x', x + BAR_WIDTH / 2);
-        textIdx.setAttribute('y', SVG_HEIGHT - 10); 
+        textIdx.setAttribute('y', SVG_HEIGHT - 10); // Below the bars
         textIdx.setAttribute('text-anchor', 'middle');
         textIdx.setAttribute('fill', 'var(--algo-muted)');
         textIdx.setAttribute('font-size', '12px');
@@ -279,11 +279,11 @@ window.AlgoWidgets[1] = function(container) {
         svg.appendChild(textIdx);
       });
   
-      
-      if (s.minIdx !== -1 && s.minIdx >= s.sortedCount) { 
+      // Draw arrow for current minIdx
+      if (s.minIdx !== -1 && s.minIdx >= s.sortedCount) { // Only show arrow for unsorted part
         var arrowX = s.minIdx * (BAR_WIDTH + BAR_GAP) + BAR_GAP + BAR_WIDTH / 2;
-        var arrowY1 = SVG_HEIGHT - 25; 
-        var arrowY2 = SVG_HEIGHT - 5;  
+        var arrowY1 = SVG_HEIGHT - 25; // Start above index label
+        var arrowY2 = SVG_HEIGHT - 5;  // End at bottom of SVG
   
         var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', arrowX);
@@ -332,13 +332,13 @@ window.AlgoWidgets[1] = function(container) {
 };
 
 window.AlgoWidgets[2] = function(container) {
-  
+  // Constants for SVG drawing
     const BAR_WIDTH = 50;
     const BAR_SPACING = 10;
-    const SVG_HEIGHT = 250; 
-    const BAR_MAX_HEIGHT = 180; 
-    const ARROW_CURVE_HEIGHT = 30; 
-    const ARROW_OFFSET_Y = 10; 
+    const SVG_HEIGHT = 250; // Height for bars + arrows
+    const BAR_MAX_HEIGHT = 180; // Max height for a bar, leaving space for labels and arrows
+    const ARROW_CURVE_HEIGHT = 30; // Height of the curve for swap arrows
+    const ARROW_OFFSET_Y = 10; // Y offset from bar top for arrow start/end
   
     container.innerHTML = '<div class="algo-widget">' +
       _AL.titleHTML(2) +
@@ -372,13 +372,13 @@ window.AlgoWidgets[2] = function(container) {
   
     function generateSteps() {
       var arr = []; for (var i = 0; i < 8; i++) arr.push(Math.floor(Math.random() * 80) + 20);
-      steps = []; var sortedIndices = []; 
+      steps = []; var sortedIndices = []; // Stores indices of elements that are in their final sorted position
   
       steps.push({
         a: arr.slice(),
-        c: [], 
-        sw: false, 
-        s: sortedIndices.slice(), 
+        c: [], // comparing indices
+        sw: false, // was a swap performed
+        s: sortedIndices.slice(), // sorted indices
         en: 'Starting Bubble Sort with array: [' + arr.join(', ') + ']',
         ar: 'بدء الترتيب بالفقاعات للمصفوفة: [' + arr.join(', ') + ']'
       });
@@ -406,7 +406,7 @@ window.AlgoWidgets[2] = function(container) {
             });
           }
         }
-        sortedIndices.push(n - 1 - pass); 
+        sortedIndices.push(n - 1 - pass); // The largest element of this pass is now in its final position
         steps.push({
           a: arr.slice(),
           c: [],
@@ -416,7 +416,7 @@ window.AlgoWidgets[2] = function(container) {
           ar: 'اكتملت الجولة ' + (pass + 1) + '. العنصر ' + arr[n - 1 - pass] + ' أصبح مرتبًا.'
         });
       }
-      sortedIndices.push(0); 
+      sortedIndices.push(0); // The last element (smallest) will also be sorted after the loop
       steps.push({
         a: arr.slice(),
         c: [],
@@ -433,33 +433,33 @@ window.AlgoWidgets[2] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
   
-      
+      // Clear previous SVG content
       svgEl.innerHTML = '';
   
-      
+      // Calculate dynamic SVG width based on number of bars
       const numBars = s.a.length;
       const totalWidth = numBars * BAR_WIDTH + (numBars - 1) * BAR_SPACING;
       svgEl.setAttribute('width', totalWidth);
       svgEl.setAttribute('viewBox', '0 0 ' + totalWidth + ' ' + SVG_HEIGHT);
   
       var maxValue = Math.max.apply(null, s.a);
-      if (maxValue === 0) maxValue = 1; 
+      if (maxValue === 0) maxValue = 1; // Avoid division by zero if all values are zero
   
       s.a.forEach(function (val, idx) {
         const barHeight = (val / maxValue) * BAR_MAX_HEIGHT;
         const x = idx * (BAR_WIDTH + BAR_SPACING);
-        const y = SVG_HEIGHT - barHeight - 20; 
+        const y = SVG_HEIGHT - barHeight - 20; // Position from bottom, leaving space for text/arrows
   
-        
+        // Bar rectangle
         var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', x);
         rect.setAttribute('y', y);
         rect.setAttribute('width', BAR_WIDTH);
         rect.setAttribute('height', barHeight);
-        rect.setAttribute('rx', 3); 
+        rect.setAttribute('rx', 3); // Rounded corners
         rect.setAttribute('ry', 3);
   
-        let fillColor = 'var(--brand-500)'; 
+        let fillColor = 'var(--brand-500)'; // Default unsorted color
         if (s.s.indexOf(idx) !== -1) {
           fillColor = 'var(--algo-sorted)';
         } else if (s.c.indexOf(idx) !== -1) {
@@ -470,10 +470,10 @@ window.AlgoWidgets[2] = function(container) {
         rect.setAttribute('stroke-width', '1');
         svgEl.appendChild(rect);
   
-        
+        // Bar label (value)
         var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', x + BAR_WIDTH / 2);
-        text.setAttribute('y', y + barHeight / 2 + 5); 
+        text.setAttribute('y', y + barHeight / 2 + 5); // Center text vertically
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('fill', 'var(--algo-text)');
         text.setAttribute('font-size', '14');
@@ -481,7 +481,7 @@ window.AlgoWidgets[2] = function(container) {
         svgEl.appendChild(text);
       });
   
-      
+      // Draw swap arrows if a swap just occurred
       if (s.sw && s.c.length === 2) {
         const idx1 = s.c[0];
         const idx2 = s.c[1];
@@ -489,11 +489,11 @@ window.AlgoWidgets[2] = function(container) {
         const x1 = idx1 * (BAR_WIDTH + BAR_SPACING) + BAR_WIDTH / 2;
         const x2 = idx2 * (BAR_WIDTH + BAR_SPACING) + BAR_WIDTH / 2;
   
-        
-        
+        // Y position for the top of the bars involved in the swap (before the swap visually)
+        // For simplicity, let's assume the arrow starts/ends slightly above the bars
         const yTop = SVG_HEIGHT - BAR_MAX_HEIGHT - 20 - ARROW_OFFSET_Y;
   
-        
+        // Define arrowhead marker
         var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
         marker.setAttribute('id', 'arrowhead');
@@ -506,28 +506,28 @@ window.AlgoWidgets[2] = function(container) {
         defs.appendChild(marker);
         svgEl.appendChild(defs);
   
-        
+        // Arrow 1: from left bar to right bar
         var arrow1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         arrow1.setAttribute('stroke', 'var(--algo-swap)');
         arrow1.setAttribute('stroke-width', '2');
         arrow1.setAttribute('fill', 'none');
         arrow1.setAttribute('marker-end', 'url(#arrowhead)');
         arrow1.setAttribute('d',
-          'M' + x1 + ',' + (yTop + ARROW_OFFSET_Y) + 
-          ' C' + x1 + ',' + (yTop - ARROW_CURVE_HEIGHT) + 
-          ' ' + x2 + ',' + (yTop - ARROW_CURVE_HEIGHT) + 
-          ' ' + x2 + ',' + (yTop + ARROW_OFFSET_Y)    
+          'M' + x1 + ',' + (yTop + ARROW_OFFSET_Y) + // Start at top of left bar
+          ' C' + x1 + ',' + (yTop - ARROW_CURVE_HEIGHT) + // Control point 1 (above left bar)
+          ' ' + x2 + ',' + (yTop - ARROW_CURVE_HEIGHT) + // Control point 2 (above right bar)
+          ' ' + x2 + ',' + (yTop + ARROW_OFFSET_Y)    // End at top of right bar
         );
         svgEl.appendChild(arrow1);
   
-        
+        // Arrow 2: from right bar to left bar
         var arrow2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         arrow2.setAttribute('stroke', 'var(--algo-swap)');
         arrow2.setAttribute('stroke-width', '2');
         arrow2.setAttribute('fill', 'none');
         arrow2.setAttribute('marker-end', 'url(#arrowhead)');
         arrow2.setAttribute('d',
-          'M' + x2 + ',' + (yTop + ARROW_OFFSET_Y + 10) + 
+          'M' + x2 + ',' + (yTop + ARROW_OFFSET_Y + 10) + // Start slightly below arrow1
           ' C' + x2 + ',' + (yTop - ARROW_CURVE_HEIGHT + 10) +
           ' ' + x1 + ',' + (yTop - ARROW_CURVE_HEIGHT + 10) +
           ' ' + x1 + ',' + (yTop + ARROW_OFFSET_Y + 10)
@@ -562,9 +562,9 @@ window.AlgoWidgets[2] = function(container) {
 window.AlgoWidgets[3] = function(container) {
   var ID = 3;
     var CHAR_WIDTH = 30;
-    var CHAR_MARGIN = 2; 
-    var TEXT_ROW_TOP = 50; 
-    var PATTERN_ROW_TOP = TEXT_ROW_TOP + CHAR_WIDTH + 20; 
+    var CHAR_MARGIN = 2; // Margin-right for each char box
+    var TEXT_ROW_TOP = 50; // Y position for text row relative to canvas top
+    var PATTERN_ROW_TOP = TEXT_ROW_TOP + CHAR_WIDTH + 20; // Y position for pattern row
   
     container.innerHTML = '<div class="algo-widget">' +
       _AL.titleHTML(ID) +
@@ -617,7 +617,7 @@ window.AlgoWidgets[3] = function(container) {
       box.style.height = CHAR_WIDTH + 'px';
       box.style.marginRight = CHAR_MARGIN + 'px';
       box.style.marginLeft = '0px';
-      box.style.backgroundColor = 'var(--brand-400)'; 
+      box.style.backgroundColor = 'var(--brand-400)'; // Default
       box.style.color = 'var(--algo-text)';
       box.style.display = 'flex';
       box.style.alignItems = 'center';
@@ -630,8 +630,8 @@ window.AlgoWidgets[3] = function(container) {
     }
   
     function generateSteps() {
-      var T = "ABAAABCDBACDAABA"; 
-      var P = "AABA";             
+      var T = "ABAAABCDBACDAABA"; // Example text
+      var P = "AABA";             // Example pattern
   
       steps = [];
       var n = T.length;
@@ -649,7 +649,7 @@ window.AlgoWidgets[3] = function(container) {
         var isFullMatch = true;
   
         for (var j = 0; j < m; j++) {
-          
+          // Step for comparing characters
           steps.push({
             text: T, pattern: P, offset: i, matchLength: currentMatchLength, compareIdx: j, mismatchIdx: -1, fullMatch: false,
             en: 'Comparing T[' + (i + j) + '] (' + T[i + j] + ') with P[' + j + '] (' + P[j] + ').',
@@ -661,17 +661,17 @@ window.AlgoWidgets[3] = function(container) {
           } else {
             currentMismatchIdx = j;
             isFullMatch = false;
-            break; 
+            break; // Mismatch, break inner loop
           }
         }
   
-        if (isFullMatch) { 
+        if (isFullMatch) { // Full match
           steps.push({
             text: T, pattern: P, offset: i, matchLength: m, compareIdx: -1, mismatchIdx: -1, fullMatch: true,
             en: 'Full match found at index ' + i + '!',
             ar: 'تم العثور على تطابق كامل عند الفهرس ' + i + '!'
           });
-        } else { 
+        } else { // Mismatch
           steps.push({
             text: T, pattern: P, offset: i, matchLength: currentMatchLength, compareIdx: -1, mismatchIdx: currentMismatchIdx, fullMatch: false,
             en: 'Mismatch at T[' + (i + currentMismatchIdx) + '] and P[' + currentMismatchIdx + ']. Shifting pattern.',
@@ -695,49 +695,49 @@ window.AlgoWidgets[3] = function(container) {
       textRowEl.innerHTML = '';
       patternRowEl.innerHTML = '';
   
-      
+      // Render Text
       for (var i = 0; i < s.text.length; i++) {
         var charBox = createCharBox(s.text[i]);
-        
+        // Check if character is within the current pattern window
         if (i >= s.offset && i < s.offset + s.pattern.length) {
-          var j = i - s.offset; 
+          var j = i - s.offset; // Index within pattern
           if (s.fullMatch) {
-            charBox.style.backgroundColor = 'var(--algo-compare)'; 
+            charBox.style.backgroundColor = 'var(--algo-compare)'; // All chars in window are matched
           } else if (s.compareIdx !== -1 && j === s.compareIdx) {
-            charBox.style.backgroundColor = 'var(--algo-active)'; 
+            charBox.style.backgroundColor = 'var(--algo-active)'; // Currently comparing
           } else if (s.mismatchIdx !== -1 && j === s.mismatchIdx) {
-            charBox.style.backgroundColor = 'var(--algo-swap)'; 
+            charBox.style.backgroundColor = 'var(--algo-swap)'; // First mismatch
           } else if (j < s.matchLength) {
-            charBox.style.backgroundColor = 'var(--algo-compare)'; 
+            charBox.style.backgroundColor = 'var(--algo-compare)'; // Already matched prefix
           }
         }
         textRowEl.appendChild(charBox);
       }
   
-      
+      // Render Pattern
       for (var j = 0; j < s.pattern.length; j++) {
         var charBox = createCharBox(s.pattern[j]);
         if (s.fullMatch) {
-          charBox.style.backgroundColor = 'var(--algo-compare)'; 
+          charBox.style.backgroundColor = 'var(--algo-compare)'; // All chars in pattern are matched
         } else if (s.compareIdx !== -1 && j === s.compareIdx) {
-          charBox.style.backgroundColor = 'var(--algo-active)'; 
+          charBox.style.backgroundColor = 'var(--algo-active)'; // Currently comparing
         } else if (s.mismatchIdx !== -1 && j === s.mismatchIdx) {
-          charBox.style.backgroundColor = 'var(--algo-swap)'; 
+          charBox.style.backgroundColor = 'var(--algo-swap)'; // First mismatch
         } else if (j < s.matchLength) {
-          charBox.style.backgroundColor = 'var(--algo-compare)'; 
+          charBox.style.backgroundColor = 'var(--algo-compare)'; // Already matched prefix
         }
         patternRowEl.appendChild(charBox);
       }
   
-      
+      // Position pattern row
       patternRowEl.style.left = (s.offset * (CHAR_WIDTH + CHAR_MARGIN)) + 'px';
   
-      
+      // Update arrow
       var arrowX = s.offset * (CHAR_WIDTH + CHAR_MARGIN) + CHAR_WIDTH / 2;
       arrowLineEl.setAttribute('x1', arrowX);
-      arrowLineEl.setAttribute('y1', TEXT_ROW_TOP - 10); 
+      arrowLineEl.setAttribute('y1', TEXT_ROW_TOP - 10); // Above text row
       arrowLineEl.setAttribute('x2', arrowX);
-      arrowLineEl.setAttribute('y2', PATTERN_ROW_TOP - 10); 
+      arrowLineEl.setAttribute('y2', PATTERN_ROW_TOP - 10); // Above pattern row
     }
   
     function startPlay() {
@@ -772,12 +772,12 @@ window.AlgoWidgets[4] = function (container) {
     _AL.toolbar(4) +
     '<div class="algo-explanation" id="w4-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
     
-    
+    // حاوية متجاوبة 16:9
     '<div class="algo-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
       '<svg id="w4-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
     '</div>' +
     
-    
+    // دليل الألوان
     '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--bg-elevated);border:2px solid var(--text-muted);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w4-point"></span></span>' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w4-current"></span></span>' +
@@ -794,11 +794,11 @@ window.AlgoWidgets[4] = function (container) {
   var steps = [], cur = 0, playing = false, interval = null;
   var isInitialized = false;
 
-  
+  // مساحة الرسم (800x450) مع هوامش للحواف
   const W = 800, H = 450, PADDING = 60;
   const RADIUS = 8;
   
-  
+  // بيانات الخوارزمية وعناصر الـ UI
   var points = [];
   var uiPoints = [];
   var uiBestLine = null;
@@ -820,12 +820,12 @@ window.AlgoWidgets[4] = function (container) {
 
   function generateSteps() {
     points = [];
-    
+    // توليد 8 إلى 12 نقطة عشوائية بمسافات متباعدة نسبياً
     var numPoints = Math.floor(Math.random() * 5) + 8; 
     
     for (var i = 0; i < numPoints; i++) {
       points.push({
-        id: String.fromCharCode(65 + i), 
+        id: String.fromCharCode(65 + i), // A, B, C...
         x: PADDING + Math.floor(Math.random() * (W - PADDING * 2)),
         y: PADDING + Math.floor(Math.random() * (H - PADDING * 2))
       });
@@ -883,27 +883,27 @@ window.AlgoWidgets[4] = function (container) {
     svgEl.innerHTML = '';
     uiPoints = [];
 
-    
+    // مجموعة الخطوط في الخلفية
     let linesG = makeSVG('g', {});
     
-    
+    // خط أفضل مسافة (Best Pair Line)
     uiBestLine = makeSVG('line', { stroke: 'var(--algo-sorted)', 'stroke-width': 4, opacity: 0 });
     linesG.appendChild(uiBestLine);
 
-    
+    // خط المقارنة الحالية (Current Comparison Line)
     uiCurrLine = makeSVG('line', { stroke: 'var(--algo-compare)', 'stroke-width': 2.5, 'stroke-dasharray': '6,4', opacity: 0 });
     linesG.appendChild(uiCurrLine);
     
     svgEl.appendChild(linesG);
 
-    
+    // مجموعة النقاط
     let nodesG = makeSVG('g', {});
     points.forEach((p, i) => {
       let g = makeSVG('g', { 'transform-origin': `${p.x}px ${p.y}px` });
       
       let circ = makeSVG('circle', { cx: p.x, cy: p.y, r: RADIUS, fill: 'var(--bg-elevated)', stroke: 'var(--text-muted)', 'stroke-width': 2 });
       
-      
+      // خلفية بسيطة للحرف ليكون مقروءاً دائماً
       let lblBg = makeSVG('circle', { cx: p.x, cy: p.y - 20, r: 10, fill: 'var(--algo-canvas-bg)', opacity: 0.8 });
       let lbl = makeSVG('text', { x: p.x, y: p.y - 20, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--text-primary)', 'font-family': "'JetBrains Mono', monospace", 'font-weight': 'bold', 'font-size': '14px' });
       lbl.textContent = p.id;
@@ -917,7 +917,7 @@ window.AlgoWidgets[4] = function (container) {
     });
     svgEl.appendChild(nodesG);
 
-    
+    // صندوق يطفو فوق خط المقارنة لعرض المسافة الحالية
     uiDistLabel.g = makeSVG('g', { opacity: 0 });
     uiDistLabel.bg = makeSVG('rect', { width: 54, height: 24, rx: 6, fill: 'var(--algo-compare)' });
     uiDistLabel.txt = makeSVG('text', { 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: '#ffffff', 'font-family': "'JetBrains Mono', monospace", 'font-weight': '800', 'font-size': '13px' });
@@ -935,18 +935,18 @@ window.AlgoWidgets[4] = function (container) {
     counter.textContent = _AL.stepLabel(cur, steps.length - 1);
     expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-    
+    // 1. تحديث الخط الأفضل (Best Line)
     if (s.bestPair) {
       let bp1 = points[s.bestPair[0]];
       let bp2 = points[s.bestPair[1]];
       uiBestLine.setAttribute('x1', bp1.x); uiBestLine.setAttribute('y1', bp1.y);
       uiBestLine.setAttribute('x2', bp2.x); uiBestLine.setAttribute('y2', bp2.y);
-      uiBestLine.style.opacity = (s.phase === 'done') ? '1' : '0.4'; 
+      uiBestLine.style.opacity = (s.phase === 'done') ? '1' : '0.4'; // واضح جداً في النهاية، باهت أثناء البحث
     } else {
       uiBestLine.style.opacity = '0';
     }
 
-    
+    // 2. تحديث خط المقارنة الحالي وتسمية المسافة (Current Compare Line & Label)
     if (s.p1 !== null && s.p2 !== null && s.phase !== 'done') {
       let cp1 = points[s.p1];
       let cp2 = points[s.p2];
@@ -956,7 +956,7 @@ window.AlgoWidgets[4] = function (container) {
       let mx = (cp1.x + cp2.x) / 2;
       let my = (cp1.y + cp2.y) / 2;
       
-      
+      // إذا كان هذا هو الرقم الأصغر الجديد، نغير لون الصندوق ليكون مميزاً
       let isNewMin = s.phase === 'new_min';
       let boxColor = isNewMin ? 'var(--algo-swap)' : 'var(--algo-compare)';
       uiCurrLine.setAttribute('stroke', boxColor);
@@ -973,7 +973,7 @@ window.AlgoWidgets[4] = function (container) {
       uiCurrLine.style.opacity = '1';
       uiDistLabel.g.style.opacity = '1';
       
-      
+      // تأثير القفز للرقم عند إيجاد حد أدنى جديد
       uiDistLabel.g.style.transform = isNewMin ? 'scale(1.2)' : 'scale(1)';
       uiDistLabel.g.style.transformOrigin = `${mx}px ${my}px`;
     } else {
@@ -981,7 +981,7 @@ window.AlgoWidgets[4] = function (container) {
       uiDistLabel.g.style.opacity = '0';
     }
 
-    
+    // 3. تحديث مظهر النقاط (Nodes)
     uiPoints.forEach((ui, idx) => {
       let isComparing = (idx === s.p1 || idx === s.p2) && s.phase !== 'done';
       let isBest = (s.bestPair && (idx === s.bestPair[0] || idx === s.bestPair[1]));
@@ -990,7 +990,7 @@ window.AlgoWidgets[4] = function (container) {
       let fill = 'var(--bg-elevated)';
       let stroke = 'var(--text-muted)';
       let scale = 'scale(1)';
-      let opacity = '0.3'; 
+      let opacity = '0.3'; // بهتان النقاط غير النشطة للتركيز على مسار الفحص
 
       if (s.phase === 'intro' || s.phase === 'done') {
         opacity = '1';
@@ -1001,7 +1001,7 @@ window.AlgoWidgets[4] = function (container) {
         stroke = '#ffffff';
         scale = 'scale(1.4)';
         opacity = '1';
-        
+        // إظهار النقاط التي يتم فحصها في المقدمة
         ui.g.parentNode.appendChild(ui.g); 
       } else if (isBest) {
         fill = 'var(--algo-sorted)';
@@ -1033,7 +1033,7 @@ window.AlgoWidgets[4] = function (container) {
   container.querySelector('[data-algo-btn="step"]').addEventListener('click', function () { stopPlay(); if (cur < steps.length - 1) { cur++; render(); } });
   container.querySelector('[data-algo-btn="play"]').addEventListener('click', function () { playing ? stopPlay() : startPlay(); });
   
-  
+  // إعادة التوليد بأرقام وإحداثيات جديدة عند النقر على "إعادة"
   container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function () { 
     stopPlay(); 
     isInitialized = false;
@@ -1107,7 +1107,7 @@ window.AlgoWidgets[5] = function(container) {
           return edges[i].weight;
         }
       }
-      return Infinity; 
+      return Infinity; // Should not happen for a complete graph
     }
   
     function getDelay() { return _AL.speedToDelay(parseInt(container.querySelector('.algo-speed input').value)); }
@@ -1124,8 +1124,8 @@ window.AlgoWidgets[5] = function(container) {
     function generateSteps() {
       steps = [];
       var cityNames = Object.keys(nodes);
-      var startNode = cityNames[0]; 
-      var otherCities = cityNames.slice(1); 
+      var startNode = cityNames[0]; // Fix start node to 'A'
+      var otherCities = cityNames.slice(1); // B, C, D
   
       var initialStep = {
         tours: [],
@@ -1168,9 +1168,9 @@ window.AlgoWidgets[5] = function(container) {
           });
         } else {
           for (var i = l; i <= r; i++) {
-            [arr[l], arr[i]] = [arr[i], arr[l]]; 
+            [arr[l], arr[i]] = [arr[i], arr[l]]; // Swap
             permute(arr, l + 1, r, currentTours);
-            [arr[l], arr[i]] = [arr[i], arr[l]]; 
+            [arr[l], arr[i]] = [arr[i], arr[l]]; // Backtrack
           }
         }
       }
@@ -1180,7 +1180,7 @@ window.AlgoWidgets[5] = function(container) {
       var finalStep = steps[steps.length - 1];
       steps.push({
         tours: finalStep.tours,
-        currentTour: [], 
+        currentTour: [], // No specific tour highlighted, just final result
         currentTourLength: 0,
         optimalTourIdx: finalStep.optimalTourIdx,
         en: 'All tours evaluated. The shortest tour has a length of ' + finalStep.tours[finalStep.optimalTourIdx].length + '.',
@@ -1194,11 +1194,11 @@ window.AlgoWidgets[5] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
   
-      
+      // Render SVG graph
       canvasEl.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 350 350"></svg>';
       var svg = canvasEl.querySelector('svg');
   
-      
+      // Draw edges
       edges.forEach(function (edge) {
         var fromNode = nodes[edge.from];
         var toNode = nodes[edge.to];
@@ -1211,7 +1211,7 @@ window.AlgoWidgets[5] = function(container) {
         line.setAttribute('stroke-width', '2');
         svg.appendChild(line);
   
-        
+        // Draw edge weight
         var midX = (fromNode.x + toNode.x) / 2;
         var midY = (fromNode.y + toNode.y) / 2;
         var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -1223,7 +1223,7 @@ window.AlgoWidgets[5] = function(container) {
         svg.appendChild(text);
       });
   
-      
+      // Highlight optimal path edges first (if different from current)
       if (s.optimalTourIdx !== -1 && s.currentTour.length > 0 && s.tours[s.optimalTourIdx].path !== s.currentTour.join(' → ')) {
         var optimalPathNodes = s.tours[s.optimalTourIdx].path.split(' → ');
         for (var i = 0; i < optimalPathNodes.length - 1; i++) {
@@ -1240,7 +1240,7 @@ window.AlgoWidgets[5] = function(container) {
         }
       }
   
-      
+      // Highlight current path edges
       if (s.currentTour.length > 0) {
         for (var i = 0; i < s.currentTour.length - 1; i++) {
           var n1 = nodes[s.currentTour[i]];
@@ -1256,7 +1256,7 @@ window.AlgoWidgets[5] = function(container) {
         }
       }
   
-      
+      // Draw nodes (on top of lines)
       for (var nodeName in nodes) {
         var node = nodes[nodeName];
         var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -1278,7 +1278,7 @@ window.AlgoWidgets[5] = function(container) {
         svg.appendChild(text);
       }
   
-      
+      // Render tours table
       toursTableBody.innerHTML = '';
       s.tours.forEach(function (tour, idx) {
         var row = toursTableBody.insertRow();
@@ -1348,7 +1348,7 @@ window.AlgoWidgets[6] = function(container) {
       '<div class="w6-table-container">' +
         '<h5 data-algo-text="w6-subsets-table-title"></h5>' +
         
-        
+        // دليل الألوان (Legend) الجديد
         '<div class="w6-legend">' +
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: var(--algo-compare);"></span> <span data-algo-text="w6-leg-current"></span></span>' +
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: var(--algo-swap);"></span> <span data-algo-text="w6-leg-infeasible"></span></span>' +
@@ -1356,7 +1356,7 @@ window.AlgoWidgets[6] = function(container) {
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: var(--algo-sorted);"></span> <span data-algo-text="w6-leg-optimal"></span></span>' +
         '</div>' +
 
-        
+        // حاوية شريط التمرير الجديدة التي تغلف الجدول
         '<div class="w6-table-scroll-area">' +
           '<table id="w6-subsets-table" class="w6-subsets-table">' +
             '<thead><tr>' +
@@ -1370,34 +1370,34 @@ window.AlgoWidgets[6] = function(container) {
         '</div>' +
       '</div>' +
       '<style>' +
-         
+        /* ترتيب الحاويتين (العناصر والسعة) بجانب بعضهما مع تقليل المسافات */
         '.w6-knapsack-container { display: flex; justify-content: center; align-items: stretch; gap: 15px; margin-top: 10px; flex-wrap: wrap; }' +
         '.w6-items-display { flex: 1; min-width: 200px; max-width: 400px; border: 1px solid var(--algo-border); padding: 10px; border-radius: 8px; background-color: var(--algo-canvas-bg); text-align: center; }' +
         '.w6-knapsack-info { width: 140px; border: 1px solid var(--algo-border); padding: 10px; border-radius: 8px; background-color: var(--algo-canvas-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }' +
         
-         
+        /* جعل العناصر مربعة ومضغوطة */
         '.w6-items-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }' +
         '.w6-item-box { width: 65px; height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--algo-muted); border-radius: 6px; background-color: var(--brand-400); color: var(--algo-text); font-size: 0.8em; line-height: 1.3; transition: all 0.2s ease-in-out; }' +
         '.w6-item-box.w6-item-selected { background-color: var(--algo-active); border-color: var(--algo-active); color: var(--algo-bg); transform: scale(1.05); box-shadow: 0 4px 8px var(--brand-glow); }' +
         
-         
+        /* تقليل حجم نص السعة ليتناسب مع الصندوق الجديد */
         '.w6-capacity-value { font-size: 1.3em; font-weight: bold; color: var(--algo-active); margin-top: 5px; }' +
         '.w6-table-container { margin-top: 30px; text-align: center; }' +
         
-         
+        /* تنسيق دليل الألوان */
         '.w6-legend { display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; font-size: 0.9em; color: var(--algo-text); }' +
         '.w6-legend-item { display: flex; align-items: center; gap: 6px; }' +
         '.w6-legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--algo-border); }' +
 
-         
+        /* تنسيق صندوق التمرير للجدول */
         '.w6-table-scroll-area { max-height: 300px; overflow-y: auto; border: 1px solid var(--algo-border); border-radius: 8px; margin: 0 auto; max-width: 800px; background-color: var(--algo-canvas-bg); }' +
         '.w6-subsets-table { width: 100%; border-collapse: collapse; margin: 0; }' +
         '.w6-subsets-table th, .w6-subsets-table td { border: 1px solid var(--algo-border); border-top: none; padding: 10px; text-align: center; }' +
         
-         
+        /* تثبيت رأس الجدول أثناء التمرير (Sticky Header) */
         '.w6-subsets-table thead th { position: sticky; top: 0; z-index: 10; background-color: var(--brand-500); color: var(--algo-bg); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }' +
 
-         
+        /* --- الأسطر التي تم استرجاعها لتلوين صفوف الجدول --- */
         '.w6-subsets-table tbody tr:nth-child(even) { background-color: rgba(var(--brand-rgb), 0.1); }' +
         '.w6-subsets-table tbody tr.w6-current-subset { background-color: var(--algo-compare); color: var(--algo-bg); font-weight: bold; }' +
         '.w6-subsets-table tbody tr.w6-infeasible { background-color: var(--algo-swap); color: var(--algo-bg); }' +
@@ -1434,26 +1434,26 @@ window.AlgoWidgets[6] = function(container) {
     }
   
     function generateSteps() {
-      
+      // Generate random items (4-5 items)
       items = [];
-      var numItems = Math.floor(Math.random() * 2) + 4; 
+      var numItems = Math.floor(Math.random() * 2) + 4; // 4 or 5 items
       for (var i = 0; i < numItems; i++) {
         items.push({
           id: 'i' + (i + 1),
-          weight: Math.floor(Math.random() * 7) + 3, 
-          value: Math.floor(Math.random() * 90) + 10 
+          weight: Math.floor(Math.random() * 7) + 3, // 3-9 kg
+          value: Math.floor(Math.random() * 90) + 10 // $10-$100
         });
       }
-      
-      capacity = Math.floor(Math.random() * 10) + 15; 
+      // Generate random capacity
+      capacity = Math.floor(Math.random() * 10) + 15; // 15-24 kg
   
       steps = [];
       var n = items.length;
       var maxOverallValue = -1;
       var optimalSubsetIndex = -1;
-      var subsetsTable = []; 
+      var subsetsTable = []; // Stores all generated subsets for the table
   
-      
+      // Initial state
       steps.push({
         items: items,
         capacity: capacity,
@@ -1467,7 +1467,7 @@ window.AlgoWidgets[6] = function(container) {
         ar: 'بدء حل مشكلة حقيبة الظهر بالقوة الغاشمة. تم تحديد العناصر والسعة.'
       });
   
-      
+      // Iterate through all 2^n subsets
       for (var i = 0; i < (1 << n); i++) {
         var currentSubset = [];
         var currentSubsetIndices = [];
@@ -1475,7 +1475,7 @@ window.AlgoWidgets[6] = function(container) {
         var currentValue = 0;
   
         for (var j = 0; j < n; j++) {
-          if ((i >> j) & 1) { 
+          if ((i >> j) & 1) { // If j-th bit is set, include item j
             currentSubset.push(items[j].id);
             currentSubsetIndices.push(j);
             currentWeight += items[j].weight;
@@ -1492,11 +1492,11 @@ window.AlgoWidgets[6] = function(container) {
           weight: currentWeight,
           value: currentValue,
           isFeasible: isFeasible,
-          isOptimal: false 
+          isOptimal: false // Will be set later for the final optimal
         };
         subsetsTable.push(newSubsetRow);
   
-        
+        // Update optimal solution if feasible and better
         if (isFeasible && currentValue > maxOverallValue) {
           maxOverallValue = currentValue;
           optimalSubsetIndex = i;
@@ -1520,7 +1520,7 @@ window.AlgoWidgets[6] = function(container) {
           currentWeight: currentWeight,
           currentValue: currentValue,
           isFeasible: isFeasible,
-          subsetsTable: JSON.parse(JSON.stringify(subsetsTable)), 
+          subsetsTable: JSON.parse(JSON.stringify(subsetsTable)), // Deep copy
           currentSubsetId: i,
           optimalSubsetIndex: optimalSubsetIndex,
           en: explanationEn,
@@ -1528,7 +1528,7 @@ window.AlgoWidgets[6] = function(container) {
         });
       }
   
-      
+      // Final step: Mark the optimal solution
       var finalSubsetsTable = JSON.parse(JSON.stringify(subsetsTable));
       if (optimalSubsetIndex !== -1) {
         finalSubsetsTable.find(row => row.id === optimalSubsetIndex).isOptimal = true;
@@ -1536,7 +1536,7 @@ window.AlgoWidgets[6] = function(container) {
       steps.push({
         items: items,
         capacity: capacity,
-        currentSubsetIndices: [], 
+        currentSubsetIndices: [], // No specific subset highlighted
         currentWeight: 0,
         currentValue: 0,
         isFeasible: true,
@@ -1553,12 +1553,12 @@ window.AlgoWidgets[6] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
   
-      
+      // Render items
       itemsListEl.innerHTML = '';
       s.items.forEach(function(item, idx) {
         var itemBox = document.createElement('div');
         itemBox.className = 'w6-item-box';
-        
+        // تم تنسيق النص ليظهر بشكل عمودي مناسب للمربع
         itemBox.innerHTML = '<strong>' + item.id + '</strong><span>' + item.weight + 'kg</span><span>$' + item.value + '</span>';
         if (s.currentSubsetIndices.includes(idx)) {
           itemBox.classList.add('w6-item-selected');
@@ -1566,10 +1566,10 @@ window.AlgoWidgets[6] = function(container) {
         itemsListEl.appendChild(itemBox);
       });
   
-      
+      // Render capacity
       capacityValueEl.textContent = s.capacity + 'kg';
   
-      
+      // Render subsets table
       subsetsTableBody.innerHTML = '';
       s.subsetsTable.forEach(function(subsetRow) {
         var tr = document.createElement('tr');
@@ -1602,22 +1602,22 @@ window.AlgoWidgets[6] = function(container) {
         subsetsTableBody.appendChild(tr);
       });
 	  
-	  
+	  // --- كود التمرير التلقائي (Auto-scroll) المطور ---
       var scrollArea = container.querySelector('.w6-table-scroll-area');
       
-      
+      // نبحث أولاً عن الصف الجاري تقييمه
       var activeRow = container.querySelector('.w6-current-subset');
       
-      
+      // إذا لم نجد صفاً جاري تقييمه، وكنا في الخطوة الأخيرة، نبحث عن صف (الحل الأمثل)
       if (!activeRow && cur === steps.length - 1) {
         activeRow = container.querySelector('.w6-optimal');
       }
       
       if (scrollArea && activeRow) {
-        
+        // حساب المسافة لعمل تمرير سلس يضع الصف المستهدف في منتصف الصندوق تقريباً
         var scrollPosition = activeRow.offsetTop - (scrollArea.clientHeight / 2) + (activeRow.clientHeight / 2);
         
-        
+        // تطبيق التمرير
         scrollArea.scrollTo({
           top: scrollPosition,
           behavior: 'smooth'
@@ -1652,16 +1652,16 @@ window.AlgoWidgets[7] = function(container) {
   container.innerHTML = '<div class="algo-widget">' +
       _AL.titleHTML(7) +
       _AL.toolbar(7) +
-      
+      // تصغير حجم الشرح العلوي ليتناسب مع الجوال (0.85rem)
       '<div class="algo-explanation" id="w7-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 10px;"></div>' +
       
       '<div class="algo-assignment-container" style="display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:10px;">' +
       
-      
+      // التعديل 1: تنسيق صندوق الجدول
       '<div class="algo-matrix-wrapper" style="border:1px solid var(--algo-border); border-radius: var(--radius-md); padding:10px; background:var(--algo-canvas-bg); width: 100%; max-width: 500px; overflow-x: auto;">' +
       '<h5 style="text-align:center; margin-top:0; margin-bottom:10px; color:var(--algo-text); font-size: 0.95rem; font-weight: 800;" data-algo-text="w7-cost-matrix-title"></h5>' +
       
-      
+      // التعديل 2: تنسيق الجدول (تصغير الخط، منع الالتصاق، وتوسيط)
       '<table id="w7-cost-matrix" class="algo-table" style="width:100%; border-collapse:collapse; font-size: 0.75rem; margin: 0 auto; text-align: center;">' +
       '<thead style="background:var(--bg-elevated); color: var(--text-primary); font-weight: 800;">' +
       '<tr id="w7-matrix-header"></tr>' +
@@ -1670,18 +1670,18 @@ window.AlgoWidgets[7] = function(container) {
       '</table>' +
       '</div>' +
       
-      
+      // التعديل 3: التجاوب الذكي للرسمة باستخدام aspect-ratio بدلاً من الارتفاع الثابت
       '<div class="algo-svg-wrapper" style="width:100%; max-width:500px; aspect-ratio: 5 / 2; border:1px solid var(--algo-border); border-radius: var(--radius-md); background:var(--algo-canvas-bg); overflow: hidden;">' +
       '<svg id="w7-assignment-svg" width="100%" height="100%" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet"></svg>' +
       '</div>' +
       
-      
+      // التعديل 4: إزالة النصوص المكررة السفلية المزعجة (تم إخفاء التعيين والتكلفة، وإبقاء رسالة الحل الأمثل فقط)
       '<div class="algo-current-info" style="text-align:center; font-size:0.9rem; line-height:1.6; color:var(--algo-text);">' +
       '<div id="w7-optimal-found" style="margin-top:5px; font-weight:bold; color:var(--algo-sorted); display:none;"></div>' +
       '</div>' +
       '</div>' +
       
-      
+      // تصغير الأسطورة لـ 0.8rem
       '<div class="algo-legend" style="display:flex;justify-content:center;gap:15px;margin-top:10px;font-size:0.8rem; color:var(--algo-text);">' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w7-current-assignment"></span></span>' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-sorted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w7-optimal-solution"></span></span>' +
@@ -1691,17 +1691,17 @@ window.AlgoWidgets[7] = function(container) {
     var btnPlay = container.querySelector('[data-algo-btn="play"]');
     var expEl = container.querySelector('#w7-exp');
     var counter = container.querySelector('[data-algo-counter]');
-    var matrixTableEl = container.querySelector('#w7-cost-matrix'); 
+    var matrixTableEl = container.querySelector('#w7-cost-matrix'); // نحتاج هذا للـ RTL
     var matrixHeaderEl = container.querySelector('#w7-matrix-header');
     var matrixBodyEl = container.querySelector('#w7-matrix-body');
     var svgEl = container.querySelector('#w7-assignment-svg');
     var optimalFoundEl = container.querySelector('#w7-optimal-found');
  
     var steps = [], cur = 0, playing = false, interval = null;
-    var numEntities = 4; 
+    var numEntities = 4; // Persons/Jobs
     var currentCostMatrix = []; 
  
-    
+    // SVG Node positions
     var nodeRadius = 15;
     var personNodes = [];
     var jobNodes = [];
@@ -1725,7 +1725,7 @@ window.AlgoWidgets[7] = function(container) {
       container.querySelector('[data-algo-text="w7-current-assignment"]').textContent = _AL.exp('Current Assignment', 'التعيين الحالي');
       container.querySelector('[data-algo-text="w7-optimal-solution"]').textContent = _AL.exp('Optimal Solution', 'الحل الأمثل');
  
-      
+      // التعديل 5: إضافة white-space: nowrap للخلايا لمنع الكلمات من الالتصاق
       matrixHeaderEl.innerHTML = '<th style="padding: 6px; white-space: nowrap; border-bottom: 2px solid var(--brand-500);">' + _AL.exp('Person', 'الشخص') + '</th>';
       for (var j = 0; j < numEntities; j++) {
         matrixHeaderEl.innerHTML += '<th style="padding: 6px; white-space: nowrap; border-bottom: 2px solid var(--brand-500);">' + _AL.exp('Job ' + (j + 1), 'الوظيفة ' + (j + 1)) + '</th>';
@@ -1843,18 +1843,18 @@ window.AlgoWidgets[7] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
  
-      
+      // التعديل 6: فرض التفاف الجدول برمجياً ليدعم العربية RTL
       if(matrixTableEl) {
         matrixTableEl.style.setProperty('direction', _AL.lang() === 'ar' ? 'rtl' : 'ltr', 'important');
       }
  
-      
+      // Render Cost Matrix Table
       matrixBodyEl.innerHTML = '';
       for (var i = 0; i < numEntities; i++) {
         var row = matrixBodyEl.insertRow();
         var cellPerson = row.insertCell();
         cellPerson.textContent = _AL.exp('P' + (i + 1), 'ش' + (i + 1));
-        cellPerson.style.fontWeight = '700'; 
+        cellPerson.style.fontWeight = '700'; // خط أقل سماكة بقليل ليتناسب مع الكلمة العربية
         cellPerson.style.color = 'var(--text-primary)';
         cellPerson.style.border = '1px solid var(--algo-border)';
         cellPerson.style.padding = '6px';
@@ -1864,7 +1864,7 @@ window.AlgoWidgets[7] = function(container) {
           var cell = row.insertCell();
           cell.textContent = currentCostMatrix[i][j];
           cell.style.border = '1px solid var(--algo-border)';
-          cell.style.padding = '6px'; 
+          cell.style.padding = '6px'; // Padding أقل
           cell.style.textAlign = 'center';
           cell.style.background = 'transparent';
           cell.style.color = 'var(--text-secondary)';
@@ -1872,7 +1872,7 @@ window.AlgoWidgets[7] = function(container) {
         }
       }
  
-      
+      // Highlight current assignments in matrix
       s.assignments.forEach(function (assignment) {
         var row = matrixBodyEl.rows[assignment.person];
         if (row) {
@@ -1885,7 +1885,7 @@ window.AlgoWidgets[7] = function(container) {
         }
       });
  
-      
+      // Highlight optimal assignments
       if (cur === steps.length - 1 || s.isOptimal) {
         s.optimalAssignmentsSoFar.forEach(function (assignment) {
           var row = matrixBodyEl.rows[assignment.person];
@@ -1900,10 +1900,10 @@ window.AlgoWidgets[7] = function(container) {
         });
       }
  
-      
+      // Render SVG
       svgEl.innerHTML = ''; 
  
-      
+      // Draw lines
       s.assignments.forEach(function (assignment) {
         var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', personNodes[assignment.person].x + nodeRadius);
@@ -1911,11 +1911,11 @@ window.AlgoWidgets[7] = function(container) {
         line.setAttribute('x2', jobNodes[assignment.job].x - nodeRadius);
         line.setAttribute('y2', jobNodes[assignment.job].y);
         line.setAttribute('stroke', 'var(--algo-active)');
-        line.setAttribute('stroke-width', '2'); 
+        line.setAttribute('stroke-width', '2'); // سلك أنحف وأكثر أناقة
         svgEl.appendChild(line);
       });
  
-      
+      // Draw nodes
       var nodeTextColor = '#fff'; 
       var nodeBgColor = 'var(--brand-500)'; 
  
@@ -1932,7 +1932,7 @@ window.AlgoWidgets[7] = function(container) {
         text.setAttribute('y', node.y + 4); 
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('fill', nodeTextColor);
-        text.setAttribute('font-size', '11px'); 
+        text.setAttribute('font-size', '11px'); // خط العقد أصغر ليتناسب مع العقدة
         text.setAttribute('font-weight', '700');
         text.textContent = node.label;
         svgEl.appendChild(text);
@@ -2037,9 +2037,9 @@ window.AlgoWidgets[8] = function(container) {
       2: [4],
       3: [5],
       4: [6],
-      5: [1], 
+      5: [1], // Back edge to 1
       6: [7],
-      7: [2]  
+      7: [2]  // Back edge to 2
     };
   
     function getDelay() { return _AL.speedToDelay(parseInt(container.querySelector('.algo-speed input').value)); }
@@ -2118,7 +2118,7 @@ window.AlgoWidgets[8] = function(container) {
               'العودة من DFS على ' + v + '. متابعة استكشاف جيران ' + u + '.',
               u
             );
-          } else if (finish[v] === -1 && v !== parent[u]) { 
+          } else if (finish[v] === -1 && v !== parent[u]) { // v is visited, but not yet finished, and not parent
             backEdges.push({ u: u, v: v });
             addStep(
               'Node ' + v + ' is visited and still in stack (discovery[' + v + ']=' + discovery[v] + ' < discovery[' + u + ']=' + discovery[u] + '). Add (' + u + ' -> ' + v + ') as a back edge (cycle detected).',
@@ -2141,11 +2141,11 @@ window.AlgoWidgets[8] = function(container) {
         addStep(
           'Finished exploring node ' + u + '. Pop from stack. Finish time: ' + finish[u],
           'انتهى استكشاف العقدة ' + u + '. إخراجها من المكدس. وقت الانتهاء: ' + finish[u],
-          null 
+          null // No current node when popping
         );
       }
   
-      
+      // Iterate over all nodes to handle disconnected components
       for (var i = 0; i < N; i++) {
         if (!visited[i]) {
           addStep(
@@ -2166,14 +2166,14 @@ window.AlgoWidgets[8] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
   
-      
-      graphCanvas.innerHTML = ''; 
+      // Render Graph
+      graphCanvas.innerHTML = ''; // Clear previous drawing
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('width', '100%');
       svg.setAttribute('height', '100%');
-      svg.setAttribute('viewBox', '-50 -50 450 600'); 
+      svg.setAttribute('viewBox', '-50 -50 450 600'); // Adjust viewBox to fit nodes and labels
   
-      
+      // Arrowhead definition
       var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
       var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
       marker.setAttribute('id', 'arrowhead');
@@ -2186,7 +2186,7 @@ window.AlgoWidgets[8] = function(container) {
       defs.appendChild(marker);
       svg.appendChild(defs);
   
-      
+      // Draw default edges (background, dashed)
       for (var u in adj) {
         adj[u].forEach(function (v) {
           var nodeU = nodes.find(n => n.id == u);
@@ -2205,7 +2205,7 @@ window.AlgoWidgets[8] = function(container) {
         });
       }
   
-      
+      // Tree edges
       s.treeEdges.forEach(function (edge) {
         var nodeU = nodes.find(n => n.id == edge.u);
         var nodeV = nodes.find(n => n.id == edge.v);
@@ -2221,7 +2221,7 @@ window.AlgoWidgets[8] = function(container) {
         svg.appendChild(line);
       });
   
-      
+      // Back edges
       s.backEdges.forEach(function (edge) {
         var nodeU = nodes.find(n => n.id == edge.u);
         var nodeV = nodes.find(n => n.id == edge.v);
@@ -2238,7 +2238,7 @@ window.AlgoWidgets[8] = function(container) {
         svg.appendChild(line);
       });
   
-      
+      // Exploring edge (drawn last to be on top)
       if (s.exploring_edge) {
         var nodeU = nodes.find(n => n.id == s.exploring_edge.u);
         var nodeV = nodes.find(n => n.id == s.exploring_edge.v);
@@ -2255,7 +2255,7 @@ window.AlgoWidgets[8] = function(container) {
         }
       }
   
-      
+      // Draw nodes
       nodes.forEach(function (node) {
         var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', node.x);
@@ -2263,13 +2263,13 @@ window.AlgoWidgets[8] = function(container) {
         circle.setAttribute('r', '15');
         circle.setAttribute('stroke', 'var(--algo-border)');
         circle.setAttribute('stroke-width', '2');
-        circle.setAttribute('fill', 'var(--brand-500)'); 
+        circle.setAttribute('fill', 'var(--brand-500)'); // Default unvisited
   
         if (s.visited[node.id]) {
-          circle.setAttribute('fill', 'var(--algo-sorted)'); 
+          circle.setAttribute('fill', 'var(--algo-sorted)'); // Visited
         }
         if (s.current_node === node.id) {
-          circle.setAttribute('fill', 'var(--algo-active)'); 
+          circle.setAttribute('fill', 'var(--algo-active)'); // Current
         }
         svg.appendChild(circle);
   
@@ -2389,7 +2389,7 @@ window.AlgoWidgets[8] = function(container) {
       cur = 0;
       render();
     });
-    _algoBindSpeed(container, getDelay, startPlay); 
+    _algoBindSpeed(container, getDelay, startPlay); // Use helper for speed binding
   
     window._algoRerenders[8] = render;
     generateSteps();
@@ -2405,7 +2405,7 @@ window.AlgoWidgets[9] = function(container) {
       _AL.toolbar(9) +
       '<div class="algo-explanation" id="w9-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      
+      // حاوية متجاوبة بأبعاد 16:9 مع شبكة (Grid) لتجاوب أفضل بين الرسم والطابور
       '<div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; width: 100%; max-width: 800px; margin: 0 auto;">' +
         '<div class="algo-canvas" id="w9-canvas" style="position:relative; width:100%; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
           '<svg id="w9-svg" width="100%" height="100%" viewBox="0 0 600 350" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
@@ -2434,7 +2434,7 @@ window.AlgoWidgets[9] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    
+    // بنية الجراف مع إحداثيات متناسقة لـ viewBox="0 0 600 350"
     const RADIUS = 22;
     var graph = {
       'A': ['B', 'C'],
@@ -2453,11 +2453,11 @@ window.AlgoWidgets[9] = function(container) {
       'D': { x: 80,  y: 280 },
       'E': { x: 520, y: 280 },
       'F': { x: 300, y: 280 },
-      'G': { x: 300, y: 170 } 
+      'G': { x: 300, y: 170 } // توسيط G بين B و C
     };
 
     var allEdges = [];
-    
+    // بناء قائمة حواف فريدة
     let seenEdges = new Set();
     Object.keys(graph).forEach(u => {
       graph[u].forEach(v => {
@@ -2485,7 +2485,7 @@ window.AlgoWidgets[9] = function(container) {
     function generateSteps() {
       steps = [];
       
-      
+      // التفاعلية: اختيار عقدة بداية عشوائية
       let nodesArray = Object.keys(graph);
       let startNode = nodesArray[Math.floor(Math.random() * nodesArray.length)];
 
@@ -2523,7 +2523,7 @@ window.AlgoWidgets[9] = function(container) {
           ar: `سحب العقدة <strong>${u}</strong> من الطابور. الآن سنعالج جميع جيرانها غير المستكشفين.`
         });
 
-        
+        // ترتيب الجيران ليكون العرض منطقياً
         var neighbors = graph[u].slice().sort();
         for (var i = 0; i < neighbors.length; i++) {
           var v = neighbors[i];
@@ -2554,8 +2554,8 @@ window.AlgoWidgets[9] = function(container) {
           }
         }
         
-        
-        
+        // بعد الانتهاء من جميع الجيران، العقدة تعتبر "منتهية" تماماً
+        // نستخدم حالة خاصة (أو نعتمد على كونها ليست في الطابور وليست الحالية ومزورة)
       }
 
       steps.push({
@@ -2580,12 +2580,12 @@ window.AlgoWidgets[9] = function(container) {
       let edgesG = makeSVG('g', {});
       let nodesG = makeSVG('g', {});
 
-      
+      // بناء الخطوط
       allEdges.forEach(e => {
         let p1 = nodePositions[e.u];
         let p2 = nodePositions[e.v];
         
-        
+        // الحسابات المثلثية لتلامس الدائرة (حتى لو كبرت)
         let dx = p2.x - p1.x; let dy = p2.y - p1.y; let dist = Math.hypot(dx, dy);
         let x1 = p1.x + (dx/dist) * RADIUS; let y1 = p1.y + (dy/dist) * RADIUS;
         let x2 = p2.x - (dx/dist) * RADIUS; let y2 = p2.y - (dy/dist) * RADIUS;
@@ -2595,7 +2595,7 @@ window.AlgoWidgets[9] = function(container) {
         uiEdges[e.id] = line;
       });
 
-      
+      // بناء العقد
       Object.keys(nodePositions).forEach(id => {
         let p = nodePositions[id];
         let g = makeSVG('g', { 'transform-origin': `${p.x}px ${p.y}px` });
@@ -2604,7 +2604,7 @@ window.AlgoWidgets[9] = function(container) {
         let txt = makeSVG('text', { x: p.x, y: p.y, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--text-primary)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '18px', 'font-weight': '800' });
         txt.textContent = id;
 
-        
+        // نص المسافة
         let distTxt = makeSVG('text', { x: p.x, y: p.y + RADIUS + 15, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: 'var(--text-muted)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '14px', 'font-weight': '700', opacity: 0 });
 
         g.appendChild(circ);
@@ -2627,7 +2627,7 @@ window.AlgoWidgets[9] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-      
+      // 1. تحديث الخطوط
       Object.keys(uiEdges).forEach(edgeId => {
         let line = uiEdges[edgeId];
         let isHl = s.highlightedEdge === edgeId;
@@ -2635,27 +2635,27 @@ window.AlgoWidgets[9] = function(container) {
         let color = isHl ? 'var(--algo-active)' : 'var(--text-muted)';
         let sw = isHl ? '4' : '2';
         let dash = isHl ? '6,4' : '0';
-        let op = isHl ? '1' : '0.3'; 
-        if(s.highlightedEdge === null && s.current === null) op = '1'; 
+        let op = isHl ? '1' : '0.3'; // التركيز على الخط الحالي
+        if(s.highlightedEdge === null && s.current === null) op = '1'; // النهاية
 
         line.setAttribute('stroke', color);
         line.setAttribute('stroke-width', sw);
         line.setAttribute('stroke-dasharray', dash);
         line.style.opacity = op;
         
-        
+        // إظهار الخط في الأمام عند التحديد
         if(isHl) line.parentNode.appendChild(line);
       });
 
-      
+      // 2. تحديث العقد
       Object.keys(uiNodes).forEach(id => {
         let ui = uiNodes[id];
         
         let isCur = s.current === id;
         let inQ = s.queue.includes(id);
-        let isVis = s.visited[id]; 
+        let isVis = s.visited[id]; // visited in BFS means "discovered"
         
-        
+        // If it's visited, NOT in queue, and NOT current -> it is DONE
         let isDone = isVis && !inQ && !isCur;
 
         let fill = 'var(--bg-elevated)';
@@ -2665,7 +2665,7 @@ window.AlgoWidgets[9] = function(container) {
 
         if (isCur) {
           fill = 'var(--algo-active)'; stroke = '#ffffff'; txtFill = '#ffffff'; scale = 'scale(1.2)';
-          
+          // جلب العقدة للأمام
           ui.g.parentNode.appendChild(ui.g);
         } else if (inQ) {
           fill = 'var(--algo-compare)'; stroke = '#ffffff'; txtFill = '#ffffff'; scale = 'scale(1.1)';
@@ -2679,7 +2679,7 @@ window.AlgoWidgets[9] = function(container) {
         ui.txt.setAttribute('fill', txtFill);
         ui.g.style.transform = scale;
 
-        
+        // تحديث المسافة
         let d = s.distances[id];
         if (d !== Infinity) {
           ui.distTxt.textContent = `d=${d}`;
@@ -2690,7 +2690,7 @@ window.AlgoWidgets[9] = function(container) {
         }
       });
 
-      
+      // 3. تحديث الطابور (Queue) برمجياً دون تدمير حاويته
       queueEl.innerHTML = '';
       if (s.queue.length === 0) {
         queueEl.innerHTML = `<span style="color:var(--text-muted); font-size:14px; font-family:'Cairo', sans-serif;">${_AL.exp('Empty', 'فارغ')}</span>`;
@@ -2732,7 +2732,7 @@ window.AlgoWidgets[9] = function(container) {
     container.querySelector('[data-algo-btn="step"]').addEventListener('click', function() { stopPlay(); if (cur < steps.length - 1) { cur++; render(); } });
     container.querySelector('[data-algo-btn="play"]').addEventListener('click', function() { playing ? stopPlay() : startPlay(); });
     
-    
+    // إعادة التوليد من عقدة عشوائية
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function() { 
       stopPlay(); 
       isInitialized = false;

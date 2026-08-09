@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" data-theme="dark" data-subject="CS231" data-module="5">
 <head>
-  
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>الوحدة 05: أنواع التنفيذ ثنائي المستوى للتعبيرات المنطقية · CS231 · الحديقة الرقمية</title>
 
-  
+  <!-- Anti-flash: MUST be first script -->
   <script>
     (function(){
       var t=localStorage.getItem('garden_theme')||'dark';
@@ -24,45 +24,34 @@
     })();
   </script>
 
+  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
+  <script src="../../shared/subject-tint.js"></script>
   <link rel="stylesheet" href="../../shared/garden.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/all.min.css">
 
-  
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
   <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#a78bfa">
+  <!-- /data-garden-icons -->
 </head>
-<body>
+<body data-page-title="CS231" data-page-title-en="CS231">
 
 <div class="reading-progress"></div>
 <div class="page-layout">
 
-<header class="site-header">
-  <div class="header-inner">
-    <nav class="header-nav">
-      <a href="index.html" class="nav-btn nav-btn--icon" title="Home"><i class="fa-solid fa-house"></i></a>
-      <a href="M04.html" class="nav-btn">
-        <i class="fa-solid fa-arrow-right"></i>
-        <span data-i18n="nav.prev">السابق</span>
-      </a>
-    </nav>
-    <div class="header-center">
-      <div class="subject-icon"><i class="fa-solid fa-microchip"></i></div>
-      <span class="module-badge font-display">MOD 5</span>
-      <span class="subject-name">CS231</span>
-    </div>
-    <div class="header-actions">
-      <a href="M06.html" class="nav-btn">
-        <span data-i18n="nav.next">التالي</span>
-        <i class="fa-solid fa-arrow-left"></i>
-      </a>
-      <div class="divider-v"></div>
-      <button class="toggle-btn" onclick="Garden.toggleLanguage()"><span id="lang-label">AR</span></button>
-      <button class="toggle-btn" onclick="Garden.cycleTheme()"><span id="theme-icon">🌙</span></button>
-    </div>
-  </div>
-</header>
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=CS231"></header>
 
 <div class="content-wrapper">
   <aside class="sidebar">
@@ -181,7 +170,7 @@
 </section>
 
 <section id="objectives" class="objectives-card glass-card fade-up">
-  <h2><span class="obj-icon">🎯</span> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
   <ul class="objectives-list" data-bilingual>
     <template class="content-ar">
       <li><span class="obj-icon">✦</span><span>استنتاج صيغتي مجموع المضاريب (SOP) ومضروب المجاميع (POS) مباشرة من خريطة كارنوف.</span></li>
@@ -209,9 +198,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -239,123 +228,123 @@
     <div class="math-block">$$F = (F')'$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[6]: Detailed SVG generation prompt: A Karnaugh map (4 variables A,B,C,D) showing 0s grouped together. An arrow points from the grouped 0s to an equation F' = AB + CD + BD'. Another arrow points to the final DeMorgan result F = (A'+B')(C'+D')(B'+D). Style: educational, dark background #0d1117, accent color #00ffcc, viewBox 0 0 800 400. -->
 <div class="svg-diagram" data-diagram-id="6">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
     <defs>
-        
+        <!-- Arrowhead Marker -->
         <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
             <polygon points="0 0, 10 3.5, 0 7" fill="var(--brand-500)" />
         </marker>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-    
+    <!-- Main Title -->
     <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Product of Sums (PoS) Derivation / اشتقاق مضروب المجاميع</text>
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- K-MAP SECTION                              -->
+    <!-- ========================================== -->
 
-    
-    
+    <!-- Group Highlights (Drawn under the grid lines) -->
+    <!-- Group 1: AB (Row 11) -->
     <rect x="105" y="225" width="190" height="40" rx="8" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
     
-    
+    <!-- Group 2: CD (Col 11) -->
     <rect x="205" y="125" width="40" height="190" rx="8" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2"/>
     
-    
-    
+    <!-- Group 3: BD' (Wrap-around Rows 01, 11 & Cols 00, 10) -->
+    <!-- Left Wrap -->
     <path d="M 100 175 L 135 175 Q 145 175 145 185 L 145 255 Q 145 265 135 265 L 100 265" fill="var(--brand-400)" fill-opacity="0.1" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4"/>
-    
+    <!-- Right Wrap -->
     <path d="M 300 175 L 265 175 Q 255 175 255 185 L 255 255 Q 255 265 265 265 L 300 265" fill="var(--brand-400)" fill-opacity="0.1" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4"/>
 
-    
+    <!-- K-Map Grid -->
     <rect x="100" y="120" width="200" height="200" fill="none" stroke="var(--border-color)" stroke-width="2"/>
-    
+    <!-- Vertical Lines -->
     <line x1="150" y1="120" x2="150" y2="320" stroke="var(--border-color)" stroke-width="1"/>
     <line x1="200" y1="120" x2="200" y2="320" stroke="var(--border-color)" stroke-width="1"/>
     <line x1="250" y1="120" x2="250" y2="320" stroke="var(--border-color)" stroke-width="1"/>
-    
+    <!-- Horizontal Lines -->
     <line x1="100" y1="170" x2="300" y2="170" stroke="var(--border-color)" stroke-width="1"/>
     <line x1="100" y1="220" x2="300" y2="220" stroke="var(--border-color)" stroke-width="1"/>
     <line x1="100" y1="270" x2="300" y2="270" stroke="var(--border-color)" stroke-width="1"/>
 
-    
+    <!-- K-Map Labels (Variables) -->
     <line x1="60" y1="80" x2="95" y2="115" stroke="var(--border-color)" stroke-width="1"/>
     <text x="65" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">AB</text>
     <text x="85" y="90" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">CD</text>
 
-    
+    <!-- Column Labels (CD) -->
     <text x="125" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">00</text>
     <text x="175" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">01</text>
     <text x="225" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">11</text>
     <text x="275" y="110" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle">10</text>
 
-    
+    <!-- Row Labels (AB) -->
     <text x="90" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">00</text>
     <text x="90" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">01</text>
     <text x="90" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">11</text>
     <text x="90" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="end" dominant-baseline="middle">10</text>
 
-    
-    
+    <!-- K-Map Values (0s and 1s) -->
+    <!-- Row 00 -->
     <text x="125" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
     <text x="175" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
     <text x="225" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="275" y="147" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
-    
+    <!-- Row 01 -->
     <text x="125" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="175" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
     <text x="225" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="275" y="197" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
-    
+    <!-- Row 11 -->
     <text x="125" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="175" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="225" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="275" y="247" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
-    
+    <!-- Row 10 -->
     <text x="125" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
     <text x="175" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
     <text x="225" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle" dominant-baseline="middle">0</text>
     <text x="275" y="297" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
 
-    
+    <!-- Group Labels -->
     <text x="310" y="245" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-500)" dominant-baseline="middle">AB</text>
     <text x="225" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">CD</text>
     <text x="70" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-400)" text-anchor="middle">BD'</text>
 
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- EQUATIONS SECTION                          -->
+    <!-- ========================================== -->
 
-    
+    <!-- Box 1: Grouping 0s -->
     <rect x="420" y="100" width="340" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
     <text x="590" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">1. Group 0s to find F' / تجميع الأصفار لإيجاد F'</text>
     <text x="590" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">F' = AB + CD + BD'</text>
 
-    
+    <!-- Box 2: DeMorgan's Law -->
     <rect x="420" y="230" width="340" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
     <text x="590" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle">2. Apply DeMorgan's Law / تطبيق قانون دي مورغان</text>
     <text x="590" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-primary)" text-anchor="middle">F = (F')' = (AB + CD + BD')'</text>
     <text x="590" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">F = (A'+B')(C'+D')(B'+D)</text>
 
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- CONNECTING ARROWS                          -->
+    <!-- ========================================== -->
 
-    
+    <!-- Arrow from K-Map to Box 1 -->
     <path d="M 340 245 C 380 245, 380 140, 410 140" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
 
-    
+    <!-- Arrow from Box 1 to Box 2 -->
     <path d="M 590 185 L 590 220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
     <text x="600" y="207" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">DeMorgan</text>
 
-    
+    <!-- Footer Note -->
     <text x="400" y="380" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">Grouping 0s yields the complement F'. DeMorgan's Law converts it to Product of Sums (PoS).</text>
 
 </svg>
@@ -423,9 +412,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -453,7 +442,7 @@
     <div class="math-block">$$F(A,B,C,D) = \sum m(1,3,7,11,15) + d(0,2,5)$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: Two side-by-side K-maps showing the same function with 'X's. The left map shows 'X's grouped with 1s to form large blocks (optimal). The right map shows what happens if 'X's are treated as 0s (smaller blocks, more complex equation). Style: educational, dark background #0d1117, accent colors #ff4444 and #00ccff. -->
 <div class="svg-diagram" data-diagram-id="5">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
   <defs>
@@ -465,30 +454,30 @@
     </marker>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Main Title -->
   <text x="450" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Karnaugh Maps: Don't Care Conditions (X)</text>
   <text x="450" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-secondary)" text-anchor="middle">خرائط كارنوف: حالات عدم الاكتراث</text>
 
-  
+  <!-- LEFT PANEL: Optimal Grouping -->
   <g>
-    
+    <!-- Panel Background -->
     <rect x="40" y="90" width="400" height="420" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
     
-    
+    <!-- Panel Title -->
     <text x="240" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-500)" text-anchor="middle">Optimal Grouping / تجميع مثالي</text>
 
-    
+    <!-- K-Map Grid -->
     <g transform="translate(0, 0)">
-      
+      <!-- Corner Box & Diagonal -->
       <path d="M 100 140 L 140 140 L 140 180 L 100 180 Z" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
       <line x1="100" y1="140" x2="140" y2="180" stroke="var(--border-color)" stroke-width="1.5" />
       <text x="115" y="172" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">AB</text>
       <text x="132" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">CD</text>
 
-      
+      <!-- Column Labels -->
       <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">
         <text x="165" y="170">00</text>
         <text x="215" y="170">01</text>
@@ -496,7 +485,7 @@
         <text x="315" y="170">10</text>
       </g>
 
-      
+      <!-- Row Labels -->
       <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" dominant-baseline="central">
         <text x="120" y="205">00</text>
         <text x="120" y="255">01</text>
@@ -504,37 +493,37 @@
         <text x="120" y="355">10</text>
       </g>
 
-      
+      <!-- Grid Lines -->
       <rect x="140" y="180" width="200" height="200" fill="none" stroke="var(--border-color)" stroke-width="2" />
       <path d="M 140 230 L 340 230 M 140 280 L 340 280 M 140 330 L 340 330 M 190 180 L 190 380 M 240 180 L 240 380 M 290 180 L 290 380" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
 
-      
-      
+      <!-- Highlights (Groups) -->
+      <!-- Group 1: Col 00 (C'D') -->
       <rect x="145" y="185" width="40" height="190" rx="15" fill="var(--brand-500)" opacity="0.2" />
       <rect x="145" y="185" width="40" height="190" rx="15" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2" />
       
-      
+      <!-- Group 2: Top Right 2x2 (A'C) -->
       <rect x="245" y="185" width="90" height="90" rx="15" fill="var(--brand-500)" opacity="0.2" />
       <rect x="245" y="185" width="90" height="90" rx="15" fill="none" stroke="var(--brand-500)" stroke-width="2" />
 
-      
+      <!-- Cell Values -->
       <g font-family="monospace" font-size="20" font-weight="bold" text-anchor="middle" dominant-baseline="central">
-        
+        <!-- Row 00 -->
         <text x="165" y="205" fill="var(--brand-500)">X</text>
         <text x="215" y="205" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="265" y="205" fill="var(--text-primary)">1</text>
         <text x="315" y="205" fill="var(--text-primary)">1</text>
-        
+        <!-- Row 01 -->
         <text x="165" y="255" fill="var(--text-primary)">1</text>
         <text x="215" y="255" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="265" y="255" fill="var(--brand-500)">X</text>
         <text x="315" y="255" fill="var(--brand-500)">X</text>
-        
+        <!-- Row 11 -->
         <text x="165" y="305" fill="var(--text-primary)">1</text>
         <text x="215" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="265" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="315" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
-        
+        <!-- Row 10 -->
         <text x="165" y="355" fill="var(--brand-500)">X</text>
         <text x="215" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="265" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
@@ -542,37 +531,37 @@
       </g>
     </g>
 
-    
+    <!-- Annotation Arrow -->
     <path d="M 85 250 Q 85 205 135 205" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
     <text x="85" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle">Treat X as 1</text>
     <text x="85" y="290" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">اعتبار X كـ 1</text>
 
-    
+    <!-- Equation -->
     <rect x="140" y="400" width="200" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
     <text x="240" y="425" font-family="monospace" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">F = C'D' + A'C</text>
     
-    
+    <!-- Subtitles -->
     <text x="240" y="465" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Larger groups (4 cells) = Simpler terms</text>
     <text x="240" y="485" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">مجموعات أكبر (4 خلايا) = حدود أبسط</text>
   </g>
 
-  
+  <!-- RIGHT PANEL: Suboptimal Grouping -->
   <g>
-    
+    <!-- Panel Background -->
     <rect x="460" y="90" width="400" height="420" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
     
-    
+    <!-- Panel Title -->
     <text x="660" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Suboptimal Grouping / تجميع غير مثالي</text>
 
-    
+    <!-- K-Map Grid -->
     <g transform="translate(0, 0)">
-      
+      <!-- Corner Box & Diagonal -->
       <path d="M 520 140 L 560 140 L 560 180 L 520 180 Z" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
       <line x1="520" y1="140" x2="560" y2="180" stroke="var(--border-color)" stroke-width="1.5" />
       <text x="535" y="172" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">AB</text>
       <text x="552" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">CD</text>
 
-      
+      <!-- Column Labels -->
       <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">
         <text x="585" y="170">00</text>
         <text x="635" y="170">01</text>
@@ -580,7 +569,7 @@
         <text x="735" y="170">10</text>
       </g>
 
-      
+      <!-- Row Labels -->
       <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" dominant-baseline="central">
         <text x="540" y="205">00</text>
         <text x="540" y="255">01</text>
@@ -588,37 +577,37 @@
         <text x="540" y="355">10</text>
       </g>
 
-      
+      <!-- Grid Lines -->
       <rect x="560" y="180" width="200" height="200" fill="none" stroke="var(--border-color)" stroke-width="2" />
       <path d="M 560 230 L 760 230 M 560 280 L 760 280 M 560 330 L 760 330 M 610 180 L 610 380 M 660 180 L 660 380 M 710 180 L 710 380" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
 
-      
-      
+      <!-- Highlights (Groups) -->
+      <!-- Group 1: Col 00, middle 2 (BC'D') -->
       <rect x="565" y="235" width="40" height="90" rx="15" fill="var(--text-muted)" opacity="0.2" />
       <rect x="565" y="235" width="40" height="90" rx="15" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="4 2" />
       
-      
+      <!-- Group 2: Top Right, top 2 (A'B'C) -->
       <rect x="665" y="185" width="90" height="40" rx="15" fill="var(--text-muted)" opacity="0.2" />
       <rect x="665" y="185" width="90" height="40" rx="15" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
 
-      
+      <!-- Cell Values -->
       <g font-family="monospace" font-size="20" font-weight="bold" text-anchor="middle" dominant-baseline="central">
-        
+        <!-- Row 00 -->
         <text x="585" y="205" fill="var(--brand-500)">X</text>
         <text x="635" y="205" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="685" y="205" fill="var(--text-primary)">1</text>
         <text x="735" y="205" fill="var(--text-primary)">1</text>
-        
+        <!-- Row 01 -->
         <text x="585" y="255" fill="var(--text-primary)">1</text>
         <text x="635" y="255" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="685" y="255" fill="var(--brand-500)">X</text>
         <text x="735" y="255" fill="var(--brand-500)">X</text>
-        
+        <!-- Row 11 -->
         <text x="585" y="305" fill="var(--text-primary)">1</text>
         <text x="635" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="685" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="735" y="305" fill="var(--text-muted)" opacity="0.5">0</text>
-        
+        <!-- Row 10 -->
         <text x="585" y="355" fill="var(--brand-500)">X</text>
         <text x="635" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
         <text x="685" y="355" fill="var(--text-muted)" opacity="0.5">0</text>
@@ -626,16 +615,16 @@
       </g>
     </g>
 
-    
+    <!-- Annotation Arrow -->
     <path d="M 505 250 Q 505 205 555 205" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
     <text x="505" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle">Treat X as 0</text>
     <text x="505" y="290" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">اعتبار X كـ 0</text>
 
-    
+    <!-- Equation -->
     <rect x="560" y="400" width="200" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
     <text x="660" y="425" font-family="monospace" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">F = BC'D' + A'B'C</text>
     
-    
+    <!-- Subtitles -->
     <text x="660" y="465" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Smaller groups (2 cells) = Complex terms</text>
     <text x="660" y="485" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle">مجموعات أصغر (خليتين) = حدود معقدة</text>
   </g>
@@ -665,9 +654,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -695,130 +684,130 @@
     <div class="math-block">$$X \cdot X = X' \quad (NAND \text{ as NOT})$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Three diagrams showing how a NAND gate emulates NOT, AND, and OR gates. 1) NOT: inputs tied together. 2) AND: NAND followed by a NAND-NOT. 3) OR: Inverters (NAND-NOTs) on inputs feeding into a NAND gate (DeMorgan's). Style: educational, dark background #0d1117, logic gate symbols in light blue. -->
 <div class="svg-diagram" data-diagram-id="4">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
     </marker>
 
-    
+    <!-- Standard NAND Gate Symbol -->
     <g id="nand">
-      
+      <!-- Main D-shape -->
       <path d="M 0,0 L 30,0 A 30,30 0 0,1 30,60 L 0,60 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
-      
+      <!-- Inversion Circle -->
       <circle cx="66" cy="30" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
-      
+      <!-- Input Terminals -->
       <line x1="-15" y1="15" x2="0" y2="15" stroke="var(--brand-500)" stroke-width="2" />
       <line x1="-15" y1="45" x2="0" y2="45" stroke="var(--brand-500)" stroke-width="2" />
-      
+      <!-- Output Terminal -->
       <line x1="72" y1="30" x2="87" y2="30" stroke="var(--brand-500)" stroke-width="2" />
     </g>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Main Title -->
   <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)">Universal Property of NAND Gate (بوابة NAND كبوابة شاملة)</text>
   <text x="400" y="65" text-anchor="middle" font-size="16" fill="var(--text-secondary)">Building basic logic gates using only NAND gates</text>
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- ROW 1: NOT GATE                            -->
+  <!-- ========================================== -->
   <rect x="50" y="90" width="700" height="110" rx="8" fill="none" stroke="var(--border-color)" stroke-dasharray="4,4" />
   <text x="400" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">1. NOT Gate (بوابة نفي)</text>
   
-  
+  <!-- Inputs -->
   <text x="170" y="165" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A</text>
   
-  
+  <!-- Wires -->
   <path d="M 190,160 L 290,160 M 290,145 L 290,175 M 290,145 L 335,145 M 290,175 L 335,175" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
   <circle cx="290" cy="160" r="4" fill="var(--text-primary)" />
   
-  
+  <!-- Gate -->
   <text x="365" y="120" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
   <use href="#nand" x="350" y="130" />
   
-  
+  <!-- Output -->
   <line x1="437" y1="160" x2="510" y2="160" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="580" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">NOT A (A')</text>
 
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- ROW 2: AND GATE                            -->
+  <!-- ========================================== -->
   <rect x="50" y="220" width="700" height="140" rx="8" fill="none" stroke="var(--border-color)" stroke-dasharray="4,4" />
   <text x="400" y="245" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">2. AND Gate (بوابة و)</text>
   
-  
+  <!-- Inputs -->
   <text x="170" y="290" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A</text>
   <text x="170" y="320" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">B</text>
   
-  
+  <!-- Wires to NAND 1 -->
   <path d="M 190,285 L 275,285 M 190,315 L 275,315" fill="none" stroke="var(--text-primary)" stroke-width="2" />
   
-  
+  <!-- NAND 1 -->
   <use href="#nand" x="290" y="270" />
   
-  
+  <!-- Intermediate Label -->
   <text x="425" y="260" text-anchor="middle" font-size="14" fill="var(--text-secondary)">(A NAND B)</text>
   
-  
+  <!-- Wires from NAND 1 to NAND 2 -->
   <path d="M 377,300 L 410,300 M 410,285 L 410,315 M 410,285 L 455,285 M 410,315 L 455,315" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
   <circle cx="410" cy="300" r="4" fill="var(--text-primary)" />
   
-  
+  <!-- NAND 2 -->
   <text x="485" y="260" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
   <use href="#nand" x="470" y="270" />
   
-  
+  <!-- Output -->
   <line x1="557" y1="300" x2="610" y2="300" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="690" y="305" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">A AND B (A • B)</text>
 
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- ROW 3: OR GATE                             -->
+  <!-- ========================================== -->
   <rect x="50" y="380" width="700" height="190" rx="8" fill="none" stroke="var(--border-color)" stroke-dasharray="4,4" />
   <text x="400" y="405" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)">3. OR Gate (بوابة أو)</text>
   
-  
+  <!-- Inputs -->
   <text x="170" y="465" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">A</text>
   <text x="170" y="545" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end">B</text>
   
-  
+  <!-- Wires to NAND 1 & 2 -->
   <path d="M 190,460 L 230,460 M 230,445 L 230,475 M 230,445 L 275,445 M 230,475 L 275,475" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
   <circle cx="230" cy="460" r="4" fill="var(--text-primary)" />
   
   <path d="M 190,540 L 230,540 M 230,525 L 230,555 M 230,525 L 275,525 M 230,555 L 275,555" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
   <circle cx="230" cy="540" r="4" fill="var(--text-primary)" />
   
-  
+  <!-- NAND 1 & 2 -->
   <text x="305" y="420" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
   <use href="#nand" x="290" y="430" />
   
   <text x="305" y="500" font-size="13" fill="var(--brand-500)" text-anchor="middle">Acts as NOT</text>
   <use href="#nand" x="290" y="510" />
   
-  
+  <!-- Intermediate Labels -->
   <text x="410" y="450" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A'</text>
   <text x="410" y="560" text-anchor="middle" font-size="14" fill="var(--text-secondary)">B'</text>
   
-  
+  <!-- Wires to NAND 3 -->
   <path d="M 377,460 L 430,460 L 430,485 L 475,485" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
   <path d="M 377,540 L 430,540 L 430,515 L 475,515" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
   
-  
+  <!-- NAND 3 -->
   <use href="#nand" x="490" y="470" />
   
-  
+  <!-- Output -->
   <line x1="577" y1="500" x2="610" y2="500" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
   <text x="690" y="505" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-500)">A OR B (A + B)</text>
   
-  
+  <!-- De Morgan's Note -->
   <text x="690" y="535" text-anchor="middle" font-size="13" fill="var(--text-muted)">De Morgan's Law:</text>
   <text x="690" y="555" text-anchor="middle" font-size="13" fill="var(--text-muted)">(A' • B')' = A + B</text>
 
@@ -887,9 +876,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -908,77 +897,77 @@
     <div class="content-target"></div>
   </div>
 
-  
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A two-step diagram. Top: An AND-OR circuit. Bottom: The same circuit converted to all-NAND. Show bubbles on the outputs of the first level and inputs of the second level canceling each other out (circled with a dashed line). Show one uncompensated bubble on an input line requiring an extra NOT gate. Style: educational, dark background #0d1117. -->
 <div class="svg-diagram" data-diagram-id="3">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 850" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0,1 L 8,5 L 0,9 Z" fill="var(--brand-500)"/>
     </marker>
 
-    
+    <!-- AND Gate Symbol -->
     <g id="and-gate">
       <path d="M 0,-30 L 30,-30 A 30,30 0 0,1 30,30 L 0,30 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
     </g>
 
-    
+    <!-- OR Gate Symbol -->
     <g id="or-gate">
       <path d="M 0,-30 Q 40,-30 60,0 Q 40,30 0,30 Q 15,0 0,-30 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
     </g>
 
-    
+    <!-- NOT Gate Symbol -->
     <g id="not-gate">
       <path d="M 0,-15 L 30,0 L 0,15 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round"/>
       <circle cx="35" cy="0" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
     </g>
 
-    
+    <!-- Inversion Bubble -->
     <g id="bubble">
       <circle cx="0" cy="0" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5"/>
     </g>
   </defs>
 
-  
+  <!-- Background Rect (Subtle) -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" rx="16" />
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- TOP CIRCUIT: ORIGINAL AND-OR               -->
+  <!-- ========================================== -->
   <g transform="translate(0, 60)">
-    
+    <!-- Section Title -->
     <text x="400" y="0" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">Original AND-OR Circuit</text>
     <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-secondary)">دارة AND-OR الأصلية</text>
 
-    
+    <!-- Wires -->
     <g stroke="var(--text-primary)" stroke-width="2" fill="none" stroke-linejoin="round">
-      
+      <!-- Inputs to AND1 -->
       <line x1="100" y1="105" x2="250" y2="105" />
       <line x1="100" y1="135" x2="250" y2="135" />
-      
+      <!-- Inputs to AND2 -->
       <line x1="100" y1="205" x2="250" y2="205" />
       <line x1="100" y1="235" x2="250" y2="235" />
-      
+      <!-- Input E to OR -->
       <path d="M 100,280 L 440,280 L 440,185 L 506,185" />
-      
+      <!-- AND1 to OR -->
       <path d="M 310,120 L 400,120 L 400,155 L 506,155" />
-      
+      <!-- AND2 to OR -->
       <path d="M 310,220 L 420,220 L 420,170 L 508,170" />
-      
+      <!-- OR Output -->
       <line x1="560" y1="170" x2="650" y2="170" />
     </g>
 
-    
+    <!-- Gates -->
     <use href="#and-gate" x="250" y="120" />
     <use href="#and-gate" x="250" y="220" />
     <use href="#or-gate" x="500" y="170" />
 
-    
+    <!-- Gate Labels -->
     <text x="265" y="125" font-size="14" fill="var(--text-primary)" font-weight="bold">AND</text>
     <text x="265" y="225" font-size="14" fill="var(--text-primary)" font-weight="bold">AND</text>
     <text x="520" y="175" font-size="14" fill="var(--text-primary)" font-weight="bold">OR</text>
 
-    
+    <!-- I/O Labels -->
     <g font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
       <text x="80" y="110">A</text>
       <text x="80" y="140">B</text>
@@ -990,77 +979,77 @@
     <text x="650" y="145" font-size="14" fill="var(--text-secondary)">Y = AB + CD + E</text>
   </g>
 
-  
+  <!-- Divider Line -->
   <line x1="100" y1="400" x2="700" y2="400" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 8" opacity="0.3" />
 
-  
-  
-  
+  <!-- ========================================== -->
+  <!-- BOTTOM CIRCUIT: ALL-NAND CONVERSION        -->
+  <!-- ========================================== -->
   <g transform="translate(0, 440)">
-    
+    <!-- Section Title -->
     <text x="400" y="0" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">Equivalent All-NAND Circuit</text>
     <text x="400" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-secondary)">دارة NAND المكافئة</text>
 
-    
-    
+    <!-- HIGHLIGHTS (Drawn behind wires) -->
+    <!-- Tube 1: Top Cancellation -->
     <path d="M 315,120 L 400,120 L 400,155 L 501,155" fill="none" stroke="var(--brand-500)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity="0.15"/>
     <path d="M 315,120 L 400,120 L 400,155 L 501,155" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
     
-    
+    <!-- Tube 2: Mid Cancellation -->
     <path d="M 315,220 L 420,220 L 420,170 L 503,170" fill="none" stroke="var(--brand-500)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity="0.15"/>
     <path d="M 315,220 L 420,220 L 420,170 L 503,170" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
 
-    
+    <!-- Uncompensated Bubble Highlight -->
     <circle cx="501" cy="185" r="14" fill="var(--brand-500)" opacity="0.15" />
     <circle cx="501" cy="185" r="14" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
     
-    
+    <!-- NOT Gate Highlight -->
     <rect x="235" y="255" width="65" height="50" rx="8" fill="var(--brand-500)" opacity="0.15" />
     <rect x="235" y="255" width="65" height="50" rx="8" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
 
-    
+    <!-- Wires -->
     <g stroke="var(--text-primary)" stroke-width="2" fill="none" stroke-linejoin="round">
-      
+      <!-- Inputs to NAND1 -->
       <line x1="100" y1="105" x2="250" y2="105" />
       <line x1="100" y1="135" x2="250" y2="135" />
-      
+      <!-- Inputs to NAND2 -->
       <line x1="100" y1="205" x2="250" y2="205" />
       <line x1="100" y1="235" x2="250" y2="235" />
-      
+      <!-- Input E to NOT -->
       <line x1="100" y1="280" x2="250" y2="280" />
-      
+      <!-- NAND1 to Neg-OR -->
       <path d="M 320,120 L 400,120 L 400,155 L 496,155" />
-      
+      <!-- NAND2 to Neg-OR -->
       <path d="M 320,220 L 420,220 L 420,170 L 498,170" />
-      
+      <!-- NOT to Neg-OR -->
       <path d="M 290,280 L 440,280 L 440,185 L 496,185" />
-      
+      <!-- Neg-OR Output -->
       <line x1="560" y1="170" x2="650" y2="170" />
     </g>
 
-    
+    <!-- Gates -->
     <use href="#and-gate" x="250" y="120" />
     <use href="#and-gate" x="250" y="220" />
     <use href="#or-gate" x="500" y="170" />
     <use href="#not-gate" x="250" y="280" />
 
-    
-    
+    <!-- Bubbles -->
+    <!-- NAND Outputs -->
     <use href="#bubble" x="315" y="120" />
     <use href="#bubble" x="315" y="220" />
-    
+    <!-- Neg-OR Inputs -->
     <use href="#bubble" x="501" y="155" />
     <use href="#bubble" x="503" y="170" />
     <use href="#bubble" x="501" y="185" />
 
-    
+    <!-- Gate Labels -->
     <text x="265" y="125" font-size="14" fill="var(--text-primary)" font-weight="bold">NAND</text>
     <text x="265" y="225" font-size="14" fill="var(--text-primary)" font-weight="bold">NAND</text>
     <text x="520" y="170" font-size="14" fill="var(--text-primary)" font-weight="bold">NAND</text>
     <text x="520" y="185" font-size="11" fill="var(--text-secondary)">(Neg-OR)</text>
     <text x="265" y="270" font-size="12" fill="var(--text-primary)" font-weight="bold">NOT</text>
 
-    
+    <!-- I/O Labels -->
     <g font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
       <text x="80" y="110">A</text>
       <text x="80" y="140">B</text>
@@ -1071,13 +1060,13 @@
     </g>
     <text x="650" y="145" font-size="14" fill="var(--text-secondary)">Y = ((AB)'(CD)'E')'</text>
 
-    
-    
+    <!-- Annotations -->
+    <!-- Cancellation Annotation -->
     <text x="410" y="65" text-anchor="middle" font-size="15" fill="var(--brand-500)" font-weight="bold">Bubbles cancel out / الفقاعات تلغي بعضها</text>
     <path d="M 410,75 L 400,105" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 410,75 L 420,155" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
 
-    
+    <!-- Uncompensated Bubble Annotation -->
     <text x="400" y="345" text-anchor="middle" font-size="15" fill="var(--brand-500)" font-weight="bold">Uncompensated bubble requires added NOT gate</text>
     <text x="400" y="365" text-anchor="middle" font-size="15" fill="var(--brand-500)" font-weight="bold">فقاعة غير معوضة تتطلب إضافة بوابة نفي</text>
     <path d="M 450,325 L 495,205" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
@@ -1108,9 +1097,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1138,39 +1127,39 @@
     <div class="math-block">$$F = ((AB) + (CD))'$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Diagram showing Wired Logic. Two NAND gates have their outputs physically connected together (a dot at the junction) leading to a single output line. The equation F = (AB + CD)' is shown. Label it 'Wired-AND in open-collector TTL NAND gates'. Style: educational, dark background #0d1117. -->
 <div class="svg-diagram" data-diagram-id="2">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
   <defs>
-    
+    <!-- Arrowhead Marker -->
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
     </marker>
     
-    
+    <!-- Open-Collector Symbol (IEEE standard) -->
     <g id="oc-symbol" stroke="var(--brand-500)" stroke-width="1.5" fill="none">
       <path d="M -5 0 L 0 -5 L 5 0 L 0 5 Z" />
       <path d="M -5 8 L 5 8" />
     </g>
   </defs>
 
-  
+  <!-- Background -->
   <rect width="100%" height="100%" fill="var(--bg-surface)" />
 
-  
+  <!-- Title -->
   <text x="400" y="40" fill="var(--text-primary)" font-size="22" font-weight="bold" text-anchor="middle">Wired-AND in open-collector TTL NAND gates</text>
   <text x="400" y="65" fill="var(--text-secondary)" font-size="16" text-anchor="middle">بوابات NAND ذات المجمع المفتوح (اتصال سلكي)</text>
 
-  
+  <!-- Input Lines -->
   <path d="M 150 165 L 200 165 M 150 195 L 200 195 M 150 305 L 200 305 M 150 335 L 200 335" stroke="var(--brand-500)" stroke-width="2.5" fill="none" stroke-linecap="round" />
 
-  
+  <!-- Input Labels -->
   <text x="135" y="171" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">A</text>
   <text x="135" y="201" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">B</text>
   <text x="135" y="311" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">C</text>
   <text x="135" y="341" fill="var(--text-primary)" font-size="18" font-weight="bold" text-anchor="end">D</text>
 
-  
+  <!-- Top NAND Gate -->
   <path d="M 200 150 L 230 150 A 30 30 0 0 1 230 210 L 200 210 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
   <circle cx="266" cy="180" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
   <use href="#oc-symbol" x="245" y="180" />
@@ -1178,7 +1167,7 @@
   <text x="245" y="125" fill="var(--text-muted)" font-size="13" text-anchor="middle">مجمع مفتوح</text>
   <text x="245" y="142" fill="var(--text-muted)" font-size="12" text-anchor="middle">Open-Collector</text>
 
-  
+  <!-- Bottom NAND Gate -->
   <path d="M 200 290 L 230 290 A 30 30 0 0 1 230 350 L 200 350 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
   <circle cx="266" cy="320" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
   <use href="#oc-symbol" x="245" y="320" />
@@ -1186,40 +1175,40 @@
   <text x="245" y="265" fill="var(--text-muted)" font-size="13" text-anchor="middle">مجمع مفتوح</text>
   <text x="245" y="282" fill="var(--text-muted)" font-size="12" text-anchor="middle">Open-Collector</text>
 
-  
+  <!-- Intermediate Equations -->
   <text x="335" y="170" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle">X = (AB)'</text>
   <text x="335" y="310" fill="var(--text-secondary)" font-size="15" font-weight="bold" text-anchor="middle">Y = (CD)'</text>
 
-  
+  <!-- Wired Connection Lines -->
   <path d="M 272 180 L 400 180 L 400 320 L 272 320" stroke="var(--brand-500)" stroke-width="2.5" fill="none" stroke-linejoin="round" />
   <path d="M 400 250 L 560 250" stroke="var(--brand-500)" stroke-width="2.5" fill="none" />
   
-  
+  <!-- Junction Dots -->
   <circle cx="400" cy="250" r="5" fill="var(--brand-500)" />
   <circle cx="450" cy="250" r="5" fill="var(--brand-500)" />
 
-  
+  <!-- Highlight Box for Wired-AND Junction -->
   <rect x="385" y="235" width="80" height="30" fill="var(--brand-500)" fill-opacity="0.05" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" rx="4" />
 
-  
+  <!-- Pull-up Resistor -->
   <path d="M 450 250 L 450 160 L 440 155 L 460 145 L 440 135 L 460 125 L 440 115 L 460 105 L 450 100 L 450 70" stroke="var(--brand-500)" stroke-width="2.5" fill="none" stroke-linejoin="round" />
   
-  
+  <!-- Vcc Terminal -->
   <circle cx="450" cy="65" r="5" fill="none" stroke="var(--brand-500)" stroke-width="2.5" />
   <text x="450" y="50" fill="var(--text-primary)" font-size="15" font-weight="bold" text-anchor="middle">V<tspan baseline-shift="sub" font-size="11">CC</tspan></text>
 
-  
-  
+  <!-- Annotations -->
+  <!-- Wired-AND Junction Annotation -->
   <text x="290" y="245" fill="var(--text-secondary)" font-size="14" font-weight="bold" text-anchor="middle">Wired-AND Junction</text>
   <text x="290" y="265" fill="var(--text-muted)" font-size="14" text-anchor="middle">وصلة سلكية</text>
   <path d="M 355 250 L 375 250" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
 
-  
+  <!-- Pull-up Resistor Annotation -->
   <text x="540" y="120" fill="var(--text-secondary)" font-size="14" font-weight="bold" text-anchor="middle">Pull-up Resistor (R<tspan baseline-shift="sub" font-size="10">p</tspan>)</text>
   <text x="540" y="140" fill="var(--text-muted)" font-size="14" text-anchor="middle">مقاومة رفع</text>
   <path d="M 485 120 L 465 120" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow)" fill="none" />
 
-  
+  <!-- Final Equation Box -->
   <rect x="560" y="210" width="200" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
   <text x="660" y="240" fill="var(--brand-500)" font-size="20" font-weight="bold" text-anchor="middle">F = (AB + CD)'</text>
   <text x="660" y="270" fill="var(--text-secondary)" font-size="14" text-anchor="middle">Derivation: F = X · Y</text>
@@ -1248,9 +1237,9 @@
   </div>
 
   <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash" data-i18n="layer.flash">⚡ سريع</button>
-    <button class="depth-tab" data-layer="full" data-i18n="layer.full">📖 كامل</button>
-    <button class="depth-tab" data-layer="deep" data-i18n="layer.deep">🔬 عميق</button>
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
@@ -1278,113 +1267,113 @@
     <div class="math-block">$$A \oplus B \oplus C = \sum m(1, 2, 4, 7)$$</div>
   </div>
 
-  
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A 3-bit even parity generator circuit using two XOR gates. Inputs x, y go into the first XOR, its output and input z go into the second XOR, producing output P. Next to it, a 4-bit parity checker circuit using three XOR gates. Style: educational, dark background #0d1117, XOR gates in light blue. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
     <defs>
-        
+        <!-- Arrow Marker for Signal Flow -->
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
             <path d="M 0 1 L 8 5 L 0 9 Z" fill="var(--brand-500)"/>
         </marker>
 
-        
+        <!-- Standard XOR Gate Symbol -->
         <g id="xor">
-            
+            <!-- Isolated back curve -->
             <path d="M 0,0 C 10,10 10,30 0,40" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
-            
+            <!-- Main body -->
             <path d="M 10,0 C 30,0 50,10 60,20 C 50,30 30,40 10,40 C 20,30 20,10 10,0 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
-            
+            <!-- Gate Label -->
             <text x="32" y="24" font-size="13" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">XOR</text>
         </g>
     </defs>
 
-    
+    <!-- Background -->
     <rect width="100%" height="100%" fill="var(--bg-surface)"/>
 
-    
+    <!-- Main Titles -->
     <text x="450" y="40" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">3-Bit Even Parity Generator &amp; 4-Bit Checker</text>
     <text x="450" y="70" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--text-secondary)">مُولد ومدقق التكافؤ الزوجي</text>
 
+    <!-- ========================================== -->
+    <!-- CIRCUIT 1: 3-BIT PARITY GENERATOR (LEFT)   -->
+    <!-- ========================================== -->
     
-    
-    
-    
-    
+    <!-- Bounding Box -->
     <rect x="30" y="100" width="370" height="210" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 4" opacity="0.5"/>
     <text x="215" y="130" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">Parity Generator (مُولد)</text>
 
-    
+    <!-- Inputs (x, y, z) -->
     <text x="40" y="185" font-size="16" font-weight="bold" fill="var(--text-primary)">x</text>
     <text x="40" y="205" font-size="16" font-weight="bold" fill="var(--text-primary)">y</text>
     <text x="40" y="265" font-size="16" font-weight="bold" fill="var(--text-primary)">z</text>
 
-    
+    <!-- Input Wires -->
     <path d="M 60,180 L 145,180" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 60,200 L 145,200" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 60,260 L 285,260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
 
-    
+    <!-- XOR Gate 1 -->
     <use href="#xor" x="150" y="170"/>
     
-    
+    <!-- Intermediate Wire (XOR 1 to XOR 2) -->
     <path d="M 210,190 L 250,190 L 250,240 L 285,240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="230" y="180" font-size="14" fill="var(--text-secondary)">x &#x2295; y</text>
 
-    
+    <!-- XOR Gate 2 -->
     <use href="#xor" x="290" y="230"/>
 
-    
+    <!-- Output Wire (P) -->
     <path d="M 350,250 L 375,250" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="385" y="255" font-size="16" font-weight="bold" fill="var(--text-primary)">P</text>
     <text x="385" y="275" font-size="13" fill="var(--text-muted)">Parity Bit</text>
     <text x="350" y="295" font-size="14" text-anchor="middle" fill="var(--text-secondary)">P = x &#x2295; y &#x2295; z</text>
 
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- CIRCUIT 2: 4-BIT PARITY CHECKER (RIGHT)    -->
+    <!-- ========================================== -->
 
-    
+    <!-- Bounding Box -->
     <rect x="430" y="100" width="440" height="210" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 4" opacity="0.5"/>
     <text x="650" y="130" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--brand-500)">Parity Checker (مدقق)</text>
 
-    
+    <!-- Inputs (x, y, z, P) -->
     <text x="450" y="155" font-size="16" font-weight="bold" fill="var(--text-primary)">x</text>
     <text x="450" y="175" font-size="16" font-weight="bold" fill="var(--text-primary)">y</text>
     <text x="450" y="275" font-size="16" font-weight="bold" fill="var(--text-primary)">z</text>
     <text x="450" y="295" font-size="16" font-weight="bold" fill="var(--text-primary)">P</text>
 
-    
+    <!-- Input Wires -->
     <path d="M 470,150 L 545,150" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 470,170 L 545,170" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 470,270 L 545,270" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <path d="M 470,290 L 545,290" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
 
-    
+    <!-- XOR Gate 3 (Top) -->
     <use href="#xor" x="550" y="140"/>
     
-    
+    <!-- XOR Gate 4 (Bottom) -->
     <use href="#xor" x="550" y="260"/>
 
-    
+    <!-- Intermediate Wires -->
     <path d="M 610,160 L 650,160 L 650,210 L 685,210" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="630" y="150" font-size="14" fill="var(--text-secondary)">x &#x2295; y</text>
 
     <path d="M 610,280 L 650,280 L 650,230 L 685,230" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="630" y="270" font-size="14" fill="var(--text-secondary)">z &#x2295; P</text>
 
-    
+    <!-- XOR Gate 5 (Final) -->
     <use href="#xor" x="690" y="200"/>
 
-    
+    <!-- Output Wire (C) -->
     <path d="M 750,220 L 775,220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
     <text x="785" y="225" font-size="16" font-weight="bold" fill="var(--text-primary)">C</text>
     <text x="785" y="245" font-size="13" fill="var(--text-muted)">Check Bit</text>
 
 
-    
-    
-    
+    <!-- ========================================== -->
+    <!-- LEGEND / TRUTH TABLE SUMMARY               -->
+    <!-- ========================================== -->
     <rect x="250" y="340" width="400" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
     <text x="450" y="365" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">Error Check Logic (منطق التحقق)</text>
     <text x="450" y="395" font-size="15" text-anchor="middle" fill="var(--text-secondary)">C = 0 : Data Valid (بيانات صحيحة)  |  C = 1 : Error (يوجد خطأ)</text>
@@ -1408,7 +1397,7 @@
 
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
-    <span class="professor-icon">🎓</span>
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
@@ -1419,7 +1408,7 @@
 </section>
 
 <section id="ask-professor" class="fade-up section-gap">
-  <h2 data-i18n="ask.title">❓ اسأل البروفيسور</h2>
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
   <div class="accordion">
     <div class="accordion-item">
       <button class="accordion-trigger">
@@ -1595,7 +1584,7 @@
 </section>
 
 <section id="flashcards" class="flashcard-section fade-up">
-  <h2 data-i18n="fc.title">البطاقات التعليمية</h2>
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
   <div id="fc-container"></div>
 </section>
 <script type="application/json" id="flashcard-data">
@@ -1944,16 +1933,16 @@
 </script>
 
 <section id="quiz" class="quiz-section fade-up">
-  <h2 data-i18n="quiz.title">اختبر نفسك</h2>
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
       <span id="quiz-counter">1 / 10</span>
-      <span>🎯 <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
     <div class="quiz-options" id="quiz-options-container"></div>
-    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()" data-i18n="quiz.hint">💡 تلميح</button>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
     <div class="quiz-feedback hidden" id="quiz-feedback"></div>
     <div class="quiz-nav">
       <div></div>
@@ -1963,7 +1952,7 @@
     </div>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
-    <div class="score-emoji" id="quiz-score-emoji">🏆</div>
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
     <div class="score-display" id="quiz-score-display">0 / 10</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
@@ -2294,9 +2283,9 @@
 </script>
 
 <section id="vault" class="vault-section glass-card fade-up">
-  <h2 data-i18n="vault.title">🔐 خزنة الامتحان</h2>
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ (Trap)</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الاعتقاد بأن حالة عدم الاكتراث 'X' يجب أن تكون دائماً 0 أو دائماً 1 في كل الخريطة. الحقيقة: يمكنك اختيار قيمة مختلفة لكل 'X' بشكل مستقل بناءً على ما يخدم التبسيط.</template>
       <template class="content-en">Thinking that a Don't Care 'X' must be universally 0 or universally 1 across the K-map. Reality: You can independently choose the value of each 'X' based on what best simplifies the groups.</template>
@@ -2304,7 +2293,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي (Key Concept)</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">البوابات الشاملة (NAND و NOR) تعني أنك لست بحاجة لشراء أنواع مختلفة من الرقائق لبناء حاسوب؛ شريحة واحدة تحتوي على بوابات NAND تكفي لبناء أي منطق.</template>
       <template class="content-en">Universal gates (NAND and NOR) mean you don't need to buy different types of chips to build a computer; a single chip type with NAND gates is sufficient to build any logic.</template>
@@ -2312,7 +2301,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--secret">🤫 سر (Secret)</div>
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
       <template class="content-ar">طريقة 'دفع الفقاعات' (Bubble Pushing) في تحويل الدوائر ليست سحراً، بل هي مجرد تطبيق بصري سريع لنظرية دي مورغان لتجنب كتابة المعادلات الطويلة.</template>
       <template class="content-en">The 'Bubble Pushing' method in circuit conversion isn't magic; it's just a fast, visual application of DeMorgan's theorem to avoid writing out long equations.</template>
@@ -2320,7 +2309,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--trap">⚠️ فخ (Trap)</div>
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
       <template class="content-ar">الاعتقاد بأن بت التكافؤ (Parity Bit) يضمن وصول البيانات خالية من الأخطاء بنسبة 100%. الحقيقة: هو يكتشف الأخطاء الفردية فقط، ويفشل إذا حدث خطأ مزدوج.</template>
       <template class="content-en">Believing that a Parity Bit guarantees 100% error-free data. Reality: It only detects single-bit (odd) errors and fails completely if a double-bit error occurs.</template>
@@ -2328,7 +2317,7 @@
     </div>
   </div>
   <div class="vault-entry">
-    <div class="vault-type vault-type--key">🔑 مفهوم أساسي (Key Concept)</div>
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
     <div data-bilingual>
       <template class="content-ar">تبسيط POS هو ببساطة إجراء تبسيط SOP على الأصفار بدلاً من الآحاد، ثم عكس النتيجة النهائية.</template>
       <template class="content-en">POS simplification is simply performing SOP simplification on the 0s instead of the 1s, and then inverting the final result.</template>
@@ -2346,14 +2335,15 @@
         <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
         <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
         <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
-        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</button>
+        <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
       </div>
-      <span class="footer-brand">🌱 CS Level 5 · Digital Garden</span>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
     </div>
   </footer>
 </div>
 
 <script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
 <script src="../../shared/firebase-sync.js"></script>
 </body>
 </html>

@@ -1,84 +1,183 @@
- 
+/*@3.GARJ.1*/
+;(function () {
+  'use strict';
+  if (window.GardenFlags) return;
+
+  /*@3.GARJ.2*/
+  var DEFAULTS = {
+    'ratings.course.enabled': false,
+    'ratings.course.publicMin': 50,
+    'ratings.course.resourcesOn': true,
+    'ratings.faculty.enabled': true,
+    'labs.publicNav': true,
+    'banner.syncEnabled': true,
+    'alerts.enabled': true
+  };
+
+  /*@3.GARJ.3*/
+  var CACHE_KEY = 'gd_flags';
+  var TTL_MS = 5 * 60 * 1000;
+
+  var current = {}, subs = [], fetched = false, cachedAt = 0;
+
+  for (var d in DEFAULTS) {
+    if (Object.prototype.hasOwnProperty.call(DEFAULTS, d)) current[d] = DEFAULTS[d];
+  }
+
+  try {
+    var raw = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (raw && raw.f && typeof raw.f === 'object') {
+      for (var k in raw.f) {
+        if (Object.prototype.hasOwnProperty.call(raw.f, k)) current[k] = raw.f[k];
+      }
+      cachedAt = Number(raw.at) || 0;
+    }
+  } catch (e) { /*@3.GARJ.4*/ }
+
+  function get(key) {
+    return Object.prototype.hasOwnProperty.call(current, key) ? current[key] : DEFAULTS[key];
+  }
+
+  function announce(changed) {
+    if (!changed.length) return;
+    for (var i = 0; i < subs.length; i++) {
+      try { subs[i](current, changed); } catch (e) { }
+    }
+  }
+
+  function apply(f) {
+    var changed = [];
+    for (var key in f) {
+      if (!Object.prototype.hasOwnProperty.call(f, key)) continue;
+      if (current[key] !== f[key]) { current[key] = f[key]; changed.push(key); }
+    }
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), f: current }));
+    } catch (e) { }
+    announce(changed);
+  }
+
+  function refresh(force) {
+    if (fetched && !force) return;
+    fetched = true;
+    /*@3.GARJ.5*/
+    var E = window.GardenEndpoints;
+    var base = E && (E.publicData || E.sync);
+    if (!base) return;
+    if (!force && Date.now() - cachedAt < TTL_MS) return;
+    try {
+      fetch(base + '/v1/flags.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (j && j.ok && j.flags) apply(j.flags); })
+        .catch(function () { /*@3.GARJ.6*/ });
+    } catch (e) { }
+  }
+
+  window.GardenFlags = {
+    get: get,
+    all: function () { var o = {}; for (var q in current) o[q] = current[q]; return o; },
+    on: function (fn) { if (typeof fn === 'function') subs.push(fn); },
+    refresh: function () { refresh(true); },
+    DEFAULTS: DEFAULTS
+  };
+
+  refresh(false);
+})();
+
+/*@3.GARJ.7*/
 
 ; (function () {
   'use strict';
 
+  /*@3.GARJ.8*/
+  const _thisScript = document.currentScript;
+  const ROOT = (_thisScript && _thisScript.src)
+    ? _thisScript.src.replace(/shared\/garden\.js(\?.*)?$/, '')
+    : '';
+
   const THEMES = ['dark', 'dim', 'light'];
-  const THEME_ICONS = { dark: '🌫️', dim: '️☀️', light: '🌙' };
+  /*@3.GARJ.9*/
+  const THEME_ICONS = { dark: 'fa-solid fa-cloud-moon', dim: 'fa-solid fa-sun', light: 'fa-solid fa-moon' };
 
   let currentLang = localStorage.getItem('garden_lang') || 'ar';
   let currentTheme = localStorage.getItem('garden_theme') || 'dark';
 
-   
+  /*@3.GARJ.10*/
   (function () {
     const fs = localStorage.getItem('garden_font_size');
     if (fs) document.documentElement.setAttribute('data-font-size', fs);
   })();
 
-   
+  /*@3.GARJ.11*/
   const i18n = {
     ar: {
       'nav.home': 'الرئيسية', 'nav.prev': 'السابق', 'nav.next': 'التالي',
-      'layer.flash': '⚡ سريع', 'layer.full': '📖 كامل', 'layer.deep': '🔬 عميق',
+      /*@3.GARJ.12*/
+      'layer.flash': 'سريع', 'layer.full': 'كامل', 'layer.deep': 'عميق',
       'fc.title': 'البطاقات التعليمية', 'fc.due': 'بطاقة للمراجعة',
       'fc.none_due': 'أحسنت! لا توجد بطاقات مستحقة اليوم', 'fc.flip': 'اضغط للقلب',
       'fc.grade.0': 'لم أتذكر', 'fc.grade.2': 'صعب', 'fc.grade.3': 'جيد', 'fc.grade.4': 'ممتاز', 'fc.grade.5': 'سهل',
       'fc.reset': 'إعادة الضبط',
-      'fc.undo': '↩ تراجع', 'fc.bury': '⏸ تأجيل',
+      'fc.undo': 'تراجع', 'fc.bury': 'تأجيل',
       'fc.info': 'البطاقات تعمل بنظام التكرار المتباعد (SM-2) — أحد أقوى تقنيات الحفظ العلمية.\n\n📊 كيف يعمل التقييم:\n• "لم أتذكر" (0): تعود لنهاية الجلسة لمحاولة أخرى.\n• "صعب" (2): تعود مع تقليل معامل السهولة — ستُراجَع أكثر.\n• "جيد" (3): تختفي اليوم وتعود بفترة قياسية (×EF).\n• "ممتاز" (4): فترة أطول من جيد — أفضل لزيادة معامل السهولة.\n• "سهل" (5): أطول فترة ممكنة — يزيد معامل السهولة بشكل ملحوظ.\n\n🧠 النظام يتكيف معك — كلما أجبت صح، زادت الفترة قبل المراجعة التالية.\n\n⌨️ اختصارات لوحة المفاتيح:\n• مسافة: اقلب البطاقة\n• 0/2/3/4/5: التقييم بعد القلب\n\n↩ تراجع: يلغي آخر 5 تقييمات (بالضغط المتكرر).\n⏸ تأجيل: يرجئ البطاقة لليوم التالي.\n↺ إعادة الضبط: يمسح كل التقدم (يطلب تأكيد أولاً).',
       'fc.reset_all': 'إعادة جميع البطاقات', 'fc.reset_hard': 'الصعبة فقط',
-      'fc.practice': '🔁 مراجعة حرة', 'fc.practice_badge': 'وضع المراجعة الحرة — لا يؤثر على تقدمك',
+      'fc.practice': 'مراجعة حرة', 'fc.practice_badge': 'وضع المراجعة الحرة — لا يؤثر على تقدمك',
       'fc.practice_done': 'انتهت المراجعة الحرة', 'fc.practice_next': 'التالي',
-      'fc.leech': '🔥 تسرّب', 'fc.leech_warning': 'بطاقة متسرّبة — فشلت أكثر من 8 مرات',
+      'fc.leech': 'تسرّب', 'fc.leech_warning': 'بطاقة متسرّبة — فشلت أكثر من 8 مرات',
       'fc.filter.all': 'الكل', 'fc.filter.new': 'جديدة', 'fc.filter.learning': 'قيد التعلم',
       'fc.filter.mastered': 'متقنة', 'fc.filter.leech': 'صعبة جداً',
-      'fc.quick': '⚡ مراجعة سريعة (10)',
+      'fc.quick': 'مراجعة سريعة (10)',
       'fc.streak': 'أيام متتالية', 'fc.retention': 'معدل الحفظ',
-      'fc.3d_on': '✨ تأثير 3D مفعّل', 'fc.3d_off': '✨ تأثير 3D معطّل',
-      'quiz.title': 'اختبر نفسك', 'quiz.hint': '💡 تلميح', 'quiz.score': 'النتيجة',
+      'fc.3d_on': 'تأثير 3D مفعّل', 'fc.3d_off': 'تأثير 3D معطّل',
+      'quiz.title': 'اختبر نفسك', 'quiz.hint': 'تلميح', 'quiz.score': 'النتيجة',
       'quiz.next': 'التالي', 'quiz.retry': 'إعادة الاختبار',
-      'vault.title': '🔐 خزنة الامتحان', 'prof.title': '🎓 حديث البروفيسور',
-      'ask.title': '❓ اسأل البروفيسور', 'obj.title': '🎯 أهداف التعلم',
+      'vault.title': 'خزنة الامتحان', 'prof.title': 'حديث البروفيسور',
+      'ask.title': 'اسأل البروفيسور', 'obj.title': 'أهداف التعلم',
+      /*@3.GARJ.13*/
+      'vault.trap': 'فخ امتحاني', 'vault.secret': 'سر الامتحان',
+      'vault.key': 'مفهوم أساسي',
       'toc.title': 'محتويات الوحدة',
       'notes.btn': 'ملاحظاتي'
     },
     en: {
       'nav.home': 'Home', 'nav.prev': 'Previous', 'nav.next': 'Next',
-      'layer.flash': '⚡ Quick', 'layer.full': '📖 Full', 'layer.deep': '🔬 Deep',
+      'layer.flash': 'Quick', 'layer.full': 'Full', 'layer.deep': 'Deep',
       'fc.title': 'Flashcards', 'fc.due': 'cards due',
       'fc.none_due': 'Well done! No cards due today', 'fc.flip': 'Click to flip',
       'fc.grade.0': 'Blackout', 'fc.grade.2': 'Hard', 'fc.grade.3': 'Good', 'fc.grade.4': 'Very Good', 'fc.grade.5': 'Easy',
       'fc.reset': 'Reset',
-      'fc.undo': '↩ Undo', 'fc.bury': '⏸ Bury',
+      'fc.undo': 'Undo', 'fc.bury': 'Bury',
       'fc.info': 'Cards use Spaced Repetition (SM-2) — one of the most powerful evidence-based memorization techniques.\n\n📊 Grading system:\n• "Blackout" (0): Card goes back to end for another try.\n• "Hard" (2): Goes back with reduced ease — scheduled more often.\n• "Good" (3): Disappears today, returns at standard interval (×EF).\n• "Very Good" (4): Longer interval than Good — grows ease factor better.\n• "Easy" (5): Longest possible interval — significantly boosts ease factor.\n\n🧠 The system adapts to you — the better you know a card, the longer the interval.\n\n⌨️ Keyboard shortcuts:\n• Space: flip card\n• 0/2/3/4/5: grade after flipping\n\n↩ Undo: reverts last 5 grades (press repeatedly).\n⏸ Bury: postpones card until tomorrow.\n↺ Reset: clears all progress (asks for confirmation first).',
       'fc.reset_all': 'Reset All Cards', 'fc.reset_hard': 'Hard Only',
-      'fc.practice': '🔁 Free Review', 'fc.practice_badge': 'Practice Mode — does not affect your progress',
+      'fc.practice': 'Free Review', 'fc.practice_badge': 'Practice Mode — does not affect your progress',
       'fc.practice_done': 'Practice session complete', 'fc.practice_next': 'Next',
-      'fc.leech': '🔥 Leech', 'fc.leech_warning': 'Leech card — failed 8+ times',
+      'fc.leech': 'Leech', 'fc.leech_warning': 'Leech card — failed 8+ times',
       'fc.filter.all': 'All', 'fc.filter.new': 'New', 'fc.filter.learning': 'Learning',
       'fc.filter.mastered': 'Mastered', 'fc.filter.leech': 'Leeches',
-      'fc.quick': '⚡ Quick Review (10)',
+      'fc.quick': 'Quick Review (10)',
       'fc.streak': 'day streak', 'fc.retention': 'Retention Rate',
-      'fc.3d_on': '✨ 3D Flip ON', 'fc.3d_off': '✨ 3D Flip OFF',
-      'quiz.title': 'Self Quiz', 'quiz.hint': '💡 Hint', 'quiz.score': 'Score',
+      'fc.3d_on': '3D Flip ON', 'fc.3d_off': '3D Flip OFF',
+      'quiz.title': 'Self Quiz', 'quiz.hint': 'Hint', 'quiz.score': 'Score',
       'quiz.next': 'Next', 'quiz.retry': 'Retry Quiz',
-      'vault.title': '🔐 Exam Vault', 'prof.title': '🎓 Professor\'s Narrative',
-      'ask.title': '❓ Ask The Professor', 'obj.title': '🎯 Learning Objectives',
+      'vault.title': 'Exam Vault', 'prof.title': 'Professor\'s Narrative',
+      'ask.title': 'Ask The Professor', 'obj.title': 'Learning Objectives',
+      'vault.trap': 'Exam Trap', 'vault.secret': 'Exam Secret',
+      'vault.key': 'Key Concept',
       'toc.title': 'Module Contents',
       'notes.btn': 'My Notes'
     }
   };
 
-   
+  /*@3.GARJ.14*/
   function showModal({ icon, title, message, confirmText, cancelText, onConfirm, danger }) {
-    
+    /*@3.GARJ.15*/
     document.querySelector('.garden-modal-overlay')?.remove();
 
     const overlay = document.createElement('div');
     overlay.className = 'garden-modal-overlay';
     overlay.innerHTML = `
       <div class="garden-modal">
-        <div class="garden-modal-icon">${icon || '⚠️'}</div>
+        <div class="garden-modal-icon">${icon || '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>'}</div>
         <div class="garden-modal-title">${title || ''}</div>
         <div class="garden-modal-message">${message || ''}</div>
         <div class="garden-modal-actions">
@@ -89,11 +188,11 @@
 
     document.body.appendChild(overlay);
 
-    
+    /*@3.GARJ.16*/
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) overlay.remove();
     });
-    
+    /*@3.GARJ.17*/
     const escHandler = (e) => {
       if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); }
     };
@@ -106,20 +205,68 @@
     });
   }
 
-   
+  /*@3.GARJ.18*/
+  const THEME_META_COLOR = { light: '#a78bfa', dark: '#111827', dim: '#0f111a' };
+  function updateThemeColorMeta(theme) {
+    const color = THEME_META_COLOR[theme] || THEME_META_COLOR.dark;
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'theme-color');
+      (document.head || document.documentElement).appendChild(meta);
+    }
+    meta.setAttribute('content', color);
+  }
   function applyTheme(theme) {
     currentTheme = theme;
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('garden_theme', theme);
+    updateThemeColorMeta(theme);
     const icon = document.getElementById('theme-icon');
-    if (icon) icon.textContent = THEME_ICONS[theme] || '🌙';
+    if (icon) icon.innerHTML = '<i class="'
+      + (THEME_ICONS[theme] || 'fa-solid fa-moon') + '" aria-hidden="true"></i>';
   }
   function cycleTheme() {
     applyTheme(THEMES[(THEMES.indexOf(currentTheme) + 1) % THEMES.length]);
     if (document.querySelector('.mermaid')) location.reload();
   }
 
-   
+  /*@3.GARJ.19*/
+
+  /*@3.GARJ.20*/
+  function localizeNode(el, lang) {
+    if (!el || el.nodeType !== 1) return;
+    if (el.hasAttribute('data-i18n')) {
+      const key = el.getAttribute('data-i18n');
+      if (i18n[lang]?.[key]) el.textContent = i18n[lang][key];
+    }
+    if (el.hasAttribute('data-ar') && el.hasAttribute('data-en')) {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt != null) el.textContent = txt;
+    }
+    if (el.hasAttribute('data-ar-placeholder') && el.hasAttribute('data-en-placeholder')) {
+      const ph = el.getAttribute('data-' + lang + '-placeholder');
+      if (ph != null) el.placeholder = ph;
+    }
+    /*@3.GARJ.21*/
+    if (el.hasAttribute('data-ar-title') && el.hasAttribute('data-en-title')) {
+      const tt = el.getAttribute('data-' + lang + '-title');
+      if (tt != null) {
+        el.setAttribute('title', tt);
+        if (el.hasAttribute('aria-label')) el.setAttribute('aria-label', tt);
+      }
+    }
+  }
+  function localize(root, lang) {
+    lang = lang || currentLang || document.documentElement.getAttribute('lang') || 'ar';
+    if (!root) return;
+    localizeNode(root, lang);
+    const scope = root.querySelectorAll ? root : document;
+    scope.querySelectorAll(
+      '[data-i18n],[data-ar][data-en],[data-ar-placeholder][data-en-placeholder],[data-ar-title][data-en-title]'
+    ).forEach(el => localizeNode(el, lang));
+  }
+
   function setLanguage(lang) {
     currentLang = lang;
     const html = document.documentElement;
@@ -127,20 +274,7 @@
     html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
     localStorage.setItem('garden_lang', lang);
 
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (i18n[lang]?.[key]) el.textContent = i18n[lang][key];
-    });
-    
-    document.querySelectorAll('[data-ar][data-en]').forEach(el => {
-      const txt = el.getAttribute('data-' + lang);
-      if (txt != null) el.textContent = txt;
-    });
-    
-    document.querySelectorAll('[data-ar-placeholder][data-en-placeholder]').forEach(el => {
-      const ph = el.getAttribute('data-' + lang + '-placeholder');
-      if (ph != null) el.placeholder = ph;
-    });
+    localize(document, lang);
     document.querySelectorAll('[data-bilingual]').forEach(container => {
       const tpl = container.querySelector(`.content-${lang}`);
       const target = container.querySelector('.content-target');
@@ -153,23 +287,29 @@
       const termEn = term.getAttribute('data-term-en') || '';
       updateTooltipContent(tip, termEn, enDef, lang);
     });
+    /*@3.GARJ.22*/
+    if (typeof initSmartTermTooltips === 'function') initSmartTermTooltips();
+    /*@3.GARJ.23*/
+    const langText = lang === 'ar' ? 'EN' : 'AR';
     const ll = document.getElementById('lang-label');
-    if (ll) ll.textContent = lang === 'ar' ? 'EN' : 'AR';
+    if (ll) ll.textContent = langText;
+    const lb = document.getElementById('lang-btn');
+    if (lb) lb.textContent = langText;
 
     if (window._gardenFC.cards) { const wasFlipped = document.getElementById('fc-card')?.classList.contains('flipped'); renderFlashcard(); if (wasFlipped) flipCard(); }
     if (window._gardenQuiz.questions) renderQuestion();
     if (typeof window._algoRefresh === 'function') window._algoRefresh();
 
-    
+    /*@3.GARJ.24*/
     if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
       MathJax.typesetPromise().catch((err) => console.log('MathJax Error:', err));
     }
-    
+    /*@3.GARJ.25*/
     document.dispatchEvent(new CustomEvent('garden:languageChanged', { detail: { lang } }));
   }
   function toggleLanguage() { setLanguage(currentLang === 'ar' ? 'en' : 'ar'); }
 
-   
+  /*@3.GARJ.26*/
   function initDepthTabs() {
     document.querySelectorAll('.depth-tabs').forEach(tg => {
       const card = tg.closest('.concept-card'); if (!card) return;
@@ -185,7 +325,7 @@
     });
   }
 
-   
+  /*@3.GARJ.27*/
   function initAccordion() {
     document.querySelectorAll('.accordion-trigger').forEach(tr => {
       tr.addEventListener('click', () => {
@@ -197,7 +337,7 @@
     });
   }
 
-   
+  /*@3.GARJ.28*/
   window._gardenFC = { _undoStack: [] };
 
   function fcKey() {
@@ -215,38 +355,48 @@
     return { n, ef, interval, nextReview: Date.now() + interval * 86400000, lastGrade: grade };
   }
 
-   
+  /*@3.GARJ.29*/
   function calcRetrieval(state) {
     if (!state || !state.n || state.n === 0 || !state.interval || state.interval <= 0) return null;
     const lastReview = state.nextReview - state.interval * 86400000;
-    const t = (Date.now() - lastReview) / 86400000; 
+    const t = (Date.now() - lastReview) / 86400000; /*@3.GARJ.30*/
     if (t < 0) return 100;
     return Math.max(0, Math.min(100, Math.round(Math.pow(0.9, t / state.interval) * 100)));
   }
   function newCard() { return { n: 0, ef: 2.5, interval: 0, nextReview: Date.now(), failCount: 0, buriedUntil: 0 }; }
 
-   
-   
+  /*@3.GARJ.31*/
+  function _fcIsPlaceholder(s) {
+    const t = String(s == null ? '' : s).trim();
+    return /^\[[A-Z][A-Z_]*\]$/.test(t) || t === 'null' || t === 'undefined';
+  }
+  function _fcTxt(s) { return _fcIsPlaceholder(s) ? '' : (s || ''); }
+  function _fcHasExample(card) {
+    const e = card && card.back && card.back.example;
+    return !!e && !!(_fcTxt(e.ar) || _fcTxt(e.en));
+  }
+
+  /*@3.GARJ.32*/
   function getMobile3D() {
     try { return localStorage.getItem('garden_mobile_3d') !== '0'; } catch (e) { return true; }
   }
   function setMobile3D(val) {
     try { localStorage.setItem('garden_mobile_3d', val ? '1' : '0'); } catch (e) { }
     document.documentElement.classList.toggle('mobile-3d-off', !val);
-    
-    const btn = document.querySelector('.fc-3d-btn');
-    if (btn) {
+    /*@3.GARJ.33*/
+    document.querySelectorAll('.fc-3d-btn').forEach(function (btn) {
       btn.classList.toggle('active', val);
+      btn.setAttribute('aria-pressed', val ? 'true' : 'false');
       btn.title = val
         ? (document.documentElement.lang === 'ar' ? '3D مفعّل — اضغط لإيقافه' : '3D ON — tap to disable')
         : (document.documentElement.lang === 'ar' ? '3D معطّل — اضغط لتفعيله' : '3D OFF — tap to enable');
-    }
+    });
   }
-  
+  /*@3.GARJ.34*/
   window._gardenGetMobile3D = getMobile3D;
   window._gardenSetMobile3D = setMobile3D;
   window._gardenToggle3D = function () { setMobile3D(!getMobile3D()); };
-  
+  /*@3.GARJ.35*/
   document.documentElement.classList.toggle('mobile-3d-off', !getMobile3D());
 
   function isReviewPage() {
@@ -257,7 +407,7 @@
       || (module !== '0' && isNaN(Number(module)));
   }
 
-   
+  /*@3.GARJ.36*/
   function activityKey() {
     const s = document.documentElement.getAttribute('data-subject') || 'XX';
     return 'garden_' + s + '_activity';
@@ -287,7 +437,7 @@
     try { return JSON.parse(localStorage.getItem(activityKey()) || '{}'); } catch (e) { return {}; }
   }
 
-   
+  /*@3.GARJ.37*/
   function retentionKey() { return fcKey() + '_ret'; }
   function recordRetention(success) {
     try {
@@ -303,7 +453,7 @@
     } catch (e) { return null; }
   }
 
-   
+  /*@3.GARJ.38*/
   function launchConfetti() {
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999';
@@ -349,7 +499,7 @@
     const fc = window._gardenFC;
     const now = Date.now();
 
-     
+    /*@3.GARJ.39*/
     if (isReviewPage()) {
       fc.queue = fc.cards.map((card, i) => ({
         card, i,
@@ -361,9 +511,9 @@
       return;
     }
 
-     
+    /*@3.GARJ.40*/
     fc._isReview = false;
-    
+    /*@3.GARJ.41*/
     try {
       const saved = parseInt(localStorage.getItem('garden_daily_new_limit'));
       fc.dailyNewLimit = (!isNaN(saved) && saved > 0) ? saved : (fc.dailyNewLimit || 10);
@@ -380,7 +530,7 @@
       .map((card, i) => ({
         card, i,
         state: fc.sm2[i] || newCard(),
-        
+        /*@3.GARJ.42*/
         _isOriginallyNew: !fc.sm2[i] || fc.sm2[i].n === 0
       }))
       .filter(({ i, state, _isOriginallyNew }) => {
@@ -398,30 +548,173 @@
     fc.filterMode = filterMode || null;
   }
 
+  /*@3.GARJ.43*/
+  function ghostsHTML(remaining, nextCard, L, label) {
+    const n = Math.max(0, Math.min(3, (remaining | 0) - 1));
+    let out = '';
+    for (let i = 0; i < n; i++) {
+      if (i === 0 && nextCard) {
+        const t = _fcTxt(nextCard.front?.[L] || nextCard.front?.ar || nextCard.front?.en || '');
+        out += `<i class="fc-ghost fc-ghost--next" aria-hidden="true">` +
+          (label ? `<span class="fc-g-pill">${escHtml(label)}</span>` : '') +
+          `<span class="fc-g-term">${escHtml(t)}</span></i>`;
+        continue;
+      }
+      out += '<i class="fc-ghost" aria-hidden="true"></i>';
+    }
+    return out;
+  }
+
+  /*@3.GARJ.44*/
+  const MATH_RE = /\$[^$\n]+\$|\\\(|\\\[/;
+
+  /*@3.GARJ.45*/
+  const _SUP = /(\{[^}]{1,12}\}|[A-Za-z0-9\)\]])\^(\{[^}]{1,12}\}|-?[A-Za-z0-9]{1,4})/g;
+  const _SUB = /\b([A-Za-z])_(\{[^}]{1,10}\}|[A-Za-z0-9]{1,2})\b/g;
+  /*@3.GARJ.46*/
+  const _RUN = /[A-Za-z0-9\(\[][^؀-ۿ\n]{0,80}(?:=|≡|≤|≥|\bmod\b)[^؀-ۿ\n]{0,80}[A-Za-z0-9\)\]]/g;
+  function _braces(s) { return s.replace(/^\{|\}$/g, ''); }
+
+  function _supSub(s) {
+    return s
+      .replace(_SUP, (m, a, b) => a + '<sup>' + _braces(b) + '</sup>')
+      .replace(_SUB, (m, a, b) => a + '<sub>' + _braces(b) + '</sub>');
+  }
+
+  /*@3.GARJ.47*/
+  const _MATH_WORDS = /^(mod|sqrt|log|ln|exp|max|min|sin|cos|tan|true|false|null|and|xor|not|div|gcd|lcm)$/i;
+  function _isFormula(m) {
+    if (m.length > 44) return false;
+    const words = m.match(/[A-Za-z]{4,}/g);
+    return !words || words.every((w) => _MATH_WORDS.test(w));
+  }
+
+  function mathText(s) {
+    if (!s) return '';
+    const str = String(s);
+    if (MATH_RE.test(str)) return str;        /*@3.GARJ.48*/
+    let out = '', last = 0, m;
+    _RUN.lastIndex = 0;
+    while ((m = _RUN.exec(str)) !== null) {
+      out += _supSub(str.slice(last, m.index));
+      out += _isFormula(m[0])
+        ? '<span class="fc-math">' + _supSub(m[0]) + '</span>'
+        : _supSub(m[0]);
+      last = m.index + m[0].length;
+    }
+    out += _supSub(str.slice(last));
+    return out;
+  }
+
+  /*@3.GARJ.49*/
+  const MATH_SEL = '.fc-term .content-target, .fc-term-en, .fc-definition .content-target,' +
+    '.fc-example .content-target, .fc-g-term,' +
+    '.fc-term, .fc-definition, .fc-example';
+  function enhanceMath(root) {
+    if (!root) return;
+    root.querySelectorAll(MATH_SEL).forEach((el) => {
+      if (el.dataset.mathDone === '1') return;
+      if (el.querySelector('.content-target')) return;   /*@3.GARJ.50*/
+      const raw = el.textContent || '';
+      const html = mathText(raw);
+      if (html !== raw) el.innerHTML = html;
+      el.dataset.mathDone = '1';
+    });
+  }
+
+  let _mathLoading = null;
+  function typesetMath(el) {
+    if (!el) return;
+    enhanceMath(el);
+    if (!MATH_RE.test(el.textContent || '')) return;
+    if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+      MathJax.typesetPromise([el]).catch(() => { });
+      return;
+    }
+    if (!_mathLoading) {
+      window.MathJax = window.MathJax || {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        chtml: { displayAlign: 'left' },
+        options: { enableMenu: false }
+      };
+      _mathLoading = new Promise((res) => {
+        const s = document.createElement('script');
+        s.id = 'MathJax-script';
+        s.async = true;
+        s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        s.onload = () => res(true);
+        s.onerror = () => res(false);
+        document.head.appendChild(s);
+      });
+    }
+    _mathLoading.then((ok) => {
+      if (ok && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([el]).catch(() => { });
+      }
+    });
+  }
+  window.GardenMath = { typeset: typesetMath, text: mathText, enhance: enhanceMath };
+
+  /*@3.GARJ.51*/
+  const TAP_SEEN = 'garden_fc_tap_seen';
+  function tapSeen() { try { return localStorage.getItem(TAP_SEEN) === '1'; } catch (e) { return false; } }
+  function markTapSeen() { try { localStorage.setItem(TAP_SEEN, '1'); } catch (e) {} }
+  function tapHintHTML(L) {
+    if (tapSeen()) return '';
+    return '<div class="fc-tap"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i>' +
+      '<span>' + (L === 'ar' ? 'اضغط البطاقة لقلبها' : 'Tap the card to flip') + '</span></div>';
+  }
+
+  /*@3.GARJ.52*/
+  function fcSubjectLabel() {
+    return (document.querySelector('meta[name="course-name"]')?.content) ||
+      (document.documentElement.getAttribute('data-subject') || '');
+  }
+
+  function fcTopHTML(L, num, total, isBack) {
+    const subj = document.documentElement.getAttribute('data-subject') || '';
+    const name = (document.querySelector('meta[name="course-name"]')?.content) ||
+      (L === 'ar' ? subj : subj);
+    const pos = String(num).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    return `<div class="fc-top">
+      <span class="fc-pos">${pos}</span>
+      <span class="fc-pill"><i class="fa-solid fa-atom" aria-hidden="true"></i>${name}</span>
+      ${isBack ? `<span class="fc-ans"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>${L === 'ar' ? 'الإجابة' : 'Answer'}</span>` : '<span></span>'}
+    </div>`;
+  }
+
   function renderFlashcard() {
     const fc = window._gardenFC;
+    /*@3.GARJ.53*/
+    if (fc._deferRender) return;
     const box = document.getElementById('fc-container');
     if (!box) return;
     const L = currentLang;
 
-    
+    /*@3.GARJ.54*/
+    const mode = fc.browseMode ? 'browse' : (fc.practiceMode ? 'practice' : 'learn');
+
+    if (mode !== 'learn') return renderLoose(fc, box, L, mode);
+
+    /*@3.GARJ.55*/
     if (!fc.queue || fc.queue.length === 0 || fc.pos >= fc.queue.length) {
       const fcInfoText = (i18n[L]?.['fc.info'] || '').split('\n').join('<br>');
       box.innerHTML = `
         <div class="fc-toolbar">
           <div class="flashcard-counter" style="visibility:hidden">—</div>
           <div class="fc-toolbar-actions">
-            <button class="fc-mini-btn" onclick="Garden.resetFC('all')" title="${i18n[L]?.['fc.reset'] || 'Reset'}">↺</button>
-            <button class="fc-report-btn" onclick="Garden.report()" title="${L === 'ar' ? 'تقرير SM-2' : 'SM-2 Report'}">R</button>
-            <span class="fc-info-btn" tabindex="0" data-fc-info="${encodeURIComponent(fcInfoText)}">ⓘ</span>
+            <button class="fc-mini-btn" onclick="Garden.resetFC('all')" title="${i18n[L]?.['fc.reset'] || 'Reset'}"><i class="fa-solid fa-eraser" aria-hidden="true"></i></button>
+            <button class="fc-report-btn" onclick="Garden.report()" title="${L === 'ar' ? 'تقرير SM-2' : 'SM-2 Report'}"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></button>
+            <span class="fc-info-btn" tabindex="0" data-fc-info="${encodeURIComponent(fcInfoText)}"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
           </div>
         </div>
         <div class="fc-empty">
-          <div class="fc-empty-icon">🎉</div>
+          <div class="fc-empty-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
           <p>${i18n[L]?.['fc.none_due'] || ''}</p>
           <div class="fc-actions">
+            <button class="fc-reset-btn fc-practice-btn" onclick="Garden.browse()">${L === 'ar' ? 'تصفّح البطاقات' : 'Browse cards'}</button>
             <button class="fc-reset-btn fc-practice-btn" onclick="Garden.practice()">${i18n[L]?.['fc.practice'] || ''}</button>
-            <button class="fc-reset-btn fc-practice-btn" onclick="Garden.quickReview()">${i18n[L]?.['fc.quick'] || '⚡ Quick (10)'}</button>
+            <button class="fc-reset-btn fc-practice-btn" onclick="Garden.quickReview()">${i18n[L]?.['fc.quick'] || 'Quick (10)'}</button>
             <button class="fc-reset-btn" onclick="Garden.resetFC('all')">${i18n[L]?.['fc.reset_all'] || ''}</button>
             <button class="fc-reset-btn" onclick="Garden.resetFC('hard')">${i18n[L]?.['fc.reset_hard'] || ''}</button>
           </div>
@@ -433,7 +726,7 @@
             <button class="fc-filter-btn${fc.filterMode === 'leech' ? ' active' : ''}" onclick="Garden.filterFC('leech')">${i18n[L]?.['fc.filter.leech'] || 'Leeches'}</button>
           </div>
           <div class="fc-daily-limit-row">
-            <span class="fc-dl-label">${L === 'ar' ? '📅 حد البطاقات الجديدة يومياً:' : '📅 Daily new cards limit:'}</span>
+            <span class="fc-dl-label"><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> ${L === 'ar' ? 'حد البطاقات الجديدة يومياً:' : 'Daily new cards limit:'}</span>
             <div class="fc-dl-controls">
               <button class="fc-dl-btn" onclick="Garden.changeDailyLimit(-5)">−</button>
               <span class="fc-dl-value" id="fc-dl-value">${fc.dailyNewLimit || 10}</span>
@@ -447,11 +740,11 @@
     const item = fc.queue[fc.pos];
     const card = item.card;
     const num = fc.completed + 1;
-    
+    /*@3.GARJ.56*/
     const uniqueRemaining = new Set(fc.queue.map(q => q.i)).size;
     const total = fc.completed + uniqueRemaining;
 
-    
+    /*@3.GARJ.57*/
     const ret = calcRetrieval(item.state);
     const retBadge = ret !== null
       ? (() => {
@@ -461,47 +754,59 @@
       })()
       : '';
 
-    
+    /*@3.GARJ.58*/
     const undoCount = fc._undoStack ? fc._undoStack.length : 0;
     const undoLabel = undoCount > 1
-      ? (i18n[L]?.['fc.undo'] || '↩') + ` (${undoCount})`
-      : (i18n[L]?.['fc.undo'] || '↩ Undo');
+      ? (i18n[L]?.['fc.undo'] || 'Undo') + ` (${undoCount})`
+      : (i18n[L]?.['fc.undo'] || 'Undo');
 
     box.innerHTML = `
       <div class="fc-toolbar">
         <div class="flashcard-counter">${fc._isReview
-        ? '<span class="fc-review-badge">' + (L === 'ar' ? '📋 وضع المراجعة' : '📋 Review Mode') + '</span>'
-        : (num + ' / ' + total)}</div>
+        ? '<span class="fc-review-badge">' + (L === 'ar' ? 'وضع المراجعة' : 'Review Mode') + '</span>'
+        : ''}</div>
         <div class="fc-toolbar-actions">
-          <button class="fc-toolbar-bury" onclick="Garden.bury()" title="${L === 'ar' ? 'يرجئ هذه البطاقة ليوم الغد' : 'Postpone this card until tomorrow'}">${L === 'ar' ? 'تأجيل' : 'Bury'}</button>
-          <button class="fc-mini-btn" onclick="Garden.resetFC('all')" title="${i18n[L]?.['fc.reset'] || 'Reset'}">↺</button>
-          <button class="fc-report-btn" onclick="Garden.report()" title="${L === 'ar' ? 'تقرير SM-2' : 'SM-2 Report'}">R</button>
+          <button class="fc-toolbar-bury" onclick="Garden.bury()" title="${L === 'ar' ? 'يرجئ هذه البطاقة ليوم الغد' : 'Postpone this card until tomorrow'}"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>${L === 'ar' ? 'تأجيل' : 'Bury'}</span></button>
+          <button class="fc-mini-btn fc-undo-mini" onclick="Garden.undo()" ${undoCount ? '' : 'disabled'} title="${L === 'ar' ? 'تراجع عن آخر تقييم' : 'Undo last grade'}"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>${undoCount > 1 ? '<b>' + undoCount + '</b>' : ''}</button>
+          <button class="fc-mini-btn" onclick="Garden.browse()" title="${L === 'ar' ? 'تصفّح كل البطاقات بحرّية' : 'Browse all cards freely'}"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></button>
+          <button class="fc-mini-btn" onclick="Garden.resetFC('all')" title="${i18n[L]?.['fc.reset'] || 'Reset'}"><i class="fa-solid fa-eraser" aria-hidden="true"></i></button>
+          <button class="fc-report-btn" onclick="Garden.report()" title="${L === 'ar' ? 'تقرير SM-2' : 'SM-2 Report'}"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></button>
           <button class="fc-3d-btn${getMobile3D() ? ' active' : ''}" onclick="window._gardenToggle3D()" title="${getMobile3D() ? (L === 'ar' ? '3D مفعّل — اضغط لإيقافه' : '3D ON — tap to disable') : (L === 'ar' ? '3D معطّل — اضغط لتفعيله' : '3D OFF — tap to enable')}">3D</button>
-          <span class="fc-info-btn" tabindex="0" data-fc-info="${encodeURIComponent((i18n[L]?.['fc.info'] || '').replace(/\n/g, '<br>'))}">ⓘ</span>
+          <span class="fc-info-btn" tabindex="0" data-fc-info="${encodeURIComponent((i18n[L]?.['fc.info'] || '').replace(/\n/g, '<br>'))}"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>
         </div>
       </div>
       <div class="flashcard-scene">
+        ${ghostsHTML(uniqueRemaining, fc.queue[fc.pos + 1]?.card, L, fcSubjectLabel())}
         <div class="flashcard-card" id="fc-card" onclick="Garden.flip()">
           <div class="flashcard-face flashcard-front">
-            ${(item.state.failCount || 0) >= 8 ? ('<div class="fc-leech-badge" title="' + (i18n[L]?.['fc.leech_warning'] || 'Leech') + '">' + (i18n[L]?.['fc.leech'] || '🔥') + '</div>') : ''}
-            ${retBadge}
-            <div class="fc-term" data-bilingual>
-              <template class="content-ar">${card.front?.ar || ''}</template>
-              <template class="content-en">${card.front?.en || ''}</template>
-              <div class="content-target">${card.front?.[L] || ''}</div>
+            ${fcTopHTML(L, num, total, false)}
+            <div class="fc-body">
+              ${(item.state.failCount || 0) >= 8 ? ('<div class="fc-leech-badge" title="' + (i18n[L]?.['fc.leech_warning'] || 'Leech') + '">' + '<i class="fa-solid fa-fire" aria-hidden="true"></i> ' + (i18n[L]?.['fc.leech'] || 'Leech') + '</div>') : ''}
+              ${retBadge}
+              <div class="fc-term" data-bilingual>
+                <template class="content-ar">${card.front?.ar || ''}</template>
+                <template class="content-en">${card.front?.en || ''}</template>
+                <div class="content-target">${card.front?.[L] || ''}</div>
+              </div>
+              <div class="fc-term-en">${L === 'ar' ? (card.front?.en || '') : ''}</div>
             </div>
-            <div class="flashcard-hint">${i18n[L]?.['fc.flip'] || ''}</div>
+            <div class="fc-rule" aria-hidden="true"><i></i><b></b><i></i></div>
+            ${tapHintHTML(L)}
           </div>
           <div class="flashcard-face flashcard-back">
-            <div class="fc-definition" data-bilingual>
-              <template class="content-ar">${card.back?.definition?.ar || ''}</template>
-              <template class="content-en">${card.back?.definition?.en || ''}</template>
-              <div class="content-target">${card.back?.definition?.[L] || ''}</div>
+            ${fcTopHTML(L, num, total, true)}
+            <div class="fc-body">
+              <div class="fc-definition" data-bilingual>
+                <template class="content-ar">${card.back?.definition?.ar || ''}</template>
+                <template class="content-en">${card.back?.definition?.en || ''}</template>
+                <div class="content-target">${card.back?.definition?.[L] || ''}</div>
+              </div>
             </div>
-            ${card.back?.example ? `<div class="fc-example" data-bilingual>
-              <template class="content-ar">${card.back.example.ar || ''}</template>
-              <template class="content-en">${card.back.example.en || ''}</template>
-              <div class="content-target">${card.back.example[L] || ''}</div>
+            <div class="fc-rule" aria-hidden="true"><i></i><b></b><i></i></div>
+            ${_fcHasExample(card) ? `<div class="fc-example" data-bilingual>
+              <template class="content-ar">${_fcTxt(card.back.example.ar)}</template>
+              <template class="content-en">${_fcTxt(card.back.example.en)}</template>
+              <div class="content-target">${_fcTxt(card.back.example[L])}</div>
             </div>`: ''}
           </div>
         </div>
@@ -513,9 +818,8 @@
         <button class="sm2-btn sm2-btn--4" onclick="Garden.grade(4)">${i18n[L]?.['fc.grade.4'] || '4'}</button>
         <button class="sm2-btn sm2-btn--5" onclick="Garden.grade(5)">${i18n[L]?.['fc.grade.5'] || '5'}</button>
       </div>
-      ${undoCount > 0
-        ? '<div class="fc-util-row"><button class="fc-util-btn fc-undo-btn" onclick="Garden.undo()">' + undoLabel + '</button></div>'
-        : ''}`;
+`;
+    typesetMath(box);
   }
 
   function flipCard() {
@@ -523,14 +827,21 @@
     const g = document.getElementById('fc-grades');
     if (c) c.classList.toggle('flipped');
     if (g) g.classList.toggle('hidden', !c?.classList.contains('flipped'));
+    /*@3.GARJ.59*/
+    if (c && c.classList.contains('flipped') && !tapSeen()) {
+      markTapSeen();
+      const t = document.querySelector('.fc-tap');
+      if (t) t.remove();
+    }
   }
 
-   
+  /*@3.GARJ.60*/
   function startPractice() {
     const fc = window._gardenFC;
     if (!fc.cards || fc.cards.length === 0) return;
-    
+    /*@3.GARJ.61*/
     fc.practiceMode = true;
+    fc.browseMode = false;
     const _all = fc.cards.map((card, i) => ({ card, i }));
     for (let _i = _all.length - 1; _i > 0; _i--) {
       const _j = Math.floor(Math.random() * (_i + 1));
@@ -538,26 +849,29 @@
     }
     fc.practiceQueue = _all;
     fc.practicePos = 0;
-    renderPractice();
+    renderFlashcard();
   }
 
-  function renderPractice() {
-    const fc = window._gardenFC;
-    const box = document.getElementById('fc-container');
-    if (!box) return;
-    const L = currentLang;
-    const q = fc.practiceQueue;
-    const pos = fc.practicePos;
+  /*@3.GARJ.62*/
+  function renderPractice() { renderFlashcard(); }
 
-    if (!q || pos >= q.length) {
+  /*@3.GARJ.63*/
+  function renderLoose(fc, box, L, mode) {
+    const q = fc.practiceQueue || [];
+    const pos = fc.practicePos || 0;
+
+    if (!q.length) { fc.practiceMode = false; fc.browseMode = false; return renderFlashcard(); }
+    if (pos >= q.length) {
+      /*@3.GARJ.64*/
+      if (mode === 'browse') { fc.practicePos = 0; return renderFlashcard(); }
       fc.practiceMode = false;
       box.innerHTML = `
         <div class="fc-empty">
-          <div class="fc-empty-icon">✅</div>
+          <div class="fc-empty-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
           <p>${i18n[L]?.['fc.practice_done'] || ''}</p>
           <div class="fc-actions">
             <button class="fc-reset-btn fc-practice-btn" onclick="Garden.practice()">${i18n[L]?.['fc.practice'] || ''}</button>
-            <button class="fc-reset-btn" onclick="Garden.resetFC('all')">${i18n[L]?.['fc.reset_all'] || ''}</button>
+            <button class="fc-reset-btn" onclick="Garden.exitLoose()">${L === 'ar' ? 'عودة للمراجعة المجدولة' : 'Back to scheduled review'}</button>
           </div>
         </div>`;
       return;
@@ -565,57 +879,146 @@
 
     const item = q[pos];
     const card = item.card;
-    const num = pos + 1;
-    const total = q.length;
+    const num = pos + 1, total = q.length;
+    const badge = mode === 'browse'
+      ? (L === 'ar' ? 'تصفّحٌ حرّ — لا يؤثّر على تقدّمك' : 'Free browsing — does not affect your progress')
+      : (i18n[L]?.['fc.practice_badge'] || '');
 
     box.innerHTML = `
-      <div class="fc-practice-badge">${i18n[L]?.['fc.practice_badge'] || ''}</div>
-      <div class="fc-toolbar">
-        <div class="flashcard-counter">${num} / ${total}</div>
-        <div class="fc-toolbar-actions">
-          <button class="fc-mini-btn" onclick="window._gardenFC.practiceMode=false;Garden.renderFC()" title="${L === 'ar' ? 'إنهاء المراجعة الحرة' : 'Exit Practice'}">✕</button>
-          <button class="fc-report-btn" onclick="Garden.report()" title="${L === 'ar' ? 'تقرير SM-2' : 'SM-2 Report'}">R</button>
-        </div>
-      </div>
+      <div class="fc-practice-badge">${badge}</div>
+      ${fcToolbarHTML(L, num, total, mode)}
       <div class="flashcard-scene">
-        <div class="flashcard-card" id="fc-card" onclick="this.classList.toggle('flipped');document.getElementById('fc-pnext')?.classList.toggle('hidden',!this.classList.contains('flipped'))">
+        ${ghostsHTML(total - pos, q[pos + 1]?.card, L, fcSubjectLabel())}
+        <div class="flashcard-card" id="fc-card" onclick="Garden.flip()">
           <div class="flashcard-face flashcard-front">
-            <div class="fc-term" data-bilingual>
-              <template class="content-ar">${card.front?.ar || ''}</template>
-              <template class="content-en">${card.front?.en || ''}</template>
-              <div class="content-target">${card.front?.[L] || ''}</div>
+            ${fcTopHTML(L, num, total, false)}
+            <div class="fc-body">
+              <div class="fc-term" data-bilingual>
+                <template class="content-ar">${card.front?.ar || ''}</template>
+                <template class="content-en">${card.front?.en || ''}</template>
+                <div class="content-target">${card.front?.[L] || ''}</div>
+              </div>
+              <div class="fc-term-en">${L === 'ar' ? (card.front?.en || '') : ''}</div>
             </div>
-            <div class="flashcard-hint">${i18n[L]?.['fc.flip'] || ''}</div>
+            <div class="fc-rule" aria-hidden="true"><i></i><b></b><i></i></div>
+            ${tapHintHTML(L)}
           </div>
           <div class="flashcard-face flashcard-back">
-            <div class="fc-definition" data-bilingual>
-              <template class="content-ar">${card.back?.definition?.ar || ''}</template>
-              <template class="content-en">${card.back?.definition?.en || ''}</template>
-              <div class="content-target">${card.back?.definition?.[L] || ''}</div>
+            ${fcTopHTML(L, num, total, true)}
+            <div class="fc-body">
+              <div class="fc-definition" data-bilingual>
+                <template class="content-ar">${card.back?.definition?.ar || ''}</template>
+                <template class="content-en">${card.back?.definition?.en || ''}</template>
+                <div class="content-target">${card.back?.definition?.[L] || ''}</div>
+              </div>
             </div>
-            ${card.back?.example ? `<div class="fc-example" data-bilingual>
-              <template class="content-ar">${card.back.example.ar || ''}</template>
-              <template class="content-en">${card.back.example.en || ''}</template>
-              <div class="content-target">${card.back.example[L] || ''}</div>
+            <div class="fc-rule" aria-hidden="true"><i></i><b></b><i></i></div>
+            ${_fcHasExample(card) ? `<div class="fc-example" data-bilingual>
+              <template class="content-ar">${_fcTxt(card.back.example.ar)}</template>
+              <template class="content-en">${_fcTxt(card.back.example.en)}</template>
+              <div class="content-target">${_fcTxt(card.back.example[L])}</div>
             </div>`: ''}
           </div>
         </div>
       </div>
-      <div class="sm2-grades hidden" id="fc-pnext">
-        <button class="sm2-btn" style="background:var(--brand-500);min-width:160px" onclick="window._gardenFC.practicePos++;Garden.renderPractice()">${i18n[L]?.['fc.practice_next'] || 'Next'} →</button>
-      </div>`;
+      ${fcNavHTML(L, pos, total)}`;
+    typesetMath(box);
   }
 
+  /*@3.GARJ.65*/
+  function fcNavHTML(L, pos, total) {
+    return `<div class="fc-nav">
+      <button class="fc-nav-btn" type="button" onclick="Garden.loosePrev()" ${pos <= 0 ? 'disabled' : ''}
+        aria-label="${L === 'ar' ? 'السابق' : 'Previous'}"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+      <span class="fc-nav-pos">${pos + 1} / ${total}</span>
+      <button class="fc-nav-btn" type="button" onclick="Garden.looseNext()"
+        aria-label="${L === 'ar' ? 'التالي' : 'Next'}"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+    </div>`;
+  }
+
+  function fcToolbarHTML(L, num, total, mode) {
+    return `<div class="fc-toolbar">
+      <div class="flashcard-counter"></div>
+      <div class="fc-toolbar-actions">
+        <button class="fc-mini-btn" onclick="Garden.exitLoose()" title="${L === 'ar' ? 'عودة للمراجعة المجدولة' : 'Back to scheduled review'}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button class="fc-report-btn" onclick="Garden.report()" title="${L === 'ar' ? 'تقرير SM-2' : 'SM-2 Report'}"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></button>
+      </div>
+    </div>`;
+  }
+
+  function loosePrev() {
+    const fc = window._gardenFC;
+    if ((fc.practicePos || 0) > 0) { fc.practicePos--; renderFlashcard(); }
+  }
+  function looseNext() {
+    const fc = window._gardenFC;
+    fc.practicePos = (fc.practicePos || 0) + 1;
+    renderFlashcard();
+  }
+  function exitLoose() {
+    const fc = window._gardenFC;
+    fc.practiceMode = false; fc.browseMode = false;
+    renderFlashcard();
+  }
+
+  /*@3.GARJ.66*/
+  function startBrowse() {
+    const fc = window._gardenFC;
+    if (!fc.cards || !fc.cards.length) return;
+    fc.browseMode = true;
+    fc.practiceMode = false;
+    fc.practiceQueue = fc.cards.map((card, i) => ({ card, i }));
+    fc.practicePos = 0;
+    renderFlashcard();
+    document.getElementById('fc-container')?.scrollIntoView({ block: 'nearest' });
+  }
+
+  /*@3.GARJ.67*/
+  function exitClassFor(g) {
+    return g >= 4 ? 'fc-exit-away' : g === 3 ? 'fc-exit-slide' : 'fc-exit-back';
+  }
+  const EXIT_MS = 420;
+  function _reduced() {
+    try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+  }
+
+  /*@3.GARJ.68*/
   function gradeCard(grade) {
+    const c = document.getElementById('fc-card');
+    /*@3.GARJ.69*/
+    if (c && c.dataset.exiting === '1') return;
+    if (!c || _reduced()) { _gradeCardNow(grade); return; }
+
+    const fc = window._gardenFC;
+    c.dataset.exiting = '1';
+    c.classList.add(exitClassFor(grade));
+    const g = document.getElementById('fc-grades');
+    if (g) g.style.pointerEvents = 'none';
+
+    fc._deferRender = true;
+    let done = false;
+    /*@3.GARJ.70*/
+    const finish = () => {
+      if (done) return;
+      done = true;
+      fc._deferRender = false;
+      renderFlashcard();
+    };
+    c.addEventListener('animationend', finish, { once: true });
+    try { _gradeCardNow(grade); }          /*@3.GARJ.71*/
+    finally { setTimeout(finish, EXIT_MS + 140); }
+  }
+
+  function _gradeCardNow(grade) {
     const fc = window._gardenFC;
     if (!fc.queue || fc.pos >= fc.queue.length) return;
     const item = fc.queue[fc.pos];
 
-    
+    /*@3.GARJ.72*/
     if (!fc._undoStack) fc._undoStack = [];
     fc._undoStack.push({
       itemIndex: item.i,
-      sm2Snapshot: JSON.parse(JSON.stringify(fc.sm2)),  
+      sm2Snapshot: JSON.parse(JSON.stringify(fc.sm2)),  /*@3.GARJ.73*/
       queue: fc.queue.map(q => ({
         card: q.card, i: q.i,
         state: JSON.parse(JSON.stringify(q.state)),
@@ -626,19 +1029,19 @@
       completed: fc.completed,
       dailyNewCount: fc._dailyNewCount || 0
     });
-    if (fc._undoStack.length > 5) fc._undoStack.shift();  
+    if (fc._undoStack.length > 5) fc._undoStack.shift();  /*@3.GARJ.74*/
 
     if (grade >= 3) {
-      
+      /*@3.GARJ.75*/
       const updated = sm2Calc(item.state, grade);
 
-      
+      /*@3.GARJ.76*/
       const prevFail = item.state.failCount || 0;
       if (updated.interval >= 21) {
-        
+        /*@3.GARJ.77*/
         updated.failCount = 0;
       } else if (prevFail > 0 && updated.n > 2) {
-        
+        /*@3.GARJ.78*/
         updated.failCount = prevFail - 1;
       } else {
         updated.failCount = prevFail;
@@ -650,7 +1053,7 @@
         saveSM2(fc.sm2);
         recordRetention(true);
         recordDailyActivity();
-        
+        /*@3.GARJ.79*/
         if (item._isOriginallyNew) {
           const dn = (fc._dailyNewCount || 0) + 1;
           fc._dailyNewCount = dn;
@@ -660,7 +1063,7 @@
       fc.queue.splice(fc.pos, 1);
       fc.completed++;
     } else {
-      
+      /*@3.GARJ.80*/
       const updated = sm2Calc(item.state, grade);
       updated.nextReview = Date.now();
       updated.failCount = (item.state.failCount || 0) + 1;
@@ -684,7 +1087,7 @@
 
     if (fc.pos >= fc.queue.length) fc.pos = 0;
 
-    
+    /*@3.GARJ.81*/
     if (fc.queue.length === 0 && fc.completed > 0 && !fc.filterMode && !fc._isReview) {
       setTimeout(launchConfetti, 300);
     }
@@ -693,7 +1096,7 @@
     updateDueCount();
   }
 
-   
+  /*@3.GARJ.82*/
   function undoGrade() {
     const fc = window._gardenFC;
     if (!fc._undoStack || fc._undoStack.length === 0) return;
@@ -713,7 +1116,7 @@
     updateDueCount();
   }
 
-   
+  /*@3.GARJ.83*/
   function buryCard() {
     const fc = window._gardenFC;
     if (!fc.queue || fc.pos >= fc.queue.length) return;
@@ -730,10 +1133,10 @@
     renderFlashcard(); updateDueCount();
   }
 
-   
+  /*@3.GARJ.84*/
   function filterFC(mode) { buildQueue(mode); renderFlashcard(); updateDueCount(); }
 
-   
+  /*@3.GARJ.85*/
   function quickReview() {
     const fc = window._gardenFC;
     if (!fc.cards || fc.cards.length === 0) return;
@@ -745,7 +1148,8 @@
     }
     fc.practiceQueue = all.slice(0, 10);
     fc.practicePos = 0;
-    renderPractice();
+    fc.browseMode = false;
+    renderFlashcard();
   }
 
   function resetFC(mode) {
@@ -753,7 +1157,7 @@
     const isAll = mode === 'all';
 
     const modalConfig = isAll ? {
-      icon: '🔄',
+      icon: '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i>',
       title: L === 'ar' ? 'إعادة ضبط جميع البطاقات؟' : 'Reset All Cards?',
       message: L === 'ar'
         ? 'سيتم مسح كل تقدمك في البطاقات التعليمية لهذه الوحدة وإعادة جميع البطاقات من الصفر. هذا الإجراء لا يمكن التراجع عنه.'
@@ -761,7 +1165,7 @@
       confirmText: L === 'ar' ? 'نعم، إعادة الضبط' : 'Yes, Reset All',
       danger: true
     } : {
-      icon: '🔁',
+      icon: '<i class="fa-solid fa-rotate" aria-hidden="true"></i>',
       title: L === 'ar' ? 'إعادة البطاقات الصعبة فقط؟' : 'Reset Hard Cards Only?',
       message: L === 'ar'
         ? 'سيتم إعادة البطاقات التي كانت صعبة عليك (معامل السهولة أقل من 2.0) فقط. البطاقات التي أتقنتها ستبقى كما هي.'
@@ -776,7 +1180,7 @@
         const fc = window._gardenFC;
         if (isAll) {
           fc.sm2 = {};
-          
+          /*@3.GARJ.86*/
           try {
             const prefix = fcKey() + '_dn_';
             Object.keys(localStorage)
@@ -784,7 +1188,7 @@
               .forEach(k => localStorage.removeItem(k));
           } catch (e) { }
           fc._dailyNewCount = 0;
-          
+          /*@3.GARJ.87*/
           try { localStorage.removeItem(retentionKey()); } catch (e) { }
         } else {
           Object.keys(fc.sm2).forEach(k => {
@@ -795,8 +1199,7 @@
         buildQueue();
         renderFlashcard();
         updateDueCount();
-        
-        
+        /*@3.GARJ.88*/
         const sm2Dash = document.getElementById('sm2-dashboard');
         const sm2Ov = document.getElementById('sm2-overlay');
         const sm2Tog = document.getElementById('sm2-toggle');
@@ -811,26 +1214,26 @@
   function updateDueCount() {
     const fc = window._gardenFC;
     const el = document.getElementById('fc-due-count');
-    
+    /*@3.GARJ.89*/
     if (el && fc.queue) {
       const uniqueLeft = new Set(fc.queue.map(it => it.i)).size;
       el.textContent = uniqueLeft;
     } else if (el) { el.textContent = 0; }
 
-    
+    /*@3.GARJ.90*/
     const widget = document.querySelector('.sidebar-widget');
     if (widget && fc.queue?.length > 0) widget.classList.add('has-due');
 
-    
+    /*@3.GARJ.91*/
     updateSM2Dashboard();
   }
 
-   
+  /*@3.GARJ.92*/
   function initSM2Dashboard() {
     const widget = document.querySelector('.sidebar-widget');
     if (!widget) return;
 
-    
+    /*@3.GARJ.93*/
     const dueNum = widget.querySelector('.widget-number');
     const dueLabel = widget.querySelector('.widget-label');
     if (!dueNum || !dueLabel) return;
@@ -844,29 +1247,19 @@
           <div class="widget-number" id="fc-due-count">${currentNum}</div>
           <div class="widget-label" data-i18n="fc.due">${currentLabel}</div>
         </div>
-        <span class="widget-chevron">▼</span>
+        <span class="widget-chevron"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></span>
       </button>
       <div class="sm2-dashboard" id="sm2-dashboard">
+        ${[['last', 'clock-rotate-left', 'last-review'],
+           ['next', 'forward-step', 'next-review'],
+           ['streak', 'fire', 'streak'],
+           ['retention', 'bullseye', 'retention'],
+           ['total', 'chart-simple', 'total-cards']].map(([k, ic, val]) => `
         <div class="sm2-dash-row">
-          <span class="sm2-dash-label" id="sm2-last-label">📅</span>
-          <span class="sm2-dash-value" id="sm2-last-review">—</span>
-        </div>
-        <div class="sm2-dash-row">
-          <span class="sm2-dash-label" id="sm2-next-label">⏭️</span>
-          <span class="sm2-dash-value" id="sm2-next-review">—</span>
-        </div>
-        <div class="sm2-dash-row">
-          <span class="sm2-dash-label" id="sm2-streak-label">🔥</span>
-          <span class="sm2-dash-value" id="sm2-streak">—</span>
-        </div>
-        <div class="sm2-dash-row">
-          <span class="sm2-dash-label" id="sm2-retention-label">🎯</span>
-          <span class="sm2-dash-value" id="sm2-retention">—</span>
-        </div>
-        <div class="sm2-dash-row">
-          <span class="sm2-dash-label" id="sm2-total-label">📊</span>
-          <span class="sm2-dash-value" id="sm2-total-cards">—</span>
-        </div>
+          <span class="sm2-dash-label"><i class="fa-solid fa-${ic}" aria-hidden="true"></i>
+            <span id="sm2-${k}-label"></span></span>
+          <span class="sm2-dash-value" id="sm2-${val}">—</span>
+        </div>`).join('')}
         <div class="sm2-dash-bar" id="sm2-bar">
           <span class="sm2-bar-new" style="width:100%"></span>
           <span class="sm2-bar-learning" style="width:0%"></span>
@@ -879,11 +1272,11 @@
         </div>
       </div>`;
 
-    
+    /*@3.GARJ.94*/
     const toggle = document.getElementById('sm2-toggle');
     const dash = document.getElementById('sm2-dashboard');
 
-    
+    /*@3.GARJ.95*/
     let overlay = document.getElementById('sm2-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
@@ -899,7 +1292,7 @@
       const popoverWidth = 260;
       const widgetCenter = rect.left + rect.width / 2;
       const idealLeft = widgetCenter - popoverWidth / 2;
-      
+      /*@3.GARJ.96*/
       const clampedLeft = Math.max(8, Math.min(idealLeft, window.innerWidth - popoverWidth - 8));
       dash.style.left = clampedLeft + 'px';
       dash.style.right = 'auto';
@@ -914,7 +1307,7 @@
       overlay.classList.remove('open');
       toggle.setAttribute('aria-expanded', 'false');
     }
-    
+    /*@3.GARJ.97*/
     window._gardenCloseSM2 = closeSM2;
 
     toggle.addEventListener('click', () => {
@@ -936,7 +1329,7 @@
     const now = Date.now();
     const total = fc.cards.length;
 
-    
+    /*@3.GARJ.98*/
     let newCount = 0, learningCount = 0, masteredCount = 0;
     let lastReviewTime = 0, nextReviewTime = Infinity;
 
@@ -944,28 +1337,28 @@
       const st = fc.sm2[i];
       if (!st) { newCount++; continue; }
 
-      
+      /*@3.GARJ.99*/
       const reviewedAt = st.nextReview - (st.interval * 86400000);
       if (reviewedAt > lastReviewTime && st.n > 0) lastReviewTime = reviewedAt;
 
-      
+      /*@3.GARJ.100*/
       if (st.nextReview > now && st.nextReview < nextReviewTime) nextReviewTime = st.nextReview;
 
-      
+      /*@3.GARJ.101*/
       if (st.interval >= 21) masteredCount++;
       else learningCount++;
     }
 
-    
+    /*@3.GARJ.102*/
     const labels = {
       ar: {
-        last: '📅 آخر مراجعة', next: '⏭️ القادمة', total: '📊 الإجمالي',
+        last: 'آخر مراجعة', next: 'القادمة', total: 'الإجمالي',
         newL: 'جديدة', learning: 'قيد التعلم', mastered: 'متقنة',
         never: 'لم تبدأ بعد', today: 'اليوم', tomorrow: 'غداً', yesterday: 'أمس',
         daysAgo: 'أيام', daysLater: 'يوم', allDone: 'أنجزت الكل!'
       },
       en: {
-        last: '📅 Last review', next: '⏭️ Next due', total: '📊 Total',
+        last: 'Last review', next: 'Next due', total: 'Total',
         newL: 'New', learning: 'Learning', mastered: 'Mastered',
         never: 'Not started', today: 'Today', tomorrow: 'Tomorrow', yesterday: 'Yesterday',
         daysAgo: 'days ago', daysLater: 'days', allDone: 'All done!'
@@ -973,7 +1366,7 @@
     };
     const t = labels[L] || labels.ar;
 
-    
+    /*@3.GARJ.103*/
     function relTime(ts, isFuture) {
       if (!ts || ts === Infinity || ts === 0) return isFuture ? t.allDone : t.never;
       const diffMs = ts - now;
@@ -989,7 +1382,7 @@
       }
     }
 
-    
+    /*@3.GARJ.104*/
     const $l = id => document.getElementById(id);
     const setT = (id, v) => { const e = $l(id); if (e) e.textContent = v; };
 
@@ -999,19 +1392,19 @@
     setT('sm2-last-review', relTime(lastReviewTime, false));
     setT('sm2-next-review', relTime(nextReviewTime, true));
     setT('sm2-total-cards', String(total));
-    
+    /*@3.GARJ.105*/
     const streak = calculateStreak();
-    setT('sm2-streak-label', L === 'ar' ? ('🔥 ' + (i18n[L]?.['fc.streak'] || 'أيام متتالية')) : '🔥 Streak');
+    setT('sm2-streak-label', L === 'ar' ? (i18n[L]?.['fc.streak'] || 'أيام متتالية') : 'Streak');
     setT('sm2-streak', streak > 0 ? (streak + (L === 'ar' ? ' يوم' : ' days')) : (L === 'ar' ? 'ابدأ اليوم!' : 'Start today!'));
-    
+    /*@3.GARJ.106*/
     const retention = getRetentionRate();
-    setT('sm2-retention-label', L === 'ar' ? ('🎯 ' + (i18n[L]?.['fc.retention'] || 'معدل الحفظ')) : '🎯 Retention');
+    setT('sm2-retention-label', L === 'ar' ? (i18n[L]?.['fc.retention'] || 'معدل الحفظ') : 'Retention');
     setT('sm2-retention', retention !== null ? (retention + '%') : '—');
     setT('sm2-leg-new', newCount + ' ' + t.newL);
     setT('sm2-leg-learning', learningCount + ' ' + t.learning);
     setT('sm2-leg-mastered', masteredCount + ' ' + t.mastered);
 
-    
+    /*@3.GARJ.107*/
     const bar = $l('sm2-bar');
     if (bar && total > 0) {
       const spans = bar.querySelectorAll('span');
@@ -1021,7 +1414,7 @@
     }
   }
 
-   
+  /*@3.GARJ.108*/
   function showSM2Report() {
     const fc = window._gardenFC;
     const L = currentLang;
@@ -1032,13 +1425,12 @@
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const total = fc.cards?.length || 0;
 
-    
+    /*@3.GARJ.109*/
     let newCount = 0, learningCount = 0, masteredCount = 0;
     let totalEF = 0, efCount = 0;
     const forecast = {};
 
-    
-    
+    /*@3.GARJ.110*/
     let needsReviews1 = 0, needsReviews2 = 0, needsReviews3plus = 0;
     let nextDueTs = Infinity;
     for (let i = 0; i < total; i++) {
@@ -1057,10 +1449,7 @@
           masteredCount++;
         } else {
           learningCount++;
-          
-          
-          
-          
+          /*@3.GARJ.111*/
           const repsNeeded = (st.n <= 1) ? 3 : st.n === 2 ? 2 : 1;
           if (repsNeeded === 1) needsReviews1++;
           else if (repsNeeded === 2) needsReviews2++;
@@ -1072,11 +1461,11 @@
     const nextDueDate = nextDueTs < Infinity ? new Date(nextDueTs) : null;
     const avgEF = efCount > 0 ? (totalEF / efCount).toFixed(2) : '—';
 
-    
+    /*@3.GARJ.112*/
     const sessionTotal = fc.totalOriginal || 0;
     const sessionDone = fc.completed || 0;
     const sessionLeft = fc.queue ? new Set(fc.queue.map(it => it.i)).size : 0;
-    
+    /*@3.GARJ.113*/
     const gs = { 0: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     for (let i = 0; i < total; i++) {
       const st = fc.sm2?.[i];
@@ -1084,12 +1473,12 @@
     }
     const gsTot = (gs[0] || 0) + (gs[2] || 0) + (gs[3] || 0) + (gs[4] || 0) + (gs[5] || 0);
 
-    
+    /*@3.GARJ.114*/
     const avgEFNum = efCount > 0 ? totalEF / efCount : 0;
     const easeHell = efCount >= 3 && avgEFNum < 1.6;
     const easeHellHTML = easeHell ? `
       <div class="sm2-ease-warning">
-        <span class="sm2-ease-icon">⚠️</span>
+        <span class="sm2-ease-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
         <div>
           <strong>${isAr ? 'تحذير: Ease Hell' : 'Warning: Ease Hell'}</strong>
           <p>${isAr
@@ -1099,7 +1488,7 @@
         </div>
       </div>` : '';
 
-    
+    /*@3.GARJ.115*/
     const allKeys = Object.keys(forecast).map(Number).sort((a, b) => a - b);
     const maxVal = allKeys.length ? Math.max(...allKeys.map(k => forecast[k])) : 1;
     const forecastHTML = allKeys.filter(d => d <= 14 || forecast[d] > 0).map(d => {
@@ -1120,15 +1509,15 @@
     overlay.innerHTML = `
       <div class="sm2-report-modal" dir="${isAr ? 'rtl' : 'ltr'}">
         <div class="sm2-report-header">
-          <span class="sm2-report-header-icon">📊</span>
+          <span class="sm2-report-header-icon"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i></span>
           <h3 class="sm2-report-title">${isAr ? 'تقرير البطاقات التعليمية' : 'Flashcard SM-2 Report'}</h3>
-          <button class="sm2-report-close" id="sm2-report-close">✕</button>
+          <button class="sm2-report-close" id="sm2-report-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
         <div class="sm2-report-body">
 
           ${sessionTotal > 0 ? `
           <div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>⚡</span>${isAr ? 'جلسة اليوم' : "Today's Session"}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>${isAr ? 'جلسة اليوم' : "Today's Session"}</div>
             <div class="sm2-rpills">
               <div class="sm2-rpill sm2-rpill--blue"><span class="sm2-rpill-n">${sessionTotal}</span><span class="sm2-rpill-l">${isAr ? 'إجمالي' : 'Total'}</span></div>
               <div class="sm2-rpill sm2-rpill--green"><span class="sm2-rpill-n">${sessionDone}</span><span class="sm2-rpill-l">${isAr ? 'أُنجز' : 'Done'}</span></div>
@@ -1137,7 +1526,7 @@
           </div>` : ''}
 
           <div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>🗂️</span>${isAr ? 'حالة البطاقات' : 'Card Status'}<span class="sm2-rtotal-badge">${total} ${isAr ? 'بطاقة' : 'cards'}</span></div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-folder-tree" aria-hidden="true"></i></span>${isAr ? 'حالة البطاقات' : 'Card Status'}<span class="sm2-rtotal-badge">${total} ${isAr ? 'بطاقة' : 'cards'}</span></div>
             <div class="sm2-rstat-bar">
               <div class="sm2-rsb-new"      style="width:${total ? ((newCount / total) * 100).toFixed(1) : 0}%"></div>
               <div class="sm2-rsb-learning" style="width:${total ? ((learningCount / total) * 100).toFixed(1) : 0}%"></div>
@@ -1153,16 +1542,16 @@
           </div>
 
           <div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>🎯</span>${isAr ? 'مسار الإتقان' : 'Path to Mastery'}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span>${isAr ? 'مسار الإتقان' : 'Path to Mastery'}</div>
             <div class="sm2-rmastery-note">${isAr ? 'البطاقة تُعتبر متقنة عند وصول الفاصل الزمني إلى <strong>21 يوماً أو أكثر</strong> (معيار Anki العالمي). يستلزم ذلك <strong>3 مراجعات ناجحة متتالية</strong> كحد أدنى.' : 'A card is considered <strong>mastered</strong> when its interval reaches <strong>21+ days</strong> (Anki global standard). This requires a minimum of <strong>3 consecutive successful reviews</strong>.'}</div>
             <div class="sm2-rmastery-path">
-              <div class="sm2-rmp-step sm2-rmp-s1"><span class="sm2-rmp-day">${isAr ? 'اليوم' : 'Today'}</span><span class="sm2-rmp-icon">📖</span><span class="sm2-rmp-label">${isAr ? 'مراجعة ١' : 'Review 1'}</span></div>
+              <div class="sm2-rmp-step sm2-rmp-s1"><span class="sm2-rmp-day">${isAr ? 'اليوم' : 'Today'}</span><span class="sm2-rmp-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><span class="sm2-rmp-label">${isAr ? 'مراجعة ١' : 'Review 1'}</span></div>
               <div class="sm2-rmp-arrow">→</div>
-              <div class="sm2-rmp-step sm2-rmp-s2"><span class="sm2-rmp-day">${isAr ? '+1 يوم' : '+1 day'}</span><span class="sm2-rmp-icon">📖</span><span class="sm2-rmp-label">${isAr ? 'مراجعة ٢' : 'Review 2'}</span></div>
+              <div class="sm2-rmp-step sm2-rmp-s2"><span class="sm2-rmp-day">${isAr ? '+1 يوم' : '+1 day'}</span><span class="sm2-rmp-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><span class="sm2-rmp-label">${isAr ? 'مراجعة ٢' : 'Review 2'}</span></div>
               <div class="sm2-rmp-arrow">→</div>
-              <div class="sm2-rmp-step sm2-rmp-s3"><span class="sm2-rmp-day">${isAr ? '+6 أيام' : '+6 days'}</span><span class="sm2-rmp-icon">📖</span><span class="sm2-rmp-label">${isAr ? 'مراجعة ٣' : 'Review 3'}</span></div>
+              <div class="sm2-rmp-step sm2-rmp-s3"><span class="sm2-rmp-day">${isAr ? '+6 أيام' : '+6 days'}</span><span class="sm2-rmp-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><span class="sm2-rmp-label">${isAr ? 'مراجعة ٣' : 'Review 3'}</span></div>
               <div class="sm2-rmp-arrow">→</div>
-              <div class="sm2-rmp-step sm2-rmp-s4"><span class="sm2-rmp-day">${isAr ? '+21 يوماً' : '+21 days'}</span><span class="sm2-rmp-icon">🏆</span><span class="sm2-rmp-label">${isAr ? 'متقنة!' : 'Mastered!'}</span></div>
+              <div class="sm2-rmp-step sm2-rmp-s4"><span class="sm2-rmp-day">${isAr ? '+21 يوماً' : '+21 days'}</span><span class="sm2-rmp-icon"><i class="fa-solid fa-trophy" aria-hidden="true"></i></span><span class="sm2-rmp-label">${isAr ? 'متقنة!' : 'Mastered!'}</span></div>
             </div>
             ${(learningCount > 0) ? `<div class="sm2-rmastery-breakdown">
               ${needsReviews1 > 0 ? `<div class="sm2-rmb-row"><span class="sm2-rmb-dot" style="background:#10b981"></span><span>${isAr ? `${needsReviews1} بطاقة — مراجعة واحدة بعيدة عن الإتقان` : `${needsReviews1} card${needsReviews1 > 1 ? 's' : ''} — 1 more review to mastery`}</span></div>` : ''}
@@ -1182,23 +1571,23 @@
           </div>
 
           <div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>🏆</span>${isAr ? 'الأداء العام' : 'Overall Performance'}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-trophy" aria-hidden="true"></i></span>${isAr ? 'الأداء العام' : 'Overall Performance'}</div>
             <div class="sm2-rpills">
               <div class="sm2-rpill sm2-rpill--blue">
                 <span class="sm2-rpill-n">${calculateStreak()}</span>
-                <span class="sm2-rpill-l">${isAr ? 'أيام متتالية 🔥' : 'Day Streak 🔥'}</span>
+                <span class="sm2-rpill-l">${isAr ? 'أيام متتالية' : 'Day Streak'}</span>
               </div>
               ${(() => {
         const r = getRetentionRate();
         if (r === null) return '';
         const cls = r >= 80 ? 'sm2-rpill--green' : r >= 60 ? 'sm2-rpill--orange' : 'sm2-rpill--red';
-        return '<div class="sm2-rpill ' + cls + '"><span class="sm2-rpill-n">' + r + '%</span><span class="sm2-rpill-l">' + (isAr ? 'معدل الحفظ 🎯' : 'Retention 🎯') + '</span></div>';
+        return '<div class="sm2-rpill ' + cls + '"><span class="sm2-rpill-n">' + r + '%</span><span class="sm2-rpill-l">' + (isAr ? 'معدل الحفظ' : 'Retention') + '</span></div>';
       })()}
             </div>
           </div>
 
           <div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>📅</span>${isAr ? 'نشاط المراجعة (12 أسبوع)' : 'Review Activity (12 weeks)'}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>${isAr ? 'نشاط المراجعة (12 أسبوع)' : 'Review Activity (12 weeks)'}</div>
             ${(() => {
         const actData = getActivityData();
         const refDay = new Date(); const DAYS = 84;
@@ -1223,9 +1612,9 @@
           </div>
 
           ${nextDueDate ? `<div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>🔔</span>${isAr ? 'الزيارة القادمة المقررة' : 'Your Next Scheduled Visit'}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-bell" aria-hidden="true"></i></span>${isAr ? 'الزيارة القادمة المقررة' : 'Your Next Scheduled Visit'}</div>
             <div class="sm2-rnext-date">
-              <div class="sm2-rnd-big">${nextDueDate.toLocaleDateString(isAr ? 'ar-SA' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div class="sm2-rnd-big">${nextDueDate.toLocaleDateString(isAr ? 'ar-SA-u-ca-gregory' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
               <div class="sm2-rnd-sub">${(() => {
           const diff = Math.round((nextDueDate - today) / 86400000);
           if (diff <= 0) return isAr ? 'البطاقات متاحة الآن' : 'Cards available now';
@@ -1236,12 +1625,12 @@
           </div>` : ''}
 
           <div class="sm2-report-section">
-            <div class="sm2-rsec-title"><span>📅</span>${isAr ? 'جدول المراجعات القادمة' : 'Upcoming Review Schedule'}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>${isAr ? 'جدول المراجعات القادمة' : 'Upcoming Review Schedule'}</div>
             <div class="sm2-rfc-list">${forecastHTML}</div>
           </div>
 
           <div class="sm2-report-section sm2-report-howto">
-            <div class="sm2-rsec-title"><span>🧠</span>${isAr ? 'كيف يعمل نظام SM-2؟' : 'How does SM-2 work?'}</div>
+            <div class="sm2-rsec-title"><span><i class="fa-solid fa-brain" aria-hidden="true"></i></span>${isAr ? 'كيف يعمل نظام SM-2؟' : 'How does SM-2 work?'}</div>
             <div class="sm2-rhow-grid">
               <div class="sm2-rhow-item sm2-rhow-0"><span class="sm2-rhow-g">0</span><div><strong>${isAr ? 'لم أتذكر' : 'Blackout'}</strong><p>${isAr ? 'تُعاد لنهاية الجلسة (حتى ٣ محاولات)' : 'Re-queued to end (up to 3 tries)'}</p></div></div>
               <div class="sm2-rhow-item sm2-rhow-2"><span class="sm2-rhow-g">2</span><div><strong>${isAr ? 'صعب' : 'Hard'}</strong><p>${isAr ? 'تُعاد، يقل معامل السهولة' : 'Re-queued, ease factor reduced'}</p></div></div>
@@ -1270,7 +1659,7 @@
     });
   }
 
-   
+  /*@3.GARJ.116*/
   function initActionLinks() {
     const selectors = [
       '.toc-link[href="#flashcards"]',
@@ -1280,13 +1669,15 @@
       const link = document.querySelector(sel);
       if (!link) return;
       link.classList.add('toc-link--action');
-      
+      /*@3.GARJ.117*/
       const href = link.getAttribute('href');
       const icon = document.createElement('span');
       icon.className = 'toc-action-icon';
-      icon.textContent = href === '#flashcards' ? '🃏' : '🎯';
+      icon.innerHTML = href === '#flashcards'
+        ? '<i class="fa-solid fa-clone" aria-hidden="true"></i>'
+        : '<i class="fa-solid fa-list-check" aria-hidden="true"></i>';
       link.prepend(icon);
-      
+      /*@3.GARJ.118*/
       try {
         const key = 'garden_action_pulsed';
         if (!sessionStorage.getItem(key)) {
@@ -1297,8 +1688,23 @@
     });
   }
 
-   
+  /*@3.GARJ.119*/
   window._gardenQuiz = {};
+
+  /*@3.GARJ.120*/
+  function shuffleMcqOptions(q) {
+    if (!q || !q.options || !q.options.ar) return;
+    var n = q.options.ar.length;
+    if (n < 2) return;
+    var map = Array.from({ length: n }, function(_, i) { return i; });
+    for (var i = n - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = map[i]; map[i] = map[j]; map[j] = t;
+    }
+    q.options.ar = map.map(function(i) { return q.options.ar[i]; });
+    if (q.options.en) q.options.en = map.map(function(i) { return q.options.en[i]; });
+    q.correctIndex = map.indexOf(q.correctIndex);
+  }
 
   function initQuiz() {
     const el = document.getElementById('quiz-data');
@@ -1342,6 +1748,7 @@
     if (hintBtn) { hintBtn.classList.remove('hidden'); hintBtn.onclick = () => showHint(); }
 
     if (opts) {
+      shuffleMcqOptions(item); /*@3.GARJ.121*/
       opts.innerHTML = (item.options?.[L] || []).map((o, i) =>
         `<button class="mcq-option" onclick="Garden.pick(${i})"><span class="mcq-label">${labels[i]}</span><span>${o}</span></button>`
       ).join('');
@@ -1373,6 +1780,64 @@
     if (fb) { fb.textContent = q.questions[q.current].hint?.[currentLang] || ''; fb.className = 'quiz-feedback'; fb.style.cssText = 'background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border-color)'; }
   }
 
+  /*@3.GARJ.122*/
+  var QLOG_CAP = 120;                 /*@3.GARJ.123*/
+
+  function quizLogKey(code) { return 'garden_' + String(code || '').toUpperCase() + '_quizlog'; }
+
+  function readQuizLog(code) {
+    try {
+      var raw = localStorage.getItem(quizLogKey(code));
+      var v = raw ? JSON.parse(raw) : null;
+      return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
+  }
+
+  /*@3.GARJ.124*/
+  function recordQuiz(code, kind, score, total) {
+    code = String(code || '').toUpperCase();
+    kind = String(kind == null ? '' : kind);
+    score = Number(score); total = Number(total);
+    if (!code || !kind || !isFinite(score) || !isFinite(total) || total <= 0) return null;
+    var log = readQuizLog(code);
+    var at = Date.now();
+    /*@3.GARJ.125*/
+    log.push({ id: kind + '@' + at, k: kind, s: Math.max(0, Math.round(score)), t: Math.round(total), at: at });
+    if (log.length > QLOG_CAP) log = log.slice(log.length - QLOG_CAP);
+    try {
+      localStorage.setItem(quizLogKey(code), JSON.stringify(log));
+      /*@3.GARJ.126*/
+      localStorage.setItem('__syncT_' + quizLogKey(code), String(Date.now()));
+    } catch (e) { return null; }
+    return log[log.length - 1];
+  }
+
+  /*@3.GARJ.127*/
+  function recordQuizByKey(storageKey, score, total) {
+    var m = /^([A-Za-z0-9]+)_(midterm|final)_score$/.exec(String(storageKey || ''));
+    if (!m) return null;
+    return recordQuiz(m[1], m[2], score, total);
+  }
+
+  /*@3.GARJ.128*/
+  function hookExamPages() {
+    if (typeof window.finishExam !== 'function' || window.finishExam.__gLog) return;
+    var orig = window.finishExam;
+    var wrapped = function () {
+      var out = orig.apply(this, arguments);
+      try {
+        /*@3.GARJ.129*/
+        var k = (typeof STORAGE_KEY !== 'undefined') ? STORAGE_KEY : null;
+        var s = (typeof score !== 'undefined') ? score : null;
+        var t = (typeof TOTAL !== 'undefined') ? TOTAL : null;
+        if (k != null && s != null && t != null) recordQuizByKey(k, s, t);
+      } catch (e) {}
+      return out;
+    };
+    wrapped.__gLog = 1;
+    window.finishExam = wrapped;
+  }
+
   function showResults() {
     const q = window._gardenQuiz;
     document.getElementById('quiz-content')?.classList.add('hidden');
@@ -1381,9 +1846,18 @@
     const se = document.getElementById('quiz-score-display'); if (se) se.textContent = `${q.score} / ${q.questions.length}`;
     const ee = document.getElementById('quiz-score-emoji');
     const pct = q.score / q.questions.length;
-    if (ee) { if (pct >= 0.9) { ee.textContent = '🏆'; try { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }) } catch (e) { } } else if (pct >= 0.7) ee.textContent = '🌟'; else if (pct >= 0.5) ee.textContent = '💪'; else ee.textContent = '📚'; }
+    /*@3.GARJ.130*/
+    const badge = n => `<i class="fa-solid fa-${n}" aria-hidden="true"></i>`;
+    if (ee) {
+      if (pct >= 0.9) { ee.innerHTML = badge('trophy'); try { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }) } catch (e) { } }
+      else if (pct >= 0.7) ee.innerHTML = badge('star');
+      else if (pct >= 0.5) ee.innerHTML = badge('hand-fist');
+      else ee.innerHTML = badge('book-open-reader');
+    }
     const s = document.documentElement.getAttribute('data-subject') || 'XX', m = document.documentElement.getAttribute('data-module') || '0';
     try { const p = parseInt(localStorage.getItem(`garden_${s}_m${m}_quiz`)) || 0; if (q.score > p) localStorage.setItem(`garden_${s}_m${m}_quiz`, q.score) } catch (e) { }
+    /*@3.GARJ.131*/
+    recordQuiz(s, m, q.score, q.questions.length);
   }
 
   function retryQuiz() {
@@ -1393,7 +1867,7 @@
     renderQuestion();
   }
 
-   
+  /*@3.GARJ.132*/
   function initSyntaxHighlight() {
     document.querySelectorAll('.code-block').forEach(block => {
       const headerSpan = block.querySelector('.code-block-header span');
@@ -1401,7 +1875,7 @@
       if (!codeEl) return;
 
       const lang = (headerSpan?.textContent || '').trim().toLowerCase();
-      const raw = codeEl.textContent; 
+      const raw = codeEl.textContent; /*@3.GARJ.133*/
 
       let highlighted;
       if (['sql', 'mysql', 'postgresql', 'plsql', 'sqlite'].includes(lang)) {
@@ -1427,7 +1901,7 @@
     });
   }
 
-   
+  /*@3.GARJ.134*/
 
   function escHtml(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1449,7 +1923,7 @@
         rule.regex.lastIndex = pos;
         const m = rule.regex.exec(line);
         if (m && m.index === pos) {
-          if (pos > m.index) continue; 
+          if (pos > m.index) continue; /*@3.GARJ.135*/
           tokens.push({ type: rule.type, text: m[0] });
           pos += m[0].length;
           matched = true;
@@ -1457,7 +1931,7 @@
         }
       }
       if (!matched) {
-        
+        /*@3.GARJ.136*/
         const last = tokens[tokens.length - 1];
         if (last && last.type === 'plain') {
           last.text += line[pos];
@@ -1470,7 +1944,7 @@
     return tokens;
   }
 
-  
+  /*@3.GARJ.137*/
   const SQL_RULES = [
     { type: 'cm', regex: /--.*$/gm },
     { type: 'cm', regex: /\/\*[\s\S]*?\*\//g },
@@ -1487,7 +1961,7 @@
     return code.split('\n').map(line => renderTokens(tokenizeLine(line, SQL_RULES))).join('\n');
   }
 
-  
+  /*@3.GARJ.138*/
   const PSEUDO_RULES = [
     { type: 'cm', regex: /\/\/.*$/gm },
     { type: 'cm', regex: /#.*$/gm },
@@ -1503,7 +1977,7 @@
     return code.split('\n').map(line => renderTokens(tokenizeLine(line, PSEUDO_RULES))).join('\n');
   }
 
-  
+  /*@3.GARJ.139*/
   const PY_RULES = [
     { type: 'cm', regex: /#.*$/gm },
     { type: 'str', regex: /"""[\s\S]*?"""|'''[\s\S]*?'''|"[^"]*"|'[^']*'/g },
@@ -1518,7 +1992,7 @@
     return code.split('\n').map(line => renderTokens(tokenizeLine(line, PY_RULES))).join('\n');
   }
 
-  
+  /*@3.GARJ.140*/
   const C_RULES = [
     { type: 'cm', regex: /\/\/.*$/gm },
     { type: 'cm', regex: /\/\*[\s\S]*?\*\//g },
@@ -1535,7 +2009,7 @@
     return code.split('\n').map(line => renderTokens(tokenizeLine(line, C_RULES))).join('\n');
   }
 
-  
+  /*@3.GARJ.141*/
   const JS_RULES = [
     { type: 'cm', regex: /\/\/.*$/gm },
     { type: 'cm', regex: /\/\*[\s\S]*?\*\//g },
@@ -1551,17 +2025,15 @@
     return code.split('\n').map(line => renderTokens(tokenizeLine(line, JS_RULES))).join('\n');
   }
 
-  
+  /*@3.GARJ.142*/
   function hlGeneric(code) {
     const sqlHits = (code.match(/\b(SELECT|CREATE|INSERT|DELETE|UPDATE|FROM|WHERE|TABLE|PRIMARY|FOREIGN|KEY|REFERENCES|CONSTRAINT)\b/gi) || []).length;
     return sqlHits >= 2 ? hlSQL(code) : hlPseudo(code);
   }
 
-   
+  /*@3.GARJ.143*/
 
-  
-  
-  
+  /*@3.GARJ.144*/
   const NOTE_COLORS = {
     yellow:  { dot: '#fde047', rgb: '253,224,71',  label_ar: 'أصفر',    label_en: 'Yellow'  },
     amber:   { dot: '#fb923c', rgb: '251,146,60',  label_ar: 'برتقالي', label_en: 'Orange'  },
@@ -1644,7 +2116,7 @@
              '" data-color="' + k + '" style="--dot:' + getDotColor(k) + ';" title="' + getDotLabel(k) + '"></button>';
     };
     const backBtn = opts.showBack
-      ? '<button type="button" class="notes-tip-dot-back notes-cp-back-btn" id="cp-back-btn" title="' + nL('رجوع','Back') + '"><i class="fa-solid fa-arrow-right-to-line"></i></button>'
+      ? '<button type="button" class="notes-tip-dot-back notes-cp-back-btn" id="cp-back-btn" title="' + nL('رجوع','Back') + '"><i class="fa-solid fa-reply"></i></button>'
       : '';
     return (
       '<div class="notes-cp-primary">' +
@@ -1752,7 +2224,7 @@
   function wireColorPicker(container, onPick, onBack, previewEls, onExpand) {
     container.addEventListener('mousedown', e => e.stopPropagation());
 
-     
+    /*@3.GARJ.145*/
     function getRgb(colorKey) {
       return isCustomColor(colorKey)
         ? (() => { const {r,g,b}=hexToRgb(colorKey); return r+','+g+','+b; })()
@@ -1760,7 +2232,7 @@
     }
     function applyPreview(colorKey) {
       removePreview();
-      
+      /*@3.GARJ.146*/
       if (previewEls && previewEls.length) {
         const rgb = getRgb(colorKey);
         previewEls.forEach(el => {
@@ -1771,7 +2243,7 @@
         });
         return;
       }
-      
+      /*@3.GARJ.147*/
       const range = _gardenSelRange;
       if (!range || range.collapsed) return;
       try {
@@ -1790,7 +2262,7 @@
       } catch (_) {}
     }
     function removePreview() {
-      
+      /*@3.GARJ.148*/
       if (previewEls && previewEls.length) {
         previewEls.forEach(el => {
           if (el._previewOrig) {
@@ -1849,13 +2321,13 @@
         manPanel.style.display = 'block';
         buildColorManagerUI(container, () => {
           const cfg2 = getColorConfig();
-          
+          /*@3.GARJ.149*/
           if (primRow) {
             primRow.querySelectorAll('.notes-tip-dot').forEach(d => d.remove());
             const firstBtn = primRow.querySelector('button:not(.notes-tip-dot)');
             cfg2.primary.forEach(k => { const el = makeDotEl(k,null,''); primRow.insertBefore(el, firstBtn); });
           }
-          
+          /*@3.GARJ.150*/
           if (extPanel) {
             extPanel.innerHTML = cfg2.extended.map(k => {
               const ex = isCustomColor(k) ? ' notes-tip-custom-dot' : '';
@@ -1885,7 +2357,7 @@
         const hex = e.target.value;
         addCustomColorToCfg(hex);
         addRecentColor(hex);
-        
+        /*@3.GARJ.151*/
         if (extPanel && !extPanel.querySelector('[data-color="' + hex + '"]')) {
           const dot = makeDotEl(hex, null, 'notes-tip-custom-dot');
           dot._cpBound = true;
@@ -1907,7 +2379,24 @@
       });
     }
   }
-  let _gardenSelRange = null;   
+  let _gardenSelRange = null;   /*@3.GARJ.152*/
+  let _gardenSelAnchor = null;
+  let _gardenSelText = '';
+  function _captureSelection(range, text) {
+    _gardenSelRange = range;
+    _gardenSelText = text || '';
+    try { _gardenSelAnchor = range ? computeAnchor(range.cloneRange()) : null; }
+    catch (_) { _gardenSelAnchor = null; }
+  }
+  /*@3.GARJ.153*/
+  function _resolveSel() {
+    const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+    const live = range ? range.toString().trim() : '';
+    const text = _gardenSelText || live || (window._gardenNotesSelection || '').trim();
+    const anchor = _gardenSelAnchor
+      || (range ? computeAnchor(range) : (text ? { text: text, occurrence: 0, blockIndex: -1 } : null));
+    return { text: text, anchor: anchor };
+  }
 
   function nL(ar, en) { return currentLang === 'ar' ? ar : en; }
 
@@ -1919,7 +2408,7 @@
   function loadNotes() {
     try {
       const arr = JSON.parse(localStorage.getItem(notesKey())) || [];
-      
+      /*@3.GARJ.154*/
       return arr.map(n => ({
         id: n.id,
         title: n.title || (n.highlight && !n.free ? smartTitle(n.highlight) : (n.highlight || nL('ملاحظة', 'Note'))),
@@ -1943,10 +2432,10 @@
     return (words.length > 46 ? words.slice(0, 46) + '…' : words) || nL('ملاحظة', 'Note');
   }
 
-   
+  /*@3.GARJ.155*/
   function getContentRoot() { return document.querySelector('.main-content') || document.body; }
 
-   
+  /*@3.GARJ.156*/
   function bilingualBlocks() {
     const root = getContentRoot();
     if (!root) return [];
@@ -1960,7 +2449,7 @@
     return bilingualBlocks().indexOf(block);
   }
 
-   
+  /*@3.GARJ.157*/
   function charOffsetOf(root, container, offset) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     let pos = 0, n;
@@ -1971,7 +2460,7 @@
     return -1;
   }
 
-   
+  /*@3.GARJ.158*/
   function rangeFromCharOffsets(root, startChar, endChar) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     let pos = 0, startNode = null, startOff = 0, endNode = null, endOff = 0, n;
@@ -1990,7 +2479,7 @@
     } catch (e) { return null; }
   }
 
-   
+  /*@3.GARJ.159*/
   function computeAnchor(range) {
     const root = getContentRoot();
     if (!root || !range) return null;
@@ -2005,7 +2494,7 @@
     return { text: text, occurrence: occ, blockIndex: blockIndex };
   }
 
-   
+  /*@3.GARJ.160*/
   function highlightRange(range, id, color) {
     const sc = range.startContainer, so = range.startOffset;
     const ec = range.endContainer, eo = range.endOffset;
@@ -2038,11 +2527,11 @@
           }
         }
         r.surroundContents(mark);
-      } catch (_) {   }
+      } catch (_) { /*@3.GARJ.161*/ }
     });
   }
 
-   
+  /*@3.GARJ.162*/
   function findAndHighlight(note) {
     const root = getContentRoot();
     if (!root) return false;
@@ -2057,14 +2546,14 @@
       count++; from = idx + 1;
     }
     if (found === -1) found = full.indexOf(text);
-    if (found === -1) return false;        
+    if (found === -1) return false;        /*@3.GARJ.163*/
     const range = rangeFromCharOffsets(root, found, found + text.length);
     if (!range) return false;
     highlightRange(range, note.id, note.color);
     return true;
   }
 
-   
+  /*@3.GARJ.164*/
   function clearHighlights() {
     document.querySelectorAll('mark.user-highlight').forEach(m => {
       const parent = m.parentNode;
@@ -2079,11 +2568,11 @@
     const root = getContentRoot();
     if (!root) return;
     clearHighlights();
-    
+    /*@3.GARJ.165*/
     loadNotes().forEach(n => { if (!n.free) findAndHighlight(n); });
   }
 
-   
+  /*@3.GARJ.166*/
   function renderNoteBody(src) {
     if (!src) return '';
     let s = escapeHTML(src);
@@ -2110,7 +2599,7 @@
     return s;
   }
 
-   
+  /*@3.GARJ.167*/
   function notesToast(msg) {
     document.querySelector('.notes-toast')?.remove();
     const t = document.createElement('div');
@@ -2121,7 +2610,7 @@
     setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 1900);
   }
 
-   
+  /*@3.GARJ.168*/
   function copyText(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(
@@ -2140,9 +2629,9 @@
     } catch (e) { notesToast(nL('تعذّر النسخ', 'Copy failed')); }
   }
 
-   
+  /*@3.GARJ.169*/
   function initNotes() {
-    
+    /*@3.GARJ.170*/
     const tooltip = document.createElement('div');
     tooltip.className = 'notes-tooltip';
     tooltip.id = 'notes-tooltip';
@@ -2155,13 +2644,18 @@
       notesBtn.className = 'sidebar-notes-btn';
       notesBtn.id = 'sidebar-notes-btn';
       const notes = loadNotes();
-      notesBtn.innerHTML = `📝 <span data-i18n="notes.btn">${nL('ملاحظاتي', 'My Notes')}</span> <span class="notes-count" id="notes-count">${notes.length}</span>`;
+      notesBtn.innerHTML = `<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> <span data-i18n="notes.btn">${nL('ملاحظاتي', 'My Notes')}</span> <span class="notes-count" id="notes-count">${notes.length}</span>`;
       notesBtn.addEventListener('click', openNotesPanel);
       widget.parentNode.insertBefore(notesBtn, widget.nextSibling);
     }
 
     let selectionTimeout;
     const mainContent = document.querySelector('.main-content');
+
+    /*@3.GARJ.171*/
+    const notesOff = document.body.hasAttribute('data-no-notes');
+    if (notesOff) return;
+
     mainContent?.addEventListener('mouseup', (e) => {
       clearTimeout(selectionTimeout);
       selectionTimeout = setTimeout(() => {
@@ -2169,7 +2663,7 @@
         const sel = window.getSelection();
         const text = sel?.toString().trim();
         if (text && text.length >= 1 && text.length < 500) {
-          _gardenSelRange = sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+          _captureSelection(sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null, text);
           const rect = _gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null;
           showNotesTooltip(rect, text);
         } else { hideNotesTooltip(); }
@@ -2185,24 +2679,24 @@
         const sel = window.getSelection();
         const text = sel?.toString().trim();
         if (text && text.length >= 1 && text.length < 500 && mainContent?.contains(sel.anchorNode)) {
-          _gardenSelRange = sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+          _captureSelection(sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null, text);
           showMobileNoteSaveBar(text);
         } else { hideMobileNoteSaveBar(); }
       }, 800);
     });
 
-    
+    /*@3.GARJ.172*/
     mainContent?.addEventListener('click', (e) => {
       const mark = e.target.closest('mark.user-highlight');
       if (!mark) return;
-      
+      /*@3.GARJ.173*/
       if ((window.getSelection()?.toString() || '').trim().length > 3) return;
       const id = mark.dataset.noteId;
       const note = loadNotes().find(n => String(n.id) === String(id));
       if (note) { e.stopPropagation(); showNotePop(note, mark.getBoundingClientRect()); }
     });
 
-    
+    /*@3.GARJ.174*/
     document.addEventListener('mousedown', (e) => {
       if (!e.target.closest('.notes-tooltip, .notes-panel, .mobile-note-bar, .notes-cp-primary, .notes-cp-extended, .notes-cp-hidden-input')) {
         hideNotesTooltip();
@@ -2212,10 +2706,10 @@
       }
     });
 
-    
+    /*@3.GARJ.175*/
     document.addEventListener('garden:languageChanged', () => {
       hideNotePop();
-      buildSelectionTooltip(tooltip);   
+      buildSelectionTooltip(tooltip);   /*@3.GARJ.176*/
       clearTimeout(window._notesRestoreT);
       window._notesRestoreT = setTimeout(restoreHighlights, 120);
     });
@@ -2223,14 +2717,19 @@
     restoreHighlights();
   }
 
-   
+  /*@3.GARJ.177*/
   function buildSelectionTooltip(tip) {
     const isPaused = sessionStorage.getItem('garden_notes_paused') === '1';
+    /*@3.GARJ.178*/
+    const explainBtn = _isContentPage()
+      ? `<button class="notes-tip-btn notes-tip-explain" id="tip-explain" title="${nL('اشرح بالذكاء','Explain')}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>${nL('اشرح','Explain')}</span></button>`
+      : '';
     tip.innerHTML = `
       <div class="notes-tip-main">
         <button class="notes-tip-btn notes-tip-color" id="tip-color" title="${nL('تلوين النص','Highlight')}"><i class="fa-solid fa-highlighter"></i><span>${nL('تلوين','Highlight')}</span></button>
         <button class="notes-tip-btn notes-tip-copy"  id="tip-copy"  title="${nL('نسخ النص','Copy')}"><i class="fa-solid fa-copy"></i><span>${nL('نسخ','Copy')}</span></button>
         <button class="notes-tip-btn notes-tip-note"  id="tip-note"  title="${nL('إضافة ملاحظة','Add note')}"><i class="fa-solid fa-pen-to-square"></i><span>${nL('ملاحظة','Note')}</span></button>
+        ${explainBtn}
         <button class="notes-tip-pause" id="tip-pause" title="${nL('إخفاء مؤقت','Dismiss for session')}"><i class="fa-solid fa-eye-slash"></i></button>
       </div>
       <div class="notes-tip-colors notes-cp" id="tip-colors" style="display:none;">
@@ -2247,20 +2746,34 @@
       window.getSelection()?.removeAllRanges();
     });
     tip.querySelector('#tip-note').addEventListener('click', () => {
-      const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
-      const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
+      const { text, anchor } = _resolveSel();
       if (!text) return;
-      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
       hideNotesTooltip();
       window.getSelection()?.removeAllRanges();
       openNoteEditor({ free: false, highlightText: text, anchor: anchor });
     });
     tip.querySelector('#tip-color').addEventListener('click', () => {
-      
+      /*@3.GARJ.179*/
       try { window.getSelection()?.removeAllRanges(); } catch(_) {}
       main.style.display = 'none';
       colors.style.display = 'block';
       requestAnimationFrame(() => repositionTooltip());
+    });
+
+    const explainEl = tip.querySelector('#tip-explain');
+    if (explainEl) explainEl.addEventListener('click', () => {
+      const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+      const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
+      if (!text) return;
+      let title = '';
+      const node = range ? range.startContainer : null;
+      const host = node ? (node.nodeType === 1 ? node : node.parentElement) : null;
+      const card = host && host.closest ? host.closest('.concept-card, .vault-section, .objectives-card, .accordion-item, .professor-card') : null;
+      if (card) { const hh = card.querySelector('h2, h3'); title = hh ? hh.textContent.trim().slice(0, 80) : ''; }
+      if (!title) title = (document.title.split('·')[0] || '').trim();
+      hideNotesTooltip();
+      try { window.getSelection()?.removeAllRanges(); } catch (_) {}
+      showAiModal({ title, content: text, background: '', activeLayer: '', allLayersText: '', svgBlock: '', type: 'selection', hasSVG: false, hasAlgo: false, svgOnly: false });
     });
 
     tip.querySelector('#tip-pause').addEventListener('click', (e) => {
@@ -2268,22 +2781,20 @@
       sessionStorage.setItem('garden_notes_paused', '1');
       hideNotesTooltip();
       hideMobileNoteSaveBar();
-      notesToast(nL('تم إخفاء الشريط حتى نهاية الجلسة — يمكن تفعيله من قائمة الملاحظات ⚙', 'Toolbar hidden for this session — re-enable from the Notes panel ⚙'));
+      notesToast(nL('تم إخفاء الشريط حتى نهاية الجلسة — يمكن تفعيله من قائمة الملاحظات', 'Toolbar hidden for this session — re-enable from the Notes panel ⚙'));
     });
 
     const goBack = () => { colors.style.display = 'none'; main.style.display = 'flex'; };
     wireColorPicker(colors, (colorKey) => {
-      const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
-      const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
+      const { text, anchor } = _resolveSel();
       if (!text) return;
-      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
       createHighlightOnly(text, anchor, colorKey);
       hideNotesTooltip();
       window.getSelection()?.removeAllRanges();
     }, goBack);
   }
 
-   
+  /*@3.GARJ.180*/
   function createHighlightOnly(text, anchor, color) {
     const notes = loadNotes();
     notes.unshift({
@@ -2305,7 +2816,7 @@
     notesToast(nL('تم التلوين ✓', 'Highlighted ✓'));
   }
 
-   
+  /*@3.GARJ.181*/
   let _tooltipRect = null;
   function placeFloating(el, rect, gap) {
     gap = gap || 10;
@@ -2346,7 +2857,7 @@
     if (rect && rect.width) _tooltipRect = rect;
     const main   = tip.querySelector('.notes-tip-main');
     const colors = tip.querySelector('#tip-colors');
-    
+    /*@3.GARJ.182*/
     if (main)   main.style.display   = 'flex';
     if (colors) colors.style.display = 'none';
     const extP = tip.querySelector('#cp-extended');
@@ -2356,6 +2867,8 @@
     if (manP) manP.style.display = 'none';
     if (primR) primR.style.display = '';
     placeFloating(tip, _tooltipRect || rect, 8);
+    /*@3.GARJ.183*/
+    document.body.classList.add('garden-selbar-open');
   }
 
   function hideNotesTooltip() {
@@ -2363,6 +2876,7 @@
     if (tip) tip.style.display = 'none';
     _tooltipRect = null;
     document.querySelectorAll('.notes-preview-overlay').forEach(d => d.remove());
+    document.body.classList.remove('garden-selbar-open');
   }
 
   function showMobileNoteSaveBar(text) {
@@ -2387,13 +2901,11 @@
       '</div>';
     bar.style.display = 'flex';
 
-    const getRange = () => _gardenSelRange ? _gardenSelRange.cloneRange() : null;
     bar.querySelector('#mnb-save').onclick = () => {
-      const range = getRange();
-      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
+      const r = _resolveSel();
       hideMobileNoteSaveBar();
       window.getSelection()?.removeAllRanges();
-      openNoteEditor({ free: false, highlightText: text, anchor: anchor });
+      openNoteEditor({ free: false, highlightText: r.text || text, anchor: r.anchor || { text: text, occurrence: 0, blockIndex: -1 } });
     };
     bar.querySelector('#mnb-copy').onclick = () => { copyText(text); hideMobileNoteSaveBar(); window.getSelection()?.removeAllRanges(); };
     bar.querySelector('#mnb-color').onclick = () => {
@@ -2401,9 +2913,10 @@
       c.style.display = c.style.display === 'none' ? 'block' : 'none';
     };
     wireColorPicker(bar.querySelector('#mnb-colors'), (colorKey) => {
-      const range = getRange();
-      const anchor = range ? computeAnchor(range) : { text: text, occurrence: 0, blockIndex: -1 };
-      createHighlightOnly(text, anchor, colorKey);
+      const r = _resolveSel();
+      const text2 = r.text || text;
+      const anchor = r.anchor || { text: text2, occurrence: 0, blockIndex: -1 };
+      createHighlightOnly(text2, anchor, colorKey);
       hideMobileNoteSaveBar();
       window.getSelection()?.removeAllRanges();
     });
@@ -2414,7 +2927,7 @@
     if (bar) bar.style.display = 'none';
   }
 
-   
+  /*@3.GARJ.184*/
   function ensureNotePop() {
     let pop = document.getElementById('note-pop');
     if (!pop) {
@@ -2452,7 +2965,7 @@
       .join('');
 
     if (note.highlightOnly) {
-      
+      /*@3.GARJ.185*/
       pop.innerHTML = `
         <div class="note-pop-head">
           <span class="note-pop-dot"></span>
@@ -2482,10 +2995,10 @@
       pop.querySelector('#hl-recolor').onclick = () => {
         const opening = colorsRow.style.display === 'none';
         colorsRow.style.display = opening ? 'block' : 'none';
-        
+        /*@3.GARJ.186*/
         requestAnimationFrame(() => placeFloating(pop, rect, 12));
       };
-      
+      /*@3.GARJ.187*/
       const existingMarks = Array.from(document.querySelectorAll('mark.user-highlight[data-note-id="' + note.id + '"]'));
       wireColorPicker(colorsRow, (c) => {
         const notes = loadNotes();
@@ -2507,7 +3020,7 @@
       return;
     }
 
-    
+    /*@3.GARJ.188*/
     const hasBody = !!(note.body && note.body.trim());
     const bodyHtml = hasBody
       ? `<div class="note-pop-body">${renderNoteBody(note.body)}</div>`
@@ -2549,7 +3062,7 @@
     setTimeout(() => { if (pop && !pop.classList.contains('visible')) pop.style.display = 'none'; }, 180);
   }
 
-   
+  /*@3.GARJ.189*/
   function openNoteEditor(opts) {
     opts = opts || {};
     const editing = !!opts.note;
@@ -2585,7 +3098,7 @@
       <div class="garden-modal note-editor" style="max-width:520px;">
         <div class="note-editor-head">
           <div class="note-editor-title">
-            <span class="note-editor-icon">${isFree ? '🗒️' : '📝'}</span>
+            <span class="note-editor-icon">${isFree ? '<i class="fa-solid fa-note-sticky" aria-hidden="true"></i>' : '<i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>'}</span>
             ${editing ? (L === 'ar' ? 'تعديل الملاحظة' : 'Edit Note')
         : (isFree ? (L === 'ar' ? 'ملاحظة جديدة' : 'New Note') : (L === 'ar' ? 'أضف ملاحظتك' : 'Add Your Note'))}
           </div>
@@ -2623,7 +3136,7 @@
     const preview = overlay.querySelector('#note-preview');
     const previewToggle = overlay.querySelector('#note-preview-toggle');
 
-    
+    /*@3.GARJ.190*/
     const wraps = { bold: ['**', '**'], italic: ['*', '*'], code: ['`', '`'], hl: ['==', '=='] };
     overlay.querySelector('#note-format-toolbar').addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-md]');
@@ -2637,7 +3150,7 @@
       if (preview.style.display !== 'none') preview.innerHTML = renderNoteBody(bodyInput.value);
     });
 
-    
+    /*@3.GARJ.191*/
     previewToggle.addEventListener('click', () => {
       const showing = preview.style.display !== 'none';
       if (showing) {
@@ -2652,7 +3165,7 @@
       }
     });
 
-    
+    /*@3.GARJ.192*/
     const swatchesCP = overlay.querySelector('#note-color-swatches-cp');
     if (swatchesCP) {
       wireColorPicker(swatchesCP, (c) => { color = c; });
@@ -2675,7 +3188,7 @@
           notes[i].body = body;
           notes[i].color = color;
           notes[i].lang = currentLang;
-          if (body) notes[i].highlightOnly = false;   
+          if (body) notes[i].highlightOnly = false;   /*@3.GARJ.193*/
         }
       } else {
         const newNote = {
@@ -2702,7 +3215,7 @@
     setTimeout(() => { (titleVal ? bodyInput : titleInput).focus(); }, 100);
   }
 
-   
+  /*@3.GARJ.194*/
   function wrapTextarea(ta, before, after) {
     const start = ta.selectionStart, end = ta.selectionEnd;
     const val = ta.value;
@@ -2729,12 +3242,12 @@
     if (el) el.textContent = loadNotes().length;
   }
 
-   
+  /*@3.GARJ.195*/
   function gotoNoteSource(note) {
-    if (note.free) { showNotePop(note, null); return; }       
+    if (note.free) { showNotePop(note, null); return; }       /*@3.GARJ.196*/
     closeNotesPanel();
     setTimeout(() => {
-      
+      /*@3.GARJ.197*/
       let mark = document.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`);
       if (!mark) { findAndHighlight(note); mark = document.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`); }
       if (mark) {
@@ -2744,7 +3257,7 @@
         setTimeout(() => showNotePop(note, mark.getBoundingClientRect()), 360);
         return;
       }
-      
+      /*@3.GARJ.198*/
       const blocks = bilingualBlocks();
       const bi = note.anchor && note.anchor.blockIndex != null ? note.anchor.blockIndex : (note.blockIndex != null ? note.blockIndex : -1);
       const block = (bi >= 0 && bi < blocks.length) ? blocks[bi] : null;
@@ -2756,12 +3269,12 @@
         notesToast(nL('عُرضت الملاحظة عند فقرتها (النص بلغة أخرى)', 'Shown at its paragraph (text is in the other language)'));
         return;
       }
-      
+      /*@3.GARJ.199*/
       showNotePop(note, null);
     }, 240);
   }
 
-   
+  /*@3.GARJ.200*/
   function closeNotesPanel() {
     document.querySelector('.notes-panel-overlay')?.remove();
     document.querySelector('.notes-panel')?.remove();
@@ -2780,11 +3293,11 @@
     const isPaused = sessionStorage.getItem('garden_notes_paused') === '1';
     panel.innerHTML = `
       <div class="notes-panel-header">
-        <h3 id="notes-panel-title">📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'}</h3>
+        <h3 id="notes-panel-title"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i> ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'}</h3>
         <div class="notes-panel-head-actions">
           ${isPaused ? `<button class="notes-resume-btn" id="notes-resume" title="${L === 'ar' ? 'تفعيل شريط التحديد' : 'Re-enable selection toolbar'}"><i class="fa-solid fa-eye"></i></button>` : ''}
           <button class="notes-add-free" id="notes-add-free" title="${L === 'ar' ? 'ملاحظة جديدة' : 'New note'}"><i class="fa-solid fa-plus"></i></button>
-          <button class="notes-panel-close" id="notes-panel-close" title="${L === 'ar' ? 'إغلاق' : 'Close'}">✕</button>
+          <button class="notes-panel-close" id="notes-panel-close" title="${L === 'ar' ? 'إغلاق' : 'Close'}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
       </div>
       <div class="notes-search-wrap">
@@ -2822,7 +3335,7 @@
     renderNotesPanelBody();
   }
 
-   
+  /*@3.GARJ.201*/
   function notesConfirm(opts) {
     return new Promise((resolve) => {
       hideNotePop();
@@ -2858,7 +3371,7 @@
     });
   }
 
-   
+  /*@3.GARJ.202*/
   async function clearAllHighlights() {
     const notes = loadNotes();
     const highlightCount = notes.filter(n => n.highlightOnly).length;
@@ -2874,7 +3387,7 @@
     });
     if (!ok) return;
 
-    
+    /*@3.GARJ.203*/
     const kept = notes.filter(n => !n.highlightOnly);
     saveNotes(kept);
     restoreHighlights();
@@ -2883,7 +3396,7 @@
     notesToast(nL('تم حذف كل التلوينات ✓', 'All highlights cleared ✓'));
   }
 
-   
+  /*@3.GARJ.204*/
   async function clearAllNotes() {
     const notes = loadNotes();
     const noteCount = notes.filter(n => !n.highlightOnly && n.body && n.body.trim()).length;
@@ -2899,9 +3412,9 @@
     });
     if (!ok) return;
 
-    
+    /*@3.GARJ.205*/
     const kept = notes.filter(n => n.highlightOnly || !(n.body && n.body.trim()));
-    
+    /*@3.GARJ.206*/
     const finalKept = kept.filter(n => n.highlightOnly);
     saveNotes(finalKept);
     restoreHighlights();
@@ -2917,7 +3430,7 @@
     const body = panel.querySelector('#notes-panel-body');
     const titleEl = panel.querySelector('#notes-panel-title');
     let notes = loadNotes();
-    
+    /*@3.GARJ.207*/
     notes = notes.filter(n => !n.highlightOnly);
     const total = notes.length;
 
@@ -2927,18 +3440,18 @@
       (n.body || '').toLowerCase().includes(q) ||
       (n.highlight || '').toLowerCase().includes(q));
 
-    if (titleEl) titleEl.innerHTML = `📝 ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'} <span class="notes-title-count">${total}</span>`;
+    if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'} <span class="notes-title-count">${total}</span>`;
 
     if (total === 0) {
       body.innerHTML = `<div class="notes-empty">
-        <div class="notes-empty-icon">🗒️</div>
+        <div class="notes-empty-icon"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i></div>
         <div>${L === 'ar' ? 'لا توجد ملاحظات بعد.' : 'No notes yet.'}</div>
         <div class="notes-empty-hint">${L === 'ar' ? 'حدّد أي نص ثم اختر «تلوين» أو «ملاحظة»، أو أنشئ ملاحظة عامة بزر +' : 'Select any text then choose "Highlight" or "Note", or create a general note with +'}</div>
       </div>`;
       return;
     }
     if (notes.length === 0) {
-      body.innerHTML = `<div class="notes-empty"><div class="notes-empty-icon">🔍</div><div>${L === 'ar' ? 'لا نتائج مطابقة' : 'No matching notes'}</div></div>`;
+      body.innerHTML = `<div class="notes-empty"><div class="notes-empty-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div><div>${L === 'ar' ? 'لا نتائج مطابقة' : 'No matching notes'}</div></div>`;
       return;
     }
 
@@ -2975,7 +3488,7 @@
         </div>`;
     }).join('');
 
-    
+    /*@3.GARJ.208*/
     body.querySelectorAll('[data-goto]').forEach(el => {
       el.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -2984,7 +3497,7 @@
         if (note) gotoNoteSource(note);
       });
     });
-    
+    /*@3.GARJ.209*/
     body.querySelectorAll('.note-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.note-act') || e.target.closest('[data-goto]')) return;
@@ -2992,10 +3505,10 @@
         const note = loadNotes().find(n => n.id === id);
         if (!note) return;
         if (card.classList.contains('is-navigable')) gotoNoteSource(note);
-        else showNotePop(note, null);   
+        else showNotePop(note, null);   /*@3.GARJ.210*/
       });
     });
-    
+    /*@3.GARJ.211*/
     body.querySelectorAll('.note-edit').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3004,7 +3517,7 @@
         if (note) openNoteEditor({ note: note });
       });
     });
-    
+    /*@3.GARJ.212*/
     body.querySelectorAll('.note-delete').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3027,7 +3540,7 @@
   }
 
 
-   
+  /*@3.GARJ.213*/
   function initVideos() {
     const subject = document.documentElement.getAttribute('data-subject');
     const moduleNum = document.documentElement.getAttribute('data-module');
@@ -3042,14 +3555,16 @@
         if (!data.videos || data.videos.length === 0) return;
         renderVideoSection(data);
       })
-      .catch(() => {   });
+      .catch(() => { /*@3.GARJ.214*/ });
   }
 
   function renderVideoSection(data) {
     const L = currentLang;
     const videos = data.videos;
+    /*@3.GARJ.215*/
+    const FILM = '<i class="fa-solid fa-film" aria-hidden="true"></i>';
 
-    
+    /*@3.GARJ.216*/
     const anchor = document.getElementById('professor')
       || document.getElementById('flashcards')
       || document.getElementById('vault');
@@ -3074,18 +3589,18 @@
               <span class="content-target">${escapeHTML(L === 'ar' ? topicAr : topicEn)}</span>
             </div>
           </div>
-          <div class="video-card-play">▶</div>
+          <div class="video-card-play"><i class="fa-solid fa-play" aria-hidden="true"></i></div>
         </a>`;
     }).join('');
 
     section.innerHTML = `
       <button class="video-toggle glass-card" id="video-toggle" aria-expanded="false">
         <div class="video-toggle-content" data-bilingual>
-          <template class="content-ar">🎬 فيديوهات تعليمية مقترحة (${videos.length})</template>
-          <template class="content-en">🎬 Recommended Videos (${videos.length})</template>
-          <span class="content-target">${L === 'ar' ? `🎬 فيديوهات تعليمية مقترحة (${videos.length})` : `🎬 Recommended Videos (${videos.length})`}</span>
+          <template class="content-ar">${FILM} فيديوهات تعليمية مقترحة (${videos.length})</template>
+          <template class="content-en">${FILM} Recommended Videos (${videos.length})</template>
+          <span class="content-target">${L === 'ar' ? `${FILM} فيديوهات تعليمية مقترحة (${videos.length})` : `${FILM} Recommended Videos (${videos.length})`}</span>
         </div>
-        <span class="video-toggle-chevron">▼</span>
+        <span class="video-toggle-chevron"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></span>
       </button>
       <div class="video-collapsible" id="video-collapsible">
         <p class="video-section-desc" data-bilingual>
@@ -3098,7 +3613,7 @@
 
     anchor.parentNode.insertBefore(section, anchor);
 
-    
+    /*@3.GARJ.217*/
     document.getElementById('video-toggle').addEventListener('click', () => {
       const btn = document.getElementById('video-toggle');
       const list = document.getElementById('video-collapsible');
@@ -3106,7 +3621,7 @@
       btn.setAttribute('aria-expanded', isOpen);
     });
 
-    
+    /*@3.GARJ.218*/
     const tocDivider = document.querySelector('.toc-divider');
     if (tocDivider) {
       const tocLink = document.createElement('a');
@@ -3114,21 +3629,21 @@
       tocLink.className = 'toc-link toc-link--action';
       tocLink.setAttribute('data-bilingual', '');
       tocLink.innerHTML = `
-        <span class="toc-action-icon">🎬</span>
+        <span class="toc-action-icon"><i class="fa-solid fa-film" aria-hidden="true"></i></span>
         <template class="content-ar">فيديوهات مقترحة</template>
         <template class="content-en">Recommended Videos</template>
         <span class="content-target">${L === 'ar' ? 'فيديوهات مقترحة' : 'Recommended Videos'}</span>`;
       tocDivider.parentNode.insertBefore(tocLink, tocDivider);
     }
 
-    
+    /*@3.GARJ.219*/
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.08 });
     obs.observe(section);
   }
 
-   
+  /*@3.GARJ.220*/
   const FONT_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
   const FONT_LABELS = { xs: 'XS', sm: 'S', md: 'M', lg: 'L', xl: 'XL' };
   let currentFontSize = localStorage.getItem('garden_font_size') || 'md';
@@ -3158,13 +3673,13 @@
   }
 
   function initFontSize() {
-    
+    /*@3.GARJ.221*/
     applyFontSize(currentFontSize);
 
-    
+    /*@3.GARJ.222*/
     const actions = document.querySelector('.header-actions');
     if (!actions) {
-      
+      /*@3.GARJ.223*/
       const dashActions = document.querySelector('.dash-actions');
       if (dashActions) injectFontButtons(dashActions, 'before');
       return;
@@ -3173,7 +3688,7 @@
   }
 
   function injectFontButtons(container, position) {
-    
+    /*@3.GARJ.224*/
     if (document.getElementById('font-size-group')) return;
 
     const group = document.createElement('div');
@@ -3184,7 +3699,7 @@
       '<span class="font-size-indicator" id="font-size-indicator">' + (FONT_LABELS[currentFontSize] || 'M') + '</span>' +
       '<button class="font-size-btn" id="font-size-plus" title="' + (currentLang === 'ar' ? 'تكبير الخط' : 'Increase font') + '"><i class="fa-solid fa-plus"></i></button>';
 
-    
+    /*@3.GARJ.225*/
     const divider = container.querySelector('.divider-v');
     if (divider && position === 'before') {
       container.insertBefore(group, divider);
@@ -3192,15 +3707,15 @@
       container.prepend(group);
     }
 
-    
+    /*@3.GARJ.226*/
     document.getElementById('font-size-minus').addEventListener('click', () => changeFontSize(-1));
     document.getElementById('font-size-plus').addEventListener('click', () => changeFontSize(1));
     updateFontSizeUI();
   }
 
-   
+  /*@3.GARJ.227*/
   function initScrollToTop() {
-    
+    /*@3.GARJ.228*/
     if (document.querySelector('.garden-scroll-top') || document.getElementById('back-to-top')) return;
     const btn = document.createElement('button');
     btn.className = 'garden-scroll-top';
@@ -3221,9 +3736,9 @@
     }, { passive: true });
   }
 
-   
+  /*@3.GARJ.229*/
   function initTableWrap() {
-    
+    /*@3.GARJ.230*/
     document.querySelectorAll('.comparison-table').forEach(table => {
       if (table.parentElement?.classList.contains('comparison-wrapper')) return;
       const wrapper = document.createElement('div');
@@ -3233,10 +3748,25 @@
     });
   }
 
-   
+  /*@3.GARJ.231*/
   function initScrollAnimations() {
-    const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.08 });
-    document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+    const all = document.querySelectorAll('.fade-up');
+    const reveal = el => el.classList.add('visible');
+    const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (calm) { all.forEach(reveal); return; }
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) reveal(e.target); });
+    }, { threshold: 0.08 });
+
+    all.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < innerHeight && r.bottom > 0) reveal(el);   /*@3.GARJ.232*/
+      else obs.observe(el);
+    });
+
+    /*@3.GARJ.233*/
+    setTimeout(() => all.forEach(reveal), 3000);
   }
   function initTOC() {
     const secs = document.querySelectorAll('section[id]'); if (!secs.length) return;
@@ -3262,10 +3792,10 @@
     window.addEventListener('scroll', () => { const t = document.body.scrollHeight - window.innerHeight; bar.style.width = t > 0 ? `${(window.scrollY / t) * 100}%` : '0%'; }, { passive: true });
   }
   function initCopy() {
-    document.querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', () => { const code = btn.closest('.code-block')?.querySelector('pre')?.textContent || ''; navigator.clipboard.writeText(code).then(() => { const o = btn.textContent; btn.textContent = '✅'; setTimeout(() => btn.textContent = o, 1500) }); }); });
+    document.querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', () => { const code = btn.closest('.code-block')?.querySelector('pre')?.textContent || ''; navigator.clipboard.writeText(code).then(() => { const o = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>'; setTimeout(() => btn.innerHTML = o, 1500) }); }); });
   }
 
-   
+  /*@3.GARJ.234*/
   function initSmartSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const tocList = document.querySelector('.toc-list');
@@ -3274,9 +3804,7 @@
     const divider = tocList.querySelector('.toc-divider');
     if (!divider) return;
 
-    
-    
-    
+    /*@3.GARJ.235*/
     const conceptLinks = [], bottomLinks = [];
     let passedDivider = false;
 
@@ -3286,16 +3814,16 @@
       if (passedDivider) { bottomLinks.push(el); } else { conceptLinks.push(el); }
     });
 
-    
+    /*@3.GARJ.236*/
     if (conceptLinks.length < 4) return;
     sidebar.classList.add('smart');
 
-    
+    /*@3.GARJ.237*/
     const wrapper = document.createElement('div');
     wrapper.className = 'toc-concepts-wrapper at-top at-bottom';
 
     if (conceptLinks.length >= 10) {
-      
+      /*@3.GARJ.238*/
       const innerTop = document.createElement('div');
       innerTop.className = 'toc-inner-top';
       conceptLinks.slice(0, 2).forEach(l => innerTop.appendChild(l));
@@ -3319,13 +3847,13 @@
           scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 5);
       }, { passive: true });
 
-      
+      /*@3.GARJ.239*/
       requestAnimationFrame(() => {
         if (scroller.scrollHeight <= scroller.clientHeight) {
-          
+          /*@3.GARJ.240*/
           wrapper.style.overflow = 'visible';
           wrapper.style.flex = '0 0 auto';
-          
+          /*@3.GARJ.241*/
           const topFragment = document.createDocumentFragment();
           Array.from(innerTop.children).forEach(l => topFragment.appendChild(l));
           scroller.insertBefore(topFragment, scroller.firstChild);
@@ -3334,7 +3862,7 @@
           innerBot.remove();
           scroller.style.flex = '0 0 auto';
           scroller.style.height = 'auto';
-          
+          /*@3.GARJ.242*/
           tocList.innerHTML = '';
           const centerGroup = document.createElement('div');
           centerGroup.className = 'toc-center-group';
@@ -3344,7 +3872,7 @@
       });
 
     } else {
-      
+      /*@3.GARJ.243*/
       wrapper.style.overflow = 'visible';
       wrapper.style.flex = '0 0 auto';
       const scroller = document.createElement('div');
@@ -3355,19 +3883,17 @@
       wrapper.appendChild(scroller);
     }
 
-    
-    
-    
+    /*@3.GARJ.244*/
     const pinnedBottom = document.createElement('div');
     pinnedBottom.className = 'toc-pinned-bottom';
     pinnedBottom.appendChild(divider);
     bottomLinks.forEach(l => pinnedBottom.appendChild(l));
 
-    
+    /*@3.GARJ.245*/
     tocList.innerHTML = '';
 
     if (conceptLinks.length < 10) {
-      
+      /*@3.GARJ.246*/
       const centerGroup = document.createElement('div');
       centerGroup.className = 'toc-center-group';
       centerGroup.appendChild(wrapper);
@@ -3376,7 +3902,7 @@
       tocList.appendChild(wrapper);
     }
 
-    
+    /*@3.GARJ.247*/
     const widget = sidebar.querySelector('.sidebar-widget');
     if (widget) {
       sidebar.insertBefore(pinnedBottom, widget);
@@ -3386,64 +3912,21 @@
   }
 
 
-   
+  /*@3.GARJ.248*/
   function initMobileFabs() {
     if (window.innerWidth > 1024) return;
-    const hasCards = !!document.getElementById('flashcard-data');
+    /*@3.GARJ.249*/
     const hasNotes = !!document.querySelector('.sidebar-notes-btn');
-    if (!hasCards && !hasNotes) return;
-    const L = () => document.documentElement.lang || 'ar';
+    if (!hasNotes) return;
     const ctn = document.createElement('div');
     ctn.className = 'mobile-fab-container';
     ctn.id = 'mobile-fabs';
 
-    
-    if (hasCards) {
-      const fab = document.createElement('button');
-      fab.className = 'mobile-fab';
-      fab.innerHTML = '\ud83d\udcc7';
-      const badge = document.createElement('span');
-      badge.className = 'fab-badge'; badge.id = 'fab-cards-badge'; badge.textContent = '0';
-      fab.appendChild(badge);
-      fab.addEventListener('click', () => {
-        const old = document.getElementById('fab-card-sheet');
-        if (old) { old.remove(); return; }
-        const isAr = L() === 'ar';
-        const dueEl = document.getElementById('fc-due-count');
-        const dueN = dueEl ? dueEl.textContent : '0';
-        const sheet = document.createElement('div');
-        sheet.id = 'fab-card-sheet'; sheet.className = 'mobile-bottom-sheet';
-        sheet.innerHTML =
-          '<div class="mbs-handle"></div>' +
-          '<div class="mbs-row">' +
-          '<span class="mbs-icon">\ud83d\udcc7</span>' +
-          '<div class="mbs-info"><span class="mbs-count">' + dueN + '</span> ' +
-          '<span class="mbs-label">' + (isAr ? '\u0628\u0637\u0627\u0642\u0629 \u0644\u0644\u0645\u0631\u0627\u062c\u0639\u0629' : 'cards due') + '</span></div>' +
-          '<button class="mbs-go" id="mbs-go-cards">' + (isAr ? '\u0627\u0628\u062f\u0623 \u25b6' : 'Start \u25b6') + '</button>' +
-          '</div>' +
-          '<button class="mbs-dismiss" id="mbs-dismiss">\ud83d\udccc ' + (isAr ? '\u0625\u062e\u0641\u0627\u0621 \u0627\u0644\u0632\u0631 \u0627\u0644\u0639\u0627\u0626\u0645' : 'Hide floating button') + '</button>';
-        document.body.appendChild(sheet);
-        requestAnimationFrame(() => sheet.classList.add('open'));
-        sheet.querySelector('#mbs-go-cards').onclick = () => {
-          sheet.remove();
-          document.getElementById('flashcards')?.scrollIntoView({ behavior: 'smooth' });
-        };
-        sheet.querySelector('#mbs-dismiss').onclick = () => { sheet.remove(); ctn.classList.add('docked'); };
-        sheet.querySelector('.mbs-handle').onclick = () => sheet.remove();
-        setTimeout(() => { if (sheet.parentNode) sheet.remove(); }, 8000);
-      });
-      ctn.appendChild(fab);
-      const syncBadge = () => { const d = document.getElementById('fc-due-count'); if (d) badge.textContent = d.textContent; };
-      syncBadge();
-      const dueEl = document.getElementById('fc-due-count');
-      if (dueEl) new MutationObserver(syncBadge).observe(dueEl, { childList: true, characterData: true, subtree: true });
-    }
-
-    
+    /*@3.GARJ.250*/
     if (hasNotes) {
       const nfab = document.createElement('button');
       nfab.className = 'mobile-fab';
-      nfab.innerHTML = '\ud83d\udcdd';
+      nfab.innerHTML = '<i class="fa-solid fa-note-sticky" aria-hidden="true"></i>';
       const nbadge = document.createElement('span');
       nbadge.className = 'fab-badge'; nbadge.id = 'fab-notes-badge';
       const nc = document.getElementById('notes-count');
@@ -3477,33 +3960,29 @@
     });
   }
 
-   
+  /*@3.GARJ.251*/
   function initAlgoPalette() {
-     
+    /*@3.GARJ.252*/
     const PALETTES = {
-      
-      
+      /*@3.GARJ.253*/
       'CS353': {
         dark: { compare: '#2DD4BF', compareGlow: 'rgba(45, 212, 191, 0.35)', swap: '#60A5FA', swapGlow: 'rgba(96, 165, 250, 0.35)', sorted: '#22D3EE', active: '#FB923C', activeGlow: 'rgba(251, 146, 60, 0.35)', bar: 'var(--brand-400)', nodeText: '#0F172A', barLabel: '#0F172A' },
         dim: { compare: '#2DD4BF', compareGlow: 'rgba(45, 212, 191, 0.25)', swap: '#60A5FA', swapGlow: 'rgba(96, 165, 250, 0.25)', sorted: '#22D3EE', active: '#FB923C', activeGlow: 'rgba(251, 146, 60, 0.25)', bar: 'var(--brand-300)', nodeText: '#0F172A', barLabel: '#0F172A' },
         light: { compare: '#0D9488', compareGlow: 'rgba(13, 148, 136, 0.25)', swap: '#2563EB', swapGlow: 'rgba(37, 99, 235, 0.25)', sorted: '#0891B2', active: '#EA580C', activeGlow: 'rgba(234, 88, 12, 0.25)', bar: 'var(--brand-500)', nodeText: '#ffffff', barLabel: '#ffffff' },
       },
-      
-      
+      /*@3.GARJ.254*/
       'CS352': {
         dark: { compare: '#FDE047', compareGlow: 'rgba(253, 224, 71, 0.35)', swap: '#F472B6', swapGlow: 'rgba(244, 114, 182, 0.35)', sorted: '#34D399', active: '#C084FC', activeGlow: 'rgba(192, 132, 252, 0.35)', bar: 'var(--brand-400)', nodeText: '#0F172A', barLabel: '#0F172A' },
         dim: { compare: '#FDE047', compareGlow: 'rgba(253, 224, 71, 0.25)', swap: '#F472B6', swapGlow: 'rgba(244, 114, 182, 0.25)', sorted: '#34D399', active: '#C084FC', activeGlow: 'rgba(192, 132, 252, 0.25)', bar: 'var(--brand-300)', nodeText: '#0F172A', barLabel: '#0F172A' },
         light: { compare: '#CA8A04', compareGlow: 'rgba(202, 138, 4, 0.25)', swap: '#DB2777', swapGlow: 'rgba(219, 39, 119, 0.25)', sorted: '#059669', active: '#9333EA', activeGlow: 'rgba(147, 51, 234, 0.25)', bar: 'var(--brand-500)', nodeText: '#ffffff', barLabel: '#ffffff' },
       },
-      
-      
+      /*@3.GARJ.255*/
       'CS350': {
         dark: { compare: '#22D3EE', compareGlow: 'rgba(34, 211, 238, 0.35)', swap: '#F87171', swapGlow: 'rgba(248, 113, 113, 0.35)', sorted: '#2DD4BF', active: '#60A5FA', activeGlow: 'rgba(96, 165, 250, 0.35)', bar: 'var(--brand-400)', nodeText: '#0F172A', barLabel: '#0F172A' },
         dim: { compare: '#22D3EE', compareGlow: 'rgba(34, 211, 238, 0.25)', swap: '#F87171', swapGlow: 'rgba(248, 113, 113, 0.25)', sorted: '#2DD4BF', active: '#60A5FA', activeGlow: 'rgba(96, 165, 250, 0.25)', bar: 'var(--brand-300)', nodeText: '#0F172A', barLabel: '#0F172A' },
         light: { compare: '#0891B2', compareGlow: 'rgba(8, 145, 178, 0.25)', swap: '#DC2626', swapGlow: 'rgba(220, 38, 38, 0.25)', sorted: '#0D9488', active: '#2563EB', activeGlow: 'rgba(37, 99, 235, 0.25)', bar: 'var(--brand-500)', nodeText: '#ffffff', barLabel: '#ffffff' },
       },
-      
-      
+      /*@3.GARJ.256*/
       'CS351': {
         dark: { compare: '#FDE047', compareGlow: 'rgba(253, 224, 71, 0.35)', swap: '#F472B6', swapGlow: 'rgba(244, 114, 182, 0.35)', sorted: '#22D3EE', active: '#C084FC', activeGlow: 'rgba(192, 132, 252, 0.35)', bar: 'var(--brand-400)', nodeText: '#0F172A', barLabel: '#0F172A' },
         dim: { compare: '#FDE047', compareGlow: 'rgba(253, 224, 71, 0.25)', swap: '#F472B6', swapGlow: 'rgba(244, 114, 182, 0.25)', sorted: '#22D3EE', active: '#C084FC', activeGlow: 'rgba(192, 132, 252, 0.25)', bar: 'var(--brand-300)', nodeText: '#0F172A', barLabel: '#0F172A' },
@@ -3533,65 +4012,76 @@
 
     applyAlgoPalette();
 
-     
+    /*@3.GARJ.257*/
     new MutationObserver(applyAlgoPalette)
       .observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
     root.setAttribute('data-algo-palette', currentSubject);
   }
 
-   
+  /*@3.GARJ.258*/
   function initAlgoLoader() {
     const m = document.documentElement.getAttribute('data-module');
     if (!m || m === 'review' || m === 'midterm' || m === 'final' || isNaN(m)) return;
-    
+    /*@3.GARJ.259*/
     const padded = 'M' + String(m).padStart(2, '0') + '_algo.js';
     if (document.querySelector(`script[src="${padded}"]`)) return;
     const s = document.createElement('script');
     s.src = padded;
-    s.onerror = function () { }; 
+    s.onerror = function () { }; /*@3.GARJ.260*/
     document.body.appendChild(s);
   }
 
-   
+  /*@3.GARJ.261*/
+  let _smartTipActive = null;
+  let _smartTipDocBound = false;
   function initSmartTermTooltips() {
-    let activeTip = null;
+    /*@3.GARJ.262*/
+    const liveTips = new Set();
+    document.querySelectorAll('.smart-term').forEach(term => { if (term._gardenTip) liveTips.add(term._gardenTip); });
+    document.querySelectorAll('body > .smart-term-tooltip').forEach(tip => {
+      if (!liveTips.has(tip)) { if (_smartTipActive === tip) _smartTipActive = null; tip.remove(); }
+    });
 
-    
+    /*@3.GARJ.263*/
     document.querySelectorAll('.smart-term').forEach(term => {
+      if (term._gardenTip && term._gardenTip.isConnected) return;
       const termEn = term.getAttribute('data-term-en') || '';
       const enDef = term.getAttribute('data-en-def') || '';
-      if (!termEn && !enDef) return; 
+      if (!termEn && !enDef) return; /*@3.GARJ.264*/
 
-      
+      /*@3.GARJ.265*/
       const oldTip = term.querySelector('.smart-term-tooltip');
       if (oldTip) oldTip.remove();
 
-      
+      /*@3.GARJ.266*/
       const tip = document.createElement('div');
       tip.className = 'smart-term-tooltip';
       updateTooltipContent(tip, termEn, enDef, currentLang);
       document.body.appendChild(tip);
 
-      
+      /*@3.GARJ.267*/
       term._gardenTip = tip;
 
       term.addEventListener('mouseenter', () => showTip(term, tip));
       term.addEventListener('mouseleave', () => hideTip(tip));
       term.addEventListener('focus', () => showTip(term, tip));
       term.addEventListener('blur', () => hideTip(tip));
-      
+      /*@3.GARJ.268*/
       term.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (activeTip === tip) { hideTip(tip); activeTip = null; }
-        else { if (activeTip) hideTip(activeTip); showTip(term, tip); activeTip = tip; }
+        if (_smartTipActive === tip) { hideTip(tip); _smartTipActive = null; }
+        else { if (_smartTipActive) hideTip(_smartTipActive); showTip(term, tip); _smartTipActive = tip; }
       }, { passive: false });
     });
 
-    
-    document.addEventListener('touchstart', (e) => {
-      if (activeTip && !e.target.closest('.smart-term')) { hideTip(activeTip); activeTip = null; }
-    });
+    /*@3.GARJ.269*/
+    if (!_smartTipDocBound) {
+      _smartTipDocBound = true;
+      document.addEventListener('touchstart', (e) => {
+        if (_smartTipActive && !e.target.closest('.smart-term')) { hideTip(_smartTipActive); _smartTipActive = null; }
+      });
+    }
   }
 
   function updateTooltipContent(tip, termEn, enDef, lang) {
@@ -3604,10 +4094,10 @@
 
   function showTip(term, tip) {
     const rect = term.getBoundingClientRect();
-    const pad = 12; 
+    const pad = 12; /*@3.GARJ.270*/
     tip.classList.remove('below');
 
-    
+    /*@3.GARJ.271*/
     tip.style.visibility = 'hidden';
     tip.style.display = 'block';
     tip.style.left = '0'; tip.style.top = '0';
@@ -3618,7 +4108,7 @@
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    
+    /*@3.GARJ.272*/
     let top;
     let isBelow = false;
     if (rect.top - tipH - 10 >= pad) {
@@ -3629,11 +4119,11 @@
       tip.classList.add('below');
     }
 
-    
+    /*@3.GARJ.273*/
     let idealLeft = rect.left + rect.width / 2 - tipW / 2;
     let left = Math.max(pad, Math.min(idealLeft, vw - tipW - pad));
 
-    
+    /*@3.GARJ.274*/
     const termCenter = rect.left + rect.width / 2;
     const arrowLeft = Math.max(14, Math.min(termCenter - left, tipW - 14));
     tip.style.setProperty('--arrow-left', arrowLeft + 'px');
@@ -3645,33 +4135,48 @@
 
   function hideTip(tip) {
     tip.classList.remove('visible');
-    
+    /*@3.GARJ.275*/
     setTimeout(() => { if (!tip.classList.contains('visible')) tip.style.display = 'none'; }, 200);
   }
 
-   
+  /*@3.GARJ.276*/
   function init() {
     setLanguage(currentLang);
     initDepthTabs(); initAccordion(); initFlashcards(); initQuiz();
+
+    /* [Byte] 2026-07-02 — Hook quiz-page renderMcq for option shuffling.
+       Quiz pages define renderMcq as a global before garden.js loads;
+       we wrap it so options are shuffled once per question per session.
+       To remove: delete this block (7 lines). */
+    if (typeof renderMcq === 'function' && !window._gardenMcqHooked) {
+      window._gardenMcqHooked = true;
+      var _origMcq = renderMcq;
+      window.renderMcq = function(idx) {
+        var q = window.sessionMCQ && window.sessionMCQ[idx];
+        if (q && !q._shuffled) { shuffleMcqOptions(q); q._shuffled = true; }
+        return _origMcq.call(this, idx);
+      };
+    }
+
     initScrollAnimations(); initSmartSidebar(); initTOC(); initProgress(); initCopy(); initKeys();
     initSyntaxHighlight();
     initSM2Dashboard(); initActionLinks(); initNotes(); initVideos(); initMobileFabs();
     initAlgoPalette();
     initTableWrap(); initScrollToTop(); initFontSize(); initAlgoLoader();
-    initAiSystem();
+    if (_isContentPage()) initAiSystem();   /*@3.GARJ.277*/
     initInfoBtnToggle();
     initSmartTermTooltips();
   }
 
-   
+  /*@3.GARJ.278*/
   function initInfoBtnToggle() {
-    
+    /*@3.GARJ.279*/
     const panel = document.createElement('div');
     panel.id = 'fc-info-panel';
     panel.className = 'fc-info-tooltip';
     document.body.appendChild(panel);
 
-    
+    /*@3.GARJ.280*/
     let infoOverlay = document.getElementById('fc-info-overlay');
     if (!infoOverlay) {
       infoOverlay = document.createElement('div');
@@ -3686,10 +4191,10 @@
       const r = btn.getBoundingClientRect();
       const w = Math.min(300, window.innerWidth - 32);
       const gap = 10;
-      
+      /*@3.GARJ.281*/
       panel.style.width = w + 'px';
       panel.style.top = (r.bottom + gap) + 'px';
-      
+      /*@3.GARJ.282*/
       let left = r.right - w;
       left = Math.max(12, Math.min(left, window.innerWidth - w - 12));
       panel.style.left = left + 'px';
@@ -3713,22 +4218,22 @@
       infoOverlay.classList.remove('open');
     }
 
-    
+    /*@3.GARJ.283*/
     document.addEventListener('mouseover', function (e) {
       const btn = e.target.closest('.fc-info-btn');
       if (btn && !panel.classList.contains('open')) {
         const raw = btn.getAttribute('data-fc-info') || '';
         panel.innerHTML = decodeURIComponent(raw);
         positionPanel(btn);
-        
+        /*@3.GARJ.284*/
       }
     });
 
     document.addEventListener('mouseleave', function (e) {
-      
+      /*@3.GARJ.285*/
     }, true);
 
-    
+    /*@3.GARJ.286*/
     document.addEventListener('click', function (e) {
       const btn = e.target.closest('.fc-info-btn');
       if (btn) {
@@ -3740,7 +4245,7 @@
         }
         return;
       }
-      
+      /*@3.GARJ.287*/
       if (panel.contains(e.target)) return;
       closePanel();
     });
@@ -3751,18 +4256,17 @@
     });
   }
 
-   
+  /*@3.GARJ.288*/
 
-  
-  const GARDEN_AI_ENDPOINT = 'https://gardin-main.xxli50xx.workers.dev'; 
+  /*@3.GARJ.289*/
+  const GARDEN_AI_ENDPOINT = 'https://gardin-main.xxli50xx.workers.dev'; /*@3.GARJ.290*/
 
   const AI_CACHE_PREFIX = 'garden_ai_';
-  const AI_CACHE_MAX = 50; 
+  const AI_CACHE_MAX = 50; /*@3.GARJ.291*/
 
   function aiT(ar, en) { return currentLang === 'ar' ? ar : en; }
 
-   
-   
+  /*@3.GARJ.292*/
   const AI_COURSE_NAMES = {
     'CS350': { ar: 'مقدمة في قواعد البيانات', en: 'Intro to Database' },
     'CS351': { ar: 'نظم التشغيل', en: 'Operating Systems' },
@@ -3770,19 +4274,34 @@
     'CS353': { ar: 'تصميم الخوارزميات وتحليلها', en: 'Design & Analysis of Algorithms' },
   };
 
-   
+  /*@3.GARJ.293*/
+  let AI_CATALOG = null;
+  function loadAiCatalog() {
+    if (AI_CATALOG !== null) return;
+    AI_CATALOG = {}; /*@3.GARJ.294*/
+    try {
+      const gs = document.querySelector('script[src*="garden.js"]');
+      const base = gs && gs.src ? gs.src.replace(/garden\.js[^/]*$/, '') : 'shared/';
+      fetch(base + 'courses_catalog.json')
+        .then(r => (r.ok ? r.json() : null))
+        .then(j => { if (j && typeof j === 'object') AI_CATALOG = j; })
+        .catch(() => { });
+    } catch (e) { }
+  }
+
+  /*@3.GARJ.295*/
   function extractSVGComment(card) {
     try {
       const iter = document.createNodeIterator(card, NodeFilter.SHOW_COMMENT);
       let node;
       while ((node = iter.nextNode())) {
         if (node.nodeValue.includes('DIAGRAM[')) {
-          
+          // استخرج النص بعد DIAGRAM[N]:
           let raw = node.nodeValue.replace(/[\s\S]*DIAGRAM\[\d+\]:\s*/, '').trim();
-          
+          /*@3.GARJ.296*/
           raw = raw.replace(/^Detailed SVG generation prompt:\s*/i, '');
           raw = raw.replace(/^Create\s+a\s+\w[\w\s-]*showing\s+/i, '');
-          
+          /*@3.GARJ.297*/
           raw = raw.replace(/Style:[^.]+\./gi, '').replace(/viewBox[^.]+\./gi, '').trim();
           return raw;
         }
@@ -3791,17 +4310,18 @@
     return '';
   }
 
-   
+  /*@3.GARJ.298*/
   function stripHTML(html) {
     return (html || '').replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim();
   }
 
-   
+  /*@3.GARJ.299*/
   function extractCardContent(card) {
     const L = currentLang;
-    const result = { title: '', content: '', type: 'concept', hasSVG: false, hasAlgo: false };
+    /*@3.GARJ.300*/
+    const result = { title: '', content: '', background: '', activeLayer: '', allLayersText: '', svgBlock: '', type: 'concept', hasSVG: false, hasAlgo: false, svgOnly: false };
 
-    
+    /*@3.GARJ.301*/
     if (card.classList.contains('vault-section') || card.closest('.vault-section')) {
       result.type = 'vault';
     } else if (card.id === 'professor' || card.classList.contains('professor-card')) {
@@ -3816,9 +4336,9 @@
       result.type = 'objectives';
     }
 
-    
+    /*@3.GARJ.302*/
     if (result.type === 'accordion') {
-      
+      /*@3.GARJ.303*/
       const triggerSpan = card.querySelector('.accordion-trigger [data-bilingual]');
       if (triggerSpan) {
         const tpl = triggerSpan.querySelector(`.content-${L}`) || triggerSpan.querySelector('.content-ar');
@@ -3832,27 +4352,45 @@
       }
     }
 
-    
+    /*@3.GARJ.304*/
     const LAYER_LABELS = {
       ar: { flash: '⚡ سريع', full: '📖 كامل', deep: '🔬 عميق' },
       en: { flash: '⚡ Flash', full: '📖 Full', deep: '🔬 Deep' },
     };
     const labels = LAYER_LABELS[L] || LAYER_LABELS.ar;
-    const parts = [];
+    const focusParts = [];
+    const bgParts = [];
+    const allChunks = [];
 
     card.querySelectorAll('.depth-layer').forEach(layer => {
       const layerName = layer.getAttribute('data-layer') || layer.className.match(/layer--(\w+)/)?.[1] || '';
       const tpl = layer.querySelector(`.content-${L}`) || layer.querySelector('.content-ar');
       const text = tpl ? stripHTML(tpl.innerHTML) : layer.textContent.trim();
-      if (text && layerName && labels[layerName]) {
-        parts.push(`[${labels[layerName]}]\n${text}`);
+      if (!(text && layerName && labels[layerName])) return;
+      const chunk = `[${labels[layerName]}]\n${text}`;
+      allChunks.push(chunk);
+      /*@3.GARJ.305*/
+      if (layer.classList.contains('active')) {
+        focusParts.push(chunk);
+        result.activeLayer = layerName;
+      } else {
+        bgParts.push(chunk);
       }
     });
 
-    if (parts.length) {
-      result.content = parts.join('\n\n');
+    if (allChunks.length) result.allLayersText = allChunks.join('\n\n');
+
+    /*@3.GARJ.306*/
+    if (!focusParts.length && bgParts.length) {
+      focusParts.push(...bgParts);
+      bgParts.length = 0;
+    }
+
+    if (focusParts.length) {
+      result.content = focusParts.join('\n\n');
+      result.background = bgParts.join('\n\n');
     } else if (result.type === 'vault') {
-      
+      /*@3.GARJ.307*/
       const entries = [];
       card.querySelectorAll('.vault-entry').forEach(entry => {
         const typeLabel = entry.querySelector('.vault-type')?.textContent?.trim() || '';
@@ -3863,7 +4401,7 @@
       });
       result.content = entries.join('\n\n').substring(0, 3000);
     } else if (result.type === 'accordion') {
-      
+      /*@3.GARJ.308*/
       const qEl = card.querySelector('.accordion-trigger [data-bilingual]');
       const aEl = card.querySelector('.accordion-body [data-bilingual]');
       const qTpl = qEl?.querySelector(`.content-${L}`) || qEl?.querySelector('.content-ar');
@@ -3873,7 +4411,7 @@
       if (q) result.content += (L === 'ar' ? `[السؤال]: ${q}` : `[Question]: ${q}`);
       if (a) result.content += '\n' + (L === 'ar' ? `[الإجابة]: ${a}` : `[Answer]: ${a}`);
     } else {
-      
+      /*@3.GARJ.309*/
       const texts = [];
       card.querySelectorAll('[data-bilingual]').forEach(el => {
         const tpl = el.querySelector(`.content-${L}`) || el.querySelector('.content-ar');
@@ -3885,17 +4423,26 @@
       result.content = texts.join('\n').substring(0, 3000);
     }
 
-    
+    /*@3.GARJ.310*/
     if (card.querySelector('.svg-diagram, .concept-diagram')) {
       const svgDesc = extractSVGComment(card);
       if (svgDesc) {
-        
-        result.content += `\n\n[سياق الرسمة — للفهم المفاهيمي فقط، لا تُعد وصفها]:\n${svgDesc}`;
         result.hasSVG = true;
+        /*@3.GARJ.311*/
+        const svgBlock = `[سياق الرسمة — للفهم المفاهيمي فقط، لا تُعد وصفها]:\n${svgDesc}`;
+        result.svgBlock = svgBlock;
+        if (!result.content.trim()) {
+          /*@3.GARJ.312*/
+          result.svgOnly = true;
+          result.content = svgBlock;
+        } else {
+          /*@3.GARJ.313*/
+          result.background += (result.background ? '\n\n' : '') + svgBlock;
+        }
       }
     }
 
-    
+    /*@3.GARJ.314*/
     const algoEl = card.querySelector('.svg-placeholder, .algo-widget, [data-algo]');
     if (algoEl) {
       const algoName = algoEl.getAttribute('data-algo-name') || algoEl.getAttribute('data-algo') || '';
@@ -3912,7 +4459,7 @@
     return result;
   }
 
-   
+  /*@3.GARJ.315*/
   const _BASE_RULES_AR = `قواعد صارمة:
 - اكتب بالعربية الفصحى البسيطة حصراً
 - لا تتجاوز 150 كلمة نهائياً (حد صارم)
@@ -3927,7 +4474,7 @@
 - No intro or closing sentence
 - If multiple points exist, connect them under one unifying idea`;
 
-  
+  /*@3.GARJ.316*/
   const _BASE_RULES_AR_RICH = `قواعد صارمة:
 - اكتب بالعربية الفصحى البسيطة حصراً
 - لا تتجاوز 200 كلمة نهائياً (حد صارم)
@@ -3940,31 +4487,170 @@
 - Never copy text verbatim
 - No intro or closing sentence`;
 
-   
-  function buildPrompt(cardData, regenVariant) {
+  /*@3.GARJ.317*/
+  const _BASE_RULES_AR_XL = `قواعد صارمة:
+- اكتب بالعربية الفصحى البسيطة حصراً
+- لا تتجاوز 300 كلمة نهائياً (حد صارم)
+- أدرج مثالاً محسوساً محلولاً خطوة بخطوة إن كان الموضوع يحتمله
+- لا تكرر محتوى البطاقة حرفياً
+- لا تضف مقدمة أو خاتمة`;
+
+  const _BASE_RULES_EN_XL = `Rules (strict):
+- Write in English only
+- Max 260 words total (hard cap)
+- Include a small worked example step by step if the topic allows it
+- Never copy card text verbatim
+- No intro or closing sentence`;
+
+  /*@3.GARJ.318*/
+  function trimAtSentence(text, limit, L) {
+    const t = (text || '').trim();
+    if (t.length <= limit) return t;
+    const cut = t.substring(0, limit);
+    /*@3.GARJ.319*/
+    let idx = Math.max(
+      cut.lastIndexOf('. '), cut.lastIndexOf('.\n'),
+      cut.lastIndexOf('؟'), cut.lastIndexOf('!'),
+      cut.lastIndexOf('\n')
+    );
+    /*@3.GARJ.320*/
+    if (idx < limit * 0.5) idx = cut.lastIndexOf(' ');
+    if (idx <= 0) idx = limit - 1;
+    return cut.substring(0, idx + 1).trim() + (L === 'ar' ? ' …[اقتُطع]' : ' …[trimmed]');
+  }
+
+  /*@3.GARJ.321*/
+  function composeCardData(raw, scope) {
+    if (scope === 'card' && raw.allLayersText) {
+      const d = Object.assign({}, raw);
+      d.content = raw.allLayersText;
+      d.background = raw.svgBlock || '';
+      d.svgOnly = false;
+      return d;
+    }
+    if (scope === 'svg' && raw.svgBlock) {
+      const d = Object.assign({}, raw);
+      d.content = raw.svgBlock;
+      d.background = raw.content; /*@3.GARJ.322*/
+      d.svgOnly = true; /*@3.GARJ.323*/
+      return d;
+    }
+    return raw; /*@3.GARJ.324*/
+  }
+
+  /*@3.GARJ.325*/
+  const AI_STYLES = {
+    simplify: {
+      ar: `أستاذ CS بارع في التبسيط، مهمتك جعل الفكرة بديهية لطالب تاه في المصطلحات. اشرح في 3 أقسام مرقمة:
+🪄 التشبيه: تشبيه واحد ممتد من الحياة اليومية يطابق الفكرة بدقة — ابنِ الصورة كاملة (3-4 جمل)
+🔁 من التشبيه إلى المفهوم: اربط كل عنصر في تشبيهك بمقابله التقني الصحيح واحداً واحداً
+📌 الجملة الدقيقة: صياغة تقنية صحيحة واحدة يحفظها الطالب بعد أن فهم`,
+      en: `CS professor who excels at simplification; make the idea intuitive for a student lost in jargon. Explain in 3 numbered sections:
+🪄 The Analogy: one extended everyday-life analogy that precisely mirrors the idea — build the full picture (3-4 sentences)
+🔁 Analogy to Concept: map each element of your analogy to its correct technical counterpart, one by one
+📌 The Precise Sentence: one technically correct formulation to keep after understanding`,
+    },
+    example: {
+      ar: `أستاذ CS يشرح بالأمثلة لا بالتنظير. اشرح عبر مثال واحد صغير محسوس في 3 أقسام مرقمة:
+🧮 المثال: معطيات صغيرة محددة (أرقام أو جدول مصغر أو حالة واقعية مصغرة)
+⚙️ الحل خطوة بخطوة: طبّق المفهوم على المثال خطوة خطوة واذكر ناتج كل خطوة
+📌 التعميم: جملة واحدة تحوّل ما حدث في المثال إلى القاعدة العامة`,
+      en: `CS professor who teaches by example, not theory. Explain through one small concrete worked example in 3 numbered sections:
+🧮 The Example: small specific inputs (numbers, a mini table, or a miniature real case)
+⚙️ Step-by-step Solution: apply the concept to the example step by step, stating each step's result
+📌 Generalization: one sentence turning what happened in the example into the general rule`,
+    },
+    why: {
+      ar: `أستاذ CS يجيب عن سؤال الطالب الخفي: "لماذا يوجد هذا أصلاً؟". اشرح في 3 أقسام مرقمة:
+❓ المشكلة قبل الحل: ما الذي كان ينكسر أو يستحيل قبل وجود هذا المفهوم
+💡 لماذا هذا التصميم تحديداً: المنطق الذي جعل الحل بهذا الشكل وليس بشكل آخر أبسط
+⚖️ الثمن المدفوع: جملة واحدة عمّا نخسره أو نعقّده مقابل هذه الفائدة`,
+      en: `CS professor answering the student's hidden question: "why does this even exist?". Explain in 3 numbered sections:
+❓ The Problem Before: what used to break or be impossible before this concept existed
+💡 Why This Design: the reasoning that made the solution take this exact shape and not a simpler one
+⚖️ The Price Paid: one sentence on what we lose or complicate in exchange for this benefit`,
+    },
+    exam: {
+      ar: `أستاذ CS خبير بأسئلة امتحانات الجامعة. جهّز الطالب لهذا الموضوع تحديداً في 3 أقسام مرقمة:
+📋 أشكال السؤال المتوقعة: صيغتان مختلفتان يُسأل بهما هذا الموضوع (تعريف/مقارنة/سيناريو)
+✍️ الإجابة النموذجية: سطران جاهزان للكتابة حرفياً في ورقة الإجابة
+⚠️ الفخ: الخطأ الذي يخسر به الطلاب درجاتهم في هذا الموضوع بالذات`,
+      en: `CS professor expert in university exam questions. Prepare the student for this exact topic in 3 numbered sections:
+📋 Expected Question Forms: two different phrasings this topic is asked in (definition/comparison/scenario)
+✍️ Model Answer: two lines ready to write verbatim on the answer sheet
+⚠️ The Trap: the exact mistake students lose marks on for this specific topic`,
+    },
+  };
+
+  /*@3.GARJ.326*/
+  function tinyHash(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36);
+  }
+
+  /*@3.GARJ.327*/
+  function saveAiFeedback(vote, meta) {
+    try {
+      const KEY = 'garden_ai_feedback';
+      const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+      arr.push(Object.assign({ ts: Date.now(), vote }, meta));
+      while (arr.length > 200) arr.shift();
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    } catch (e) { }
+    if (typeof window.gtag === 'function') {
+      try { window.gtag('event', 'ai_explain_feedback', Object.assign({ vote }, meta)); } catch (e) { }
+    }
+  }
+
+  /*@3.GARJ.328*/
+  function buildPrompt(cardData, opts) {
+    opts = opts || {};
+    const regenVariant = opts.regen || false;
+    const prevText = opts.prevText || '';
     const subjectCode = document.documentElement.getAttribute('data-subject') || '';
     const moduleNum = document.documentElement.getAttribute('data-module') || '';
     const L = currentLang;
 
-    const courseName = L === 'ar'
-      ? (AI_COURSE_NAMES[subjectCode]?.ar || subjectCode)
-      : (AI_COURSE_NAMES[subjectCode]?.en || subjectCode);
+    /*@3.GARJ.329*/
+    const cat = (AI_CATALOG && AI_CATALOG[subjectCode]) || {};
+    const nameEn = (cat.name_en || '').trim() || AI_COURSE_NAMES[subjectCode]?.en || '';
+    const courseLabel = nameEn ? `${nameEn} (${subjectCode})` : subjectCode;
+    let ctxLine = L === 'ar'
+      ? `المادة: ${courseLabel} | الوحدة: ${moduleNum}`
+      : `Course: ${courseLabel} | Module: ${moduleNum}`;
 
-    const ctxLine = L === 'ar'
-      ? `المادة: ${subjectCode} — ${courseName} | الوحدة: ${moduleNum}`
-      : `Course: ${subjectCode} — ${courseName} | Module: ${moduleNum}`;
+    /*@3.GARJ.330*/
+    const textbook = (cat.textbook || '').trim();
+    if (textbook) {
+      ctxLine += L === 'ar'
+        ? `\nالكتاب المقرر (المرجع العلمي المعتمد — استند إلى مصطلحاته ومنهجه): ${textbook}`
+        : `\nCourse textbook (authoritative reference — align terminology and approach with it): ${textbook}`;
+    }
 
-    
-    const CONTENT_LIMIT = 1500;
+    /*@3.GARJ.331*/
+    const FOCUS_LIMIT = 2000;
+    const TOTAL_LIMIT = 2600;
     const rawContent = (cardData.content || '').trim();
-    const content = rawContent.length > CONTENT_LIMIT
-      ? rawContent.substring(0, CONTENT_LIMIT) + (L === 'ar' ? '\n[محتوى مقتطع]' : '\n[content trimmed]')
-      : rawContent;
+    const focus = trimAtSentence(rawContent, FOCUS_LIMIT, L);
+    /*@3.GARJ.332*/
+    let bg = (cardData.background || '').trim();
+    const bgBudget = TOTAL_LIMIT - focus.length;
+    bg = (bg && bgBudget > 250) ? trimAtSentence(bg, bgBudget, L) : '';
+    const content = focus + (bg
+      ? (L === 'ar'
+        ? '\n\n[خلفية إضافية — للسياق فقط، ركّز الشرح على المحتوى الأساسي أعلاه]:\n'
+        : '\n\n[Extra background — context only; focus the explanation on the main content above]:\n') + bg
+      : '');
 
-    
-    const baseRules = L === 'ar' ? _BASE_RULES_AR : _BASE_RULES_EN;
+    /*@3.GARJ.333*/
+    const isComplex = cardData.hasAlgo || cardData.svgOnly ||
+      cardData.activeLayer === 'deep' || rawContent.length > 900;
+    const baseRules = L === 'ar'
+      ? (isComplex ? _BASE_RULES_AR_XL : _BASE_RULES_AR)
+      : (isComplex ? _BASE_RULES_EN_XL : _BASE_RULES_EN);
 
-    
+    /*@3.GARJ.334*/
     const regenSuffix = regenVariant
       ? (L === 'ar'
         ? `\n\n[إعادة توليد — منظور مختلف تماماً: إذا استخدمت تشبيهاً، استخدم الآن مثالاً رقمياً أو سياقاً تطبيقياً آخر. غيّر ترتيب الأقسام وأسلوب الربط كلياً. لا تعيد نفس الجمل.]`
@@ -3973,10 +4659,34 @@
 
     let systemPrompt, userMsg;
 
-    
-    
-    
-    if (cardData.hasSVG) {
+    /*@3.GARJ.335*/
+    const styleTpl = (opts.style && opts.style !== 'auto') ? AI_STYLES[opts.style] : null;
+    if (styleTpl) {
+      systemPrompt = (L === 'ar' ? styleTpl.ar : styleTpl.en) + '\n' + baseRules + regenSuffix;
+      userMsg = L === 'ar'
+        ? `${ctxLine}\nالموضوع: ${cardData.title}\n\n${content}`
+        : `${ctxLine}\nTopic: ${cardData.title}\n\n${content}`;
+
+    /*@3.GARJ.336*/
+    } else if (cardData.type === 'selection') {
+      systemPrompt = (L === 'ar'
+        ? `أستاذ CS. الطالب ظلّل هذا المقطع تحديداً من صفحة الدرس لأنه لم يفهمه. اشرح المقطع نفسه لا الموضوع العام. 3 أقسام مرقمة:
+🔍 المعنى المباشر: ماذا يقول هذا المقطع بالضبط بكلمات أبسط
+💡 لماذا يهم: دور هذه الجزئية في الفكرة الأكبر للدرس
+📌 الخلاصة: جملة واحدة يستبدل بها الطالب المقطع في ذهنه
+${baseRules}`
+        : `CS professor. The student highlighted this exact passage from the lesson because they didn't understand it. Explain the passage itself, not the general topic. 3 numbered sections:
+🔍 Direct Meaning: what exactly this passage says, in simpler words
+💡 Why it Matters: this piece's role in the lesson's bigger idea
+📌 Takeaway: one sentence the student can mentally substitute for the passage
+${baseRules}`) + regenSuffix;
+
+      userMsg = L === 'ar'
+        ? `${ctxLine}\nمن بطاقة: ${cardData.title}\n\n[المقطع المُظلَّل]:\n${content}`
+        : `${ctxLine}\nFrom card: ${cardData.title}\n\n[Highlighted passage]:\n${content}`;
+
+    /*@3.GARJ.337*/
+    } else if (cardData.svgOnly) {
       systemPrompt = (L === 'ar'
         ? `أستاذ CS متخصص. الطالب يرى الرسمة أمامه مباشرةً — لا تعد وصف عناصرها البصرية مطلقاً.
 استخدم سياق الرسمة المرفق كمرجع فقط لتبني عليه الشرح المفاهيمي.
@@ -3997,9 +4707,7 @@ ${baseRules}`) + regenSuffix;
         ? `${ctxLine}\nالمفهوم: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nConcept: ${cardData.title}\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.338*/
     } else if (cardData.hasAlgo || cardData.type === 'algo') {
       systemPrompt = (L === 'ar'
         ? `أستاذ خوارزميات CS. اشرح في 3 أقسام مرقمة:
@@ -4017,9 +4725,7 @@ ${baseRules}`) + regenSuffix;
         ? `${ctxLine}\nالموضوع: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nTopic: ${cardData.title}\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.339*/
     } else if (cardData.type === 'professor') {
       systemPrompt = (L === 'ar'
         ? `أستاذ CS. هذا النص سردي امتحاني من أستاذ الوحدة. اشرح في 3 أقسام مرقمة:
@@ -4037,9 +4743,7 @@ ${baseRules}`) + regenSuffix;
         ? `${ctxLine}\nحديث البروفيسور — الوحدة ${moduleNum}\n\n${content}`
         : `${ctxLine}\nProfessor's narrative — Module ${moduleNum}\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.340*/
     } else if (cardData.type === 'vault') {
       const baseRulesVault = L === 'ar' ? _BASE_RULES_AR_RICH : _BASE_RULES_EN_RICH;
       systemPrompt = (L === 'ar'
@@ -4058,9 +4762,7 @@ ${baseRulesVault}`) + regenSuffix;
         ? `${ctxLine}\nمحتوى الخزنة: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nVault content: ${cardData.title}\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.341*/
     } else if (cardData.type === 'accordion') {
       systemPrompt = (L === 'ar'
         ? `أستاذ CS. هذا سؤال وإجابته من قسم "اسأل البروفيسور". لا تعد كتابة الإجابة. اشرح في 3 أقسام مرقمة:
@@ -4078,9 +4780,7 @@ ${baseRules}`) + regenSuffix;
         ? `${ctxLine}\nسؤال وإجابة: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nQ&A: ${cardData.title}\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.342*/
     } else if (cardData.type === 'objectives') {
       const baseRulesObj = L === 'ar' ? _BASE_RULES_AR_RICH : _BASE_RULES_EN_RICH;
       systemPrompt = (L === 'ar'
@@ -4099,9 +4799,7 @@ ${baseRulesObj}`) + regenSuffix;
         ? `${ctxLine}\nأهداف الوحدة ${moduleNum}\n\n${content}`
         : `${ctxLine}\nModule ${moduleNum} objectives\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.343*/
     } else if (rawContent.length > 900) {
       systemPrompt = (L === 'ar'
         ? `أستاذ CS. اشرح في 3 أقسام مرقمة:
@@ -4119,9 +4817,7 @@ ${baseRules}`) + regenSuffix;
         ? `${ctxLine}\nالموضوع: ${cardData.title}\n\n${content}`
         : `${ctxLine}\nTopic: ${cardData.title}\n\n${content}`;
 
-    
-    
-    
+    /*@3.GARJ.344*/
     } else {
       systemPrompt = (L === 'ar'
         ? `أستاذ CS. اشرح في 3 أقسام مرقمة:
@@ -4140,18 +4836,36 @@ ${baseRules}`) + regenSuffix;
         : `${ctxLine}\nTopic: ${cardData.title}\n\n${content}`;
     }
 
+    /*@3.GARJ.345*/
+    if (opts.question) {
+      userMsg += (L === 'ar'
+        ? `\n\n[سؤال الطالب — أجب عنه تحديداً وبوضوح ضمن الشرح]:\n`
+        : `\n\n[Student's question — answer it specifically and clearly within the explanation]:\n`) + String(opts.question).trim().substring(0, 300);
+    }
+
+    /*@3.GARJ.346*/
+    if (regenVariant && prevText) {
+      userMsg += (L === 'ar'
+        ? `\n\n[شرحك السابق لنفس البطاقة — ممنوع تكرار زواياه أو أمثلته أو جمله]:\n`
+        : `\n\n[Your previous explanation of this card — do not reuse its angles, examples, or sentences]:\n`) + trimAtSentence(prevText, 600, L);
+    }
+
     return { systemPrompt, userMsg };
   }
 
-   
-  function aiCacheKey(title, content) {
+  /*@3.GARJ.347*/
+  function aiCacheKey(title, content, layer, variant) {
     const s = document.documentElement.getAttribute('data-subject') || '';
     const m = document.documentElement.getAttribute('data-module') || '';
-    
+    /*@3.GARJ.348*/
     const keyBase = (title && title.length > 5)
       ? title.substring(0, 50)
       : (content || '').substring(0, 60);
-    return AI_CACHE_PREFIX + s + '_' + m + '_' + currentLang + '_' + keyBase.replace(/\s+/g, '_');
+    /*@3.GARJ.349*/
+    return AI_CACHE_PREFIX + s + '_' + m + '_' + currentLang
+      + (layer ? '_' + layer : '')
+      + (variant ? '_' + variant : '')
+      + '_' + keyBase.replace(/\s+/g, '_');
   }
 
   function getAiCache(key) {
@@ -4160,7 +4874,7 @@ ${baseRules}`) + regenSuffix;
 
   function setAiCache(key, value) {
     try {
-      
+      /*@3.GARJ.350*/
       const allKeys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
@@ -4170,11 +4884,11 @@ ${baseRules}`) + regenSuffix;
         allKeys.slice(0, allKeys.length - AI_CACHE_MAX + 5).forEach(k => localStorage.removeItem(k));
       }
       localStorage.setItem(key, value);
-    } catch {   }
+    } catch { /*@3.GARJ.351*/ }
   }
 
-   
-  async function callAI(systemPrompt, userMsg) {
+  /*@3.GARJ.352*/
+  async function callAI(messages, onDelta, onThinking) {
     if (!GARDEN_AI_ENDPOINT) return { error: true, text: '' };
 
     try {
@@ -4182,11 +4896,10 @@ ${baseRules}`) + regenSuffix;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMsg }
-          ],
-          max_tokens: 1000
+          messages,
+          /*@3.GARJ.353*/
+          max_tokens: 2000,
+          stream: !!onDelta
         })
       });
 
@@ -4194,6 +4907,39 @@ ${baseRules}`) + regenSuffix;
         const err = await res.json().catch(() => ({}));
         console.error('AI Proxy error:', res.status, err);
         return { error: true, text: '', errorData: err };
+      }
+
+      const ctype = res.headers.get('Content-Type') || '';
+      if (onDelta && ctype.includes('text/event-stream') && res.body) {
+        /*@3.GARJ.354*/
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '', full = '', thinkingNotified = false;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop(); /*@3.GARJ.355*/
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t.startsWith('data:')) continue;
+            const payload = t.slice(5).trim();
+            if (payload === '[DONE]') continue;
+            try {
+              const j = JSON.parse(payload);
+              const delta = j.choices?.[0]?.delta || {};
+              /*@3.GARJ.356*/
+              if (delta.reasoning_content && !full && !thinkingNotified) {
+                thinkingNotified = true;
+                if (typeof onThinking === 'function') onThinking();
+              }
+              const dc = delta.content || '';
+              if (dc) { full += dc; onDelta(full); }
+            } catch (e) { /*@3.GARJ.357*/ }
+          }
+        }
+        return { error: false, text: full };
       }
 
       const data = await res.json();
@@ -4209,24 +4955,57 @@ ${baseRules}`) + regenSuffix;
     }
   }
 
-   
-  const _AI_ICON_HEADER = `<span class="ai-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" fill="white"/><circle cx="4.5" cy="7.5" r="1.8" fill="rgba(255,255,255,0.75)"/><circle cx="19.5" cy="7.5" r="1.8" fill="rgba(255,255,255,0.75)"/><circle cx="4.5" cy="16.5" r="1.8" fill="rgba(255,255,255,0.75)"/><circle cx="19.5" cy="16.5" r="1.8" fill="rgba(255,255,255,0.75)"/><line x1="12" y1="9" x2="6" y2="8.2" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><line x1="12" y1="9" x2="18" y2="8.2" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><line x1="12" y1="15" x2="6" y2="15.8" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><line x1="12" y1="15" x2="18" y2="15.8" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/></svg></span>`;
+  /*@3.GARJ.358*/
+  const _AI_ICON_HEADER = `<span class="ai-header-icon"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span>`;
 
-  const _AI_ICON_DEEPSEEK = `<svg width="16" height="16" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="36" height="36" rx="9" fill="#1A56DB"/><g transform="translate(4.5,6.8) scale(0.97)"><path d="M26.5542 4.34393C26.2719 4.20592 26.1506 4.46928 25.9856 4.60268C25.9292 4.64581 25.8815 4.70216 25.8338 4.75391C25.4215 5.19438 24.9396 5.48361 24.3105 5.44911C23.3905 5.39736 22.605 5.68659 21.9104 6.39041C21.7626 5.52271 21.2721 5.00462 20.5258 4.67226C20.1353 4.49976 19.7403 4.32668 19.4666 3.95119C19.2757 3.68381 19.2234 3.38595 19.1279 3.09211C19.0669 2.91501 19.0066 2.73388 18.8024 2.7034C18.5811 2.6689 18.4942 2.85463 18.4074 3.00989C18.0601 3.6447 17.9255 4.34393 17.9388 5.05235C17.9692 6.64572 18.642 7.91478 19.9789 8.81756C20.1307 8.92106 20.1698 9.02457 20.1221 9.1758C20.0307 9.48688 19.9226 9.78876 19.8271 10.0998C19.7662 10.2982 19.6753 10.3419 19.4626 10.2551C18.7288 9.94862 18.0952 9.49493 17.5351 8.94694C16.5846 8.02749 15.7249 7.01258 14.6531 6.21791C14.4013 6.03218 14.1494 5.85967 13.8889 5.69522C12.7952 4.63316 14.0321 3.76086 14.3185 3.65736C14.618 3.54925 14.4225 3.17779 13.4548 3.18239C12.487 3.18642 11.6015 3.51073 10.4727 3.94256C10.3077 4.00754 10.1341 4.05469 9.95637 4.09379C8.93227 3.89944 7.86849 3.85631 6.75755 3.98167C4.66564 4.21455 2.99464 5.20358 1.7664 6.89183C0.290908 8.92106 -0.0564026 11.2269 0.368535 13.6316C0.815324 16.1663 2.10911 18.2645 4.09695 19.905C6.15838 21.6059 8.53263 22.4397 11.2415 22.2799C12.8867 22.185 14.7181 21.9648 16.7841 20.2161C17.3051 20.4755 17.8519 20.579 18.7587 20.6566C19.4574 20.7216 20.1302 20.6221 20.6511 20.514C21.4671 20.3415 21.4107 19.5859 21.1157 19.4473C18.7242 18.3335 19.2492 18.7866 18.772 18.4198C19.987 16.9822 21.8431 14.4269 22.4158 10.9474C22.4722 10.5633 22.5441 10.0222 22.5355 9.71114C22.5309 9.52138 22.5746 9.44778 22.7913 9.42593C23.3905 9.35693 23.9718 9.19305 24.506 8.89921C26.0557 8.05279 26.6808 6.6624 26.828 4.996C26.8498 4.74126 26.8234 4.47791 26.5542 4.34393ZM13.0511 19.3438C10.7332 17.5216 9.60906 16.9219 9.14502 16.9477C8.71089 16.9736 8.78909 17.4704 8.88454 17.7942C8.98459 18.1139 9.11455 18.3341 9.29683 18.6147C9.42276 18.8004 9.50959 19.0764 9.1709 19.284C8.42453 19.7458 7.12671 19.1288 7.06576 19.0983C5.55519 18.2087 4.29245 17.0346 3.40233 15.4285C2.54268 13.8829 2.04356 12.2245 1.96133 10.4546C1.93948 10.0274 2.06541 9.87617 2.49092 9.79854C3.05099 9.69504 3.62831 9.67319 4.1878 9.75541C6.55342 10.101 8.56713 11.1585 10.2554 12.8341C11.2191 13.788 11.9482 14.9283 12.6992 16.0421C13.4979 17.2249 14.357 18.3519 15.4512 19.276C15.8377 19.5997 16.1459 19.8458 16.4408 20.0275C15.5513 20.127 14.0666 20.1483 13.0511 19.345V19.3438ZM14.162 12.1981C14.162 12.0083 14.3139 11.8571 14.5048 11.8571C14.5479 11.8571 14.587 11.8657 14.6221 11.8784C14.6698 11.8956 14.7135 11.9215 14.748 11.9606C14.8089 12.021 14.8434 12.1072 14.8434 12.1981C14.8434 12.3878 14.6916 12.5391 14.5007 12.5391C14.3098 12.5391 14.162 12.3878 14.162 12.1981ZM17.6127 13.968C17.3913 14.0588 17.17 14.1365 16.9572 14.1451C16.6271 14.1623 16.2672 14.0284 16.0717 13.8645C15.7681 13.6098 15.5507 13.4671 15.4599 13.0227C15.4208 12.8329 15.4426 12.5391 15.4771 12.3706C15.5553 12.0078 15.4685 11.7749 15.2126 11.5633C15.0045 11.3908 14.7394 11.343 14.4484 11.343C14.3397 11.343 14.2403 11.2953 14.1661 11.2568C14.0447 11.1964 13.9447 11.0452 14.0401 10.8594C14.0706 10.7991 14.2184 10.6524 14.2529 10.6266C14.6479 10.4017 15.1034 10.4753 15.5248 10.6438C15.9153 10.8037 16.2108 11.0969 16.6358 11.5115C17.0699 12.0124 17.1481 12.1504 17.3954 12.5264C17.5909 12.8203 17.7686 13.1221 17.8905 13.4677C17.9641 13.6834 17.8686 13.8599 17.6127 13.968Z" fill="white"/></g></svg>`;
+  /*@3.GARJ.359*/
+  const _AI_ICON_SVC = `<i class="fa-solid fa-arrow-up-right-from-square ai-svc-ico" aria-hidden="true"></i>`;
 
-  const _AI_ICON_CHATGPT = `<svg width="16" height="16" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="36" height="36" rx="9" fill="#0d0d0d"/><path d="M18 9C13.6 9 10 12.3 10 16.4C10 18.9 11.3 21.1 13.3 22.5L12.5 26L16 24.3C16.6 24.5 17.3 24.6 18 24.6C22.4 24.6 26 21.3 26 17.2C26 13.1 22.4 9 18 9Z" fill="white" opacity="0.95"/><circle cx="14.5" cy="16.8" r="1.5" fill="#0d0d0d"/><circle cx="18" cy="16.8" r="1.5" fill="#0d0d0d"/><circle cx="21.5" cy="16.8" r="1.5" fill="#0d0d0d"/></svg>`;
+  /*@3.GARJ.360*/
 
-  const _AI_ICON_GEMINI = `<svg width="16" height="16" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="36" height="36" rx="9" fill="white"/><rect width="36" height="36" rx="9" stroke="#e8e8e8" stroke-width="0.5"/><path d="M18 5L20.2 15.8L31 18L20.2 20.2L18 31L15.8 20.2L5 18L15.8 15.8Z" fill="url(#ai-gem-grad)"/><defs><linearGradient id="ai-gem-grad" x1="5" y1="5" x2="31" y2="31" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#4285F4"/><stop offset="45%" stop-color="#9C27B0"/><stop offset="100%" stop-color="#EA4335"/></linearGradient></defs></svg>`;
 
-   
+
+  /*@3.GARJ.361*/
   function showAiModal(cardData) {
-    
+    /*@3.GARJ.362*/
     document.querySelector('.ai-modal-overlay')?.remove();
 
-    const { systemPrompt, userMsg } = buildPrompt(cardData);
-    const fullPromptText = systemPrompt + '\n\n' + userMsg;
-    const cacheKey = aiCacheKey(cardData.title, cardData.content);
-    const cached = getAiCache(cacheKey);
+    /*@3.GARJ.363*/
+    const intent = { scope: 'layer', style: 'auto', question: '' };
+    let lastAiText = '';
+    let busy = false;
+    let sysPromptNow = '';   /*@3.GARJ.364*/
+    let thread = [];         /*@3.GARJ.365*/
+    const MAX_FOLLOWUPS = 4;
+
+    const hasLayers = !!cardData.allLayersText;
+    const hasDiagram = !!cardData.svgBlock;
+
+    /*@3.GARJ.366*/
+    const scopeChips = [];
+    if (hasLayers) {
+      scopeChips.push({ id: 'layer', ico: 'fa-layer-group', label: aiT('الطبقة الحالية', 'Current layer') });
+      scopeChips.push({ id: 'card', ico: 'fa-file-lines', label: aiT('البطاقة كلها', 'Whole card') });
+      if (hasDiagram) scopeChips.push({ id: 'svg', ico: 'fa-image', label: aiT('الرسمة', 'Diagram') });
+    }
+
+    /*@3.GARJ.367*/
+    const styleChips = [
+      { id: 'auto',     ico: 'fa-wand-magic-sparkles', label: aiT('تلقائي', 'Smart') },
+      { id: 'simplify', ico: 'fa-feather',             label: aiT('بسّطها لي', 'Simplify it') },
+      { id: 'example',  ico: 'fa-calculator',          label: aiT('مثال محلول', 'Worked example') },
+      { id: 'why',      ico: 'fa-circle-question',     label: aiT('لماذا؟', 'Why?') },
+      { id: 'exam',     ico: 'fa-bullseye',            label: aiT('للامتحان', 'Exam prep') },
+    ];
+
+    const chips = (list, group, activeId) => list.map(c =>
+      `<button class="ai-chip${c.id === activeId ? ' active' : ''}" data-group="${group}" data-id="${c.id}">` +
+      (c.ico ? `<i class="fa-solid ${c.ico}" aria-hidden="true"></i>` : '') + `${c.label}</button>`
+    ).join('');
+
+    const REGEN_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>`;
+    /*@3.GARJ.368*/
+    const REGEN_INNER = `${REGEN_ICON}<span class="ai-btn-label">${aiT('توليد', 'Regen')}</span>`;
 
     const overlay = document.createElement('div');
     overlay.className = 'ai-modal-overlay';
@@ -4234,35 +5013,41 @@ ${baseRules}`) + regenSuffix;
       <div class="ai-modal">
         <div class="ai-modal-header">
           <h3>${_AI_ICON_HEADER} ${aiT('DeepSeek يشرح', 'AI Explanation')}</h3>
-          <button class="ai-modal-close" id="ai-close">✕</button>
+          <button class="ai-modal-close" id="ai-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <div class="ai-intent-bar">
+          ${scopeChips.length ? `<div class="ai-chip-row"><span class="ai-chip-label">${aiT('ماذا أشرح؟', 'Explain what?')}</span>${chips(scopeChips, 'scope', intent.scope)}</div>` : ''}
+          <div class="ai-chip-row"><span class="ai-chip-label">${aiT('كيف؟', 'How?')}</span>${chips(styleChips, 'style', intent.style)}</div>
+          <div class="ai-q-row">
+            <input type="text" class="ai-q-input" id="ai-question" maxlength="300" placeholder="${aiT('ما الذي لم تفهمه بالضبط؟ (اختياري)', 'What exactly is unclear? (optional)')}">
+            <button class="ai-q-send" id="ai-ask">${aiT('اشرح', 'Explain')}</button>
+          </div>
         </div>
         <div class="ai-modal-body" id="ai-body">
-          ${cached
-        ? `<div class="ai-cached-badge">⚡ ${aiT('محفوظ مسبقاً', 'Cached')}</div><div class="ai-result">${formatAiText(cached)}</div>`
-        : `<div class="ai-loading"><div class="ai-loading-spinner"></div><span>${aiT('جاري الشرح...', 'Generating explanation...')}</span></div>`
-      }
+          <div id="ai-thread"></div>
+          <div class="ai-composer" id="ai-composer" style="display:none">
+            <div class="ai-feedback-row" id="ai-fb"></div>
+            <div class="ai-followup-row" id="ai-fu-row"></div>
+          </div>
         </div>
         <div class="ai-modal-footer" id="ai-footer">
-          <button class="ai-action-btn" id="ai-copy-prompt">
+          <button class="ai-action-btn" id="ai-copy-prompt" title="${aiT('نسخ البرومبت', 'Copy prompt')}">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            ${aiT('نسخ البرومبت', 'Copy Prompt')}
+            <span class="ai-btn-label">${aiT('نسخ', 'Copy')}</span>
           </button>
-          ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--regen" id="ai-regen" title="${aiT('تجاهل الكاش وتوليد شرح جديد', 'Bypass cache and generate a fresh explanation')}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-            ${aiT('إعادة التوليد', 'Regenerate')}
-          </button>` : ''}
-          <a class="ai-action-btn" href="https://chat.deepseek.com/" target="_blank" rel="noopener">
-            ${_AI_ICON_DEEPSEEK} DeepSeek
+          ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--regen" id="ai-regen" title="${aiT('تجاهل الكاش وتوليد شرح جديد', 'Bypass cache and generate a fresh explanation')}">${REGEN_INNER}</button>` : ''}
+          <a class="ai-action-btn ai-svc-btn" href="https://chat.qwen.ai/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح Qwen', 'Copy the prompt and open Qwen')}">
+            ${_AI_ICON_SVC} <span class="ai-btn-label">Qwen</span>
           </a>
-          <a class="ai-action-btn" href="https://chatgpt.com/" target="_blank" rel="noopener">
-            ${_AI_ICON_CHATGPT} ChatGPT
+          <a class="ai-action-btn ai-svc-btn" href="https://chatgpt.com/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح ChatGPT', 'Copy the prompt and open ChatGPT')}">
+            ${_AI_ICON_SVC} <span class="ai-btn-label">ChatGPT</span>
           </a>
-          <a class="ai-action-btn" href="https://gemini.google.com/" target="_blank" rel="noopener">
-            ${_AI_ICON_GEMINI} Gemini
+          <a class="ai-action-btn ai-svc-btn" href="https://gemini.google.com/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح Gemini', 'Copy the prompt and open Gemini')}">
+            ${_AI_ICON_SVC} <span class="ai-btn-label">Gemini</span>
           </a>
-          ${!cached && GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--primary" id="ai-retry" style="display:none">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-            ${aiT('إعادة المحاولة', 'Retry')}
+          ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--primary" id="ai-retry" style="display:none" title="${aiT('إعادة المحاولة', 'Retry')}">
+            ${REGEN_ICON}
+            <span class="ai-btn-label">${aiT('محاولة', 'Retry')}</span>
           </button>` : ''}
         </div>
       </div>`;
@@ -4270,7 +5055,11 @@ ${baseRules}`) + regenSuffix;
     document.body.appendChild(overlay);
     requestAnimationFrame(() => overlay.classList.add('open'));
 
-    
+    const body = overlay.querySelector('#ai-body');
+    const threadEl = overlay.querySelector('#ai-thread');
+    const composer = overlay.querySelector('#ai-composer');
+
+    /*@3.GARJ.369*/
     const close = () => {
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
@@ -4281,122 +5070,403 @@ ${baseRules}`) + regenSuffix;
       if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
     });
 
-    
-    overlay.querySelector('#ai-copy-prompt')?.addEventListener('click', () => {
-      navigator.clipboard.writeText(fullPromptText).then(() => {
-        const btn = overlay.querySelector('#ai-copy-prompt');
-        if (btn) { const old = btn.innerHTML; btn.innerHTML = `✅ ${aiT('تم النسخ!', 'Copied!')}`; setTimeout(() => btn.innerHTML = old, 1500); }
-      });
-    });
-
-     
-    function doRegen() {
-      const body = overlay.querySelector('#ai-body');
-      const regenBtn = overlay.querySelector('#ai-regen');
-      if (!body) return;
-      try { localStorage.removeItem(cacheKey); } catch (e) { }
-      if (regenBtn) {
-        regenBtn.disabled = true;
-        regenBtn.innerHTML = `<span class="ai-regen-spin">↻</span> ${aiT('جاري التوليد...', 'Generating...')}`;
-      }
-      body.innerHTML = `<div class="ai-loading"><div class="ai-loading-spinner"></div><span>${aiT('جاري توليد شرح جديد...', 'Generating a fresh explanation...')}</span></div>`;
-      
-      const regenPrompt = buildPrompt(cardData, true);
-      callAI(regenPrompt.systemPrompt, regenPrompt.userMsg).then(result => {
-        if (!body) return;
-        if (regenBtn) {
-          regenBtn.disabled = false;
-          regenBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> ${aiT('إعادة التوليد', 'Regenerate')}`;
-        }
-        if (result.error) {
-          const errMsg = result.errorData?.message_ar && currentLang === 'ar'
-            ? result.errorData.message_ar
-            : result.errorData?.message_en || aiT('فشل التوليد. حاول مرة أخرى.', 'Generation failed. Try again.');
-          body.innerHTML = `<div class="ai-error"><div class="ai-error-icon">⚠️</div><div class="ai-error-msg">${errMsg}</div></div>`;
-        } else {
-          setAiCache(cacheKey, result.text);
-          body.innerHTML = `<div class="ai-fresh-badge">✨ ${aiT('شرح جديد', 'Fresh explanation')}</div><div class="ai-result">${formatAiText(result.text)}</div>`;
-        }
+    /*@3.GARJ.370*/
+    function currentKey() {
+      const variant = intent.scope + '-' + intent.style
+        + (intent.question ? '-q' + tinyHash(intent.question) : '');
+      return aiCacheKey(cardData.title, cardData.content, cardData.activeLayer, variant);
+    }
+    function currentPrompt(regen) {
+      const composed = composeCardData(cardData, intent.scope);
+      return buildPrompt(composed, {
+        regen: !!regen,
+        prevText: regen ? lastAiText : '',
+        style: intent.style,
+        question: intent.question,
       });
     }
-    overlay.querySelector('#ai-regen')?.addEventListener('click', doRegen);
 
-    
-    if (!cached && GARDEN_AI_ENDPOINT) {
-      callAI(systemPrompt, userMsg).then(result => {
-        const body = overlay.querySelector('#ai-body');
-        if (!body) return;
-        if (result.error) {
-          const errMsg = result.errorData?.message_ar && currentLang === 'ar'
-            ? result.errorData.message_ar
-            : result.errorData?.message_en || aiT('النموذج يتعرض لضغط عالي حالياً.', 'AI model is under heavy load.');
-          body.innerHTML = `
-            <div class="ai-error">
-              <div class="ai-error-icon">⚠️</div>
-              <div class="ai-error-msg">${errMsg}</div>
-              <div style="font-size:0.8rem;color:var(--text-muted)">${aiT('يمكنك نسخ البرومبت وإرساله يدوياً عبر الأزرار أدناه', 'You can copy the prompt and send it manually using the buttons below')}</div>
-            </div>`;
-          const retryBtn = overlay.querySelector('#ai-retry');
-          if (retryBtn) retryBtn.style.display = '';
-        } else {
-          setAiCache(cacheKey, result.text);
-          body.innerHTML = `<div class="ai-result">${formatAiText(result.text)}</div>`;
-        }
-      });
-    } else if (!cached && !GARDEN_AI_ENDPOINT) {
-      const body = overlay.querySelector('#ai-body');
-      if (body) body.innerHTML = `
+    /*@3.GARJ.371*/
+    function threadWindow() {
+      let hist = thread;
+      if (hist.length > 6) hist = hist.slice(0, 2).concat(hist.slice(-4));
+      return hist;
+    }
+
+    /*@3.GARJ.372*/
+    function currentMessages() {
+      if (thread.length && sysPromptNow) {
+        return [{ role: 'system', content: sysPromptNow }].concat(threadWindow());
+      }
+      const p = currentPrompt(false);
+      return [{ role: 'system', content: p.systemPrompt }, { role: 'user', content: p.userMsg }];
+    }
+
+    /*@3.GARJ.373*/
+    function scrollBottom() { if (body) body.scrollTop = body.scrollHeight; }
+
+    function newHolder() {
+      const holder = document.createElement('div');
+      holder.className = 'ai-answer-holder';
+      threadEl.appendChild(holder);
+      return holder;
+    }
+
+    function typesetIn(el) {
+      if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+        MathJax.typesetPromise([el]).catch(() => { });
+      }
+    }
+
+    function errorHTML(result) {
+      const errMsg = result.errorData?.message_ar && currentLang === 'ar'
+        ? result.errorData.message_ar
+        : result.errorData?.message_en || aiT('النموذج يتعرض لضغط عالي حالياً.', 'AI model is under heavy load.');
+      return `
         <div class="ai-error">
-          <div class="ai-error-icon">📋</div>
-          <div class="ai-error-msg">${aiT('انسخ البرومبت وأرسله لأي نموذج ذكاء اصطناعي', 'Copy the prompt and send it to any AI model')}</div>
+          <div class="ai-error-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+          <div class="ai-error-msg">${errMsg}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">${aiT('يمكنك نسخ البرومبت وإرساله يدوياً عبر الأزرار أدناه', 'You can copy the prompt and send it manually using the buttons below')}</div>
         </div>`;
     }
 
-    
-    overlay.querySelector('#ai-retry')?.addEventListener('click', () => {
-      const body = overlay.querySelector('#ai-body');
-      if (body) body.innerHTML = `<div class="ai-loading"><div class="ai-loading-spinner"></div><span>${aiT('جاري الشرح...', 'Generating explanation...')}</span></div>`;
-      callAI(systemPrompt, userMsg).then(result => {
-        if (!body) return;
-        if (result.error) {
-          body.innerHTML = `<div class="ai-error"><div class="ai-error-icon">⚠️</div><div class="ai-error-msg">${aiT('لم ينجح الاتصال. حاول لاحقاً.', 'Connection failed. Try later.')}</div></div>`;
-        } else {
-          setAiCache(cacheKey, result.text);
-          body.innerHTML = `<div class="ai-result">${formatAiText(result.text)}</div>`;
+    function restoreRegenBtn() {
+      const regenBtn = overlay.querySelector('#ai-regen');
+      if (regenBtn) {
+        regenBtn.disabled = false;
+        regenBtn.innerHTML = REGEN_INNER;
+      }
+    }
+
+    /*@3.GARJ.374*/
+    function setFailState(failed) {
+      const regenBtn = overlay.querySelector('#ai-regen');
+      const retryBtn = overlay.querySelector('#ai-retry');
+      if (regenBtn) regenBtn.style.display = failed ? 'none' : '';
+      if (retryBtn) retryBtn.style.display = failed ? '' : 'none';
+    }
+
+    /*@3.GARJ.375*/
+    function runAI(messages, holder, opts, onOk) {
+      holder.innerHTML = `<div class="ai-loading"><div class="ai-loading-spinner"></div><span>${opts.loadingMsg || aiT('جاري الشرح...', 'Generating explanation...')}</span></div>`;
+      let streamEl = null;
+      const onThinking = () => {
+        const span = holder.querySelector('.ai-loading span');
+        if (span) span.textContent = aiT('يفكر بعمق في شرحك...', 'Thinking deeply about your explanation...');
+      };
+      const onDelta = (full) => {
+        if (!document.body.contains(holder)) return;
+        if (!streamEl) {
+          holder.innerHTML = '';
+          streamEl = document.createElement('div');
+          streamEl.className = 'ai-result ai-streaming';
+          holder.appendChild(streamEl);
         }
+        streamEl.textContent = full; /*@3.GARJ.376*/
+        scrollBottom();
+      };
+      callAI(messages, onDelta, onThinking).then(result => {
+        busy = false;
+        restoreRegenBtn();
+        if (!document.body.contains(overlay)) return;
+        if (result.error || !result.text) {
+          holder.innerHTML = errorHTML(result);
+          setFailState(true);
+        } else {
+          setFailState(false);
+          holder.innerHTML = (opts.badge || '') + `<div class="ai-result">${formatAiText(result.text)}</div>`;
+          typesetIn(holder);
+          onOk(result.text);
+        }
+        scrollBottom();
+      });
+    }
+
+    /*@3.GARJ.377*/
+    function generate(opts) {
+      opts = opts || {};
+      if (busy || !body) return;
+      thread = [];
+      composer.style.display = 'none';
+      resetFeedback();
+      resetFollowupRow();
+      threadEl.innerHTML = '';
+      const key = currentKey();
+
+      const p = currentPrompt(!!opts.regen);
+      sysPromptNow = p.systemPrompt;
+
+      if (!opts.force) {
+        const hit = getAiCache(key);
+        if (hit) {
+          lastAiText = hit;
+          thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: hit }];
+          const holder = newHolder();
+          holder.innerHTML = `<div class="ai-cached-badge"><i class="fa-solid fa-bolt" aria-hidden="true"></i> ${aiT('محفوظ مسبقاً', 'Cached')}</div><div class="ai-result">${formatAiText(hit)}</div>`;
+          typesetIn(holder);
+          composer.style.display = '';
+          return;
+        }
+      }
+
+      if (!GARDEN_AI_ENDPOINT) {
+        threadEl.innerHTML = `
+          <div class="ai-error">
+            <div class="ai-error-icon"><i class="fa-solid fa-clipboard" aria-hidden="true"></i></div>
+            <div class="ai-error-msg">${aiT('انسخ البرومبت وأرسله لأي نموذج ذكاء اصطناعي', 'Copy the prompt and send it to any AI model')}</div>
+          </div>`;
+        return;
+      }
+
+      busy = true;
+      if (opts.regen) {
+        try { localStorage.removeItem(key); } catch (e) { }
+        const regenBtn = overlay.querySelector('#ai-regen');
+        if (regenBtn) {
+          regenBtn.disabled = true;
+          /*@3.GARJ.378*/
+          regenBtn.innerHTML = `<span class="ai-regen-spin">↻</span><span class="ai-btn-label">${aiT('جارٍ…', 'Working…')}</span>`;
+        }
+      }
+
+      const holder = newHolder();
+      runAI(
+        [{ role: 'system', content: p.systemPrompt }, { role: 'user', content: p.userMsg }],
+        holder,
+        {
+          badge: opts.regen ? `<div class="ai-fresh-badge"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ${aiT('شرح جديد', 'Fresh explanation')}</div>` : '',
+          loadingMsg: opts.regen ? aiT('جاري توليد شرح جديد...', 'Generating a fresh explanation...') : aiT('جاري الشرح...', 'Generating explanation...'),
+        },
+        (text) => {
+          setAiCache(key, text);
+          lastAiText = text;
+          thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: text }];
+          composer.style.display = '';
+        }
+      );
+    }
+
+    /*@3.GARJ.379*/
+    function followUp(msgText, displayText) {
+      if (busy || !msgText || !thread.length) return;
+      busy = true;
+      const q = document.createElement('div');
+      q.className = 'ai-user-q';
+      q.textContent = displayText || msgText;
+      threadEl.appendChild(q);
+      scrollBottom();
+
+      /*@3.GARJ.380*/
+      const messages = [{ role: 'system', content: sysPromptNow }]
+        .concat(threadWindow(), [{ role: 'user', content: msgText }]);
+
+      const holder = newHolder();
+      runAI(messages, holder, { loadingMsg: aiT('جاري الرد...', 'Answering...') }, (ans) => {
+        thread.push({ role: 'user', content: msgText }, { role: 'assistant', content: ans });
+        lastAiText = ans;
+        if ((thread.length - 2) / 2 >= MAX_FOLLOWUPS) limitComposer();
+      });
+    }
+
+    /*@3.GARJ.381*/
+    function bindFeedback() {
+      overlay.querySelectorAll('.ai-fb-btn').forEach(b => b.addEventListener('click', () => {
+        const vote = b.getAttribute('data-v');
+        saveAiFeedback(vote, {
+          s: document.documentElement.getAttribute('data-subject') || '',
+          m: document.documentElement.getAttribute('data-module') || '',
+          t: (cardData.title || '').substring(0, 40),
+          intent: intent.scope + '-' + intent.style,
+          turns: Math.max(0, (thread.length - 2) / 2),
+          ctype: cardData.type,
+        });
+        const fb = overlay.querySelector('#ai-fb');
+        if (fb) fb.innerHTML = vote === 'up'
+          ? `<span class="ai-fb-thanks"><i class="fa-solid fa-heart" aria-hidden="true"></i> ${aiT('شكراً! تقييمك يحسّن الشرح', 'Thanks! Your rating improves explanations')}</span>`
+          : `<span class="ai-fb-thanks">${aiT('جرّب «لم أفهم بعد» أو غيّر الأسلوب من الأعلى', 'Try "Still unclear" or switch the style above')}</span>`;
+      }));
+    }
+    function resetFeedback() {
+      const fb = overlay.querySelector('#ai-fb');
+      if (!fb) return;
+      fb.innerHTML = `
+        <span class="ai-fb-label">${aiT('هل أفادك الشرح؟', 'Was this helpful?')}</span>
+        <button class="ai-fb-btn" data-v="up" aria-label="${aiT('مفيد', 'Helpful')}"><i class="fa-solid fa-thumbs-up" aria-hidden="true"></i></button>
+        <button class="ai-fb-btn" data-v="down" aria-label="${aiT('غير مفيد', 'Not helpful')}"><i class="fa-solid fa-thumbs-down" aria-hidden="true"></i></button>`;
+      bindFeedback();
+    }
+
+    /*@3.GARJ.382*/
+    function resetFollowupRow() {
+      const row = overlay.querySelector('#ai-fu-row');
+      if (!row) return;
+      row.innerHTML = `
+        <button class="ai-confused-btn" id="ai-confused"><i class="fa-solid fa-face-dizzy" aria-hidden="true"></i> ${aiT('لم أفهم بعد', 'Still unclear')}</button>
+        <input type="text" class="ai-q-input" id="ai-fu-input" maxlength="300" placeholder="${aiT('اسأل سؤال متابعة...', 'Ask a follow-up...')}">
+        <button class="ai-q-send" id="ai-fu-send">${aiT('أرسل', 'Send')}</button>`;
+      const fuInput = row.querySelector('#ai-fu-input');
+      const sendFu = () => {
+        const v = fuInput.value.trim();
+        if (!v) return;
+        fuInput.value = '';
+        followUp(v);
+      };
+      row.querySelector('#ai-fu-send').addEventListener('click', sendFu);
+      fuInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendFu(); });
+      row.querySelector('#ai-confused').addEventListener('click', () => {
+        followUp(
+          aiT(
+            'لم أفهم شرحك السابق. انزل مستوى: أعد الشرح بأسلوب أبسط بكثير، بتشبيه أسهل ومثال أصغر خطوة بخطوة، وكأنك تشرح لمبتدئ تماماً.',
+            "I didn't understand your previous explanation. Go a level down: re-explain much more simply, with an easier analogy and a smaller step-by-step example, as if to a complete beginner."
+          ),
+          aiT('لم أفهم بعد — بسّط أكثر', "Still unclear — simplify more")
+        );
+      });
+    }
+    function limitComposer() {
+      const row = overlay.querySelector('#ai-fu-row');
+      if (row) row.innerHTML = `<span class="ai-fu-limit">${aiT('وصلت لحد المتابعة — استخدم «إعادة التوليد» لبدء شرح جديد', 'Follow-up limit reached — use "Regenerate" to start fresh')}</span>`;
+    }
+
+    /*@3.GARJ.383*/
+    overlay.querySelectorAll('.ai-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (busy) return;
+        const group = chip.getAttribute('data-group');
+        const id = chip.getAttribute('data-id');
+        if ((group === 'scope' ? intent.scope : intent.style) === id) return;
+        overlay.querySelectorAll(`.ai-chip[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        if (group === 'scope') intent.scope = id; else intent.style = id;
+        generate();
       });
     });
+
+    const qInput = overlay.querySelector('#ai-question');
+    const askNow = () => {
+      if (busy) return;
+      intent.question = qInput.value.trim();
+      generate();
+    };
+    overlay.querySelector('#ai-ask').addEventListener('click', askNow);
+    qInput.addEventListener('keydown', e => { if (e.key === 'Enter') askNow(); });
+
+    /*@3.GARJ.384*/
+    function promptTextOut() {
+      const ROLE_LABEL = { system: '[System]', user: '[User]', assistant: '[Assistant]' };
+      return currentMessages()
+        .map(m => `${ROLE_LABEL[m.role] || '[' + m.role + ']'}:\n${m.content}`)
+        .join('\n\n');
+    }
+    /*@3.GARJ.385*/
+    function flashOK(btn) {
+      if (!btn || btn.dataset.flash === '1') return;
+      btn.dataset.flash = '1';
+      if (!btn.dataset.html) btn.dataset.html = btn.innerHTML;
+      btn.innerHTML = `<span class="ai-btn-label"><i class="fa-solid fa-check" aria-hidden="true"></i> ${aiT('نُسخ', 'Copied')}</span>`;
+      setTimeout(() => { btn.innerHTML = btn.dataset.html; btn.dataset.flash = '0'; }, 1500);
+    }
+    function copyPrompt(btn) {
+      const text = promptTextOut();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => flashOK(btn), () => {});
+      }
+    }
+    overlay.querySelector('#ai-copy-prompt')?.addEventListener('click', e =>
+      copyPrompt(e.currentTarget));
+
+    /*@3.GARJ.386*/
+    overlay.querySelectorAll('.ai-svc-btn').forEach(a =>
+      a.addEventListener('click', () => copyPrompt(a)));
+
+    overlay.querySelector('#ai-regen')?.addEventListener('click', () => generate({ regen: true, force: true }));
+    overlay.querySelector('#ai-retry')?.addEventListener('click', () => generate({ force: true }));
+
+    /*@3.GARJ.387*/
+    generate();
   }
 
-   
+  /*@3.GARJ.388*/
   function formatAiText(text) {
-    return text
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const inline = s => esc(s)
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')
-      .replace(/^/, '<p>').replace(/$/, '</p>');
+      .replace(/`([^`]+)`/g, '<code dir="ltr">$1</code>');
+
+    const lines = (text || '').replace(/\r\n/g, '\n').split('\n');
+    let html = '';
+    let para = [];
+    let list = null; /*@3.GARJ.389*/
+    let inCode = false, codeBuf = [];
+
+    const flushPara = () => { if (para.length) { html += '<p>' + para.join('<br>') + '</p>'; para = []; } };
+    const flushList = () => { if (list) { html += `<${list.type}>` + list.items.map(i => `<li>${i}</li>`).join('') + `</${list.type}>`; list = null; } };
+
+    for (const rawLine of lines) {
+      const t = rawLine.trim();
+      /*@3.GARJ.390*/
+      if (/^```/.test(t)) {
+        if (inCode) {
+          html += `<pre dir="ltr"><code>${esc(codeBuf.join('\n'))}</code></pre>`;
+          codeBuf = []; inCode = false;
+        } else {
+          flushPara(); flushList(); inCode = true;
+        }
+        continue;
+      }
+      if (inCode) { codeBuf.push(rawLine); continue; }
+      if (!t) { flushPara(); flushList(); continue; }
+      /*@3.GARJ.391*/
+      const h = t.match(/^#{1,4}\s+(.*)/);
+      if (h) { flushPara(); flushList(); html += `<h4>${inline(h[1])}</h4>`; continue; }
+      /*@3.GARJ.392*/
+      const ul = t.match(/^[-*•]\s+(.*)/);
+      const ol = t.match(/^\d+[.)]\s+(.*)/);
+      if (ul || ol) {
+        flushPara();
+        const type = ul ? 'ul' : 'ol';
+        if (!list || list.type !== type) { flushList(); list = { type, items: [] }; }
+        list.items.push(inline((ul || ol)[1]));
+        continue;
+      }
+      flushList();
+      para.push(inline(t));
+    }
+    if (inCode && codeBuf.length) html += `<pre dir="ltr"><code>${esc(codeBuf.join('\n'))}</code></pre>`;
+    flushPara(); flushList();
+    return html || '<p></p>';
   }
 
-   
+  /*@3.GARJ.393*/
+  function renderAiResult(bodyEl, html) {
+    if (!bodyEl) return;
+    bodyEl.innerHTML = html;
+    if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+      MathJax.typesetPromise([bodyEl]).catch(() => { });
+    }
+  }
+
+  /*@3.GARJ.394*/
   function initAiExplain() {
     const targets = document.querySelectorAll(
       '.concept-card, .professor-card, .vault-section, .objectives-card, .accordion-item'
     );
     targets.forEach(card => {
-      if (card.querySelector('.ai-explain-btn')) return; 
-      
+      if (card.querySelector('.ai-explain-btn')) return; /*@3.GARJ.395*/
       if (card.id === 'mcq-card' || card.id === 'final-score-screen') return;
-      
+      /*@3.GARJ.396*/
       if (document.documentElement.getAttribute('data-page') === 'quiz' &&
         !card.classList.contains('accordion-item')) return;
-      if (!card.style.position || card.style.position === 'static') {
-        card.style.position = 'relative'; 
+      /*@3.GARJ.397*/
+      if (getComputedStyle(card).position === 'static') {
+        card.style.position = 'relative'; /*@3.GARJ.398*/
       }
       const btn = document.createElement('button');
       btn.className = 'ai-explain-btn';
-      btn.setAttribute('aria-label', aiT('DeepSeek يشرح', 'AI Explanation'));
-      btn.title = aiT('DeepSeek يشرح', 'AI Explanation');
+      /*@3.GARJ.399*/
+      btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>';
+      btn.setAttribute('aria-label', aiT('اشرح بالذكاء', 'Explain'));
+      btn.title = aiT('اشرح بالذكاء', 'Explain');
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const data = extractCardContent(card);
@@ -4406,35 +5476,45 @@ ${baseRules}`) + regenSuffix;
     });
   }
 
-   
-   
-   
-   
+  /*@3.GARJ.400*/
   function initSvgTextOrder() {
     document.querySelectorAll('.svg-diagram svg, figure.svg-diagram > svg').forEach(svg => {
-      
+      /*@3.GARJ.401*/
       const texts = Array.from(svg.querySelectorAll('text'));
       if (!texts.length) return;
-      
-      
+      /*@3.GARJ.402*/
       texts.forEach(t => t.parentNode.appendChild(t));
     });
   }
 
-   
+  /*@3.GARJ.403*/
   function initFavicon() {
     if (document.querySelector('link[rel="icon"]')) return;
     const link = document.createElement('link');
     link.rel = 'icon';
     link.type = 'image/svg+xml';
-    
+    /*@3.GARJ.404*/
     link.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'%3E%3Cpath fill='%2310B981' d='M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c18 0 32-14 32-32s-14-32-32-32V384c18 0 32-14 32-32V32c0-18-14-32-32-32H384 96zm0 384H352v64H96c-18 0-32-14-32-32s14-32 32-32zm32-240c0-9 7-16 16-16H336c9 0 16 7 16 16s-7 16-16 16H144c-9 0-16-7-16-16zm16 48H336c9 0 16 7 16 16s-7 16-16 16H144c-9 0-16-7-16-16s7-16 16-16z'/%3E%3C/svg%3E";
     document.head.appendChild(link);
   }
 
-   
+  /*@3.GARJ.405*/
+
+  /*@3.GARJ.406*/
+  function _isContentPage() {
+    var root = document.documentElement;
+    var p = root.getAttribute('data-page');
+    if (p === 'review' || p === 'quiz') return true;
+    if (root.hasAttribute('data-subject') && root.hasAttribute('data-module')) return true;
+    /*@3.GARJ.407*/
+    var gh = document.querySelector('[data-gh-variant]');
+    if (gh && gh.getAttribute('data-gh-variant') === 'module') return true;
+    return false;
+  }
   function initAiSystem() {
+    if (!_isContentPage()) return;   /*@3.GARJ.408*/
     initAiExplain();
+    loadAiCatalog(); /*@3.GARJ.409*/
   }
 
   if (document.readyState === 'loading') {
@@ -4445,207 +5525,153 @@ ${baseRules}`) + regenSuffix;
     init();
   }
 
-   
+  /*@3.GARJ.410*/
   function changeDailyLimit(delta) {
     const fc = window._gardenFC;
     const current = fc.dailyNewLimit || 10;
     const next = Math.max(5, Math.min(50, current + delta));
     fc.dailyNewLimit = next;
     try { localStorage.setItem('garden_daily_new_limit', String(next)); } catch (e) { }
-    
+    /*@3.GARJ.411*/
     const el = document.getElementById('fc-dl-value');
     if (el) el.textContent = next;
   }
 
 
-   
+  /*@3.GARJ.412*/
   (function () {
-    function _todayStr() {
-      const d = new Date();
-      return d.getFullYear() + '-' +
-        String(d.getMonth() + 1).padStart(2, '0') + '-' +
-        String(d.getDate()).padStart(2, '0');
+    var SCHEDULE_KEY = 'weekly_schedule';
+    var DAYS_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+    function _pad2(n) { return n < 10 ? ('0' + n) : String(n); }
+
+    function _todayStr(d) {
+      d = d || new Date();
+      return d.getFullYear() + '-' + _pad2(d.getMonth() + 1) + '-' + _pad2(d.getDate());
     }
 
-    function _getPlannerBannerData() {
-      const today = _todayStr();
+    /*@3.GARJ.413*/
+    function _weekIdOf(d) {
+      var dt = new Date(d);
+      dt.setHours(0, 0, 0, 0);
+      dt.setDate(dt.getDate() + 3 - (dt.getDay() + 6) % 7);
+      var week1 = new Date(dt.getFullYear(), 0, 4);
+      var weekNum = 1 + Math.round(((dt - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+      return dt.getFullYear() + '-W' + _pad2(weekNum);
+    }
 
-      
-      
-      
-      
-      var pathMatch = location.pathname.match(/\/L(\d+)\/|\/level(\d+)\//i);
-      var currentLevel = pathMatch ? (pathMatch[1] || pathMatch[2]) : null;
-      var levels = currentLevel ? [currentLevel] : ['3', '4', '5', '6', '7', '8'];
+    /*@3.GARJ.414*/
+    function _getTodayBannerData() {
+      var raw;
+      try { raw = localStorage.getItem(SCHEDULE_KEY); } catch (e) { raw = null; }
+      if (!raw) return { hasData: false };
+      var sch;
+      try { sch = JSON.parse(raw); } catch (e) { return { hasData: false }; }
+      if (!sch || typeof sch !== 'object') return { hasData: false };
 
-      
-      var combined = {
-        hasPlan: false,
-        todaySessions: 0, todayDone: 0,
-        totalSessions: 0, doneSessions: 0,
-        progressPct: 0, planUrl: null, planType: null,
-        version: null,
-        level: currentLevel
-      };
+      var lectures = sch.lectures || [];
+      var studyBlocks = sch.study_blocks || [];
+      var exams = sch.exams || [];
+      if (!lectures.length && !studyBlocks.length && !exams.length) return { hasData: false };
 
-      for (var li = 0; li < levels.length; li++) {
-        var lv = levels[li];
-        var v2Raw = localStorage.getItem('planner_v2_L' + lv);
-        if (!v2Raw) continue;
-        try {
-          var v2Data = JSON.parse(v2Raw);
-          if (!v2Data || v2Data.version !== 2 || !v2Data.plans) continue;
+      var now = new Date();
+      var today = _todayStr(now);
+      var dayKey = DAYS_ORDER[now.getDay()];
+      var wid = _weekIdOf(now);
+      var overrides = (sch.week_overrides && sch.week_overrides[wid]) || {};
+      var cancelled = overrides.cancelled_lectures || [];
+      var completed = overrides.completed_events || [];
 
-          var activeType = v2Data.active_plan || 'midterm';
-          var activePlan = v2Data.plans[activeType];
-          if (!activePlan || !activePlan.entries) continue;
-
-          
-          var todayEntry = activePlan.entries[today];
-          var todayMods = todayEntry && todayEntry.items
-            ? todayEntry.items.filter(function (i) { return i.type === 'module'; })
-            : [];
-          var todayTotal = todayMods.length;
-          var todayDone = todayMods.filter(function (i) { return i.completed; }).length;
-
-          
-          var totalSessions = 0, doneSessions = 0;
-          Object.keys(activePlan.entries).forEach(function (d) {
-            var mods = (activePlan.entries[d].items || []).filter(function (i) { return i.type === 'module'; });
-            totalSessions += mods.length;
-            doneSessions += mods.filter(function (i) { return i.completed; }).length;
-          });
-
-          if (todayTotal === 0 && totalSessions === 0) continue;
-
-          combined.hasPlan = true;
-          combined.version = 2;
-          combined.todaySessions += todayTotal;
-          combined.todayDone += todayDone;
-          combined.totalSessions += totalSessions;
-          combined.doneSessions += doneSessions;
-          if (!combined.planType) combined.planType = activeType;
-          if (!combined.planUrl) combined.planUrl = '/L' + lv + '/planner/index.html';
-        } catch (e) {   }
-      }
-
-      
-      
-      
-      if (!combined.hasPlan) {
-        const legacyKeys = [];
-        levels.forEach(function (lv) {
-          legacyKeys.push(
-            'study_plan_L' + lv + '_midterm',
-            'study_plan_L' + lv + '_final',
-            'study_plan_L' + lv + '_general'
-          );
+      var todayEvents = [];
+      lectures.forEach(function (l) {
+        if (!l || l.day !== dayKey || !l.recurring) return;
+        if (cancelled.indexOf(l.id) !== -1) return;
+        todayEvents.push({
+          id: l.id, start: l.start_time || '', course: l.course_code || '',
+          done: completed.indexOf(l.id) !== -1
         });
-        
-        if (!currentLevel) {
-          legacyKeys.push('study_plan_midterm', 'study_plan_final', 'study_plan_general');
-        }
+      });
+      studyBlocks.forEach(function (b) {
+        if (!b || b.day !== dayKey) return;
+        if (b.week_id != null && b.week_id !== wid) return;
+        todayEvents.push({
+          id: b.id, start: b.start_time || '', course: b.course_code || '',
+          done: completed.indexOf(b.id) !== -1
+        });
+      });
+      exams.forEach(function (ex) {
+        if (!ex || ex.date !== today) return;
+        todayEvents.push({
+          id: ex.id, start: ex.start_time || '', course: ex.course_code || '',
+          done: !!ex.completed_at
+        });
+      });
 
-        for (var i = 0; i < legacyKeys.length; i++) {
-          var raw = localStorage.getItem(legacyKeys[i]);
-          if (!raw) continue;
-          try {
-            var plan = JSON.parse(raw);
-            if (!plan || !Array.isArray(plan.days)) continue;
+      todayEvents.sort(function (a, b) { return String(a.start).localeCompare(String(b.start)); });
 
-            var todayDay = null;
-            for (var j = 0; j < plan.days.length; j++) {
-              if (plan.days[j].date === today) { todayDay = plan.days[j]; break; }
-            }
+      var doneCount = 0;
+      todayEvents.forEach(function (e) { if (e.done) doneCount++; });
 
-            var todaySessions = todayDay ? (todayDay.sessions || []) : [];
-            var todayTotalL = todaySessions.length;
-            var todayDoneL = todaySessions.filter(function (s) { return s.completed; }).length;
-
-            var totalSessionsL = 0, doneSessionsL = 0;
-            plan.days.forEach(function (d) {
-              var ss = d.sessions || [];
-              totalSessionsL += ss.length;
-              doneSessionsL += ss.filter(function (s) { return s.completed; }).length;
-            });
-
-            if (todayTotalL === 0 && totalSessionsL === 0) continue;
-
-            combined.hasPlan = true;
-            combined.version = 1;
-            combined.todaySessions += todayTotalL;
-            combined.todayDone += todayDoneL;
-            combined.totalSessions += totalSessionsL;
-            combined.doneSessions += doneSessionsL;
-            if (!combined.planType) combined.planType = plan.plan_type;
-            if (!combined.planUrl) {
-              var lvMatch = legacyKeys[i].match(/L(\d+)/);
-              var lvL = lvMatch ? lvMatch[1] : '5';
-              combined.planUrl = '/L' + lvL + '/planner/index.html';
-            }
-          } catch (e) {   }
+      /*@3.GARJ.415*/
+      var nowHM = _pad2(now.getHours()) + ':' + _pad2(now.getMinutes());
+      var next = null;
+      for (var i = 0; i < todayEvents.length; i++) {
+        if (!todayEvents[i].done && todayEvents[i].start >= nowHM) { next = todayEvents[i]; break; }
+      }
+      if (!next) {
+        for (var j = 0; j < todayEvents.length; j++) {
+          if (!todayEvents[j].done) { next = todayEvents[j]; break; }
         }
       }
 
-      if (!combined.hasPlan) return { hasPlan: false };
-
-      combined.progressPct = combined.totalSessions > 0
-        ? Math.round((combined.doneSessions / combined.totalSessions) * 100) : 0;
-
-      var isAr = (document.documentElement.lang || localStorage.getItem('garden_lang') || 'ar') === 'ar';
-      var n = combined.todaySessions;
-      combined.todaySessionsFormatted = isAr
-        ? (n === 0 ? 'لا جلسات اليوم' : n === 1 ? 'جلسة واحدة' : n === 2 ? 'جلستين' : n + ' جلسات')
-        : (n + ' Session' + (n === 1 ? '' : 's'));
-
-      return combined;
+      return {
+        hasData: true,
+        todayTotal: todayEvents.length,
+        todayDone: doneCount,
+        progressPct: todayEvents.length ? Math.round((doneCount / todayEvents.length) * 100) : 0,
+        next: next,
+        scheduleUrl: ROOT + 'hub/schedule.html'
+      };
     }
 
-    
-    if (!window.Planner) {
-      window.Planner = {};
-    }
-    
-    if (!window.Planner.getTodayBannerData) {
-      window.Planner.getTodayBannerData = _getPlannerBannerData;
-    }
+    /*@3.GARJ.416*/
+    if (!window.GardenToday) window.GardenToday = {};
+    window.GardenToday.getTodayBannerData = _getTodayBannerData;
 
-     
+    /*@3.GARJ.417*/
     function _updateTodayBanner() {
       var banner = document.getElementById('today-banner');
-      if (!banner) return; 
-      var data = _getPlannerBannerData();
+      if (!banner) return; /*@3.GARJ.418*/
+      var data = _getTodayBannerData();
       var isAr = (document.documentElement.lang || localStorage.getItem('garden_lang') || 'ar') === 'ar';
 
-      if (!data.hasPlan) {
-        
+      if (!data.hasData) {
+        /*@3.GARJ.419*/
         banner.style.display = 'none';
-        var badge0 = document.getElementById('today-sessions-badge');
-        if (badge0) badge0.style.display = 'none';
         return;
       }
 
-      banner.style.display = '';
-
-      var planTypeLabel = '';
-      if (data.planType === 'midterm') planTypeLabel = isAr ? 'ميدتيرم' : 'Midterm';
-      else if (data.planType === 'final') planTypeLabel = isAr ? 'فاينل' : 'Final';
-      else if (data.planType === 'general') planTypeLabel = isAr ? 'عام' : 'General';
+      /*@3.GARJ.420*/
+      banner.style.display = 'flex';
 
       var titleEl = document.getElementById('today-banner-title');
       if (titleEl) {
-        titleEl.textContent = data.todaySessions > 0
+        titleEl.textContent = data.todayTotal > 0
           ? (isAr
-            ? ('📅 جلسة اليوم: ' + data.todayDone + ' من ' + data.todaySessions + ' مكتملة')
-            : ('📅 Today: ' + data.todayDone + ' of ' + data.todaySessions + ' sessions done'))
-          : (isAr ? '📅 خطة مذاكرة نشطة' : '📅 Active study plan');
+            ? ('اليوم: ' + data.todayDone + ' من ' + data.todayTotal + ' مكتمل')
+            : ('Today: ' + data.todayDone + ' of ' + data.todayTotal + ' done'))
+          : (isAr ? 'لا أحداث اليوم' : 'No events today');
       }
 
       var subEl = document.getElementById('today-banner-subtitle');
       if (subEl) {
-        subEl.textContent = isAr
-          ? (planTypeLabel + ' · الإجمالي: ' + data.doneSessions + ' من ' + data.totalSessions + ' جلسة')
-          : (planTypeLabel + ' · Total: ' + data.doneSessions + ' of ' + data.totalSessions + ' sessions');
+        if (data.next) {
+          subEl.textContent = isAr
+            ? ('القادم: ' + (data.next.course || '') + (data.next.start ? ' الساعة ' + data.next.start : ''))
+            : ('Next: ' + (data.next.course || '') + (data.next.start ? ' at ' + data.next.start : ''));
+        } else {
+          subEl.textContent = isAr ? 'الجدول الأسبوعي' : 'Weekly schedule';
+        }
       }
 
       var pctEl = document.getElementById('today-banner-pct');
@@ -4654,46 +5680,218 @@ ${baseRules}`) + regenSuffix;
       var fillEl = document.getElementById('today-banner-bar-fill');
       if (fillEl) fillEl.style.width = data.progressPct + '%';
 
-      var badge = document.getElementById('today-sessions-badge');
-      if (badge) {
-        var pending = data.todaySessions - data.todayDone;
-        if (pending > 0) { badge.textContent = pending; badge.style.display = ''; }
-        else { badge.style.display = 'none'; }
-      }
+      /*@3.GARJ.421*/
     }
 
-    
+    /*@3.GARJ.422*/
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() { setTimeout(_updateTodayBanner, 100); });
     } else {
-      
+      /*@3.GARJ.423*/
       setTimeout(_updateTodayBanner, 100);
     }
-    
+    /*@3.GARJ.424*/
     window.addEventListener('focus', _updateTodayBanner);
-    
-    window.Planner.refreshBanner = _updateTodayBanner;
+    /*@3.GARJ.425*/
+    window.GardenToday.refreshBanner = _updateTodayBanner;
   })();
+
+  /*@3.GARJ.426*/
+  function garden_lang() {
+    return document.documentElement.getAttribute('lang') || 'ar';
+  }
+  function arabicCount(n, singular, dual, plural, isAdj) {
+    if (n === 0) return n + ' ' + plural;
+    if (n === 1) return isAdj ? ('1 ' + singular) : (singular + ' واحدة');
+    if (n === 2) return dual;
+    if (n >= 3 && n <= 10) return n + ' ' + plural;
+    return n + ' ' + singular;
+  }
+  function englishCount(n, singular, plural) {
+    return n + ' ' + (n === 1 ? singular : plural);
+  }
+  function smartCount(n, arForms, enForms, isAdj) {
+    return (garden_lang() === 'ar')
+      ? arabicCount(n, arForms[0], arForms[1], arForms[2], isAdj)
+      : englishCount(n, enForms[0], enForms[1]);
+  }
+  function countWord(n, arForms, enForms) {
+    if (garden_lang() === 'ar') {
+      if (n === 1) return arForms[0];
+      if (n === 2) return arForms[1];
+      if (n >= 3 && n <= 10) return arForms[2];
+      return arForms[0];
+    }
+    return (n === 1) ? enForms[0] : enForms[1];
+  }
+
+  /*@3.GARJ.427*/
+
+  /*@3.GARJ.428*/
+  var NAV_STACK_KEY = 'garden_nav_stack';
+  /*@3.GARJ.429*/
+  function _canonUrl(h) {
+    try {
+      var u = new URL(h, location.href);
+      u.hash = '';
+      if (/\/$/.test(u.pathname)) u.pathname += 'index.html';
+      return u.href;
+    } catch (e) { return String(h || ''); }
+  }
+  function _navStackRead() {
+    try { return JSON.parse(sessionStorage.getItem(NAV_STACK_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function _navStackWrite(a) {
+    try { sessionStorage.setItem(NAV_STACK_KEY, JSON.stringify(a.slice(-50))); } catch (e) {}
+  }
+  function _pushNavStack() {
+    var here = location.href, canon = _canonUrl(here);
+    var st = _navStackRead();
+    if (st.length && _canonUrl(st[st.length - 1]) === canon) return;   /*@3.GARJ.430*/
+    if (st.length >= 2 && _canonUrl(st[st.length - 2]) === canon) {
+      st.pop();
+      _navStackWrite(st);
+      return;
+    }
+    st.push(here);
+    _navStackWrite(st);
+  }
+  function hasBackTarget() { return _navStackRead().length > 1; }
+  /*@3.GARJ.431*/
+  function goBack() {
+    var st = _navStackRead();
+    if (st.length < 2) return false;
+    st.pop();
+    var target = st[st.length - 1];
+    _navStackWrite(st);
+    location.href = target;
+    return true;
+  }
+  /*@3.GARJ.432*/
+  function goUp(href) {
+    var abs = _canonUrl(href);
+    var st = _navStackRead();
+    st.pop();                                       /*@3.GARJ.433*/
+    if (!st.length || _canonUrl(st[st.length - 1]) !== abs) st.push(abs);
+    _navStackWrite(st);
+    location.href = href;
+    return true;
+  }
+  /*@3.GARJ.434*/
+  function isSelfHref(href) { return _canonUrl(href) === _canonUrl(location.href); }
+
+  /*@3.GARJ.435*/
+  _pushNavStack();
+
+  function _navL(ar, en) { return (currentLang === 'ar') ? ar : en; }
+
+  /*@3.GARJ.436*/
+  function ensureNavAffordances() {
+    var nav = document.querySelector('.header-nav');
+    if (!nav) return;
+
+    /*@3.GARJ.437*/
+    if (!nav.querySelector('.g-nav-home')) {
+      var home = document.createElement('a');
+      home.className = 'nav-btn nav-btn--icon g-nav-home';
+      home.href = ROOT + 'index.html';
+      home.innerHTML = '<img src="' + ROOT + 'shared/icons/logo-mark.svg" alt="" width="17" height="17" aria-hidden="true">';
+      home.title = _navL('الحديقة الرقمية — الرئيسية', 'Digital Garden — Home');
+      home.setAttribute('aria-label', home.title);
+      home.setAttribute('data-ar-title', 'الحديقة الرقمية — الرئيسية');
+      home.setAttribute('data-en-title', 'Digital Garden — Home');
+      nav.insertBefore(home, nav.firstChild);
+    }
+
+    /*@3.GARJ.438*/
+    if (!nav.querySelector('.g-nav-back')) {
+      var back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'nav-btn nav-btn--icon g-nav-back';
+      back.innerHTML = '<i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>';
+      back.title = _navL('رجوع خطوة', 'Back one step');
+      back.setAttribute('aria-label', back.title);
+      back.setAttribute('data-ar-title', 'رجوع خطوة');
+      back.setAttribute('data-en-title', 'Back one step');
+      back.addEventListener('click', function () { goBack(); });
+      /*@3.GARJ.439*/
+      if (!hasBackTarget()) back.style.display = 'none';
+      var homeEl = nav.querySelector('.g-nav-home');
+      nav.insertBefore(back, homeEl ? homeEl.nextSibling : nav.firstChild);
+    }
+
+    /*@3.GARJ.440*/
+    var up2 = nav.querySelector('.nav-btn--icon[title="Home"]');
+    if (up2) {
+      up2.title = _navL('صفحة المادة', 'Course page');
+      up2.setAttribute('aria-label', up2.title);
+      up2.setAttribute('data-ar-title', 'صفحة المادة');
+      up2.setAttribute('data-en-title', 'Course page');
+    }
+  }
+
+  /*@3.GARJ.441*/
+
+  /*@3.GARJ.442*/
+  function _fixFooterBrand() {
+    var el = document.querySelector('.footer-brand');
+    if (!el) return;
+    var p = location.pathname;
+    var m = p.match(/\/L(\d+)\//);
+    var label = m ? 'CS Level ' + m[1] : (/\/others\//.test(p) ? 'General Courses' : null);
+    if (!label) return;                       /*@3.GARJ.443*/
+    el.innerHTML = '<i class="fa-solid fa-seedling" aria-hidden="true"></i> <span></span> · Digital Garden';
+      el.querySelector('span').textContent = label;
+  }
+  function _bootPage() {
+    applyTheme(currentTheme);
+    _fixFooterBrand();
+    hookExamPages();
+    /*@3.GARJ.444*/
+  }
+
+  /*@3.GARJ.445*/
+  document.addEventListener('click', function (e) {
+    var inp = e.target.closest && e.target.closest('input[type=date], input[type=time], input[type=datetime-local], input[type=month], input[type=week]');
+    if (!inp || inp.disabled || inp.readOnly) return;
+    if (typeof inp.showPicker === 'function') { try { inp.showPicker(); } catch (_) {} }
+  });
+
+  /*@3.GARJ.446*/
+  hookExamPages();
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _bootPage);
+  } else {
+    _bootPage();
+  }
 
   window.Garden = {
     cycleTheme, toggleLanguage, setLanguage, applyTheme,
+    /*@3.GARJ.447*/
+    localize,
+    goBack, hasBackTarget, goUp, isSelfHref, ensureNavAffordances,
+    smartCount, countWord,
     flip: flipCard, grade: gradeCard, resetFC, report: showSM2Report,
     practice: startPractice, renderPractice, renderFC: renderFlashcard,
+    browse: startBrowse, loosePrev, looseNext, exitLoose,
     undo: undoGrade, bury: buryCard, filterFC, quickReview,
+    launchConfetti,
     changeDailyLimit,
     toggle3D: (v) => { setMobile3D(typeof v === 'boolean' ? v : !getMobile3D()); },
     getStreak: calculateStreak, getRetention: getRetentionRate,
     pick: selectOption, nextQ, retryQuiz, showQuizHint: showHint,
+    recordQuiz, recordQuizByKey, quizLog: readQuizLog,
     fontUp: () => changeFontSize(1), fontDown: () => changeFontSize(-1), setFontSize: applyFontSize,
     aiExplain: showAiModal, extractCard: extractCardContent
   };
 
-   
+  /*@3.GARJ.448*/
 
   ; (function () {
     'use strict';
 
-     
+    /*@3.GARJ.449*/
     function getLang() {
       return document.documentElement.getAttribute('lang') || 'ar';
     }
@@ -4713,29 +5911,29 @@ ${baseRules}`) + regenSuffix;
       try { sessionStorage.setItem(essayKey(), JSON.stringify(state)); } catch (e) { }
     }
 
-     
+    /*@3.GARJ.450*/
     const essayI18n = {
       ar: {
-        'essay.title': '📝 أسئلة المقالي',
+        'essay.title': '<i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> أسئلة المقالي',
         'essay.score': 'نقاطك:',
         'essay.write': 'اكتب إجابتك هنا...',
-        'essay.reveal': '👁️ أظهر الإجابة النموذجية',
-        'essay.answer_label': '✍️ الإجابة النموذجية',
+        'essay.reveal': '<i class="fa-solid fa-eye" aria-hidden="true"></i> أظهر الإجابة النموذجية',
+        'essay.answer_label': '<i class="fa-solid fa-pen-nib" aria-hidden="true"></i> الإجابة النموذجية',
         'essay.grade_prompt': 'قيّم إجابتك:',
-        'essay.correct': '✅ أجبت صحيح',
-        'essay.wrong': '❌ لم أتذكر',
+        'essay.correct': '<i class="fa-solid fa-check" aria-hidden="true"></i> أجبت صحيح',
+        'essay.wrong': '<i class="fa-solid fa-xmark" aria-hidden="true"></i> لم أتذكر',
         'essay.q_num': 'سؤال',
         'essay.module': 'وحدة',
       },
       en: {
-        'essay.title': '📝 Essay Questions',
+        'essay.title': '<i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Essay Questions',
         'essay.score': 'Score:',
         'essay.write': 'Write your answer here...',
-        'essay.reveal': '👁️ Show Model Answer',
-        'essay.answer_label': '✍️ Model Answer',
+        'essay.reveal': '<i class="fa-solid fa-eye" aria-hidden="true"></i> Show Model Answer',
+        'essay.answer_label': '<i class="fa-solid fa-pen-nib" aria-hidden="true"></i> Model Answer',
         'essay.grade_prompt': 'Rate your answer:',
-        'essay.correct': '✅ I got it right',
-        'essay.wrong': '❌ I missed it',
+        'essay.correct': '<i class="fa-solid fa-check" aria-hidden="true"></i> I got it right',
+        'essay.wrong': '<i class="fa-solid fa-xmark" aria-hidden="true"></i> I missed it',
         'essay.q_num': 'Q',
         'essay.module': 'Module',
       }
@@ -4746,7 +5944,7 @@ ${baseRules}`) + regenSuffix;
       return essayI18n[L]?.[key] || essayI18n.ar[key] || key;
     }
 
-     
+    /*@3.GARJ.451*/
     window._gardenEssay = { questions: null, state: {}, correct: 0 };
 
     function initEssayEngine() {
@@ -4762,7 +5960,7 @@ ${baseRules}`) + regenSuffix;
       window._gardenEssay.questions = questions;
       window._gardenEssay.state = loadEssayProgress();
 
-      
+      /*@3.GARJ.452*/
       window._gardenEssay.correct = Object.values(window._gardenEssay.state)
         .filter(v => v === 1).length;
 
@@ -4777,14 +5975,14 @@ ${baseRules}`) + regenSuffix;
       const state = window._gardenEssay.state;
       const L = getLang();
 
-      
+      /*@3.GARJ.453*/
       const totalEl = document.getElementById('essay-total');
       if (totalEl) totalEl.textContent = questions.length;
 
-      
+      /*@3.GARJ.454*/
       updateEssayScoreUI();
 
-      
+      /*@3.GARJ.455*/
       container.innerHTML = questions.map((q, i) => {
         const graded = state[i];
         const wasRevealed = graded !== undefined;
@@ -4803,7 +6001,7 @@ ${baseRules}`) + regenSuffix;
     <span class="module-chip">${t('essay.module')} ${moduleNum}</span>
     <span style="font-size:0.8rem;font-weight:800;color:var(--text-muted)">#${i + 1}</span>
     ${wasRevealed ? `<span style="font-size:0.8rem;font-weight:700;color:${isCorrect ? '#10b981' : '#ef4444'}">
-      ${isCorrect ? '✅' : '❌'}
+      ${isCorrect ? '<i class="fa-solid fa-check" aria-hidden="true"></i>' : '<i class="fa-solid fa-xmark" aria-hidden="true"></i>'}
     </span>` : ''}
   </div>
 
@@ -4849,7 +6047,7 @@ ${baseRules}`) + regenSuffix;
 </div>`;
       }).join('');
 
-      
+      /*@3.GARJ.456*/
       questions.forEach((_, i) => {
         const ta = document.getElementById(`essay-ta-${i}`);
         if (ta) {
@@ -4866,11 +6064,11 @@ ${baseRules}`) + regenSuffix;
       const q = window._gardenEssay.questions?.[idx];
       if (!q) return;
 
-      
+      /*@3.GARJ.457*/
       document.getElementById(`essay-reveal-${idx}`)?.classList.add('hidden');
       document.getElementById(`essay-answer-${idx}`)?.classList.remove('hidden');
 
-      
+      /*@3.GARJ.458*/
       const ta = document.getElementById(`essay-ta-${idx}`);
       if (ta) {
         window._gardenEssay.state['ta_' + idx] = ta.value;
@@ -4881,22 +6079,22 @@ ${baseRules}`) + regenSuffix;
     function gradeEssay(idx, correct) {
       const was = window._gardenEssay.state[idx];
 
-      
+      /*@3.GARJ.459*/
       if (was === 1) window._gardenEssay.correct--;
       if (correct) window._gardenEssay.correct++;
 
-      
+      /*@3.GARJ.460*/
       window._gardenEssay.state[idx] = correct;
       saveEssayProgress(window._gardenEssay.state);
 
-      
+      /*@3.GARJ.461*/
       const item = document.getElementById(`essay-item-${idx}`);
       if (item) {
         item.style.borderInlineStartColor = correct ? '#10b981' : '#ef4444';
         item.setAttribute('data-graded', correct);
       }
 
-      
+      /*@3.GARJ.462*/
       const btnCorrect = document.getElementById(`essay-grade-correct-${idx}`);
       const btnWrong = document.getElementById(`essay-grade-wrong-${idx}`);
       [btnCorrect, btnWrong].forEach(b => { if (b) { b.disabled = true; b.classList.remove('active'); } });
@@ -4914,11 +6112,11 @@ ${baseRules}`) + regenSuffix;
     }
 
     function refreshEssayLanguage() {
-      
+      /*@3.GARJ.463*/
       if (!window._gardenEssay.questions) return;
       const L = getLang();
 
-      
+      /*@3.GARJ.464*/
       document.querySelectorAll('.essay-textarea').forEach(ta => {
         ta.setAttribute('dir', L === 'ar' ? 'rtl' : 'ltr');
         ta.style.direction = L === 'ar' ? 'rtl' : 'ltr';
@@ -4926,34 +6124,35 @@ ${baseRules}`) + regenSuffix;
         ta.placeholder = t('essay.write');
       });
 
-      
+      /*@3.GARJ.465*/
       window._gardenEssay.questions.forEach((_, i) => {
         const bc = document.getElementById(`essay-grade-correct-${i}`);
         const bw = document.getElementById(`essay-grade-wrong-${i}`);
-        if (bc) bc.textContent = t('essay.correct');
-        if (bw) bw.textContent = t('essay.wrong');
+        /*@3.GARJ.466*/
+        if (bc) bc.innerHTML = t('essay.correct');
+        if (bw) bw.innerHTML = t('essay.wrong');
         const rb = document.getElementById(`essay-reveal-${i}`);
-        if (rb) rb.textContent = t('essay.reveal');
+        if (rb) rb.innerHTML = t('essay.reveal');
       });
 
-      
+      /*@3.GARJ.467*/
       document.querySelectorAll('.essay-grade-label').forEach(el => {
         el.textContent = t('essay.grade_prompt');
       });
       document.querySelectorAll('.essay-answer-label').forEach(el => {
-        el.textContent = t('essay.answer_label');
+        el.innerHTML = t('essay.answer_label');
       });
       updateEssayScoreUI();
     }
 
-     
+    /*@3.GARJ.468*/
     function patchLanguageToggle() {
       document.addEventListener('garden:languageChanged', function () {
         refreshEssayLanguage();
       });
     }
 
-     
+    /*@3.GARJ.469*/
     function initAdditions() {
       initEssayEngine();
       patchLanguageToggle();
@@ -4965,7 +6164,7 @@ ${baseRules}`) + regenSuffix;
       initAdditions();
     }
 
-     
+    /*@3.GARJ.470*/
     if (!window.Garden) window.Garden = {};
     window.Garden.revealEssay = revealEssay;
     window.Garden.gradeEssay = gradeEssay;
@@ -4975,16 +6174,16 @@ ${baseRules}`) + regenSuffix;
 })();
 
 
- 
+/*@3.GARJ.471*/
 ;(function () {
   'use strict';
 
-   
+  /*@3.GARJ.472*/
   function isQuizPage() {
     return !!document.getElementById('mcq-engine');
   }
 
-   
+  /*@3.GARJ.473*/
   function _hashStr(str) {
     var h = 2166136261 >>> 0;
     for (var i = 0; i < str.length; i++) {
@@ -4994,18 +6193,18 @@ ${baseRules}`) + regenSuffix;
     return h;
   }
 
-   
+  /*@3.GARJ.474*/
   function _shuffleQuestionOptions(qArr) {
     if (!qArr || !Array.isArray(qArr)) return;
     qArr.forEach(function (q) {
-      if (q._shuffled) return;                        
+      if (q._shuffled) return;                        /*@3.GARJ.475*/
       var opts = q.options;
       if (!opts) { q._shuffled = true; return; }
       var langs = Object.keys(opts);
       var numOpts = (opts[langs[0]] || []).length;
       if (numOpts < 2) { q._shuffled = true; return; }
 
-       
+      /*@3.GARJ.476*/
       var order = [];
       for (var i = 0; i < numOpts; i++) order.push(i);
       var s = _hashStr(String(q.id !== undefined ? q.id : Math.random()));
@@ -5015,19 +6214,19 @@ ${baseRules}`) + regenSuffix;
         var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
       }
 
-       
+      /*@3.GARJ.477*/
       langs.forEach(function (lang) {
         var orig = opts[lang].slice();
         opts[lang] = order.map(function (idx) { return orig[idx]; });
       });
 
-       
+      /*@3.GARJ.478*/
       q.correctIndex = order.indexOf(q.correctIndex);
       q._shuffled = true;
     });
   }
 
-   
+  /*@3.GARJ.479*/
   function _fixHintButtonTranslation() {
     var btn = document.getElementById('mcq-hint-btn');
     if (!btn) return;
@@ -5038,15 +6237,15 @@ ${baseRules}`) + regenSuffix;
     });
   }
 
-   
+  /*@3.GARJ.480*/
   function _addEssayModuleFilter() {
     var essaySection = document.getElementById('essay-section');
     if (!essaySection) return;
 
-     
+    /*@3.GARJ.481*/
     var essayArr = (typeof sessionEssay !== 'undefined') ? sessionEssay : [];
     if (!essayArr || !essayArr.length) {
-      
+      /*@3.GARJ.482*/
       essayArr = (typeof essayBank !== 'undefined') ? essayBank : [];
     }
     var modSet = {};
@@ -5054,20 +6253,20 @@ ${baseRules}`) + regenSuffix;
     var modules = Object.keys(modSet).map(Number).sort(function (a, b) { return a - b; });
     if (!modules.length) return;
 
-     
+    /*@3.GARJ.483*/
     essayArr.forEach(function (q, i) {
       var item = document.getElementById('essay-item-' + i);
       if (item) item.setAttribute('data-essay-module', q.module);
     });
 
-     
+    /*@3.GARJ.484*/
     if (document.getElementById('essay-module-toolbar')) return;
 
     var lang = document.documentElement.getAttribute('lang') || 'ar';
     var allText   = lang === 'ar' ? 'الكل' : 'All';
     var labelText = lang === 'ar' ? 'تصفية الوحدة:' : 'Filter Module:';
 
-     
+    /*@3.GARJ.485*/
     var toolbar = document.createElement('div');
     toolbar.id = 'essay-module-toolbar';
     toolbar.style.cssText = [
@@ -5088,8 +6287,8 @@ ${baseRules}`) + regenSuffix;
     if (container) container.parentNode.insertBefore(toolbar, container);
   }
 
-   
-  var _selectedMCQModules = []; 
+  /*@3.GARJ.486*/
+  var _selectedMCQModules = []; /*@3.GARJ.487*/
 
   function _buildMultiModuleSession() {
     if (typeof mcqBank === 'undefined' || typeof seededRNG === 'undefined') return;
@@ -5098,14 +6297,14 @@ ${baseRules}`) + regenSuffix;
     var pool;
 
     if (!_selectedMCQModules.length) {
-       
+      /*@3.GARJ.488*/
       var total = (typeof MCQ_SESSION !== 'undefined') ? MCQ_SESSION : 70;
       var groups = (typeof MODULE_GROUPS !== 'undefined') ? MODULE_GROUPS : [[1,2,3],[4,5,6]];
       pool = (typeof pickSessionMCQ === 'function')
         ? pickSessionMCQ(mcqBank, groups, total, seed)
         : shuffleArr(mcqBank, seededRNG(seed)).slice(0, total);
     } else {
-       
+      /*@3.GARJ.489*/
       var total = (typeof MCQ_SESSION !== 'undefined') ? MCQ_SESSION : 70;
       var mods = _selectedMCQModules.slice();
       var base = Math.floor(total / mods.length);
@@ -5120,18 +6319,18 @@ ${baseRules}`) + regenSuffix;
       pool = shuffleArr(pool, seededRNG(seed + 'final'));
     }
 
-     
+    /*@3.GARJ.490*/
     sessionMCQ = pool;
     TOTAL      = pool.length;
     cur        = 0;
     score      = 0;
     answered.length = 0;
 
-     
+    /*@3.GARJ.491*/
     pool.forEach(function (q) { q._shuffled = false; });
     _shuffleQuestionOptions(pool);
 
-     
+    /*@3.GARJ.492*/
     var qTotal = document.getElementById('q-total');
     var lScore = document.getElementById('live-score');
     var card   = document.getElementById('mcq-card');
@@ -5161,17 +6360,17 @@ ${baseRules}`) + regenSuffix;
   }
 
   function _patchSetModuleFocus() {
-     
+    /*@3.GARJ.493*/
     window.setModuleFocus = function (mod) {
       if (mod === 0) {
-         
+        /*@3.GARJ.494*/
         _selectedMCQModules = [];
       } else {
         var idx = _selectedMCQModules.indexOf(mod);
         if (idx === -1) {
-          _selectedMCQModules.push(mod);   
+          _selectedMCQModules.push(mod);   /*@3.GARJ.495*/
         } else {
-          _selectedMCQModules.splice(idx, 1); 
+          _selectedMCQModules.splice(idx, 1); /*@3.GARJ.496*/
         }
       }
       currentModuleFocus = _selectedMCQModules.length === 1 ? _selectedMCQModules[0] : 0;
@@ -5181,11 +6380,11 @@ ${baseRules}`) + regenSuffix;
   }
 
   function _patchRetryFunctions() {
-     
+    /*@3.GARJ.497*/
     if (typeof retryWithNewQuestions === 'function') {
       window.retryWithNewQuestions = function () {
         _buildMultiModuleSession();
-         
+        /*@3.GARJ.498*/
         var seed2 = Date.now().toString(36) + 'e';
         var groups = (typeof MODULE_GROUPS !== 'undefined') ? MODULE_GROUPS : [[1,2,3],[4,5,6]];
         var essCnt = (typeof ESSAY_SESSION !== 'undefined') ? ESSAY_SESSION : 10;
@@ -5195,7 +6394,7 @@ ${baseRules}`) + regenSuffix;
         essayScore = 0;
         if (typeof renderEssays === 'function') {
           renderEssays();
-           
+          /*@3.GARJ.499*/
           document.querySelectorAll('#essay-questions-container .fade-up')
             .forEach(function (el) { el.classList.add('visible'); });
           setTimeout(_addEssayModuleFilter, 10);
@@ -5203,11 +6402,11 @@ ${baseRules}`) + regenSuffix;
       };
     }
 
-     
+    /*@3.GARJ.500*/
     if (typeof shuffleCurrentQuestions === 'function') {
       window.shuffleCurrentQuestions = function () {
         if (!_selectedMCQModules.length && typeof seededRNG !== 'undefined') {
-           
+          /*@3.GARJ.501*/
           sessionMCQ = shuffleArr(sessionMCQ, seededRNG(Date.now().toString()));
           TOTAL = sessionMCQ.length; cur = 0; score = 0; answered.length = 0;
           sessionMCQ.forEach(function (q) { q._shuffled = false; });
@@ -5222,7 +6421,7 @@ ${baseRules}`) + regenSuffix;
         } else {
           _buildMultiModuleSession();
         }
-         
+        /*@3.GARJ.502*/
         var seed3 = Date.now().toString(36) + 'sh';
         var groups = (typeof MODULE_GROUPS !== 'undefined') ? MODULE_GROUPS : [[1,2,3],[4,5,6]];
         var essCnt = (typeof ESSAY_SESSION !== 'undefined') ? ESSAY_SESSION : 10;
@@ -5231,7 +6430,7 @@ ${baseRules}`) + regenSuffix;
           essayScore = 0;
           if (typeof renderEssays === 'function') {
             renderEssays();
-             
+            /*@3.GARJ.503*/
             document.querySelectorAll('#essay-questions-container .fade-up')
               .forEach(function (el) { el.classList.add('visible'); });
             setTimeout(_addEssayModuleFilter, 10);
@@ -5241,16 +6440,16 @@ ${baseRules}`) + regenSuffix;
     }
   }
 
-   
+  /*@3.GARJ.504*/
   window._quizPatch = {
     filterEssay: function (mod) {
-       
+      /*@3.GARJ.505*/
       document.querySelectorAll('[id^="essay-filter-"]').forEach(function (btn) {
         var bm = parseInt(btn.id.replace('essay-filter-', ''), 10);
         btn.classList.toggle('tag--accent', bm === mod);
       });
 
-       
+      /*@3.GARJ.506*/
       document.querySelectorAll('[data-essay-module]').forEach(function (item) {
         var m = parseInt(item.getAttribute('data-essay-module'), 10);
         item.style.display = (mod === 0 || m === mod) ? '' : 'none';
@@ -5258,23 +6457,23 @@ ${baseRules}`) + regenSuffix;
     }
   };
 
-   
+  /*@3.GARJ.507*/
   function _applyAllPatches() {
     if (!isQuizPage()) return;
 
-     
+    /*@3.GARJ.508*/
     if (typeof sessionMCQ !== 'undefined') {
       _shuffleQuestionOptions(sessionMCQ);
     }
 
-     
+    /*@3.GARJ.509*/
     _fixHintButtonTranslation();
 
-     
+    /*@3.GARJ.510*/
     _patchSetModuleFocus();
     _patchRetryFunctions();
 
-     
+    /*@3.GARJ.511*/
     var lang = document.documentElement.getAttribute('lang') || 'ar';
     var tip  = lang === 'ar' ? 'انقر لتفعيل/إلغاء الوحدة (متعدد)' : 'Click to toggle module (multi-select)';
     document.querySelectorAll('.module-filter-btn[data-module]').forEach(function (btn) {
@@ -5286,14 +6485,14 @@ ${baseRules}`) + regenSuffix;
   function _applyDOMReadyPatches() {
     if (!isQuizPage()) return;
 
-     
+    /*@3.GARJ.512*/
     _addEssayModuleFilter();
   }
 
-   
+  /*@3.GARJ.513*/
   _applyAllPatches();
 
-   
+  /*@3.GARJ.514*/
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       setTimeout(_applyDOMReadyPatches, 50);
@@ -5303,4 +6502,256 @@ ${baseRules}`) + regenSuffix;
   }
 
 })();
- 
+/*@3.GARJ.515*/
+
+/*@3.GARJ.516*/
+;(function(){
+  'use strict';
+  var path = location.pathname;
+
+  /*@3.GARJ.517*/
+  var isSubjectHub = /\/[A-Z]{2,5}\d{2,4}\/(index\.html)?$/.test(path);
+  /*@3.GARJ.518*/
+  var isLevelHub = /\/(L\d+|others)\/(index\.html)?$/.test(path);
+  /*@3.GARJ.519*/
+  var isHubIndex = /\/hub\/(index\.html)?$/.test(path);
+  /*@3.GARJ.520*/
+  var isModulePage = /\/[A-Z]{2,5}\d{2,4}\/M\d+\.html$/.test(path);
+  /*@3.GARJ.521*/
+  var isReviewPage = /\/[A-Z]{2,5}\d{2,4}\/(midterm|final)-(review|quiz)\.html$/.test(path);
+
+  /*@3.GARJ.522*/
+  function trackSemesterVisit() {
+    /*@3.GARJ.523*/
+    var isStudyPage = isSubjectHub || isLevelHub || isModulePage || isReviewPage || isHubIndex;
+    if (!isStudyPage) return;
+    var semRaw = null;
+    try { semRaw = localStorage.getItem('my_semester'); } catch(e) { return; }
+    if (!semRaw) return;
+    var sem = null;
+    try { sem = JSON.parse(semRaw); } catch(e) { return; }
+    if (!sem) return;
+
+    var metaRaw = null;
+    try { metaRaw = localStorage.getItem('garden_semester_meta'); } catch(e) {}
+    var meta = metaRaw ? (function(){ try { return JSON.parse(metaRaw); } catch(e) { return null; } })() : null;
+    if (!meta) meta = { visits: 0, last_visit: 0 };
+
+    var today = new Date(); today.setHours(0,0,0,0);
+    var todayTs = today.getTime();
+    var lastDay = meta.last_visit ? new Date(meta.last_visit) : new Date(0);
+    lastDay.setHours(0,0,0,0);
+    var lastDayTs = lastDay.getTime();
+
+    var changed = false;
+    if (lastDayTs !== todayTs) {
+      meta.visits = (meta.visits || 0) + 1;
+      meta.last_visit = Date.now();
+      changed = true;
+      /*@3.GARJ.524*/
+      if (meta.visits >= 3 && sem.is_active !== true && sem.was_activated !== true) {
+        sem.is_active = true;
+        sem.was_activated = true;
+        sem.updated_at = new Date().toISOString();
+        try {
+          localStorage.setItem('my_semester', JSON.stringify(sem));
+          document.dispatchEvent(new CustomEvent('garden:semesterActivated'));
+        } catch(e) {}
+      }
+    }
+    if (changed) {
+      try { localStorage.setItem('garden_semester_meta', JSON.stringify(meta)); } catch(e) {}
+    }
+  }
+  trackSemesterVisit();
+
+  /*@3.GARJ.525*/
+
+  /*@3.GARJ.526*/
+
+  /*@3.GARJ.527*/
+  var isDashboard = !isSubjectHub && !isLevelHub && !isHubIndex &&
+                    (path === '/' || /\/index\.html$/.test(path) || /\/$/.test(path));
+
+  /*@3.GARJ.528*/
+  if (isLevelHub || isDashboard || isHubIndex) {
+    try {
+      sessionStorage.removeItem('garden_nav_from_hub');
+      sessionStorage.removeItem('garden_nav_from_dashboard');
+    } catch (e) {}
+  }
+})();
+/*@3.GARJ.529*/
+
+/*@3.GARJ.530*/
+;(function () {
+  'use strict';
+  /*@3.GARJ.531*/
+  var sc = document.currentScript;
+  var root = (sc && sc.src) ? sc.src.replace(/shared\/garden\.js(\?.*)?$/, '') : '';
+  if (!root || root === (sc && sc.src)) return;   /*@3.GARJ.532*/
+
+  /*@3.GARJ.533*/
+  var ics = document.createElement('script');
+  ics.src = root + 'shared/ics-boot.js';
+  ics.async = true;
+  (document.head || document.documentElement).appendChild(ics);
+
+  /*@3.GARJ.534*/
+  if (document.documentElement.getAttribute('data-subject') &&
+      !document.documentElement.hasAttribute('data-tinted') &&
+      !window.GardenTint) {
+    var tint = document.createElement('script');
+    tint.src = root + 'shared/subject-tint.js';
+    (document.head || document.documentElement).appendChild(tint);
+  }
+
+  if (window.Reminders) return;                   /*@3.GARJ.535*/
+  var el = document.createElement('script');
+  el.src = root + 'shared/reminders-boot.js';
+  el.async = true;
+  (document.head || document.documentElement).appendChild(el);
+})();
+
+
+/*@3.GARJ.536*/
+;(function () {
+  'use strict';
+  if (window.GardenTryInLab) return;
+
+  /*@3.GARJ.537*/
+  var LAB_LANGS = {
+    java: 'java', python: 'python', py: 'python', c: 'c', cpp: 'cpp', 'c++': 'cpp',
+    php: 'php', sql: 'sql', javascript: 'javascript', js: 'javascript',
+    html: 'web', css: 'web', marie: 'marie'
+  };
+  var LAB_PATH = 'labs/programming-languages.html';
+
+  function isAr() { return (localStorage.getItem('garden_lang') || 'ar') === 'ar'; }
+
+  function rootPrefix() {
+    var tag = document.querySelector('script[src*="garden.js"]');
+    return tag ? tag.src.replace(/shared\/garden\.js.*$/, '') : '../';
+  }
+
+  function b64url(bytes) {
+    var binary = '';
+    for (var i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  /*@3.GARJ.538*/
+  function buildLink(code, lang) {
+    var url = rootPrefix() + LAB_PATH;
+    if (window.GardenPLStore && window.GardenPLStore.snippetLink) {
+      return window.GardenPLStore.snippetLink(url, code, lang);
+    }
+    var raw = new TextEncoder().encode(code);
+    if (typeof CompressionStream !== 'function') {
+      return Promise.resolve(url + '#snippet=' + b64url(raw) + '&lang=' + lang + '&raw=1');
+    }
+    var stream = new CompressionStream('deflate-raw');
+    var writer = stream.writable.getWriter();
+    writer.write(raw); writer.close();
+    return new Response(stream.readable).arrayBuffer()
+      .then(function (buffer) { return url + '#snippet=' + b64url(new Uint8Array(buffer)) + '&lang=' + lang; })
+      .catch(function () { return url + '#snippet=' + b64url(raw) + '&lang=' + lang + '&raw=1'; });
+  }
+
+  var current = null;
+  function offer(code, lang) {
+    if (current) { clearTimeout(current.timer); current.node.remove(); current = null; }
+    buildLink(code, lang).then(function (link) {
+      if (!link) return;                       /*@3.GARJ.539*/
+      var node = document.createElement('div');
+      node.className = 'gtl-toast';
+      node.setAttribute('dir', 'auto');
+      var label = document.createElement('span');
+      label.textContent = isAr() ? 'نُسخ الكود — تجرّبه في المختبر؟' : 'Code copied — try it in the lab?';
+      var go = document.createElement('a');
+      go.href = link; go.target = '_blank'; go.rel = 'noopener';
+      go.textContent = isAr() ? 'افتح المختبر ↗' : 'Open the lab ↗';
+      go.addEventListener('click', function () { node.remove(); current = null; });
+      var close = document.createElement('button');
+      close.setAttribute('aria-label', isAr() ? 'إغلاق' : 'Close');
+      close.innerHTML = '&times;';
+      close.addEventListener('click', function () { node.remove(); current = null; });
+      node.appendChild(label); node.appendChild(go); node.appendChild(close);
+      document.body.appendChild(node);
+      /*@3.GARJ.540*/
+      void node.offsetHeight;
+      node.classList.add('on');
+      current = { node: node, timer: setTimeout(function () {
+        node.classList.remove('on');
+        setTimeout(function () { node.remove(); }, 260);
+        current = null;
+      }, 9000) };
+    });
+  }
+
+  function handle(block) {
+    if (!block) return;
+    var header = block.querySelector('.code-block-header span');
+    var tag = header ? header.textContent.trim().toLowerCase() : '';
+    var lang = LAB_LANGS[tag];
+    if (!lang) return;                          /*@3.GARJ.541*/
+    var pre = block.querySelector('pre');
+    var code = pre ? pre.textContent : '';
+    if (code.trim().length < 12) return;         /*@3.GARJ.542*/
+    offer(code, lang);
+  }
+
+  /*@3.GARJ.543*/
+  document.addEventListener('click', function (event) {
+    var button = event.target && event.target.closest && event.target.closest('.copy-btn');
+    if (button) setTimeout(function () { handle(button.closest('.code-block')); }, 120);
+  }, true);
+
+  /*@3.GARJ.544*/
+  document.addEventListener('copy', function (event) {
+    var node = event.target;
+    var block = (node && node.closest) ? node.closest('.code-block') : null;
+    if (!block && window.getSelection && window.getSelection().anchorNode) {
+      var anchor = window.getSelection().anchorNode;
+      block = (anchor.nodeType === 1 ? anchor : anchor.parentElement);
+      block = block && block.closest ? block.closest('.code-block') : null;
+    }
+    if (block) setTimeout(function () { handle(block); }, 120);
+  }, true);
+
+  window.GardenTryInLab = { offer: offer, languages: LAB_LANGS };
+})();
+
+
+/*@3.GARJ.545*/
+;(function () {
+  'use strict';
+  if (window.__gardenLightDismiss) return;
+  window.__gardenLightDismiss = true;
+
+  var armed = null;   /*@3.GARJ.546*/
+
+  function isOutside(dlg, e) {
+    var r = dlg.getBoundingClientRect();
+    if (!r.width || !r.height) return false;   /*@3.GARJ.547*/
+    return e.clientX < r.left || e.clientX > r.right ||
+           e.clientY < r.top  || e.clientY > r.bottom;
+  }
+
+  function candidate(e) {
+    var d = e.target;
+    if (!d || d.tagName !== 'DIALOG' || !d.open) return null;
+    if (d.hasAttribute('data-keep-open')) return null;
+    return isOutside(d, e) ? d : null;
+  }
+
+  document.addEventListener('mousedown', function (e) {
+    armed = (e.button === 0) ? candidate(e) : null;
+  }, true);
+
+  document.addEventListener('click', function (e) {
+    var dlg = armed; armed = null;
+    if (!dlg || candidate(e) !== dlg) return;
+    try { dlg.close(); } catch (err) {}
+  }, true);
+})();
