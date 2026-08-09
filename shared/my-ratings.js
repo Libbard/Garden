@@ -30,9 +30,9 @@
     var i = info(code);
     return (i && i.icon) || 'fa-solid fa-book';
   }
-  function tintOf(code) {
+  function tint(code) {
     var i = info(code);
-    return (i && i.brand_color) || 'var(--st-accent)';
+    return (i && i.brand_color) ? ' style="--tint:' + esc(i.brand_color) + '"' : '';
   }
 
   function CR() { return window.GardenCourseRate; }
@@ -142,7 +142,7 @@
     var pill = c.kind === 'done'
       ? '<span class="mr-pill is-done">' + esc(t('أنهيتَها', 'Finished')) + '</span>'
       : '<span class="mr-pill">' + esc(t('تدرسها الآن', 'In progress')) + '</span>';
-    return '<article class="mr-todo" style="--tint:' + esc(tintOf(c.code)) + '">' +
+    return '<article class="mr-todo"' + tint(c.code) + '>' +
       '<i class="mr-todo-i ' + esc(iconOf(c.code)) + '" aria-hidden="true"></i>' +
       '<div class="mr-todo-t">' +
         '<b class="mr-code">' + esc(c.code) + '</b>' +
@@ -186,7 +186,7 @@
     }
     if (r.updated_at) meta.push('<span class="mr-meta-i">' + esc(ago(r.updated_at)) + '</span>');
 
-    return '<article class="mr-row" style="--tint:' + esc(tintOf(r.code)) + '">' +
+    return '<article class="mr-row"' + tint(r.code) + '>' +
       '<header class="mr-row-h">' +
         '<i class="mr-row-i ' + esc(iconOf(r.code)) + '" aria-hidden="true"></i>' +
         '<div class="mr-row-t">' +
