@@ -2,11 +2,13 @@
   const root = document.documentElement;
   const state = {
     lang: localStorage.getItem("garden_lang") === "en" ? "en" : "ar",
-    theme: ["dark", "dim", "light"].includes(root.dataset.theme) ? root.dataset.theme : "dark",
+    theme: ["dark", "dim"].includes(root.dataset.theme) ? root.dataset.theme : "dark",
     data: null,
     filter: "all",
     query: "",
-    courseColour: "#ef4444"
+    courseColour: "#ef4444",
+    studyTheme: "tokyo",
+    planDensity: 2
   };
 
   const copy = {
@@ -51,20 +53,36 @@
         ar: "هدف مريح: أنت على مسار يسمح بهامش جيد بين الفصول.",
         en: "A comfortable target: your path leaves a healthy margin between terms."
       }
+    },
+    planDensity: {
+      1: { ar: "9 جلسات موزعة على 9 أيام، بمعدل جلسة واحدة يومياً.", en: "9 sessions across 9 days, averaging one session a day." },
+      2: { ar: "18 جلسة موزعة على 9 أيام، مع مراجعة قبل كل اختبار.", en: "18 sessions across 9 days, with a review before every exam." },
+      3: { ar: "27 جلسة موزعة على 9 أيام، مع مراجعتين متباعدتين للوحدات الثقيلة.", en: "27 sessions across 9 days, with two spaced reviews for demanding modules." }
     }
   };
 
   const text = value => value?.[state.lang] || "";
-  const themes = ["dark", "dim", "light"];
+  const themes = ["dark", "dim"];
   const themeIcons = {
     dark: "fa-solid fa-cloud-moon",
-    dim: "fa-solid fa-sun",
-    light: "fa-solid fa-moon"
+    dim: "fa-solid fa-moon"
   };
   const themeNames = {
     dark: { ar: "الداكن", en: "dark theme" },
-    dim: { ar: "الخافت", en: "dim theme" },
-    light: { ar: "الفاتح", en: "light theme" }
+    dim: { ar: "الخافت", en: "dim theme" }
+  };
+  const studyThemeNames = {
+    garden: { ar: "الحديقة الرقمية", en: "Digital Garden" },
+    paper: { ar: "ورق دافئ", en: "Warm Paper" },
+    github: { ar: "جِت هَب نهاري", en: "GitHub Light" },
+    solar: { ar: "سولارايزد نهاري", en: "Solarized Light" },
+    onedark: { ar: "ون دارك", en: "One Dark" },
+    dracula: { ar: "دراكولا", en: "Dracula" },
+    nord: { ar: "نورد", en: "Nord" },
+    gruvbox: { ar: "جروف بوكس", en: "Gruvbox Dark" },
+    oled: { ar: "أسود خالص", en: "True Black OLED" },
+    tokyo: { ar: "طوكيو ليلاً", en: "Tokyo Night" },
+    amber: { ar: "كهرماني", en: "Amber Night" }
   };
 
   function validColour(value) {
@@ -77,6 +95,15 @@
       return validColour(preferences?.courseStyle?.CS231?.color) || "#ef4444";
     } catch {
       return "#ef4444";
+    }
+  }
+
+  function savedStudyTheme() {
+    try {
+      const preferences = JSON.parse(localStorage.getItem("dashboard_prefs") || "null");
+      return studyThemeNames[preferences?.moduleTheme] ? preferences.moduleTheme : "tokyo";
+    } catch {
+      return "tokyo";
     }
   }
 
@@ -99,7 +126,7 @@
     document.querySelectorAll("[data-tour-theme]").forEach(button => {
       button.setAttribute("aria-pressed", String(button.dataset.tourTheme === state.theme));
     });
-    const themeColours = { dark: "#111827", dim: "#0f111a", light: "#f9fafb" };
+    const themeColours = { dark: "#111827", dim: "#0f111a" };
     document.querySelector("meta[name='theme-color']").content = themeColours[state.theme];
     updateThemeSwitch();
     if (persist) localStorage.setItem("garden_theme", state.theme);
@@ -116,6 +143,31 @@
     });
     const input = document.getElementById("course-colour-own");
     if (input) input.value = state.courseColour;
+  }
+
+  function setStudyTheme(theme) {
+    state.studyTheme = studyThemeNames[theme] ? theme : "tokyo";
+    const preview = document.getElementById("study-skin-preview");
+    if (preview) preview.dataset.studyTheme = state.studyTheme;
+    document.querySelectorAll("[data-study-theme]").forEach(button => {
+      if (button.tagName === "BUTTON") button.setAttribute("aria-checked", String(button.dataset.studyTheme === state.studyTheme));
+    });
+    const name = document.getElementById("study-theme-name");
+    if (name) name.textContent = text(studyThemeNames[state.studyTheme]);
+  }
+
+  function updatePlanDensity(density) {
+    const value = Math.min(3, Math.max(1, Number(density) || 2));
+    state.planDensity = value;
+    const showcase = document.getElementById("intensive-showcase");
+    if (showcase) showcase.dataset.planDensity = String(value);
+    document.querySelectorAll(".plan-density [data-plan-density]").forEach(button => {
+      button.setAttribute("aria-pressed", String(Number(button.dataset.planDensity) === value));
+    });
+    const verdict = document.getElementById("plan-verdict");
+    if (verdict) verdict.textContent = text(copy.planDensity[value]);
+    const total = document.querySelector(".plan-board__head b");
+    if (total) total.textContent = `09 DAYS · ${value * 9} SESSIONS`;
   }
 
   function setLanguage(lang) {
@@ -148,6 +200,8 @@
     updateTarget();
     updateCircuit();
     updateQuizFeedback();
+    updatePlanDensity(state.planDensity);
+    setStudyTheme(state.studyTheme);
     renderAtlas();
     renderStats();
     window.dispatchEvent(new CustomEvent("garden-language-change", { detail: { lang: state.lang } }));
@@ -331,6 +385,9 @@
       });
     });
     document.getElementById("target-range").addEventListener("input", updateTarget);
+    document.querySelectorAll(".plan-density [data-plan-density]").forEach(button => {
+      button.addEventListener("click", () => updatePlanDensity(button.dataset.planDensity));
+    });
     const circuit = document.querySelector(".circuit-demo");
     circuit.dataset.a = "0";
     circuit.dataset.b = "0";
@@ -359,13 +416,20 @@
     document.querySelectorAll("[data-course-colour]").forEach(button => {
       button.addEventListener("click", () => setCourseColour(button.dataset.courseColour));
     });
+    document.querySelectorAll("button[data-study-theme]").forEach(button => {
+      button.addEventListener("click", () => setStudyTheme(button.dataset.studyTheme));
+    });
     document.getElementById("course-colour-own").addEventListener("input", event => setCourseColour(event.target.value));
     window.addEventListener("storage", event => {
       if (event.key === "garden_theme") setTheme(event.newValue, false);
-      if (event.key === "dashboard_prefs") setCourseColour(savedCourseColour());
+      if (event.key === "dashboard_prefs") {
+        setCourseColour(savedCourseColour());
+        setStudyTheme(savedStudyTheme());
+      }
     });
     setTheme(state.theme, false);
     setCourseColour(savedCourseColour());
+    setStudyTheme(savedStudyTheme());
   }
 
   function setupMotion() {
@@ -403,13 +467,24 @@
       chapters.forEach(chapter => chapterObserver.observe(chapter));
     }
     const path = document.getElementById("living-root-line");
+    const flow = document.getElementById("living-root-flow");
+    const node = document.getElementById("living-root-node");
     const bar = document.getElementById("page-progress-bar");
     const topbar = document.getElementById("topbar");
     let ticking = false;
     const updateScroll = () => {
       const scrollable = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
-      path.style.strokeDashoffset = String(1 - progress);
+      if (path) {
+        path.style.strokeDashoffset = String(1 - progress);
+        if (node) {
+          const point = path.getPointAtLength(path.getTotalLength() * progress);
+          node.setAttribute("cx", point.x.toFixed(3));
+          node.setAttribute("cy", point.y.toFixed(3));
+          node.style.opacity = progress > .01 ? "1" : "0";
+        }
+      }
+      if (flow) flow.style.setProperty("--scroll-progress", progress.toFixed(4));
       bar.style.transform = `scaleX(${progress})`;
       topbar.classList.toggle("is-scrolled", window.scrollY > 28);
       ticking = false;
@@ -419,6 +494,7 @@
       ticking = true;
       requestAnimationFrame(updateScroll);
     }, { passive: true });
+    window.addEventListener("resize", updateScroll, { passive: true });
     updateScroll();
   }
 

@@ -6544,20 +6544,11 @@ ${baseRules}`) + regenSuffix;
     var lastDayTs = lastDay.getTime();
 
     var changed = false;
+    /*@3.GARJ.548*/
     if (lastDayTs !== todayTs) {
       meta.visits = (meta.visits || 0) + 1;
       meta.last_visit = Date.now();
       changed = true;
-      /*@3.GARJ.524*/
-      if (meta.visits >= 3 && sem.is_active !== true && sem.was_activated !== true) {
-        sem.is_active = true;
-        sem.was_activated = true;
-        sem.updated_at = new Date().toISOString();
-        try {
-          localStorage.setItem('my_semester', JSON.stringify(sem));
-          document.dispatchEvent(new CustomEvent('garden:semesterActivated'));
-        } catch(e) {}
-      }
     }
     if (changed) {
       try { localStorage.setItem('garden_semester_meta', JSON.stringify(meta)); } catch(e) {}

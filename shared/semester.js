@@ -91,6 +91,7 @@
     sched: null,        /*@3.SEMJ.10*/
     deadlines: [],      /*@3.SEMJ.11*/
     pending: [],        /*@3.SEMJ.12*/
+    roll: null,
     nextFilter: 'all',
     openArchive: {},    /*@3.SEMJ.13*/
     addLevel: 'all',
@@ -300,15 +301,6 @@
 
   function renderHead() {
     el('sem-name').textContent = GardenData.dispName(S.sem) || L('فصلي', 'My term');
-
-    var dot = el('sem-dot');
-    dot.hidden = false;
-    dot.setAttribute('data-on', S.sem.is_active ? '1' : '0');
-    dot.setAttribute('data-pin', S.sem.is_pinned ? '1' : '0');
-    dot.title = S.sem.is_pinned
-      ? L('مثبَّت — انقر لإلغاء التثبيت', 'Pinned — click to unpin')
-      : (S.sem.is_active ? L('فصلٌ نشط — انقر لتثبيته', 'Active — click to pin')
-                         : L('غير نشط — انقر لتفعيله', 'Inactive — click to activate'));
 
     /*@3.SEMJ.30*/
     var bits = [];
@@ -1695,61 +1687,155 @@
     return (b && b.currentLevel) ? b.currentLevel() : 3;
   }
 
-  function newSemester(pair) {
-    S.sem = {
+  /*@3.SEMJ.94*/
+  function stampPair(o, pair) {
+    o.name = pair.ar; o.name_ar = pair.ar; o.name_en = pair.en;
+    if (pair.level) { o.level = pair.level; o.summer = false; o.term = 'regular'; }
+    else { delete o.level; o.summer = true; o.term = 'summer'; }
+    return o;
+  }
+
+  function newSemester(pair, key) {
+    S.sem = stampPair({
       id: 'sem_' + Date.now(),
-      name: pair.ar, name_ar: pair.ar, name_en: pair.en,
       courses: [], is_active: true, is_pinned: false, was_activated: false,
       created_at: new Date().toISOString(), updated_at: new Date().toISOString()
-    };
-    /*@3.SEMJ.94*/
-    if (pair.level) S.sem.level = pair.level; else delete S.sem.level;
+    }, pair);
+    /*@3.SEMJ.177*/
+    if (key) S.sem.roll_done = key;
     try { localStorage.removeItem('garden_semester_meta'); } catch (e) {}
     save();
     refresh();
   }
 
-  function openCreate() {
+  function applyPair(pair, key) {
+    if (!S.sem) return;
+    stampPair(S.sem, pair);
+    if (key) S.sem.roll_done = key;
+    delete S.sem.roll_off;
+    save();
+    refresh();
+  }
+
+  var lvMode = 'create', lvMore = false;
+
+  function openLevel(mode) {
     var b = BN();
     /*@3.SEMJ.95*/
-    if (!b || !b.levelPair) { openName('create'); return; }
-
-    if (b.isSummerNow()) {
-      var sp = b.summerPair();
-      newSemester(sp);
-      toast(L('أُنشئ «' + sp.ar + '» — غيّر الاسمَ من «تسمية» إن شئت',
-              '“' + sp.en + '” created — rename it if you like'));
-      return;
-    }
-    el('lv-n').value = String(guessLevel());
-    renderLevelPrev();
+    if (!b || !b.suggestPairs) { openName(mode); return; }
+    lvMode = mode;
+    lvMore = false;
+    el('dlg-level-t').textContent = mode === 'create'
+      ? L('أنشئ فصلك', 'Create your semester') : L('سمِّ فصلك', 'Name your semester');
+    renderLevelList();
     el('dlg-level').showModal();
     /*@3.SEMJ.96*/
-    setTimeout(function () { try { el('lv-n').select(); } catch (e) {} }, 30);
+    setTimeout(function () { try { $('[data-lvpick]', el('lv-top')).focus(); } catch (e) {} }, 30);
   }
 
-  function levelPairNow() {
-    var b = BN(), n = parseInt(el('lv-n').value, 10);
-    if (!b || !(n >= 1) || n > (b.MAX_LEVEL || 12)) return null;
-    return b.levelPair(n);
+  /*@3.SEMJ.174*/
+  function renderLevelList() {
+    var b = BN();
+    if (!b) return;
+    var cur = lvMode === 'rename' ? parseInt(S.sem && S.sem.level, 10) : NaN;
+    var s = b.suggestPairs(cur >= 1 ? cur : null);
+    el('lv-top').innerHTML = s.top.map(lvBtn).join('');
+    el('lv-rest').innerHTML = s.rest.map(lvBtn).join('');
+    el('lv-rest').hidden = !lvMore;
+    el('lv-more').hidden = !s.rest.length;
+    el('lv-more').setAttribute('data-open', lvMore ? '1' : '0');
+    el('lv-more').setAttribute('aria-expanded', lvMore ? 'true' : 'false');
+    $('span', el('lv-more')).textContent = lvMore ? L('أقلّ', 'Less') : L('مزيد', 'More');
   }
 
-  function renderLevelPrev() {
-    var p = levelPairNow(), ok = !!p;
-    var box = el('lv-prev');
-    el('lv-prev-ar').textContent = ok ? p.ar : L('رقمٌ غيرُ صالح', 'Not a valid number');
-    el('lv-prev-en').textContent = ok ? p.en : '';
-    el('lv-prev-en').hidden = !ok;
-    /*@3.SEMJ.97*/
-    box.style.setProperty('--tint', ok ? 'var(--tint-on)' : 'var(--st-danger, #ef4444)');
+  function lvBtn(p) {
+    var now = S.sem && GardenData.dispName(S.sem);
+    var on = lvMode === 'rename' && now && (now === p.ar || now === p.en);
+    return '<button class="sem-lv" type="button" data-lvpick="' + (p.summer ? 's' : p.level) + '"' +
+      (p.primary ? ' data-primary="1"' : '') + (on ? ' data-on="1"' : '') + '>' +
+      '<span class="sem-lv-ar">' + esc(p.ar) + '</span>' +
+      '<span class="sem-lv-en">' + esc(p.en) + '</span>' +
+      (p.primary ? '<span class="sem-lv-tag">' + esc(L('مقترح', 'Suggested')) + '</span>' : '') +
+      '</button>';
   }
 
-  function saveLevel() {
-    var p = levelPairNow();
-    if (!p) { renderLevelPrev(); el('lv-n').focus(); return; }
-    newSemester(p);
-    el('dlg-level').close();
-    toast(L('أُنشئ «' + p.ar + '»', '“' + p.en + '” created'));
+  function openCreate() { openLevel('create'); }
+
+  /*@3.SEMJ.172*/
+  function nextPair() {
+    var b = BN();
+    if (!b || !S.sem) return null;
+    var n = parseInt(S.sem.level, 10);
+    if (S.sem.summer || S.sem.term === 'summer') {
+      return b.levelPair(Math.max(b.currentLevel(), n >= 1 ? n : 1));
+    }
+    if (!(n >= 1)) n = b.currentLevel();
+    return b.isSummerNow() ? b.summerPair() : b.levelPair(Math.min(b.MAX_LEVEL, n + 1));
+  }
+
+  /*@3.SEMJ.173*/
+  function rollKey() {
+    if (!S.sem) return null;
+    var arc = termArc();
+    if (arc && arc.after) return 'end:' + arc.end;
+    var b = BN();
+    if (b && !b.isSummerNow() && (S.sem.summer || S.sem.term === 'summer')) {
+      return 'sum:' + new Date().getFullYear();
+    }
+    return null;
+  }
+
+  function rollPending() {
+    if (!S.sem) return null;
+    var k = rollKey();
+    if (!k || S.sem.roll_done === k) return null;
+    var p = nextPair();
+    if (!p || p.ar === S.sem.name_ar) return null;
+    /*@3.SEMJ.176*/
+    if (!courses().length) {
+      stampPair(S.sem, p);
+      S.sem.roll_done = k;
+      delete S.sem.roll_off;
+      save();
+      return null;
+    }
+    return S.sem.roll_off === k ? null : { pair: p, key: k };
+  }
+
+  function renderRoll() {
+    var box = el('sem-roll');
+    var r = S.roll;
+    if (!r) { box.hidden = true; return; }
+    box.hidden = false;
+    var old = GardenData.dispName(S.sem);
+    var nu = isAr() ? r.pair.ar : r.pair.en;
+    el('sem-roll-h').textContent = L('انتهى «' + old + '»', '“' + old + '” has ended');
+    el('sem-roll-p').textContent = L(
+      'نؤرشفه بموادّه ودرجاته تحت اسمه، ونفتح لك «' + nu + '» فارغاً.',
+      'We’ll archive it with its courses and grades under its own name, and open an empty “' + nu + '” for you.');
+    el('sem-roll-go-t').textContent = L('أرشِفه وابدأ «' + nu + '»', 'Archive it and start “' + nu + '”');
+  }
+
+  function doRoll() {
+    var r = S.roll;
+    if (!r || !S.sem) return;
+    var s = archiveStats({ courses: S.sem.courses });
+    var arch = GardenData.archive() || [];
+    arch.push({
+      id: S.sem.id,
+      name: S.sem.name || S.sem.name_ar || S.sem.name_en,
+      name_ar: S.sem.name_ar || S.sem.name,
+      name_en: S.sem.name_en || S.sem.name,
+      level: S.sem.level, term: S.sem.term,
+      courses: S.sem.courses,
+      gpa: s.gpa, total_credits: s.credits,
+      created_at: S.sem.created_at,
+      archived_at: new Date().toISOString()
+    });
+    saveArchive(arch);
+    newSemester(r.pair, r.key);
+    toast(L('أُرشف فصلُك السابق، وبدأ «' + r.pair.ar + '»',
+            'Your past term is archived — “' + r.pair.en + '” has begun'));
   }
 
   /*@3.SEMJ.98*/
@@ -1761,6 +1847,11 @@
       ? L('أنشئ فصلك', 'Create your semester') : L('اسم الفصل', 'Semester name');
     el('nm-ar').value = (mode === 'create') ? '' : (S.sem && S.sem.name_ar) || (S.sem && S.sem.name) || '';
     el('nm-en').value = (mode === 'create') ? '' : (S.sem && S.sem.name_en) || '';
+    /*@3.SEMJ.178*/
+    if (BN() && !el('nm-ar').dataset.biBound) {
+      el('nm-ar').dataset.biBound = '1';
+      BN().attach({ ar: el('nm-ar'), en: el('nm-en'), suggest: false });
+    }
     el('dlg-name').showModal();
     setTimeout(function () { try { el('nm-ar').focus(); } catch (e) {} }, 30);
   }
@@ -2048,7 +2139,9 @@
       renderArchiveOnlyHero();
       return;
     }
+    S.roll = rollPending();
     renderHead();
+    renderRoll();
     renderPending();
     renderArc();
     renderStats();
@@ -2092,7 +2185,7 @@
       if (act) {
         var a = act.getAttribute('data-act');
         if (a === 'add') { openAdd(); return; }
-        if (a === 'rename') { openName('rename'); return; }
+        if (a === 'rename') { openLevel('rename'); return; }
         if (a === 'create') { openCreate(); return; }
         if (a === 'archive') { askArchive(); return; }
         if (a === 'due') { if (window.GardenDue) GardenDue.open(); return; }
@@ -2189,23 +2282,34 @@
       if (da) { askDeleteArchive(da.getAttribute('data-delarch')); return; }
     });
 
-    on('sem-dot', 'click', function () {
-      if (!S.sem) return;
-      /*@3.SEMJ.125*/
-      if (!S.sem.is_active) { S.sem.is_active = true; S.sem.is_pinned = false; }
-      else if (!S.sem.is_pinned) { S.sem.is_pinned = true; }
-      else { S.sem.is_active = false; S.sem.is_pinned = false; }
-      save(); renderHead();
-    });
-
     on('nm-ok', 'click', saveName);
 
+    /*@3.SEMJ.175*/
+    on('dlg-level', 'click', function (e) {
+      var btn = e.target.closest && e.target.closest('[data-lvpick]');
+      if (!btn) return;
+      var p = BN() && BN().pairOf(btn.getAttribute('data-lvpick'));
+      if (!p) return;
+      el('dlg-level').close();
+      if (lvMode === 'create') {
+        newSemester(p);
+        toast(L('أُنشئ «' + p.ar + '»', '“' + p.en + '” created'));
+      } else {
+        applyPair(p);
+        toast(L('صار «' + p.ar + '»', 'Renamed to “' + p.en + '”'));
+      }
+    });
     /*@3.SEMJ.126*/
-    on('lv-ok', 'click', saveLevel);
-    on('lv-n', 'input', renderLevelPrev);
-    on('lv-n', 'keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveLevel(); } });
+    on('lv-more', 'click', function () { lvMore = !lvMore; renderLevelList(); });
     /*@3.SEMJ.127*/
-    on('lv-custom', 'click', function () { el('dlg-level').close(); openName('create'); });
+    on('lv-custom', 'click', function () { el('dlg-level').close(); openName(lvMode); });
+
+    on('sem-roll-go', 'click', doRoll);
+    on('sem-roll-off', 'click', function () {
+      if (!S.sem) return;
+      S.sem.roll_off = rollKey();
+      save(); refresh();
+    });
 
     on('add-custom', 'click', addCustom);
     /*@3.SEMJ.128*/
@@ -2277,7 +2381,7 @@
       refresh();
       if (el('dlg-add').open) { renderAddLevels(); renderAddList(); renderAddColor(); }
       /*@3.SEMJ.135*/
-      if (el('dlg-level') && el('dlg-level').open) renderLevelPrev();
+      if (el('dlg-level') && el('dlg-level').open) renderLevelList();
       /*@3.SEMJ.169*/
       if (el('dlg-crn') && el('dlg-crn').open) { crnLead(); renderCrn(); }
     });

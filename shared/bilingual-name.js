@@ -15,9 +15,11 @@
   var LEVEL_AR = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس',
                   'السابع', 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر'];
   var MAX_LEVEL = LEVEL_AR.length - 1;      /*@3.BINJ.3*/
+  /*@3.BINJ.28*/
+  var MIN_PICK = 3, MAX_PICK = 10;
   function pairs() {
     var out = [];
-    for (var i = 3; i <= 8; i++) out.push(levelPair(i));
+    for (var i = MIN_PICK; i <= MAX_PICK; i++) out.push(levelPair(i));
     out.push(summerPair());
     return out;
   }
@@ -36,14 +38,10 @@
   function readJSON(k) {
     try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; }
   }
-  function inferLevel() {
-    /*@3.BINJ.6*/
-    var prof = readJSON('student_profile') || {};
-    var explicit = parseInt(prof.level, 10);
-    if (explicit >= 3 && explicit <= 8) return explicit;
-
+  /*@3.BINJ.31*/
+  function levelFromRecord() {
     var D = window.GardenData;
-    if (!D || !D.completedCourses || !D.courseInfo) return 3;
+    if (!D || !D.completedCourses || !D.courseInfo) return 0;
     var max = 0;
     var done = D.completedCourses() || {};
     Object.keys(done).forEach(function (code) {
@@ -51,7 +49,15 @@
       var m = info && String(info.level || '').match(/\d+/);
       if (m) { var n = parseInt(m[0], 10); if (n > max) max = n; }
     });
-    return max ? Math.min(8, max + 1) : 3;
+    return max ? max + 1 : 0;
+  }
+  function inferLevel() {
+    /*@3.BINJ.6*/
+    var prof = readJSON('student_profile') || {};
+    var explicit = parseInt(prof.level, 10);
+    if (!(explicit >= 1)) explicit = 0;
+    var n = Math.max(explicit, levelFromRecord());
+    return n ? Math.max(MIN_PICK, Math.min(MAX_PICK, n)) : MIN_PICK;
   }
   function isSummerNow() {
     var m = new Date().getMonth() + 1;   /*@3.BINJ.7*/
@@ -73,6 +79,31 @@
     var top = all[i];
     top.primary = true;
     return [top].concat(all.filter(function (_, j) { return j !== i; }));
+  }
+
+  /*@3.BINJ.29*/
+  function suggestPairs(override) {
+    var n = (typeof override === 'number' && override >= 1)
+      ? Math.min(MAX_PICK, override) : inferLevel();
+    var top = [levelPair(n)];
+    if (n < MAX_PICK) top.push(levelPair(n + 1));
+    top.push(summerPair());
+    if (isSummerNow()) top.unshift(top.pop());
+    top[0].primary = true;
+
+    var seen = {};
+    top.forEach(function (p) { seen[key(p)] = 1; });
+    var rest = pairs().filter(function (p) { return !seen[key(p)]; });
+    return { top: top, rest: rest };
+
+    function key(p) { return p.summer ? 's' : ('L' + p.level); }
+  }
+
+  /*@3.BINJ.30*/
+  function pairOf(v) {
+    if (v === 's' || v === 'summer') return summerPair();
+    var n = parseInt(v, 10);
+    return (n >= 1 && n <= MAX_LEVEL) ? levelPair(n) : null;
   }
 
   /*@3.BINJ.10*/
@@ -267,9 +298,13 @@
     /*@3.BINJ.27*/
     levelPair: levelPair,
     summerPair: summerPair,
+    suggestPairs: suggestPairs,
+    pairOf: pairOf,
     isSummerNow: isSummerNow,
     currentLevel: inferLevel,
     MAX_LEVEL: MAX_LEVEL,
+    MIN_PICK: MIN_PICK,
+    MAX_PICK: MAX_PICK,
     resolve: resolve,
     read: read,
     attach: attach,
