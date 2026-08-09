@@ -198,6 +198,12 @@
     dlg.addEventListener('change', function (e) {
       if (e.target && e.target.getAttribute('data-f') === 'term') drawInsRes();
     });
+    /*@3.CORJ.52*/
+    dlg.addEventListener('pointerdown', function (e) {
+      var box = dlg.querySelector('.crx-ins-box');
+      if (!box || !e.target || box.contains(e.target)) return;
+      insShut();
+    });
     /*@3.CORJ.43*/
     dlg.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' || !e.target || !e.target.hasAttribute) return;
@@ -395,6 +401,29 @@
       .catch(function () { _ins = { code: ctx.code, list: [], terms: {} }; drawIns(); });
   }
 
+  /*@3.CORJ.45*/
+  var _dir = null, _dirBusy = false;
+  function loadDir(then) {
+    if (_dir) { then && then(); return; }
+    if (_dirBusy) return;
+    _dirBusy = true;
+    var done = function (d) {
+      _dirBusy = false;
+      _dir = ((d && d.faculty) || []).map(function (f) {
+        return { n: (f.link && f.link.n) || f.en || f.name, a: f.name || '',
+                 e: f.en || '', c: 0, t: [], dir: 1 };
+      });
+      then && then();
+    };
+    if (window.GardenFaculty && GardenFaculty.load) { GardenFaculty.load(done); return; }
+    fetch(API + '/v1/faculty.json', { cache: 'default' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(done).catch(function () { done(null); });
+  }
+
+  /*@3.CORJ.46*/
+  function dirKey(f) { return lat(f.n) || lat(tr(f.a)); }
+
   function insTermOf(f) {
     var out = {};
     (f.t || []).forEach(function (r) { out[r[0]] = 1; });
@@ -422,7 +451,7 @@
   function keysOf(f) {
     if (f._k) return f._k;
     var out = [];
-    [f.n, f.a, f.k].forEach(function (src) {
+    [f.n, f.a, f.k, f.e].forEach(function (src) {
       words(src).forEach(function (w) {
         var L = hasAr(w) ? tr(w) : w;
         var l = lat(L);
@@ -509,11 +538,15 @@
       var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
       var lead = (isAr() && f.a) ? f.a : f.n;
       var sub  = (isAr() && f.a) ? f.n : (f.a || '');
-      return '<button type="button" class="crx-ins-i" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
+      /*@3.CORJ.47*/
+      var meta = f.dir
+        ? t('من دليل الأساتذة', 'From the directory')
+        : (esc(String(f.c || 0)) + ' ' + esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : ''));
+      return '<button type="button" class="crx-ins-i' + (f.dir ? ' is-dir' : '') +
+          '" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
         '<span class="crx-ins-n">' + esc(lead) + '</span>' +
         (sub ? '<span class="crx-ins-ar">' + esc(sub) + '</span>' : '') +
-        '<span class="crx-ins-m">' + esc(String(f.c || 0)) + ' ' +
-          esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : '') + '</span>' +
+        '<span class="crx-ins-m">' + (f.dir ? esc(meta) : meta) + '</span>' +
       '</button>';
     }).join('');
   }
@@ -556,13 +589,31 @@
       here.sort(byScore); past.sort(byScore);
     }
 
+    /*@3.CORJ.48*/
+    var other = [];
+    if (q && _dir) {
+      var seen = {};
+      here.concat(past).forEach(function (f) { seen[dirKey(f)] = 1; });
+      _dir.forEach(function (f) {
+        if (seen[dirKey(f)]) return;
+        var sc = insScore(f, q);
+        if (!sc) return;
+        f._sc = sc; other.push(f);
+      });
+      other.sort(function (a, b) { return b._sc - a._sc; });
+    }
+
     /*@3.CORJ.40*/
+    /*@3.CORJ.53*/
     var list;
-    if (box.getAttribute('data-open') !== '1' && !q) {
-      list = '<p class="crx-ins-shut">' +
-        esc(t('اضغطِ الحقلَ أعلاه لتبحثَ في ', 'Tap the field above to search ')) +
-        esc(String(_ins.list.length)) +
-        esc(t(' اسماً درّسوا هذه المادة.', ' instructors who taught this course.')) + '</p>';
+    if (box.getAttribute('data-open') !== '1') {
+      list = '<p class="crx-ins-shut">' + (q
+        ? esc(t('بحثُك «', 'Your search “')) + esc(q) +
+          esc(t('» — اضغطِ الحقلَ لتعودَ إلى النتائج.', '” — tap the field to see the results again.'))
+        : esc(t('اضغطِ الحقلَ أعلاه لتبحثَ في ', 'Tap the field above to search ')) +
+          esc(String(_ins.list.length)) +
+          esc(t(' اسماً درّسوا هذه المادة — وفي دليل القسم كلِّه.',
+                ' who taught this course — and the whole directory.'))) + '</p>';
     } else {
       list =
         (here.length
@@ -575,8 +626,15 @@
               : t('من درّسها سابقاً', 'Taught it previously')) +
             '</p><div class="crx-ins-l">' + insRows(past) + '</div>'
           : '') +
-        (!here.length && !past.length
-          ? '<p class="crx-ins-none">' + esc(t('لا اسمَ يطابق بحثَك.', 'No name matches.')) + '</p>'
+        (other.length
+          ? '<p class="crx-ins-h">' + esc(t('ومن دليل الأساتذة (لم تُسجَّل له شعبةٌ في هذه المادة)',
+              'From the directory (no section recorded for this course)')) +
+            '</p><div class="crx-ins-l">' + insRows(other) + '</div>'
+          : '') +
+        (!here.length && !past.length && !other.length
+          ? '<p class="crx-ins-none">' + esc(q && !_dir
+              ? t('يُبحث في دليل القسم…', 'Searching the directory…')
+              : t('لا اسمَ يطابق بحثَك.', 'No name matches.')) + '</p>'
           : '');
     }
 
@@ -587,16 +645,36 @@
   function bindIns(box) {
     var qi = box.querySelector('[data-ins-q]');
     if (!qi) return;
-    qi.addEventListener('input', function () {
-      box.setAttribute('data-q', qi.value);
+    /*@3.CORJ.49*/
+    var open = function () {
+      loadDir(function () { if (dlg.querySelector('.crx-ins-box') === box) drawInsRes(); });
       box.setAttribute('data-open', '1');
       drawInsRes();
+    };
+    qi.addEventListener('input', function () {
+      box.setAttribute('data-q', qi.value);
+      open();
     });
     qi.addEventListener('focus', function () {
       if (box.getAttribute('data-open') === '1') return;
-      box.setAttribute('data-open', '1');
-      drawInsRes();
+      open();
     });
+    /*@3.CORJ.51*/
+    qi.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      e.stopPropagation();
+      insShut();
+      qi.blur();
+    });
+  }
+
+  /*@3.CORJ.50*/
+  function insShut() {
+    var box = dlg && dlg.querySelector('.crx-ins-box');
+    if (!box || box.getAttribute('data-open') !== '1') return false;
+    box.removeAttribute('data-open');
+    drawInsRes();
+    return true;
   }
 
   function pickFree(name) {
