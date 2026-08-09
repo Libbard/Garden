@@ -35,11 +35,25 @@
 
   var state = null;
 
+  /*@3.ICSJ.68*/
+  var RUN_KEY = 'garden_ics_run';
+  var RUN_FIELDS = ['stamp', 'last_try', 'last_ok', 'last_err', 'count', 'inbox'];
+
+  function isRun(k) { return RUN_FIELDS.indexOf(k) > -1; }
+
+  var lastDur = '';
+
   function load() {
     if (state) return state;
-    var raw = null;
+    var raw = null, run = null;
     try { raw = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+    try { run = JSON.parse(localStorage.getItem(RUN_KEY) || 'null'); } catch (e) {}
+    if (!raw || typeof raw !== 'object') raw = {};
+    if (run && typeof run === 'object') {
+      RUN_FIELDS.forEach(function (k) { if (run[k] !== undefined) raw[k] = run[k]; });
+    }
     state = repair(raw);
+    lastDur = '';
     return state;
   }
 
@@ -59,15 +73,28 @@
     return s;
   }
 
+  /*@3.ICSJ.69*/
   function save() {
     if (!state) return false;
+    var dur = {}, run = {};
+    Object.keys(state).forEach(function (k) {
+      if (isRun(k)) run[k] = state[k]; else dur[k] = state[k];
+    });
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify(state));
-      /*@3.ICSJ.17*/
-      localStorage.setItem('__syncT_' + LS_KEY, String(Date.now()));
+      /*@3.ICSJ.70*/
+      var js = JSON.stringify(dur);
+      if (js !== lastDur) { localStorage.setItem(LS_KEY, js); lastDur = js; }
+      localStorage.setItem(RUN_KEY, JSON.stringify(run));
       return true;
     } catch (e) { return false; }
   }
+
+  /*@3.ICSJ.71*/
+  try {
+    window.addEventListener('garden:syncCompleted', function () {
+      state = null; lastDur = '';
+    });
+  } catch (e) {}
 
   /*@3.ICSJ.18*/
 

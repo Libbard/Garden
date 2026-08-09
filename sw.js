@@ -100,6 +100,11 @@ var PRECACHE_URLS = [
   /*@0.SWJ.66*/
   'shared/course-rate.js',
   'shared/course-rate.css',
+  'shared/course-rate-view.js',
+  'shared/course-rate-view.css',
+  'hub/ratings.html',
+  'shared/my-ratings.js',
+  'shared/my-ratings.css',
   'shared/schedule-motivation.js',
   /*@0.SWJ.67*/
   'shared/legacy-data.js',

@@ -419,4 +419,6 @@
   /*@3.ICPJ.17*/
   document.addEventListener('garden:languageChanged', render);
   window.addEventListener('ics:sync', function () { /*@3.ICPJ.18*/ });
+  /*@3.ICPJ.20*/
+  window.addEventListener('garden:syncCompleted', function () { render(); });
 })();
