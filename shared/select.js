@@ -169,7 +169,11 @@
     this._onDoc = function (e) { if (!pop.contains(e.target) && !self.wrap.contains(e.target)) self.close(); };
     this._onKey = function (e) { self.onPopKey(e); };
     /*@3.SELJ.18*/
-    this._onScroll = function () { self.place(); };
+    /*@3.SELJ.45*/
+    this._onScroll = function (e) {
+      if (e && e.target && e.target !== pop && pop.contains && pop.contains(e.target)) return;
+      self.place();
+    };
     document.addEventListener('mousedown', this._onDoc, true);
     document.addEventListener('keydown', this._onKey, true);
     window.addEventListener('scroll', this._onScroll, true);
@@ -209,6 +213,8 @@
   /*@3.SELJ.19*/
   Enhanced.prototype.paint = function () {
     if (!this.pop) return;
+    /*@3.SELJ.46*/
+    this._ph = 0;
     var self = this;
     var q = (this.query || '').trim().toLowerCase();
     var shown = this.items.filter(function (it) {
@@ -377,11 +383,25 @@
     pop.style.maxWidth = Math.round(Math.min(padR - padL, Math.max(r.width, 340))) + 'px';
 
     /*@3.SELJ.41*/
-    pop.style.maxHeight = 'none';
-    pop.style.top = '0px';
-    pop.style.left = '0px';
-    var o = pop.getBoundingClientRect();
-    var ox = o.left, oy = o.top, ph = o.height, w = o.width;
+    /*@3.SELJ.43*/
+    var probe = document.createElement('div');
+    probe.style.cssText =
+      'position:fixed;top:0;left:0;width:100px;height:100px;visibility:hidden;pointer-events:none';
+    (host || document.body).appendChild(probe);
+    var pb = probe.getBoundingClientRect();
+    /*@3.SELJ.47*/
+    var ox = pb.left, oy = pb.top;
+    var sx = pb.width / 100 || 1, sy = pb.height / 100 || 1;
+    probe.parentNode.removeChild(probe);
+
+    /*@3.SELJ.44*/
+    if (!this._ph) {
+      var keep = pop.style.maxHeight;
+      pop.style.maxHeight = 'none';
+      this._ph = pop.getBoundingClientRect().height;
+      pop.style.maxHeight = keep;
+    }
+    var ph = this._ph, w = pop.getBoundingClientRect().width;
 
     /*@3.SELJ.40*/
     var CAP = 320;
@@ -399,8 +419,8 @@
     left = Math.max(padL, Math.min(left, padR - w));
 
     /*@3.SELJ.42*/
-    pop.style.top = Math.round(top - oy) + 'px';
-    pop.style.left = Math.round(left - ox) + 'px';
+    pop.style.top = Math.round((top - oy) / sy) + 'px';
+    pop.style.left = Math.round((left - ox) / sx) + 'px';
   };
 
   /*@3.SELJ.29*/

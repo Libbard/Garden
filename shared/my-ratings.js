@@ -208,28 +208,76 @@
     '</article>';
   }
 
+  /*@3.MYRJ.8*/
+  var _all = null, _allBusy = false;
+  function loadAll(then) {
+    /*@3.MYRJ.11*/
+    if (_all || _allBusy) return;
+    _allBusy = true;
+    fetch(API + '/v1/plans', { cache: 'default' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        var seen = {}, out = [];
+        ((j && j.programs) || []).forEach(function (p) {
+          (p.courses || []).forEach(function (c) {
+            if (!c || !c.c || seen[c.c] || !CODE_RE.test(c.c)) return;
+            seen[c.c] = 1;
+            out.push({ code: c.c, name_ar: c.ta || c.t || c.c, name_en: c.t || c.ta || c.c });
+          });
+        });
+        _all = out; _allBusy = false;
+        then && then();
+      })
+      .catch(function () { _all = []; _allBusy = false; then && then(); });
+  }
+
+  /*@3.MYRJ.9*/
+  function pickerOpts(list, rated) {
+    return list.map(function (c) {
+      return '<option value="' + esc(c.code) + '">' + esc(c.code) + ' · ' +
+        esc(isAr() ? (c.name_ar || c.code) : (c.name_en || c.code)) +
+        (rated[c.code] ? ' ✓' : '') + '</option>';
+    }).join('');
+  }
+
   /*@3.MYRJ.4*/
   function pickerHtml() {
     var d = D();
-    var list = (d && d.catalogList && d.catalogList()) || [];
-    if (!list.length) return '';
+    var mine = ((d && d.catalogList && d.catalogList()) || [])
+      .filter(function (c) { return c && c.code && CODE_RE.test(c.code); });
     var rated = ratedSet();
-    var opts = list.filter(function (c) { return c && c.code && CODE_RE.test(c.code); })
-      .sort(function (a, b) { return a.code < b.code ? -1 : 1; })
-      .map(function (c) {
-        return '<option value="' + esc(c.code) + '">' + esc(c.code) + ' · ' +
-          esc(isAr() ? (c.name_ar || c.code) : (c.name_en || c.code)) +
-          (rated[c.code] ? ' ✓' : '') + '</option>';
-      }).join('');
+    var have = {};
+    mine.forEach(function (c) { have[c.code] = 1; });
+    var rest = (_all || []).filter(function (c) { return !have[c.code]; });
+    var byCode = function (a, b) { return a.code < b.code ? -1 : 1; };
+    mine.sort(byCode); rest.sort(byCode);
+    if (!mine.length && !rest.length) return '';
+
+    /*@3.MYRJ.10*/
+    var opts =
+      (mine.length
+        ? '<optgroup label="' + esc(t('موادُّ خطّتك', 'Your plan')) + '">' +
+            pickerOpts(mine, rated) + '</optgroup>'
+        : '') +
+      (rest.length
+        ? '<optgroup label="' + esc(t('كلُّ موادّ الجامعة', 'All university courses')) + '">' +
+            pickerOpts(rest, rated) + '</optgroup>'
+        : '');
+
     return '<div class="mr-any">' +
       '<label class="mr-any-l" for="mr-pick">' +
-        esc(t('أو قيّم أيَّ مادّةٍ أخرى درستَها', 'Or rate any other course you took')) + '</label>' +
+        esc(t('أو قيّمْ أيَّ مادّةٍ أخرى درستَها', 'Or rate any other course you took')) + '</label>' +
+      '<p class="mr-any-h">' + esc(rest.length
+        ? t('ليست خطّتُك حدَّك — المشتركةُ والمُعادلةُ وما درستَه خارج تخصّصك كلُّها هنا.',
+            'Your plan is not the limit — shared, transferred and out-of-major courses are all here.')
+        : t('يُجلب باقي موادّ الجامعة…', 'Loading the rest of the catalogue…')) + '</p>' +
       '<div class="mr-any-row">' +
         '<select class="gsf-in" data-gs id="mr-pick"><option value="">' +
           esc(t('اختر مادّة…', 'Choose a course…')) + '</option>' + opts + '</select>' +
         '<button type="button" class="gsf-btn gsf-btn--go" id="mr-pick-go">' +
           esc(t('افتحِ النموذج', 'Open the form')) + '</button>' +
       '</div>' +
+      '<p class="mr-any-msg" id="mr-pick-msg" role="status"></p>' +
     '</div>';
   }
 
@@ -253,6 +301,9 @@
       done.innerHTML = '';
       return;
     }
+
+    /*@3.MYRJ.12*/
+    loadAll(draw);
 
     var rated = ratedSet();
     var open = ratingsOn();
@@ -308,8 +359,16 @@
     if (!b) return;
     if (b.id === 'mr-retry') { load(); return; }
     if (b.id === 'mr-pick-go') {
-      var sel = $('mr-pick');
-      if (sel && sel.value) openFor(sel.value);
+      var sel = $('mr-pick'), msg = $('mr-pick-msg');
+      /*@3.MYRJ.13*/
+      if (!sel || !sel.value) {
+        if (msg) msg.textContent = t('اختر مادّةً من القائمة أوّلاً.', 'Choose a course from the list first.');
+        var gsb = sel && sel.closest('.gs') && sel.closest('.gs').querySelector('.gs-btn');
+        if (gsb) gsb.focus();
+        return;
+      }
+      if (msg) msg.textContent = '';
+      openFor(sel.value);
       return;
     }
     var rate = b.getAttribute('data-rate');
