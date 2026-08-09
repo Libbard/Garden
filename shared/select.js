@@ -364,25 +364,38 @@
     }
 
     var pop = this.pop;
+
+    /*@3.SELJ.39*/
+    var host = pop.parentNode;
+    var hr = (host && host.tagName === 'DIALOG') ? host.getBoundingClientRect() : null;
+    var padT = hr ? Math.max(8, hr.top + 8) : 8;
+    var padB = hr ? Math.min(vh - 8, hr.bottom - 8) : (vh - 8);
+    var padL = hr ? Math.max(8, hr.left + 8) : 8;
+    var padR = hr ? Math.min(vw - 8, hr.right - 8) : (vw - 8);
+
     pop.style.minWidth = Math.round(r.width) + 'px';
-    pop.style.maxWidth = Math.round(Math.min(vw - 16, Math.max(r.width, 340))) + 'px';
+    pop.style.maxWidth = Math.round(Math.min(padR - padL, Math.max(r.width, 340))) + 'px';
 
     /*@3.SELJ.27*/
     pop.style.insetBlockStart = '-9999px';
     var ph = pop.getBoundingClientRect().height;
 
-    var below = vh - r.bottom - 8, above = r.top - 8;
+    /*@3.SELJ.40*/
+    var CAP = 320;
+    var below = padB - r.bottom - 4, above = r.top - padT - 4;
     var flip = below < Math.min(ph, 180) && above > below;
-    var top = flip ? Math.max(8, r.top - Math.min(ph, above) - 4) : (r.bottom + 4);
+    var room = Math.max(120, Math.min(CAP, flip ? above : below));
+    var top = flip ? (r.top - Math.min(ph, room) - 4) : (r.bottom + 4);
+    top = Math.max(padT, Math.min(top, padB - Math.min(ph, room)));
     pop.classList.toggle('is-up', flip);
-    pop.style.maxHeight = Math.max(120, Math.min(ph, flip ? above : below)) + 'px';
+    pop.style.maxHeight = Math.round(room) + 'px';
     pop.style.top = Math.round(top) + 'px';
 
     /*@3.SELJ.28*/
     var w = pop.getBoundingClientRect().width;
     var rtl = (document.documentElement.getAttribute('dir') || 'rtl') === 'rtl';
     var left = rtl ? (r.right - w) : r.left;
-    left = Math.max(8, Math.min(left, vw - w - 8));
+    left = Math.max(padL, Math.min(left, padR - w));
     pop.style.left = Math.round(left) + 'px';
   };
 

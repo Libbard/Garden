@@ -138,20 +138,23 @@
     }
   }
 
+  /*@3.MYRJ.7*/
   function todoCard(c, hasRating) {
-    var pill = c.kind === 'done'
-      ? '<span class="mr-pill is-done">' + esc(t('أنهيتَها', 'Finished')) + '</span>'
-      : '<span class="mr-pill">' + esc(t('تدرسها الآن', 'In progress')) + '</span>';
-    return '<article class="mr-todo"' + tint(c.code) + '>' +
+    var done = c.kind === 'done';
+    var flag = '<i class="mr-flag' + (done ? ' is-done' : '') +
+      ' fa-solid ' + (done ? 'fa-circle-check' : 'fa-hourglass-half') + '" aria-hidden="true" title="' +
+      esc(done ? t('أنهيتَها', 'Finished') : t('تدرسها الآن', 'In progress')) + '"></i>';
+    return '<button type="button" class="mr-todo" data-rate="' + esc(c.code) + '"' + tint(c.code) +
+        ' aria-label="' + esc((hasRating ? t('عدّلْ تقييم ', 'Edit rating for ') : t('قيّمْ ', 'Rate ')) +
+                             c.code + ' ' + nameOf(c.code)) + '">' +
+      flag +
       '<i class="mr-todo-i ' + esc(iconOf(c.code)) + '" aria-hidden="true"></i>' +
       '<div class="mr-todo-t">' +
         '<b class="mr-code">' + esc(c.code) + '</b>' +
         '<span class="mr-name">' + esc(nameOf(c.code)) + '</span>' +
-      '</div>' + pill +
-      '<button type="button" class="gsf-btn gsf-btn--go" data-rate="' + esc(c.code) + '">' +
-        esc(hasRating ? t('عدّلْ', 'Edit') : t('قيّمها', 'Rate it')) +
-      '</button>' +
-    '</article>';
+      '</div>' +
+      (hasRating ? '<span class="mr-todo-tag">' + esc(t('مكتوب', 'Written')) + '</span>' : '') +
+    '</button>';
   }
 
   function excerpt(s, n) {
@@ -277,8 +280,8 @@
     } else {
       todo.innerHTML = head +
         '<p class="mr-sec-sub">' + esc(t(
-          'اضغطْ واحدةً بعد الأخرى — كلُّ نافذةٍ تُغلق فتجد التاليةَ أمامك.',
-          'Tap them one after another — each dialog closes and the next is right there.')) + '</p>' +
+          'اضغطْ على أيِّ مادّةٍ لتقييمها — كلُّ نافذةٍ تُغلق فتجد التاليةَ أمامك.',
+          'Tap any course to rate it — each dialog closes and the next is right there.')) + '</p>' +
         '<div class="mr-todos">' + pend.map(function (c) { return todoCard(c, false); }).join('') + '</div>' +
         pickerHtml();
     }

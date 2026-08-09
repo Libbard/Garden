@@ -108,13 +108,22 @@
   };
   function lbl(v) { return isAr() ? v : (EN[v] || v); }
 
+  /*@3.CORJ.32*/
+  function tone(i, n) {
+    if (n < 2) return 0;
+    return 1 + Math.round((i / (n - 1)) * 4);
+  }
+
   /*@3.CORJ.6*/
-  function chips(name, list, multi, cur) {
+  function chips(name, list, multi, cur, scale) {
     var sel = multi ? (cur || []) : (cur ? [cur] : []);
+    var n = list.length;
     return '<div class="gsf-chips" data-f="' + esc(name) + '" data-multi="' + (multi ? '1' : '') + '">' +
-      list.map(function (v) {
+      list.map(function (v, i) {
         var on = sel.indexOf(v) >= 0;
+        var tn = scale ? tone(i, n) : 0;
         return '<button type="button" class="gsf-chip' + (on ? ' on' : '') + '" ' +
+          (tn ? 'data-tone="' + tn + '" ' : '') +
           'data-v="' + esc(v) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
           esc(lbl(v)) + '</button>';
       }).join('') + '</div>';
@@ -127,8 +136,12 @@
       '</label>' +
       (hint ? '<p class="crx-hint">' + hint + '</p>' : '') + inner + '</div>';
   }
-  function sec(title, body, note) {
-    return '<section class="crx-sec"><h3 class="crx-h">' + esc(title) + '</h3>' +
+  /*@3.CORJ.33*/
+  function sec(title, body, note, icon) {
+    return '<section class="gsf-card crx-sec">' +
+      '<h3 class="gsf-card-h">' +
+        (icon ? '<i class="fa-solid fa-' + icon + '" aria-hidden="true"></i>' : '') +
+        esc(title) + '</h3>' +
       (note ? '<p class="crx-note">' + note + '</p>' : '') + body + '</section>';
   }
 
@@ -246,7 +259,7 @@
           : '') +
       '</header>' +
 
-      sec(t('أساسيات', 'Basics'),
+      sec(t('متى ومع من', 'When and with whom'),
         field(t('الفصل الذي درستَها فيه', 'Term you took it'),
           '<select class="gsf-in" data-gs data-f="term">' +
             '<option value="">' + esc(t('اختر…', 'Choose…')) + '</option>' +
@@ -264,31 +277,36 @@
           '</div>',
           /*@3.CORJ.10*/
           t('<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>لا يدخل مؤشّرَ الصعوبة إطلاقاً.</b> «صعبةٌ مع فلان» ليست صعوبةَ مادّة — وللأساتذة صفحتُهم.',
-            '<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>Never affects the difficulty score.</b> Instructors have their own page.')) +
+            '<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>Never affects the difficulty score.</b> Instructors have their own page.')),
+        '', 'calendar-day') +
 
+      sec(t('أنهيتَها ودرجتُك', 'Finished it & your grade'),
         field(t('أنهيتَها؟', 'Finished it?'),
           chips('took_it', ['نعم', 'لا زلت فيها'], false,
             v.took_it === true ? 'نعم' : v.took_it === false ? 'لا زلت فيها' : null)) +
 
         field(t('درجتُك (اختياريّة)', 'Your grade (optional)'),
-          chips('grade', O.grade, false, v.grade),
+          chips('grade', O.grade, false, v.grade, true),
           /*@3.CORJ.11*/
           t('<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>تُخزَّن ولا تُعرض أبداً — لا لك ولا لغيرك.</b> حضورُها وحدَه يرفع وزنَ تقييمك، وقيمتُها لا تُقرأ ولا تُجمَّع.',
-            '<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>Stored, never shown.</b> Its presence raises your weight; its value is never read.'))) +
+            '<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>Stored, never shown.</b> Its presence raises your weight; its value is never read.')),
+        '', 'flag-checkered') +
 
       sec(t('الصعوبة والعبء', 'Difficulty & load'),
-        field(t('الصعوبة', 'Difficulty'), chips('difficulty', O.difficulty, false, v.difficulty), '', true) +
+        field(t('الصعوبة', 'Difficulty'), chips('difficulty', O.difficulty, false, v.difficulty, true), '', true) +
         field(t('ساعاتٌ أسبوعياً خارج المحاضرة', 'Weekly hours outside class'),
-          chips('weekly_hours', O.weekly_hours, false, v.weekly_hours)) +
+          chips('weekly_hours', O.weekly_hours, false, v.weekly_hours, true)) +
         field(t('إيقاعُ المذاكرة', 'Study rhythm'),
-          chips('study_rhythm', O.study_rhythm, false, v.study_rhythm),
+          chips('study_rhythm', O.study_rhythm, false, v.study_rhythm, true),
           t('أنفعُ سؤالٍ هنا: <b>توزُّعُ</b> العبء يقول عن الصعوبة أكثرَ من <b>مجموع</b> الساعات.',
             'The most useful question: how work is <b>spread</b> matters more than total hours.')) +
-        field(t('تكدُّسُ العبء', 'Load shape'), chips('load_shape', O.load_shape, false, v.load_shape))) +
+        field(t('تكدُّسُ العبء', 'Load shape'), chips('load_shape', O.load_shape, false, v.load_shape, true)),
+        '', 'gauge-high') +
 
       sec(t('طبيعةُ المادة', 'Nature'),
         field(t('اختر حتى ثلاثة', 'Pick up to three'),
-          chips('nature', M.nature.opts, true, v.nature))) +
+          chips('nature', M.nature.opts, true, v.nature)),
+        '', 'shapes') +
 
       sec(t('الاختبارات والدرجة', 'Exams & grading'),
         field(t('أين تكمن الدرجة', 'Where the grade sits'),
@@ -296,25 +314,28 @@
         field(t('نمطُ الأسئلة', 'Question style'), chips('q_style', M.q_style.opts, true, v.q_style)) +
         field(t('مصدرُ الأسئلة', 'Question source'), chips('q_source', O.q_source, false, v.q_source)) +
         field(t('صعوبتُها مقارنةً بالتمارين', 'Versus the exercises'),
-          chips('q_vs_ex', O.q_vs_ex, false, v.q_vs_ex))) +
+          chips('q_vs_ex', O.q_vs_ex, false, v.q_vs_ex, true)),
+        '', 'file-pen') +
 
       sec(t('كيف تُذاكَر', 'How to study it'),
         field(t('أنفعُ ما فعلتَ', 'What helped most'), chips('helped', M.helped.opts, true, v.helped)) +
         field(t('نصيحةٌ لمن سيأخذها', 'Advice for the next student'),
           '<textarea class="gsf-in gsf-ta" data-f="advice" rows="3" maxlength="300">' +
-            esc(v.advice || '') + '</textarea>')) +
+            esc(v.advice || '') + '</textarea>'),
+        '', 'lightbulb') +
 
       sec(t('اشرح المادةَ بكلماتك', 'Explain it in your words'),
         field(t('ما هذه المادةُ فعلاً؟', 'What is this course really?'),
           '<textarea class="gsf-in gsf-ta" data-f="explain" rows="4" maxlength="500">' +
             esc(v.explain || '') + '</textarea>',
-          t('أوّلُ ما يقرؤه زميلُك.', 'The first thing your classmate reads.'))) +
+          t('أوّلُ ما يقرؤه زميلُك.', 'The first thing your classmate reads.')),
+        '', 'comment-dots') +
 
       sec(t('مصادرُ التعلّم', 'Learning resources'),
         '<div class="crx-res"></div>' +
         '<button type="button" class="crx-addres">+ ' + esc(t('أضف مصدراً', 'Add a resource')) + '</button>',
         t('يوتيوب يظهر مباشرةً، وما عداه ينتظر مراجعةً قبل أن يراه غيرُك.',
-          'YouTube appears immediately; other links await review.')) +
+          'YouTube appears immediately; other links await review.'), 'link') +
 
       '<footer class="gsf-foot crx-foot">' +
         '<p class="crx-msg" aria-live="polite"></p>' +
@@ -381,35 +402,51 @@
   }
   function lat(s) { return String(s || '').toLowerCase().replace(/[^a-z]/g, ''); }
   function skel(s) { return lat(s).replace(/[aeiouwy]/g, '').replace(/(.)\1+/g, '$1'); }
-  function toks(s) {
-    return String(s || '').split(/[^A-Za-z]+/).filter(function (x) { return x.length > 1; });
+  /*@3.CORJ.35*/
+  function words(s) {
+    return String(s || '').split(/[^A-Za-z؀-ۿ]+/).filter(function (x) { return x.length > 1; });
   }
+  function keysOf(f) {
+    if (f._k) return f._k;
+    var out = [];
+    [f.n, f.a, f.k].forEach(function (src) {
+      words(src).forEach(function (w) {
+        var L = hasAr(w) ? tr(w) : w;
+        var l = lat(L);
+        if (l.length > 1) out.push({ l: l, s: skel(L), a: hasAr(w) ? w : '' });
+      });
+    });
+    f._k = out;
+    return out;
+  }
+
   /*@3.CORJ.28*/
+  /*@3.CORJ.34*/
   function insScore(f, q) {
     if (!q) return 1;
-    var ar = hasAr(q);
-    if (ar) {
-      var qn = q.replace(/\s+/g, '');
-      if (f.a && String(f.a).indexOf(q) >= 0) return 4;
-      if (f.k && String(f.k).indexOf(qn) >= 0) return 4;
-    }
-    var base = ar ? tr(q) : q;
-    var ql = lat(base), qs = skel(base);
-    if (ql.length < 2) return 0;
-
-    var names = [String(f.n || '')];
-    if (f.a) names.push(tr(f.a));
-    if (f.k) names.push(tr(f.k));
-    var best = 0;
-    for (var i = 0; i < names.length; i++) {
-      if (lat(names[i]).indexOf(ql) >= 0) return 3;
-      var tk = toks(names[i]);
-      for (var j = 0; j < tk.length; j++) {
-        if (skel(tk[j]) === qs && qs) best = Math.max(best, 2);
+    var qw = words(q);
+    if (!qw.length) return 0;
+    var keys = keysOf(f);
+    var total = 0;
+    for (var i = 0; i < qw.length; i++) {
+      var w = qw[i];
+      var isAr_ = hasAr(w);
+      var L = isAr_ ? tr(w) : w;
+      var ql = lat(L), qs = skel(L);
+      if (ql.length < 2) return 0;
+      var best = 0;
+      for (var j = 0; j < keys.length && best < 4; j++) {
+        var k = keys[j];
+        if (isAr_ && k.a && k.a.indexOf(w) >= 0) { best = 4; break; }
+        if (k.l === ql) { best = Math.max(best, 4); continue; }
+        if (k.l.indexOf(ql) >= 0) { best = Math.max(best, 3); continue; }
+        if (qs && k.s === qs) { best = Math.max(best, 2); continue; }
+        if (qs.length >= 2 && k.s.indexOf(qs) >= 0) best = Math.max(best, 1);
       }
-      if (!best && qs.length >= 2 && skel(names[i]).indexOf(qs) >= 0) best = 1;
+      if (!best) return 0;
+      total += best;
     }
-    return best;
+    return total;
   }
 
   function drawIns() {
@@ -449,12 +486,15 @@
       here.sort(byScore); past.sort(byScore);
     }
 
+    /*@3.CORJ.36*/
     function rows(list) {
       return list.slice(0, 40).map(function (f) {
         var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
+        var lead = (isAr() && f.a) ? f.a : f.n;
+        var sub  = (isAr() && f.a) ? f.n : (f.a || '');
         return '<button type="button" class="crx-ins-i" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
-          '<span class="crx-ins-n">' + esc(f.n) + '</span>' +
-          (f.a ? '<span class="crx-ins-ar">' + esc(f.a) + '</span>' : '') +
+          '<span class="crx-ins-n">' + esc(lead) + '</span>' +
+          (sub ? '<span class="crx-ins-ar">' + esc(sub) + '</span>' : '') +
           '<span class="crx-ins-m">' + esc(String(f.c || 0)) + ' ' +
             esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : '') + '</span>' +
         '</button>';
