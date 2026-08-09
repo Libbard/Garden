@@ -151,7 +151,9 @@
     if (this.multi) pop.setAttribute('aria-multiselectable', 'true');
     /*@3.SELJ.16*/
     pop.setAttribute('dir', document.documentElement.getAttribute('dir') || 'rtl');
-    document.body.appendChild(pop);
+    /*@3.SELJ.38*/
+    var host = (this.sel.closest && this.sel.closest('dialog[open]')) || document.body;
+    host.appendChild(pop);
     this.pop = pop;
 
     this.items = readOptions(this.sel);

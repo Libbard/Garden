@@ -90,7 +90,7 @@
     var min = Number(flag('ratings.course.publicMin', 50)) || 50;
     var can = flag('ratings.course.enabled', true) !== false;
     var btn = can
-      ? '<button type="button" class="cv-cta" data-cv-rate="' + esc(code) + '">' +
+      ? '<button type="button" class="gsf-btn gsf-btn--go" data-cv-rate="' + esc(code) + '">' +
           '<i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> ' +
           esc(t('شاركْ رأيك', 'Add your take')) + '</button>'
       : '';
@@ -243,16 +243,16 @@
     code = String(code || '').toUpperCase();
     if (!vdlg) {
       vdlg = document.createElement('dialog');
-      vdlg.className = 'cvx';
-      vdlg.innerHTML = '<form method="dialog" class="cvx-x"><button class="cvx-close" aria-label="' +
-        esc(t('إغلاق', 'Close')) + '">✕</button></form>' +
-        '<header class="cvx-head"><h2></h2><p class="cvx-sub"></p></header>' +
-        '<div class="cvx-body"></div>';
+      vdlg.className = 'gsf cvx';
+      vdlg.innerHTML = '<div class="gsf-grip" aria-hidden="true"></div><form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' +
+        esc(t('إغلاق', 'Close')) + '"><i class="fa-solid fa-xmark"></i></button></form>' +
+        '<header class="cvx-head gsf-head"><h2></h2><p class="cvx-sub gsf-sub"></p></header>' +
+        '<div class="cvx-body gsf-body"></div>';
       document.body.appendChild(vdlg);
     }
     vdlg.querySelector('.cvx-head h2').textContent = t('كيف هي المادة؟', 'How is this course?');
     var nm = (window.GardenData && GardenData.courseInfo && GardenData.courseInfo(code)) || null;
-    vdlg.querySelector('.cvx-sub').innerHTML = '<span class="cv-code">' + esc(code) + '</span> ' +
+    vdlg.querySelector('.cvx-sub').innerHTML = '<span class="gsf-code">' + esc(code) + '</span> ' +
       esc(nm ? (isAr() ? nm.name_ar : (nm.name_en || nm.name_ar)) : '');
     var box = vdlg.querySelector('.cvx-body');
     box.setAttribute('data-cv-box', code);

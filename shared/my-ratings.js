@@ -148,7 +148,7 @@
         '<b class="mr-code">' + esc(c.code) + '</b>' +
         '<span class="mr-name">' + esc(nameOf(c.code)) + '</span>' +
       '</div>' + pill +
-      '<button type="button" class="mr-btn mr-btn--go" data-rate="' + esc(c.code) + '">' +
+      '<button type="button" class="gsf-btn gsf-btn--go" data-rate="' + esc(c.code) + '">' +
         esc(hasRating ? t('عدّلْ', 'Edit') : t('قيّمها', 'Rate it')) +
       '</button>' +
     '</article>';
@@ -197,9 +197,9 @@
       (body ? '<p class="mr-quote">' + esc(excerpt(body, 220)) + '</p>' : '') +
       '<div class="mr-meta">' + meta.join('') + '</div>' +
       '<div class="mr-acts">' +
-        '<button type="button" class="mr-btn" data-rate="' + esc(r.code) + '">' +
+        '<button type="button" class="gsf-btn" data-rate="' + esc(r.code) + '">' +
           '<i class="fa-solid fa-pen" aria-hidden="true"></i> ' + esc(t('عدّلْ', 'Edit')) + '</button>' +
-        '<button type="button" class="mr-btn mr-btn--danger" data-drop="' + esc(r.code) + '">' +
+        '<button type="button" class="gsf-btn gsf-btn--danger" data-drop="' + esc(r.code) + '">' +
           '<i class="fa-solid fa-trash" aria-hidden="true"></i> ' + esc(t('اسحبْ', 'Withdraw')) + '</button>' +
       '</div>' +
     '</article>';
@@ -222,9 +222,9 @@
       '<label class="mr-any-l" for="mr-pick">' +
         esc(t('أو قيّم أيَّ مادّةٍ أخرى درستَها', 'Or rate any other course you took')) + '</label>' +
       '<div class="mr-any-row">' +
-        '<select class="mr-in" id="mr-pick"><option value="">' +
+        '<select class="gsf-in" data-gs id="mr-pick"><option value="">' +
           esc(t('اختر مادّة…', 'Choose a course…')) + '</option>' + opts + '</select>' +
-        '<button type="button" class="mr-btn mr-btn--go" id="mr-pick-go">' +
+        '<button type="button" class="gsf-btn gsf-btn--go" id="mr-pick-go">' +
           esc(t('افتحِ النموذج', 'Open the form')) + '</button>' +
       '</div>' +
     '</div>';
@@ -245,7 +245,7 @@
         '<i class="fa-solid fa-plug-circle-xmark" aria-hidden="true"></i>' +
         '<p>' + esc(t('تعذّر الوصولُ إلى الخدمة. تقييماتُك سليمةٌ في مكانها — أعِد المحاولةَ بعد قليل.',
                       'Could not reach the service. Your ratings are safe — try again shortly.')) + '</p>' +
-        '<button type="button" class="mr-btn" id="mr-retry">' + esc(t('أعِدِ المحاولة', 'Retry')) + '</button>' +
+        '<button type="button" class="gsf-btn" id="mr-retry">' + esc(t('أعِدِ المحاولة', 'Retry')) + '</button>' +
       '</div>';
       done.innerHTML = '';
       return;
@@ -290,6 +290,8 @@
         ? '<div class="mr-rows">' + rows.map(doneRow).join('') + '</div>'
         : '<div class="mr-empty"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i><p>' +
           esc(t('لم تكتب شيئاً بعد.', 'Nothing yet.')) + '</p></div>');
+
+    if (window.GardenSelect && GardenSelect.enhance) GardenSelect.enhance(todo);
   }
 
   function openFor(code) {

@@ -111,10 +111,10 @@
   /*@3.CORJ.6*/
   function chips(name, list, multi, cur) {
     var sel = multi ? (cur || []) : (cur ? [cur] : []);
-    return '<div class="crx-chips" data-f="' + esc(name) + '" data-multi="' + (multi ? '1' : '') + '">' +
+    return '<div class="gsf-chips" data-f="' + esc(name) + '" data-multi="' + (multi ? '1' : '') + '">' +
       list.map(function (v) {
         var on = sel.indexOf(v) >= 0;
-        return '<button type="button" class="crx-chip' + (on ? ' on' : '') + '" ' +
+        return '<button type="button" class="gsf-chip' + (on ? ' on' : '') + '" ' +
           'data-v="' + esc(v) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
           esc(lbl(v)) + '</button>';
       }).join('') + '</div>';
@@ -133,18 +133,50 @@
   }
 
   /*@3.CORJ.7*/
-  var dlg = null, ctx = null, state = null;
+  var dlg = null, ctx = null, state = null, _armed = false;
+
+  function outside(e) {
+    var r = dlg.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    return e.clientX < r.left || e.clientX > r.right ||
+           e.clientY < r.top  || e.clientY > r.bottom;
+  }
+
+  /*@3.CORJ.24*/
+  function askLeave() {
+    if (!state || !state.dirty) return true;
+    var foot = dlg.querySelector('.crx-foot');
+    if (!foot) return true;
+    var g = foot.querySelector('.gsf-guard');
+    if (!g) {
+      g = document.createElement('div');
+      g.className = 'gsf-guard';
+      g.innerHTML =
+        '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
+        '<p>' + esc(t('غيّرتَ ولم تحفظ بعد.', 'You have unsaved changes.')) + '</p>' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost" data-a="leave">' +
+          esc(t('أغلقْ بلا حفظ', 'Discard')) + '</button>' +
+        '<button type="button" class="gsf-btn gsf-btn--go" data-a="stay">' +
+          esc(t('أُكملُ', 'Keep editing')) + '</button>';
+      foot.insertBefore(g, foot.firstChild);
+    }
+    g.hidden = false;
+    var keep = g.querySelector('[data-a="stay"]');
+    if (keep) keep.focus();
+    return false;
+  }
 
   function ensureDlg() {
     if (dlg) return dlg;
     dlg = document.createElement('dialog');
-    dlg.className = 'crx';
+    dlg.className = 'gsf crx';
     /*@3.CORJ.8*/
     dlg.setAttribute('data-keep-open', '');
     dlg.innerHTML =
-      '<form method="dialog" class="crx-x"><button class="crx-close" aria-label="' +
-        esc(t('إغلاق', 'Close')) + '">✕</button></form>' +
-      '<div class="crx-body"></div>';
+      '<div class="gsf-grip" aria-hidden="true"></div>' +
+      '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' +
+        esc(t('إغلاق', 'Close')) + '"><i class="fa-solid fa-xmark"></i></button></form>' +
+      '<div class="crx-body gsf-body"></div>';
     document.body.appendChild(dlg);
     dlg.addEventListener('click', onClick);
     /*@3.CORJ.21*/
@@ -152,9 +184,14 @@
       if (e.target && e.target.getAttribute('data-f') === 'term') drawIns();
     });
     /*@3.CORJ.9*/
-    dlg.addEventListener('cancel', function (e) {
-      if (state && state.dirty && !confirm(t('تُغلق بلا حفظ؟', 'Close without saving?'))) e.preventDefault();
-    });
+    dlg.addEventListener('cancel', function (e) { if (!askLeave()) e.preventDefault(); });
+    /*@3.CORJ.23*/
+    dlg.addEventListener('mousedown', function (e) { _armed = (e.button === 0 && outside(e)); }, true);
+    dlg.addEventListener('click', function (e) {
+      var was = _armed; _armed = false;
+      if (!was || !outside(e)) return;
+      if (askLeave()) dlg.close();
+    }, true);
     return dlg;
   }
 
@@ -202,7 +239,7 @@
     var body =
       '<header class="crx-head">' +
         '<h2>' + esc(t('كيف هي المادة؟', 'How is this course?')) + '</h2>' +
-        '<p class="crx-sub"><span class="crx-code">' + esc(ctx.code) + '</span> ' + esc(ctx.name) + '</p>' +
+        '<p class="crx-sub"><span class="gsf-code">' + esc(ctx.code) + '</span> ' + esc(ctx.name) + '</p>' +
         (state.existing
           ? '<p class="crx-edit">' + esc(t('تعدّل تقييمَك السابق — ويمكنك سحبُه في أيِّ وقت.',
               'Editing your earlier rating — you can withdraw it any time.')) + '</p>'
@@ -211,7 +248,7 @@
 
       sec(t('أساسيات', 'Basics'),
         field(t('الفصل الذي درستَها فيه', 'Term you took it'),
-          '<select class="crx-in" data-f="term">' +
+          '<select class="gsf-in" data-gs data-f="term">' +
             '<option value="">' + esc(t('اختر…', 'Choose…')) + '</option>' +
             terms.map(function (x) {
               return '<option value="' + esc(x.term) + '"' +
@@ -222,7 +259,7 @@
 
         field(t('الدكتور (اختياريّ)', 'Instructor (optional)'),
           '<div class="crx-ins" data-ins>' +
-            '<input class="crx-in" type="hidden" data-f="instructor" value="' + esc(v.instructor || '') + '">' +
+            '<input class="gsf-in" type="hidden" data-f="instructor" value="' + esc(v.instructor || '') + '">' +
             '<div class="crx-ins-box"></div>' +
           '</div>',
           /*@3.CORJ.10*/
@@ -264,12 +301,12 @@
       sec(t('كيف تُذاكَر', 'How to study it'),
         field(t('أنفعُ ما فعلتَ', 'What helped most'), chips('helped', M.helped.opts, true, v.helped)) +
         field(t('نصيحةٌ لمن سيأخذها', 'Advice for the next student'),
-          '<textarea class="crx-in crx-ta" data-f="advice" rows="3" maxlength="300">' +
+          '<textarea class="gsf-in gsf-ta" data-f="advice" rows="3" maxlength="300">' +
             esc(v.advice || '') + '</textarea>')) +
 
       sec(t('اشرح المادةَ بكلماتك', 'Explain it in your words'),
         field(t('ما هذه المادةُ فعلاً؟', 'What is this course really?'),
-          '<textarea class="crx-in crx-ta" data-f="explain" rows="4" maxlength="500">' +
+          '<textarea class="gsf-in gsf-ta" data-f="explain" rows="4" maxlength="500">' +
             esc(v.explain || '') + '</textarea>',
           t('أوّلُ ما يقرؤه زميلُك.', 'The first thing your classmate reads.'))) +
 
@@ -279,18 +316,18 @@
         t('يوتيوب يظهر مباشرةً، وما عداه ينتظر مراجعةً قبل أن يراه غيرُك.',
           'YouTube appears immediately; other links await review.')) +
 
-      '<footer class="crx-foot">' +
+      '<footer class="gsf-foot crx-foot">' +
         '<p class="crx-msg" aria-live="polite"></p>' +
         (synced() ? '' :
           '<p class="crx-warn">' + esc(t(
             'لا مزامنةَ على هذا الجهاز — تقييمُك يُحفظ، ولكنّ تعديلَه لاحقاً مرتبطٌ بهذا المتصفّح وحدَه.',
             'No sync on this device — your rating saves, but editing it later works only in this browser.')) +
           '</p>') +
-        '<div class="crx-acts">' +
+        '<div class="gsf-acts">' +
           (state.existing
-            ? '<button type="button" class="crx-btn crx-btn--danger" data-a="withdraw">' +
+            ? '<button type="button" class="gsf-btn gsf-btn--danger" data-a="withdraw">' +
                 esc(t('اسحبْ تقييمي', 'Withdraw')) + '</button>' : '') +
-          '<button type="button" class="crx-btn crx-btn--go" data-a="save">' +
+          '<button type="button" class="gsf-btn gsf-btn--go" data-a="save">' +
             esc(state.existing ? t('احفظِ التعديل', 'Save changes') : t('أرسلْ تقييمي', 'Send')) +
           '</button>' +
         '</div>' +
@@ -299,6 +336,12 @@
     dlg.querySelector('.crx-body').innerHTML = body;
     drawRes();
     loadIns();
+    gsEnhance();
+  }
+
+  /*@3.CORJ.27*/
+  function gsEnhance() {
+    if (window.GardenSelect && GardenSelect.enhance) GardenSelect.enhance(dlg);
   }
 
   /*@3.CORJ.22*/
@@ -324,6 +367,46 @@
     return out;
   }
 
+  /*@3.CORJ.25*/
+  var TR = { 'ا': 'a', 'أ': 'a', 'إ': 'a', 'آ': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j',
+             'ح': 'h', 'خ': 'kh', 'د': 'd', 'ذ': 'th', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh',
+             'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+             'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'ة': '', 'و': 'w', 'ي': 'y',
+             'ى': 'y', 'ئ': 'y', 'ؤ': 'w', 'ء': '' };
+  function hasAr(s) { return /[؀-ۿ]/.test(String(s || '')); }
+  /*@3.CORJ.30*/
+  function tr(s) {
+    return String(s || '').replace(/[ً-ْـ]/g, '').replace(/[هة](?=\s|$)/g, '').split('')
+      .map(function (c) { return TR[c] !== undefined ? TR[c] : c; }).join('');
+  }
+  function lat(s) { return String(s || '').toLowerCase().replace(/[^a-z]/g, ''); }
+  function skel(s) { return lat(s).replace(/[aeiouwy]/g, '').replace(/(.)\1+/g, '$1'); }
+  function toks(s) {
+    return String(s || '').split(/[^A-Za-z]+/).filter(function (x) { return x.length > 1; });
+  }
+  /*@3.CORJ.28*/
+  function insScore(f, q) {
+    if (!q) return 1;
+    var ar = hasAr(q);
+    if (ar && f.a && String(f.a).indexOf(q) >= 0) return 4;
+    var base = ar ? tr(q) : q;
+    var ql = lat(base), qs = skel(base);
+    if (ql.length < 2) return 0;
+
+    var names = [String(f.n || '')];
+    if (f.a) names.push(tr(f.a));
+    var best = 0;
+    for (var i = 0; i < names.length; i++) {
+      if (lat(names[i]).indexOf(ql) >= 0) return 3;
+      var tk = toks(names[i]);
+      for (var j = 0; j < tk.length; j++) {
+        if (skel(tk[j]) === qs && qs) best = Math.max(best, 2);
+      }
+      if (!best && qs.length >= 2 && skel(names[i]).indexOf(qs) >= 0) best = 1;
+    }
+    return best;
+  }
+
   function drawIns() {
     var box = dlg.querySelector('.crx-ins-box');
     if (!box || !_ins) return;
@@ -331,40 +414,72 @@
     var term = readIn('term');
 
     if (picked) {
-      box.innerHTML = '<div class="crx-ins-on">' +
-        '<i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>' +
+      var src = box.getAttribute('data-src');
+      var known = _ins.list.some(function (f) {
+        return String(f.n || '').replace(/[\s,.]+/g, '').toLowerCase() ===
+               String(picked).replace(/[\s,.]+/g, '').toLowerCase();
+      });
+      var free = src === 'typed' || (src !== 'archive' && !known);
+      box.innerHTML = '<div class="crx-ins-on' + (free ? ' is-free' : '') + '">' +
+        '<i class="fa-solid ' + (free ? 'fa-user-pen' : 'fa-chalkboard-user') + '" aria-hidden="true"></i>' +
         '<b>' + esc(picked) + '</b>' +
+        (free ? '<span class="crx-ins-tag">' +
+            esc(t('غيرُ مؤكَّدٍ من الأرشيف', 'Not matched in archive')) + '</span>' : '') +
         '<button type="button" class="crx-ins-x" data-a="ins-clear" aria-label="' +
-          esc(t('أزلْ', 'Clear')) + '">✕</button></div>';
-      return;
-    }
-    if (!_ins.list.length) {
-      box.innerHTML = '<p class="crx-ins-none">' + esc(t(
-        'لا أرشيفَ شعبٍ لهذه المادة — اتركِ الحقلَ فارغاً.',
-        'No section archive for this course — leave it empty.')) + '</p>';
+          esc(t('أزلْ', 'Clear')) + '"><i class="fa-solid fa-xmark"></i></button></div>';
       return;
     }
 
-    var q = (box.getAttribute('data-q') || '').trim().toLowerCase();
+    var q = (box.getAttribute('data-q') || '').trim();
     var here = [], past = [];
     _ins.list.forEach(function (f) {
-      if (q && String(f.n || '').toLowerCase().indexOf(q) < 0) return;
+      var sc = insScore(f, q);
+      if (!sc) return;
+      f._sc = sc;
       (term && insTermOf(f)[term] ? here : past).push(f);
     });
+    /*@3.CORJ.29*/
+    if (q) {
+      var byScore = function (a, b) { return b._sc - a._sc; };
+      here.sort(byScore); past.sort(byScore);
+    }
 
     function rows(list) {
       return list.slice(0, 40).map(function (f) {
         var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
         return '<button type="button" class="crx-ins-i" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
           '<span class="crx-ins-n">' + esc(f.n) + '</span>' +
+          (f.a ? '<span class="crx-ins-ar">' + esc(f.a) + '</span>' : '') +
           '<span class="crx-ins-m">' + esc(String(f.c || 0)) + ' ' +
             esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : '') + '</span>' +
         '</button>';
       }).join('');
     }
 
+    /*@3.CORJ.26*/
+    var freeBox = box.getAttribute('data-free') === '1'
+      ? '<div class="crx-ins-free">' +
+          '<input class="gsf-in" data-ins-free-in maxlength="120" value="' + esc(q) + '" ' +
+            'placeholder="' + esc(t('اسمُ الدكتور كما تعرفه', 'Instructor name as you know it')) + '">' +
+          '<button type="button" class="gsf-btn gsf-btn--go" data-a="ins-free-ok">' +
+            esc(t('أثبتْه', 'Use it')) + '</button>' +
+        '</div>'
+      : '<div class="crx-ins-free">' +
+          '<p>' + esc(t('لم تجدْه؟ قد يكون درّسها ولم تُسجَّل شعبتُه في بانر.',
+                        'Not there? He may have taught it without a Banner record.')) + '</p>' +
+          '<button type="button" class="gsf-btn" data-a="ins-free">' +
+            esc(t('اكتبِ الاسمَ يدويّاً', 'Type the name')) + '</button>' +
+        '</div>';
+
+    if (!_ins.list.length) {
+      box.innerHTML = '<p class="crx-ins-none">' + esc(t(
+        'لا أرشيفَ شعبٍ لهذه المادة.', 'No section archive for this course.')) + '</p>' + freeBox;
+      bindIns(box);
+      return;
+    }
+
     box.innerHTML =
-      '<input class="crx-in crx-ins-q" type="search" data-ins-q value="' + esc(q) +
+      '<input class="gsf-in crx-ins-q" type="search" data-ins-q value="' + esc(q) +
         '" placeholder="' + esc(t('ابحث باسم الدكتور…', 'Search by instructor name…')) + '" ' +
         'autocomplete="off" spellcheck="false">' +
       (here.length
@@ -379,8 +494,13 @@
         : '') +
       (!here.length && !past.length
         ? '<p class="crx-ins-none">' + esc(t('لا اسمَ يطابق بحثَك.', 'No name matches.')) + '</p>'
-        : '');
+        : '') +
+      freeBox;
 
+    bindIns(box);
+  }
+
+  function bindIns(box) {
     var qi = box.querySelector('[data-ins-q]');
     if (qi) {
       qi.addEventListener('input', function () {
@@ -390,6 +510,24 @@
         if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
       });
     }
+    var fi = box.querySelector('[data-ins-free-in]');
+    if (fi) {
+      fi.focus();
+      fi.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); pickFree(fi.value); }
+      });
+    }
+  }
+
+  function pickFree(name) {
+    var v = String(name || '').trim().replace(/\s+/g, ' ');
+    if (v.length < 3) return;
+    var box = dlg.querySelector('.crx-ins-box');
+    var el = dlg.querySelector('[data-f="instructor"]');
+    if (el) el.value = v;
+    if (box) { box.setAttribute('data-src', 'typed'); box.removeAttribute('data-free'); }
+    state.dirty = true;
+    drawIns();
   }
 
   /*@3.CORJ.12*/
@@ -398,14 +536,14 @@
     if (!box) return;
     box.innerHTML = state.res.map(function (r, i) {
       return '<div class="crx-r" data-i="' + i + '">' +
-        '<input class="crx-in" type="url" data-rf="url" placeholder="https://…" value="' + esc(r.url || '') + '">' +
-        '<input class="crx-in" type="text" data-rf="title" maxlength="120" placeholder="' +
+        '<input class="gsf-in" type="url" data-rf="url" placeholder="https://…" value="' + esc(r.url || '') + '">' +
+        '<input class="gsf-in" type="text" data-rf="title" maxlength="120" placeholder="' +
           esc(t('العنوان', 'Title')) + '" value="' + esc(r.title || '') + '">' +
-        '<select class="crx-in" data-rf="kind">' +
+        '<select class="gsf-in" data-gs data-rf="kind">' +
           (_opts.resKind || []).map(function (k) {
             return '<option value="' + esc(k) + '"' + (r.kind === k ? ' selected' : '') + '>' + esc(lbl(k)) + '</option>';
           }).join('') + '</select>' +
-        '<input class="crx-in" type="text" data-rf="why" maxlength="160" placeholder="' +
+        '<input class="gsf-in" type="text" data-rf="why" maxlength="160" placeholder="' +
           esc(t('لماذا نفعك؟', 'Why it helped')) + '" value="' + esc(r.why || '') + '">' +
         '<button type="button" class="crx-rdel" data-a="delres">✕</button>' +
         '</div>';
@@ -413,11 +551,12 @@
     var add = dlg.querySelector('.crx-addres');
     /*@3.CORJ.13*/
     if (add) add.hidden = state.res.length >= 3;
+    gsEnhance();
   }
 
   /*@3.CORJ.14*/
   function onClick(e) {
-    var chip = e.target.closest && e.target.closest('.crx-chip');
+    var chip = e.target.closest && e.target.closest('.gsf-chip');
     if (chip) { toggleChip(chip); return; }
     var b = e.target.closest && e.target.closest('[data-a]');
     if (!b) return;
@@ -429,6 +568,8 @@
     if (a === 'ins-pick') {
       var el = dlg.querySelector('[data-f="instructor"]');
       if (el) el.value = b.getAttribute('data-n') || '';
+      var bx = dlg.querySelector('.crx-ins-box');
+      if (bx) bx.setAttribute('data-src', 'archive');
       state.dirty = true;
       drawIns();
       return;
@@ -436,10 +577,25 @@
     if (a === 'ins-clear') {
       var el2 = dlg.querySelector('[data-f="instructor"]');
       if (el2) el2.value = '';
+      var bx2 = dlg.querySelector('.crx-ins-box');
+      if (bx2) { bx2.removeAttribute('data-src'); bx2.removeAttribute('data-free'); }
       state.dirty = true;
       drawIns();
       return;
     }
+    if (a === 'ins-free') {
+      var bx3 = dlg.querySelector('.crx-ins-box');
+      if (bx3) bx3.setAttribute('data-free', '1');
+      drawIns();
+      return;
+    }
+    if (a === 'ins-free-ok') {
+      var fin = dlg.querySelector('[data-ins-free-in]');
+      pickFree(fin ? fin.value : '');
+      return;
+    }
+    if (a === 'stay') { var g = b.closest('.gsf-guard'); if (g) g.hidden = true; return; }
+    if (a === 'leave') { state.dirty = false; dlg.close(); return; }
     if (a === 'save') { save(b); return; }
     if (a === 'withdraw') { withdraw(b); return; }
   }
@@ -453,7 +609,7 @@
       if (!on) { chip.classList.add('on'); chip.setAttribute('aria-pressed', 'true'); }
     } else {
       var max = (_opts.multi[f] || {}).max || 99;
-      var n = box.querySelectorAll('.crx-chip.on').length;
+      var n = box.querySelectorAll('.gsf-chip.on').length;
       if (!on && n >= max) { flash(t('حتى ' + max + ' خيارات', 'Up to ' + max)); return; }
       chip.classList.toggle('on', !on);
       chip.setAttribute('aria-pressed', on ? 'false' : 'true');
@@ -462,9 +618,9 @@
   }
 
   function readChips(f) {
-    var box = dlg.querySelector('.crx-chips[data-f="' + f + '"]');
+    var box = dlg.querySelector('.gsf-chips[data-f="' + f + '"]');
     if (!box) return null;
-    var on = [].map.call(box.querySelectorAll('.crx-chip.on'), function (c) { return c.getAttribute('data-v'); });
+    var on = [].map.call(box.querySelectorAll('.gsf-chip.on'), function (c) { return c.getAttribute('data-v'); });
     return box.getAttribute('data-multi') ? on : (on[0] || null);
   }
   function readIn(f) {
@@ -565,8 +721,13 @@
   }
 
   /*@3.CORJ.19*/
+  /*@3.CORJ.31*/
   document.addEventListener('input', function (e) {
-    if (state && dlg && dlg.contains(e.target)) state.dirty = true;
+    if (!state || !dlg || !dlg.contains(e.target)) return;
+    var el = e.target;
+    if (!el.hasAttribute) return;
+    if (!el.hasAttribute('data-f') && !el.hasAttribute('data-rf')) return;
+    state.dirty = true;
   }, true);
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.crx-addres');
