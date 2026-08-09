@@ -189,12 +189,21 @@
       '<div class="gsf-grip" aria-hidden="true"></div>' +
       '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' +
         esc(t('إغلاق', 'Close')) + '"><i class="fa-solid fa-xmark"></i></button></form>' +
-      '<div class="crx-body gsf-body"></div>';
+      '<div class="crx-body gsf-body"></div>' +
+      /*@3.CORJ.37*/
+      '<footer class="gsf-foot crx-foot" hidden></footer>';
     document.body.appendChild(dlg);
     dlg.addEventListener('click', onClick);
     /*@3.CORJ.21*/
     dlg.addEventListener('change', function (e) {
-      if (e.target && e.target.getAttribute('data-f') === 'term') drawIns();
+      if (e.target && e.target.getAttribute('data-f') === 'term') drawInsRes();
+    });
+    /*@3.CORJ.43*/
+    dlg.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' || !e.target || !e.target.hasAttribute) return;
+      if (!e.target.hasAttribute('data-ins-free-in')) return;
+      e.preventDefault();
+      pickFree(e.target.value);
     });
     /*@3.CORJ.9*/
     dlg.addEventListener('cancel', function (e) { if (!askLeave()) e.preventDefault(); });
@@ -215,6 +224,7 @@
             instructor: o.instructor || '', onSaved: o.onSaved };
     state = { dirty: false, vals: {}, res: [], existing: null };
     var d = ensureDlg();
+    d.querySelector('.crx-foot').hidden = true;
     d.querySelector('.crx-body').innerHTML = '<p class="crx-load">' + esc(t('يُحمَّل…', 'Loading…')) + '</p>';
     if (!d.open) d.showModal();
 
@@ -335,9 +345,10 @@
         '<div class="crx-res"></div>' +
         '<button type="button" class="crx-addres">+ ' + esc(t('أضف مصدراً', 'Add a resource')) + '</button>',
         t('يوتيوب يظهر مباشرةً، وما عداه ينتظر مراجعةً قبل أن يراه غيرُك.',
-          'YouTube appears immediately; other links await review.'), 'link') +
+          'YouTube appears immediately; other links await review.'), 'link');
 
-      '<footer class="gsf-foot crx-foot">' +
+    /*@3.CORJ.44*/
+    var foot =
         '<p class="crx-msg" aria-live="polite"></p>' +
         (synced() ? '' :
           '<p class="crx-warn">' + esc(t(
@@ -351,10 +362,12 @@
           '<button type="button" class="gsf-btn gsf-btn--go" data-a="save">' +
             esc(state.existing ? t('احفظِ التعديل', 'Save changes') : t('أرسلْ تقييمي', 'Send')) +
           '</button>' +
-        '</div>' +
-      '</footer>';
+        '</div>';
 
     dlg.querySelector('.crx-body').innerHTML = body;
+    var fx = dlg.querySelector('.crx-foot');
+    fx.innerHTML = foot;
+    fx.hidden = false;
     drawRes();
     loadIns();
     gsEnhance();
@@ -453,7 +466,6 @@
     var box = dlg.querySelector('.crx-ins-box');
     if (!box || !_ins) return;
     var picked = readIn('instructor');
-    var term = readIn('term');
 
     if (picked) {
       var src = box.getAttribute('data-src');
@@ -472,7 +484,65 @@
       return;
     }
 
+    /*@3.CORJ.38*/
+    if (!_ins.list.length) {
+      box.innerHTML = '<p class="crx-ins-none">' + esc(t(
+        'لا أرشيفَ شعبٍ لهذه المادة.', 'No section archive for this course.')) + '</p>' +
+        insFree(box, (box.getAttribute('data-q') || '').trim());
+      return;
+    }
+
+    box.innerHTML =
+      '<input class="gsf-in crx-ins-q" type="search" data-ins-q value="' +
+        esc(box.getAttribute('data-q') || '') +
+        '" placeholder="' + esc(t('ابحث باسم الدكتور…', 'Search by instructor name…')) + '" ' +
+        'autocomplete="off" spellcheck="false">' +
+      '<div class="crx-ins-res"></div>';
+
+    bindIns(box);
+    drawInsRes();
+  }
+
+  /*@3.CORJ.36*/
+  function insRows(list) {
+    return list.slice(0, 40).map(function (f) {
+      var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
+      var lead = (isAr() && f.a) ? f.a : f.n;
+      var sub  = (isAr() && f.a) ? f.n : (f.a || '');
+      return '<button type="button" class="crx-ins-i" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
+        '<span class="crx-ins-n">' + esc(lead) + '</span>' +
+        (sub ? '<span class="crx-ins-ar">' + esc(sub) + '</span>' : '') +
+        '<span class="crx-ins-m">' + esc(String(f.c || 0)) + ' ' +
+          esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : '') + '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  /*@3.CORJ.26*/
+  function insFree(box, q) {
+    return box.getAttribute('data-free') === '1'
+      ? '<div class="crx-ins-free">' +
+          '<input class="gsf-in" data-ins-free-in maxlength="120" value="' + esc(q) + '" ' +
+            'placeholder="' + esc(t('اسمُ الدكتور كما تعرفه', 'Instructor name as you know it')) + '">' +
+          '<button type="button" class="gsf-btn gsf-btn--go" data-a="ins-free-ok">' +
+            esc(t('أثبتْه', 'Use it')) + '</button>' +
+        '</div>'
+      : '<div class="crx-ins-free">' +
+          '<p>' + esc(t('لم تجدْه؟ قد يكون درّسها ولم تُسجَّل شعبتُه في بانر.',
+                        'Not there? He may have taught it without a Banner record.')) + '</p>' +
+          '<button type="button" class="gsf-btn" data-a="ins-free">' +
+            esc(t('اكتبِ الاسمَ يدويّاً', 'Type the name')) + '</button>' +
+        '</div>';
+  }
+
+  /*@3.CORJ.39*/
+  function drawInsRes() {
+    var box = dlg.querySelector('.crx-ins-box');
+    var res = box && box.querySelector('.crx-ins-res');
+    if (!res || !_ins) return;
+
     var q = (box.getAttribute('data-q') || '').trim();
+    var term = readIn('term');
     var here = [], past = [];
     _ins.list.forEach(function (f) {
       var sc = insScore(f, q);
@@ -486,82 +556,47 @@
       here.sort(byScore); past.sort(byScore);
     }
 
-    /*@3.CORJ.36*/
-    function rows(list) {
-      return list.slice(0, 40).map(function (f) {
-        var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
-        var lead = (isAr() && f.a) ? f.a : f.n;
-        var sub  = (isAr() && f.a) ? f.n : (f.a || '');
-        return '<button type="button" class="crx-ins-i" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
-          '<span class="crx-ins-n">' + esc(lead) + '</span>' +
-          (sub ? '<span class="crx-ins-ar">' + esc(sub) + '</span>' : '') +
-          '<span class="crx-ins-m">' + esc(String(f.c || 0)) + ' ' +
-            esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : '') + '</span>' +
-        '</button>';
-      }).join('');
+    /*@3.CORJ.40*/
+    var list;
+    if (box.getAttribute('data-open') !== '1' && !q) {
+      list = '<p class="crx-ins-shut">' +
+        esc(t('اضغطِ الحقلَ أعلاه لتبحثَ في ', 'Tap the field above to search ')) +
+        esc(String(_ins.list.length)) +
+        esc(t(' اسماً درّسوا هذه المادة.', ' instructors who taught this course.')) + '</p>';
+    } else {
+      list =
+        (here.length
+          ? '<p class="crx-ins-h">' + esc(t('درّسها في الفصل الذي اخترتَه', 'Taught it in your chosen term')) +
+            '</p><div class="crx-ins-l">' + insRows(here) + '</div>'
+          : '') +
+        (past.length
+          ? '<p class="crx-ins-h">' + esc(term && here.length
+              ? t('ودرّسها في فصولٍ أخرى', 'And taught it in other terms')
+              : t('من درّسها سابقاً', 'Taught it previously')) +
+            '</p><div class="crx-ins-l">' + insRows(past) + '</div>'
+          : '') +
+        (!here.length && !past.length
+          ? '<p class="crx-ins-none">' + esc(t('لا اسمَ يطابق بحثَك.', 'No name matches.')) + '</p>'
+          : '');
     }
 
-    /*@3.CORJ.26*/
-    var freeBox = box.getAttribute('data-free') === '1'
-      ? '<div class="crx-ins-free">' +
-          '<input class="gsf-in" data-ins-free-in maxlength="120" value="' + esc(q) + '" ' +
-            'placeholder="' + esc(t('اسمُ الدكتور كما تعرفه', 'Instructor name as you know it')) + '">' +
-          '<button type="button" class="gsf-btn gsf-btn--go" data-a="ins-free-ok">' +
-            esc(t('أثبتْه', 'Use it')) + '</button>' +
-        '</div>'
-      : '<div class="crx-ins-free">' +
-          '<p>' + esc(t('لم تجدْه؟ قد يكون درّسها ولم تُسجَّل شعبتُه في بانر.',
-                        'Not there? He may have taught it without a Banner record.')) + '</p>' +
-          '<button type="button" class="gsf-btn" data-a="ins-free">' +
-            esc(t('اكتبِ الاسمَ يدويّاً', 'Type the name')) + '</button>' +
-        '</div>';
-
-    if (!_ins.list.length) {
-      box.innerHTML = '<p class="crx-ins-none">' + esc(t(
-        'لا أرشيفَ شعبٍ لهذه المادة.', 'No section archive for this course.')) + '</p>' + freeBox;
-      bindIns(box);
-      return;
-    }
-
-    box.innerHTML =
-      '<input class="gsf-in crx-ins-q" type="search" data-ins-q value="' + esc(q) +
-        '" placeholder="' + esc(t('ابحث باسم الدكتور…', 'Search by instructor name…')) + '" ' +
-        'autocomplete="off" spellcheck="false">' +
-      (here.length
-        ? '<p class="crx-ins-h">' + esc(t('درّسها في الفصل الذي اخترتَه', 'Taught it in your chosen term')) +
-          '</p><div class="crx-ins-l">' + rows(here) + '</div>'
-        : '') +
-      (past.length
-        ? '<p class="crx-ins-h">' + esc(term && here.length
-            ? t('ودرّسها في فصولٍ أخرى', 'And taught it in other terms')
-            : t('من درّسها سابقاً', 'Taught it previously')) +
-          '</p><div class="crx-ins-l">' + rows(past) + '</div>'
-        : '') +
-      (!here.length && !past.length
-        ? '<p class="crx-ins-none">' + esc(t('لا اسمَ يطابق بحثَك.', 'No name matches.')) + '</p>'
-        : '') +
-      freeBox;
-
-    bindIns(box);
+    res.innerHTML = list + insFree(box, q);
   }
 
+  /*@3.CORJ.41*/
   function bindIns(box) {
     var qi = box.querySelector('[data-ins-q]');
-    if (qi) {
-      qi.addEventListener('input', function () {
-        box.setAttribute('data-q', qi.value);
-        drawIns();
-        var again = box.querySelector('[data-ins-q]');
-        if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
-      });
-    }
-    var fi = box.querySelector('[data-ins-free-in]');
-    if (fi) {
-      fi.focus();
-      fi.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); pickFree(fi.value); }
-      });
-    }
+    if (!qi) return;
+    qi.addEventListener('input', function () {
+      box.setAttribute('data-q', qi.value);
+      box.setAttribute('data-open', '1');
+      drawInsRes();
+    });
+    qi.addEventListener('focus', function () {
+      if (box.getAttribute('data-open') === '1') return;
+      box.setAttribute('data-open', '1');
+      drawInsRes();
+    });
   }
 
   function pickFree(name) {
@@ -631,7 +666,10 @@
     if (a === 'ins-free') {
       var bx3 = dlg.querySelector('.crx-ins-box');
       if (bx3) bx3.setAttribute('data-free', '1');
-      drawIns();
+      /*@3.CORJ.42*/
+      if (bx3 && bx3.querySelector('.crx-ins-res')) drawInsRes(); else drawIns();
+      var fi3 = dlg.querySelector('[data-ins-free-in]');
+      if (fi3) fi3.focus();
       return;
     }
     if (a === 'ins-free-ok') {

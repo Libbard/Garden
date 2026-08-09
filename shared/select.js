@@ -376,9 +376,12 @@
     pop.style.minWidth = Math.round(r.width) + 'px';
     pop.style.maxWidth = Math.round(Math.min(padR - padL, Math.max(r.width, 340))) + 'px';
 
-    /*@3.SELJ.27*/
-    pop.style.insetBlockStart = '-9999px';
-    var ph = pop.getBoundingClientRect().height;
+    /*@3.SELJ.41*/
+    pop.style.maxHeight = 'none';
+    pop.style.top = '0px';
+    pop.style.left = '0px';
+    var o = pop.getBoundingClientRect();
+    var ox = o.left, oy = o.top, ph = o.height, w = o.width;
 
     /*@3.SELJ.40*/
     var CAP = 320;
@@ -389,14 +392,15 @@
     top = Math.max(padT, Math.min(top, padB - Math.min(ph, room)));
     pop.classList.toggle('is-up', flip);
     pop.style.maxHeight = Math.round(room) + 'px';
-    pop.style.top = Math.round(top) + 'px';
 
     /*@3.SELJ.28*/
-    var w = pop.getBoundingClientRect().width;
     var rtl = (document.documentElement.getAttribute('dir') || 'rtl') === 'rtl';
     var left = rtl ? (r.right - w) : r.left;
     left = Math.max(padL, Math.min(left, padR - w));
-    pop.style.left = Math.round(left) + 'px';
+
+    /*@3.SELJ.42*/
+    pop.style.top = Math.round(top - oy) + 'px';
+    pop.style.left = Math.round(left - ox) + 'px';
   };
 
   /*@3.SELJ.29*/
