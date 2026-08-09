@@ -11,7 +11,8 @@
     'ratings.faculty.enabled': true,
     'labs.publicNav': true,
     'banner.syncEnabled': true,
-    'alerts.enabled': true
+    'alerts.enabled': true,
+    'telemetry.enabled': true
   };
 
   /*@3.GARJ.3*/
@@ -220,7 +221,10 @@
   function applyTheme(theme) {
     currentTheme = theme;
     document.documentElement.setAttribute('data-theme', theme);
+    /*@3.GARJ.552*/
+    var _prevTheme = localStorage.getItem('garden_theme');
     localStorage.setItem('garden_theme', theme);
+    if (_prevTheme && _prevTheme !== theme) window.GardenEv('theme_switch', { t: theme });
     updateThemeColorMeta(theme);
     const icon = document.getElementById('theme-icon');
     if (icon) icon.innerHTML = '<i class="'
@@ -272,7 +276,9 @@
     const html = document.documentElement;
     html.setAttribute('lang', lang);
     html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    var _prevLang = localStorage.getItem('garden_lang');
     localStorage.setItem('garden_lang', lang);
+    if (_prevLang && _prevLang !== lang) window.GardenEv('lang_switch', { l: lang });
 
     localize(document, lang);
     document.querySelectorAll('[data-bilingual]').forEach(container => {
@@ -826,6 +832,9 @@
     const c = document.getElementById('fc-card');
     const g = document.getElementById('fc-grades');
     if (c) c.classList.toggle('flipped');
+    if (c && c.classList.contains('flipped')) window.GardenEv('card_flip', {
+      s: document.documentElement.getAttribute('data-subject') || ''
+    });
     if (g) g.classList.toggle('hidden', !c?.classList.contains('flipped'));
     /*@3.GARJ.59*/
     if (c && c.classList.contains('flipped') && !tapSeen()) {
@@ -1713,6 +1722,8 @@
     window._gardenQuiz.current = 0;
     window._gardenQuiz.score = 0;
     window._gardenQuiz.answered = false;
+    window._gardenQuiz.marks = [];
+    window._gardenQuiz.started = false;
     liveScore();
     renderQuestion();
   }
@@ -1763,6 +1774,17 @@
     const btns = document.querySelectorAll('.mcq-option');
     btns.forEach(b => b.disabled = true);
     const ok = idx === item.correctIndex;
+    if (!q.marks) q.marks = [];
+    q.marks[q.current] = ok ? 1 : 0;
+    /*@3.GARJ.553*/
+    if (!q.started) {
+      q.started = true;
+      window.GardenEv('quiz_start', {
+        s: document.documentElement.getAttribute('data-subject') || '',
+        m: document.documentElement.getAttribute('data-module') || '',
+        n: (q.questions || []).length
+      });
+    }
     if (ok) { btns[idx]?.classList.add('correct'); q.score++; }
     else { btns[idx]?.classList.add('wrong'); btns[item.correctIndex]?.classList.add('correct'); }
     liveScore();
@@ -1809,6 +1831,12 @@
       /*@3.GARJ.126*/
       localStorage.setItem('__syncT_' + quizLogKey(code), String(Date.now()));
     } catch (e) { return null; }
+    var _q = window._gardenQuiz;
+    var _marks = (_q && Array.isArray(_q.marks) && _q.marks.length === Math.round(total)) ? _q.marks : null;
+    window.GardenEv('quiz_submit', {
+      s: code, k: kind, sc: Math.round(score), t: Math.round(total),
+      pct: Math.round(score / total * 100), items: _marks
+    });
     return log[log.length - 1];
   }
 
@@ -1861,7 +1889,7 @@
   }
 
   function retryQuiz() {
-    const q = window._gardenQuiz; q.current = 0; q.score = 0; q.answered = false; liveScore();
+    const q = window._gardenQuiz; q.current = 0; q.score = 0; q.answered = false; q.marks = []; q.started = false; liveScore();
     document.getElementById('quiz-content')?.classList.remove('hidden');
     document.getElementById('quiz-results')?.classList.add('hidden');
     renderQuestion();
@@ -4598,9 +4626,7 @@
       while (arr.length > 200) arr.shift();
       localStorage.setItem(KEY, JSON.stringify(arr));
     } catch (e) { }
-    if (typeof window.gtag === 'function') {
-      try { window.gtag('event', 'ai_explain_feedback', Object.assign({ vote }, meta)); } catch (e) { }
-    }
+    window.GardenEv('ai_explain_feedback', Object.assign({ vote: vote }, meta));
   }
 
   /*@3.GARJ.328*/
@@ -5009,6 +5035,11 @@ ${baseRules}`) + regenSuffix;
 
     const overlay = document.createElement('div');
     overlay.className = 'ai-modal-overlay';
+    window.GardenEv('ai_open', {
+      s: document.documentElement.getAttribute('data-subject') || '',
+      m: document.documentElement.getAttribute('data-module') || '',
+      ctype: cardData && cardData.type, intent: intent.scope + '-' + intent.style
+    });
     overlay.innerHTML = `
       <div class="ai-modal">
         <div class="ai-modal-header">
@@ -5165,8 +5196,14 @@ ${baseRules}`) + regenSuffix;
         streamEl.textContent = full; /*@3.GARJ.376*/
         scrollBottom();
       };
+      var _t0 = Date.now();
       callAI(messages, onDelta, onThinking).then(result => {
         busy = false;
+        window.GardenEv('ai_answer', {
+          ms: Date.now() - _t0,
+          ch: (result && result.text) ? result.text.length : 0,
+          err: (result && result.error) ? 1 : 0
+        });
         restoreRegenBtn();
         if (!document.body.contains(overlay)) return;
         if (result.error || !result.text) {
@@ -5249,6 +5286,7 @@ ${baseRules}`) + regenSuffix;
     /*@3.GARJ.379*/
     function followUp(msgText, displayText) {
       if (busy || !msgText || !thread.length) return;
+      window.GardenEv('ai_followup', { turns: Math.max(0, Math.round((thread.length - 1) / 2)) });
       busy = true;
       const q = document.createElement('div');
       q.className = 'ai-user-q';
@@ -6745,4 +6783,23 @@ ${baseRules}`) + regenSuffix;
     if (!dlg || candidate(e) !== dlg) return;
     try { dlg.close(); } catch (err) {}
   }, true);
+})();
+
+/*@3.GARJ.551*/
+window.GardenEv = window.GardenEv || function (n, p) {
+  (window.__gtq = window.__gtq || []).push([n, p, Date.now()]);
+  if (window.__gtq.length > 40) window.__gtq.shift();
+};
+
+/*@3.GARJ.549*/ /*@3.GARJ.550*/
+; (function () {
+  'use strict';
+  if (window.GardenTelemetry || document.getElementById('gt-boot')) return;
+  var s = document.currentScript;
+  var root = (s && s.src) ? s.src.replace(/shared\/garden\.js(\?.*)?$/, '') : '';
+  var el = document.createElement('script');
+  el.id = 'gt-boot';
+  el.src = root + 'shared/garden-telemetry.js';
+  el.async = true;
+  (document.head || document.documentElement).appendChild(el);
 })();

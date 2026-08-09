@@ -173,6 +173,7 @@
 
   function fresh(reg, key) {
     /*@3.PUCJ.18*/
+    window.GardenEv('notif_enable', {});
     return reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlB64ToU8(key)

@@ -144,6 +144,7 @@
   function toggle(kind, term, target) {
     target = String(target).toUpperCase();
     var on = has(kind, term, target);
+    window.GardenEv('sect_watch', { kind: kind, off: on ? 1 : 0 });
     var row = { kind: kind, term: term, target: target, armed: true, fires: 0,
                 created_at: new Date().toISOString(), pending: true };
 

@@ -45,6 +45,7 @@
   function renderChart() {
     var svg = el('fc-chart');
     if (!svg) return;
+    window.GardenEv('gpa_forecast', {});
     var data = buildPoints();
     var pts = data.pts;
 

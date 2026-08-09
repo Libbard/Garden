@@ -261,6 +261,9 @@
     a.className = 'lx-lab';
     a.href = ROOT + lab.route;
     a.setAttribute('data-lab-id', lab.id);
+    a.addEventListener('click', function () {
+      window.GardenEv('lab_open', { id: lab.id, why: why || 'browse' });
+    });
 
     var icon = (cat && cat.icon) || 'fa-flask';
     var codes = coursesOf(lab);

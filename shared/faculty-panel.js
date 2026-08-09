@@ -450,6 +450,7 @@
     btn.disabled = true;
     msg.className = 'fc-r-msg';
     msg.textContent = t('يُرسَل…', 'Sending…');
+    window.GardenEv('rate_faculty', {});
     fetch(API + '/v1/faculty/rate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     })

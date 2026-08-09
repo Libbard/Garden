@@ -241,7 +241,11 @@
   function openDoc(title, bodyHtml, geom) {
     var isA = ar();
     var win = window.open('', '_blank');
-    if (!win) { alert(T('مانع النوافذ منع الطباعة', 'Popup blocked')); return; }
+    if (!win) {
+      window.GardenEv('sched_print', { ok: 0, why: 'popup_blocked' });
+      alert(T('مانع النوافذ منع الطباعة', 'Popup blocked')); return;
+    }
+    window.GardenEv('sched_print', { ok: 1 });
     win.document.write('<!DOCTYPE html><html dir="' + (isA ? 'rtl' : 'ltr') + '" lang="' + (isA ? 'ar' : 'en') + '"><head>' +
       '<meta charset="UTF-8"><title>' + esc(title) + '</title>' +
       '<link rel="preconnect" href="https://fonts.googleapis.com">' +

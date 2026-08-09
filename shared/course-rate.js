@@ -839,6 +839,7 @@
 
     btn.disabled = true;
     flash(t('يُرسَل…', 'Sending…'));
+    window.GardenEv('rate_course', { s: b && b.course, has_grade: b && b.grade ? 1 : 0 });
     post('/v1/courses/rate', b).then(function (x) {
       btn.disabled = false;
       if (x.s === 403) { flash(t('التقييمُ مغلقٌ حالياً.', 'Ratings are closed right now.'), true); return; }

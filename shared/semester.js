@@ -823,6 +823,7 @@
   function save() {
     if (!S.sem) return;
     S.sem.updated_at = new Date().toISOString();
+    window.GardenEv('sem_edit', { n: ((S.sem && S.sem.courses) || []).length });
     try { localStorage.setItem('my_semester', JSON.stringify(S.sem)); } catch (e) {}
     try { localStorage.setItem('__syncT_my_semester', String(Date.now())); } catch (e) {}
   }

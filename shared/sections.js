@@ -2758,7 +2758,10 @@
   function bind() {
     $('#sx-q').addEventListener('input', function (e) {
       state.q = e.target.value; clearTimeout(bind._t);
-      bind._t = setTimeout(apply, 180);
+      bind._t = setTimeout(function () {
+        apply();
+        window.GardenEv('sect_search', { len: String(state.q || '').length });
+      }, 180);
     });
     /*@3.SECJ.298*/
     $$('.gs-me:not([multiple])').forEach(function (host) {

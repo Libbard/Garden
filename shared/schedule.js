@@ -256,6 +256,7 @@
   function save() {
     schedule.updated_at = new Date().toISOString();
     try { localStorage.setItem(LS_KEY, JSON.stringify(schedule)); } catch (e) {}
+    window.GardenEv('sched_edit', { n: (schedule.entries || []).length });
   }
 
   /*@3.SCHJ.39*/
