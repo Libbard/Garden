@@ -24,14 +24,16 @@
   }
 
   /*@3.FAPJ.2*/
-  var DATA = null, LOADING = null, WAIT = [];
+  var DATA = null, LOADING = null, WAIT = [], FRESH = false;
 
   function load(cb) {
     if (DATA) { cb && cb(DATA); return; }
     if (cb) WAIT.push(cb);
     if (LOADING) return;
     LOADING = true;
-    fetch(API + '/v1/faculty.json', { cache: 'default' })
+    /*@3.FAPJ.16*/
+    var want = FRESH; FRESH = false;
+    fetch(API + '/v1/faculty.json', { cache: want ? 'reload' : 'default' })
       .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); })
       .then(function (d) {
         DATA = d; LOADING = false;
@@ -224,7 +226,10 @@
       : '<div class="fc-f"><label>' + t('اسم الأستاذ', 'Instructor name') + '</label>' +
         '<input class="sx-search fc-in" id="fc-r-who" autocomplete="off" placeholder="' +
         esc(t('اكتب اسمه كما تعرفه', 'Type their name')) + '">' +
-        '<div class="fc-sug" id="fc-r-sug" hidden></div></div>';
+        '<div class="fc-sug" id="fc-r-sug" hidden></div>' +
+        '<div class="fc-r-who" id="fc-r-chosen" hidden></div>' +
+        '<input type="hidden" id="fc-r-name" value="">' +
+        '<input type="hidden" id="fc-r-mail" value=""></div>';
 
     var chips = pre.concat(codes).map(function (c) {
       return '<button type="button" class="fc-crs' + (o.course === c ? ' on' : '') +
@@ -234,7 +239,8 @@
     return '<div class="fc-form">' + who +
       '<div class="fc-f"><label>' + t('المواد (يمكن اختيار أكثر من واحدة)',
         'Courses (you may pick more than one)') + '</label>' +
-      (chips ? '<div class="fc-crs-row" id="fc-r-crs">' + chips + '</div>' : '') +
+      /*@3.FAPJ.17*/
+      '<div class="fc-crs-row" id="fc-r-crs"' + (chips ? '' : ' hidden') + '>' + chips + '</div>' +
       '<input class="sx-search fc-in" id="fc-r-more" autocomplete="off" placeholder="' +
         esc(t('أو اكتب رمزاً آخر ثم اضغط Enter — CS241', 'or type another code then Enter — CS241')) +
       '"></div>' +
@@ -260,7 +266,7 @@
   }
 
   /*@3.FAPJ.9*/
-  var vals = {};
+  var vals = {}, noCrsWarned = false;
   function wire(root, o) {
     o = o || {};
     if (root.__gfWired) return;
@@ -269,7 +275,8 @@
       var cp = e.target.closest('[data-copy]');
       if (cp) { copyText(cp.getAttribute('data-copy'), cp); return; }
       var crs = e.target.closest('[data-crs]');
-      if (crs) { crs.classList.toggle('on'); return; }
+      if (crs) { crs.classList.toggle('on'); noCrsWarned = false; return; }
+      if (e.target.closest('[data-gf-unpick]')) { clearPick(root); return; }
       var op = e.target.closest('.fc-opt');
       if (op) {
         var k = op.getAttribute('data-k'), on = op.classList.contains('on');
@@ -279,11 +286,7 @@
         return;
       }
       var sg = e.target.closest('.fc-sug-i');
-      if (sg) {
-        $('#fc-r-who', root).value = sg.getAttribute('data-nm');
-        $('#fc-r-sug', root).hidden = true;
-        return;
-      }
+      if (sg) { applyPick(root, byId(sg.getAttribute('data-id'))); return; }
       if (e.target.closest('#fc-r-send')) send(root, o);
     });
     root.addEventListener('input', function (e) {
@@ -296,15 +299,13 @@
         var v = e.target.value.trim().toUpperCase().replace(/\s+/g, '');
         if (!v) return;
         var row = $('#fc-r-crs', root);
-        if (!row) {
-          row = document.createElement('div');
-          row.className = 'fc-crs-row'; row.id = 'fc-r-crs';
-          e.target.parentNode.insertBefore(row, e.target);
-        }
+        if (!row) return;
+        row.hidden = false;
         if (!$('[data-crs="' + v + '"]', row)) {
           row.insertAdjacentHTML('beforeend',
             '<button type="button" class="fc-crs on" data-crs="' + esc(v) + '">' + esc(v) + '</button>');
         }
+        noCrsWarned = false;
         e.target.value = '';
       }
     });
@@ -335,11 +336,14 @@
     el.innerHTML = '<i class="fa-solid fa-check"></i>' + esc(msg);
     setTimeout(function () { el.innerHTML = old; }, 1400);
   }
-  function resetVals() { vals = {}; }
+  function resetVals() { vals = {}; noCrsWarned = false; }
 
   function suggest(root) {
     var box = $('#fc-r-sug', root), inp = $('#fc-r-who', root);
     if (!box || !inp || !DATA) return;
+    /*@3.FAPJ.18*/
+    var nm = $('#fc-r-name', root);
+    if (nm && nm.value) clearPick(root, true);
     var q = norm(inp.value);
     if (q.length < 2) { box.hidden = true; return; }
     var hit = DATA.faculty.filter(function (f) {
@@ -348,18 +352,73 @@
     if (!hit.length) { box.hidden = true; return; }
     box.hidden = false;
     box.innerHTML = hit.map(function (f) {
-      return '<button type="button" class="fc-sug-i" data-nm="' + esc(f.name) + '">' +
+      return '<button type="button" class="fc-sug-i" data-id="' + esc(f.id) + '"' +
+        ' data-nm="' + esc(f.name) + '">' +
         esc(f.name) + (f.en ? '<span class="fc-sug-en ltr">' + esc(f.en) + '</span>' : '') +
         '<span class="fc-sug-n">' + f.n + '</span></button>';
     }).join('');
   }
 
+  /*@3.FAPJ.14*/
+  function applyPick(root, f) {
+    var chosen = $('#fc-r-chosen', root);
+    if (!f || !chosen) return;
+    var box = $('#fc-r-sug', root), inp = $('#fc-r-who', root);
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+    if (inp) { inp.value = f.name; inp.hidden = true; }
+    $('#fc-r-name', root).value = f.name;
+    $('#fc-r-mail', root).value = (f.link && f.link.e) || '';
+    chosen.hidden = false;
+    chosen.innerHTML = '<i class="fa-solid fa-chalkboard-user"></i>' +
+      '<b>' + esc(nameOf(f)) + '</b>' +
+      (f.link && f.link.e ? '<span class="fc-go-n ltr">' + esc(f.link.e) + '</span>' : '') +
+      '<button type="button" class="fc-r-swap" data-gf-unpick="1">' +
+        '<i class="fa-solid fa-rotate-left"></i>' + esc(t('غيّر', 'Change')) + '</button>';
+    fillCourses(root, f);
+  }
+
+  function clearPick(root, keepText) {
+    var chosen = $('#fc-r-chosen', root), inp = $('#fc-r-who', root);
+    var nm = $('#fc-r-name', root), ml = $('#fc-r-mail', root);
+    if (nm) nm.value = '';
+    if (ml) ml.value = '';
+    if (chosen) { chosen.hidden = true; chosen.innerHTML = ''; }
+    if (inp) {
+      inp.hidden = false;
+      if (!keepText) { inp.value = ''; try { inp.focus(); } catch (e) {} }
+    }
+    /*@3.FAPJ.19*/
+    var row = $('#fc-r-crs', root);
+    if (row) {
+      $$('.fc-crs[data-src="f"]', row).forEach(function (x) { x.remove(); });
+      row.hidden = !row.children.length;
+    }
+  }
+
+  function fillCourses(root, f) {
+    var row = $('#fc-r-crs', root);
+    if (!row) return;
+    var have = {};
+    $$('.fc-crs', row).forEach(function (x) { have[x.getAttribute('data-crs')] = 1; });
+    var cs = f.courses || {};
+    var add = Object.keys(cs)
+      .sort(function (a, b) { return cs[b] - cs[a]; })
+      .filter(function (c) { return !have[c]; })
+      .map(function (c) {
+        return '<button type="button" class="fc-crs" data-src="f" data-crs="' +
+          esc(c) + '">' + esc(c) + '</button>';
+      }).join('');
+    if (add) row.insertAdjacentHTML('afterbegin', add);
+    row.hidden = !row.children.length;
+  }
+
   function send(root, o) {
     var msg = $('#fc-r-msg', root), btn = $('#fc-r-send', root);
     var nameEl = $('#fc-r-name', root), whoEl = $('#fc-r-who', root);
-    var name = nameEl ? nameEl.value : (whoEl ? whoEl.value.trim() : '');
+    /*@3.FAPJ.20*/
+    var name = (nameEl && nameEl.value.trim()) || (whoEl ? whoEl.value.trim() : '');
     var mailEl = $('#fc-r-mail', root);
-    var email = mailEl ? mailEl.value : '';
+    var email = mailEl ? mailEl.value.trim() : '';
     if (!name && !email) {
       msg.className = 'fc-r-msg is-err';
       msg.textContent = t('اكتب اسم الأستاذ أوّلاً', 'Enter the instructor name first');
@@ -371,6 +430,14 @@
       return;
     }
     var courses = $$('.fc-crs.on', root).map(function (x) { return x.getAttribute('data-crs'); });
+    /*@3.FAPJ.15*/
+    if (!courses.length && !noCrsWarned) {
+      noCrsWarned = true;
+      msg.className = 'fc-r-msg is-err';
+      msg.textContent = t('لم تختر مادّة — اختر واحدةً، أو اضغط «أرسل» ثانيةً للإرسال بلا مادّة.',
+                          'No course picked — pick one, or press Send again to send without it.');
+      return;
+    }
     var body = { name: name, email: email, courses: courses, comment: $('#fc-r-cm', root).value.trim() };
 
     /*@3.FAPJ.12*/
@@ -400,7 +467,7 @@
         msg.textContent = x.j.duplicate
           ? t('هذا التقييم مُسجَّلٌ سلفاً.', 'This rating was already recorded.')
           : t('شكراً — سُجِّل رأيُك.', 'Thanks — your rating is in.');
-        DATA = null;                       /*@3.FAPJ.13*/
+        DATA = null; FRESH = true;         /*@3.FAPJ.13*/
         resetVals();
         setTimeout(function () { o.onSent && o.onSent(); }, 1100);
       })

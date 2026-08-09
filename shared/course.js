@@ -592,6 +592,18 @@
     el('dlg-fac').showModal();
   }
 
+  /*@3.COUJ.58*/
+  function openFacRate(id) {
+    var GF = window.GardenFaculty;
+    if (!GF) return;
+    var f = GF.byId(id);
+    GF.resetVals();
+    el('dlg-fac-t').textContent = f
+      ? L('قيّم ', 'Rate ') + GF.nameOf(f)
+      : L('قيّم أستاذاً', 'Rate an instructor');
+    el('dlg-fac-b').innerHTML = GF.rateHtml(f, { course: CODE });
+  }
+
   /*@3.COUJ.32*/
 
   /*@3.COUJ.33*/
@@ -1073,6 +1085,10 @@
         if (d) d.close();
         return;
       }
+
+      /*@3.COUJ.59*/
+      var rt = t.closest('[data-rate]');
+      if (rt && t.closest('#dlg-fac-b')) { openFacRate(rt.getAttribute('data-rate')); return; }
 
       var a = t.closest('[data-act]');
       if (!a) return;
