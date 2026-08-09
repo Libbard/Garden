@@ -9,7 +9,7 @@
 
   /*@3.DASJ.2*/
   var COMMUNITY_CHAT_URL = 'https://t.me/Computing_and_Informatics';
-  var COMMUNITY_ARCHIVE_URL = 'https://t.me/computing';
+  var COMMUNITY_ARCHIVE_URL = 'https://t.me/computingg';
 
   function isAr() { return (localStorage.getItem('garden_lang') || 'ar') === 'ar'; }
   function tx(ar, en) { return isAr() ? ar : en; }
