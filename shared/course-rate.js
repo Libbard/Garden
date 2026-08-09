@@ -431,18 +431,24 @@
     });
   }
 
+  function withdrawCode(code) {
+    return post('/v1/courses/rate/withdraw',
+      Object.assign({ course_code: String(code || '').toUpperCase() }, identity()))
+      .then(function (x) { return x.s === 200 && !!(x.j && x.j.ok); })
+      .catch(function () { return false; });
+  }
+
   function withdraw(btn) {
     if (!confirm(t('يُحذف تقييمُك نهائياً. متابعة؟', 'Your rating will be deleted. Continue?'))) return;
     btn.disabled = true;
-    post('/v1/courses/rate/withdraw', Object.assign({ course_code: ctx.code }, identity()))
-      .then(function (x) {
-        btn.disabled = false;
-        if (x.s !== 200) { flash(t('تعذّر السحب.', 'Could not withdraw.'), true); return; }
-        state.dirty = false;
-        flash(t('سُحب تقييمُك.', 'Withdrawn.'));
-        if (ctx.onSaved) { try { ctx.onSaved(); } catch (e) { } }
-        setTimeout(function () { if (dlg.open) dlg.close(); }, 900);
-      });
+    withdrawCode(ctx.code).then(function (ok) {
+      btn.disabled = false;
+      if (!ok) { flash(t('تعذّر السحب.', 'Could not withdraw.'), true); return; }
+      state.dirty = false;
+      flash(t('سُحب تقييمُك.', 'Withdrawn.'));
+      if (ctx.onSaved) { try { ctx.onSaved(); } catch (e) { } }
+      setTimeout(function () { if (dlg.open) dlg.close(); }, 900);
+    });
   }
 
   /*@3.CORJ.19*/
@@ -458,5 +464,7 @@
     drawRes();
   });
 
-  window.GardenCourseRate = { open: open, identity: identity, synced: synced };
+  window.GardenCourseRate = {
+    open: open, identity: identity, synced: synced, withdraw: withdrawCode,
+  };
 })();

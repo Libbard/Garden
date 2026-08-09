@@ -598,6 +598,7 @@
     /*@3.GAHJ.65*/
     var cur = /hub\/schedule/.test(path) ? 'schedule'
             : /hub\/sections/.test(path) ? 'sections'
+            : /hub\/ratings/.test(path) ? 'ratings'
             : /hub\/faculty/.test(path) ? 'faculty'
             : /hub\/gpa/.test(path) ? 'gpa'
             : /(hub\/labs|\/labs\/)/.test(path) ? 'labs'
@@ -622,7 +623,8 @@
         /*@3.GAHJ.70*/
         { key: 'sections', href: ROOT + 'hub/sections.html', icon: 'fa-layer-group', ar: 'الشعب', en: 'Sections' },
         /*@3.GAHJ.71*/
-        { key: 'faculty', href: ROOT + 'hub/faculty.html', icon: 'fa-chalkboard-user', ar: 'الأساتذة', en: 'Faculty' }
+        { key: 'faculty', href: ROOT + 'hub/faculty.html', icon: 'fa-chalkboard-user', ar: 'الأساتذة', en: 'Faculty' },
+        { key: 'ratings', href: ROOT + 'hub/ratings.html', icon: 'fa-star-half-stroke', ar: 'تقييماتي', en: 'My ratings' }
       ] },
       { label: null, items: [
         { key: 'settings', href: ROOT + 'index.html#settings', icon: 'fa-gear', ar: 'الإعدادات', en: 'Settings' }

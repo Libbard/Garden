@@ -1215,6 +1215,8 @@
       if (window.GardenFaculty) {
         GardenFaculty.load(function () { S.facultyReady = true; renderProf(); });
       }
+
+      if (window.GardenCourseView) GardenCourseView.mount({ into: 'crs-rate', code: CODE });
     });
 
     bind();
