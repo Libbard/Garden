@@ -3008,10 +3008,8 @@
       closeAllPops();
     });
     /*@3.SECJ.323*/
-    window.addEventListener('scroll', function () {
-      if (NARROW.matches) closeAllPops();
-    }, { passive: true });
-    window.addEventListener('resize', function () { closeAllPops(); queueMarquee(); });
+    /*@3.SECJ.378*/
+    window.addEventListener('resize', function () { queueMarquee(); });
 
     /*@3.SECJ.324*/
     document.body.addEventListener('click', function (e) {

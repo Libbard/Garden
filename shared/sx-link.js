@@ -194,6 +194,48 @@
   }
 
   /*@3.SXLJ.15*/
+  function normName(v) {
+    return String(v || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  function mergeInstructors(code, list) {
+    if (!code || !Array.isArray(list) || !list.length) return 0;
+    var key = 'course_meta_' + code, meta;
+    try { meta = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch (e) { meta = {}; }
+    if (!Array.isArray(meta.instructors)) meta.instructors = [];
+
+    var byMail = {}, byName = {};
+    meta.instructors.forEach(function (x) {
+      if (!x) return;
+      if (x.email) byMail[String(x.email).toLowerCase()] = 1;
+      if (x.name) byName[normName(x.name)] = 1;
+    });
+
+    var n = 0;
+    list.forEach(function (p) {
+      var name = (p && (p.n || p)) || '';
+      var mail = (p && p.e) || '';
+      if (typeof name !== 'string' || !name.trim()) return;
+      if (mail && byMail[String(mail).toLowerCase()]) return;
+      if (byName[normName(name)]) return;
+      meta.instructors.push({
+        id: 'ins_sx_' + normName(mail || name).replace(/[^a-z0-9]+/g, '').slice(0, 24),
+        name: String(name).trim(),
+        email: String(mail || ''),
+        office_hours: '', location: '', note: '',
+        from_sections: true
+      });
+      if (mail) byMail[String(mail).toLowerCase()] = 1;
+      byName[normName(name)] = 1;
+      n++;
+    });
+
+    if (!n) return 0;
+    meta.updated_at = Date.now();
+    try { localStorage.setItem(key, JSON.stringify(meta)); } catch (e) { return 0; }
+    return n;
+  }
+
   function register(secs) {
     var d = schLoad(true);
     var have = {}, seenEx = {};
@@ -290,7 +332,9 @@
         seenEx[k] = 1;
         d.exams.push(x); have[x.id] = 1; added++;
       });
+      /*@3.SXLJ.42*/
       if (added) { n++; courses[sec.c] = { sec: sec, crn: crn }; }
+      mergeInstructors(sec.c, sec.f);
     });
 
     /*@3.SXLJ.28*/

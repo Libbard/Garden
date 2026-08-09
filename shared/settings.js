@@ -69,8 +69,10 @@
   /*@3.SETJ.6*/
 
   var menuKey = null;
+  var menuPlace = null;
   function closeMenu() {
     if (menuKey) { document.removeEventListener('keydown', menuKey, true); menuKey = null; }
+    menuPlace = null;
     var m = $('#set-menu');
     if (m) {
       var owner = m.getAttribute('data-owner');
@@ -137,15 +139,23 @@
 
     draw(items);
 
-    if (!sheet) {
+    function placeMenu() {
+      if (sheet) return true;
+      var vv = window.visualViewport;
+      var vh = (vv && vv.height) ? vv.height : window.innerHeight;
+      var vw = (vv && vv.width) ? vv.width : window.innerWidth;
       var r = btn.getBoundingClientRect(), mr = m.getBoundingClientRect();
+      if (!document.body.contains(btn) || r.bottom <= 0 || r.top >= vh) return false;
       var top = r.bottom + 6;
-      if (top + mr.height > window.innerHeight - 8) top = Math.max(8, r.top - mr.height - 6);
+      if (top + mr.height > vh - 8) top = Math.max(8, r.top - mr.height - 6);
       var startInline = r.left;
-      if (startInline + mr.width > window.innerWidth - 8) startInline = Math.max(8, window.innerWidth - 8 - mr.width);
+      if (startInline + mr.width > vw - 8) startInline = Math.max(8, vw - 8 - mr.width);
       m.style.top = top + 'px';
       m.style.left = startInline + 'px';
+      return true;
     }
+    placeMenu();
+    menuPlace = placeMenu;
 
     list.addEventListener('click', function (e) {
       var o = e.target.closest('.set-menu-opt');
@@ -186,8 +196,18 @@
     if (b) { e.preventDefault(); onMenuBtn(b); return; }
     if (!e.target.closest('#set-menu')) closeMenu();
   });
-  window.addEventListener('resize', closeMenu);
-  window.addEventListener('scroll', closeMenu, true);
+  /*@3.SETJ.36*/
+  function reflowMenu(e) {
+    if (!menuPlace) return;
+    if (e && e.target && e.target.closest && e.target.closest('#set-menu')) return;
+    if (!menuPlace()) closeMenu();
+  }
+  window.addEventListener('resize', reflowMenu);
+  window.addEventListener('scroll', reflowMenu, true);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', reflowMenu);
+    window.visualViewport.addEventListener('scroll', reflowMenu);
+  }
 
   /*@3.SETJ.10*/
 
