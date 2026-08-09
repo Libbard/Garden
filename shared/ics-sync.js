@@ -571,30 +571,44 @@
     var s = load();
     var base = api();
     if (!base || !s.url) return Promise.resolve(false);
-    return fetch(base + '/v1/ics/feed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vault_id: vaultId(), url: s.url,
-        push_id: pushId || vaultId(), lead_days: s.lead_days
-      })
-    }).then(function (r) { return r.ok; }).then(function (ok) {
-      s.on_server = !!ok; save(); return ok;
-    }, function () { return false; });
+    return vaultId().then(function (vid) {
+      if (!vid) return 'no-vault';
+      return fetch(base + '/v1/ics/feed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vault_id: vid, url: s.url,
+          push_id: pushId || vid, lead_days: s.lead_days
+        })
+      }).then(function (r) { return r.ok; }, function () { return false; });
+    }).then(function (ok) {
+      s.on_server = ok === true; save(); return ok;
+    });
   }
 
   function unregister() {
-    var base = api(), vid = vaultId();
-    if (!base || !vid) return Promise.resolve(false);
-    return fetch(base + '/v1/ics/feed?vault_id=' + encodeURIComponent(vid), { method: 'DELETE' })
-      .then(function (r) { return r.ok; }, function () { return false; });
+    var base = api();
+    if (!base) return Promise.resolve(false);
+    return vaultId().then(function (vid) {
+      if (!vid) return false;
+      return fetch(base + '/v1/ics/feed?vault_id=' + encodeURIComponent(vid), { method: 'DELETE' })
+        .then(function (r) { return r.ok; }, function () { return false; });
+    });
   }
+
+  /*@3.ICSJ.67*/
+  var VAULT_RE = /^v[0-9a-f]{32}$/;
 
   function vaultId() {
     try {
-      return (window.GardenSync && GardenSync.vaultId && GardenSync.vaultId()) ||
-             localStorage.getItem('garden_vault_id') || '';
-    } catch (e) { return ''; }
+      if (window.GardenSync && GardenSync.vaultDocId) {
+        return Promise.resolve(GardenSync.vaultDocId()).then(function (v) {
+          return VAULT_RE.test(String(v || '')) ? String(v) : '';
+        }, function () { return ''; });
+      }
+      var k = (window.GardenSync && GardenSync.getKey && GardenSync.getKey()) || '';
+      return Promise.resolve(VAULT_RE.test(k) ? k : '');
+    } catch (e) { return Promise.resolve(''); }
   }
 
   /*@3.ICSJ.62*/

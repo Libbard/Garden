@@ -22,11 +22,19 @@
     var e = window.GardenEndpoints;
     return e && e.sync ? String(e.sync).replace(/\/+$/, '') : '';
   }
+  /*@3.NOTJ.50*/
+  var VAULT_RE = /^v[0-9a-f]{32}$/;
+
   function vaultId() {
     try {
-      return (window.GardenSync && GardenSync.vaultId && GardenSync.vaultId()) ||
-             localStorage.getItem('garden_vault_id') || '';
-    } catch (e) { return ''; }
+      if (window.GardenSync && GardenSync.vaultDocId) {
+        return Promise.resolve(GardenSync.vaultDocId()).then(function (v) {
+          return VAULT_RE.test(String(v || '')) ? String(v) : '';
+        }, function () { return ''; });
+      }
+      var k = (window.GardenSync && GardenSync.getKey && GardenSync.getKey()) || '';
+      return Promise.resolve(VAULT_RE.test(k) ? k : '');
+    } catch (e) { return Promise.resolve(''); }
   }
 
   /*@3.NOTJ.5*/
@@ -92,9 +100,11 @@
 
   /*@3.NOTJ.9*/
   function fromIcs() {
-    var base = api(), vid = vaultId();
-    if (!base || !vid) return Promise.resolve([]);
-    return fetch(base + '/v1/ics/sent?vault_id=' + encodeURIComponent(vid) + '&limit=60')
+    var base = api();
+    if (!base) return Promise.resolve([]);
+    return vaultId().then(function (vid) {
+      if (!vid) return [];
+      return fetch(base + '/v1/ics/sent?vault_id=' + encodeURIComponent(vid) + '&limit=60')
       .then(function (r) { return r.ok ? r.json() : { sent: [] }; })
       .then(function (j) {
         return (j.sent || []).map(function (x) {
@@ -108,6 +118,7 @@
         });
       })
       .catch(function () { return []; });
+    });
   }
 
   /*@3.NOTJ.10*/
