@@ -22,12 +22,13 @@
       { page: 'semester', icon: 'fa-solid fa-graduation-cap',   ar: 'فصلي',     en: 'Semester', href: basePath + 'hub/index.html' },
       { page: 'schedule', icon: 'fa-solid fa-calendar-week',    ar: 'الجدول',    en: 'Schedule', href: basePath + 'hub/schedule.html' },
       { page: 'sections', icon: 'fa-solid fa-layer-group',      ar: 'الشعب',     en: 'Sections', href: basePath + 'hub/sections.html' },
-      /*@3.BONJ.4*/
-      { page: 'gpa',      icon: 'fa-solid fa-chart-line',       ar: 'المعدل',    en: 'GPA',      href: basePath + 'hub/gpa.html' },
+      /*@3.BONJ.6*/
+      /*@3.BONJ.33*/
+      { page: 'labs',     icon: 'fa-solid fa-flask',            ar: 'المختبر',   en: 'Labs',     href: basePath + 'hub/labs.html' },
       /*@3.BONJ.5*/
       { page: 'faculty',  icon: 'fa-solid fa-chalkboard-user',  ar: 'الأساتذة',  en: 'Faculty',  href: basePath + 'hub/faculty.html' },
-      /*@3.BONJ.6*/
-      { page: 'labs',     icon: 'fa-solid fa-flask',            ar: 'المختبر',   en: 'Labs',     href: basePath + 'hub/labs.html' },
+      /*@3.BONJ.4*/
+      { page: 'gpa',      icon: 'fa-solid fa-chart-line',       ar: 'المعدل',    en: 'GPA',      href: basePath + 'hub/gpa.html' },
       /*@3.BONJ.32*/
       { page: 'ratings',  icon: 'fa-solid fa-star-half-stroke', ar: 'تقييماتي',  en: 'Ratings',  href: basePath + 'hub/ratings.html' },
       { page: 'tour',     icon: 'fa-solid fa-seedling',         ar: 'اكتشف',     en: 'Explore',  href: basePath + 'tour.html' }

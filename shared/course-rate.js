@@ -147,6 +147,10 @@
       '<div class="crx-body"></div>';
     document.body.appendChild(dlg);
     dlg.addEventListener('click', onClick);
+    /*@3.CORJ.21*/
+    dlg.addEventListener('change', function (e) {
+      if (e.target && e.target.getAttribute('data-f') === 'term') drawIns();
+    });
     /*@3.CORJ.9*/
     dlg.addEventListener('cancel', function (e) {
       if (state && state.dirty && !confirm(t('تُغلق بلا حفظ؟', 'Close without saving?'))) e.preventDefault();
@@ -217,8 +221,10 @@
             'Ratings age by term — an old term is not read as today.'), true) +
 
         field(t('الدكتور (اختياريّ)', 'Instructor (optional)'),
-          '<input class="crx-in" type="text" data-f="instructor" maxlength="120" value="' +
-            esc(v.instructor || '') + '" placeholder="' + esc(t('اسمُ من درّسك', 'Who taught you')) + '">',
+          '<div class="crx-ins" data-ins>' +
+            '<input class="crx-in" type="hidden" data-f="instructor" value="' + esc(v.instructor || '') + '">' +
+            '<div class="crx-ins-box"></div>' +
+          '</div>',
           /*@3.CORJ.10*/
           t('<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>لا يدخل مؤشّرَ الصعوبة إطلاقاً.</b> «صعبةٌ مع فلان» ليست صعوبةَ مادّة — وللأساتذة صفحتُهم.',
             '<i class="fa-solid fa-lock" aria-hidden="true"></i> <b>Never affects the difficulty score.</b> Instructors have their own page.')) +
@@ -292,6 +298,98 @@
 
     dlg.querySelector('.crx-body').innerHTML = body;
     drawRes();
+    loadIns();
+  }
+
+  /*@3.CORJ.22*/
+  /*@3.CORJ.20*/
+  var _ins = null;
+  function loadIns() {
+    var box = dlg.querySelector('.crx-ins-box');
+    if (!box) return;
+    if (_ins && _ins.code === ctx.code) { drawIns(); return; }
+    box.innerHTML = '<p class="crx-ins-load">' + esc(t('يُجلب أساتذةُ المادة…', 'Loading instructors…')) + '</p>';
+    fetch(API + '/v1/course/' + encodeURIComponent(ctx.code) + '/faculty', { cache: 'default' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        _ins = { code: ctx.code, list: (j && j.faculty) || [], terms: (j && j.terms) || {} };
+        drawIns();
+      })
+      .catch(function () { _ins = { code: ctx.code, list: [], terms: {} }; drawIns(); });
+  }
+
+  function insTermOf(f) {
+    var out = {};
+    (f.t || []).forEach(function (r) { out[r[0]] = 1; });
+    return out;
+  }
+
+  function drawIns() {
+    var box = dlg.querySelector('.crx-ins-box');
+    if (!box || !_ins) return;
+    var picked = readIn('instructor');
+    var term = readIn('term');
+
+    if (picked) {
+      box.innerHTML = '<div class="crx-ins-on">' +
+        '<i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>' +
+        '<b>' + esc(picked) + '</b>' +
+        '<button type="button" class="crx-ins-x" data-a="ins-clear" aria-label="' +
+          esc(t('أزلْ', 'Clear')) + '">✕</button></div>';
+      return;
+    }
+    if (!_ins.list.length) {
+      box.innerHTML = '<p class="crx-ins-none">' + esc(t(
+        'لا أرشيفَ شعبٍ لهذه المادة — اتركِ الحقلَ فارغاً.',
+        'No section archive for this course — leave it empty.')) + '</p>';
+      return;
+    }
+
+    var q = (box.getAttribute('data-q') || '').trim().toLowerCase();
+    var here = [], past = [];
+    _ins.list.forEach(function (f) {
+      if (q && String(f.n || '').toLowerCase().indexOf(q) < 0) return;
+      (term && insTermOf(f)[term] ? here : past).push(f);
+    });
+
+    function rows(list) {
+      return list.slice(0, 40).map(function (f) {
+        var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
+        return '<button type="button" class="crx-ins-i" data-a="ins-pick" data-n="' + esc(f.n) + '">' +
+          '<span class="crx-ins-n">' + esc(f.n) + '</span>' +
+          '<span class="crx-ins-m">' + esc(String(f.c || 0)) + ' ' +
+            esc(t('شعبة', 'sections')) + (last ? ' · ' + esc(last) : '') + '</span>' +
+        '</button>';
+      }).join('');
+    }
+
+    box.innerHTML =
+      '<input class="crx-in crx-ins-q" type="search" data-ins-q value="' + esc(q) +
+        '" placeholder="' + esc(t('ابحث باسم الدكتور…', 'Search by instructor name…')) + '" ' +
+        'autocomplete="off" spellcheck="false">' +
+      (here.length
+        ? '<p class="crx-ins-h">' + esc(t('درّسها في الفصل الذي اخترتَه', 'Taught it in your chosen term')) +
+          '</p><div class="crx-ins-l">' + rows(here) + '</div>'
+        : '') +
+      (past.length
+        ? '<p class="crx-ins-h">' + esc(term && here.length
+            ? t('ودرّسها في فصولٍ أخرى', 'And taught it in other terms')
+            : t('من درّسها سابقاً', 'Taught it previously')) +
+          '</p><div class="crx-ins-l">' + rows(past) + '</div>'
+        : '') +
+      (!here.length && !past.length
+        ? '<p class="crx-ins-none">' + esc(t('لا اسمَ يطابق بحثَك.', 'No name matches.')) + '</p>'
+        : '');
+
+    var qi = box.querySelector('[data-ins-q]');
+    if (qi) {
+      qi.addEventListener('input', function () {
+        box.setAttribute('data-q', qi.value);
+        drawIns();
+        var again = box.querySelector('[data-ins-q]');
+        if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
+      });
+    }
   }
 
   /*@3.CORJ.12*/
@@ -327,6 +425,20 @@
     if (a === 'delres') {
       state.res.splice(Number(b.closest('.crx-r').getAttribute('data-i')), 1);
       state.dirty = true; drawRes(); return;
+    }
+    if (a === 'ins-pick') {
+      var el = dlg.querySelector('[data-f="instructor"]');
+      if (el) el.value = b.getAttribute('data-n') || '';
+      state.dirty = true;
+      drawIns();
+      return;
+    }
+    if (a === 'ins-clear') {
+      var el2 = dlg.querySelector('[data-f="instructor"]');
+      if (el2) el2.value = '';
+      state.dirty = true;
+      drawIns();
+      return;
     }
     if (a === 'save') { save(b); return; }
     if (a === 'withdraw') { withdraw(b); return; }
@@ -399,6 +511,7 @@
   var FIELD_AR = {
     bad_term: 'اختر الفصل', bad_difficulty: 'اختر الصعوبة', bad_code: 'رمزُ المادة',
     bad_resource: 'رابطُ مصدرٍ غيرُ صالح (يجب أن يبدأ بـhttps)',
+    bad_instructor: 'اختر الدكتورَ من القائمة',
   };
 
   function save(btn) {
