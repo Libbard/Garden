@@ -19,7 +19,7 @@
   <script>
     try {
       const savedTheme = localStorage.getItem("garden_theme");
-      if (["dark", "dim", "light"].includes(savedTheme)) document.documentElement.dataset.theme = savedTheme;
+      if (["dark", "dim"].includes(savedTheme)) document.documentElement.dataset.theme = savedTheme;
       const savedSize = localStorage.getItem("garden_font_size");
       if (savedSize) document.documentElement.dataset.fontSize = savedSize;
       localStorage.setItem("garden_tour_seen", "1");
@@ -61,6 +61,8 @@
   <svg class="living-root" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
     <path class="living-root__ghost" d="M50 -8 C49 4 56 9 50 18 C43 28 58 33 50 43 C42 54 58 59 50 70 C43 80 53 90 50 108" pathLength="1"></path>
     <path class="living-root__line" id="living-root-line" d="M50 -8 C49 4 56 9 50 18 C43 28 58 33 50 43 C42 54 58 59 50 70 C43 80 53 90 50 108" pathLength="1"></path>
+    <path class="living-root__flow" id="living-root-flow" d="M50 -8 C49 4 56 9 50 18 C43 28 58 33 50 43 C42 54 58 59 50 70 C43 80 53 90 50 108" pathLength="1"></path>
+    <circle class="living-root__node" id="living-root-node" cx="50" cy="-8" r="0.7"></circle>
   </svg>
 
   <div class="page-progress" aria-hidden="true"><span id="page-progress-bar"></span></div>
@@ -260,6 +262,37 @@
           <a href="hub/schedule.html"><span data-ar="افتح الجدول" data-en="Open the schedule">افتح الجدول</span><i>↗</i></a>
         </div>
       </div>
+
+      <div class="intensive-showcase reveal" id="intensive-showcase" data-plan-density="2">
+        <div class="intensive-showcase__copy">
+          <span class="chapter__kicker" data-ar="خطة مكثفة تُحسب، لا قالب جاهز" data-en="An intensive plan that is computed, not templated">خطة مكثفة تُحسب، لا قالب جاهز</span>
+          <h3 data-ar="من الوحدات والاختبارات إلى جلسات قابلة للتنفيذ." data-en="From modules and exams to sessions you can actually complete.">من الوحدات والاختبارات إلى جلسات قابلة للتنفيذ.</h3>
+          <p data-ar="اختر موادك ووحداتها، ضع مواعيد الاختبارات وإيقاع يومك؛ فتحسب الحديقة السعة والتعارضات، وتوزّع الجلسات والمراجعة المتباعدة قبل كل اختبار." data-en="Choose courses and modules, add exam dates and your daily rhythm; the Garden calculates capacity and conflicts, then distributes sessions and spaced reviews before every exam.">اختر موادك ووحداتها، ضع مواعيد الاختبارات وإيقاع يومك؛ فتحسب الحديقة السعة والتعارضات، وتوزّع الجلسات والمراجعة المتباعدة قبل كل اختبار.</p>
+          <div class="plan-density" role="group" aria-label="كثافة الخطة" data-ar-label="كثافة الخطة" data-en-label="Plan intensity">
+            <button type="button" data-plan-density="1" aria-pressed="false"><span data-ar="هادئة" data-en="Light">هادئة</span><b>1×</b></button>
+            <button type="button" data-plan-density="2" aria-pressed="true"><span data-ar="متوازنة" data-en="Balanced">متوازنة</span><b>2×</b></button>
+            <button type="button" data-plan-density="3" aria-pressed="false"><span data-ar="مكثفة" data-en="Intensive">مكثفة</span><b>3×</b></button>
+          </div>
+          <p class="plan-verdict" id="plan-verdict" aria-live="polite" data-ar="18 جلسة موزعة على 9 أيام، مع مراجعة قبل كل اختبار." data-en="18 sessions across 9 days, with a review before every exam.">18 جلسة موزعة على 9 أيام، مع مراجعة قبل كل اختبار.</p>
+          <a href="hub/schedule.html"><span data-ar="أنشئ خطتك المكثفة" data-en="Build an intensive plan">أنشئ خطتك المكثفة</span><i>↗</i></a>
+        </div>
+        <div class="plan-board" aria-label="معاينة توزيع الخطة" data-ar-label="معاينة توزيع الخطة" data-en-label="Plan distribution preview">
+          <div class="plan-board__head"><span data-ar="حتى الاختبار" data-en="Until the exam">حتى الاختبار</span><b>09 DAYS · 18 SESSIONS</b></div>
+          <div class="plan-board__courses">
+            <span style="--plan-course:#a78bfa"><i></i>CS231 · 6</span>
+            <span style="--plan-course:#38bdf8"><i></i>CS240 · 7</span>
+            <span style="--plan-course:#f59e0b"><i></i>MATH150 · 5</span>
+          </div>
+          <div class="plan-calendar">
+            <div><small data-ar="الأحد" data-en="SUN">الأحد</small><span class="plan-session is-cs231" data-density-min="1">M03</span><span class="plan-session is-cs240" data-density-min="3">M05</span></div>
+            <div><small data-ar="الاثنين" data-en="MON">الاثنين</small><span class="plan-session is-cs240" data-density-min="1">M04</span><span class="plan-session is-math" data-density-min="2">M06</span></div>
+            <div><small data-ar="الثلاثاء" data-en="TUE">الثلاثاء</small><span class="plan-session is-cs231" data-density-min="1">M04</span><span class="plan-session is-review" data-density-min="3"><i>↻</i><span data-ar="مراجعة" data-en="Review">مراجعة</span></span></div>
+            <div><small data-ar="الأربعاء" data-en="WED">الأربعاء</small><span class="plan-session is-math" data-density-min="2">M07</span><span class="plan-session is-cs240" data-density-min="3">M06</span></div>
+            <div><small data-ar="الخميس" data-en="THU">الخميس</small><span class="plan-session is-cs240" data-density-min="1">M05</span><span class="plan-session is-review" data-density-min="2"><i>↻</i><span data-ar="تثبيت" data-en="Recall">تثبيت</span></span></div>
+          </div>
+          <div class="plan-board__logic"><span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><b data-ar="يتجنب التعارض" data-en="Avoids conflicts">يتجنب التعارض</b></span><span><i class="fa-solid fa-brain" aria-hidden="true"></i><b data-ar="مراجعة متباعدة" data-en="Spaced review">مراجعة متباعدة</b></span><span><i class="fa-solid fa-gauge-high" aria-hidden="true"></i><b data-ar="يفحص السعة" data-en="Checks capacity">يفحص السعة</b></span></div>
+        </div>
+      </div>
     </section>
 
     <section class="chapter chapter--decide" id="decide" data-chapter="decide">
@@ -267,15 +300,51 @@
         <span class="chapter__number">04</span>
         <div>
           <p class="chapter__kicker" data-ar="قراراتك قبل أن تصبح نتائج" data-en="Decisions before they become outcomes">قراراتك قبل أن تصبح نتائج</p>
-          <h2 data-ar="اختر الشعبة، الأستاذ، والهدف بعين مفتوحة." data-en="Choose the section, instructor, and target with open eyes.">اختر الشعبة، الأستاذ، والهدف بعين مفتوحة.</h2>
-          <p data-ar="ابحث في بيانات بانر، راقب المقعد، اقرأ تقييمات الطلاب، ثم اختبر أثر درجاتك على المعدل حتى التخرج." data-en="Search Banner data, watch a seat, read student ratings, then test how grades affect your GPA through graduation.">ابحث في بيانات بانر، راقب المقعد، اقرأ تقييمات الطلاب، ثم اختبر أثر درجاتك على المعدل حتى التخرج.</p>
+          <h2 data-ar="قيّم المادة والأستاذ، ثم قرّر بخريطة كاملة." data-en="Read the course and the instructor, then decide with the whole map.">قيّم المادة والأستاذ، ثم قرّر بخريطة كاملة.</h2>
+          <p data-ar="تفصل الحديقة بين طبيعة المقرر وتجربة تدريسه، وتجمعهما مع بيانات الشُعب والخطة والمعدل؛ فلا يتحول رأي واحد إلى قرار دراسي كامل." data-en="The Garden separates the nature of a course from the experience of its teaching, then joins both with sections, degree plans, and GPA—so one opinion never becomes the whole decision.">تفصل الحديقة بين طبيعة المقرر وتجربة تدريسه، وتجمعهما مع بيانات الشُعب والخطة والمعدل؛ فلا يتحول رأي واحد إلى قرار دراسي كامل.</p>
         </div>
+      </div>
+
+      <div class="ratings-stage reveal">
+        <article class="rating-lens rating-lens--course">
+          <div class="rating-lens__top"><span><i class="fa-solid fa-star-half-stroke" aria-hidden="true"></i><b data-ar="تقييم المقرر" data-en="Course rating">تقييم المقرر</b></span><small>CS231 · SAMPLE</small></div>
+          <h3 data-ar="كيف هي المادة فعلاً؟" data-en="What is the course really like?">كيف هي المادة فعلاً؟</h3>
+          <p data-ar="رأي مؤرخ بالفصل، منفصل تماماً عن تقييم الدكتور." data-en="A term-dated take, kept entirely separate from the instructor rating.">رأي مؤرخ بالفصل، منفصل تماماً عن تقييم الدكتور.</p>
+          <div class="course-rating-bars">
+            <span><b data-ar="الصعوبة" data-en="Difficulty">الصعوبة</b><i><em style="--rating:68%"></em></i><small data-ar="متوسطة" data-en="Moderate">متوسطة</small></span>
+            <span><b data-ar="الوقت الأسبوعي" data-en="Weekly time">الوقت الأسبوعي</b><i><em style="--rating:56%"></em></i><small>5–8h</small></span>
+            <span><b data-ar="طبيعة المادة" data-en="Course nature">طبيعة المادة</b><i><em style="--rating:82%"></em></i><small data-ar="فهم + تطبيق" data-en="Concepts + practice">فهم + تطبيق</small></span>
+          </div>
+          <div class="rating-tags"><span data-ar="إيقاع المذاكرة" data-en="Study rhythm">إيقاع المذاكرة</span><span data-ar="نمط الأسئلة" data-en="Question style">نمط الأسئلة</span><span data-ar="مصادر نافعة" data-en="Useful resources">مصادر نافعة</span></div>
+          <a href="hub/course.html?code=CS231#s-rate"><span data-ar="اقرأ تقييمات المادة" data-en="Read course ratings">اقرأ تقييمات المادة</span><i>↗</i></a>
+        </article>
+
+        <div class="ratings-stage__principle">
+          <span class="ratings-stage__pulse"><i></i></span>
+          <small data-ar="قراران لا قرار واحد" data-en="Two signals, not one">قراران لا قرار واحد</small>
+          <b data-ar="نفصل بين صعوبة المحتوى وجودة التجربة." data-en="We separate content difficulty from teaching quality.">نفصل بين صعوبة المحتوى وجودة التجربة.</b>
+          <p data-ar="ثم نعرض عدد المشاركين والفصل الذي قُيّم فيه الرأي حتى تقرأ النسبة بمقامها." data-en="Then we show participant counts and the rated term, so every percentage keeps its denominator.">ثم نعرض عدد المشاركين والفصل الذي قُيّم فيه الرأي حتى تقرأ النسبة بمقامها.</p>
+        </div>
+
+        <article class="rating-lens rating-lens--faculty">
+          <div class="rating-lens__top"><span><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i><b data-ar="تقييم الأستاذ" data-en="Faculty rating">تقييم الأستاذ</b></span><small>230 FACULTY</small></div>
+          <h3 data-ar="كيف كانت تجربة التدريس؟" data-en="How was the teaching experience?">كيف كانت تجربة التدريس؟</h3>
+          <p data-ar="تقييم مرتبط بالمادة والشعبة والفصل، لا اسماً منفصلاً عن السياق." data-en="A rating tied to course, section, and term—not a name detached from context.">تقييم مرتبط بالمادة والشعبة والفصل، لا اسماً منفصلاً عن السياق.</p>
+          <div class="faculty-signals">
+            <span><i class="fa-solid fa-comments" aria-hidden="true"></i><b data-ar="وضوح الشرح" data-en="Clarity">وضوح الشرح</b></span>
+            <span><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i><b data-ar="عدالة التقييم" data-en="Fairness">عدالة التقييم</b></span>
+            <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i><b data-ar="حجم العبء" data-en="Workload">حجم العبء</b></span>
+            <span><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i><b data-ar="قيمة المحاضرة" data-en="Lecture value">قيمة المحاضرة</b></span>
+          </div>
+          <a href="hub/faculty.html"><span data-ar="استكشف تقييمات الأساتذة" data-en="Explore faculty ratings">استكشف تقييمات الأساتذة</span><i>↗</i></a>
+        </article>
       </div>
 
       <div class="decision-stage reveal">
         <figure class="product-frame product-frame--gpa">
-          <div class="product-frame__top"><span></span><span></span><span></span><b>GPA · 4.00</b></div>
-          <div class="gpa-crop"><img src="shared/tour-media/gpa.webp" width="1232" height="1550" loading="lazy" alt="حاسبة المعدل ومستشرف التخرج" data-ar-alt="حاسبة المعدل ومستشرف التخرج" data-en-alt="GPA calculator and graduation forecast"></div>
+          <div class="product-frame__top"><span></span><span></span><span></span><b>GPA · 6 LEVELS · LIVE CURVE</b></div>
+          <div class="gpa-crop"><img src="shared/tour-media/gpa-levels.png" width="1112" height="660" loading="eager" alt="منحنى معدل حقيقي لستة مستويات دراسية" data-ar-alt="منحنى معدل حقيقي لستة مستويات دراسية" data-en-alt="A real GPA curve across six academic levels"></div>
+          <figcaption class="gpa-caption"><span data-ar="سجل متعدد المستويات" data-en="Multi-level history">سجل متعدد المستويات</span><b data-ar="ترى الاتجاه، لا رقم فصل واحد." data-en="See the trajectory, not a single term.">ترى الاتجاه، لا رقم فصل واحد.</b></figcaption>
         </figure>
         <div class="target-simulator">
           <div class="target-simulator__head"><span data-ar="جرّب هدفاً" data-en="Try a target">جرّب هدفاً</span><b id="target-value">3.50</b></div>
@@ -286,7 +355,7 @@
         </div>
         <div class="decision-proof">
           <span><b>84,032</b><small data-ar="شعبة من 38 فصلاً" data-en="sections across 38 terms">شعبة من 38 فصلاً</small></span>
-          <span><b>230</b><small data-ar="عضو هيئة تدريس" data-en="faculty members">عضو هيئة تدريس</small></span>
+          <span><b>783</b><small data-ar="تقييماً للأساتذة" data-en="faculty reviews">تقييماً للأساتذة</small></span>
           <span><b>550</b><small data-ar="مقرراً في 15 خطة" data-en="courses in 15 plans">مقرراً في 15 خطة</small></span>
         </div>
       </div>
@@ -298,13 +367,13 @@
         <div>
           <p class="chapter__kicker" data-ar="الفكرة تحت يدك" data-en="Put the idea under your hands">الفكرة تحت يدك</p>
           <h2 data-ar="لا تكتفِ بقراءة المنطق والبرمجة. شغّلهما." data-en="Do not merely read logic and code. Run them.">لا تكتفِ بقراءة المنطق والبرمجة. شغّلهما.</h2>
-          <p data-ar="مختبرات كاملة تعمل في المتصفح: تبني الدائرة وتراقب خرجها، أو تقارن الفكرة نفسها عبر عشرات لغات البرمجة." data-en="Complete browser labs let you build a circuit and watch its output, or compare one idea across dozens of programming languages.">مختبرات كاملة تعمل في المتصفح: تبني الدائرة وتراقب خرجها، أو تقارن الفكرة نفسها عبر عشرات لغات البرمجة.</p>
+          <p data-ar="بيئتا عمل حقيقيتان لا ألعاب مصغرة: ابنِ دائرة من مكتبة عناصر كاملة واستخرج دليلها الرياضي، أو اكتب وشغّل واحفظ ملفاتك عبر عشرات لغات البرمجة." data-en="Two real workspaces, not mini-games: build a circuit from a full component library and derive its mathematical evidence, or write, run, and save files across dozens of programming languages.">بيئتا عمل حقيقيتان لا ألعاب مصغرة: ابنِ دائرة من مكتبة عناصر كاملة واستخرج دليلها الرياضي، أو اكتب وشغّل واحفظ ملفاتك عبر عشرات لغات البرمجة.</p>
         </div>
       </div>
 
       <div class="lab-stage reveal">
         <figure class="product-frame product-frame--labs">
-          <div class="product-frame__top"><span></span><span></span><span></span><b>LABS · 02 PUBLISHED</b></div>
+          <div class="product-frame__top"><span></span><span></span><span></span><b>LABS · 31 LANGUAGES · FULL CIRCUIT KERNEL</b></div>
           <img src="shared/tour-media/labs.webp" width="1232" height="979" loading="lazy" alt="مختبرات الحديقة المنشورة" data-ar-alt="مختبرات الحديقة المنشورة" data-en-alt="Published Garden labs">
         </figure>
         <div class="circuit-demo" aria-label="محاكي بوابة AND" data-ar-label="محاكي بوابة AND" data-en-label="AND gate simulator">
@@ -330,6 +399,29 @@
         <span><b>31</b><small data-ar="لغة برمجة" data-en="programming languages">لغة برمجة</small></span>
         <div class="language-proof__ticker"><i>Python</i><i>Java</i><i>Rust</i><i>Haskell</i><i>MARIE</i><i>SQL</i><i>Go</i><i>Scala</i></div>
         <span><b>1,870</b><small data-ar="مثالاً قابلاً للتشغيل" data-en="runnable examples">مثالاً قابلاً للتشغيل</small></span>
+      </div>
+
+      <div class="lab-capabilities reveal">
+        <article class="lab-capability lab-capability--circuit">
+          <div class="lab-capability__head"><span><i class="fa-solid fa-microchip" aria-hidden="true"></i><b data-ar="باني الدوائر التوافقية" data-en="Combinational circuit builder">باني الدوائر التوافقية</b></span><small>CS231 · EVIDENCE KERNEL</small></div>
+          <p data-ar="ارسم بحرية أو ابدأ من مثال موجّه؛ كل تغيير يعيد حساب الدليل، لا الصورة وحدها." data-en="Build freely or start from a guided example; every change recomputes the evidence, not only the picture.">ارسم بحرية أو ابدأ من مثال موجّه؛ كل تغيير يعيد حساب الدليل، لا الصورة وحدها.</p>
+          <div class="capability-grid">
+            <span><i class="fa-solid fa-table-cells" aria-hidden="true"></i><b data-ar="جدول الحقيقة" data-en="Truth table">جدول الحقيقة</b></span>
+            <span><i class="fa-solid fa-border-all" aria-hidden="true"></i><b>Karnaugh</b></span>
+            <span><i class="fa-solid fa-square-root-variable" aria-hidden="true"></i><b data-ar="تبسيط جبري" data-en="Simplification">تبسيط جبري</b></span>
+            <span><i class="fa-solid fa-wave-square" aria-hidden="true"></i><b data-ar="تتبّع الإشارة" data-en="Signal trace">تتبّع الإشارة</b></span>
+            <span><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><b>Undo / Redo</b></span>
+            <span><i class="fa-solid fa-file-export" aria-hidden="true"></i><b data-ar="استيراد وتصدير" data-en="Import & export">استيراد وتصدير</b></span>
+          </div>
+          <a href="labs/cs231-combinational-circuit-builder.html"><span data-ar="افتح باني الدوائر" data-en="Open the circuit builder">افتح باني الدوائر</span><i>↗</i></a>
+        </article>
+
+        <article class="lab-capability lab-capability--code">
+          <div class="lab-capability__head"><span><i class="fa-solid fa-code" aria-hidden="true"></i><b data-ar="مختبر لغات البرمجة" data-en="Programming languages lab">مختبر لغات البرمجة</b></span><small>FILES · TERMINAL · AI EXPLAIN</small></div>
+          <div class="code-window" aria-hidden="true"><span><i>1</i><b class="is-key">public static</b> <b class="is-fn">void</b> main(String[] args) {</span><span><i>2</i>&nbsp;&nbsp;System.out.println(<b class="is-str">"Hello, Garden"</b>);</span><span><i>3</i>}</span><em><i class="fa-solid fa-play"></i> Process finished · 0.42s</em></div>
+          <div class="code-workflow"><span data-ar="ملفات متعددة" data-en="Multiple files">ملفات متعددة</span><span data-ar="تشغيل تفاعلي" data-en="Interactive run">تشغيل تفاعلي</span><span data-ar="طرفية" data-en="Terminal">طرفية</span><span data-ar="شرح وتقييم" data-en="Explain & review">شرح وتقييم</span><span data-ar="حفظ تلقائي ومحفوظات" data-en="Autosave & named saves">حفظ تلقائي ومحفوظات</span></div>
+          <a href="labs/programming-languages.html"><span data-ar="افتح مختبر البرمجة" data-en="Open the programming lab">افتح مختبر البرمجة</span><i>↗</i></a>
+        </article>
       </div>
     </section>
 
@@ -368,13 +460,12 @@
 
       <div class="taste-stage reveal" id="taste-stage">
         <div class="taste-stage__copy">
-          <p class="chapter__kicker" data-ar="ثيمك · لونك · إيقاعك" data-en="Your theme · colour · rhythm">ثيمك · لونك · إيقاعك</p>
+          <p class="chapter__kicker" data-ar="ثيم الموقع · ثيم الدراسة · لون المادة" data-en="Site theme · study theme · course colour">ثيم الموقع · ثيم الدراسة · لون المادة</p>
           <h3 data-ar="لا توجد حديقة واحدة للجميع." data-en="There is no single Garden for everyone.">لا توجد حديقة واحدة للجميع.</h3>
-          <p data-ar="الثيم وحجم الخط واللغة وترتيب اللوحة يتبع ذوقك في كل صفحة، ولكل مادة لونها الذي تختاره أنت." data-en="Theme, type size, language, and dashboard layout follow your preferences everywhere—and every course can carry a colour you choose.">الثيم وحجم الخط واللغة وترتيب اللوحة يتبع ذوقك في كل صفحة، ولكل مادة لونها الذي تختاره أنت.</p>
+          <p data-ar="ثيم الواجهة شيء، وبيئة القراءة والدراسة شيء آخر، وهوية كل مادة شيء ثالث. تغيّر واحداً دون أن تفرض البقية عليه." data-en="The interface theme is one layer, the reading workspace another, and every course identity a third. Change one without forcing the others to follow.">ثيم الواجهة شيء، وبيئة القراءة والدراسة شيء آخر، وهوية كل مادة شيء ثالث. تغيّر واحداً دون أن تفرض البقية عليه.</p>
           <div class="theme-picker" id="theme-picker" role="group" aria-label="ثيم الحديقة" data-ar-label="ثيم الحديقة" data-en-label="Garden theme">
             <button type="button" data-tour-theme="dark" aria-pressed="false"><i class="theme-preview theme-preview--dark" aria-hidden="true"><span></span></i><b data-ar="داكن" data-en="Dark">داكن</b></button>
             <button type="button" data-tour-theme="dim" aria-pressed="false"><i class="theme-preview theme-preview--dim" aria-hidden="true"><span></span></i><b data-ar="خافت" data-en="Dim">خافت</b></button>
-            <button type="button" data-tour-theme="light" aria-pressed="false"><i class="theme-preview theme-preview--light" aria-hidden="true"><span></span></i><b data-ar="فاتح" data-en="Light">فاتح</b></button>
           </div>
         </div>
 
@@ -396,6 +487,36 @@
           </div>
           <p data-ar="هذه معاينة آمنة؛ لون مادتك المحفوظ يظهر تلقائياً ولا يتغير إلا من داخل الحديقة." data-en="This is a safe preview; your saved course colour appears automatically and only changes inside the Garden.">هذه معاينة آمنة؛ لون مادتك المحفوظ يظهر تلقائياً ولا يتغير إلا من داخل الحديقة.</p>
           <a href="hub/course.html?code=CS231"><span data-ar="افتح تجربة المادة" data-en="Open the course experience">افتح تجربة المادة</span><i>↗</i></a>
+        </div>
+
+        <div class="study-skins">
+          <div class="study-skins__copy">
+            <span class="chapter__kicker" data-ar="11 ثيماً لصفحات الدراسة" data-en="11 themes for course pages">11 ثيماً لصفحات الدراسة</span>
+            <h4 data-ar="مساحة القراءة تتجدد مع مزاجك، لا مع ثيم الموقع فقط." data-en="Your reading space changes with your mood, not only the site theme.">مساحة القراءة تتجدد مع مزاجك، لا مع ثيم الموقع فقط.</h4>
+            <p data-ar="ورق دافئ، GitHub، Solarized، One Dark، Dracula، Nord، Gruvbox، OLED، Tokyo Night، Amber Night—أو الحديقة كما هي." data-en="Warm Paper, GitHub, Solarized, One Dark, Dracula, Nord, Gruvbox, OLED, Tokyo Night, Amber Night—or the Garden itself.">ورق دافئ، GitHub، Solarized، One Dark، Dracula، Nord، Gruvbox، OLED، Tokyo Night، Amber Night—أو الحديقة كما هي.</p>
+          </div>
+          <div class="study-skin-preview" id="study-skin-preview" data-study-theme="tokyo">
+            <div class="study-skin-preview__bar"><span>CS231 · MODULE 04</span><b id="study-theme-name" data-ar="طوكيو ليلاً" data-en="Tokyo Night">طوكيو ليلاً</b></div>
+            <article>
+              <small>BOOLEAN ALGEBRA</small>
+              <h5 data-ar="لماذا نُبسّط الدائرة؟" data-en="Why simplify a circuit?">لماذا نُبسّط الدائرة؟</h5>
+              <p data-ar="كل حد نحذفه يعني بوابة أقل، زمناً أقصر، وطاقة أدنى." data-en="Every removed term means fewer gates, shorter delay, and lower power.">كل حد نحذفه يعني بوابة أقل، زمناً أقصر، وطاقة أدنى.</p>
+              <div class="study-code" dir="ltr"><span><b>F</b> = A·B + A·<i>B̅</i></span><span>= A·(B + <i>B̅</i>)</span><span>= <em>A</em></span></div>
+            </article>
+          </div>
+          <div class="study-theme-options" role="radiogroup" aria-label="ثيم صفحات المادة" data-ar-label="ثيم صفحات المادة" data-en-label="Course pages theme">
+            <button type="button" data-study-theme="garden" aria-checked="false" role="radio" style="--skin-bg:#111827;--skin-a:#a78bfa;--skin-b:#72d9d1" data-ar-label="الحديقة الرقمية" data-en-label="Digital Garden" aria-label="الحديقة الرقمية"><i></i><span data-ar="الحديقة" data-en="Garden">الحديقة</span></button>
+            <button type="button" data-study-theme="paper" aria-checked="false" role="radio" style="--skin-bg:#f6f0e4;--skin-a:#a44a3f;--skin-b:#587b7f" data-ar-label="ورق دافئ" data-en-label="Warm Paper" aria-label="ورق دافئ"><i></i><span data-ar="ورق دافئ" data-en="Paper">ورق دافئ</span></button>
+            <button type="button" data-study-theme="github" aria-checked="false" role="radio" style="--skin-bg:#ffffff;--skin-a:#cf222e;--skin-b:#8250df" data-ar-label="جت هب نهاري" data-en-label="GitHub Light" aria-label="جت هب نهاري"><i></i><span>GitHub</span></button>
+            <button type="button" data-study-theme="solar" aria-checked="false" role="radio" style="--skin-bg:#fdf6e3;--skin-a:#b58900;--skin-b:#268bd2" data-ar-label="سولارايزد نهاري" data-en-label="Solarized Light" aria-label="سولارايزد نهاري"><i></i><span>Solarized</span></button>
+            <button type="button" data-study-theme="onedark" aria-checked="false" role="radio" style="--skin-bg:#282c34;--skin-a:#c678dd;--skin-b:#61afef" data-ar-label="ون دارك" data-en-label="One Dark" aria-label="ون دارك"><i></i><span>One Dark</span></button>
+            <button type="button" data-study-theme="dracula" aria-checked="false" role="radio" style="--skin-bg:#282a36;--skin-a:#ff79c6;--skin-b:#8be9fd" data-ar-label="دراكولا" data-en-label="Dracula" aria-label="دراكولا"><i></i><span>Dracula</span></button>
+            <button type="button" data-study-theme="nord" aria-checked="false" role="radio" style="--skin-bg:#2e3440;--skin-a:#b48ead;--skin-b:#88c0d0" data-ar-label="نورد" data-en-label="Nord" aria-label="نورد"><i></i><span>Nord</span></button>
+            <button type="button" data-study-theme="gruvbox" aria-checked="false" role="radio" style="--skin-bg:#282828;--skin-a:#d3869b;--skin-b:#83a598" data-ar-label="جروف بوكس" data-en-label="Gruvbox Dark" aria-label="جروف بوكس"><i></i><span>Gruvbox</span></button>
+            <button type="button" data-study-theme="oled" aria-checked="false" role="radio" style="--skin-bg:#000000;--skin-a:#f472b6;--skin-b:#22d3ee" data-ar-label="أسود خالص" data-en-label="True Black OLED" aria-label="أسود خالص"><i></i><span>OLED</span></button>
+            <button type="button" data-study-theme="tokyo" aria-checked="true" role="radio" style="--skin-bg:#16161e;--skin-a:#bb9af7;--skin-b:#7dcfff" data-ar-label="طوكيو ليلاً" data-en-label="Tokyo Night" aria-label="طوكيو ليلاً"><i></i><span>Tokyo</span></button>
+            <button type="button" data-study-theme="amber" aria-checked="false" role="radio" style="--skin-bg:#0d0b06;--skin-a:#f59e0b;--skin-b:#fcd34d" data-ar-label="كهرماني" data-en-label="Amber Night" aria-label="كهرماني"><i></i><span>Amber</span></button>
+          </div>
         </div>
       </div>
     </section>
