@@ -27,7 +27,10 @@
       /*@3.BONJ.5*/
       { page: 'faculty',  icon: 'fa-solid fa-chalkboard-user',  ar: 'الأساتذة',  en: 'Faculty',  href: basePath + 'hub/faculty.html' },
       /*@3.BONJ.6*/
-      { page: 'labs',     icon: 'fa-solid fa-flask',            ar: 'المختبر',   en: 'Labs',     href: basePath + 'hub/labs.html' }
+      { page: 'labs',     icon: 'fa-solid fa-flask',            ar: 'المختبر',   en: 'Labs',     href: basePath + 'hub/labs.html' },
+      /*@3.BONJ.32*/
+      { page: 'ratings',  icon: 'fa-solid fa-star-half-stroke', ar: 'تقييماتي',  en: 'Ratings',  href: basePath + 'hub/ratings.html' },
+      { page: 'tour',     icon: 'fa-solid fa-seedling',         ar: 'اكتشف',     en: 'Explore',  href: basePath + 'tour.html' }
     ];
 
     /*@3.BONJ.7*/
@@ -212,6 +215,8 @@
     if (path.indexOf('/hub/labs') !== -1 || path.indexOf('/labs/') !== -1) return 'labs';
     /*@3.BONJ.26*/
     if (path.indexOf('/hub/faculty') !== -1) return 'faculty';
+    if (path.indexOf('/hub/ratings') !== -1) return 'ratings';
+    if (path.indexOf('/tour') !== -1) return 'tour';
     if (path.indexOf('/hub/') !== -1) return 'semester';
     /*@3.BONJ.27*/
     if (path.endsWith('/index.html') || path.endsWith('/')) {

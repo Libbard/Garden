@@ -627,6 +627,7 @@
         { key: 'ratings', href: ROOT + 'hub/ratings.html', icon: 'fa-star-half-stroke', ar: 'تقييماتي', en: 'My ratings' }
       ] },
       { label: null, items: [
+        { key: 'tour', href: ROOT + 'tour.html', icon: 'fa-seedling', ar: 'اكتشف الحديقة', en: 'Explore the Garden' },
         { key: 'settings', href: ROOT + 'index.html#settings', icon: 'fa-gear', ar: 'الإعدادات', en: 'Settings' }
       ] }
     ];
