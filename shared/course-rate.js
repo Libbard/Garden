@@ -388,13 +388,18 @@
   function insScore(f, q) {
     if (!q) return 1;
     var ar = hasAr(q);
-    if (ar && f.a && String(f.a).indexOf(q) >= 0) return 4;
+    if (ar) {
+      var qn = q.replace(/\s+/g, '');
+      if (f.a && String(f.a).indexOf(q) >= 0) return 4;
+      if (f.k && String(f.k).indexOf(qn) >= 0) return 4;
+    }
     var base = ar ? tr(q) : q;
     var ql = lat(base), qs = skel(base);
     if (ql.length < 2) return 0;
 
     var names = [String(f.n || '')];
     if (f.a) names.push(tr(f.a));
+    if (f.k) names.push(tr(f.k));
     var best = 0;
     for (var i = 0; i < names.length; i++) {
       if (lat(names[i]).indexOf(ql) >= 0) return 3;
