@@ -8,7 +8,20 @@
   /*@3.ICBJ.2*/
   var s = null;
   try { s = JSON.parse(localStorage.getItem('garden_ics') || 'null'); } catch (e) { return; }
-  if (!s || !s.url || s.auto === false) return;
+  if (!s || !s.url || s.auto === false) {
+    /*@3.ICBJ.9*/
+    if (!s || !s.url) {
+      window.addEventListener('garden:syncCompleted', function again() {
+        window.removeEventListener('garden:syncCompleted', again);
+        var t = null;
+        try { t = JSON.parse(localStorage.getItem('garden_ics') || 'null'); } catch (e) { return; }
+        if (!t || !t.url || t.auto === false) return;
+        try { localStorage.setItem(STAMP_LS, String(Date.now())); } catch (e) {}
+        if (window.GardenICS) go(); else start();
+      });
+    }
+    return;
+  }
 
   var last = 0;
   try { last = parseInt(localStorage.getItem(STAMP_LS), 10) || 0; } catch (e) {}

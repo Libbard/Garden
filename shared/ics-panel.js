@@ -356,11 +356,21 @@
     if (reg) reg.addEventListener('click', function () {
       work(true);
       msg(L('نسجّل تقويمك…', 'Registering…'), '');
+      /*@3.ICPJ.19*/
       ICS.register().then(function (ok) {
         work(false);
-        msg(ok ? L('فعّلناه — سنقرأ تقويمك مرّتين يومياً وننبّهك قبل التسليم.',
-                   'Enabled — we will read your calendar twice a day and remind you before deadlines.')
-                : L('تعذّر التسجيل. جرّب لاحقاً.', 'Could not register. Try later.'), ok ? 'ok' : 'bad');
+        var text;
+        if (ok === true) {
+          text = L('فعّلناه — سنقرأ تقويمك مرّتين يومياً وننبّهك قبل التسليم.',
+                   'Enabled — we will read your calendar twice a day and remind you before deadlines.');
+        } else if (ok === 'no-vault') {
+          text = L('لا يمكن تفعيلُه قبل تشغيل المزامنة: التنبيهُ يخرج من خادمنا، والخادمُ يحتاج مفتاحَ خزنتك ليعرف لمن يرسل. فعّل المزامنةَ من الإعدادات ثمّ عُد إلى هنا.',
+                   'This needs sync on first: the reminder comes from our server, and the server needs your vault key to know who to notify. Turn on sync in Settings, then come back.');
+        } else {
+          text = L('تعذّر التسجيل. تأكّد أن الرابط يعمل ثمّ جرّب ثانيةً.',
+                   'Could not register. Check the link works, then try again.');
+        }
+        msg(text, ok === true ? 'ok' : 'bad');
         render();
       });
     });
@@ -409,4 +419,6 @@
   /*@3.ICPJ.17*/
   document.addEventListener('garden:languageChanged', render);
   window.addEventListener('ics:sync', function () { /*@3.ICPJ.18*/ });
+  /*@3.ICPJ.20*/
+  window.addEventListener('garden:syncCompleted', function () { render(); });
 })();

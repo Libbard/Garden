@@ -4,6 +4,10 @@
 
   /*@3.SELJ.2*/
   var SEARCH_MIN = 14;
+
+  function finePointer() {
+    return !!(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
+  }
   var openOne = null;          /*@3.SELJ.3*/
   var uid = 0;
 
@@ -168,8 +172,13 @@
     document.addEventListener('keydown', this._onKey, true);
     window.addEventListener('scroll', this._onScroll, true);
     window.addEventListener('resize', this._onScroll);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', this._onScroll);
+      window.visualViewport.addEventListener('scroll', this._onScroll);
+    }
 
-    if (this.useSearch) {
+    /*@3.SELJ.37*/
+    if (this.useSearch && finePointer()) {
       var inp = pop.querySelector('.gs-search-i');
       if (inp) inp.focus();
     }
@@ -186,6 +195,10 @@
     document.removeEventListener('keydown', this._onKey, true);
     window.removeEventListener('scroll', this._onScroll, true);
     window.removeEventListener('resize', this._onScroll);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', this._onScroll);
+      window.visualViewport.removeEventListener('scroll', this._onScroll);
+    }
     if (this.pop && this.pop.parentNode) this.pop.parentNode.removeChild(this.pop);
     this.pop = null;
     if (openOne === this) openOne = null;
@@ -333,10 +346,21 @@
   };
 
   /*@3.SELJ.26*/
+  /*@3.SELJ.36*/
   Enhanced.prototype.place = function () {
     if (!this.pop) return;
     var r = this.btn.getBoundingClientRect();
-    var vh = window.innerHeight, vw = window.innerWidth;
+    var vv = window.visualViewport;
+    var vh = (vv && vv.height) ? vv.height : window.innerHeight;
+    var vw = (vv && vv.width) ? vv.width : window.innerWidth;
+
+    if (!document.body.contains(this.btn) ||
+        (r.width === 0 && r.height === 0) ||
+        r.bottom <= 0 || r.top >= vh || r.right <= 0 || r.left >= vw) {
+      this.close();
+      return;
+    }
+
     var pop = this.pop;
     pop.style.minWidth = Math.round(r.width) + 'px';
     pop.style.maxWidth = Math.round(Math.min(vw - 16, Math.max(r.width, 340))) + 'px';

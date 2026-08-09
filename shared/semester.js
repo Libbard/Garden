@@ -927,7 +927,9 @@
         '<span class="sem-pick-b">' +
           '<span class="sem-pick-n">' + hi(isAr() ? (c.name_ar || c.code) : (c.name_en || c.code), q) + '</span>' +
           '<span class="sem-pick-m">' + esc((isAr() ? c.level_name_ar : c.level_name_en) || '') +
-            ' · ' + esc(nOf(c.credits != null ? c.credits : 3, ['ساعة', 'ساعتان', 'ساعات'], ['hr', 'hrs'])) + '</span>' +
+            ' · ' + esc(nOf(c.credits != null ? c.credits : 3, ['ساعة', 'ساعتان', 'ساعات'], ['hr', 'hrs'])) +
+            '<span class="cv-slot" data-cv-code="' + esc(c.code) + '" data-cv-flat="1"></span>' +
+          '</span>' +
         '</span>';
 
       if (added) {
@@ -960,6 +962,22 @@
     /*@3.SEMJ.141*/
     if (looksCrn(S.addQ)) html = crnPickRow(S.addQ.trim()) + html;
     el('add-list').innerHTML = html;
+    fillRateChips(el('add-list'));
+  }
+
+  function fillRateChips(host) {
+    var V = window.GardenCourseView;
+    if (!V || !host) return;
+    var slots = [].slice.call(host.querySelectorAll('.cv-slot[data-cv-code]'));
+    if (!slots.length) return;
+    var codes = {};
+    slots.forEach(function (s) { codes[s.getAttribute('data-cv-code')] = 1; });
+    V.brief(Object.keys(codes)).then(function (map) {
+      slots.forEach(function (s) {
+        var code = s.getAttribute('data-cv-code');
+        s.innerHTML = V.chip(code, map[code], { flat: !!s.getAttribute('data-cv-flat') });
+      });
+    });
   }
 
   /*@3.SEMJ.67*/
@@ -1605,6 +1623,50 @@
     refresh();
     toast(act === 'retake' ? L('أُعيدت المادة — عادت جارية', 'Course reopened')
                            : L('حُفظ ✓', 'Saved ✓'));
+    if (act === 'done') rateNudge(code);
+  }
+
+  var NUDGE_KEY = 'gd_rate_nudged';
+  function nudged() {
+    try { return JSON.parse(localStorage.getItem(NUDGE_KEY) || '{}') || {}; }
+    catch (e) { return {}; }
+  }
+  function markNudged(code) {
+    var m = nudged(); m[code] = 1;
+    try { localStorage.setItem(NUDGE_KEY, JSON.stringify(m)); } catch (e) {}
+  }
+
+  /*@3.SEMJ.171*/
+  function rateNudge(code) {
+    if (!window.GardenCourseRate || !/^[A-Z]{2,4}[0-9]{2,4}$/.test(String(code))) return;
+    var F = window.GardenFlags;
+    if (F && F.get('ratings.course.enabled') === false) return;
+    if (nudged()[code]) return;
+    markNudged(code);
+
+    var box = document.createElement('div');
+    box.className = 'sem-nudge';
+    box.innerHTML =
+      '<p class="sem-nudge-t">' + esc(L('كيف كانت ' + code + '؟', 'How was ' + code + '?')) + '</p>' +
+      '<p class="sem-nudge-d">' + esc(L(
+        'أنهيتَها للتوّ — وهذه أدقُّ لحظةٍ تتذكّر فيها. دقيقةٌ منك تختصر فصلاً على من يأتي بعدك.',
+        'You just finished it — this is when you remember best. A minute from you saves a term for the next student.')) + '</p>' +
+      '<div class="sem-nudge-a">' +
+        '<button type="button" class="sem-chip" data-nudge="no">' + esc(L('لاحقاً', 'Later')) + '</button>' +
+        '<button type="button" class="sem-chip is-go" data-nudge="yes">' + esc(L('قيّمها الآن', 'Rate it now')) + '</button>' +
+      '</div>';
+    document.body.appendChild(box);
+
+    var close = function () { if (box.parentNode) box.parentNode.removeChild(box); };
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-nudge]');
+      if (!b) return;
+      close();
+      if (b.getAttribute('data-nudge') === 'yes') {
+        GardenCourseRate.open({ code: code, name: info({ code: code }).name });
+      }
+    });
+    setTimeout(close, 20000);
   }
 
   /*@3.SEMJ.91*/

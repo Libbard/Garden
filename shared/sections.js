@@ -592,6 +592,25 @@
     $('#sx-more').hidden = state.shown >= state.view.length;
     $('#sx-more').textContent = t('عرض المزيد (' + (state.view.length - state.shown) + ')',
                                   'Show more (' + (state.view.length - state.shown) + ')');
+    fillChips();
+  }
+
+  /*@3.SECJ.379*/
+  function fillChips() {
+    var V = window.GardenCourseView;
+    if (!V) return;
+    var slots = [].slice.call(document.querySelectorAll('.cv-slot[data-cv-code]'));
+    if (!slots.length) return;
+    var codes = {};
+    slots.forEach(function (el) { codes[el.getAttribute('data-cv-code')] = 1; });
+    V.brief(Object.keys(codes)).then(function (map) {
+      slots.forEach(function (el) {
+        /*@3.SECJ.380*/
+        if (el.getAttribute('data-cv-done')) return;
+        el.setAttribute('data-cv-done', '1');
+        el.innerHTML = V.chip(el.getAttribute('data-cv-code'), map[el.getAttribute('data-cv-code')]);
+      });
+    });
   }
 
   /*@3.SECJ.63*/
@@ -646,6 +665,7 @@
             '<span class="sx-grp-n">' + (noCap ? t('بلا حدّ', 'unlimited')
               : '<b>' + seats + '</b> ' + t('مقعد', 'seats')) + '</span>' +
             (np ? '<span class="sx-grp-n"><b>' + np + '</b> ' + t('أستاذ', 'faculty') + '</span>' : '') +
+            '<span class="cv-slot" data-cv-code="' + esc(code) + '"></span>' +
           '</span>' +
         '</button>' +
         '<div class="sx-grp-body">' + (isOn ? list.map(card).join('') : '') + '</div>' +
@@ -653,6 +673,7 @@
     }).join('');
     $('#sx-more').hidden = true;
     state.shown = state.view.length;
+    fillChips();
   }
 
   /*@3.SECJ.66*/
@@ -1137,6 +1158,7 @@
           '<i class="fa-solid fa-' + (inBasket(s.crn) ? 'check' : 'plus') + '"></i></button>' +
         '<span class="sx-dot"></span>' +
         '<span class="sx-code">' + esc(s.c || '') + '</span>' +
+        '<span class="cv-slot" data-cv-code="' + esc(s.c || '') + '"></span>' +
         (s.q && s.q !== '0' ? '<span class="sx-seq">' + t('شعبة ', 'Sec ') + esc(s.q) + '</span>' : '') +
         '<button class="sx-crn" data-copy="' + esc(s.crn) + '" title="' +
           t('اضغط لنسخ رقم الشعبة', 'Click to copy the CRN') + '">' +
@@ -3008,10 +3030,8 @@
       closeAllPops();
     });
     /*@3.SECJ.323*/
-    window.addEventListener('scroll', function () {
-      if (NARROW.matches) closeAllPops();
-    }, { passive: true });
-    window.addEventListener('resize', function () { closeAllPops(); queueMarquee(); });
+    /*@3.SECJ.378*/
+    window.addEventListener('resize', function () { queueMarquee(); });
 
     /*@3.SECJ.324*/
     document.body.addEventListener('click', function (e) {

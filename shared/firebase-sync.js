@@ -93,11 +93,14 @@
     /^__tomb_[A-Za-z0-9_.:-]+$/,
     /*@3.FISJ.21*/
     /^garden_labs_[a-z0-9-]+:(artifact|slots|slot:[a-z0-9]+)$/,
+    /*@3.FISJ.204*/
+    /^garden_ics$/,
   ];
   /*@3.FISJ.22*/
   const NEVER_SYNC = new Set([
     'garden_lang', 'garden_theme', 'garden_font_size', 'garden_mobile_3d', 'garden_sync_key',
     'garden_semester_meta',
+    'garden_ics_run', 'garden_ics_boot',
     /*@3.FISJ.23*/
     'dash_view',
     /*@3.FISJ.24*/
@@ -273,6 +276,7 @@
     'gpa_settings',
     'dashboard_prefs',
     'student_profile',
+    'garden_ics',
   ]);
   const MERGE_DEEP_PATTERNS = [
     /^course_meta_[A-Z0-9_]+$/,
