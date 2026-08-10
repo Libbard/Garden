@@ -8,6 +8,7 @@
     'ratings.course.enabled': false,
     'ratings.course.publicMin': 50,
     'ratings.course.resourcesOn': true,
+    'ratings.course.reportsOn': true,
     'ratings.faculty.enabled': true,
     'labs.publicNav': true,
     'banner.syncEnabled': true,

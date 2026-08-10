@@ -45,12 +45,32 @@
     '</p></div>';
   }
 
-  function texts(list, title, cls) {
+  /*@3.CORVJ.14*/
+  var WHYS = [
+    ['spam', 'إعلانٌ أو تكرار', 'Spam'],
+    ['wrong', 'معلومةٌ خاطئة', 'Wrong'],
+    ['rude', 'إساءة', 'Abusive'],
+    ['personal', 'يكشف هويّة', 'Doxxing'],
+    ['broken', 'رابطٌ معطوب', 'Broken link'],
+  ];
+
+  /*@3.CORVJ.15*/
+  function repBtn(kind, i) {
+    if (flag('ratings.course.reportsOn', true) === false) return '';
+    return '<button type="button" class="gsf-btn gsf-btn--ghost cv-rep" ' +
+      'data-rep-k="' + esc(kind) + '" data-rep-i="' + i + '" ' +
+      'title="' + esc(t('أبلغْ عن هذا', 'Report this')) + '" ' +
+      'aria-label="' + esc(t('أبلغْ عن هذا', 'Report this')) + '">' +
+      '<i class="fa-solid fa-flag" aria-hidden="true"></i></button>';
+  }
+
+  function texts(list, title, cls, kind) {
     if (!list || !list.length) return '';
     return '<div class="cv-block">' +
       '<h4 class="cv-h4">' + esc(title) + '</h4>' +
-      list.slice(0, 12).map(function (x) {
-        return '<blockquote class="cv-q ' + cls + '">' + esc(x.t) + '</blockquote>';
+      list.slice(0, 12).map(function (x, i) {
+        return '<blockquote class="cv-q ' + cls + '">' + esc(x.t) +
+          repBtn(kind, i) + '</blockquote>';
       }).join('') + '</div>';
   }
 
@@ -58,11 +78,12 @@
     if (!list || !list.length) return '';
     return '<div class="cv-block"><h4 class="cv-h4">' +
       esc(t('مصادرُ رشّحها من درسها', 'Resources recommended by past students')) + '</h4>' +
-      '<ul class="cv-links">' + list.slice(0, 20).map(function (x) {
+      '<ul class="cv-links">' + list.slice(0, 20).map(function (x, i) {
         return '<li><a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer nofollow">' +
           '<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> ' +
           esc(x.title || x.url) + '</a>' +
           (x.kind ? ' <span class="cv-kind">' + esc(x.kind) + '</span>' : '') +
+          repBtn('resource', i) +
           (x.why ? '<p class="cv-why">' + esc(x.why) + '</p>' : '') + '</li>';
       }).join('') + '</ul></div>';
   }
@@ -116,11 +137,13 @@
         bars(d, !!f.multi) + '</div>';
     });
 
-    body += texts(agg.explains, t('ما هذه المادةُ فعلاً؟', 'What is this course really?'), 'is-explain');
-    body += texts(agg.advices, t('نصائحُ من سبقك', 'Advice from past students'), 'is-advice');
+    body += texts(agg.explains, t('ما هذه المادةُ فعلاً؟', 'What is this course really?'), 'is-explain', 'explain');
+    body += texts(agg.advices, t('نصائحُ من سبقك', 'Advice from past students'), 'is-advice', 'advice');
     body += links(agg.resources);
 
     box.innerHTML = '<div class="cv">' + body + '<div class="cv-foot">' + btn + '</div></div>';
+    /*@3.CORVJ.21*/
+    box.__cvAgg = agg;
   }
 
   function load(box, code, term) {
@@ -150,7 +173,84 @@
     return { reload: function () { load(box, code, o.term); } };
   }
 
+  /*@3.CORVJ.16*/
+  function fp(s) {
+    var enc = new TextEncoder().encode(String(s == null ? '' : s).trim());
+    return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
+      var a = Array.prototype.map.call(new Uint8Array(buf), function (x) {
+        return ('0' + x.toString(16)).slice(-2);
+      });
+      return a.join('').slice(0, 32);
+    });
+  }
+
+  /*@3.CORVJ.17*/
+  function repContent(box, kind, i) {
+    var agg = box && box.__cvAgg;
+    if (!agg) return null;
+    if (kind === 'resource') {
+      var r = (agg.resources || [])[i];
+      return r ? r.url : null;
+    }
+    var l = (kind === 'explain' ? agg.explains : agg.advices) || [];
+    return l[i] ? l[i].t : null;
+  }
+
+  /*@3.CORVJ.18*/
+  function repRow(btn) {
+    var host = btn.parentNode;
+    var old = host.querySelector('.cv-repbox');
+    if (old) { old.parentNode.removeChild(old); return; }
+    var d = document.createElement('div');
+    d.className = 'cv-repbox';
+    d.innerHTML = '<span class="cv-repq">' + esc(t('ما الخطب؟', 'What is wrong?')) + '</span>' +
+      WHYS.map(function (w) {
+        return '<button type="button" class="gsf-chip cv-repw" data-w="' + esc(w[0]) + '">' +
+          esc(isAr() ? w[1] : w[2]) + '</button>';
+      }).join('');
+    host.appendChild(d);
+  }
+
+  /*@3.CORVJ.19*/
+  function repSend(box, kind, i, why, host) {
+    var code = box.getAttribute('data-cv-box');
+    var text = repContent(box, kind, i);
+    if (!text || !API) return;
+    var say = function (msg) {
+      host.innerHTML = '<span class="cv-repdone">' + esc(msg) + '</span>';
+    };
+    say(t('يُرسَل…', 'Sending…'));
+    fp(text).then(function (h) {
+      var k = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
+      return fetch(API + '/v1/report', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kind: kind, code: code, target: h, why: why,
+          vault: (k && /^v[0-9a-f]{32}$/.test(k)) ? k : undefined,
+        }),
+      });
+    }).then(function (r) {
+      say(r && r.ok ? t('وصل بلاغُك — يُراجَع يدوياً.', 'Report received — reviewed by a human.')
+                    : t('تعذّر الإرسال.', 'Could not send.'));
+    }).catch(function () { say(t('تعذّر الإرسال.', 'Could not send.')); });
+  }
+
   document.addEventListener('click', function (e) {
+    /*@3.CORVJ.20*/
+    var rb = e.target.closest && e.target.closest('.cv-rep');
+    if (rb) { repRow(rb); return; }
+    var rw = e.target.closest && e.target.closest('.cv-repw');
+    if (rw) {
+      var host = rw.parentNode;
+      var owner = host.parentNode.querySelector('.cv-rep');
+      var box2 = rw.closest('[data-cv-box]');
+      if (owner && box2) {
+        repSend(box2, owner.getAttribute('data-rep-k'),
+                Number(owner.getAttribute('data-rep-i')), rw.getAttribute('data-w'), host);
+      }
+      return;
+    }
+
     var b = e.target.closest && e.target.closest('[data-cv-rate]');
     if (!b || !window.GardenCourseRate) return;
     var code = b.getAttribute('data-cv-rate');
