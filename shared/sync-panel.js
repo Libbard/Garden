@@ -266,6 +266,15 @@
     /*@3.SYPJ.21*/
     var gd = this.guard;
     var armed = !!(gd && gd.armed);
+    /*@3.SYPJ.41*/
+    if (!gd && !this.guardErr) {
+      return h + '<div class="sp-sec"><div class="sp-vouch"><b>' +
+        '<i class="fa-solid fa-spinner fa-spin"></i>' +
+        esc(L('جارٍ قراءةُ حالةِ الحماية…', 'Reading protection state…')) + '</b><small>' +
+        esc(L('لحظةً — لا نقول «مفعَّلةٌ» ولا «مطفأة» قبل أن نعرف.',
+              'One moment — we will not say “on” or “off” before we know.')) +
+        '</small></div></div>';
+    }
     /*@3.SYPJ.28*/
     if (this.guardErr) {
       return h + '<div class="sp-sec"><div class="sp-vouch"><b>' +
