@@ -596,9 +596,18 @@
     if (Date.now() - wipeArmed < 5000) {
       var keep = {};
       /*@3.SETJ.23*/
-      ['garden_sync_key', 'garden_theme', 'garden_lang'].forEach(function (k) {
+      /*@3.SETJ.37*/
+      ['garden_sync_key', 'garden_vault_secret', 'garden_device_id',
+       'garden_recovery_set', 'garden_theme', 'garden_lang'].forEach(function (k) {
         var v = localStorage.getItem(k); if (v != null) keep[k] = v;
       });
+      /*@3.SETJ.38*/
+      for (var wi = 0; wi < localStorage.length; wi++) {
+        var wk = localStorage.key(wi);
+        if (wk && (wk.indexOf('garden_vault_tok:') === 0 || wk.indexOf('garden_vault_docid:') === 0)) {
+          keep[wk] = localStorage.getItem(wk);
+        }
+      }
       localStorage.clear();
       Object.keys(keep).forEach(function (k) { localStorage.setItem(k, keep[k]); });
       toast(L('مُحيت — يُعاد التحميل', 'Erased — reloading'));

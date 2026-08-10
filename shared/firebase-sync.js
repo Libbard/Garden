@@ -960,14 +960,18 @@
     const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, _te.encode(secret));
     /*@3.FISJ.83*/
     const blob = _b64u(iv) + _b64u(ct);
+    /*@3.FISJ.222*/
+    const vid = getKey() || '';
     const r = await fetch(syncEndpoint() + '/v1/pair', {
       method: 'POST', cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pid, blob }),
+      headers: guardHeaders(vid, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ pid, blob, vault_id: vid }),
     });
+    if (r.status === 401) await guardThrow(r);
     if (!r.ok) throw new Error('pair-store-failed');
+    const pj = await r.json().catch(() => ({}));
     return {
-      code, pretty: prettyPair(code),
+      code, pretty: prettyPair(code), carriesUnlock: !!(pj && pj.carries_unlock),
       link: location.origin + location.pathname.replace(/[^/]*$/, '') + 'index.html#pair=' + code,
       expiresAt: Date.now() + PAIR_TTL_MS,
     };
@@ -995,7 +999,14 @@
       /*@3.FISJ.85*/
       throw new Error('bad-code');
     }
-    return adoptVaultSecret(new TextDecoder().decode(plain));
+    const adopted = await adoptVaultSecret(new TextDecoder().decode(plain));
+    /*@3.FISJ.223*/
+    if (j.token) {
+      setVaultTok(adopted.docId, j.token);
+      lock = { armed: true, pw: lock.pw, google: lock.google, locked: false };
+      lockAnnounced = false;
+    }
+    return adopted;
   }
 
   /*@3.FISJ.86*/
@@ -1318,6 +1329,19 @@
     return j;
   }
 
+  /*@3.FISJ.226*/
+  async function revokeSession(sid) {
+    if (!/^[0-9a-f]{12}$/.test(String(sid || ''))) throw new Error('bad-sid');
+    const j = await guardPost('revoke', { sid: String(sid) });
+    /*@3.FISJ.227*/
+    if (j && j.state && !j.state.unlocked && j.state.armed) {
+      const g = await guardUrl('guard');
+      setVaultTok(g.id, '');
+      lock.locked = true;
+    }
+    return j;
+  }
+
   function lockInfo() {
     return { armed: lock.armed, pw: lock.pw, google: lock.google, locked: lock.locked };
   }
@@ -1340,11 +1364,23 @@
   /*@3.FISJ.98*/
   function disconnectDevice() {
     try {
+      /*@3.FISJ.224*/
+      const kill = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.indexOf(VAULT_TOK_LS) === 0 || k.indexOf(VAULT_MAP_LS) === 0)) kill.push(k);
+      }
+      kill.forEach(k => localStorage.removeItem(k));
       localStorage.removeItem(SYNC_KEY_LS);
       localStorage.removeItem(VAULT_SECRET_LS);
       localStorage.removeItem('garden_recovery_set');
+      localStorage.removeItem('garden_device_touch');
       localStorage.setItem(SYNC_DECLINED_LS, '1');
     } catch (e) {}
+    setPushPending(false);
+    /*@3.FISJ.225*/
+    lock = { armed: false, pw: false, google: false, locked: false };
+    lockAnnounced = false;
     userKey = null;
     setStatus('offline');
     return true;
@@ -1555,12 +1591,17 @@
   }
 
   /*@3.FISJ.113*/
+  let pairLinkError = '';
   async function consumePairLink() {
     const m = String(location.hash || '').match(/[#&]pair=([0-9A-Za-z-]{10,20})/);
     if (!m) return false;
     history.replaceState(null, '', location.pathname + location.search);
     try { await claimPairing(m[1]); return true; }
-    catch (e) { console.warn('[Sync] pairing failed:', e && e.message); return false; }
+    catch (e) {
+      /*@3.FISJ.228*/
+      pairLinkError = (e && e.message) || 'pair-failed';
+      return false;
+    }
   }
 
   /*@3.FISJ.114*/
@@ -2210,7 +2251,7 @@
     /*@3.FISJ.190*/
     saveRecovery, openRecovery, passIssue,
     guardState, lockInfo, armPassword, armGoogle, unlockPassword, unlockGoogle,
-    disarmGuard, revokeSessions,
+    disarmGuard, revokeSessions, revokeSession,
     hasToken: () => !!vaultTok(),
     hasRecovery: () => !!localStorage.getItem('garden_recovery_set'),
     downloadRecoveryFile, recoveryFileText, recoveryQR, pairQR,
@@ -2265,7 +2306,13 @@
     /*@3.FISJ.198*/
     if (/[#&]pair=/.test(location.hash)) {
       /*@3.FISJ.199*/
-      consumePairLink().then(() => { if (getKey()) initSync(); });
+      /*@3.FISJ.229*/
+      consumePairLink().then((ok) => {
+        if (getKey()) initSync();
+        ensurePanel().then((has) => {
+          if (has) window.GardenSyncPanel.openModal({ allowSkip: false, notice: ok ? '' : pairLinkError });
+        });
+      });
     } else if (/vault=/.test(location.hash)) {
       consumeVaultLink().then(ok => { if (ok || getKey()) initSync(); });
     } else if (getKey()) {

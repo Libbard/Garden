@@ -91,7 +91,9 @@
     this.host = host;
     this.opts = opts || {};
     this.view = 'auto';
-    this.busy = false; this.msg = ''; this.err = '';
+    this.busy = false; this.msg = '';
+    /*@3.SYPJ.40*/
+    this.err = this.opts.notice ? errText(new Error(this.opts.notice)) : '';
     this.pair = null; this.pairErr = null; this.tick = null; this.devs = null; this.qr = '';
     this.guard = null; this.guardErr = false;
     host.classList.add('sp');
@@ -121,6 +123,30 @@
       .then(function (s) { self.set({ guard: s, guardErr: false }); })
       .catch(function () { self.set({ guard: null, guardErr: true }); });
   };
+  /*@3.SYPJ.34*/
+  Panel.prototype.settle = function () {
+    var self = this, g = G();
+    if (!g || !g.guardState) { this.set({ view: 'home', busy: false }); this.done(); return; }
+    return g.guardState().then(function (s) {
+      var locked = !!(s && s.armed && !s.unlocked);
+      self.set({
+        guard: s, guardErr: false, busy: false,
+        view: locked ? 'locked' : 'home',
+        msg: locked
+          ? L('مفتاحُك مقبول — وهذا الحسابُ محميّ. افتحْه على هذا الجهاز لتبدأ المزامنة.',
+              'Your key is accepted — and this account is protected. Unlock it on this device to start syncing.')
+          : L('استُعيدت بياناتك.', 'Your data is back.'),
+      });
+      if (!locked) self.done();
+    }).catch(function () {
+      /*@3.SYPJ.35*/
+      self.set({ guard: null, guardErr: true, busy: false, view: 'home',
+                 msg: L('قُبل المفتاح — ولم نتحقّق من حالة الحماية بعد.',
+                        'The key was accepted — protection state not verified yet.') });
+      self.done();
+    });
+  };
+
   Panel.prototype.isLocked = function () {
     return !!(this.guard && this.guard.armed && !this.guard.unlocked);
   };
@@ -132,8 +158,10 @@
   Panel.prototype.paint = function () {
     var g = G();
     if (!g) { this.host.innerHTML = '<p class="sp-hint">' + esc(L('المزامنة غير متاحة هنا.', 'Sync is unavailable here.')) + '</p>'; return; }
+    /*@3.SYPJ.30*/
     var v = this.view;
     if (v === 'auto') v = linked() ? (this.isLocked() ? 'locked' : 'home') : 'pick';
+    this.cur = v;
 
     var st = linked() ? ((g.status && g.status()) || 'offline') : 'off';
     /*@3.SYPJ.7*/
@@ -218,7 +246,7 @@
            L('إن كنتَ حفظتَ نسخةً من مفتاحك من قبل', 'If you saved a copy of your key before')) +
       door('paste', 'fa-file-lines', L('عندي مفتاحي مكتوباً', 'I have my key written down'),
            L('من ملفِّ الاسترجاع أو الرمز المطبوع', 'From your recovery file or printed code')) +
-      '</div>' + back('pick');
+      '</div>' + back(linked() ? 'auto' : 'pick');
   };
 
   /*@3.SYPJ.10*/
@@ -320,7 +348,20 @@
              : '') +
       '<p class="sp-warn"><i class="fa-solid fa-circle-info"></i> ' + esc(L(
         'بياناتُك على هذا الجهاز سليمةٌ ولم يُحذف منها شيء. القفلُ يمنع الرفعَ والتنزيلَ فقط.',
-        'Your data on this device is intact; nothing was deleted. The lock only stops upload and download.')) + '</p>';
+        'Your data on this device is intact; nothing was deleted. The lock only stops upload and download.')) + '</p>' +
+      /*@3.SYPJ.33*/
+      '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('طرقٌ أخرى', 'Other ways in')) + '</p>' +
+      '<div class="sp-doors">' +
+      door('code', 'fa-qrcode', L('اربطْه من جهازي المفتوح', 'Link it from my unlocked device'),
+           L('افتح الحديقة هناك ⇐ المزامنة ⇐ «اربط جهازاً» — الرمزُ يفتح هذا الجهازَ فوراً',
+             'Open the Garden there ⇒ Sync ⇒ "Link a device" — that code unlocks this one at once'), 'go') +
+      door('paste', 'fa-file-lines', L('ألصقْ مفتاحاً آخر', 'Paste a different key'),
+           L('إن كان هذا ليس حسابَك', 'If this is not your account')) +
+      '</div>' +
+      '<div class="sp-acts" style="margin-top:0.8rem">' +
+      btn('guard-retry', 'fa-rotate', L('حدّثِ الحالة', 'Refresh state'), 'quiet') +
+      btn('disconnect', 'fa-arrow-right-from-bracket', L('ألغِ المزامنةَ وابدأ من جديد', 'Cancel sync and start over'), 'danger') +
+      '</div></div>';
   };
 
   Panel.prototype.vShield = function () {
@@ -346,11 +387,28 @@
     }
 
     /*@3.SYPJ.25*/
+    /*@3.SYPJ.36*/
+    var list = (gd.list && gd.list.length) ? gd.list : null;
     h += '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('الأجهزةُ المفتوحة', 'Unlocked devices')) + '</p>' +
       '<p class="sp-hint">' + esc(L(
-        'أجهزةٌ أثبتت هويّتَها وتزامن الآن: ' + (gd.sessions || 0),
-        'Devices that proved themselves and now sync: ' + (gd.sessions || 0))) + '</p>' +
-      '<div class="sp-acts">' + btn('do-revoke', 'fa-user-slash',
+        'هذه أجهزةٌ أثبتت هويّتَها وتزامن الآن. اطردْ أيَّها شئت — يُقفل فوراً ويُطلب منه الإثباتُ من جديد.',
+        'These devices proved themselves and sync now. Sign out any of them — it locks at once and must prove itself again.')) + '</p>';
+    if (list) {
+      h += list.map(function (s) {
+        return '<div class="sp-dev"><i class="fa-solid ' +
+          (s.method === 'google' ? 'fa-google' : s.method === 'pair' ? 'fa-qrcode' : 'fa-envelope') + '"></i>' +
+          '<span class="sp-dev-n">' + esc(s.name || L('جهاز', 'Device')) +
+          '<small>' + esc(L('آخرُ نشاط ', 'last active ') + ago(Date.parse(s.last_at))) + '</small></span>' +
+          (s.is_me ? '<span class="sp-dev-me">' + esc(L('هذا الجهاز', 'this one')) + '</span>'
+                   : '<button type="button" class="sp-x" data-sp="kick" data-v="' + esc(s.sid) +
+                     '" title="' + esc(L('اطردْه', 'Sign out')) + '"><i class="fa-solid fa-user-slash"></i></button>') +
+          '</div>';
+      }).join('');
+    } else {
+      h += '<p class="sp-hint">' + esc(L('جلساتٌ حيّة: ' + (gd.sessions || 0),
+                                         'Live sessions: ' + (gd.sessions || 0))) + '</p>';
+    }
+    h += '<div class="sp-acts">' + btn('do-revoke', 'fa-user-slash',
         L('اطردْ بقيّةَ الأجهزة', 'Sign out the other devices'), 'quiet') + '</div></div>';
 
     h += '<div class="sp-acts" style="margin-top:1rem">' +
@@ -405,6 +463,12 @@
         '<button type="button" class="sp-mini" data-sp="cp-code" title="' + esc(L('نسخ الرمز', 'Copy code')) +
         '"><i class="fa-solid fa-copy"></i></button></div>' +
       this.ttlBar() +
+      /*@3.SYPJ.39*/
+      (p && p.carriesUnlock
+        ? '<p class="sp-warn"><i class="fa-solid fa-shield-halved"></i> ' + esc(L(
+            'حسابُك محميّ — وهذا الرمزُ يفتح الجهازَ الجديدَ فوراً بلا بريدٍ ولا قوقل، لأنه صدر من جهازٍ مفتوح. ولذلك لا تشاركه إلا مع جهازك، وهو يموت بعد ثلاث دقائق وقراءةٍ واحدة.',
+            'Your account is protected — and this code unlocks the new device at once, with no email and no Google, because it came from an unlocked device. So share it only with your own device; it dies after three minutes and a single read.')) + '</p>'
+        : '') +
       '<div class="sp-acts">' +
         btn('cp-link', 'fa-share-nodes', L('انسخ رابطاً أرسله لنفسي', 'Copy a link to send myself')) +
         btn('pair', 'fa-rotate', L('رمزٌ جديد', 'New code')) +
@@ -440,14 +504,16 @@
     return '<p class="sp-hint">' + esc(L('اكتب الرمزَ الظاهرَ على جهازك الآخر.', 'Type the code shown on your other device.')) + '</p>' +
       '<input id="sp-in" class="sp-in sp-in--mono" maxlength="20" autocomplete="one-time-code" ' +
         'autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX">' +
-      '<div class="sp-acts">' + btn('do-code', 'fa-link', L('اربط', 'Link'), 'go wide') + '</div>' + back('have');
+      '<div class="sp-acts">' + btn('do-code', 'fa-link', L('اربط', 'Link'), 'go wide') + '</div>' +
+      back(linked() ? 'auto' : 'have');
   };
 
   Panel.prototype.vPaste = function () {
     return '<p class="sp-hint">' + esc(L('ألصق مفتاحك كما هو.', 'Paste your key exactly as it is.')) + '</p>' +
       '<input id="sp-in" class="sp-in sp-in--mono" maxlength="40" autocomplete="off" ' +
         'autocapitalize="characters" spellcheck="false">' +
-      '<div class="sp-acts">' + btn('do-paste', 'fa-check', L('استعمل هذا المفتاح', 'Use this key'), 'go wide') + '</div>' + back('have');
+      '<div class="sp-acts">' + btn('do-paste', 'fa-check', L('استعمل هذا المفتاح', 'Use this key'), 'go wide') + '</div>' +
+      back(linked() ? 'auto' : 'have');
   };
 
   Panel.prototype.vForm = function (kind) {
@@ -516,7 +582,8 @@
     var box = this.host.querySelector('#sp-gbtn');
     if (!box || !g || !g.googleRender || !(g.googleAvailable && g.googleAvailable())) return;
     /*@3.SYPJ.23*/
-    var unlocking = (this.view === 'locked');
+    /*@3.SYPJ.31*/
+    var unlocking = this.isLocked() || this.cur === 'locked';
     g.googleRender(box, function (err) {
       if (err) return self.fail(err);
       self.loadGuard();
@@ -539,15 +606,16 @@
     if (inp) {
       inp.addEventListener('input', function () { inp.value = inp.value.toUpperCase(); });
       inp.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') self.act(self.view === 'paste' ? 'do-paste' : 'do-code');
+        if (e.key === 'Enter') self.act(self.cur === 'paste' ? 'do-paste' : 'do-code');
       });
       setTimeout(function () { try { inp.focus(); } catch (e) {} }, 40);
     }
     var pw = this.host.querySelector('#sp-pw');
     if (pw) pw.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter') return;
-      self.act(self.view === 'vouch' ? 'do-vouch'
-             : self.view === 'locked' ? 'do-unlock' : 'do-recover');
+      /*@3.SYPJ.32*/
+      self.act(self.cur === 'vouch' ? 'do-vouch'
+             : self.cur === 'locked' ? 'do-unlock' : 'do-recover');
     });
     this.mountGoogle();
   };
@@ -587,13 +655,20 @@
       this.pairErr = null;
       this.set({ busy: true, err: '', msg: '', view: 'pair', pair: null });
       g.startPairing().then(function (p) {
-        self.pair = { pretty: p.pretty, code: p.code, link: p.link, expiresAt: p.expiresAt, qr: '' };
+        self.pair = { pretty: p.pretty, code: p.code, link: p.link, expiresAt: p.expiresAt,
+                      qr: '', carriesUnlock: !!p.carriesUnlock };
         return g.pairQR ? g.pairQR(p.link, { quiet: 3 }) : null;
       }).then(function (svg) {
         if (svg && self.pair) self.pair.qr = svg;
         self.set({ busy: false, view: 'pair' });
       }).catch(function (e) {
         /*@3.SYPJ.18*/
+        /*@3.SYPJ.38*/
+        if (/vault-locked/.test((e && e.message) || '')) {
+          self.loadGuard();
+          self.set({ busy: false, view: 'locked', pair: null, err: '' });
+          return;
+        }
         self.pairErr = e;
         self.set({ busy: false, view: 'pair', pair: null, err: '' });
       });
@@ -644,10 +719,8 @@
       this.set({ busy: true, err: '' });
       var p = (a === 'do-code') ? g.claimPairing(val)
                                 : Promise.resolve().then(function () { return g.adoptVaultSecret(val); });
-      p.then(function () {
-        self.set({ view: 'home', busy: false, msg: L('استُعيدت بياناتك.', 'Your data is back.') });
-        self.done();
-      }).catch(function (e) { self.fail(a === 'do-paste' ? new Error('bad-code') : e); });
+      p.then(function () { return self.settle(); })
+       .catch(function (e) { self.fail(a === 'do-paste' ? new Error('bad-code') : e); });
       return;
     }
     if (a === 'do-recover' || a === 'do-vouch' || a === 'do-unlock') {
@@ -680,9 +753,22 @@
     if (a === 'do-revoke') {
       this.set({ busy: true, err: '' });
       g.revokeSessions(false).then(function (j) {
+        /*@3.SYPJ.37*/
+        self.set({ busy: false, guard: (j && j.state) || self.guard,
+                   msg: L('طُردت ' + ((j && j.revoked) || 0) + ' جهازاً.',
+                          'Signed out ' + ((j && j.revoked) || 0) + ' device(s).') });
         self.loadGuard();
-        self.set({ busy: false, msg: L('طُردت ' + ((j && j.revoked) || 0) + ' جهازاً.',
-                                       'Signed out ' + ((j && j.revoked) || 0) + ' device(s).') });
+      }).catch(function (e) { self.fail(e); });
+      return;
+    }
+    if (a === 'kick') {
+      if (!v) return;
+      this.set({ busy: true, err: '' });
+      g.revokeSession(v).then(function (j) {
+        self.set({ busy: false, guard: (j && j.state) || self.guard,
+                   msg: ((j && j.revoked) ? L('طُرد الجهاز.', 'Device signed out.')
+                                          : L('لم يُعثر عليه — رُبّما طُرد قبلاً.', 'Not found — perhaps already signed out.')) });
+        self.loadGuard();
       }).catch(function (e) { self.fail(e); });
       return;
     }

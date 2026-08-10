@@ -1313,17 +1313,18 @@
     var S = window.GardenSync;
     var key = (S && S.getKey && S.getKey()) || null;
     var dot = el('sync-state-dot'), txt = el('sync-state-text'), last = el('sync-last-text');
-    var keyRow = el('sync-key-row'), keyVal = el('sync-key-val');
 
     if (!S) {
       if (txt) txt.textContent = tx('غير متاحة على هذه الصفحة', 'Unavailable here');
       return;
     }
+    /*@3.DASJ.132*/
+    var lk = (S.lockInfo && S.lockInfo()) || null;
     if (key) {
       if (dot) dot.className = 'dash-sync-dot is-on';
-      if (txt) txt.textContent = tx('مفعّلة', 'Enabled');
-      if (keyRow) keyRow.hidden = false;
-      if (keyVal) keyVal.textContent = String(key).slice(0, 4) + '····' + String(key).slice(-4);
+      if (txt) txt.textContent = (lk && lk.locked)
+        ? tx('محميّة — تحتاج فتحاً على هذا الجهاز', 'Protected — needs unlocking on this device')
+        : tx('مفعّلة', 'Enabled');
       var lastTs = localStorage.getItem('garden_sync_last');
       if (last && lastTs) {
         var d = D.daysUntil(new Date(parseInt(lastTs, 10)).toISOString().slice(0, 10));
@@ -1334,7 +1335,6 @@
       if (dot) dot.className = 'dash-sync-dot';
       if (txt) txt.textContent = tx('غير مفعّلة — بياناتك على هذا الجهاز فقط',
                                     'Off — your data lives on this device only');
-      if (keyRow) keyRow.hidden = true;
       if (last) last.textContent = '';
     }
   }
@@ -1493,13 +1493,7 @@
       }
       return;
     }
-    if (act === 'sync-copy') {
-      var k = window.GardenSync && window.GardenSync.getKey && window.GardenSync.getKey();
-      if (k && navigator.clipboard) {
-        navigator.clipboard.writeText(k).then(function () { toast(tx('نُسخ المفتاح', 'Key copied')); });
-      }
-      return;
-    }
+    /*@3.DASJ.133*/
     if (act === 'course-style') { openCourseStyle(id); return; }
     if (act === 'go-hub') location.href = 'hub/index.html';
     else if (act === 'go-gpa') location.href = 'hub/gpa.html';
