@@ -83,9 +83,15 @@
 
   /*@3.WACJ.7*/
 
+  /*@3.WACJ.15*/
   function api(path, opts) {
     if (!API) return Promise.reject(new Error('no-endpoint'));
-    return fetch(API + path, opts).then(function (r) {
+    var o = Object.assign({}, opts || {});
+    var SY = window.GardenSync;
+    o.headers = (SY && SY.vaultHeaders)
+      ? SY.vaultHeaders(SY.getKey && SY.getKey(), o.headers || {})
+      : (o.headers || {});
+    return fetch(API + path, o).then(function (r) {
       return r.json().catch(function () { return null; }).then(function (j) {
         if (r.ok) return j || {};
         var e = new Error((j && j.error) || ('http-' + r.status));

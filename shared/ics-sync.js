@@ -593,6 +593,13 @@
 
   /*@3.ICSJ.60*/
 
+  /*@3.ICSJ.72*/
+  function vh(extra) {
+    var S = window.GardenSync;
+    if (S && S.vaultHeaders) return S.vaultHeaders(null, extra || {});
+    return Object.assign({}, extra || {});
+  }
+
   /*@3.ICSJ.61*/
   function register(pushId) {
     var s = load();
@@ -602,7 +609,7 @@
       if (!vid) return 'no-vault';
       return fetch(base + '/v1/ics/feed', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: vh({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           vault_id: vid, url: s.url,
           push_id: pushId || vid, lead_days: s.lead_days
@@ -618,7 +625,8 @@
     if (!base) return Promise.resolve(false);
     return vaultId().then(function (vid) {
       if (!vid) return false;
-      return fetch(base + '/v1/ics/feed?vault_id=' + encodeURIComponent(vid), { method: 'DELETE' })
+      return fetch(base + '/v1/ics/feed?vault_id=' + encodeURIComponent(vid),
+                   { method: 'DELETE', headers: vh() })
         .then(function (r) { return r.ok; }, function () { return false; });
     });
   }

@@ -104,7 +104,9 @@
     if (!base) return Promise.resolve([]);
     return vaultId().then(function (vid) {
       if (!vid) return [];
-      return fetch(base + '/v1/ics/sent?vault_id=' + encodeURIComponent(vid) + '&limit=60')
+      var SY = window.GardenSync;
+      return fetch(base + '/v1/ics/sent?vault_id=' + encodeURIComponent(vid) + '&limit=60',
+                   { headers: (SY && SY.vaultHeaders) ? SY.vaultHeaders(vid) : {} })
       .then(function (r) { return r.ok ? r.json() : { sent: [] }; })
       .then(function (j) {
         return (j.sent || []).map(function (x) {

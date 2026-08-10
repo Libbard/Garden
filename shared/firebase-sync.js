@@ -2281,6 +2281,8 @@
     /*@3.FISJ.191*/
     startPairing, claimPairing,
     prettyPair,
+    /*@3.FISJ.235*/
+    vaultHeaders: guardHeaders,
     devices: listDevices,
     forgetDevice,
     deviceId, deviceName,
