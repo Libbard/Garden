@@ -93,7 +93,7 @@
     this.view = 'auto';
     this.busy = false; this.msg = ''; this.err = '';
     this.pair = null; this.pairErr = null; this.tick = null; this.devs = null; this.qr = '';
-    this.guard = null;
+    this.guard = null; this.guardErr = false;
     host.classList.add('sp');
     /*@3.SYPJ.6*/
     var self = this;
@@ -113,10 +113,13 @@
     if (this._onLock) { window.removeEventListener('garden:vaultLocked', this._onLock); this._onLock = null; }
   };
 
+  /*@3.SYPJ.27*/
   Panel.prototype.loadGuard = function () {
     var self = this, g = G();
     if (!g || !g.guardState || !linked()) return;
-    g.guardState().then(function (s) { self.set({ guard: s }); }).catch(function () {});
+    g.guardState()
+      .then(function (s) { self.set({ guard: s, guardErr: false }); })
+      .catch(function () { self.set({ guard: null, guardErr: true }); });
   };
   Panel.prototype.isLocked = function () {
     return !!(this.guard && this.guard.armed && !this.guard.unlocked);
@@ -235,6 +238,21 @@
     /*@3.SYPJ.21*/
     var gd = this.guard;
     var armed = !!(gd && gd.armed);
+    /*@3.SYPJ.28*/
+    if (this.guardErr) {
+      return h + '<div class="sp-sec"><div class="sp-vouch"><b>' +
+        '<i class="fa-solid fa-circle-question"></i>' +
+        esc(L('تعذّر قراءةُ حالةِ الحماية', 'Could not read protection state')) + '</b><small>' +
+        esc(L('لا نعرف الآن إن كانت مفعَّلةً أم لا، فلا نقول لك أحدَهما. تحقّق من اتصالك وأعد المحاولة — وإن كانت المزامنةُ متوقّفةً فقد يكون حسابُك محميّاً ويحتاج فتحاً على هذا الجهاز.',
+              'We do not know right now whether it is on, so we will not claim either. Check your connection and retry — and if sync is stopped, your account may be protected and need unlocking on this device.')) +
+        '</small><div class="sp-acts">' +
+        btn('guard-retry', 'fa-rotate', L('أعد المحاولة', 'Retry')) +
+        btn('locked', 'fa-lock-open', L('افتحْ هذا الجهاز', 'Unlock this device')) +
+        '</div></div></div>' +
+        '<div class="sp-acts" style="margin-top:1.1rem">' +
+        btn('disconnect', 'fa-arrow-right-from-bracket', L('فصلُ هذا الجهاز', 'Disconnect this device'), 'danger wide') +
+        '</div>';
+    }
     h += '<div class="sp-sec">' + (armed
       ? '<div class="sp-vouch sp-vouch--ok"><b><i class="fa-solid fa-shield-halved"></i>' +
           esc(L('حسابُك محميّ', 'Your account is protected')) + '</b><small>' +
@@ -286,11 +304,16 @@
 
   /*@3.SYPJ.22*/
   Panel.prototype.vLocked = function () {
-    var gd = this.guard || {}, g = G();
+    var g = G();
+    /*@3.SYPJ.29*/
+    var known = !!this.guard;
+    var gd = known ? this.guard : { pw: true, google: true };
     var gAvail = gd.google && g.googleAvailable && g.googleAvailable();
-    return '<p class="sp-hint">' + esc(L(
-      'هذا الجهازُ لم يُثبت هويّتَه بعد. ' + this.doorsText(gd),
-      'This device has not proven itself yet. ' + this.doorsText(gd))) + '</p>' +
+    return '<p class="sp-hint">' + esc(known
+      ? L('هذا الجهازُ لم يُثبت هويّتَه بعد. ' + this.doorsText(gd),
+          'This device has not proven itself yet. ' + this.doorsText(gd))
+      : L('أدخل ما فعّلتَ به الحماية — بريدك وكلمةَ سرّك، أو حسابَ قوقل.',
+          'Enter what you protected the account with — your email and password, or your Google account.')) + '</p>' +
       (gAvail ? '<div class="sp-gbtn" id="sp-gbtn"></div>' + (gd.pw ? '<div class="sp-or">' + esc(L('أو', 'or')) + '</div>' : '') : '') +
       (gd.pw ? emailPass('current-password') +
         '<div class="sp-acts">' + btn('do-unlock', 'fa-lock-open', L('افتحْ هذا الجهاز', 'Unlock this device'), 'go wide') + '</div>'
@@ -541,7 +564,9 @@
 
     if (a === 'skip') { if (this.opts.onSkip) this.opts.onSkip(); return; }
     if (a === 'have' || a === 'code' || a === 'recover' || a === 'paste' || a === 'vouch' ||
-        a === 'key' || a === 'unlink' || a === 'shield' || a === 'disarm') return this.go(a);
+        a === 'key' || a === 'unlink' || a === 'shield' || a === 'disarm' ||
+        a === 'locked') return this.go(a);
+    if (a === 'guard-retry') { this.set({ err: '', msg: '' }); this.loadGuard(); return; }
     if (a && a.indexOf('to-') === 0) return this.go(a.slice(3));
 
     if (a === 'new') {
