@@ -160,12 +160,66 @@
     return j.vault_id;
   }
 
+  /*@3.FISJ.205*/
+  const VAULT_TOK_LS = 'garden_vault_tok:';
+  function vaultTok(id) {
+    try { return localStorage.getItem(VAULT_TOK_LS + String(id || getKey() || '')) || ''; }
+    catch (e) { return ''; }
+  }
+  function setVaultTok(id, tok) {
+    try {
+      const k = VAULT_TOK_LS + String(id || getKey() || '');
+      if (tok) localStorage.setItem(k, String(tok));
+      else localStorage.removeItem(k);
+    } catch (e) {}
+  }
+
+  /*@3.FISJ.206*/
+  function guardHeaders(id, extra) {
+    const h = Object.assign({}, extra || {});
+    const t = vaultTok(id);
+    if (t) h['x-garden-vault'] = t;
+    return h;
+  }
+
+  /*@3.FISJ.207*/
+  let lock = { armed: false, pw: false, google: false, locked: false };
+  let lockAnnounced = false;
+  function lockFrom(j) {
+    lock = { armed: true, pw: !!(j && j.pw), google: !!(j && j.google), locked: true };
+    /*@3.FISJ.214*/
+    if (!lockAnnounced) {
+      lockAnnounced = true;
+      try {
+        window.dispatchEvent(new CustomEvent('garden:vaultLocked',
+          { detail: { pw: lock.pw, google: lock.google } }));
+      } catch (e) {}
+    }
+    setStatus('locked');
+    return new Error('vault-locked');
+  }
+  function lockClear() {
+    lock = { armed: lock.armed, pw: lock.pw, google: lock.google, locked: false };
+    lockAnnounced = false;
+  }
+
+  /*@3.FISJ.208*/
+  async function guardThrow(r) {
+    let j = null;
+    try { j = await r.json(); } catch (e) {}
+    if (j && j.error === 'vault_locked') throw lockFrom(j);
+    return j;
+  }
+
   /*@3.FISJ.34*/
   async function storeGet(docId) {
     if (usingOracle()) {
-      const r = await fetch(vaultUrl(await oracleDocId(docId)), { cache: 'no-store' });
+      const id = await oracleDocId(docId);
+      const r = await fetch(vaultUrl(id), { cache: 'no-store', headers: guardHeaders(id) });
+      if (r.status === 401) await guardThrow(r);
       if (!r.ok) throw new Error('oracle-get-' + r.status);
       const j = await r.json();
+      lockClear();
       return { exists: !!j.exists, sync: j.sync || {}, data: j };
     }
     const snap = await db.collection(collectionName()).doc(docId).get();
@@ -176,12 +230,15 @@
   /*@3.FISJ.35*/
   async function storeMerge(docId, payload, extra) {
     if (usingOracle()) {
-      const r = await fetch(vaultUrl(await oracleDocId(docId)), {
+      const id = await oracleDocId(docId);
+      const r = await fetch(vaultUrl(id), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: guardHeaders(id, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({ sync: payload })
       });
+      if (r.status === 401) await guardThrow(r);
       if (!r.ok) throw new Error('oracle-post-' + r.status);
+      lockClear();
       return r.json();
     }
     await db.collection(collectionName()).doc(docId).set(
@@ -532,6 +589,7 @@
 .sync-header-btn .sync-status-dot.loading { background: #fbbf24; animation: syncPulse 1s ease-in-out infinite; }
 .sync-header-btn .sync-status-dot.error { background: #ef4444; }
 .sync-header-btn .sync-status-dot.pending { background: #f59e0b; }
+.sync-header-btn .sync-status-dot.locked { background: #a78bfa; }
 
 /* ── Desktop header sync icon ── */
 .sync-header-btn {
@@ -834,6 +892,9 @@
     const id = await vaultDocId(s);
     localStorage.setItem(VAULT_SECRET_LS, s);
     saveKey(id);
+    /*@3.FISJ.215*/
+    lock = { armed: false, pw: false, google: false, locked: false };
+    lockAnnounced = false;
     /*@3.FISJ.79*/
     try {
       localStorage.removeItem('garden_device_touch');
@@ -972,7 +1033,9 @@
     const authHash = await crypto.subtle.digest('SHA-256', authBits);
     const wrap = await crypto.subtle.importKey('raw', wrapBits, { name: 'AES-GCM' },
                                                false, ['encrypt', 'decrypt']);
-    return { eid, authHash: _hex(authHash), wrap };
+    /*@3.FISJ.209*/
+    const proofBits = await _hkdf(new Uint8Array(K), 'garden-sync-auth-v1', 256);
+    return { eid, authHash: _hex(authHash), wrap, proof: _hex(proofBits) };
   }
 
   /*@3.FISJ.88*/
@@ -988,7 +1051,7 @@
   }
 
   /*@3.FISJ.89*/
-  async function saveRecovery(email, pass) {
+  async function saveRecEnvelope(email, pass) {
     const secret = currentVaultSecret();
     if (!secret) throw new Error('no-vault');
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(normEmail(email))) throw new Error('bad-email');
@@ -1031,7 +1094,11 @@
       plain = await crypto.subtle.decrypt(
         { name: 'AES-GCM', iv: _unb64u(blob.slice(0, 16)) }, d.wrap, _unb64u(blob.slice(16)));
     } catch (e) { throw new Error('no-match'); }
-    return adoptVaultSecret(new TextDecoder().decode(plain));
+    const adopted = await adoptVaultSecret(new TextDecoder().decode(plain));
+    /*@3.FISJ.216*/
+    try { await guardPost('unlock', { method: 'pw', proof: d.proof, name: deviceName() }); }
+    catch (e) {}
+    return adopted;
   }
 
   /*@3.FISJ.93*/
@@ -1084,11 +1151,15 @@
       client_id: googleClientId(),
       auto_select: false,
       cancel_on_tap_outside: true,
+      /*@3.FISJ.220*/
       callback: function (r) {
         if (busy) return;
         if (!r || !r.credential) { done && done(new Error('gsi-cancelled')); return; }
         busy = true;
-        gsiExchange(r.credential).then(function () { done && done(null); })
+        var work = (opts && opts.mode === 'unlock')
+          ? guardPost('unlock', { method: 'google', id_token: r.credential, name: deviceName() })
+          : gsiExchange(r.credential);
+        Promise.resolve(work).then(function () { done && done(null); })
           .catch(function (e) { done && done(e); })
           .then(function () { busy = false; });
       },
@@ -1107,13 +1178,9 @@
   async function gsiExchange(token) {
     const secret = currentVaultSecret();
     if (secret) {
-      const r = await fetch(syncEndpoint() + '/v1/recovery/google', {
-        method: 'POST', cache: 'no-store',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: token, secret }),
-      });
-      if (!r.ok) throw new Error('save-failed');
-      localStorage.setItem('garden_recovery_set', String(Date.now()));
+      await saveRecoveryGoogleWith(token);
+      /*@3.FISJ.217*/
+      await guardPost('arm', { door: 'google', id_token: token, name: deviceName() });
       return true;
     }
     const r = await fetch(syncEndpoint() + '/v1/recovery/google/open', {
@@ -1124,15 +1191,17 @@
     if (!r.ok) throw new Error('no-match');
     const j = await r.json();
     if (!j.secret) throw new Error('no-match');
-    return adoptVaultSecret(j.secret);
+    const adopted = await adoptVaultSecret(j.secret);
+    /*@3.FISJ.218*/
+    try { await guardPost('unlock', { method: 'google', id_token: token, name: deviceName() }); }
+    catch (e) {}
+    return adopted;
   }
 
-  async function saveRecoveryGoogle() {
+  async function saveRecoveryGoogleWith(token) {
     const secret = currentVaultSecret();
     if (!secret) throw new Error('no-vault');
-    if (!(await ensureGSI())) throw new Error('gsi-unavailable');
     await ensureEndpoints();
-    const token = await googleIdToken();
     const r = await fetch(syncEndpoint() + '/v1/recovery/google', {
       method: 'POST', cache: 'no-store',
       headers: { 'Content-Type': 'application/json' },
@@ -1143,19 +1212,114 @@
     return true;
   }
 
+  async function saveRecoveryGoogle() {
+    if (!currentVaultSecret()) throw new Error('no-vault');
+    if (!(await ensureGSI())) throw new Error('gsi-unavailable');
+    await ensureEndpoints();
+    return await gsiExchange(await googleIdToken());
+  }
+
   async function openRecoveryGoogle() {
     if (!(await ensureGSI())) throw new Error('gsi-unavailable');
     await ensureEndpoints();
-    const token = await googleIdToken();
-    const r = await fetch(syncEndpoint() + '/v1/recovery/google/open', {
-      method: 'POST', cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_token: token }),
-    });
-    if (!r.ok) throw new Error('no-match');
+    return await gsiExchange(await googleIdToken());
+  }
+
+  /*@3.FISJ.219*/
+
+  async function guardUrl(act) {
+    await ensureEndpoints();
+    const id = await oracleDocId(getKey() || '');
+    return { id, url: syncEndpoint() + '/v1/vault/' + encodeURIComponent(id) + '/' + act };
+  }
+
+  /*@3.FISJ.213*/
+  async function guardState() {
+    if (!getKey()) return { armed: false, pw: false, google: false, unlocked: false, sessions: 0 };
+    const g = await guardUrl('guard');
+    const r = await fetch(g.url, { cache: 'no-store', headers: guardHeaders(g.id) });
+    if (!r.ok) throw new Error('guard-' + r.status);
     const j = await r.json();
-    if (!j.secret) throw new Error('no-match');
-    return adoptVaultSecret(j.secret);
+    lock = { armed: !!j.armed, pw: !!j.pw, google: !!j.google,
+             locked: !!j.armed && !j.unlocked };
+    if (!lock.locked) lockAnnounced = false;
+    return j;
+  }
+
+  async function guardPost(act, body) {
+    const g = await guardUrl(act);
+    const r = await fetch(g.url, {
+      method: 'POST', cache: 'no-store',
+      headers: guardHeaders(g.id, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify(body || {}),
+    });
+    let j = null;
+    try { j = await r.json(); } catch (e) {}
+    if (r.status === 401 && j && j.error === 'vault_locked') throw lockFrom(j);
+    if (r.status === 401) throw new Error('no-match');
+    if (r.status === 409) throw new Error('google-in-use');
+    if (r.status === 429) throw new Error('too-many');
+    if (r.status === 503) throw new Error('guard-unavailable');
+    if (!r.ok) throw new Error('guard-' + r.status);
+    /*@3.FISJ.211*/
+    if (j && j.token) {
+      setVaultTok(g.id, j.token);
+      lockClear();
+      setStatus(pushPending ? 'pending' : 'synced');
+    }
+    return j || {};
+  }
+
+  /*@3.FISJ.210*/
+  async function saveRecovery(email, pass) {
+    await saveRecEnvelope(email, pass);
+    const d = await _recDerive(email, pass);
+    return await guardPost('arm', { door: 'pw', proof: d.proof, name: deviceName() });
+  }
+  const armPassword = saveRecovery;
+
+  async function unlockPassword(email, pass) {
+    const d = await _recDerive(email, pass);
+    return await guardPost('unlock', { method: 'pw', proof: d.proof, name: deviceName() });
+  }
+
+  /*@3.FISJ.212*/
+  async function armGoogle() {
+    if (!currentVaultSecret()) throw new Error('no-vault');
+    if (!(await ensureGSI())) throw new Error('gsi-unavailable');
+    const token = await googleIdToken();
+    await saveRecoveryGoogleWith(token);
+    return await guardPost('arm', { door: 'google', id_token: token, name: deviceName() });
+  }
+
+  async function unlockGoogle() {
+    if (!(await ensureGSI())) throw new Error('gsi-unavailable');
+    const token = await googleIdToken();
+    return await guardPost('unlock', { method: 'google', id_token: token, name: deviceName() });
+  }
+
+  async function disarmGuard(door) {
+    const j = await guardPost('disarm', { door: door || 'all' });
+    if (j.state && !j.state.armed) {
+      const g = await guardUrl('guard');
+      setVaultTok(g.id, '');
+      lock = { armed: false, pw: false, google: false, locked: false };
+    }
+    return j;
+  }
+
+  async function revokeSessions(all) {
+    const j = await guardPost('revoke', { all: !!all });
+    if (all) {
+      const g = await guardUrl('guard');
+      setVaultTok(g.id, '');
+      lock.locked = true;
+    }
+    return j;
+  }
+
+  function lockInfo() {
+    return { armed: lock.armed, pw: lock.pw, google: lock.google, locked: lock.locked };
   }
 
   /*@3.FISJ.97*/
@@ -1165,7 +1329,7 @@
     await ensureEndpoints();
     const r = await fetch(syncEndpoint() + '/v1/recovery/forget', {
       method: 'POST', cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' },
+      headers: guardHeaders(getKey(), { 'Content-Type': 'application/json' }),
       body: JSON.stringify({ secret, vault_id: getKey() || '' }),
     });
     if (!r.ok) throw new Error('forget-failed');
@@ -1291,7 +1455,7 @@
     try {
       const r = await fetch(syncEndpoint() + '/v1/devices/' + id, {
         method: 'POST', cache: 'no-store',
-        headers: { 'Content-Type': 'application/json' },
+        headers: guardHeaders(id, { 'Content-Type': 'application/json' }),
         body: JSON.stringify({ device_id: deviceId(), name: deviceName() }),
       });
       return r.ok;
@@ -1301,7 +1465,8 @@
     const id = getKey();
     if (!id || !usingOracle() || !ORACLE_ID.test(String(id))) return [];
     try {
-      const r = await fetch(syncEndpoint() + '/v1/devices/' + id, { cache: 'no-store' });
+      const r = await fetch(syncEndpoint() + '/v1/devices/' + id,
+                            { cache: 'no-store', headers: guardHeaders(id) });
       if (!r.ok) return [];
       const j = await r.json();
       const me = deviceId();
@@ -1313,7 +1478,7 @@
     if (!id || !usingOracle()) return false;
     try {
       const r = await fetch(syncEndpoint() + '/v1/devices/' + id + '/' + did,
-                            { method: 'DELETE', cache: 'no-store' });
+                            { method: 'DELETE', cache: 'no-store', headers: guardHeaders(id) });
       return r.ok;
     } catch (e) { return false; }
   }
@@ -2044,6 +2209,9 @@
     adoptVaultSecret,
     /*@3.FISJ.190*/
     saveRecovery, openRecovery, passIssue,
+    guardState, lockInfo, armPassword, armGoogle, unlockPassword, unlockGoogle,
+    disarmGuard, revokeSessions,
+    hasToken: () => !!vaultTok(),
     hasRecovery: () => !!localStorage.getItem('garden_recovery_set'),
     downloadRecoveryFile, recoveryFileText, recoveryQR, pairQR,
     forgetRecovery, disconnect: disconnectDevice,

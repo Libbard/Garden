@@ -55,6 +55,10 @@
     if (/gsi-cancelled/.test(m))         return L('أُلغيت العملية.', 'Cancelled.');
     if (/gsi-unavailable/.test(m))       return L('تعذّر فتحُ قوقل الآن.', 'Could not open Google right now.');
     if (/no-vault/.test(m))              return L('لا حسابَ بعد.', 'No account yet.');
+    /*@3.SYPJ.20*/
+    if (/vault-locked/.test(m))          return L('حسابُك محميّ — أدخل ما فعّلتَ به الحماية.', 'Your account is protected — enter what you protected it with.');
+    if (/google-in-use/.test(m))         return L('حسابُ قوقل هذا مرتبطٌ بحسابٍ آخر.', 'That Google account is linked to another account.');
+    if (/guard-unavailable/.test(m))     return L('تعذّر الوصولُ إلى خادم الحماية. أعد المحاولة.', 'Could not reach the protection server. Try again.');
     return L('تعذّر إتمامُ العملية. تحقّق من اتصالك.', 'Could not complete. Check your connection.');
   }
 
@@ -89,18 +93,33 @@
     this.view = 'auto';
     this.busy = false; this.msg = ''; this.err = '';
     this.pair = null; this.pairErr = null; this.tick = null; this.devs = null; this.qr = '';
+    this.guard = null;
     host.classList.add('sp');
     /*@3.SYPJ.6*/
     var self = this;
     this._onLang = function () { if (self.host && self.host.isConnected) self.paint(); };
     document.addEventListener('garden:languageChanged', this._onLang);
+    /*@3.SYPJ.26*/
+    this._onLock = function () { self.loadGuard(); };
+    window.addEventListener('garden:vaultLocked', this._onLock);
     this.paint();
+    this.loadGuard();
     this.loadDevices();
   }
 
   Panel.prototype.destroy = function () {
     if (this.tick) { clearInterval(this.tick); this.tick = null; }
     if (this._onLang) { document.removeEventListener('garden:languageChanged', this._onLang); this._onLang = null; }
+    if (this._onLock) { window.removeEventListener('garden:vaultLocked', this._onLock); this._onLock = null; }
+  };
+
+  Panel.prototype.loadGuard = function () {
+    var self = this, g = G();
+    if (!g || !g.guardState || !linked()) return;
+    g.guardState().then(function (s) { self.set({ guard: s }); }).catch(function () {});
+  };
+  Panel.prototype.isLocked = function () {
+    return !!(this.guard && this.guard.armed && !this.guard.unlocked);
   };
   Panel.prototype.set = function (p) { for (var k in p) this[k] = p[k]; this.paint(); };
   Panel.prototype.go = function (v) { this.set({ view: v, err: '', msg: '', pairErr: null }); };
@@ -111,11 +130,12 @@
     var g = G();
     if (!g) { this.host.innerHTML = '<p class="sp-hint">' + esc(L('المزامنة غير متاحة هنا.', 'Sync is unavailable here.')) + '</p>'; return; }
     var v = this.view;
-    if (v === 'auto') v = linked() ? 'home' : 'pick';
+    if (v === 'auto') v = linked() ? (this.isLocked() ? 'locked' : 'home') : 'pick';
 
     var st = linked() ? ((g.status && g.status()) || 'offline') : 'off';
     /*@3.SYPJ.7*/
     if (linked() && !everSynced() && st !== 'error' && st !== 'loading') st = 'unconfirmed';
+    if (this.isLocked()) st = 'locked';
     this.host.setAttribute('data-state', st);
 
     /*@3.SYPJ.8*/
@@ -130,6 +150,9 @@
       : v === 'recover' ? this.vForm('recover')
       : v === 'vouch'   ? this.vForm('vouch')
       : v === 'unlink'  ? this.vUnlink()
+      : v === 'shield'  ? this.vShield()
+      : v === 'locked'  ? this.vLocked()
+      : v === 'disarm'  ? this.vDisarm()
       :                   this.vHome();
 
     this.host.innerHTML = (solo ? '' : this.hero(st)) + body + this.msgBox();
@@ -142,7 +165,7 @@
     /*@3.SYPJ.9*/
     var ic = { synced: 'fa-circle-check', loading: 'fa-arrows-rotate', pending: 'fa-cloud-arrow-up',
                error: 'fa-triangle-exclamation', offline: 'fa-cloud', off: 'fa-cloud',
-               unconfirmed: 'fa-cloud-arrow-up' };
+               unconfirmed: 'fa-cloud-arrow-up', locked: 'fa-lock' };
     var ti = {
       synced:  L('كلُّ شيءٍ محفوظ', 'Everything is saved'),
       loading: L('جارٍ الحفظ…', 'Saving…'),
@@ -150,13 +173,17 @@
       error:   L('تعذّر الاتصال', 'Connection trouble'),
       offline: L('مرتبط', 'Linked'),
       off:     L('على هذا الجهاز فقط', 'This device only'),
-      unconfirmed: L('مفتاحُك جاهز — ولم يصل الخادمَ بعد', 'Your key is ready — the server has not seen it yet')
+      unconfirmed: L('مفتاحُك جاهز — ولم يصل الخادمَ بعد', 'Your key is ready — the server has not seen it yet'),
+      locked:  L('حسابُك محميّ — افتحه على هذا الجهاز', 'Your account is protected — unlock it on this device')
     };
     var sub = (st === 'off')
       ? L('عملُك محفوظٌ هنا ولن يتبعك إلى جهازٍ آخر.', 'Your work lives here and will not follow you elsewhere.')
       : (st === 'unconfirmed')
       ? L('لا تعتمد عليه حتى تنجح مزامنةٌ واحدة — اضغط زرَّ المزامنة بجانبه.',
           'Do not rely on it until one sync succeeds — press the sync button beside it.')
+      : (st === 'locked')
+      ? L('عملُك على هذا الجهاز سليمٌ ولم يُمَسّ — لكنّه لا يُرفَع ولا ينزل حتى تُثبت أنك أنت.',
+          'Your work on this device is intact and untouched — but it will not upload or download until you prove it is you.')
       : L('آخرُ مزامنة: ', 'Last sync: ') + ago(g.lastSync && g.lastSync());
     return '<div class="sp-hero">' +
       '<span class="sp-orb"><i class="fa-solid ' + (ic[st] || ic.offline) + '"></i></span>' +
@@ -205,21 +232,29 @@
            L('انسخه أو نزّله أو اطبعه', 'Copy, download, or print it')) +
       '</div>';
 
-    h += '<div class="sp-sec">' + (hasRec
+    /*@3.SYPJ.21*/
+    var gd = this.guard;
+    var armed = !!(gd && gd.armed);
+    h += '<div class="sp-sec">' + (armed
       ? '<div class="sp-vouch sp-vouch--ok"><b><i class="fa-solid fa-shield-halved"></i>' +
-          esc(L('طريقُ عودتك محفوظ', 'Your way back is saved')) + '</b><small>' +
-          esc(L('لو ضاع هذا الجهازُ أو مسحتَ المتصفّح، تستعيد بياناتك من أي جهازٍ آخر.',
-                'If this device is lost or your browser is cleared, you can restore your data from any other device.')) +
-          '</small>' + '<div class="sp-acts">' +
-          btn('unlink', 'fa-link-slash', L('إلغاء الحفظ', 'Remove it'), 'quiet') + '</div></div>'
+          esc(L('حسابُك محميّ', 'Your account is protected')) + '</b><small>' +
+          esc(this.doorsText(gd)) + '</small><small>' +
+          esc(L('مفتاحُك وحدَه لم يعد يكفي لفتح بياناتك على جهازٍ جديد — يُطلب معه ما فعّلتَ به الحماية.',
+                'Your key alone no longer opens your data on a new device — what you protected it with is required too.')) +
+          '</small><div class="sp-acts">' +
+          btn('shield', 'fa-sliders', L('إدارةُ الحماية', 'Manage protection')) + '</div></div>'
       /*@3.SYPJ.12*/
-      : '<div class="sp-vouch"><b><i class="fa-solid fa-life-ring"></i>' +
-          esc(L('احفظ طريقَ عودتك', 'Save your way back')) + '</b><small>' +
-          esc(L('المفتاحُ أعلاه هو كلُّ ما يفتح بياناتك. احفظ نسخةً منه عندنا مقفلةً ببريدك وكلمة سرّك، فإن ضاع جهازُك استعدتَه بهما — ولا نستطيع نحن فتحَ تلك النسخة.',
-                'The key above is all that opens your data. Keep a copy with us, locked by your email and password, so you can get it back if you lose this device — and we cannot open that copy ourselves.')) +
+      : '<div class="sp-vouch"><b><i class="fa-solid fa-shield-halved"></i>' +
+          esc(L('حماية الحساب — مطفأة', 'Account protection — off')) + '</b><small>' +
+          esc(L('اليومَ مفتاحُك وحدَه يفتح بياناتك: من يقرؤه في رسالةٍ أو لقطةِ شاشةٍ يقرأ جدولك ودرجاتك. فعّلْ بريداً وكلمةَ سرٍّ أو حسابَ قوقل، فلا تُقبل المزامنةُ بعدها إلا بأحدهما.',
+                'Today your key alone opens your data: whoever reads it in a message or a screenshot reads your schedule and grades. Turn on an email and password, or a Google account, and sync will then require one of them.')) +
           '</small>' +
+          (hasRec ? '<small>' + esc(L('ولك نسخةٌ محفوظةٌ من مفتاحك أصلاً — وهي طريقُ عودةٍ لا قفلٌ.',
+                                      'You already have a saved copy of your key — that is a way back, not a lock.')) + '</small>' : '') +
           (gAvail ? '<div class="sp-gbtn" id="sp-gbtn"></div>' : '') +
-          '<div class="sp-acts">' + btn('vouch', 'fa-envelope', L('ببريدٍ وكلمة سرّ', 'With email and password')) + '</div></div>');
+          '<div class="sp-acts">' + btn('vouch', 'fa-envelope', L('ببريدٍ وكلمة سرّ', 'With email and password')) +
+          (hasRec ? btn('unlink', 'fa-link-slash', L('احذف النسخةَ المحفوظة', 'Delete the saved copy'), 'quiet') : '') +
+          '</div></div>');
     h += '</div>';
 
     if (this.devs && this.devs.length) {
@@ -238,6 +273,76 @@
     h += '<div class="sp-acts" style="margin-top:1.1rem">' +
       btn('disconnect', 'fa-arrow-right-from-bracket', L('فصلُ هذا الجهاز', 'Disconnect this device'), 'danger wide') + '</div>';
     return h;
+  };
+
+  Panel.prototype.doorsText = function (gd) {
+    if (!gd) return '';
+    if (gd.pw && gd.google) return L('بالبريد وكلمةِ السرّ، أو بحساب قوقل — أيُّهما شئت.',
+                                     'With your email and password, or your Google account — either one.');
+    if (gd.pw)     return L('ببريدك وكلمةِ سرّك.', 'With your email and password.');
+    if (gd.google) return L('بحساب قوقل.', 'With your Google account.');
+    return '';
+  };
+
+  /*@3.SYPJ.22*/
+  Panel.prototype.vLocked = function () {
+    var gd = this.guard || {}, g = G();
+    var gAvail = gd.google && g.googleAvailable && g.googleAvailable();
+    return '<p class="sp-hint">' + esc(L(
+      'هذا الجهازُ لم يُثبت هويّتَه بعد. ' + this.doorsText(gd),
+      'This device has not proven itself yet. ' + this.doorsText(gd))) + '</p>' +
+      (gAvail ? '<div class="sp-gbtn" id="sp-gbtn"></div>' + (gd.pw ? '<div class="sp-or">' + esc(L('أو', 'or')) + '</div>' : '') : '') +
+      (gd.pw ? emailPass('current-password') +
+        '<div class="sp-acts">' + btn('do-unlock', 'fa-lock-open', L('افتحْ هذا الجهاز', 'Unlock this device'), 'go wide') + '</div>'
+             : '') +
+      '<p class="sp-warn"><i class="fa-solid fa-circle-info"></i> ' + esc(L(
+        'بياناتُك على هذا الجهاز سليمةٌ ولم يُحذف منها شيء. القفلُ يمنع الرفعَ والتنزيلَ فقط.',
+        'Your data on this device is intact; nothing was deleted. The lock only stops upload and download.')) + '</p>';
+  };
+
+  Panel.prototype.vShield = function () {
+    var gd = this.guard || {}, g = G();
+    var gAvail = g.googleAvailable && g.googleAvailable();
+    var h = '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('أبوابُ الحماية', 'Protection doors')) + '</p>';
+    h += '<div class="sp-dev"><i class="fa-solid ' + (gd.pw ? 'fa-circle-check' : 'fa-circle') + '"></i>' +
+      '<span class="sp-dev-n">' + esc(L('بريدٌ وكلمةُ سرّ', 'Email and password')) +
+      '<small>' + esc(gd.pw ? L('مفعَّل', 'on') : L('مطفأ', 'off')) + '</small></span></div>';
+    h += '<div class="sp-dev"><i class="fa-solid ' + (gd.google ? 'fa-circle-check' : 'fa-circle') + '"></i>' +
+      '<span class="sp-dev-n">' + esc(L('حسابُ قوقل', 'Google account')) +
+      '<small>' + esc(gd.google ? L('مفعَّل', 'on') : L('مطفأ', 'off')) + '</small></span></div>';
+    h += '</div>';
+
+    if (!gd.pw || !gd.google) {
+      h += '<div class="sp-vouch"><b><i class="fa-solid fa-plus"></i>' +
+        esc(L('أضف باباً ثانياً', 'Add a second door')) + '</b><small>' +
+        esc(L('بابان يعنيان أنك تفتح بأيِّهما شئت — فلا يقفلك نسيانُ أحدهما.',
+              'Two doors means either one opens it — so forgetting one does not lock you out.')) + '</small>' +
+        (!gd.google && gAvail ? '<div class="sp-gbtn" id="sp-gbtn"></div>' : '') +
+        (!gd.pw ? '<div class="sp-acts">' + btn('vouch', 'fa-envelope', L('ببريدٍ وكلمة سرّ', 'With email and password')) + '</div>' : '') +
+        '</div>';
+    }
+
+    /*@3.SYPJ.25*/
+    h += '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('الأجهزةُ المفتوحة', 'Unlocked devices')) + '</p>' +
+      '<p class="sp-hint">' + esc(L(
+        'أجهزةٌ أثبتت هويّتَها وتزامن الآن: ' + (gd.sessions || 0),
+        'Devices that proved themselves and now sync: ' + (gd.sessions || 0))) + '</p>' +
+      '<div class="sp-acts">' + btn('do-revoke', 'fa-user-slash',
+        L('اطردْ بقيّةَ الأجهزة', 'Sign out the other devices'), 'quiet') + '</div></div>';
+
+    h += '<div class="sp-acts" style="margin-top:1rem">' +
+      btn('disarm', 'fa-ban', L('أطفئِ الحماية', 'Turn protection off'), 'danger wide') + '</div>';
+    return h + back('home');
+  };
+
+  /*@3.SYPJ.24*/
+  Panel.prototype.vDisarm = function () {
+    return '<p class="sp-hint">' + esc(L(
+      'بعد الإطفاء يعود مفتاحُك وحدَه كافياً لفتح بياناتك على أيِّ جهاز — ومن يقرؤه يقرؤها. بياناتُك لا تُمَسّ، والنسخةُ المحفوظةُ من مفتاحك تبقى كما هي.',
+      'After turning it off, your key alone is enough to open your data on any device — and whoever reads it reads them. Your data is untouched, and the saved copy of your key stays as it is.')) + '</p>' +
+      '<div class="sp-acts">' +
+        btn('do-disarm', 'fa-ban', L('أطفئها', 'Turn it off'), 'danger wide') +
+      '</div>' + back('shield');
   };
 
   /*@3.SYPJ.13*/
@@ -387,11 +492,19 @@
     var self = this, g = G();
     var box = this.host.querySelector('#sp-gbtn');
     if (!box || !g || !g.googleRender || !(g.googleAvailable && g.googleAvailable())) return;
+    /*@3.SYPJ.23*/
+    var unlocking = (this.view === 'locked');
     g.googleRender(box, function (err) {
-      if (err) self.fail(err);
-      else self.set({ view: 'home', busy: false, msg: L('حُفظ طريقُ عودتك.', 'Your way back is saved.') });
-    }, { theme: (document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_black') })
-      .catch(function () {});
+      if (err) return self.fail(err);
+      self.loadGuard();
+      self.set({ view: 'home', busy: false,
+        msg: unlocking ? L('فُتح هذا الجهاز.', 'This device is unlocked.')
+                       : L('فُعّلت الحمايةُ بحساب قوقل.', 'Protection is on with your Google account.') });
+      self.done();
+    }, {
+      mode: unlocking ? 'unlock' : 'auto',
+      theme: (document.documentElement.getAttribute('data-theme') === 'light' ? 'outline' : 'filled_black'),
+    }).catch(function () {});
   };
 
   Panel.prototype.bind = function () {
@@ -409,7 +522,9 @@
     }
     var pw = this.host.querySelector('#sp-pw');
     if (pw) pw.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') self.act(self.view === 'vouch' ? 'do-vouch' : 'do-recover');
+      if (e.key !== 'Enter') return;
+      self.act(self.view === 'vouch' ? 'do-vouch'
+             : self.view === 'locked' ? 'do-unlock' : 'do-recover');
     });
     this.mountGoogle();
   };
@@ -426,7 +541,7 @@
 
     if (a === 'skip') { if (this.opts.onSkip) this.opts.onSkip(); return; }
     if (a === 'have' || a === 'code' || a === 'recover' || a === 'paste' || a === 'vouch' ||
-        a === 'key' || a === 'unlink') return this.go(a);
+        a === 'key' || a === 'unlink' || a === 'shield' || a === 'disarm') return this.go(a);
     if (a && a.indexOf('to-') === 0) return this.go(a.slice(3));
 
     if (a === 'new') {
@@ -510,15 +625,39 @@
       }).catch(function (e) { self.fail(a === 'do-paste' ? new Error('bad-code') : e); });
       return;
     }
-    if (a === 'do-recover' || a === 'do-vouch') {
+    if (a === 'do-recover' || a === 'do-vouch' || a === 'do-unlock') {
       var em = this.val('sp-em'), pw = this.val('sp-pw');
       if (!em || !pw) return;
       this.set({ busy: true, err: '' });
-      var q = (a === 'do-recover') ? g.openRecovery(em, pw) : g.saveRecovery(em, pw);
+      var q = (a === 'do-recover') ? g.openRecovery(em, pw)
+            : (a === 'do-unlock')  ? g.unlockPassword(em, pw)
+                                   : g.saveRecovery(em, pw);
       q.then(function () {
+        self.loadGuard();
         self.set({ view: 'home', busy: false,
-          msg: a === 'do-recover' ? L('استُعيدت بياناتك.', 'Your data is back.') : L('حُفظ طريقُ عودتك.', 'Your way back is saved.') });
+          msg: a === 'do-recover' ? L('استُعيدت بياناتك.', 'Your data is back.')
+             : a === 'do-unlock'  ? L('فُتح هذا الجهاز.', 'This device is unlocked.')
+             : L('فُعّلت الحماية — لا مزامنةَ بعدها إلا ببريدك وكلمةِ سرّك.',
+                 'Protection is on — sync now requires your email and password.') });
         self.done();
+      }).catch(function (e) { self.fail(e); });
+      return;
+    }
+    if (a === 'do-disarm') {
+      this.set({ busy: true, err: '' });
+      g.disarmGuard('all').then(function () {
+        self.loadGuard();
+        self.set({ view: 'home', busy: false, guard: null,
+          msg: L('أُطفئت الحماية.', 'Protection is off.') });
+      }).catch(function (e) { self.fail(e); });
+      return;
+    }
+    if (a === 'do-revoke') {
+      this.set({ busy: true, err: '' });
+      g.revokeSessions(false).then(function (j) {
+        self.loadGuard();
+        self.set({ busy: false, msg: L('طُردت ' + ((j && j.revoked) || 0) + ' جهازاً.',
+                                       'Signed out ' + ((j && j.revoked) || 0) + ' device(s).') });
       }).catch(function (e) { self.fail(e); });
       return;
     }
