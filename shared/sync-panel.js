@@ -95,6 +95,7 @@
     /*@3.SYPJ.40*/
     this.err = this.opts.notice ? errText(new Error(this.opts.notice)) : '';
     this.pair = null; this.pairErr = null; this.tick = null; this.devs = null; this.qr = '';
+    this.devArmed = false; this.devOrphans = 0;
     this.guard = null; this.guardErr = false;
     host.classList.add('sp');
     /*@3.SYPJ.6*/
@@ -312,17 +313,42 @@
           '</div></div>');
     h += '</div>';
 
+    /*@3.SYPJ.42*/
     if (this.devs && this.devs.length) {
+      var dArmed = !!this.devArmed;
       h += '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('أجهزتك', 'Your devices')) + '</p>' +
         this.devs.map(function (d) {
+          var live = dArmed && d.proven;
           return '<div class="sp-dev"><i class="fa-solid fa-display"></i>' +
             '<span class="sp-dev-n">' + esc(d.name || L('جهاز', 'Device')) +
-            '<small>' + esc(ago(Date.parse(d.last_seen))) + '</small></span>' +
+            '<small>' + esc(ago(Date.parse(d.last_seen)) +
+              (dArmed ? ' · ' + (live ? L('أثبت هويّتَه', 'proven')
+                                      : L('لا إثباتَ له — مقفل', 'not proven — locked')) : '')) +
+            '</small></span>' +
             (d.isMe ? '<span class="sp-dev-me">' + esc(L('هذا الجهاز', 'this one')) + '</span>'
                     : '<button type="button" class="sp-x" data-sp="forget" data-v="' + esc(d.device_id) +
-                      '" title="' + esc(L('إزالة', 'Remove')) + '"><i class="fa-solid fa-xmark"></i></button>') +
+                      '" title="' + esc(live ? L('اطردْ هذا الجهاز', 'Sign this device out')
+                                             : L('إزالة من القائمة', 'Remove from the list')) +
+                      '"><i class="fa-solid fa-xmark"></i></button>') +
             '</div>';
-        }).join('') + '</div>';
+        }).join('');
+      h += '<p class="sp-note' + (dArmed ? '' : ' sp-note--warn') + '">' + (dArmed
+        ? '<i class="fa-solid fa-shield-halved"></i> ' + esc(L(
+            'طردُ جهازٍ من هنا يُبطل إثباتَه فعلاً: تتوقّف مزامنتُه حتى يُفتح من جديد. وبياناتُه المحفوظةُ عليه تبقى كما هي.',
+            'Signing a device out from here really revokes its proof: its sync stops until it is unlocked again. Data already on it stays as it is.'))
+        /*@3.SYPJ.43*/
+        : '<i class="fa-solid fa-triangle-exclamation"></i> ' + esc(L(
+            'الحمايةُ مطفأة، فالإزالةُ من هذه القائمة لا تمنع الجهازَ من المزامنة — مفتاحُك وحدَه يكفيه. فعّلِ الحماية أعلاه ليصير الطردُ نافذاً.',
+            'Protection is off, so removing a device here does not stop it from syncing — your key alone is enough for it. Turn on protection above to make signing out effective.'))) +
+        '</p>';
+      /*@3.SYPJ.44*/
+      if (dArmed && this.devOrphans > 0) {
+        h += '<p class="sp-note"><i class="fa-solid fa-circle-info"></i> ' + esc(L(
+          'وثمّ ' + this.devOrphans + ' جلسةً مفتوحةً لا تُنسَب إلى جهازٍ في هذه القائمة، فلا يبلغها الطردُ من هنا — اطردها من «إدارةِ الحماية».',
+          'And ' + this.devOrphans + ' open session(s) are not tied to a device in this list, so signing out here does not reach them — use "Manage protection".')) +
+          '</p>';
+      }
+      h += '</div>';
     }
 
     h += '<div class="sp-acts" style="margin-top:1.1rem">' +
@@ -582,7 +608,10 @@
   Panel.prototype.loadDevices = function () {
     var self = this, g = G();
     if (!g || !g.devices || !linked()) return;
-    g.devices().then(function (d) { if (d && d.length) self.set({ devs: d }); }).catch(function () {});
+    g.devices().then(function (d) {
+      var list = (d && d.devices) || [];
+      self.set({ devs: list, devArmed: !!(d && d.armed), devOrphans: Number((d && d.orphans) || 0) });
+    }).catch(function () {});
   };
 
   /*@3.SYPJ.17*/
@@ -701,10 +730,24 @@
         .catch(function (e) { self.fail(e); });
       return;
     }
+    /*@3.SYPJ.45*/
     if (a === 'forget') {
-      if (!confirm(L('إزالةُ هذا الجهاز من القائمة لا تنزع منه مفتاحك. للفصل الكامل غيّر مفتاحك.',
-                     'Removing this device from the list does not revoke its key. For a full cut, change your key.'))) return;
-      g.forgetDevice(v).then(function () { self.loadDevices(); self.set({ msg: L('أُزيل.', 'Removed.') }); }).catch(function () {});
+      if (!confirm(this.devArmed
+        ? L('سيُطرد هذا الجهاز: يفقد إثباتَه وتتوقّف مزامنتُه حتى يُفتح من جديد. وبياناتُه المحفوظةُ عليه تبقى كما هي.',
+            'This device will be signed out: it loses its proof and its sync stops until it is unlocked again. Data already on it stays as it is.')
+        : L('الحمايةُ مطفأة، فهذه إزالةٌ من القائمة لا طردٌ — الجهازُ يزامن بمفتاحك وحدَه. فعّلِ الحماية ليصير الطردُ نافذاً. أنُزيله من القائمة؟',
+            'Protection is off, so this removes it from the list without signing it out — the device syncs with your key alone. Turn on protection to make signing out effective. Remove it from the list?'))) return;
+      g.forgetDevice(v).then(function (r) {
+        self.loadDevices();
+        self.loadGuard();
+        self.set({ msg: (r && r.revoked)
+          ? L('طُرد الجهاز — توقّفت مزامنتُه.', 'Device signed out — its sync has stopped.')
+          : ((r && r.armed)
+              ? L('أُزيل من القائمة. ولم تكن له جلسةٌ مفتوحةٌ أصلاً.',
+                  'Removed from the list. It had no open session anyway.')
+              : L('أُزيل من القائمة — والحمايةُ مطفأةٌ فهو ما زال يزامن بمفتاحك.',
+                  'Removed from the list — protection is off, so it still syncs with your key.')) });
+      }).catch(function () {});
       return;
     }
     if (a === 'do-unlink') {
@@ -767,6 +810,7 @@
                    msg: L('طُردت ' + ((j && j.revoked) || 0) + ' جهازاً.',
                           'Signed out ' + ((j && j.revoked) || 0) + ' device(s).') });
         self.loadGuard();
+        self.loadDevices();
       }).catch(function (e) { self.fail(e); });
       return;
     }
@@ -778,6 +822,7 @@
                    msg: ((j && j.revoked) ? L('طُرد الجهاز.', 'Device signed out.')
                                           : L('لم يُعثر عليه — رُبّما طُرد قبلاً.', 'Not found — perhaps already signed out.')) });
         self.loadGuard();
+        self.loadDevices();
       }).catch(function (e) { self.fail(e); });
       return;
     }

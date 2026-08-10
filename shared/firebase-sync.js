@@ -897,9 +897,9 @@
     lockAnnounced = false;
     /*@3.FISJ.79*/
     try {
-      localStorage.removeItem('garden_device_touch');
+      localStorage.removeItem(DEV_TOUCH_LS);
       touchDevice().then(ok => {
-        if (ok) localStorage.setItem('garden_device_touch', String(Date.now()));
+        if (ok) localStorage.setItem(DEV_TOUCH_LS, String(Date.now()));
       }).catch(() => {});
     } catch (e) {}
     return { secret: s, docId: id };
@@ -1005,6 +1005,13 @@
       setVaultTok(adopted.docId, j.token);
       lock = { armed: true, pw: lock.pw, google: lock.google, locked: false };
       lockAnnounced = false;
+      /*@3.FISJ.231*/
+      try {
+        localStorage.removeItem(DEV_TOUCH_LS);
+        touchDevice().then(function (ok) {
+          if (ok) localStorage.setItem(DEV_TOUCH_LS, String(Date.now()));
+        }).catch(function () {});
+      } catch (e) {}
     }
     return adopted;
   }
@@ -1259,10 +1266,11 @@
 
   async function guardPost(act, body) {
     const g = await guardUrl(act);
+    /*@3.FISJ.230*/
     const r = await fetch(g.url, {
       method: 'POST', cache: 'no-store',
       headers: guardHeaders(g.id, { 'Content-Type': 'application/json' }),
-      body: JSON.stringify(body || {}),
+      body: JSON.stringify(Object.assign({ dev: deviceId() }, body || {})),
     });
     let j = null;
     try { j = await r.json(); } catch (e) {}
@@ -1374,7 +1382,7 @@
       localStorage.removeItem(SYNC_KEY_LS);
       localStorage.removeItem(VAULT_SECRET_LS);
       localStorage.removeItem('garden_recovery_set');
-      localStorage.removeItem('garden_device_touch');
+      localStorage.removeItem(DEV_TOUCH_LS);
       localStorage.setItem(SYNC_DECLINED_LS, '1');
     } catch (e) {}
     setPushPending(false);
@@ -1461,6 +1469,8 @@
 
   /*@3.FISJ.104*/
   const DEVICE_LS = 'garden_device_id';
+  /*@3.FISJ.234*/
+  const DEV_TOUCH_LS = 'garden_device_touch2';
   function deviceId() {
     let d = localStorage.getItem(DEVICE_LS);
     if (!/^d[0-9a-f]{16}$/.test(d || '')) {
@@ -1497,26 +1507,36 @@
       return r.ok;
     } catch (e) { return false; }
   }
+  /*@3.FISJ.233*/
+  const NO_DEVS = { devices: [], armed: false, orphans: 0 };
   async function listDevices() {
     const id = getKey();
-    if (!id || !usingOracle() || !ORACLE_ID.test(String(id))) return [];
+    if (!id || !usingOracle() || !ORACLE_ID.test(String(id))) return NO_DEVS;
     try {
       const r = await fetch(syncEndpoint() + '/v1/devices/' + id,
                             { cache: 'no-store', headers: guardHeaders(id) });
-      if (!r.ok) return [];
+      if (!r.ok) return NO_DEVS;
       const j = await r.json();
       const me = deviceId();
-      return (j.devices || []).map(d => Object.assign({ isMe: d.device_id === me }, d));
-    } catch (e) { return []; }
+      return {
+        devices: (j.devices || []).map(d => Object.assign({ isMe: d.device_id === me }, d)),
+        armed: !!j.armed,
+        orphans: Number(j.orphans || 0),
+      };
+    } catch (e) { return NO_DEVS; }
   }
+  /*@3.FISJ.232*/
   async function forgetDevice(did) {
     const id = getKey();
-    if (!id || !usingOracle()) return false;
+    if (!id || !usingOracle()) return { ok: false, revoked: 0, armed: false };
     try {
       const r = await fetch(syncEndpoint() + '/v1/devices/' + id + '/' + did,
                             { method: 'DELETE', cache: 'no-store', headers: guardHeaders(id) });
-      return r.ok;
-    } catch (e) { return false; }
+      let j = null;
+      try { j = await r.json(); } catch (e) {}
+      if (!r.ok) return { ok: false, revoked: 0, armed: !!(j && j.armed) };
+      return { ok: true, revoked: Number((j && j.revoked) || 0), armed: !!(j && j.armed) };
+    } catch (e) { return { ok: false, revoked: 0, armed: false }; }
   }
 
   /*@3.FISJ.106*/
@@ -2223,7 +2243,7 @@
 
       /*@3.FISJ.186*/
       try {
-        const DT = 'garden_device_touch';
+        const DT = DEV_TOUCH_LS;
         if (Date.now() - Number(localStorage.getItem(DT) || 0) > 24 * 3600 * 1000) {
           touchDevice().then(ok => { if (ok) localStorage.setItem(DT, String(Date.now())); });
         }
