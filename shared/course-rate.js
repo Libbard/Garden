@@ -403,22 +403,44 @@
 
   /*@3.CORJ.45*/
   var _dir = null, _dirBusy = false;
+  /*@3.CORJ.54*/
   function loadDir(then) {
     if (_dir) { then && then(); return; }
     if (_dirBusy) return;
     _dirBusy = true;
-    var done = function (d) {
+    var rated = null, banner = null;
+    function join() {
+      if (rated === null || banner === null) return;
       _dirBusy = false;
-      _dir = ((d && d.faculty) || []).map(function (f) {
-        return { n: (f.link && f.link.n) || f.en || f.name, a: f.name || '',
-                 e: f.en || '', c: 0, t: [], dir: 1 };
+      var out = [], seen = {};
+      rated.forEach(function (f) {
+        var e = { n: (f.link && f.link.n) || f.en || f.name, a: f.name || '',
+                  e: f.en || '', c: 0, t: [], dir: 1 };
+        seen[dirKey(e)] = 1;
+        out.push(e);
       });
+      banner.forEach(function (p) {
+        var e = { n: p.n, a: p.a || '', e: '', c: p.c || 0, t: [], dir: 1 };
+        var k = dirKey(e);
+        if (k && seen[k]) return;
+        if (k) seen[k] = 1;
+        out.push(e);
+      });
+      _dir = out;
       then && then();
-    };
-    if (window.GardenFaculty && GardenFaculty.load) { GardenFaculty.load(done); return; }
-    fetch(API + '/v1/faculty.json', { cache: 'default' })
+    }
+    var takeRated = function (d) { rated = (d && d.faculty) || []; join(); };
+    if (window.GardenFaculty && GardenFaculty.load) GardenFaculty.load(takeRated);
+    else {
+      fetch(API + '/v1/faculty.json', { cache: 'default' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(takeRated).catch(function () { takeRated(null); });
+    }
+    /*@3.CORJ.55*/
+    fetch(API + '/v1/faculty/directory.json', { cache: 'default' })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(done).catch(function () { done(null); });
+      .then(function (d) { banner = (d && d.people) || []; join(); })
+      .catch(function () { banner = []; join(); });
   }
 
   /*@3.CORJ.46*/

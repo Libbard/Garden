@@ -1581,10 +1581,16 @@
         : '';
       /*@3.SECJ.155*/
       var last = f.t && f.t[0] ? (terms[f.t[0][0]] || f.t[0][0]) : '';
-      return '<details class="sx-fac" data-nm="' + esc(String(f.n || '').toLowerCase()) + '">' +
+      /*@3.SECJ.383*/
+      var hay = String(f.n || '').toLowerCase() + ' ' + normAr(f.a || '') +
+                ' ' + String(f.e || '').toLowerCase();
+      return '<details class="sx-fac" data-nm="' + esc(hay) + '">' +
         '<summary class="sx-fac-h"><i class="fa-solid fa-user" style="color:#a78bfa"></i>' +
           '<div style="min-width:0"><div class="nm">' + esc(f.n) + '</div>' +
-          '<div class="em">' + esc(last) + '</div></div>' +
+          '<div class="em">' + (f.a ? '<b class="sx-fac-ar">' + esc(f.a) + '</b> · ' : '') +
+            esc(last) + '</div></div>' +
+          /*@3.SECJ.384*/
+          rateChip({ n: f.n, e: f.e }) +
           '<span class="ct">' + f.c + ' ' + t('شعبة', 'sec') + '</span>' +
           '<i class="fa-solid fa-chevron-down sx-fac-car"></i></summary>' +
         (f.e ? '<div class="sx-fac-mail"><i class="fa-solid fa-envelope"></i>' +
@@ -3039,9 +3045,23 @@
     /*@3.SECJ.324*/
     document.body.addEventListener('click', function (e) {
       /*@3.SECJ.325*/
+      var pn = e.target.closest('[data-profrate]');
+      if (pn) {
+        /*@3.SECJ.385*/
+        e.preventDefault();
+        openProfRateNew(pn.getAttribute('data-profrate'), pn.getAttribute('data-profn'));
+        return;
+      }
       var pr = e.target.closest('[data-prof]');
       if (pr) {
+        e.preventDefault();
         openProf(pr.getAttribute('data-prof'), pr.getAttribute('data-profn'));
+        return;
+      }
+      /*@3.SECJ.386*/
+      var rd = e.target.closest('[data-rate-dir]');
+      if (rd && e.target.closest('#sx-modal')) {
+        openProfRateNew('', rd.getAttribute('data-rate-dir'));
         return;
       }
       var rt = e.target.closest('[data-rate]');
@@ -3228,7 +3248,18 @@
   }
   function rateChip(p) {
     var r = rateOf(p);
-    if (!r || r.idx == null) return '';
+    /*@3.SECJ.389*/
+    if (!RATINGS) return '';
+    /*@3.SECJ.381*/
+    if (!r || r.idx == null) {
+      if (window.GardenFlags && !GardenFlags.get('ratings.faculty.enabled')) return '';
+      var lbl = t('قيّم ' + ((p && p.n) || p || 'هذا الأستاذ'),
+                  'Rate ' + ((p && p.n) || p || 'this instructor'));
+      return '<button class="sx-rate sx-rate--add" data-profrate="' + esc((p && p.e) || '') +
+        '" data-profn="' + esc((p && p.n) || p || '') +
+        '" title="' + esc(lbl) + '" aria-label="' + esc(lbl) + '">' +
+        '<i class="fa-solid fa-pen-to-square"></i></button>';
+    }
     var col = r.idx >= 80 ? '#10b981' : r.idx >= 60 ? '#f59e0b' : r.idx >= 40 ? '#f97316' : '#ef4444';
     return '<button class="sx-rate' + (r.n < 3 ? ' is-small' : '') + '" style="color:' + col +
       '" data-prof="' + esc((p && p.e) || '') + '" data-profn="' + esc((p && p.n) || p || '') +
@@ -3246,10 +3277,22 @@
     GF.load(function () {
       var f = (email && GF.byEmail(email)) || GF.byBannerName(bannerName);
       var box = $('#sx-modal-body');
+      GF.wire($('#sx-modal'), { onSent: function () { closeModal(); } });
+      _open = { kind: 'prof', arg: email || bannerName };
       if (f) {
         $('#sx-modal-title').textContent = GF.nameOf(f);
         box.innerHTML = GF.detailHtml(f, { base: '', full: 1 });
-      } else {
+        return;
+      }
+      /*@3.SECJ.382*/
+      box.innerHTML = '<div class="sx-state"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+      GF.loadDir(function () {
+        var p = (email && GF.dirByEmail(email)) || GF.dirByName(bannerName);
+        if (p) {
+          $('#sx-modal-title').textContent = p.a || p.n;
+          box.innerHTML = GF.dirDetailHtml(p, { base: '' });
+          return;
+        }
         /*@3.SECJ.347*/
         box.innerHTML =
           '<div class="fc-d-head"><i class="fa-solid fa-user-slash fc-empty-i"></i>' +
@@ -3265,11 +3308,38 @@
           '<div class="fc-d-acts"><button class="sx-primary fc-rate" data-rate="' +
             esc(bannerName || '') + '"><i class="fa-solid fa-pen-to-square"></i>' +
             t('كن أوّل من يقيّمه', 'Be the first to rate them') + '</button></div>';
-      }
-      GF.wire($('#sx-modal'), { onSent: function () { closeModal(); } });
-      _open = { kind: 'prof', arg: email || bannerName };
+      });
     });
   }
+
+  /*@3.SECJ.387*/
+  function openProfRateNew(email, bannerName) {
+    var GF = window.GardenFaculty;
+    if (!GF) return;
+    openModal('fa-pen-to-square', t('قيّم الأستاذ', 'Rate the instructor'));
+    $('#sx-modal-body').innerHTML =
+      '<div class="sx-state"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+    GF.load(function () {
+      var f = (email && GF.byEmail(email)) || GF.byBannerName(bannerName);
+      if (f) {
+        openProfRate(f, bannerName);
+        GF.wire($('#sx-modal'), { onSent: function () { closeModal(); } });
+        return;
+      }
+      GF.loadDir(function () {
+        var p = (email && GF.dirByEmail(email)) || GF.dirByName(bannerName);
+        GF.resetVals();
+        $('#sx-modal-body').innerHTML = GF.rateHtml(null, { dir: p });
+        /*@3.SECJ.388*/
+        if (!p && bannerName) {
+          var w = $('#fc-r-who', $('#sx-modal'));
+          if (w) w.value = bannerName;
+        }
+        GF.wire($('#sx-modal'), { onSent: function () { closeModal(); } });
+      });
+    });
+  }
+
   function openProfRate(f, fallbackName) {
     var GF = window.GardenFaculty;
     GF.resetVals();

@@ -91,6 +91,7 @@
         paintHow();
         apply();
         openFromHash();
+        openFromQuery();
       } catch (e) {
         g.innerHTML = '<div class="sx-state sx-state--err">' +
           '<i class="fa-solid fa-triangle-exclamation"></i>' +
@@ -279,6 +280,8 @@
     $('#fc-grid').innerHTML = '';
     more();
 
+    paintDir();
+
     $('#fc-count').textContent = list.length
       ? t(list.length + ' أستاذاً', list.length + ' instructors')
       : '';
@@ -289,6 +292,61 @@
         '<i class="fa-solid fa-user-slash"></i>' +
         t('لا أستاذ يطابق بحثك.', 'No instructor matches your search.') + '</div>';
     }
+  }
+
+  /*@3.FACJ.32*/
+  function paintDir() {
+    var host = $('#fc-dir');
+    if (!host) return;
+    var q = String(state.q || '').trim();
+    /*@3.FACJ.33*/
+    var filtered = state.subject || state.college || state.major ||
+                   state.gender !== 'all' || state.gap;
+    if (q.length < 2 || filtered) { host.hidden = true; host.innerHTML = ''; return; }
+
+    if (!GF.dir()) {
+      host.hidden = false;
+      host.innerHTML = '<div class="fc-dir-h"><i class="fa-solid fa-spinner fa-spin"></i>' +
+        t('يُبحث في دليل البانر…', 'Searching the Banner directory…') + '</div>';
+      GF.loadDir(function () { if (state.q === q) paintDir(); });
+      return;
+    }
+    var hit = GF.searchDir(q, 12);
+    if (!hit.length) { host.hidden = true; host.innerHTML = ''; return; }
+    host.hidden = false;
+    host.innerHTML =
+      '<div class="fc-dir-h"><i class="fa-solid fa-user-plus"></i>' +
+        t('من دليل البانر · لا تقييماتِ لهم بعد', 'From the Banner directory · not rated yet') +
+        '<span class="fc-dir-n">' + hit.length + '</span></div>' +
+      '<div class="fc-grid">' + hit.map(dirCard).join('') + '</div>';
+  }
+
+  function dirCard(p) {
+    return '<article class="fc-card fc-card--dir" data-dir="' + esc(p.n) + '" tabindex="0">' +
+      '<div class="fc-c-top">' +
+        '<div class="fc-dir-ring"><i class="fa-solid fa-user-plus"></i></div>' +
+        '<div class="fc-c-id">' +
+          '<div class="fc-name ltr">' + esc(p.n) + '</div>' +
+          (p.a ? '<div class="fc-dir-ar">' + esc(p.a) + '</div>' : '') +
+          '<div class="fc-n"><i class="fa-solid fa-layer-group"></i>' +
+            t(p.c + ' شعبة', p.c + ' sections') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fc-dir-cta"><i class="fa-solid fa-pen-to-square"></i>' +
+        t('كن أوّل من يقيّمه', 'Be the first to rate them') + '</div>' +
+    '</article>';
+  }
+
+  function openDir(bannerName) {
+    var p = GF.dirByName(bannerName);
+    if (!p) return;
+    $('#fc-modal').classList.add('on');
+    $('#fc-modal-title').textContent = p.a || p.n;
+    var sub = $('#fc-modal-sub');
+    sub.textContent = p.a ? p.n : t('لا تقييماتِ له بعد', 'No ratings yet');
+    sub.hidden = false;
+    $('#fc-modal-body').innerHTML = GF.dirDetailHtml(p, { base: '' });
+    GF.wire($('#fc-modal'), {});
   }
 
   function more() {
@@ -362,6 +420,8 @@
     sub.textContent = t(f.n + ' تقييماً من الطلاب', f.n + ' student ratings');
     sub.hidden = false;
     $('#fc-modal-body').innerHTML = detail(f);
+    /*@3.FACJ.35*/
+    GF.wire($('#fc-modal'), {});
     if (history.replaceState) history.replaceState(null, '', '#' + encodeURIComponent(f.id));
   }
   function closeModal() {
@@ -372,14 +432,21 @@
   /*@3.FACJ.25*/
   function detail(f) { return GF.detailHtml(f, { base: '' }); }
 
-  function openRate(id) {
+  function openRate(id, dirName) {
     var f = id ? GF.byId(id) : null;
+    var p = dirName ? GF.dirByName(dirName) : null;
     GF.resetVals();
     $('#fc-rate').classList.add('on');
     $('#fc-rate-sub').textContent = f
       ? GF.nameOf(f)
+      : p ? (p.a || p.n)
       : t('اختر الأستاذ ثم أجب عمّا تعرفه', 'Pick the instructor, then answer what you know');
-    $('#fc-rate-body').innerHTML = GF.rateHtml(f, {});
+    $('#fc-rate-body').innerHTML = GF.rateHtml(f, { dir: p });
+    /*@3.FACJ.37*/
+    if (!f && !p && dirName) {
+      var w = $('#fc-r-who', $('#fc-rate'));
+      if (w) w.value = dirName;
+    }
     GF.wire($('#fc-rate'), { onSent: function () {
       $('#fc-rate').classList.remove('on');
       load();
@@ -389,6 +456,17 @@
   function openFromHash() {
     var h = decodeURIComponent((location.hash || '').replace(/^#/, ''));
     if (h) openId(h);
+  }
+
+  /*@3.FACJ.36*/
+  function openFromQuery() {
+    var m = /[?&]rate=([^&]+)/.exec(location.search || '');
+    if (!m) return;
+    var v = decodeURIComponent(m[1].replace(/\+/g, ' '));
+    if (!v) return;
+    var f = GF.byId(v);
+    if (f) { openRate(f.id); return; }
+    GF.loadDir(function () { openRate(null, v); });
   }
 
   /*@3.FACJ.26*/
@@ -417,11 +495,16 @@
     document.addEventListener('click', function (e) {
       /*@3.FACJ.28*/
       if (!e.target.closest('.gs') && !e.target.closest('.gs-pop')) closePops();
+      var rd = e.target.closest('[data-rate-dir]');
+      if (rd) { closeModal(); openRate(null, rd.getAttribute('data-rate-dir')); return; }
       var rb = e.target.closest('[data-rate]');
       if (rb) { closeModal(); openRate(rb.getAttribute('data-rate')); return; }
       if (e.target.closest('#fc-rate-x') || e.target.id === 'fc-rate') {
         $('#fc-rate').classList.remove('on'); return;
       }
+      /*@3.FACJ.34*/
+      var dc = e.target.closest('.fc-card--dir');
+      if (dc) { openDir(dc.getAttribute('data-dir')); return; }
       var c = e.target.closest('.fc-card');
       if (c) { openId(c.getAttribute('data-id')); return; }
       if (e.target.closest('#fc-x') || e.target.id === 'fc-modal') closeModal();

@@ -46,6 +46,89 @@
       .catch(function () { LOADING = false; WAIT.splice(0).forEach(function (fn) { fn(null); }); });
   }
 
+  /*@3.FAPJ.21*/
+  var DIR = null, DIR_LOADING = false, DIR_WAIT = [], DIR_FAILED = false;
+
+  function loadDir(cb) {
+    if (DIR) { cb && cb(DIR); return; }
+    if (DIR_FAILED) { cb && cb(null); return; }
+    if (cb) DIR_WAIT.push(cb);
+    if (DIR_LOADING) return;
+    DIR_LOADING = true;
+    fetch(API + '/v1/faculty/directory.json')
+      .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); })
+      .then(function (d) {
+        DIR = d; DIR_LOADING = false;
+        /*@3.FAPJ.22*/
+        (d.people || []).forEach(function (p) {
+          var em = String(p.e || '').toLowerCase();
+          p._k = norm(p.a || '') + ' ' +
+                 String(p.n || '').toLowerCase() + ' ' +
+                 em + ' ' + em.replace(/[._@-]/g, ' ');
+        });
+        DIR_WAIT.splice(0).forEach(function (fn) { fn(d); });
+      })
+      .catch(function () {
+        DIR_LOADING = false; DIR_FAILED = true;
+        DIR_WAIT.splice(0).forEach(function (fn) { fn(null); });
+      });
+  }
+
+  /*@3.FAPJ.31*/
+  function searchDir(q, take) {
+    if (!DIR) return [];
+    /*@3.FAPJ.35*/
+    var w = norm(q).split(/[\s._@-]+/).filter(Boolean);
+    if (!w.length) return [];
+    var out = [];
+    var people = DIR.people || [];
+    for (var i = 0; i < people.length && out.length < (take || 8) * 4; i++) {
+      var p = people[i];
+      /*@3.FAPJ.23*/
+      if (p.id) continue;
+      var all = true;
+      for (var j = 0; j < w.length; j++) {
+        if (p._k.indexOf(w[j]) < 0) { all = false; break; }
+      }
+      if (all) out.push(p);
+    }
+    return out.slice(0, take || 8);
+  }
+
+  function dirByName(bannerName) {
+    if (!DIR || !bannerName) return null;
+    var k = String(bannerName).toLowerCase().replace(/[^a-z]/g, '');
+    if (!k) return null;
+    return (DIR.people || []).filter(function (p) {
+      return String(p.n || '').toLowerCase().replace(/[^a-z]/g, '') === k;
+    })[0] || null;
+  }
+  function dirByEmail(email) {
+    if (!DIR || !email) return null;
+    var e = String(email).toLowerCase();
+    return (DIR.people || []).filter(function (p) { return p.e === e; })[0] || null;
+  }
+
+  /*@3.FAPJ.24*/
+  var SRC_AR = { r: 'كما كتبه الطلاب', m: 'اسمٌ مُثبَت', ai: 'نقحرة آلية' };
+  var SRC_EN = { r: 'as students wrote it', m: 'verified', ai: 'auto-transliterated' };
+  function arLine(p) {
+    if (!p || !p.a) return '';
+    return '<div class="fc-dir-ar">' + esc(p.a) +
+      '<span class="fc-dir-src">' + esc(t(SRC_AR[p.s] || '', SRC_EN[p.s] || '')) + '</span></div>';
+  }
+
+  /*@3.FAPJ.37*/
+  function nudge(n) {
+    n = Number(n) || 0;
+    if (n === 0) return { ar: 'كن أوّل من يقيّمه', en: 'Be the first to rate them' };
+    if (n === 1) return { ar: 'رأيُك الثاني', en: 'Be the second voice' };
+    if (n === 2) return { ar: 'رأيُك الثالث يُخرجه من «عيّنة صغيرة»',
+                          en: 'A third rating lifts them out of “small sample”' };
+    return null;
+  }
+  function nudgeT(n) { var x = nudge(n); return x ? t(x.ar, x.en) : ''; }
+
   function byEmail(email) {
     if (!DATA || !email) return null;
     var e = String(email).toLowerCase();
@@ -130,7 +213,9 @@
             'Above ' + pct + '% of rated instructors (' + peers.length + ')') + '</div>' : '') +
         (f.n < 3 ? '<div class="fc-warn fc-warn--big">' +
           t('عيّنةٌ صغيرة — اقرأه على أنه انطباعٌ لا حكم.',
-            'Small sample — read it as an impression, not a verdict.') + '</div>' : '') +
+            'Small sample — read it as an impression, not a verdict.') + '</div>' +
+          (nudgeT(f.n) ? '<div class="fc-nudge"><i class="fa-solid fa-seedling"></i>' +
+            esc(nudgeT(f.n)) + '</div>' : '') : '') +
       '</div></div>';
 
     /*@3.FAPJ.5*/
@@ -196,6 +281,39 @@
       taught + banner + comments + acts;
   }
 
+  /*@3.FAPJ.29*/
+  function dirDetailHtml(p, o) {
+    o = o || {};
+    var canRate = !window.GardenFlags || window.GardenFlags.get('ratings.faculty.enabled');
+    return '<div class="fc-d-head fc-d-head--empty">' +
+        '<i class="fa-solid fa-user-plus fc-empty-i"></i>' +
+        '<div class="fc-d-h-t">' +
+          '<div class="fc-d-name ltr">' + esc(p.n) + '</div>' +
+          arLine(p) +
+          '<div class="fc-d-sub">' +
+            t('لا تقييماتِ له بعد — رأيُك سيكون الأوّل.',
+              'No ratings yet — yours would be the first.') + '</div>' +
+        '</div></div>' +
+      /*@3.FAPJ.30*/
+      (p.c ? '<div class="fc-d-sec"><div class="fc-note">' +
+        '<i class="fa-solid fa-layer-group"></i>' +
+        t('درّس ' + p.c + ' شعبةً في كتالوج البانر.',
+          'Taught ' + p.c + ' sections in the Banner catalog.') + '</div></div>' : '') +
+      (p.e ? '<div class="fc-d-mail">' +
+        '<button class="fc-go fc-mail-copy" data-copy="' + esc(p.e) + '">' +
+          '<i class="fa-regular fa-copy"></i>' + t('انسخ البريد', 'Copy email') +
+          '<span class="fc-go-n ltr">' + esc(p.e) + '</span></button>' +
+        '<a class="fc-go" href="mailto:' + esc(p.e) + '">' +
+          '<i class="fa-regular fa-envelope"></i>' + t('راسله', 'Email') + '</a></div>' : '') +
+      '<div class="fc-d-sec"><a class="fc-go" href="' + (o.base || '') + 'sections.html?q=' +
+        encodeURIComponent(p.n) + '"><i class="fa-solid fa-layer-group"></i>' +
+        t('اعرض شُعبه', 'Show their sections') + '</a></div>' +
+      (canRate ? '<div class="fc-d-acts">' +
+        '<button class="sx-primary fc-rate" data-rate-dir="' + esc(p.n) + '">' +
+        '<i class="fa-solid fa-pen-to-square"></i>' +
+        esc(nudgeT(0)) + '</button></div>' : '');
+  }
+
   /*@3.FAPJ.7*/
   var RATE_Q = [
     { k: 'ov', ar: 'كيف كانت تجربتك عموماً؟', en: 'Overall experience?',
@@ -216,19 +334,36 @@
     var codes = f ? Object.keys(f.courses || {})
       .sort(function (a, b) { return f.courses[b] - f.courses[a]; }) : [];
     var pre = o.course && codes.indexOf(o.course) < 0 ? [o.course] : [];
+    var dp = o.dir || null;
 
     var who = f
       ? '<div class="fc-r-who"><i class="fa-solid fa-chalkboard-user"></i>' +
         '<b>' + esc(nameOf(f)) + '</b>' +
         (f.link && f.link.e ? '<span class="fc-go-n ltr">' + esc(f.link.e) + '</span>' : '') +
         '<input type="hidden" id="fc-r-name" value="' + esc(f.name) + '">' +
+        '<input type="hidden" id="fc-r-banner" value="' + esc((f.link && f.link.n) || '') + '">' +
         '<input type="hidden" id="fc-r-mail" value="' + esc((f.link && f.link.e) || '') + '"></div>'
+      : dp
+      ? '<div class="fc-r-who"><i class="fa-solid fa-chalkboard-user"></i>' +
+        '<b>' + esc(dp.a || dp.n) + '</b>' +
+        '<span class="fc-go-n ltr">' + esc(dp.n) + '</span>' +
+        '<span class="fc-r-new">' + esc(t('أوّل تقييم', 'first rating')) + '</span>' +
+        '<input type="hidden" id="fc-r-name" value="' + esc(dp.a || dp.n) + '">' +
+        '<input type="hidden" id="fc-r-banner" value="' + esc(dp.n) + '">' +
+        '<input type="hidden" id="fc-r-mail" value="' + esc(dp.e || '') + '"></div>'
       : '<div class="fc-f"><label>' + t('اسم الأستاذ', 'Instructor name') + '</label>' +
         '<input class="sx-search fc-in" id="fc-r-who" autocomplete="off" placeholder="' +
         esc(t('اكتب اسمه كما تعرفه', 'Type their name')) + '">' +
+        /*@3.FAPJ.27*/
+        /*@3.FAPJ.36*/
+        '<div class="fc-hint"><i class="fa-solid fa-circle-info"></i><span>' +
+        esc(t('لم تجده؟ الأساتذةُ الذين لم يُقيَّموا بعدُ يظهرون أسفلَ القائمة — والأسرعُ أن تكتب اسمه كما في البانر ⁦(Alqahtani, Hassan)⁩ أو بريده.',
+              'Not there? Instructors with no ratings yet appear at the bottom — fastest is to type the name exactly as Banner shows it (Alqahtani, Hassan) or their email.')) +
+        '</span></div>' +
         '<div class="fc-sug" id="fc-r-sug" hidden></div>' +
         '<div class="fc-r-who" id="fc-r-chosen" hidden></div>' +
         '<input type="hidden" id="fc-r-name" value="">' +
+        '<input type="hidden" id="fc-r-banner" value="">' +
         '<input type="hidden" id="fc-r-mail" value=""></div>';
 
     var chips = pre.concat(codes).map(function (c) {
@@ -286,7 +421,12 @@
         return;
       }
       var sg = e.target.closest('.fc-sug-i');
-      if (sg) { applyPick(root, byId(sg.getAttribute('data-id'))); return; }
+      if (sg) {
+        var dn = sg.getAttribute('data-dir');
+        if (dn) applyDirPick(root, dirByName(dn));
+        else applyPick(root, byId(sg.getAttribute('data-id')));
+        return;
+      }
       if (e.target.closest('#fc-r-send')) send(root, o);
     });
     root.addEventListener('input', function (e) {
@@ -346,17 +486,46 @@
     if (nm && nm.value) clearPick(root, true);
     var q = norm(inp.value);
     if (q.length < 2) { box.hidden = true; return; }
+    /*@3.FAPJ.25*/
+    if (!DIR && !DIR_FAILED) {
+      /*@3.FAPJ.32*/
+      loadDir(function () {
+        if ($('#fc-r-who', root) === inp && norm(inp.value) === q) suggest(root);
+      });
+    }
     var hit = DATA.faculty.filter(function (f) {
       return f._k.indexOf(q) >= 0 || String(f.en || '').toLowerCase().indexOf(q) >= 0;
     }).slice(0, 8);
-    if (!hit.length) { box.hidden = true; return; }
+    var dir = searchDir(inp.value, hit.length ? 5 : 8);
+    if (!hit.length && !dir.length) {
+      /*@3.FAPJ.33*/
+      box.hidden = false;
+      box.innerHTML = '<div class="fc-sug-none">' +
+        (DIR || DIR_FAILED
+          ? t('لا أحدَ بهذا الاسم. اكتبه كما في البانر ⁦(Alqahtani, Hassan)⁩ أو اكتب بريده.',
+              'No one by that name. Type it as Banner shows it (Alqahtani, Hassan) or type their email.')
+          : t('يُبحث في دليل الأساتذة…', 'Searching the instructor directory…')) + '</div>';
+      return;
+    }
     box.hidden = false;
-    box.innerHTML = hit.map(function (f) {
-      return '<button type="button" class="fc-sug-i" data-id="' + esc(f.id) + '"' +
-        ' data-nm="' + esc(f.name) + '">' +
-        esc(f.name) + (f.en ? '<span class="fc-sug-en ltr">' + esc(f.en) + '</span>' : '') +
-        '<span class="fc-sug-n">' + f.n + '</span></button>';
-    }).join('');
+    box.innerHTML =
+      hit.map(function (f) {
+        return '<button type="button" class="fc-sug-i" data-id="' + esc(f.id) + '"' +
+          ' data-nm="' + esc(f.name) + '">' +
+          esc(f.name) + (f.en ? '<span class="fc-sug-en ltr">' + esc(f.en) + '</span>' : '') +
+          '<span class="fc-sug-n">' + f.n + '</span></button>';
+      }).join('') +
+      (dir.length
+        ? '<div class="fc-sug-h">' +
+            t('من دليل البانر — لا تقييماتِ لهم بعد',
+              'From the Banner directory — not rated yet') + '</div>' +
+          dir.map(function (p) {
+            return '<button type="button" class="fc-sug-i is-dir" data-dir="' + esc(p.n) + '">' +
+              '<span class="ltr">' + esc(p.n) + '</span>' +
+              (p.a ? '<span class="fc-sug-en">' + esc(p.a) + '</span>' : '') +
+              '<span class="fc-sug-n fc-sug-n--new">' + t('جديد', 'new') + '</span></button>';
+          }).join('')
+        : '');
   }
 
   /*@3.FAPJ.14*/
@@ -377,11 +546,34 @@
     fillCourses(root, f);
   }
 
+  /*@3.FAPJ.26*/
+  function applyDirPick(root, p) {
+    var chosen = $('#fc-r-chosen', root);
+    if (!p || !chosen) return;
+    var box = $('#fc-r-sug', root), inp = $('#fc-r-who', root);
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+    if (inp) { inp.value = p.a || p.n; inp.hidden = true; }
+    $('#fc-r-name', root).value = p.a || p.n;
+    $('#fc-r-mail', root).value = p.e || '';
+    var bn = $('#fc-r-banner', root);
+    if (bn) bn.value = p.n;
+    chosen.hidden = false;
+    chosen.innerHTML = '<i class="fa-solid fa-chalkboard-user"></i>' +
+      '<b>' + esc(p.a || p.n) + '</b>' +
+      '<span class="fc-go-n ltr">' + esc(p.n) + '</span>' +
+      '<span class="fc-r-new">' + esc(t('أوّل تقييم', 'first rating')) + '</span>' +
+      '<button type="button" class="fc-r-swap" data-gf-unpick="1">' +
+        '<i class="fa-solid fa-rotate-left"></i>' + esc(t('غيّر', 'Change')) + '</button>';
+  }
+
   function clearPick(root, keepText) {
     var chosen = $('#fc-r-chosen', root), inp = $('#fc-r-who', root);
     var nm = $('#fc-r-name', root), ml = $('#fc-r-mail', root);
+    var bn = $('#fc-r-banner', root);
     if (nm) nm.value = '';
     if (ml) ml.value = '';
+    /*@3.FAPJ.34*/
+    if (bn) bn.value = '';
     if (chosen) { chosen.hidden = true; chosen.innerHTML = ''; }
     if (inp) {
       inp.hidden = false;
@@ -438,7 +630,10 @@
                           'No course picked — pick one, or press Send again to send without it.');
       return;
     }
-    var body = { name: name, email: email, courses: courses, comment: $('#fc-r-cm', root).value.trim() };
+    /*@3.FAPJ.28*/
+    var bnEl = $('#fc-r-banner', root);
+    var body = { name: name, email: email, banner: (bnEl && bnEl.value.trim()) || '',
+                 courses: courses, comment: $('#fc-r-cm', root).value.trim() };
 
     /*@3.FAPJ.12*/
     try {
@@ -483,6 +678,10 @@
     load: load, byEmail: byEmail, byId: byId, byBannerName: byBannerName,
     detailHtml: detailHtml, rateHtml: rateHtml, wire: wire,
     resetVals: resetVals, nameOf: nameOf, tone: tone, ring: ring,
-    data: function () { return DATA; }
+    data: function () { return DATA; },
+    loadDir: loadDir, searchDir: searchDir, dirByName: dirByName,
+    dirByEmail: dirByEmail, dirDetailHtml: dirDetailHtml, arLine: arLine,
+    nudge: nudge, nudgeT: nudgeT,
+    dir: function () { return DIR; }
   };
 })();

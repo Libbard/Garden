@@ -655,6 +655,47 @@
     return h;
   }
 
+  /*@3.SEMJ.179*/
+  function renderRateNudge() {
+    var host = el('sem-rate-nudge');
+    if (!host) return;
+    var GF = window.GardenFaculty;
+    if (!S.facultyReady || !GF) { host.hidden = true; return; }
+
+    var seen = {}, gaps = [];
+    courses().forEach(function (entry) {
+      var m = GardenData.courseMeta(entry.code);
+      ((m && m.instructors) || []).forEach(function (ins) {
+        if (!ins || !ins.name) return;
+        var k = String(ins.email || ins.name).toLowerCase();
+        if (seen[k]) return;
+        seen[k] = 1;
+        var f = (ins.email && GF.byEmail(ins.email)) || GF.byBannerName(ins.name);
+        var n = f ? (f.n || 0) : 0;
+        if (n >= 3) return;
+        gaps.push({ name: (f && GF.nameOf(f)) || ins.name,
+                    key: (f && f.id) || ins.name, n: n });
+      });
+    });
+    if (!gaps.length) { host.hidden = true; host.innerHTML = ''; return; }
+
+    gaps.sort(function (a, b) { return a.n - b.n; });
+    host.hidden = false;
+    host.innerHTML =
+      '<i class="fa-solid fa-seedling" aria-hidden="true"></i>' +
+      '<span>' + esc(L(
+        'رأيُك ناقصٌ عند ' +
+          nOf(gaps.length, ['أستاذ', 'أستاذين', 'أساتذة'], ['instructor', 'instructors'], true) +
+          ' من أساتذة فصلك:',
+        gaps.length + ' of your instructors have few or no ratings:')) + ' ' +
+        gaps.map(function (g) {
+          return '<a class="sem-nudge-b" href="faculty.html?rate=' +
+            encodeURIComponent(g.key) + '">' + esc(g.name) +
+            '<small>' + esc(GF.nudgeT(g.n)) + '</small></a>';
+        }).join('') +
+      '</span>';
+  }
+
   function renderCourses() {
     var list = courses();
     var grid = el('sem-courses'), empty = el('sem-courses-empty');
@@ -672,6 +713,7 @@
           '</span></span></div></article>';
       }
     }).join('');
+    renderRateNudge();
   }
 
   /*@3.SEMJ.53*/
