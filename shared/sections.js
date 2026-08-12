@@ -1589,9 +1589,10 @@
           '<div style="min-width:0"><div class="nm">' + esc(f.n) + '</div>' +
           '<div class="em">' + (f.a ? '<b class="sx-fac-ar">' + esc(f.a) + '</b> · ' : '') +
             esc(last) + '</div></div>' +
-          /*@3.SECJ.384*/
-          rateChip({ n: f.n, e: f.e }) +
           '<span class="ct">' + f.c + ' ' + t('شعبة', 'sec') + '</span>' +
+          /*@3.SECJ.384*/
+          /*@3.SECJ.390*/
+          rateChip({ n: f.n, e: f.e }) +
           '<i class="fa-solid fa-chevron-down sx-fac-car"></i></summary>' +
         (f.e ? '<div class="sx-fac-mail"><i class="fa-solid fa-envelope"></i>' +
                '<a href="mailto:' + esc(f.e) + '">' + esc(f.e) + '</a></div>' : '') +
@@ -1975,12 +1976,39 @@
       .catch(function () { /*@3.SECJ.201*/ });
   }
   /*@3.SECJ.202*/
+  /*@3.SECJ.391*/
+  var DIRAR = null;
+  function loadDirNames() {
+    if (!window.GardenFaculty || !GardenFaculty.loadDir) return;
+    GardenFaculty.loadDir(function (d) {
+      if (!d || !d.people || !d.people.length) return;
+      var byMail = {}, byName = {};
+      d.people.forEach(function (p) {
+        if (!p.a) return;
+        if (p.e) byMail[String(p.e).toLowerCase()] = p.a;
+        var k = nameKey(p.n);
+        if (k && !byName[k]) byName[k] = p.a;
+      });
+      DIRAR = { byMail: byMail, byName: byName };
+      HAY_GEN++;
+      if (state.all.length) apply();
+    });
+  }
+  function dirArOf(p) {
+    if (!DIRAR || !p) return '';
+    if (p.e && DIRAR.byMail[String(p.e).toLowerCase()]) return DIRAR.byMail[String(p.e).toLowerCase()];
+    var k = nameKey(p.n || p);
+    return (k && DIRAR.byName[k]) || '';
+  }
+
   function arProf(s) {
-    if (!RATINGS) return '';
     var out = [];
     (s.f || []).forEach(function (p) {
-      var r = rateOf(p);
+      var r = RATINGS ? rateOf(p) : null;
       if (r && r.name) out.push(r.name);
+      /*@3.SECJ.393*/
+      var a = dirArOf(p);
+      if (a && out.indexOf(a) < 0) out.push(a);
     });
     return out.join(' ');
   }
@@ -3509,6 +3537,9 @@
       if (qp) { state.q = qp; $('#sx-q').value = qp; }
     } catch (_) {}
     loadRatings();
+    /*@3.SECJ.392*/
+    if (window.requestIdleCallback) requestIdleCallback(loadDirNames, { timeout: 4000 });
+    else setTimeout(loadDirNames, 1200);
     loadCourseNames();
     /*@3.SECJ.362*/
     if (GW() && GW().ready()) {
