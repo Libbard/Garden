@@ -87,6 +87,8 @@
     sessClose:  ['إغلاق', 'Close'],
     sessBusy:   ['لديك جلسةٌ مفتوحةٌ — تُغلَق ثم تُفتح الجديدة…',
                  'You already have a session open — closing it, then opening the new one…'],
+    sessReconnect:['انقطع الطريقُ لحظةً — تُستعاد الجلسة…',
+                   'The connection paused — restoring your session…'],
     needsInput: ['هذا البرنامجُ يقرأ إدخالاً من لوحة المفاتيح، ولوحُ «المدخلات» فارغ — فلم يجد ما يقرؤه.',
                  'This program reads keyboard input, and the Input panel is empty — so it found nothing to read.'],
     needsInputGo:['شغّله تفاعليّاً', 'Run it interactively'],
@@ -1552,7 +1554,8 @@
   runButton.addEventListener('click', run);
 
   /*@4.LAPLJ.101*/
-  var session = { id: null, seq: 0, abort: null, alive: false, mode: 'run', ended: false };
+  var session = { id: null, seq: 0, abort: null, alive: false, mode: 'run', ended: false,
+    retryTimer: null, retryCount: 0, streamToken: 0 };
   var live = { box: null, body: null, field: null, dot: null, hint: null, stop: null, tail: null };
   var echoLeft = '';
 
@@ -1754,6 +1757,7 @@
 
   function endSession(reason) {
     if (session.abort) { try { session.abort.abort(); } catch (error) { } }
+    if (session.retryTimer) clearTimeout(session.retryTimer);
     if (session.id && aiBase()) {
       fetch(aiBase() + '/v1/sessions/' + session.id, {
         method: 'DELETE', headers: { 'X-Garden-Identity': identity() }, keepalive: true
@@ -1761,7 +1765,8 @@
     }
     clearOpenTimer();
     var mode = session.mode;
-    session = { id: null, seq: 0, abort: null, alive: false, mode: mode, ended: false };
+    session = { id: null, seq: 0, abort: null, alive: false, mode: mode, ended: false,
+      retryTimer: null, retryCount: 0, streamToken: 0 };
     echoLeft = '';
     if (reason) appendSessionLine('sys', reason);
     consoleFinished();
@@ -1965,6 +1970,7 @@
       if (stale) stale.remove();
       session.id = reply.data.id;
       session.alive = true;
+      session.retryCount = 0;
       var hints = reply.data.hints;
       if (live.hint) live.hint.textContent = session.mode === 'shell' ? t('termHold') : t('liveWait');
       if (session.mode === 'shell') {
@@ -1984,19 +1990,47 @@
     });
   }
 
+  /*@4.LAPLJ.196*/
+  function retrySessionStream(base, id, token) {
+    if (!session.alive || session.id !== id || session.streamToken !== token) return;
+    session.retryCount += 1;
+    if (live.hint) live.hint.textContent = t('sessReconnect');
+    var delay = Math.min(10000, 750 * Math.pow(2, Math.min(session.retryCount - 1, 4)));
+    session.retryTimer = setTimeout(function () {
+      session.retryTimer = null;
+      if (session.alive && session.id === id && session.streamToken === token) streamSession(base);
+    }, delay);
+  }
+
   function streamSession(base) {
+    if (!session.alive || !session.id) return;
+    var id = session.id;
+    var token = ++session.streamToken;
     session.abort = new AbortController();
-    fetch(base + '/v1/sessions/' + session.id + '/stream?from=' + session.seq, {
+    fetch(base + '/v1/sessions/' + id + '/stream?from=' + session.seq, {
       headers: { 'X-Garden-Identity': identity() },
       signal: session.abort.signal
     }).then(function (response) {
+      if (response.status === 404) {
+        if (session.alive && session.id === id && session.streamToken === token) {
+          endSession(L('لم تعد الجلسةُ موجودةً على الخادم.', 'The server session no longer exists.'));
+        }
+        return null;
+      }
       if (!response.ok || !response.body) throw new Error('stream');
+      session.retryCount = 0;
+      if (live.hint) live.hint.textContent = session.mode === 'shell' ? t('termHold') : t('liveWait');
       var reader = response.body.getReader();
       var decoder = new TextDecoder();
       var carry = '';
       function pump() {
         return reader.read().then(function (chunk) {
-          if (chunk.done) { if (session.alive) endSession(null); return; }
+          if (chunk.done) {
+            if (session.alive && session.id === id && session.streamToken === token) {
+              retrySessionStream(base, id, token);
+            }
+            return;
+          }
           carry += decoder.decode(chunk.value, { stream: true });
           var parts = carry.split('\n\n');
           carry = parts.pop() || '';
@@ -2024,10 +2058,12 @@
           return pump();
         });
       }
-      return pump();
+      return response.body ? pump() : null;
     }).catch(function (error) {
       if (error && error.name === 'AbortError') return;
-      if (session.alive) endSession(L('انقطع البثّ.', 'The stream dropped.'));
+      if (session.alive && session.id === id && session.streamToken === token) {
+        retrySessionStream(base, id, token);
+      }
     });
   }
 
