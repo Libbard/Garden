@@ -419,9 +419,15 @@
                 meta.join('<span class="mr-dot" aria-hidden="true">·</span>') + '</span>'
             : '') +
         '</div>' +
-        '<button type="button" class="mr-drop" data-fdrop="' + esc(String(r.id)) + '" ' +
-          'aria-label="' + esc(t('اسحبْ تقييمَ ', 'Withdraw rating for ') + (r.name || '')) + '">' +
-          '<i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>' +
+        '<div class="mr-facts-i">' +
+          /*@3.MYRJ.20*/
+          '<button type="button" class="mr-drop" data-fedit="' + esc(String(r.id)) + '" ' +
+            'aria-label="' + esc(t('عدّلْ تقييمَ ', 'Edit rating for ') + (r.name || '')) + '">' +
+            '<i class="fa-solid fa-pen" aria-hidden="true"></i></button>' +
+          '<button type="button" class="mr-drop" data-fdrop="' + esc(String(r.id)) + '" ' +
+            'aria-label="' + esc(t('اسحبْ تقييمَ ', 'Withdraw rating for ') + (r.name || '')) + '">' +
+            '<i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>' +
+        '</div>' +
       '</header>' +
       (axes ? '<dl class="mr-fax">' + axes + '</dl>' : '') +
       (r.comment ? '<p class="mr-quote">' + esc(excerpt(r.comment, 220)) + '</p>' : '') +
@@ -439,8 +445,8 @@
     var head = '<h2 class="mr-h">' + esc(t('أساتذةٌ قيّمتَهم', 'Instructors you rated')) +
       (rows.length ? ' <span class="mr-n">' + rows.length + '</span>' : '') + '</h2>' +
       '<p class="mr-sec-sub">' + esc(t(
-        'رأيُك في أساتذتك — تراه وتسحبه متى شئت، كما تفعل بتقييمات المواد.',
-        'What you said about your instructors — view or withdraw it any time, just like course ratings.')) + '</p>';
+        'رأيُك في أساتذتك — تعدّله وتسحبه متى شئت، كما تفعل بتقييمات المواد.',
+        'What you said about your instructors — edit or withdraw it any time, just like course ratings.')) + '</p>';
 
     if (fstate.loading) { host.innerHTML = head + '<p class="mr-load">' + esc(t('يُحمَّل…', 'Loading…')) + '</p>'; return; }
 
@@ -459,7 +465,10 @@
   }
 
   /*@3.MYRJ.17*/
-  function openFacultyForm() {
+  /*@3.MYRJ.21*/
+  var FKEY = { a_overall: 'ov', a_clear: 'cl', a_fair: 'fg', a_resp: 'em', a_gtime: 'gt' };
+
+  function openFacultyForm(row) {
     var G = window.GardenFaculty;
     if (!G || !G.rateHtml) return;
     var d = document.getElementById('mrFacDlg');
@@ -477,9 +486,23 @@
         '<div class="gsf-body" id="mrFacBody"></div>';
       document.body.appendChild(d);
     }
+    var opts = { onSent: function () { try { d.close(); } catch (e) {} loadFaculty(); } };
+    if (row) {
+      var pv = {};
+      Object.keys(FKEY).forEach(function (c) { if (row[c]) pv[FKEY[c]] = row[c]; });
+      /*@3.MYRJ.22*/
+      opts.editId = row.id;
+      opts.fixed = { name: row.name || '', email: '' };
+      opts.pre = {
+        vals: pv,
+        comment: row.comment || '',
+        courses: String(row.course || '').split('،').map(function (s) { return s.trim(); })
+                   .filter(Boolean)
+      };
+    }
     var body = d.querySelector('#mrFacBody');
-    body.innerHTML = G.rateHtml(null, {});
-    G.wire(body, { onSent: function () { try { d.close(); } catch (e) {} loadFaculty(); } });
+    body.innerHTML = G.rateHtml(null, opts);
+    G.wire(body, opts);
     if (!d.open) d.showModal();
   }
 
@@ -491,10 +514,16 @@
 
   document.addEventListener('click', function (e) {
     var b = e.target.closest &&
-      e.target.closest('[data-rate],[data-drop],[data-fdrop],#mr-retry,#mr-pick-go,#mr-fac-go');
+      e.target.closest('[data-rate],[data-drop],[data-fdrop],[data-fedit],#mr-retry,#mr-pick-go,#mr-fac-go');
     if (!b) return;
     if (b.id === 'mr-retry') { load(); loadFaculty(); return; }
     if (b.id === 'mr-fac-go') { openFacultyForm(); return; }
+    var fedit = b.getAttribute('data-fedit');
+    if (fedit) {
+      var fr = (fstate.rows || []).filter(function (x) { return String(x.id) === String(fedit); })[0];
+      if (fr) openFacultyForm(fr);
+      return;
+    }
     /*@3.MYRJ.16*/
     var fdrop = b.getAttribute('data-fdrop');
     if (fdrop) {

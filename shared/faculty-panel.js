@@ -335,8 +335,22 @@
       .sort(function (a, b) { return f.courses[b] - f.courses[a]; }) : [];
     var pre = o.course && codes.indexOf(o.course) < 0 ? [o.course] : [];
     var dp = o.dir || null;
+    /*@3.FAPJ.40*/
+    var fx = o.fixed || null;
+    /*@3.FAPJ.41*/
+    var pv = (o.pre && o.pre.vals) || {};
+    resetVals();
+    Object.keys(pv).forEach(function (k) { if (pv[k]) vals[k] = pv[k]; });
+    var pcrs = (o.pre && o.pre.courses) || [];
 
-    var who = f
+    var who = fx
+      ? '<div class="fc-r-who"><i class="fa-solid fa-chalkboard-user"></i>' +
+        '<b>' + esc(fx.name || '') + '</b>' +
+        '<span class="fc-r-new">' + esc(t('تعديل', 'editing')) + '</span>' +
+        '<input type="hidden" id="fc-r-name" value="' + esc(fx.name || '') + '">' +
+        '<input type="hidden" id="fc-r-banner" value="">' +
+        '<input type="hidden" id="fc-r-mail" value="' + esc(fx.email || '') + '"></div>'
+      : f
       ? '<div class="fc-r-who"><i class="fa-solid fa-chalkboard-user"></i>' +
         '<b>' + esc(nameOf(f)) + '</b>' +
         (f.link && f.link.e ? '<span class="fc-go-n ltr">' + esc(f.link.e) + '</span>' : '') +
@@ -366,8 +380,14 @@
         '<input type="hidden" id="fc-r-banner" value="">' +
         '<input type="hidden" id="fc-r-mail" value=""></div>';
 
-    var chips = pre.concat(codes).map(function (c) {
-      return '<button type="button" class="fc-crs' + (o.course === c ? ' on' : '') +
+    var seen = {};
+    var chips = pcrs.concat(pre, codes).filter(function (c) {
+      if (!c || seen[c]) return false;
+      seen[c] = 1;
+      return true;
+    }).map(function (c) {
+      var on = o.course === c || pcrs.indexOf(c) > -1;
+      return '<button type="button" class="fc-crs' + (on ? ' on' : '') +
         '" data-crs="' + esc(c) + '">' + esc(c) + '</button>';
     }).join('');
 
@@ -382,20 +402,25 @@
       RATE_Q.map(function (q) {
         return '<div class="fc-q"><div class="fc-q-t">' + esc(t(q.ar, q.en)) + '</div>' +
           '<div class="fc-q-o">' + q.opts.map(function (op) {
-            return '<button type="button" class="fc-opt is-' + op[2] + '" data-k="' + q.k +
+            return '<button type="button" class="fc-opt is-' + op[2] +
+              (vals[q.k] === op[0] ? ' on' : '') + '" data-k="' + q.k +
               '" data-v="' + esc(op[0]) + '">' + esc(t(op[0], op[1])) + '</button>';
           }).join('') + '</div></div>';
       }).join('') +
       '<div class="fc-f"><label>' + t('تعليقك (اختياريّ)', 'Your comment (optional)') + '</label>' +
         '<textarea class="fc-in fc-ta" id="fc-r-cm" rows="3" maxlength="1200" placeholder="' +
         esc(t('ما الذي يجب أن يعرفه زميلُك قبل أن يسجّل معه؟',
-              'What should a classmate know before registering?')) + '"></textarea></div>' +
+              'What should a classmate know before registering?')) + '">' +
+        esc((o.pre && o.pre.comment) || '') + '</textarea></div>' +
       '<div class="fc-note"><i class="fa-solid fa-shield-halved"></i>' +
         t('لا نحفظ اسمك ولا بريدك — رأيُك وحدَه، ويظهر فوراً.',
           'We store no name or email — only your answer, and it appears immediately.') + '</div>' +
       '<div class="fc-r-foot">' +
-        '<button class="sx-primary" id="fc-r-send"><i class="fa-solid fa-paper-plane"></i>' +
-          t('أرسل التقييم', 'Send rating') + '</button>' +
+        '<button class="sx-primary" id="fc-r-send">' +
+          (o.editId
+            ? '<i class="fa-solid fa-floppy-disk"></i>' + t('احفظِ التعديل', 'Save changes')
+            : '<i class="fa-solid fa-paper-plane"></i>' + t('أرسل التقييم', 'Send rating')) +
+        '</button>' +
         '<span class="fc-r-msg" id="fc-r-msg"></span>' +
       '</div></div>';
   }
@@ -404,6 +429,8 @@
   var vals = {}, noCrsWarned = false;
   function wire(root, o) {
     o = o || {};
+    /*@3.FAPJ.39*/
+    root.__gfOpts = o;
     if (root.__gfWired) return;
     root.__gfWired = true;
     root.addEventListener('click', function (e) {
@@ -427,7 +454,7 @@
         else applyPick(root, byId(sg.getAttribute('data-id')));
         return;
       }
-      if (e.target.closest('#fc-r-send')) send(root, o);
+      if (e.target.closest('#fc-r-send')) send(root, root.__gfOpts || o);
     });
     root.addEventListener('input', function (e) {
       if (e.target.id === 'fc-r-who') suggest(root);
@@ -646,11 +673,15 @@
     } catch (e) { }
     Object.keys(vals).forEach(function (k) { body[k] = vals[k]; });
 
+    /*@3.FAPJ.42*/
+    var editing = !!o.editId;
+    if (editing) body.id = Number(o.editId);
+
     btn.disabled = true;
     msg.className = 'fc-r-msg';
     msg.textContent = t('يُرسَل…', 'Sending…');
-    window.GardenEv('rate_faculty', {});
-    fetch(API + '/v1/faculty/rate', {
+    window.GardenEv(editing ? 'edit_faculty_rating' : 'rate_faculty', {});
+    fetch(API + (editing ? '/v1/faculty/rate/edit' : '/v1/faculty/rate'), {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
@@ -664,9 +695,11 @@
           return;
         }
         msg.className = 'fc-r-msg is-ok';
-        msg.textContent = x.j.duplicate
-          ? t('هذا التقييم مُسجَّلٌ سلفاً.', 'This rating was already recorded.')
-          : t('شكراً — سُجِّل رأيُك.', 'Thanks — your rating is in.');
+        msg.textContent = editing
+          ? t('حُفظ التعديل.', 'Changes saved.')
+          : (x.j.duplicate
+            ? t('هذا التقييم مُسجَّلٌ سلفاً.', 'This rating was already recorded.')
+            : t('شكراً — سُجِّل رأيُك.', 'Thanks — your rating is in.'));
         DATA = null; FRESH = true;         /*@3.FAPJ.13*/
         resetVals();
         setTimeout(function () { o.onSent && o.onSent(); }, 1100);

@@ -240,10 +240,10 @@
     var b = document.createElement('button');
     b.className = 'g-menu-item toggle-btn g-mod-theme';
     b.type = 'button';
-    b.setAttribute('data-title-ar', 'ثيم الصفحة');
-    b.setAttribute('data-title-en', 'Page theme');
-    b.title = L('ثيم الصفحة', 'Page theme');
-    b.setAttribute('aria-label', L('ثيم الصفحة', 'Page theme'));
+    b.setAttribute('data-title-ar', 'مظهرٌ مخصّص');
+    b.setAttribute('data-title-en', 'Custom appearance');
+    b.title = L('مظهرٌ مخصّص', 'Custom appearance');
+    b.setAttribute('aria-label', L('مظهرٌ مخصّص', 'Custom appearance'));
     b.setAttribute('aria-haspopup', 'menu');
     /*@3.GAHJ.24*/
     b.innerHTML = '<i class="fa-solid fa-swatchbook" aria-hidden="true"></i>';

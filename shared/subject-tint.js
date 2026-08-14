@@ -97,9 +97,10 @@
 
   /*@3.SUTJ.13*/
   var MT_BASE = {
-    paper: 'light', github: 'light', solar: 'light',
+    paper: 'light', github: 'light', solar: 'light', latte: 'light', everlight: 'light',
     onedark: 'dark', dracula: 'dark', nord: 'dark', gruvbox: 'dark',
-    oled: 'dim', tokyo: 'dim', amber: 'dim'
+    mocha: 'dark', rosepine: 'dark', everforest: 'dark',
+    oled: 'dim', tokyo: 'dim', amber: 'dim', nightowl: 'dim', ayu: 'dim', carbon: 'dim'
   };
   var MT_IDS = Object.keys(MT_BASE);
 
@@ -134,10 +135,19 @@
   /*@3.SUTJ.20*/
   /*@3.SUTJ.21*/
   var MF_AR = {
-    plex: 'IBM Plex Sans Arabic', cairo: 'Cairo', tajawal: 'Tajawal',
-    almarai: 'Almarai', readex: 'Readex Pro', naskh: 'Noto Naskh Arabic'
+    plex: 'IBM Plex Sans Arabic', readex: 'Readex Pro', notosans: 'Noto Sans Arabic',
+    amiri: 'Amiri', naskh: 'Noto Naskh Arabic', tajawal: 'Tajawal', almarai: 'Almarai',
+    alexandria: 'Alexandria', vazir: 'Vazirmatn', kufi: 'Noto Kufi Arabic',
+    messiri: 'El Messiri', zain: 'Zain', rubik: 'Rubik',
+    /*@3.SUTJ.24*/
+    thmanyah: 'Thmanyah Sans', thmanyahserif: 'Thmanyah Serif Text'
   };
-  var MF_LAT = { inter: 'Inter', literata: 'Literata', atkinson: 'Atkinson Hyperlegible' };
+  var MF_LAT = {
+    sourceserif: 'Source Serif 4', newsreader: 'Newsreader', literata: 'Literata',
+    atkinson: 'Atkinson Hyperlegible', merriweather: 'Merriweather', lora: 'Lora',
+    garamond: 'EB Garamond', spectral: 'Spectral', fraunces: 'Fraunces',
+    plexsans: 'IBM Plex Sans', sourcesans: 'Source Sans 3', geist: 'Geist'
+  };
 
   var _fontBase = (function () {
     var sc = document.currentScript;
