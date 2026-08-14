@@ -3,6 +3,15 @@
   'use strict';
 
   var S = null;
+
+  /*@3.SCPJ2.26*/
+  var _fontHref = (function () {
+    var sc = document.currentScript;
+    return sc && sc.src
+      ? sc.src.replace(/schedule-print\.js(\?.*)?$/, 'vendor/fonts/garden/garden-core.css')
+      : '';
+  })();
+
   function ar() { return S.isAr(); }
   function T(a, e) { return ar() ? a : e; }
   function esc(s) { return S.escapeH(s); }
@@ -248,8 +257,7 @@
     window.GardenEv('sched_print', { ok: 1 });
     win.document.write('<!DOCTYPE html><html dir="' + (isA ? 'rtl' : 'ltr') + '" lang="' + (isA ? 'ar' : 'en') + '"><head>' +
       '<meta charset="UTF-8"><title>' + esc(title) + '</title>' +
-      '<link rel="preconnect" href="https://fonts.googleapis.com">' +
-      '<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">' +
+      (_fontHref ? '<link rel="stylesheet" href="' + _fontHref + '">' : '') +
       '<style>' + styles(geom) + '</style></head><body>' + bodyHtml +
       '<script>if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(function(){window.print();},200);});}' +
       'else{setTimeout(function(){window.print();},700);}<\/script></body></html>');

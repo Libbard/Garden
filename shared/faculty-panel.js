@@ -110,7 +110,7 @@
   }
 
   /*@3.FAPJ.24*/
-  var SRC_AR = { r: 'كما كتبه الطلاب', m: 'اسمٌ مُثبَت', ai: 'نقحرة آلية' };
+  var SRC_AR = { r: 'كما كتبه الطلاب', m: 'اسمٌ مُثبَت', ai: 'ترجمة آلية' };
   var SRC_EN = { r: 'as students wrote it', m: 'verified', ai: 'auto-transliterated' };
   function arLine(p) {
     if (!p || !p.a) return '';

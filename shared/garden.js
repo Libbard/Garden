@@ -5178,12 +5178,23 @@ ${baseRules}`) + regenSuffix;
       if (retryBtn) retryBtn.style.display = failed ? '' : 'none';
     }
 
+    /*@3.GARJ.561*/
+    function waitRing() {
+      return '<div class="ai-wait" role="progressbar" aria-label="' +
+        aiT('يُحضَّر الشرح', 'Preparing the explanation') + '">' +
+        '<svg viewBox="0 0 44 44" aria-hidden="true">' +
+          '<circle class="ai-wait-t" cx="22" cy="22" r="19"></circle>' +
+          '<circle class="ai-wait-b" cx="22" cy="22" r="19"></circle>' +
+        '</svg></div>';
+    }
+
     /*@3.GARJ.375*/
     function runAI(messages, holder, opts, onOk) {
-      holder.innerHTML = `<div class="ai-loading"><div class="ai-loading-spinner"></div><span>${opts.loadingMsg || aiT('جاري الشرح...', 'Generating explanation...')}</span></div>`;
+      holder.innerHTML = `<div class="ai-loading">${waitRing()}<span class="ai-loading-msg">${opts.loadingMsg || aiT('جاري الشرح...', 'Generating explanation...')}</span></div>`;
       let streamEl = null;
       const onThinking = () => {
-        const span = holder.querySelector('.ai-loading span');
+        /*@3.GARJ.560*/
+        const span = holder.querySelector('.ai-loading-msg');
         if (span) span.textContent = aiT('يفكر بعمق في شرحك...', 'Thinking deeply about your explanation...');
       };
       const onDelta = (full) => {

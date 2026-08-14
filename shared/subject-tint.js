@@ -132,7 +132,12 @@
   }
 
   /*@3.SUTJ.20*/
-  var MF_IDS = ['plex', 'cairo', 'tajawal', 'almarai', 'readex', 'naskh'];
+  /*@3.SUTJ.21*/
+  var MF_AR = {
+    plex: 'IBM Plex Sans Arabic', cairo: 'Cairo', tajawal: 'Tajawal',
+    almarai: 'Almarai', readex: 'Readex Pro', naskh: 'Noto Naskh Arabic'
+  };
+  var MF_LAT = { inter: 'Inter', literata: 'Literata', atkinson: 'Atkinson Hyperlegible' };
 
   var _fontBase = (function () {
     var sc = document.currentScript;
@@ -151,23 +156,33 @@
   function modFont() {
     var root = document.documentElement, raw;
     try { raw = localStorage.getItem('dashboard_prefs'); } catch (e) { return; }
-    var id = '';
+    var p = null;
     if (raw && raw.indexOf('moduleFont') > -1) {
-      var p = null;
       try { p = JSON.parse(raw); } catch (e) {}
-      id = (p && typeof p.moduleFont === 'string') ? p.moduleFont : '';
     }
-    if (MF_IDS.indexOf(id) < 0) { root.removeAttribute('data-mod-font'); return; }
-    root.setAttribute('data-mod-font', id);
+    var ar = (p && MF_AR[p.moduleFont]) || '';
+    var lat = (p && MF_LAT[p.moduleFontLat]) || '';
+    if (!ar && !lat) {
+      root.removeAttribute('data-mod-font');
+      root.style.removeProperty('--mt-font');
+      return;
+    }
+    var stack = [];
+    if (lat) stack.push('"' + lat + '"');
+    if (ar) stack.push('"' + ar + '"');
+    /*@3.SUTJ.22*/
+    root.style.setProperty('--mt-font', stack.join(', '));
+    root.setAttribute('data-mod-font', (lat ? p.moduleFontLat : '-') + '.' + (ar ? p.moduleFont : '-'));
     fontSheet();
   }
 
-  function clearFont() {
+  function clearFont(which) {
     var p = readPrefs();
-    if (p.moduleFont === undefined) return false;
-    delete p.moduleFont;
+    var k = which === 'lat' ? 'moduleFontLat' : 'moduleFont';
+    if (p[k] === undefined) return false;
+    delete p[k];
     try { localStorage.setItem('dashboard_prefs', JSON.stringify(p)); } catch (e) {}
-    document.documentElement.removeAttribute('data-mod-font');
+    modFont();
     return true;
   }
 
@@ -214,6 +229,6 @@
   window.GardenTint = {
     scale: scale, apply: apply, chosen: chosen, refresh: run,
     THEMES: MT_IDS, THEME_BASE: MT_BASE, applyTheme: modTheme, clearTheme: clearTheme,
-    FONTS: MF_IDS, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont
+    FONTS: MF_AR, FONTS_LAT: MF_LAT, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont
   };
 })();

@@ -372,24 +372,59 @@
     });
   }
 
+  /*@3.MYRJ.19*/
+  var FVAL = {
+    'ايجابية': 'Positive', 'سلبية': 'Negative',
+    'اتفق': 'Agree', 'لا اتفق': 'Disagree',
+    'دائمًا': 'Always', 'احيانًا': 'Sometimes', 'لم يتم الرد أبدًا': 'Never replied',
+    'نعم': 'Yes', 'كان متأخر جدًا': 'Very late'
+  };
+  function fkey(s) {
+    return String(s == null ? '' : s)
+      .replace(/[\u064B-\u0652\u0640\u0654\u0655\s]/g, '')
+      .replace(/[\u0623\u0625\u0622]/g, '\u0627')
+      .replace(/\u0649/g, '\u064A')
+      .replace(/\u0629/g, '\u0647');
+  }
+  var _fmap = null;
+  function fmap() {
+    if (_fmap) return _fmap;
+    _fmap = {};
+    Object.keys(FVAL).forEach(function (k) { _fmap[fkey(k)] = FVAL[k]; });
+    return _fmap;
+  }
+  function fval(v) {
+    var s = String(v == null ? '' : v).trim();
+    if (!s || isAr()) return s;
+    return fmap()[fkey(s)] || s;
+  }
+
+  /*@3.MYRJ.18*/
   function facRow(r) {
-    var chips = FAX.filter(function (a) { return r[a.c]; }).map(function (a) {
-      return '<span class="mr-chip" title="' + esc(t(a.ar, a.en)) + '">' + esc(r[a.c]) + '</span>';
+    var axes = FAX.filter(function (a) { return r[a.c]; }).map(function (a) {
+      return '<div class="mr-fax-i">' +
+        '<dt>' + esc(t(a.ar, a.en)) + '</dt>' +
+        '<dd>' + esc(fval(r[a.c])) + '</dd></div>';
     }).join('');
     var meta = [];
-    if (r.course) meta.push('<span class="mr-meta-i"><span class="gsf-code">' + esc(r.course) + '</span></span>');
-    if (r.rated_at) meta.push('<span class="mr-meta-i">' + esc(ago(r.rated_at)) + '</span>');
+    if (r.course) meta.push('<span class="mr-fcode">' + esc(r.course) + '</span>');
+    if (r.rated_at) meta.push('<span>' + esc(ago(r.rated_at)) + '</span>');
     return '<article class="mr-row mr-frow">' +
-      '<div class="mr-row-h">' +
+      '<header class="mr-row-h">' +
         '<i class="fa-solid fa-chalkboard-user mr-frow-i" aria-hidden="true"></i>' +
-        '<b class="mr-name">' + esc(r.name || t('أستاذ', 'Instructor')) + '</b>' +
+        '<div class="mr-row-t">' +
+          '<b class="mr-fname">' + esc(r.name || t('أستاذ', 'Instructor')) + '</b>' +
+          (meta.length
+            ? '<span class="mr-fmeta">' +
+                meta.join('<span class="mr-dot" aria-hidden="true">·</span>') + '</span>'
+            : '') +
+        '</div>' +
         '<button type="button" class="mr-drop" data-fdrop="' + esc(String(r.id)) + '" ' +
           'aria-label="' + esc(t('اسحبْ تقييمَ ', 'Withdraw rating for ') + (r.name || '')) + '">' +
           '<i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>' +
-      '</div>' +
-      (chips ? '<div class="mr-chips">' + chips + '</div>' : '') +
-      (r.comment ? '<p class="mr-body">' + esc(excerpt(r.comment, 220)) + '</p>' : '') +
-      (meta.length ? '<div class="mr-meta">' + meta.join('') + '</div>' : '') +
+      '</header>' +
+      (axes ? '<dl class="mr-fax">' + axes + '</dl>' : '') +
+      (r.comment ? '<p class="mr-quote">' + esc(excerpt(r.comment, 220)) + '</p>' : '') +
     '</article>';
   }
 

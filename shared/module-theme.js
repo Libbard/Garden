@@ -63,41 +63,33 @@
     } catch (e) {}
   }
 
-  /*@3.MOTJ.6*/
-  function palettes() {
+  /*@3.MOTJ.15*/
+  var _siteSw = null, _siteKey = '';
+  function siteSwatch() {
     var root = document.documentElement;
+    /*@3.MOTJ.6*/
+    if (!root.getAttribute('data-mod-theme')) return null;
+    var site = 'dark';
+    try { site = localStorage.getItem('garden_theme') || 'dark'; } catch (e) {}
+    var key = site + '|' + (root.getAttribute('data-tinted') || '');
+    if (_siteSw && _siteKey === key) return _siteSw;
+
+    /*@3.MOTJ.7*/
     var hadSkin = root.getAttribute('data-mod-theme');
     var hadBase = root.getAttribute('data-theme');
-    var out = {};
-    THEMES.forEach(function (th) {
-      var cs;
-      if (th.id === 'garden') {
-        /*@3.MOTJ.7*/
-        root.removeAttribute('data-mod-theme');
-        var site = 'dark';
-        try { site = localStorage.getItem('garden_theme') || 'dark'; } catch (e) {}
-        root.setAttribute('data-theme', site);
-        cs = getComputedStyle(root);
-        out[th.id] = {
-          bg: cs.getPropertyValue('--bg-card').trim() || '#1f2937',
-          bars: ['--syn-keyword', '--syn-string', '--syn-function'].map(function (k) {
-            return cs.getPropertyValue(k).trim() || 'currentColor';
-          })
-        };
-        return;
-      }
-      root.setAttribute('data-mod-theme', th.id);
-      cs = getComputedStyle(root);
-      out[th.id] = {
-        bg: cs.getPropertyValue('--mt-bg').trim(),
-        bars: ['--mt-key', '--mt-str', '--mt-fn'].map(function (k) {
-          return cs.getPropertyValue(k).trim();
-        })
-      };
-    });
-    if (hadSkin) root.setAttribute('data-mod-theme', hadSkin); else root.removeAttribute('data-mod-theme');
-    if (hadBase) root.setAttribute('data-theme', hadBase);
-    return out;
+    root.removeAttribute('data-mod-theme');
+    root.setAttribute('data-theme', site);
+    var cs = getComputedStyle(root);
+    _siteSw = {
+      bg: cs.getPropertyValue('--bg-card').trim() || '#1f2937',
+      bars: ['--syn-keyword', '--syn-string', '--syn-function'].map(function (k) {
+        return cs.getPropertyValue(k).trim() || 'currentColor';
+      })
+    };
+    _siteKey = key;
+    root.setAttribute('data-mod-theme', hadSkin);
+    if (hadBase) root.setAttribute('data-theme', hadBase); else root.removeAttribute('data-theme');
+    return _siteSw;
   }
 
   /*@3.MOTJ.11*/
@@ -111,18 +103,29 @@
     { id: 'naskh',   css: 'Noto Naskh Arabic',    ar: 'نسخ',          en: 'Noto Naskh Arabic' }
   ];
 
+  /*@3.MOTJ.16*/
+  var FONTS_LAT = [
+    { id: 'garden',   css: null,                     ar: 'خطُّ الموقع', en: 'Site font' },
+    { id: 'inter',    css: 'Inter',                  ar: 'إنتر',       en: 'Inter' },
+    { id: 'literata', css: 'Literata',               ar: 'ليتيراتا',   en: 'Literata' },
+    { id: 'atkinson', css: 'Atkinson Hyperlegible',  ar: 'أتكِنسون',   en: 'Atkinson Hyperlegible' }
+  ];
+
+  function fontList() { return isAr() ? FONTS : FONTS_LAT; }
+  function fontKey() { return isAr() ? 'moduleFont' : 'moduleFontLat'; }
+
   function currentFont() {
-    var v = prefs().moduleFont;
+    var v = prefs()[fontKey()];
     return (typeof v === 'string' && v) ? v : 'garden';
   }
 
   function chooseFont(id) {
     if (!id || id === 'garden') {
-      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont();
+      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont(isAr() ? 'ar' : 'lat');
       return;
     }
     var p = prefs();
-    p.moduleFont = id;
+    p[fontKey()] = id;
     try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch (e) {}
     if (window.GardenTint && GardenTint.applyFont) GardenTint.applyFont();
   }
@@ -135,7 +138,6 @@
   function open(button) {
     if (document.getElementById('mtPop')) { close(); return; }
 
-    var pal = palettes();
     var cur = current();
     var pop = document.createElement('div');
     pop.className = 'mt-pop';
@@ -163,7 +165,7 @@
     fhead.textContent = L('خطُّ القراءة', 'Reading font');
     colFont.appendChild(fhead);
 
-    FONTS.forEach(function (fo) {
+    fontList().forEach(function (fo) {
       var opt = document.createElement('button');
       opt.type = 'button';
       opt.setAttribute('role', 'menuitemradio');
@@ -179,7 +181,8 @@
 
       var samp = document.createElement('span');
       samp.className = 'mt-fsamp';
-      samp.textContent = isAr() ? 'خوارزمية Ag' : 'Algorithm أب';
+      /*@3.MOTJ.17*/
+      samp.textContent = isAr() ? 'خوارزميّة' : 'Algorithm';
       if (fo.css) samp.style.fontFamily = '"' + fo.css + '", sans-serif';
       opt.appendChild(samp);
 
@@ -204,13 +207,14 @@
       opt.className = 'mt-opt' + (th.id === cur ? ' is-on' : '');
 
       var sw = document.createElement('span');
-      sw.className = 'mt-sw';
-      sw.style.background = pal[th.id].bg;
-      pal[th.id].bars.forEach(function (c) {
+      sw.className = 'mt-sw' + (th.id === 'garden' ? '' : ' mt-pal-' + th.id);
+      var site = th.id === 'garden' ? siteSwatch() : null;
+      if (site) sw.style.background = site.bg;
+      for (var bi = 0; bi < 3; bi++) {
         var bar = document.createElement('i');
-        bar.style.background = c;
+        if (site) bar.style.background = site.bars[bi];
         sw.appendChild(bar);
-      });
+      }
       opt.appendChild(sw);
 
       var name = document.createElement('span');
@@ -247,6 +251,6 @@
 
   window.GardenModuleTheme = {
     open: open, close: close, current: current, choose: choose, THEMES: THEMES,
-    currentFont: currentFont, chooseFont: chooseFont, FONTS: FONTS
+    currentFont: currentFont, chooseFont: chooseFont, FONTS: FONTS, FONTS_LAT: FONTS_LAT
   };
 })();
