@@ -1948,7 +1948,8 @@
 
   /*@3.FISJ.151*/
   function _fireKey(k) { return k.replace(/__/g, '____').replace(/_/g, '__').replace(/-/g, '--'); }
-  function _localKey(fk) { return fk.replace(/--/g, '-').replace(/____/g, '__PLACEHOLDER__').replace(/__/g, '_').replace(/__PLACEHOLDER__/g, '__'); }
+  /*@3.FISJ.236*/
+  function _localKey(fk) { return fk.replace(/--/g, '-').replace(/__/g, '_').replace(/____/g, '__'); }
 
   /*@3.FISJ.152*/
   function schedulePush() {

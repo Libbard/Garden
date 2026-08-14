@@ -166,12 +166,18 @@
     this.place();
 
     var self = this;
-    this._onDoc = function (e) { if (!pop.contains(e.target) && !self.wrap.contains(e.target)) self.close(); };
+    this._onDoc = function (e) {
+      var t = e && e.target;
+      if (!(t instanceof Node)) return;
+      if (!pop.contains(t) && !self.wrap.contains(t)) self.close();
+    };
     this._onKey = function (e) { self.onPopKey(e); };
     /*@3.SELJ.18*/
     /*@3.SELJ.45*/
+    /*@3.SELJ.48*/
     this._onScroll = function (e) {
-      if (e && e.target && e.target !== pop && pop.contains && pop.contains(e.target)) return;
+      var t = e && e.target;
+      if (t instanceof Node && t !== pop && pop.contains(t)) return;
       self.place();
     };
     document.addEventListener('mousedown', this._onDoc, true);

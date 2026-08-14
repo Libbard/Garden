@@ -2438,6 +2438,61 @@
 
   /*@3.SEMJ.137*/
 
+  /*@3.SEMJ.180*/
+  function askNewTerm() {
+    if (!S.sem) { openName('create'); return; }
+    var list = courses();
+    if (!list.length) { openName('create'); return; }
+    var nm = GardenData.dispName(S.sem);
+    var body = '<p style="margin:0 0 .7rem;font-size:.86rem">' +
+      esc(L('يُؤرشَف ', 'We archive ')) + '<b>' + esc(nm) + '</b>' +
+      esc(L(' بموادّه ودرجاته أوّلاً، ثمّ نفتح لك فصلاً جديداً فارغاً.',
+             ' with its courses and grades first, then open a new empty term for you.')) + '</p>' +
+      '<div class="sem-note"><i class="fa-solid fa-box-archive" aria-hidden="true"></i><span>' +
+      esc(L('ولا يضيع شيء: تجده في «الفصول السابقة» أسفل الصفحة، وتستطيع إرجاعَه فصلاً جارياً متى شئت.',
+             'Nothing is lost: you will find it under “Past semesters” below, and you can restore it as your current term any time.')) +
+      '</span></div>';
+    ask(L('فصلٌ جديد', 'New semester'), body, L('أرشِفْ وابدأ', 'Archive and start'), function () {
+      var s = archiveStats({ courses: S.sem.courses });
+      var arch = GardenData.archive() || [];
+      arch.push({
+        id: S.sem.id,
+        name: S.sem.name || S.sem.name_ar || S.sem.name_en,
+        name_ar: S.sem.name_ar || S.sem.name,
+        name_en: S.sem.name_en || S.sem.name,
+        level: S.sem.level, term: S.sem.term,
+        courses: S.sem.courses,
+        gpa: s.gpa, total_credits: s.credits,
+        created_at: S.sem.created_at,
+        archived_at: new Date().toISOString()
+      });
+      try { localStorage.removeItem('my_semester'); } catch (e) {}
+      try { localStorage.setItem('__syncT_my_semester', String(Date.now())); } catch (e) {}
+      try { localStorage.removeItem('garden_semester_meta'); } catch (e) {}
+      S.sem = null;
+      saveArchive(arch);
+      refresh();
+      toast(L('أُرشف «' + nm + '» — تجده في الفصول السابقة',
+              '“' + nm + '” is archived — find it under past semesters'));
+      setTimeout(function () { openName('create'); }, 260);
+    });
+  }
+
+  /*@3.SEMJ.181*/
+  function runIntent() {
+    var m = /[?&]add=([a-z]+)/.exec(location.search || '');
+    if (!m) return;
+    var what = m[1];
+    try {
+      history.replaceState(null, '', location.pathname + location.hash);
+    } catch (e) {}
+    if (what === 'semester') { askNewTerm(); return; }
+    if (what === 'course') {
+      if (!S.sem) { openName('create'); return; }
+      openAdd();
+    }
+  }
+
   function init() {
     if (!window.GardenData) return;
     bind();
@@ -2445,6 +2500,7 @@
       refresh();
       var h = (location.hash || '').replace('#', '');
       if (h && el('sec-' + h)) setTimeout(function () { goSec(h); }, 120);
+      runIntent();
 
       /*@3.SEMJ.138*/
       if (window.GardenFaculty) {

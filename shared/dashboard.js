@@ -1551,9 +1551,10 @@
     else if (act === 'fab') { el('fab-menu').classList.toggle('open'); }
     else if (act === 'new-task') { el('fab-menu').classList.remove('open'); showView('tasks'); openTaskModal(null); }
     else if (act === 'new-note') { el('fab-menu').classList.remove('open'); openNoteModal(null); }
-    else if (act === 'new-course') location.href = 'hub/index.html';
-    else if (act === 'new-event') location.href = 'hub/schedule.html';
-    else if (act === 'new-semester') location.href = 'hub/index.html';
+    /*@3.DASJ.135*/
+    else if (act === 'new-course') location.href = 'hub/index.html?add=course';
+    else if (act === 'new-event') location.href = 'hub/schedule.html?add=event';
+    else if (act === 'new-semester') location.href = 'hub/index.html?add=semester';
     else if (act === 'export') exportData();
     else if (act === 'import') el('import-file').click();
     else if (act === 'save-settings') saveSettings();

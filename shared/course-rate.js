@@ -150,6 +150,39 @@
   /*@3.CORJ.7*/
   var dlg = null, ctx = null, state = null, _armed = false;
 
+  /*@3.CORJ.58*/
+  var DKEY = null, DTIMER = null;
+  var DFIELDS = ['term', 'instructor', 'advice', 'explain', 'difficulty', 'weekly_hours',
+                 'study_rhythm', 'load_shape', 'grade_weight', 'q_source', 'q_vs_ex',
+                 'grade', 'nature', 'q_style', 'helped', 'took_it'];
+
+  function draftGet() {
+    try { return (window.GardenDraft && DKEY && GardenDraft.get(DKEY)) || null; } catch (e) { return null; }
+  }
+  function draftDrop() {
+    try { if (window.GardenDraft && DKEY) GardenDraft.clear(DKEY); } catch (e) {}
+  }
+  /*@3.CORJ.59*/
+  function draftSave() {
+    if (!DKEY || !window.GardenDraft) return;
+    clearTimeout(DTIMER);
+    DTIMER = setTimeout(function () {
+      if (!dlg || !state || !dlg.querySelector('.crx-foot') ||
+          dlg.querySelector('.crx-foot').hidden) return;
+      var b;
+      try { readRes(); b = collect(); } catch (e) { return; }
+      var v = {}, any = false;
+      DFIELDS.forEach(function (k) {
+        var x = b[k];
+        if (x === null || x === undefined || x === '') return;
+        if (Array.isArray(x) && !x.length) return;
+        v[k] = x; any = true;
+      });
+      var res = (b.resources || []).filter(function (r) { return r.url; });
+      try { GardenDraft.set(DKEY, (any || res.length) ? { vals: v, res: res } : null); } catch (e) {}
+    }, 350);
+  }
+
   function outside(e) {
     var r = dlg.getBoundingClientRect();
     if (!r.width || !r.height) return false;
@@ -158,27 +191,23 @@
   }
 
   /*@3.CORJ.24*/
-  function askLeave() {
-    if (!state || !state.dirty) return true;
-    var foot = dlg.querySelector('.crx-foot');
-    if (!foot) return true;
-    var g = foot.querySelector('.gsf-guard');
-    if (!g) {
-      g = document.createElement('div');
-      g.className = 'gsf-guard';
-      g.innerHTML =
-        '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
-        '<p>' + esc(t('غيّرتَ ولم تحفظ بعد.', 'You have unsaved changes.')) + '</p>' +
-        '<button type="button" class="gsf-btn gsf-btn--ghost" data-a="leave">' +
-          esc(t('أغلقْ بلا حفظ', 'Discard')) + '</button>' +
-        '<button type="button" class="gsf-btn gsf-btn--go" data-a="stay">' +
-          esc(t('أُكملُ', 'Keep editing')) + '</button>';
-      foot.insertBefore(g, foot.firstChild);
-    }
-    g.hidden = false;
-    var keep = g.querySelector('[data-a="stay"]');
-    if (keep) keep.focus();
-    return false;
+  /*@3.CORJ.60*/
+  function flushDraft() {
+    if (!state || !state.dirty) return;
+    clearTimeout(DTIMER);
+    DTIMER = null;
+    if (!DKEY || !window.GardenDraft) return;
+    var b;
+    try { readRes(); b = collect(); } catch (e) { return; }
+    var v = {}, any = false;
+    DFIELDS.forEach(function (k) {
+      var x = b[k];
+      if (x === null || x === undefined || x === '') return;
+      if (Array.isArray(x) && !x.length) return;
+      v[k] = x; any = true;
+    });
+    var res = (b.resources || []).filter(function (r) { return r.url; });
+    try { GardenDraft.set(DKEY, (any || res.length) ? { vals: v, res: res } : null); } catch (e) {}
   }
 
   function ensureDlg() {
@@ -186,7 +215,7 @@
     dlg = document.createElement('dialog');
     dlg.className = 'gsf crx';
     /*@3.CORJ.8*/
-    dlg.setAttribute('data-keep-open', '');
+    /*@3.CORJ.61*/
     dlg.innerHTML =
       '<div class="gsf-grip" aria-hidden="true"></div>' +
       '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' +
@@ -214,15 +243,49 @@
       pickFree(e.target.value);
     });
     /*@3.CORJ.9*/
-    dlg.addEventListener('cancel', function (e) { if (!askLeave()) e.preventDefault(); });
     /*@3.CORJ.23*/
+    /*@3.CORJ.62*/
     dlg.addEventListener('mousedown', function (e) { _armed = (e.button === 0 && outside(e)); }, true);
     dlg.addEventListener('click', function (e) {
       var was = _armed; _armed = false;
       if (!was || !outside(e)) return;
-      if (askLeave()) dlg.close();
+      flushDraft();
+      dlg.close();
     }, true);
+    dlg.addEventListener('close', flushDraft);
     return dlg;
+  }
+
+  /*@3.CORJ.63*/
+  function baseState() {
+    var mine = state.existing;
+    if (mine) {
+      state.vals = {
+        term: mine.term, difficulty: mine.difficulty, weekly_hours: mine.weekly_hours,
+        study_rhythm: mine.study_rhythm, load_shape: mine.load_shape, nature: mine.nature || [],
+        grade_weight: mine.grade_weight, q_style: mine.q_style || [], q_source: mine.q_source,
+        q_vs_ex: mine.q_vs_ex, helped: mine.helped || [], grade: mine.grade,
+        instructor: mine.instructor, took_it: mine.took_it,
+        advice: mine.advice, explain: mine.explain,
+      };
+      state.res = (mine.resources || []).map(function (x) {
+        return { title: x.title, url: x.url, kind: x.kind, why: x.why };
+      });
+    } else {
+      state.vals = { term: ctx.term || '', nature: [], q_style: [], helped: [],
+                     instructor: ctx.instructor || '' };
+      state.res = [];
+    }
+  }
+
+  /*@3.CORJ.64*/
+  function resetForm() {
+    draftDrop();
+    clearTimeout(DTIMER);
+    state.kept = false;
+    state.dirty = false;
+    baseState();
+    if (_opts && _terms) render(_opts, _terms);
   }
 
   function open(o) {
@@ -230,7 +293,8 @@
     if (!API) { alert(t('الخدمةُ غير متاحة الآن.', 'Service unavailable.')); return; }
     ctx = { code: String(o.code || '').toUpperCase(), name: o.name || o.code, term: o.term || '',
             instructor: o.instructor || '', onSaved: o.onSaved };
-    state = { dirty: false, vals: {}, res: [], existing: null };
+    state = { dirty: false, vals: {}, res: [], existing: null, kept: false };
+    DKEY = 'c:' + ctx.code;
     var d = ensureDlg();
     d.querySelector('.crx-foot').hidden = true;
     d.querySelector('.crx-body').innerHTML = '<p class="crx-load">' + esc(t('يُحمَّل…', 'Loading…')) + '</p>';
@@ -241,21 +305,13 @@
       .then(function (r) {
         var mine = r[2] && r[2].j && r[2].j.rating;
         state.existing = mine || null;
-        if (mine) {
-          state.vals = {
-            term: mine.term, difficulty: mine.difficulty, weekly_hours: mine.weekly_hours,
-            study_rhythm: mine.study_rhythm, load_shape: mine.load_shape, nature: mine.nature || [],
-            grade_weight: mine.grade_weight, q_style: mine.q_style || [], q_source: mine.q_source,
-            q_vs_ex: mine.q_vs_ex, helped: mine.helped || [], grade: mine.grade,
-            instructor: mine.instructor, took_it: mine.took_it,
-            advice: mine.advice, explain: mine.explain,
-          };
-          state.res = (mine.resources || []).map(function (x) {
-            return { title: x.title, url: x.url, kind: x.kind, why: x.why };
-          });
-        } else {
-          state.vals = { term: ctx.term || '', nature: [], q_style: [], helped: [],
-                         instructor: ctx.instructor || '' };
+        baseState();
+        /*@3.CORJ.65*/
+        var dft = draftGet();
+        if (dft) {
+          if (dft.vals) Object.assign(state.vals, dft.vals);
+          if (dft.res && dft.res.length) state.res = dft.res;
+          state.kept = true;
         }
         render(r[0], r[1]);
       })
@@ -363,10 +419,19 @@
             'لا مزامنةَ على هذا الجهاز — تقييمُك يُحفظ، ولكنّ تعديلَه لاحقاً مرتبطٌ بهذا المتصفّح وحدَه.',
             'No sync on this device — your rating saves, but editing it later works only in this browser.')) +
           '</p>') +
+        /*@3.CORJ.66*/
+        (state.kept
+          ? '<p class="crx-kept"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>' +
+            esc(t('أعدنا ما كتبتَه ولم تُرسله بعد.',
+                  'We brought back what you had not sent yet.')) + '</p>'
+          : '') +
         '<div class="gsf-acts">' +
           (state.existing
             ? '<button type="button" class="gsf-btn gsf-btn--danger" data-a="withdraw">' +
                 esc(t('اسحبْ تقييمي', 'Withdraw')) + '</button>' : '') +
+          /*@3.CORJ.67*/
+          '<button type="button" class="gsf-btn gsf-btn--ghost" data-a="reset">' +
+            esc(t('ابدأ من جديد', 'Start over')) + '</button>' +
           '<button type="button" class="gsf-btn gsf-btn--go" data-a="save">' +
             esc(state.existing ? t('احفظِ التعديل', 'Save changes') : t('أرسلْ تقييمي', 'Send')) +
           '</button>' +
@@ -708,7 +773,7 @@
     var el = dlg.querySelector('[data-f="instructor"]');
     if (el) el.value = v;
     if (box) { box.setAttribute('data-src', 'typed'); box.removeAttribute('data-free'); }
-    state.dirty = true;
+    state.dirty = true; draftSave();
     drawIns();
   }
 
@@ -764,14 +829,14 @@
     if (a === 'delres') {
       readRes();
       state.res.splice(Number(b.closest('.crx-r').getAttribute('data-i')), 1);
-      state.dirty = true; drawRes(); return;
+      state.dirty = true; draftSave(); drawRes(); return;
     }
     if (a === 'ins-pick') {
       var el = dlg.querySelector('[data-f="instructor"]');
       if (el) el.value = b.getAttribute('data-n') || '';
       var bx = dlg.querySelector('.crx-ins-box');
       if (bx) bx.setAttribute('data-src', 'archive');
-      state.dirty = true;
+      state.dirty = true; draftSave();
       drawIns();
       return;
     }
@@ -780,7 +845,7 @@
       if (el2) el2.value = '';
       var bx2 = dlg.querySelector('.crx-ins-box');
       if (bx2) { bx2.removeAttribute('data-src'); bx2.removeAttribute('data-free'); }
-      state.dirty = true;
+      state.dirty = true; draftSave();
       drawIns();
       return;
     }
@@ -798,8 +863,8 @@
       pickFree(fin ? fin.value : '');
       return;
     }
-    if (a === 'stay') { var g = b.closest('.gsf-guard'); if (g) g.hidden = true; return; }
-    if (a === 'leave') { state.dirty = false; dlg.close(); return; }
+    /*@3.CORJ.68*/
+    if (a === 'reset') { resetForm(); return; }
     if (a === 'save') { save(b); return; }
     if (a === 'withdraw') { withdraw(b); return; }
   }
@@ -818,7 +883,7 @@
       chip.classList.toggle('on', !on);
       chip.setAttribute('aria-pressed', on ? 'false' : 'true');
     }
-    state.dirty = true;
+    state.dirty = true; draftSave();
   }
 
   function readChips(f) {
@@ -894,6 +959,8 @@
         return;
       }
       state.dirty = false;
+      /*@3.CORJ.69*/
+      draftDrop();
       var pend = x.j.pending_links;
       flash(t('شكراً — حُفظ رأيُك.', 'Thanks — saved.') +
         (pend ? ' ' + t('و' + pend + ' رابطاً ينتظر المراجعة.', pend + ' link(s) awaiting review.') : ''));
@@ -919,6 +986,7 @@
       btn.disabled = false;
       if (!ok) { flash(t('تعذّر السحب.', 'Could not withdraw.'), true); return; }
       state.dirty = false;
+      draftDrop();
       flash(t('سُحب تقييمُك.', 'Withdrawn.'));
       if (ctx.onSaved) { try { ctx.onSaved(); } catch (e) { } }
       setTimeout(function () { if (dlg.open) dlg.close(); }, 900);
@@ -932,7 +1000,7 @@
     var el = e.target;
     if (!el.hasAttribute) return;
     if (!el.hasAttribute('data-f') && !el.hasAttribute('data-rf')) return;
-    state.dirty = true;
+    state.dirty = true; draftSave();
   }, true);
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.crx-addres');
@@ -940,7 +1008,7 @@
     if (state.res.length >= 3) return;
     readRes();
     state.res.push({ url: '', title: '', kind: (_opts.resKind || [''])[0], why: '' });
-    state.dirty = true;
+    state.dirty = true; draftSave();
     drawRes();
   });
 

@@ -112,8 +112,15 @@
   /*@3.FAPJ.24*/
   var SRC_AR = { r: 'كما كتبه الطلاب', m: 'اسمٌ مُثبَت', ai: 'ترجمة آلية' };
   var SRC_EN = { r: 'as students wrote it', m: 'verified', ai: 'auto-transliterated' };
+  /*@3.FAPJ.43*/
+  function dirSendName(p) {
+    if (!p) return '';
+    return (p.a && p.s !== 'ai') ? p.a : (p.n || p.a || '');
+  }
   function arLine(p) {
     if (!p || !p.a) return '';
+    /*@3.FAPJ.62*/
+    if (p.a === dirNameOf(p)) return '';
     return '<div class="fc-dir-ar">' + esc(p.a) +
       '<span class="fc-dir-src">' + esc(t(SRC_AR[p.s] || '', SRC_EN[p.s] || '')) + '</span></div>';
   }
@@ -186,7 +193,42 @@
     '</div>';
   }
 
-  function nameOf(f) { return (!isAr() && f.en) ? f.en : f.name; }
+  /*@3.FAPJ.57*/
+  function pickName(o) {
+    o = o || {};
+    var lat = String(o.latin || '').trim();
+    var ar = String(o.ar || '').trim();
+    if (!isAr()) return lat || ar;
+    if (ar && !o.machine) return ar;
+    return lat || ar;
+  }
+  /*@3.FAPJ.58*/
+  function otherName(o) {
+    o = o || {};
+    var main = pickName(o);
+    var lat = String(o.latin || '').trim();
+    var ar = String(o.ar || '').trim();
+    var alt = (main === ar) ? lat : ar;
+    return alt && alt !== main ? alt : '';
+  }
+  function latinOf(f) { return (f && (f.en || (f.link && f.link.n) || f.ln)) || ''; }
+  function nameOf(f) {
+    if (!f) return '';
+    return pickName({ ar: f.name, machine: !!f.mn, latin: latinOf(f) });
+  }
+  function altNameOf(f) {
+    if (!f) return '';
+    return otherName({ ar: f.name, machine: !!f.mn, latin: latinOf(f) });
+  }
+  /*@3.FAPJ.59*/
+  function dirNameOf(p) {
+    if (!p) return '';
+    return pickName({ ar: p.a, machine: p.s === 'ai', latin: p.n });
+  }
+  function dirAltOf(p) {
+    if (!p) return '';
+    return otherName({ ar: p.a, machine: p.s === 'ai', latin: p.n });
+  }
 
   /*@3.FAPJ.4*/
   function detailHtml(f, o) {
@@ -288,7 +330,9 @@
     return '<div class="fc-d-head fc-d-head--empty">' +
         '<i class="fa-solid fa-user-plus fc-empty-i"></i>' +
         '<div class="fc-d-h-t">' +
-          '<div class="fc-d-name ltr">' + esc(p.n) + '</div>' +
+          /*@3.FAPJ.60*/
+          '<div class="fc-d-name' + (hasAr(dirNameOf(p)) ? '' : ' ltr') + '">' +
+            esc(dirNameOf(p)) + '</div>' +
           arLine(p) +
           '<div class="fc-d-sub">' +
             t('لا تقييماتِ له بعد — رأيُك سيكون الأوّل.',
@@ -328,6 +372,43 @@
       opts: [['نعم', 'Yes', 'ok'], ['احيانًا', 'Sometimes', 'mid'], ['كان متأخر جدًا', 'Very late', 'bad']] }
   ];
 
+  /*@3.FAPJ.44*/
+  var DKEY = null, DTIMER = null;
+
+  function draftKey(f, o) {
+    if (o.editId) return 'f:e' + o.editId;
+    if (f) return 'f:' + (f.fkey || f.id);
+    if (o.dir) return 'f:d' + (o.dir.e || o.dir.n);
+    return 'f:new';
+  }
+  function draftGet(k) {
+    try { return (window.GardenDraft && GardenDraft.get(k)) || null; } catch (e) { return null; }
+  }
+  function draftDrop(k) {
+    try { if (window.GardenDraft) GardenDraft.clear(k); } catch (e) {}
+  }
+  /*@3.FAPJ.45*/
+  function draftSave(root) {
+    if (!DKEY || !window.GardenDraft) return;
+    clearTimeout(DTIMER);
+    DTIMER = setTimeout(function () {
+      if (!root || !root.isConnected) return;
+      var cm = $('#fc-r-cm', root), nm = $('#fc-r-name', root);
+      var ml = $('#fc-r-mail', root), bn = $('#fc-r-banner', root);
+      var d = {
+        vals: vals,
+        courses: $$('.fc-crs.on', root).map(function (x) { return x.getAttribute('data-crs'); }),
+        comment: cm ? cm.value : '',
+        name: nm ? nm.value : '',
+        mail: ml ? ml.value : '',
+        banner: bn ? bn.value : ''
+      };
+      var empty = !Object.keys(d.vals).length && !d.courses.length &&
+                  !d.comment.trim() && !d.name && !d.mail;
+      try { GardenDraft.set(DKEY, empty ? null : d); } catch (e) {}
+    }, 350);
+  }
+
   function rateHtml(f, o) {
     o = o || {};
     /*@3.FAPJ.8*/
@@ -339,9 +420,19 @@
     var fx = o.fixed || null;
     /*@3.FAPJ.41*/
     var pv = (o.pre && o.pre.vals) || {};
+    var pcrs = (o.pre && o.pre.courses) || [];
+    var pcm = (o.pre && o.pre.comment) || '';
+    /*@3.FAPJ.46*/
+    DKEY = draftKey(f, o);
+    var dft = draftGet(DKEY), kept = false;
+    if (dft) {
+      kept = true;
+      if (dft.vals && Object.keys(dft.vals).length) pv = dft.vals;
+      if (dft.courses) pcrs = dft.courses;
+      if (typeof dft.comment === 'string') pcm = dft.comment;
+    }
     resetVals();
     Object.keys(pv).forEach(function (k) { if (pv[k]) vals[k] = pv[k]; });
-    var pcrs = (o.pre && o.pre.courses) || [];
 
     var who = fx
       ? '<div class="fc-r-who"><i class="fa-solid fa-chalkboard-user"></i>' +
@@ -359,14 +450,16 @@
         '<input type="hidden" id="fc-r-mail" value="' + esc((f.link && f.link.e) || '') + '"></div>'
       : dp
       ? '<div class="fc-r-who"><i class="fa-solid fa-chalkboard-user"></i>' +
-        '<b>' + esc(dp.a || dp.n) + '</b>' +
-        '<span class="fc-go-n ltr">' + esc(dp.n) + '</span>' +
+        '<b>' + esc(dirNameOf(dp)) + '</b>' +
+        (dirAltOf(dp) ? '<span class="fc-go-n' + (hasAr(dirAltOf(dp)) ? '' : ' ltr') +
+          '">' + esc(dirAltOf(dp)) + '</span>' : '') +
         '<span class="fc-r-new">' + esc(t('أوّل تقييم', 'first rating')) + '</span>' +
-        '<input type="hidden" id="fc-r-name" value="' + esc(dp.a || dp.n) + '">' +
+        '<input type="hidden" id="fc-r-name" value="' + esc(dirSendName(dp)) + '">' +
         '<input type="hidden" id="fc-r-banner" value="' + esc(dp.n) + '">' +
         '<input type="hidden" id="fc-r-mail" value="' + esc(dp.e || '') + '"></div>'
       : '<div class="fc-f"><label>' + t('اسم الأستاذ', 'Instructor name') + '</label>' +
-        '<input class="sx-search fc-in" id="fc-r-who" autocomplete="off" placeholder="' +
+        '<input class="sx-search fc-in" id="fc-r-who" autocomplete="off" value="' +
+        esc((dft && dft.name) || '') + '" placeholder="' +
         esc(t('اكتب اسمه كما تعرفه', 'Type their name')) + '">' +
         /*@3.FAPJ.27*/
         /*@3.FAPJ.36*/
@@ -376,9 +469,9 @@
         '</span></div>' +
         '<div class="fc-sug" id="fc-r-sug" hidden></div>' +
         '<div class="fc-r-who" id="fc-r-chosen" hidden></div>' +
-        '<input type="hidden" id="fc-r-name" value="">' +
-        '<input type="hidden" id="fc-r-banner" value="">' +
-        '<input type="hidden" id="fc-r-mail" value=""></div>';
+        '<input type="hidden" id="fc-r-name" value="' + esc((dft && dft.name) || '') + '">' +
+        '<input type="hidden" id="fc-r-banner" value="' + esc((dft && dft.banner) || '') + '">' +
+        '<input type="hidden" id="fc-r-mail" value="' + esc((dft && dft.mail) || '') + '"></div>';
 
     var seen = {};
     var chips = pcrs.concat(pre, codes).filter(function (c) {
@@ -396,9 +489,14 @@
         'Courses (you may pick more than one)') + '</label>' +
       /*@3.FAPJ.17*/
       '<div class="fc-crs-row" id="fc-r-crs"' + (chips ? '' : ' hidden') + '>' + chips + '</div>' +
-      '<input class="sx-search fc-in" id="fc-r-more" autocomplete="off" placeholder="' +
-        esc(t('أو اكتب رمزاً آخر ثم اضغط Enter — CS241', 'or type another code then Enter — CS241')) +
-      '"></div>' +
+      /*@3.FAPJ.47*/
+      '<div class="fc-more-row">' +
+        '<input class="sx-search fc-in" id="fc-r-more" autocomplete="off" inputmode="text" placeholder="' +
+          esc(t('أو اكتب رمزاً آخر — CS241', 'or type another code — CS241')) + '">' +
+        '<button type="button" class="fc-more-add" id="fc-r-add" aria-label="' +
+          esc(t('أضفِ المادة', 'Add course')) + '"><i class="fa-solid fa-plus"></i>' +
+          '<span>' + esc(t('أضف', 'Add')) + '</span></button>' +
+      '</div></div>' +
       RATE_Q.map(function (q) {
         return '<div class="fc-q"><div class="fc-q-t">' + esc(t(q.ar, q.en)) + '</div>' +
           '<div class="fc-q-o">' + q.opts.map(function (op) {
@@ -411,22 +509,71 @@
         '<textarea class="fc-in fc-ta" id="fc-r-cm" rows="3" maxlength="1200" placeholder="' +
         esc(t('ما الذي يجب أن يعرفه زميلُك قبل أن يسجّل معه؟',
               'What should a classmate know before registering?')) + '">' +
-        esc((o.pre && o.pre.comment) || '') + '</textarea></div>' +
+        esc(pcm) + '</textarea></div>' +
       '<div class="fc-note"><i class="fa-solid fa-shield-halved"></i>' +
         t('لا نحفظ اسمك ولا بريدك — رأيُك وحدَه، ويظهر فوراً.',
           'We store no name or email — only your answer, and it appears immediately.') + '</div>' +
+      /*@3.FAPJ.48*/
+      (kept ? '<div class="fc-kept"><i class="fa-solid fa-clock-rotate-left"></i>' +
+        esc(t('أعدنا ما كتبتَه ولم تُرسله بعد.', 'We brought back what you had not sent yet.')) +
+        '</div>' : '') +
       '<div class="fc-r-foot">' +
         '<button class="sx-primary" id="fc-r-send">' +
           (o.editId
             ? '<i class="fa-solid fa-floppy-disk"></i>' + t('احفظِ التعديل', 'Save changes')
             : '<i class="fa-solid fa-paper-plane"></i>' + t('أرسل التقييم', 'Send rating')) +
         '</button>' +
+        /*@3.FAPJ.49*/
+        '<button type="button" class="fc-r-clear" id="fc-r-clear">' +
+          '<i class="fa-solid fa-eraser"></i>' + esc(t('ابدأ من جديد', 'Start over')) + '</button>' +
         '<span class="fc-r-msg" id="fc-r-msg"></span>' +
       '</div></div>';
   }
 
   /*@3.FAPJ.9*/
   var vals = {}, noCrsWarned = false;
+
+  /*@3.FAPJ.10*/
+  /*@3.FAPJ.50*/
+  function addTyped(root) {
+    var inp = $('#fc-r-more', root);
+    if (!inp) return 0;
+    var raw = String(inp.value || '').toUpperCase();
+    var row = $('#fc-r-crs', root);
+    if (!row) return 0;
+    var added = 0;
+    raw.split(/[^A-Z0-9]+/).join(' ')
+      .replace(/([A-Z]{2,6})\s*(\d{3})/g, function (_, s, d) { return ' ' + s + d + ' '; })
+      .split(/\s+/).filter(function (v) { return /^[A-Z]{2,6}\d{3}$/.test(v); })
+      .forEach(function (v) {
+        row.hidden = false;
+        var have = $('[data-crs="' + v + '"]', row);
+        if (have) { have.classList.add('on'); return; }
+        row.insertAdjacentHTML('beforeend',
+          '<button type="button" class="fc-crs on" data-crs="' + esc(v) + '">' + esc(v) + '</button>');
+        added++;
+      });
+    if (added || /^[A-Z]{2,6}\d{3}$/.test(raw.replace(/[^A-Z0-9]/g, ''))) {
+      inp.value = '';
+      noCrsWarned = false;
+    }
+    return added;
+  }
+
+  /*@3.FAPJ.51*/
+  function clearForm(root) {
+    draftDrop(DKEY);
+    resetVals();
+    $$('.fc-opt.on', root).forEach(function (x) { x.classList.remove('on'); });
+    $$('.fc-crs.on', root).forEach(function (x) { x.classList.remove('on'); });
+    var cm = $('#fc-r-cm', root); if (cm) cm.value = '';
+    var more = $('#fc-r-more', root); if (more) more.value = '';
+    var kept = root.querySelector('.fc-kept'); if (kept) kept.remove();
+    var msg = $('#fc-r-msg', root);
+    if (msg) { msg.className = 'fc-r-msg'; msg.textContent = ''; }
+    if ($('#fc-r-who', root)) clearPick(root);
+  }
+
   function wire(root, o) {
     o = o || {};
     /*@3.FAPJ.39*/
@@ -437,14 +584,17 @@
       var cp = e.target.closest('[data-copy]');
       if (cp) { copyText(cp.getAttribute('data-copy'), cp); return; }
       var crs = e.target.closest('[data-crs]');
-      if (crs) { crs.classList.toggle('on'); noCrsWarned = false; return; }
-      if (e.target.closest('[data-gf-unpick]')) { clearPick(root); return; }
+      if (crs) { crs.classList.toggle('on'); noCrsWarned = false; draftSave(root); return; }
+      if (e.target.closest('[data-gf-unpick]')) { clearPick(root); draftSave(root); return; }
+      if (e.target.closest('#fc-r-add')) { addTyped(root); draftSave(root); return; }
+      if (e.target.closest('#fc-r-clear')) { clearForm(root); return; }
       var op = e.target.closest('.fc-opt');
       if (op) {
         var k = op.getAttribute('data-k'), on = op.classList.contains('on');
         $$('.fc-opt[data-k="' + k + '"]', root).forEach(function (x) { x.classList.remove('on'); });
         if (on) delete vals[k];
         else { op.classList.add('on'); vals[k] = op.getAttribute('data-v'); }
+        draftSave(root);
         return;
       }
       var sg = e.target.closest('.fc-sug-i');
@@ -452,29 +602,25 @@
         var dn = sg.getAttribute('data-dir');
         if (dn) applyDirPick(root, dirByName(dn));
         else applyPick(root, byId(sg.getAttribute('data-id')));
+        draftSave(root);
         return;
       }
       if (e.target.closest('#fc-r-send')) send(root, root.__gfOpts || o);
     });
     root.addEventListener('input', function (e) {
       if (e.target.id === 'fc-r-who') suggest(root);
+      if (/^fc-r-(who|cm|more)$/.test(e.target.id || '')) draftSave(root);
+    });
+    /*@3.FAPJ.52*/
+    root.addEventListener('focusout', function (e) {
+      if (e.target && e.target.id === 'fc-r-more') { addTyped(root); draftSave(root); }
     });
     root.addEventListener('keydown', function (e) {
-      /*@3.FAPJ.10*/
-      if (e.target.id === 'fc-r-more' && e.key === 'Enter') {
-        e.preventDefault();
-        var v = e.target.value.trim().toUpperCase().replace(/\s+/g, '');
-        if (!v) return;
-        var row = $('#fc-r-crs', root);
-        if (!row) return;
-        row.hidden = false;
-        if (!$('[data-crs="' + v + '"]', row)) {
-          row.insertAdjacentHTML('beforeend',
-            '<button type="button" class="fc-crs on" data-crs="' + esc(v) + '">' + esc(v) + '</button>');
-        }
-        noCrsWarned = false;
-        e.target.value = '';
-      }
+      if (e.target.id !== 'fc-r-more') return;
+      if (e.key !== 'Enter' && e.key !== ',' && e.key !== '،') return;
+      e.preventDefault();
+      addTyped(root);
+      draftSave(root);
     });
   }
   /*@3.FAPJ.11*/
@@ -537,9 +683,13 @@
     box.hidden = false;
     box.innerHTML =
       hit.map(function (f) {
+        /*@3.FAPJ.61*/
+        var alt = altNameOf(f);
         return '<button type="button" class="fc-sug-i" data-id="' + esc(f.id) + '"' +
           ' data-nm="' + esc(f.name) + '">' +
-          esc(f.name) + (f.en ? '<span class="fc-sug-en ltr">' + esc(f.en) + '</span>' : '') +
+          esc(nameOf(f)) +
+          (alt ? '<span class="fc-sug-en' + (hasAr(alt) ? '' : ' ltr') + '">' +
+            esc(alt) + '</span>' : '') +
           '<span class="fc-sug-n">' + f.n + '</span></button>';
       }).join('') +
       (dir.length
@@ -547,9 +697,12 @@
             t('من دليل البانر — لا تقييماتِ لهم بعد',
               'From the Banner directory — not rated yet') + '</div>' +
           dir.map(function (p) {
+            var da = dirAltOf(p);
             return '<button type="button" class="fc-sug-i is-dir" data-dir="' + esc(p.n) + '">' +
-              '<span class="ltr">' + esc(p.n) + '</span>' +
-              (p.a ? '<span class="fc-sug-en">' + esc(p.a) + '</span>' : '') +
+              '<span' + (hasAr(dirNameOf(p)) ? '' : ' class="ltr"') + '>' +
+                esc(dirNameOf(p)) + '</span>' +
+              (da ? '<span class="fc-sug-en' + (hasAr(da) ? '' : ' ltr') + '">' +
+                esc(da) + '</span>' : '') +
               '<span class="fc-sug-n fc-sug-n--new">' + t('جديد', 'new') + '</span></button>';
           }).join('')
         : '');
@@ -579,15 +732,17 @@
     if (!p || !chosen) return;
     var box = $('#fc-r-sug', root), inp = $('#fc-r-who', root);
     if (box) { box.hidden = true; box.innerHTML = ''; }
-    if (inp) { inp.value = p.a || p.n; inp.hidden = true; }
-    $('#fc-r-name', root).value = p.a || p.n;
+    if (inp) { inp.value = dirNameOf(p); inp.hidden = true; }
+    /*@3.FAPJ.53*/
+    $('#fc-r-name', root).value = dirSendName(p);
     $('#fc-r-mail', root).value = p.e || '';
     var bn = $('#fc-r-banner', root);
     if (bn) bn.value = p.n;
     chosen.hidden = false;
     chosen.innerHTML = '<i class="fa-solid fa-chalkboard-user"></i>' +
-      '<b>' + esc(p.a || p.n) + '</b>' +
-      '<span class="fc-go-n ltr">' + esc(p.n) + '</span>' +
+      '<b>' + esc(dirNameOf(p)) + '</b>' +
+      (dirAltOf(p) ? '<span class="fc-go-n' + (hasAr(dirAltOf(p)) ? '' : ' ltr') +
+        '">' + esc(dirAltOf(p)) + '</span>' : '') +
       '<span class="fc-r-new">' + esc(t('أوّل تقييم', 'first rating')) + '</span>' +
       '<button type="button" class="fc-r-swap" data-gf-unpick="1">' +
         '<i class="fa-solid fa-rotate-left"></i>' + esc(t('غيّر', 'Change')) + '</button>';
@@ -633,6 +788,8 @@
 
   function send(root, o) {
     var msg = $('#fc-r-msg', root), btn = $('#fc-r-send', root);
+    /*@3.FAPJ.54*/
+    addTyped(root);
     var nameEl = $('#fc-r-name', root), whoEl = $('#fc-r-who', root);
     /*@3.FAPJ.20*/
     var name = (nameEl && nameEl.value.trim()) || (whoEl ? whoEl.value.trim() : '');
@@ -695,12 +852,21 @@
           return;
         }
         msg.className = 'fc-r-msg is-ok';
-        msg.textContent = editing
+        /*@3.FAPJ.55*/
+        var kept = String((x.j && x.j.codes) || '').split('+').filter(Boolean);
+        var lost = courses.filter(function (c) { return kept.indexOf(c) < 0; });
+        var note = (kept.length || courses.length === 0) && lost.length
+          ? ' ' + t('(لم نتعرّف على ' + lost.join('، ') + ' فبقيت كما كتبتَها)',
+                    '(we did not recognise ' + lost.join(', ') + ', kept as you wrote it)')
+          : '';
+        msg.textContent = (editing
           ? t('حُفظ التعديل.', 'Changes saved.')
           : (x.j.duplicate
             ? t('هذا التقييم مُسجَّلٌ سلفاً.', 'This rating was already recorded.')
-            : t('شكراً — سُجِّل رأيُك.', 'Thanks — your rating is in.'));
+            : t('شكراً — سُجِّل رأيُك.', 'Thanks — your rating is in.'))) + note;
         DATA = null; FRESH = true;         /*@3.FAPJ.13*/
+        /*@3.FAPJ.56*/
+        draftDrop(DKEY);
         resetVals();
         setTimeout(function () { o.onSent && o.onSent(); }, 1100);
       })
@@ -715,6 +881,8 @@
     load: load, byEmail: byEmail, byId: byId, byBannerName: byBannerName,
     detailHtml: detailHtml, rateHtml: rateHtml, wire: wire,
     resetVals: resetVals, nameOf: nameOf, tone: tone, ring: ring,
+    pickName: pickName, otherName: otherName, altNameOf: altNameOf,
+    dirNameOf: dirNameOf, dirAltOf: dirAltOf, latinOf: latinOf,
     data: function () { return DATA; },
     loadDir: loadDir, searchDir: searchDir, dirByName: dirByName,
     dirByEmail: dirByEmail, dirDetailHtml: dirDetailHtml, arLine: arLine,

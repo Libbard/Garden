@@ -2220,15 +2220,37 @@
 
   var pendingSlot = { day: null, time: null, date: null };
 
+  /*@3.SCHJ.223*/
+  function nowSlotTime() {
+    var sp = effectiveRange();
+    var d = new Date();
+    var m = Math.ceil((d.getHours() * 60 + d.getMinutes()) / 15) * 15;
+    m = Math.max(sp.startH * 60, Math.min(sp.endH * 60 - 30, m));
+    return minToHM24(m);
+  }
+
   function openAddModal(day, time, dateStr) {
     editingEvent = null;
     hideDeleteButtons();
+    var base = (currentView === 'day' ? currentDayDate : new Date());
     pendingSlot = {
-      day: day || DAYS_ORDER[(currentView === 'day' ? currentDayDate : new Date()).getDay()],
-      time: time || '15:00',
-      date: dateStr || fmtLocalDate(currentView === 'day' ? currentDayDate : new Date())
+      day: day || DAYS_ORDER[base.getDay()],
+      /*@3.SCHJ.224*/
+      time: time || nowSlotTime(),
+      date: dateStr || fmtLocalDate(base)
     };
     document.getElementById('modal-choose-type').style.display = '';
+  }
+
+  /*@3.SCHJ.225*/
+  function runIntent() {
+    var q = location.search || '';
+    if (!/[?&]add=event/.test(q)) return;
+    var d = (/[?&]d=(\d{4}-\d{2}-\d{2})/.exec(q) || [])[1] || null;
+    var tm = (/[?&]t=(\d{2}:\d{2})/.exec(q) || [])[1] || null;
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+    var day = d ? DAYS_ORDER[parseLocalDate(d).getDay()] : null;
+    openAddModal(day, tm, d);
   }
 
   function prepLectureModal() {
@@ -3616,6 +3638,8 @@
     agendaOn = !!schedule.settings.agenda;
 
     bindEvents();
+    /*@3.SCHJ.226*/
+    setTimeout(runIntent, 0);
     TP.build(document);
     syncViewButtons();
     render();

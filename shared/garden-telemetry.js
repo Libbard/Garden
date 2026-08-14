@@ -351,6 +351,28 @@
     return String(m || '').replace(/https?:\/\/\S+/g, '·').slice(0, 120);
   }
 
+  /*@3.GATJ.28*/
+  function frameOf(stack) {
+    var lines = String(stack || '').split('\n');
+    for (var i = 0; i < lines.length && i < 6; i++) {
+      var m = /([^\/\s()]+\.js)[^:]*:(\d+):\d+/.exec(lines[i]);
+      if (m) return { f: m[1], l: Number(m[2]) || 0 };
+    }
+    return null;
+  }
+
+  /*@3.GATJ.29*/
+  function assetName(el) {
+    var u = el && (el.src || el.href);
+    if (!u) return '';
+    u = String(u).split('?')[0].split('#')[0];
+    var host = '', path = u;
+    var m = /^https?:\/\/([^\/]+)(\/.*)?$/.exec(u);
+    if (m) { host = m[1]; path = m[2] || ''; }
+    var leaf = path.split('/').filter(Boolean).pop() || host;
+    return host && host !== location.host ? host + '/' + leaf : leaf;
+  }
+
   function watchErrors() {
     window.addEventListener('error', function (e) {
       var m = e && e.message;
@@ -361,9 +383,25 @@
         l: e.lineno || 0
       });
     });
+    /*@3.GATJ.30*/
+    window.addEventListener('error', function (e) {
+      var el = e && e.target;
+      if (!el || el === window || e.message) return;
+      var tag = el.tagName;
+      if (tag !== 'SCRIPT' && tag !== 'LINK' && tag !== 'IMG') return;
+      var n = assetName(el);
+      if (!n) return;
+      ev('js_error', { m: 'asset load failed: ' + n.slice(0, 90), f: tag.toLowerCase(), l: 0 });
+    }, true);
     window.addEventListener('unhandledrejection', function (e) {
       var r = e && e.reason;
-      ev('js_error', { m: shortErr(r && (r.message || r)), f: 'promise', l: 0 });
+      /*@3.GATJ.31*/
+      var at = frameOf(r && r.stack);
+      ev('js_error', {
+        m: shortErr(r && (r.message || r)),
+        f: at ? at.f : 'promise',
+        l: at ? at.l : 0
+      });
     });
   }
 

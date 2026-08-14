@@ -1110,10 +1110,11 @@
     slots.push(slotExam(meetsOf(s, ['FEXM'])[0], t('فاينل', 'Final')));
 
     var profs = (s.f || []).filter(function (p) { return p && (p.n || typeof p === 'string'); });
-    var profTx = profs.map(function (p) { return (p && p.n) || p || ''; }).join(' ');
+    /*@3.SECJ.406*/
+    var profTx = profs.map(profName).join(' ');
     var profHtml = profs.length
       ? '<div class="sx-prof' + (hasAr(profTx) ? '' : ' ltr') + '"><i class="fa-solid fa-user"></i>' + profs.map(function (p) {
-          var nm = esc((p && p.n) || p || '');
+          var nm = esc(profName(p));
           /*@3.SECJ.129*/
           var a = '<button class="sx-prof-b" data-prof="' + esc((p && p.e) || '') +
             '" data-profn="' + esc((p && p.n) || p || '') + '" title="' +
@@ -2054,22 +2055,38 @@
     GardenFaculty.loadDir(function (d) {
       if (!d || !d.people || !d.people.length) return;
       var byMail = {}, byName = {};
+      /*@3.SECJ.404*/
       d.people.forEach(function (p) {
         if (!p.a) return;
-        if (p.e) byMail[String(p.e).toLowerCase()] = p.a;
+        var rec = { a: p.a, s: p.s || 'ai' };
+        if (p.e) byMail[String(p.e).toLowerCase()] = rec;
         var k = nameKey(p.n);
-        if (k && !byName[k]) byName[k] = p.a;
+        if (k && !byName[k]) byName[k] = rec;
       });
       DIRAR = { byMail: byMail, byName: byName };
       HAY_GEN++;
       if (state.all.length) apply();
     });
   }
-  function dirArOf(p) {
-    if (!DIRAR || !p) return '';
+  function dirRecOf(p) {
+    if (!DIRAR || !p) return null;
     if (p.e && DIRAR.byMail[String(p.e).toLowerCase()]) return DIRAR.byMail[String(p.e).toLowerCase()];
     var k = nameKey(p.n || p);
-    return (k && DIRAR.byName[k]) || '';
+    return (k && DIRAR.byName[k]) || null;
+  }
+  function dirArOf(p) { var r = dirRecOf(p); return r ? r.a : ''; }
+
+  /*@3.SECJ.405*/
+  function profName(p) {
+    var lat = (p && p.n) || p || '';
+    var GF = window.GardenFaculty;
+    if (!GF || !GF.pickName) return lat;
+    var r = RATINGS ? rateOf(p) : null;
+    if (r && r.name) {
+      return GF.pickName({ ar: r.name, machine: !!r.mn, latin: r.en || lat });
+    }
+    var d = dirRecOf(p);
+    return GF.pickName({ ar: d ? d.a : '', machine: !d || d.s === 'ai', latin: lat });
   }
 
   function arProf(s) {

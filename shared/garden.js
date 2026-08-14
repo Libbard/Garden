@@ -6914,3 +6914,59 @@ window.GardenEv = window.GardenEv || function (n, p) {
   el.async = true;
   (document.head || document.documentElement).appendChild(el);
 })();
+
+/*@3.GARJ.562*/
+;(function () {
+  'use strict';
+  if (window.GardenDraft) return;
+
+  var KEY = 'gd_rate_drafts';
+  var TTL = 30 * 24 * 3600e3;
+  var MAX = 24;
+
+  function all() {
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY) || '{}');
+      return (o && typeof o === 'object') ? o : {};
+    } catch (e) { return {}; }
+  }
+  function write(o) {
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+  }
+  /*@3.GARJ.563*/
+  function prune(o) {
+    var now = Date.now();
+    var ks = Object.keys(o).filter(function (k) {
+      if (!o[k] || now - (o[k].t || 0) > TTL) { delete o[k]; return false; }
+      return true;
+    });
+    if (ks.length <= MAX) return o;
+    ks.sort(function (a, b) { return o[b].t - o[a].t; })
+      .slice(MAX).forEach(function (k) { delete o[k]; });
+    return o;
+  }
+
+  function get(key) {
+    if (!key) return null;
+    var o = prune(all());
+    var r = o[key];
+    return r ? r.d : null;
+  }
+  /*@3.GARJ.564*/
+  function set(key, data) {
+    if (!key) return;
+    var o = prune(all());
+    if (!data || !Object.keys(data).length) delete o[key];
+    else o[key] = { t: Date.now(), d: data };
+    write(o);
+  }
+  function clear(key) {
+    if (!key) return;
+    var o = all();
+    if (!(key in o)) return;
+    delete o[key];
+    write(o);
+  }
+
+  window.GardenDraft = { get: get, set: set, clear: clear };
+})();

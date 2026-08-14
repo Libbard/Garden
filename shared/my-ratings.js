@@ -476,7 +476,7 @@
       d = document.createElement('dialog');
       d.className = 'gsf mr-fdlg';
       d.id = 'mrFacDlg';
-      d.setAttribute('data-keep-open', '');
+      /*@3.MYRJ.23*/
       d.innerHTML =
         '<div class="gsf-grip" aria-hidden="true"></div>' +
         '<form method="dialog" class="gsf-x">' +
