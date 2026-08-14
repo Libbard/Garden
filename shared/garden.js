@@ -5426,9 +5426,108 @@ ${baseRules}`) + regenSuffix;
   }
 
   /*@3.GARJ.388*/
+  /*@3.GARJ.559*/
+  var _RATER_TOK = 'gd_crate_tok';
+  var _RATER_RE = /^[A-Za-z0-9_-]{20,80}$/;
+
+  function raterLocalToken() {
+    var v = '';
+    try { v = localStorage.getItem(_RATER_TOK) || ''; } catch (e) {}
+    if (_RATER_RE.test(v)) return v;
+    var a = new Uint8Array(24);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+    else for (var i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256);
+    v = btoa(String.fromCharCode.apply(null, a))
+          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    try { localStorage.setItem(_RATER_TOK, v); } catch (e) {}
+    return v;
+  }
+
+  function raterIdentity() {
+    var out = {};
+    try {
+      var k = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
+      if (k && /^v[0-9a-f]{32}$/.test(k)) { out.vault_id = k; return out; }
+    } catch (e) {}
+    out.local_token = raterLocalToken();
+    return out;
+  }
+
+  window.GardenRaterId = {
+    identity: raterIdentity,
+    token: raterLocalToken,
+    synced: function () { return !!raterIdentity().vault_id; }
+  };
+
+  /*@3.GARJ.554*/
+  var _AI_EMO = {
+    '\u{1FA84}': 'fa-shapes',
+    '\u{1F501}': 'fa-right-left',
+    '\u{1F4CC}': 'fa-thumbtack',
+    '\u{1F9EE}': 'fa-calculator',
+    '⚙': 'fa-gears',
+    '❓': 'fa-circle-question',
+    '\u{1F4A1}': 'fa-lightbulb',
+    '⚖': 'fa-scale-balanced',
+    '\u{1F4CB}': 'fa-clipboard-list',
+    '✍': 'fa-pen-nib',
+    '⚠': 'fa-triangle-exclamation',
+    '✅': 'fa-circle-check',
+    '❌': 'fa-circle-xmark',
+    '\u{1F534}': 'fa-circle-exclamation',
+    '\u{1F3AF}': 'fa-bullseye',
+    '\u{1F511}': 'fa-key',
+    '\u{1F4DD}': 'fa-pen-to-square',
+    '\u{1F50D}': 'fa-magnifying-glass',
+    '\u{1F4CA}': 'fa-chart-simple',
+    '\u{1F4D0}': 'fa-ruler-combined',
+    '\u{1F517}': 'fa-link',
+    '\u{1F4DA}': 'fa-book',
+    '\u{1F4A3}': 'fa-bomb',
+    '\u{1F9E9}': 'fa-puzzle-piece'
+  };
+
+  /*@3.GARJ.555*/
+  var _AI_EMO_RE = /(?:[\uD83C-\uD83E][\uDC00-\uDFFF]|[‼⁉™ℹ⌚⌛⌨⏏⏩-⏺Ⓜ▪▫▶◀◻-◾☀-☄☎☑☔☕☘☝☠☢☣☦☪☮☯☸-☺♀♂♈-♓♟♠♣♥♦♨♻♾♿⚒-⚗⚙⚛⚜⚠⚡⚪⚫⚰⚱⚽⚾⛄⛅⛈⛎⛏⛑⛓⛔⛩⛪⛰-⛵⛷-⛺⛽✂✅✈-✍✏✒✔✖✝✡✨✳✴❄❇❌❎❓-❕❗❣❤➕-➗➡➰➿⤴⤵⬅-⬇⬛⬜⭐⭕〰〽㊗㊙])[︎️]?(?:\uD83C[\uDFFB-\uDFFF])?(?:‍(?:[\uD83C-\uD83E][\uDC00-\uDFFF]|[☀-➿⬀-⯿])[︎️]?)*/g;
+
+  /*@3.GARJ.556*/
+  function _aiIcoName(seq) {
+    return _AI_EMO[String(seq).replace(/[︎️‍]/g, '')] || null;
+  }
+
+  /*@3.GARJ.557*/
+  function aiIconMarkup(escaped) {
+    return String(escaped == null ? '' : escaped).replace(_AI_EMO_RE, function (m) {
+      var ico = _aiIcoName(m);
+      return ico ? '<i class="fa-solid ' + ico + ' ai-ico" aria-hidden="true"></i>' : '';
+    }).replace(/[ \t]{2,}/g, ' ');
+  }
+
+  /*@3.GARJ.558*/
+  function aiIconInto(el, text) {
+    if (!el) return;
+    var src = String(text == null ? '' : text);
+    var last = 0, m;
+    _AI_EMO_RE.lastIndex = 0;
+    while ((m = _AI_EMO_RE.exec(src))) {
+      if (m.index > last) el.appendChild(document.createTextNode(src.slice(last, m.index)));
+      var ico = _aiIcoName(m[0]);
+      if (ico) {
+        var i = document.createElement('i');
+        i.className = 'fa-solid ' + ico + ' ai-ico';
+        i.setAttribute('aria-hidden', 'true');
+        el.appendChild(i);
+      }
+      last = m.index + m[0].length;
+    }
+    if (last < src.length) el.appendChild(document.createTextNode(src.slice(last)));
+  }
+
+  window.GardenAIIcons = { markup: aiIconMarkup, into: aiIconInto };
+
   function formatAiText(text) {
     const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const inline = s => esc(s)
+    const inline = s => aiIconMarkup(esc(s))
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/`([^`]+)`/g, '<code dir="ltr">$1</code>');
 

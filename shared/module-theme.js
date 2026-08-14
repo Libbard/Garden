@@ -100,6 +100,33 @@
     return out;
   }
 
+  /*@3.MOTJ.11*/
+  var FONTS = [
+    { id: 'garden',  css: null,                   ar: 'خطُّ الموقع',   en: 'Site font' },
+    { id: 'plex',    css: 'IBM Plex Sans Arabic', ar: 'بلكس عربي',    en: 'IBM Plex Sans Arabic' },
+    { id: 'cairo',   css: 'Cairo',                ar: 'القاهرة',      en: 'Cairo' },
+    { id: 'tajawal', css: 'Tajawal',              ar: 'تجوّل',         en: 'Tajawal' },
+    { id: 'almarai', css: 'Almarai',              ar: 'المراعي',      en: 'Almarai' },
+    { id: 'readex',  css: 'Readex Pro',           ar: 'ريدكس برو',    en: 'Readex Pro' },
+    { id: 'naskh',   css: 'Noto Naskh Arabic',    ar: 'نسخ',          en: 'Noto Naskh Arabic' }
+  ];
+
+  function currentFont() {
+    var v = prefs().moduleFont;
+    return (typeof v === 'string' && v) ? v : 'garden';
+  }
+
+  function chooseFont(id) {
+    if (!id || id === 'garden') {
+      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont();
+      return;
+    }
+    var p = prefs();
+    p.moduleFont = id;
+    try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch (e) {}
+    if (window.GardenTint && GardenTint.applyFont) GardenTint.applyFont();
+  }
+
   function close() {
     var pop = document.getElementById('mtPop');
     if (pop && pop.parentNode) pop.parentNode.removeChild(pop);
@@ -115,10 +142,50 @@
     pop.id = 'mtPop';
     pop.setAttribute('role', 'menu');
 
+    /*@3.MOTJ.12*/
+    var colTheme = document.createElement('div');
+    colTheme.className = 'mt-col';
+    var colFont = document.createElement('div');
+    colFont.className = 'mt-col mt-col--font';
+    pop.appendChild(colTheme);
+    pop.appendChild(colFont);
+
     var head = document.createElement('div');
     head.className = 'mt-sep';
     head.textContent = L('ثيمُ صفحات المادة', 'Course pages theme');
-    pop.appendChild(head);
+    colTheme.appendChild(head);
+
+    /*@3.MOTJ.13*/
+    if (window.GardenTint && GardenTint.fontSheet) GardenTint.fontSheet();
+    var curF = currentFont();
+    var fhead = document.createElement('div');
+    fhead.className = 'mt-sep';
+    fhead.textContent = L('خطُّ القراءة', 'Reading font');
+    colFont.appendChild(fhead);
+
+    FONTS.forEach(function (fo) {
+      var opt = document.createElement('button');
+      opt.type = 'button';
+      opt.setAttribute('role', 'menuitemradio');
+      opt.setAttribute('aria-checked', fo.id === curF ? 'true' : 'false');
+      opt.className = 'mt-opt mt-fopt' + (fo.id === curF ? ' is-on' : '');
+
+      var name = document.createElement('span');
+      name.className = 'mt-name';
+      name.textContent = isAr() ? fo.ar : fo.en;
+      /*@3.MOTJ.14*/
+      if (fo.css) name.style.fontFamily = '"' + fo.css + '", sans-serif';
+      opt.appendChild(name);
+
+      var samp = document.createElement('span');
+      samp.className = 'mt-fsamp';
+      samp.textContent = isAr() ? 'خوارزمية Ag' : 'Algorithm أب';
+      if (fo.css) samp.style.fontFamily = '"' + fo.css + '", sans-serif';
+      opt.appendChild(samp);
+
+      opt.addEventListener('click', function () { chooseFont(fo.id); close(); });
+      colFont.appendChild(opt);
+    });
 
     var group = null;
     THEMES.forEach(function (th) {
@@ -128,7 +195,7 @@
         var sep = document.createElement('div');
         sep.className = 'mt-sep';
         sep.textContent = L(FAMILY[group].ar, FAMILY[group].en);
-        pop.appendChild(sep);
+        colTheme.appendChild(sep);
       }
       var opt = document.createElement('button');
       opt.type = 'button';
@@ -152,7 +219,7 @@
       opt.appendChild(name);
 
       opt.addEventListener('click', function () { choose(th.id); close(); });
-      pop.appendChild(opt);
+      colTheme.appendChild(opt);
     });
 
     /*@3.MOTJ.9*/
@@ -178,5 +245,8 @@
     }, 0);
   }
 
-  window.GardenModuleTheme = { open: open, close: close, current: current, choose: choose, THEMES: THEMES };
+  window.GardenModuleTheme = {
+    open: open, close: close, current: current, choose: choose, THEMES: THEMES,
+    currentFont: currentFont, chooseFont: chooseFont, FONTS: FONTS
+  };
 })();

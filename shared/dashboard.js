@@ -1625,8 +1625,9 @@
       updateSidebarBadges();
       buildMobileTabs();
       /*@3.DASJ.122*/
+      /*@3.DASJ.134*/
       var hashView = (location.hash || '').replace('#', '');
-      var v = hashView || localStorage.getItem('dash_view') || 'overview';
+      var v = hashView || 'overview';
       if (!document.querySelector('.dash-view[data-view="' + v + '"]')) v = 'overview';
       /*@3.DASJ.123*/
       if (!hasVisibleSwitcher(v)) v = 'overview';

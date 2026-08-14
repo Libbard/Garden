@@ -131,6 +131,46 @@
     if (root.getAttribute('data-theme') !== base) root.setAttribute('data-theme', base);
   }
 
+  /*@3.SUTJ.20*/
+  var MF_IDS = ['plex', 'cairo', 'tajawal', 'almarai', 'readex', 'naskh'];
+
+  var _fontBase = (function () {
+    var sc = document.currentScript;
+    return (sc && sc.src) ? sc.src.replace(/shared\/subject-tint\.js(\?.*)?$/, '') : '';
+  })();
+
+  function fontSheet() {
+    if (document.querySelector('link[data-garden-fonts]')) return;
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = _fontBase + 'shared/vendor/fonts/garden/garden-fonts.css';
+    l.setAttribute('data-garden-fonts', '');
+    document.head.appendChild(l);
+  }
+
+  function modFont() {
+    var root = document.documentElement, raw;
+    try { raw = localStorage.getItem('dashboard_prefs'); } catch (e) { return; }
+    var id = '';
+    if (raw && raw.indexOf('moduleFont') > -1) {
+      var p = null;
+      try { p = JSON.parse(raw); } catch (e) {}
+      id = (p && typeof p.moduleFont === 'string') ? p.moduleFont : '';
+    }
+    if (MF_IDS.indexOf(id) < 0) { root.removeAttribute('data-mod-font'); return; }
+    root.setAttribute('data-mod-font', id);
+    fontSheet();
+  }
+
+  function clearFont() {
+    var p = readPrefs();
+    if (p.moduleFont === undefined) return false;
+    delete p.moduleFont;
+    try { localStorage.setItem('dashboard_prefs', JSON.stringify(p)); } catch (e) {}
+    document.documentElement.removeAttribute('data-mod-font');
+    return true;
+  }
+
   /*@3.SUTJ.16*/
   function clearTheme() {
     var p = readPrefs();
@@ -145,6 +185,7 @@
   function run() {
     var root = document.documentElement;
     modTheme();
+    modFont();
     var code = root.getAttribute('data-subject');
     var hex = chosen(code);
     /*@3.SUTJ.17*/
@@ -172,6 +213,7 @@
   /*@3.SUTJ.19*/
   window.GardenTint = {
     scale: scale, apply: apply, chosen: chosen, refresh: run,
-    THEMES: MT_IDS, THEME_BASE: MT_BASE, applyTheme: modTheme, clearTheme: clearTheme
+    THEMES: MT_IDS, THEME_BASE: MT_BASE, applyTheme: modTheme, clearTheme: clearTheme,
+    FONTS: MF_IDS, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont
   };
 })();

@@ -636,9 +636,13 @@
                  courses: courses, comment: $('#fc-r-cm', root).value.trim() };
 
     /*@3.FAPJ.12*/
+    /*@3.FAPJ.38*/
     try {
-      var vk = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
-      if (vk && /^v[0-9a-f]{32}$/.test(vk)) body.vault_id = vk;
+      if (window.GardenRaterId) Object.assign(body, GardenRaterId.identity());
+      else {
+        var vk = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
+        if (vk && /^v[0-9a-f]{32}$/.test(vk)) body.vault_id = vk;
+      }
     } catch (e) { }
     Object.keys(vals).forEach(function (k) { body[k] = vals[k]; });
 

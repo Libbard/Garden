@@ -6,6 +6,16 @@
   var CODE_RE = /^[A-Z]{2,4}[0-9]{2,4}$/;
 
   var state = { rows: null, loading: true, err: false };
+  var fstate = { rows: null, loading: true, err: false };
+
+  /*@3.MYRJ.14*/
+  var FAX = [
+    { c: 'a_overall', ar: 'التجربة العامة', en: 'Overall' },
+    { c: 'a_clear',   ar: 'وضوح الشرح',     en: 'Clarity' },
+    { c: 'a_fair',    ar: 'عدالة التصحيح',  en: 'Fair grading' },
+    { c: 'a_resp',    ar: 'سرعة الرد',      en: 'Responsiveness' },
+    { c: 'a_gtime',   ar: 'رصد الدرجات',    en: 'Grade timing' }
+  ];
 
   function isAr() { return (localStorage.getItem('garden_lang') || 'ar') === 'ar'; }
   function t(ar, en) { return isAr() ? ar : en; }
@@ -348,6 +358,96 @@
     if (window.GardenSelect && GardenSelect.enhance) GardenSelect.enhance(todo);
   }
 
+  function loadFaculty() {
+    if (!API) { fstate.loading = false; fstate.err = true; drawFaculty(); return Promise.resolve(); }
+    fstate.loading = true;
+    return post('/v1/faculty/rate/list', identity()).then(function (x) {
+      fstate.loading = false;
+      if (x.s !== 200 || !x.j || !x.j.ok) { fstate.err = true; fstate.rows = []; }
+      else { fstate.err = false; fstate.rows = x.j.rows || []; }
+      drawFaculty();
+    }).catch(function () {
+      fstate.loading = false; fstate.err = true; fstate.rows = [];
+      drawFaculty();
+    });
+  }
+
+  function facRow(r) {
+    var chips = FAX.filter(function (a) { return r[a.c]; }).map(function (a) {
+      return '<span class="mr-chip" title="' + esc(t(a.ar, a.en)) + '">' + esc(r[a.c]) + '</span>';
+    }).join('');
+    var meta = [];
+    if (r.course) meta.push('<span class="mr-meta-i"><span class="gsf-code">' + esc(r.course) + '</span></span>');
+    if (r.rated_at) meta.push('<span class="mr-meta-i">' + esc(ago(r.rated_at)) + '</span>');
+    return '<article class="mr-row mr-frow">' +
+      '<div class="mr-row-h">' +
+        '<i class="fa-solid fa-chalkboard-user mr-frow-i" aria-hidden="true"></i>' +
+        '<b class="mr-name">' + esc(r.name || t('أستاذ', 'Instructor')) + '</b>' +
+        '<button type="button" class="mr-drop" data-fdrop="' + esc(String(r.id)) + '" ' +
+          'aria-label="' + esc(t('اسحبْ تقييمَ ', 'Withdraw rating for ') + (r.name || '')) + '">' +
+          '<i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>' +
+      '</div>' +
+      (chips ? '<div class="mr-chips">' + chips + '</div>' : '') +
+      (r.comment ? '<p class="mr-body">' + esc(excerpt(r.comment, 220)) + '</p>' : '') +
+      (meta.length ? '<div class="mr-meta">' + meta.join('') + '</div>' : '') +
+    '</article>';
+  }
+
+  function drawFaculty() {
+    var host = $('mr-fac');
+    if (!host) return;
+    var rows = fstate.rows || [];
+    /*@3.MYRJ.15*/
+    if (fstate.err && !rows.length) { host.innerHTML = ''; host.hidden = true; return; }
+    host.hidden = false;
+
+    var head = '<h2 class="mr-h">' + esc(t('أساتذةٌ قيّمتَهم', 'Instructors you rated')) +
+      (rows.length ? ' <span class="mr-n">' + rows.length + '</span>' : '') + '</h2>' +
+      '<p class="mr-sec-sub">' + esc(t(
+        'رأيُك في أساتذتك — تراه وتسحبه متى شئت، كما تفعل بتقييمات المواد.',
+        'What you said about your instructors — view or withdraw it any time, just like course ratings.')) + '</p>';
+
+    if (fstate.loading) { host.innerHTML = head + '<p class="mr-load">' + esc(t('يُحمَّل…', 'Loading…')) + '</p>'; return; }
+
+    host.innerHTML = head +
+      (rows.length
+        ? '<div class="mr-rows">' + rows.map(facRow).join('') + '</div>'
+        : '<div class="mr-empty"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i><p>' +
+          esc(t('لم تقيّم أستاذاً بعد.', 'You have not rated an instructor yet.')) + '</p></div>') +
+      '<div class="mr-facts">' +
+        '<button type="button" class="gsf-btn gsf-btn--go" id="mr-fac-go">' +
+          '<i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>' +
+          esc(t('قيّمْ أستاذاً', 'Rate an instructor')) + '</button>' +
+        '<a class="gsf-btn gsf-btn--ghost" href="faculty.html">' +
+          esc(t('تصفّحِ الأساتذة', 'Browse instructors')) + '</a>' +
+      '</div>';
+  }
+
+  /*@3.MYRJ.17*/
+  function openFacultyForm() {
+    var G = window.GardenFaculty;
+    if (!G || !G.rateHtml) return;
+    var d = document.getElementById('mrFacDlg');
+    if (!d) {
+      d = document.createElement('dialog');
+      d.className = 'gsf mr-fdlg';
+      d.id = 'mrFacDlg';
+      d.setAttribute('data-keep-open', '');
+      d.innerHTML =
+        '<div class="gsf-grip" aria-hidden="true"></div>' +
+        '<form method="dialog" class="gsf-x">' +
+          '<button class="gsf-close" aria-label="' + esc(t('إغلاق', 'Close')) + '">' +
+            '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
+        '</form>' +
+        '<div class="gsf-body" id="mrFacBody"></div>';
+      document.body.appendChild(d);
+    }
+    var body = d.querySelector('#mrFacBody');
+    body.innerHTML = G.rateHtml(null, {});
+    G.wire(body, { onSent: function () { try { d.close(); } catch (e) {} loadFaculty(); } });
+    if (!d.open) d.showModal();
+  }
+
   function openFor(code) {
     var c = CR();
     if (!c) return;
@@ -355,9 +455,39 @@
   }
 
   document.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('[data-rate],[data-drop],#mr-retry,#mr-pick-go');
+    var b = e.target.closest &&
+      e.target.closest('[data-rate],[data-drop],[data-fdrop],#mr-retry,#mr-pick-go,#mr-fac-go');
     if (!b) return;
-    if (b.id === 'mr-retry') { load(); return; }
+    if (b.id === 'mr-retry') { load(); loadFaculty(); return; }
+    if (b.id === 'mr-fac-go') { openFacultyForm(); return; }
+    /*@3.MYRJ.16*/
+    var fdrop = b.getAttribute('data-fdrop');
+    if (fdrop) {
+      if (b.getAttribute('data-armed') !== '1') {
+        b.setAttribute('data-armed', '1');
+        b.classList.add('is-armed');
+        b.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>' +
+                      '<span>' + esc(t('تأكيد', 'Confirm')) + '</span>';
+        setTimeout(function () {
+          if (!b.isConnected || b.getAttribute('data-armed') !== '1') return;
+          b.removeAttribute('data-armed');
+          b.classList.remove('is-armed');
+          b.innerHTML = '<i class="fa-solid fa-trash-can" aria-hidden="true"></i>';
+        }, 5000);
+        return;
+      }
+      b.disabled = true;
+      post('/v1/faculty/rate/withdraw',
+        Object.assign({ id: Number(fdrop) }, identity())).then(function (x) {
+        b.disabled = false;
+        if (x.s !== 200 || !x.j || !x.j.ok) { flashFac(t('تعذّر السحب. جرّب لاحقاً.', 'Could not withdraw. Try later.')); return; }
+        loadFaculty();
+      }).catch(function () {
+        b.disabled = false;
+        flashFac(t('تعذّر السحب. جرّب لاحقاً.', 'Could not withdraw. Try later.'));
+      });
+      return;
+    }
     if (b.id === 'mr-pick-go') {
       var sel = $('mr-pick'), msg = $('mr-pick-msg');
       /*@3.MYRJ.13*/
@@ -387,11 +517,24 @@
     }
   });
 
-  document.addEventListener('garden:languageChanged', function () { draw(); });
+  document.addEventListener('garden:languageChanged', function () { draw(); drawFaculty(); });
+
+  function flashFac(msg) {
+    var host = $('mr-fac');
+    if (!host) return;
+    var p = host.querySelector('.mr-fac-msg');
+    if (!p) {
+      p = document.createElement('p');
+      p.className = 'mr-fac-msg';
+      p.setAttribute('role', 'status');
+      host.appendChild(p);
+    }
+    p.textContent = msg;
+  }
 
   function boot() {
     var d = D();
-    var go = function () { load(); };
+    var go = function () { load(); loadFaculty(); };
     if (d && d.ready) d.ready().then(go, go);
     else go();
   }

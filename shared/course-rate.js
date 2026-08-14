@@ -26,7 +26,9 @@
     try { localStorage.setItem(TOK_KEY, v); } catch (e) { }
     return v;
   }
+  /*@3.CORJ.57*/
   function identity() {
+    if (window.GardenRaterId) return GardenRaterId.identity();
     var out = {};
     try {
       var k = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
@@ -710,6 +712,24 @@
     drawIns();
   }
 
+  /*@3.CORJ.56*/
+  function readRes() {
+    if (!dlg) return;
+    var rows = dlg.querySelectorAll('.crx-r');
+    for (var i = 0; i < rows.length; i++) {
+      var r = state.res[i];
+      if (!r) continue;
+      var g = function (row, k) {
+        var el = row.querySelector('[data-rf="' + k + '"]');
+        return el ? el.value : '';
+      };
+      r.url = g(rows[i], 'url');
+      r.title = g(rows[i], 'title');
+      r.kind = g(rows[i], 'kind');
+      r.why = g(rows[i], 'why');
+    }
+  }
+
   /*@3.CORJ.12*/
   function drawRes() {
     var box = dlg.querySelector('.crx-res');
@@ -742,6 +762,7 @@
     if (!b) return;
     var a = b.getAttribute('data-a');
     if (a === 'delres') {
+      readRes();
       state.res.splice(Number(b.closest('.crx-r').getAttribute('data-i')), 1);
       state.dirty = true; drawRes(); return;
     }
@@ -917,6 +938,7 @@
     var b = e.target.closest && e.target.closest('.crx-addres');
     if (!b || !state) return;
     if (state.res.length >= 3) return;
+    readRes();
     state.res.push({ url: '', title: '', kind: (_opts.resKind || [''])[0], why: '' });
     state.dirty = true;
     drawRes();

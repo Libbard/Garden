@@ -1401,17 +1401,88 @@
                     ' — but notifications are blocked; you will see it in the page'), 4200);
       return;
     }
-    actionToast(msg + t(' — فعّل الإشعارات ليصلك والموقع مغلق',
-                        ' — enable notifications to get it while the site is closed'),
-      t('فعّل', 'Enable'), function () {
+    pushDialog(msg);
+  }
+
+  /*@3.SECJ.401*/
+  function pushDialog(msg) {
+    var hasVault = false;
+    try {
+      var k = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
+      hasVault = !!(k && /^v[0-9a-f]{32}$/.test(k));
+    } catch (e) {}
+
+    var d = document.getElementById('sxPushDlg');
+    if (!d) {
+      d = document.createElement('dialog');
+      d.className = 'gsf sx-pushdlg';
+      d.id = 'sxPushDlg';
+      document.body.appendChild(d);
+    }
+    d.innerHTML =
+      '<div class="gsf-grip" aria-hidden="true"></div>' +
+      '<form method="dialog" class="gsf-x">' +
+        '<button class="gsf-close" aria-label="' + esc(t('إغلاق', 'Close')) + '">' +
+          '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
+      '</form>' +
+      '<div class="gsf-body">' +
+        '<h2 class="sx-pd-t"><i class="fa-solid fa-bell" aria-hidden="true"></i>' +
+          esc(t('لتصلك التنبيهات', 'To receive alerts')) + '</h2>' +
+        '<p class="sx-pd-p">' + esc(msg) + '</p>' +
+        '<p class="sx-pd-p">' + esc(t(
+          'يحتاج المتصفّحُ إذنَك أوّلاً — ثمّ يصلك التنبيهُ والموقعُ مغلق.',
+          'The browser needs your permission first — then alerts arrive even when the site is closed.')) + '</p>' +
+        (hasVault ? '' :
+          '<p class="sx-pd-warn"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>' + esc(t(
+            'وبلا خزنةٍ يصل التنبيهُ إلى هذا المتصفّح وحدَه: الخادمُ لا يعرف أن جوّالك وحاسبك لك أنت حتى تربطهما بخزنةٍ واحدة. أكملِ الإعدادَ لتصلك على أجهزتك كلِّها.',
+            'Without a vault, alerts reach this browser only: the server cannot tell that your phone and laptop are both yours until one vault links them. Finish setup to get alerts on all your devices.')) +
+          '</span></p>') +
+      '</div>' +
+      '<div class="gsf-foot"><div class="gsf-acts">' +
+        '<button type="button" class="gsf-btn gsf-btn--go" data-a="sx-pd-allow">' +
+          esc(t('اسمحْ بالإشعارات', 'Allow notifications')) + '</button>' +
+        (hasVault ? '' :
+          '<button type="button" class="gsf-btn" data-a="sx-pd-setup">' +
+            esc(t('أكملِ الإعداد', 'Finish setup')) + '</button>') +
+        '<button type="button" class="gsf-btn gsf-btn--ghost" data-a="sx-pd-later">' +
+          esc(t('لاحقاً', 'Later')) + '</button>' +
+      '</div></div>';
+
+    /*@3.SECJ.403*/
+    if (d.__sxWired) { if (!d.open) d.showModal(); return; }
+    d.__sxWired = 1;
+    d.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-a]');
+      if (!b) return;
+      var a = b.getAttribute('data-a');
+      if (a === 'sx-pd-later') { d.close(); return; }
+      /*@3.SECJ.402*/
+      if (a === 'sx-pd-setup') { d.close(); openAlertsStep(); return; }
+      if (a === 'sx-pd-allow') {
+        b.disabled = true;
         Notification.requestPermission().then(function (p) {
+          b.disabled = false;
           if (p !== 'granted') { toast(t('لم يُمنح الإذن', 'Permission not granted')); return; }
-          P.subscribe().then(function (r) {
-            toast(r && r.ok ? t('تم — ستصلك التنبيهات', 'Done — alerts will reach you')
+          var P2 = window.GardenPush;
+          if (!P2 || !P2.subscribe) { d.close(); return; }
+          P2.subscribe().then(function (r) {
+            d.close();
+            toast(r && r.ok ? t('تمّ — ستصلك التنبيهات', 'Done — alerts will reach you')
                             : t('تعذّر التفعيل', 'Could not enable'), 2600);
           });
-        });
-      }, 6000);
+        }, function () { b.disabled = false; });
+      }
+    });
+
+    if (!d.open) d.showModal();
+  }
+
+  function openAlertsStep() {
+    openSetup();
+    var p = loadProf();
+    if (!profReady(p)) return;
+    W.step = STEP_ALERTS;
+    paintSetup();
   }
 
   /*@3.SECJ.145*/
@@ -2276,8 +2347,12 @@
     { ar: 'الفرع', en: 'Campus' },
     { ar: 'المستوى', en: 'Level' },
     { ar: 'المجتاز', en: 'Completed' },
-    { ar: 'خطة الفصل', en: 'This term' }
+    { ar: 'خطة الفصل', en: 'This term' },
+    /*@3.SECJ.394*/
+    { ar: 'التنبيهات', en: 'Alerts' }
   ];
+  var STEP_SAVE = 5;
+  var STEP_ALERTS = 6;
 
   function openSetup() {
     var p = loadProf();
@@ -2640,13 +2715,104 @@
           '<em>' + t('مطفأة افتراضياً — إن أطفأتها رأيت كل شعب كلّيتك.',
                      'Off by default — leave it off to see your whole college.') + '</em></span></label>';
     }
+    /*@3.SECJ.397*/
+    if (W.step === STEP_ALERTS) h = alertsHtml();
     $('#sx-setup-body').innerHTML = h;
+    if (W.step === STEP_ALERTS) paintAlerts();
     $('#sx-back').hidden = W.step === 0;
-    $('#sx-next').textContent = W.step === STEPS.length - 1 ? t('حفظ', 'Save') : t('التالي', 'Next');
+    /*@3.SECJ.400*/
+    $('#sx-next').textContent = W.step === STEP_ALERTS ? t('تمّ', 'Done')
+      : W.step === STEP_SAVE ? t('حفظ', 'Save') : t('التالي', 'Next');
     /*@3.SECJ.274*/
     var ok = W.step === 0 ? !!(d.college || d.college_key)
            : W.step === 2 ? !!(d.gender && (d.campus_city || !hasCampuses())) : true;
     $('#sx-next').disabled = !ok;
+  }
+
+  /*@3.SECJ.395*/
+  function alertsHtml() {
+    return '<div class="sx-q">' + t('تنبيهات المقاعد — كيف تصلك؟', 'Seat alerts — how do they reach you?') + '</div>' +
+      '<div class="sx-alerts">' +
+        '<div class="sx-acard" id="sx-a-sync">' +
+          '<div class="sx-acard-h">' +
+            '<i class="fa-solid fa-cloud" aria-hidden="true"></i>' +
+            '<b>' + t('خزنتُك', 'Your vault') + '</b>' +
+            '<span class="sx-astate" id="sx-a-sync-s">—</span>' +
+          '</div>' +
+          '<p class="sx-ahint">' + t(
+            'مفتاحٌ واحدٌ يربط أجهزتك ببياناتك — بلا حساب ولا كلمة مرور. وبه يصل التنبيهُ إلى كلِّ أجهزتك لا إلى هذا المتصفّح وحدَه.',
+            'One key links your devices to your data — no account, no password. With it, alerts reach every device of yours, not just this browser.') + '</p>' +
+          '<button type="button" class="sx-mini sx-a-btn" id="sx-a-sync-go"></button>' +
+        '</div>' +
+        '<div class="sx-acard" id="sx-a-push">' +
+          '<div class="sx-acard-h">' +
+            '<i class="fa-solid fa-bell" aria-hidden="true"></i>' +
+            '<b>' + t('إذنُ الإشعارات', 'Notification permission') + '</b>' +
+            '<span class="sx-astate" id="sx-a-push-s">—</span>' +
+          '</div>' +
+          '<p class="sx-ahint" id="sx-a-push-h"></p>' +
+          '<button type="button" class="sx-mini sx-a-btn" id="sx-a-push-go"></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sx-hint">' + t(
+        'كلاهما اختياريّ — تتابع الشعبَ بدونهما وتفتح الصفحةَ لترى المقاعد.',
+        'Both are optional — you can still watch sections and check seats by opening the page.') + '</div>';
+  }
+
+  function pushPerm() {
+    if (!('Notification' in window)) return 'unsupported';
+    return Notification.permission;
+  }
+
+  function paintAlerts() {
+    var hasVault = false;
+    try {
+      var k = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
+      hasVault = !!(k && /^v[0-9a-f]{32}$/.test(k));
+    } catch (e) {}
+    var ss = $('#sx-a-sync-s'), sb = $('#sx-a-sync-go');
+    if (ss) {
+      ss.textContent = hasVault ? t('مفعّلة', 'On') : t('غير مفعّلة', 'Off');
+      ss.className = 'sx-astate ' + (hasVault ? 'is-ok' : 'is-off');
+    }
+    if (sb) {
+      sb.textContent = hasVault ? t('إدارةُ الأجهزة', 'Manage devices') : t('أنشئ خزنة', 'Create a vault');
+      sb.disabled = !(window.GardenSyncPanel && GardenSyncPanel.openModal);
+    }
+
+    var perm = pushPerm(), ps = $('#sx-a-push-s'), pb = $('#sx-a-push-go'), ph = $('#sx-a-push-h');
+    var canPush = !!(window.GardenPush && GardenPush.supported && GardenPush.supported());
+    if (ps) {
+      ps.textContent = perm === 'granted' ? t('مسموح', 'Allowed')
+        : perm === 'denied' ? t('محجوب', 'Blocked')
+        : perm === 'unsupported' ? t('غير مدعوم', 'Unsupported') : t('لم يُطلب', 'Not asked');
+      ps.className = 'sx-astate ' + (perm === 'granted' ? 'is-ok' : perm === 'denied' ? 'is-bad' : 'is-off');
+    }
+    if (ph) {
+      ph.textContent = perm === 'denied'
+        ? t('أوقف المتصفّحُ إشعاراتِ الموقع، ولا يُعاد الإذنُ من داخل الصفحة — افتح قفلَ العنوان في شريط المتصفّح ثم اسمح بالإشعارات.',
+            'The browser blocked notifications for this site. A page cannot restore that — open the padlock in the address bar and allow notifications.')
+        : perm === 'unsupported' || !canPush
+        ? t('هذا المتصفّحُ لا يدعم الإشعاراتِ الدفعيّة. تبقى المتابعةُ تعمل، وتُقرأ عند فتح الصفحة.',
+            'This browser does not support push. Watching still works — read your alerts when you open the page.')
+        : hasVault
+        ? t('يصلك التنبيهُ على كلِّ أجهزةِ خزنتك.', 'Alerts reach every device on your vault.')
+        : t('بلا خزنةٍ يصل التنبيهُ إلى هذا المتصفّح وحدَه.',
+            'Without a vault, alerts reach this browser only.');
+    }
+    if (pb) {
+      pb.hidden = perm === 'granted' || perm === 'denied' || perm === 'unsupported' || !canPush;
+      pb.textContent = t('اسمحْ بالإشعارات', 'Allow notifications');
+    }
+  }
+
+  function askPush() {
+    if (!('Notification' in window)) { paintAlerts(); return; }
+    Notification.requestPermission().then(function () {
+      if (window.GardenPush && GardenPush.subscribe) {
+        GardenPush.subscribe().then(function () { paintAlerts(); }, function () { paintAlerts(); });
+      } else paintAlerts();
+    }, function () { paintAlerts(); });
   }
 
   function setupNext() {
@@ -2655,7 +2821,9 @@
       var only = $('#sx-only-lv');
       if (only) W.draft.only_my_level = !!only.checked;
     }
-    if (W.step === STEPS.length - 1) {
+    /*@3.SECJ.398*/
+    if (W.step === STEP_ALERTS) { closeSetup(); return; }
+    if (W.step === STEP_SAVE) {
       /*@3.SECJ.276*/
       var extra = Object.keys(W.draft.passed).filter(function (c) {
         return W.draft.passed[c] === 'me';
@@ -2674,7 +2842,6 @@
         level: loadProf().level || (W.draft.levels[0] ? String(parseInt(W.draft.levels[0], 10)) : ''),
         sx_setup_at: Date.now()
       });
-      closeSetup();
       state.mine = 'on';
       paintMe(); apply();
       /*@3.SECJ.280*/
@@ -2682,6 +2849,8 @@
         GW().syncCourses(state.term, W.draft.watch || []).then(paintBells);
       }
       toast(t('حُفظ ملفّك — وسيصل إلى أجهزتك الأخرى', 'Saved — syncing to your devices'));
+      /*@3.SECJ.399*/
+      W.step = STEP_ALERTS; paintSetup();
       return;
     }
     W.step++; paintSetup();
@@ -2973,6 +3142,15 @@
       }
     });
     $('#sx-setup-body').addEventListener('click', function (e) {
+      /*@3.SECJ.396*/
+      if (e.target.closest('#sx-a-sync-go')) {
+        if (window.GardenSyncPanel && GardenSyncPanel.openModal) {
+          GardenSyncPanel.openModal({ onClose: paintAlerts });
+          setTimeout(paintAlerts, 400);
+        }
+        return;
+      }
+      if (e.target.closest('#sx-a-push-go')) { askPush(); return; }
       var ci = e.target.closest('.sx-cl-i');
       if (ci) {
         var dv = ci.dataset.v, dd = W.draft;

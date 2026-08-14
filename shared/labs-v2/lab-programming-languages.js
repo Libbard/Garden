@@ -2998,7 +2998,7 @@
     if (!code.trim()) { aiMessage(t('aiNoCode'), 'note'); return; }
 
     var base = aiBase();
-    if (!base) { aiMessage(t('aiOffline'), 'err'); return; }
+    if (!base) { aiMessage(t('aiOffline'), 'err', true); return; }
 
     aiState.busy = true;
     body.textContent = '';
@@ -3036,8 +3036,8 @@
     }, function (error) {
       aiState.busy = false;
       pending.remove();
-      aiMessage(String(error && error.message) === 'capped' ? t('aiCapped') : t('aiOffline'),
-        String(error && error.message) === 'capped' ? 'note' : 'err');
+      var capped = String(error && error.message) === 'capped';
+      aiMessage(capped ? t('aiCapped') : t('aiOffline'), capped ? 'note' : 'err', true);
     });
   }
 
@@ -3085,18 +3085,21 @@
       block.split('\n').forEach(function (line) {
         var trimmed = line.trim();
         if (!trimmed) return;
-        var node;
+        var node, text;
         if (/^#{1,4}\s/.test(trimmed)) {
           node = document.createElement('h4');
-          node.textContent = trimmed.replace(/^#{1,4}\s+/, '');
+          text = trimmed.replace(/^#{1,4}\s+/, '');
         } else if (/^[-·*]\s/.test(trimmed)) {
           node = document.createElement('div');
           node.className = 'pl-ai-li';
-          node.textContent = trimmed.replace(/^[-·*]\s+/, '');
+          text = trimmed.replace(/^[-·*]\s+/, '');
         } else {
           node = document.createElement('p');
-          node.textContent = trimmed;
+          text = trimmed;
         }
+        /*@4.LAPLJ.197*/
+        if (window.GardenAIIcons) window.GardenAIIcons.into(node, text);
+        else node.textContent = text;
         node.setAttribute('dir', 'auto');
         host.appendChild(node);
       });
@@ -3104,7 +3107,7 @@
     host.scrollTop = host.scrollHeight;
   }
 
-  function aiMessage(text, kind) {
+  function aiMessage(text, kind, offer) {
     var body = $('plAiBody');
     if (!body) return;
     body.textContent = '';
@@ -3113,6 +3116,150 @@
     note.setAttribute('dir', 'auto');
     note.textContent = text;
     body.appendChild(note);
+    /*@4.LAPLJ.198*/
+    if (offer) body.appendChild(aiFallback());
+  }
+
+  /*@4.LAPLJ.199*/
+  function aiFence(parts) {
+    var longest = 0;
+    parts.forEach(function (part) {
+      String(part || '').replace(/`+/g, function (run) {
+        longest = Math.max(longest, run.length); return run;
+      });
+    });
+    return new Array(Math.max(3, longest + 1) + 1).join('`');
+  }
+
+  /*@4.LAPLJ.200*/
+  var AI_ASK = {
+    explain: ['اشرح ما يفعله هذا الكود ولماذا أعطى هذا الناتج: ماذا يفعل، ثم كيف يعمل خطوةً خطوةً بأسماء المتغيّرات الحقيقية، ثم لماذا ظهر هذا الناتج تحديداً.',
+              'Explain what this code does and why it produced this output: what it does, then how it works step by step using the real variable names, then why this exact output appeared.'],
+    fix: ['هذا الكود لم يعمل. اشرح ما الخطأ، وأين هو بالضبط، ولماذا هو خطأ في هذه اللغة، وكيف أُصلحه — ولا تكتب لي الملفّ كاملاً مصحَّحاً.',
+          'This code does not work. Explain what the error is, exactly where, why it is wrong in this language, and how to fix it — do not write the whole corrected file for me.'],
+    evaluate: ['قيّم هذا الكود كما يقيّمه مصحّحٌ منصف: الصحّة، ثم الأسلوب والتسمية، ثم التعقيد الزمنيّ والمكانيّ بصيغة O الكبرى، ثم أهمّ تحسينٍ واحد.',
+               'Review this code as a fair grader would: correctness, then style and naming, then time and space complexity in big-O, then the single most valuable improvement.'],
+    exercise: ['ولّد لي تمريناً مشابهاً أتدرّب به على الفكرة نفسِها، مع مثالٍ للمدخلات والمخرجات المتوقّعة وتلميحٍ واحد — ولا تكتب الحلّ.',
+               'Give me a similar exercise to practise the same idea, with one concrete input/output example and a single hint — do not write the solution.']
+  };
+
+  /*@4.LAPLJ.201*/
+  function aiPromptText() {
+    var code = editor.value || '';
+    var out = lastOutput.join('\n').slice(0, 4000);
+    var err = lastOutput.filter(function (line) {
+      return /error|exception|traceback|خطأ/i.test(line);
+    }).join('\n').slice(0, 1500);
+    var ask = AI_ASK[aiState.mode] || AI_ASK.explain;
+    var fence = aiFence([code, out, err]);
+    var lines = [];
+    lines.push(L('أنا طالبُ علوم حاسبٍ جامعيّ، وهذا كودي بلغة ' + current.id + '.',
+                 'I am a university computer science student, and this is my ' + current.id + ' code.'));
+    lines.push(L(ask[0], ask[1]));
+    lines.push(L('أجب بالعربية الفصيحة، والمصطلحاتُ التقنية والكودُ بالإنجليزية كما هي.',
+                 'Answer in clear English.'));
+    lines.push('');
+    lines.push(fence + current.id);
+    lines.push(code);
+    lines.push(fence);
+    if (out) {
+      lines.push('');
+      lines.push(L('ناتجُ التشغيل:', 'Program output:'));
+      lines.push(fence + 'text');
+      lines.push(out);
+      lines.push(fence);
+    }
+    if (err) {
+      lines.push('');
+      lines.push(L('رسالةُ الخطأ:', 'Error message:'));
+      lines.push(fence + 'text');
+      lines.push(err);
+      lines.push(fence);
+    }
+    return lines.join('\n');
+  }
+
+  /*@4.LAPLJ.202*/
+  function aiCopy(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(function () { return aiCopyLegacy(text); });
+    }
+    return Promise.resolve(aiCopyLegacy(text));
+  }
+  function aiCopyLegacy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.insetInlineStart = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /*@4.LAPLJ.203*/
+  var AI_SERVICES = [
+    ['Gemini', 'https://gemini.google.com/app'],
+    ['ChatGPT', 'https://chatgpt.com/'],
+    ['Qwen', 'https://chat.qwen.ai/']
+  ];
+
+  /*@4.LAPLJ.204*/
+  function aiFallback() {
+    var box = document.createElement('div');
+    box.className = 'pl-ai-fb';
+
+    var hint = document.createElement('p');
+    hint.className = 'pl-ai-fb-h';
+    hint.textContent = L('انسخ سؤالَك كاملاً والصقه في أيِّ مساعدٍ مجّاني — كودُك وناتجُه معه.',
+                         'Copy the full question and paste it into any free assistant — your code and its output come along.');
+    box.appendChild(hint);
+
+    var row = document.createElement('div');
+    row.className = 'pl-ai-fb-row';
+
+    var copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'pl-ai-fb-copy';
+    copy.innerHTML = '<i class="fa-solid fa-clipboard" aria-hidden="true"></i>';
+    copy.appendChild(document.createTextNode(L('انسخ السؤال', 'Copy the question')));
+    copy.addEventListener('click', function () {
+      aiCopy(aiPromptText()).then(function (ok) {
+        copy.classList.add('is-done');
+        copy.textContent = '';
+        copy.innerHTML = '<i class="fa-solid ' + (ok === false ? 'fa-xmark' : 'fa-check') + '" aria-hidden="true"></i>';
+        copy.appendChild(document.createTextNode(
+          ok === false ? L('تعذّر النسخ', 'Copy failed') : L('نُسخ', 'Copied')));
+        setTimeout(function () {
+          copy.classList.remove('is-done');
+          copy.textContent = '';
+          copy.innerHTML = '<i class="fa-solid fa-clipboard" aria-hidden="true"></i>';
+          copy.appendChild(document.createTextNode(L('انسخ السؤال', 'Copy the question')));
+        }, 2400);
+      });
+    });
+    row.appendChild(copy);
+
+    AI_SERVICES.forEach(function (svc) {
+      var a = document.createElement('a');
+      a.className = 'pl-ai-fb-svc';
+      a.href = svc[1];
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.title = L('انسخ السؤالَ وافتح ' + svc[0], 'Copy the question and open ' + svc[0]);
+      a.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>';
+      a.appendChild(document.createTextNode(svc[0]));
+      /*@4.LAPLJ.205*/
+      a.addEventListener('click', function () { aiCopy(aiPromptText()); });
+      row.appendChild(a);
+    });
+
+    box.appendChild(row);
+    return box;
   }
 
   if (FEATURES.ai) { renderAiPanel(); loadQuota(); }
