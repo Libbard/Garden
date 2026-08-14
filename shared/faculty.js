@@ -421,7 +421,10 @@
     $('#fc-modal').classList.add('on');
     $('#fc-modal-title').textContent = nameOf(f);
     var sub = $('#fc-modal-sub');
-    sub.textContent = t(f.n + ' تقييماً من الطلاب', f.n + ' student ratings');
+    /*@3.FACJ.44*/
+    var alt = subNameOf(f);
+    sub.textContent = (alt ? alt + ' · ' : '') +
+      t(f.n + ' تقييماً من الطلاب', f.n + ' student ratings');
     sub.hidden = false;
     $('#fc-modal-body').innerHTML = detail(f);
     /*@3.FACJ.35*/

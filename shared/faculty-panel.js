@@ -117,12 +117,16 @@
     if (!p) return '';
     return (p.a && p.s !== 'ai') ? p.a : (p.n || p.a || '');
   }
+  /*@3.FAPJ.62*/
+  /*@3.FAPJ.64*/
   function arLine(p) {
-    if (!p || !p.a) return '';
-    /*@3.FAPJ.62*/
-    if (p.a === dirNameOf(p)) return '';
-    return '<div class="fc-dir-ar">' + esc(p.a) +
-      '<span class="fc-dir-src">' + esc(t(SRC_AR[p.s] || '', SRC_EN[p.s] || '')) + '</span></div>';
+    if (!p) return '';
+    var alt = dirAltOf(p);
+    if (!alt) return '';
+    var tag = (alt === String(p.a || '').trim())
+      ? '<span class="fc-dir-src">' + esc(t(SRC_AR[p.s] || '', SRC_EN[p.s] || '')) + '</span>'
+      : '';
+    return '<div class="fc-dir-ar' + (hasAr(alt) ? '' : ' ltr') + '">' + esc(alt) + tag + '</div>';
   }
 
   /*@3.FAPJ.37*/
@@ -194,13 +198,12 @@
   }
 
   /*@3.FAPJ.57*/
+  /*@3.FAPJ.63*/
   function pickName(o) {
     o = o || {};
     var lat = String(o.latin || '').trim();
     var ar = String(o.ar || '').trim();
-    if (!isAr()) return lat || ar;
-    if (ar && !o.machine) return ar;
-    return lat || ar;
+    return isAr() ? (ar || lat) : (lat || ar);
   }
   /*@3.FAPJ.58*/
   function otherName(o) {

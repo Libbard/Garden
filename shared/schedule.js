@@ -2222,10 +2222,9 @@
 
   /*@3.SCHJ.223*/
   function nowSlotTime() {
-    var sp = effectiveRange();
     var d = new Date();
     var m = Math.ceil((d.getHours() * 60 + d.getMinutes()) / 15) * 15;
-    m = Math.max(sp.startH * 60, Math.min(sp.endH * 60 - 30, m));
+    if (m >= 24 * 60) m = 24 * 60 - 15;
     return minToHM24(m);
   }
 

@@ -953,6 +953,18 @@
     sel.innerHTML = opts;
   }
 
+  /*@3.DASJ.136*/
+  function nowParts() {
+    var d = new Date();
+    var p2 = function (n) { return String(n).padStart(2, '0'); };
+    var m = Math.ceil((d.getHours() * 60 + d.getMinutes()) / 15) * 15;
+    if (m >= 24 * 60) m = 24 * 60 - 15;
+    return {
+      date: d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()),
+      time: p2(Math.floor(m / 60)) + ':' + p2(m % 60)
+    };
+  }
+
   function openTaskModal(id) {
     var m = el('tk-modal');
     if (!m) return;
@@ -963,9 +975,12 @@
     el('tk-f-course').value = t ? (t.course || '') : '';
     el('tk-f-type').value = t ? (t.type || 'hw') : 'hw';
     /*@3.DASJ.69*/
+    /*@3.DASJ.137*/
     var due = t ? String(t.due || '') : '';
-    el('tk-f-date').value = due ? due.split('T')[0] : '';
-    el('tk-f-time').value = due.indexOf('T') > -1 ? due.split('T')[1].slice(0, 5) : '';
+    var nowD = nowParts();
+    el('tk-f-date').value = due ? due.split('T')[0] : (t ? '' : nowD.date);
+    el('tk-f-time').value = due.indexOf('T') > -1 ? due.split('T')[1].slice(0, 5)
+                          : (t ? '' : nowD.time);
     el('tk-f-note').value = t ? (t.note || '') : '';
     el('tk-modal-title').textContent = t ? tx('تعديل المهمة', 'Edit task') : tx('مهمة جديدة', 'New task');
     m.hidden = false;
