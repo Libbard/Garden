@@ -23,8 +23,12 @@
       .replace(/\s+/g, ' ').trim().toLowerCase();
   }
 
+  /*@3.FAPJ.65*/
+  function skey(s) { return norm(s).replace(/[^ء-يa-z0-9]+/g, ' ').trim(); }
+  function qwords(s) { return skey(s).split(' ').filter(Boolean); }
+
   /*@3.FAPJ.2*/
-  var DATA = null, LOADING = null, WAIT = [], FRESH = false;
+  var DATA = null, LOADING = null, WAIT = [], FRESH = false, DATA_FAILED = false;
 
   function load(cb) {
     if (DATA) { cb && cb(DATA); return; }
@@ -40,10 +44,16 @@
         (d.faculty || []).forEach(function (f) {
           f._k = norm(f.name);
           f._e = f.link && f.link.e ? String(f.link.e).toLowerCase() : null;
+          /*@3.FAPJ.66*/
+          f._s = skey([f.name, f.en || '', (f.link && f.link.n) || '', f._e || '',
+                       (f.alias || []).join(' ')].join(' '));
         });
         WAIT.splice(0).forEach(function (fn) { fn(d); });
       })
-      .catch(function () { LOADING = false; WAIT.splice(0).forEach(function (fn) { fn(null); }); });
+      .catch(function () {
+        LOADING = false; DATA_FAILED = true;
+        WAIT.splice(0).forEach(function (fn) { fn(null); });
+      });
   }
 
   /*@3.FAPJ.21*/
@@ -78,7 +88,8 @@
   function searchDir(q, take) {
     if (!DIR) return [];
     /*@3.FAPJ.35*/
-    var w = norm(q).split(/[\s._@-]+/).filter(Boolean);
+    /*@3.FAPJ.69*/
+    var w = qwords(q);
     if (!w.length) return [];
     var out = [];
     var people = DIR.people || [];
@@ -579,6 +590,8 @@
 
   function wire(root, o) {
     o = o || {};
+    /*@3.FAPJ.70*/
+    if (!DATA && !DATA_FAILED && $('#fc-r-who', root)) load();
     /*@3.FAPJ.39*/
     root.__gfOpts = o;
     if (root.__gfWired) return;
@@ -656,12 +669,26 @@
 
   function suggest(root) {
     var box = $('#fc-r-sug', root), inp = $('#fc-r-who', root);
-    if (!box || !inp || !DATA) return;
+    if (!box || !inp) return;
     /*@3.FAPJ.18*/
     var nm = $('#fc-r-name', root);
     if (nm && nm.value) clearPick(root, true);
     var q = norm(inp.value);
     if (q.length < 2) { box.hidden = true; return; }
+    /*@3.FAPJ.67*/
+    if (!DATA) {
+      box.hidden = false;
+      box.innerHTML = '<div class="fc-sug-none">' + esc(DATA_FAILED
+        ? t('تعذّر جلبُ قائمة الأساتذة. تحقّقْ من اتّصالك.',
+            'Could not load the instructor list. Check your connection.')
+        : t('تُجلب قائمةُ الأساتذة…', 'Loading the instructor list…')) + '</div>';
+      if (!DATA_FAILED) {
+        load(function () {
+          if ($('#fc-r-who', root) === inp && norm(inp.value) === q) suggest(root);
+        });
+      }
+      return;
+    }
     /*@3.FAPJ.25*/
     if (!DIR && !DIR_FAILED) {
       /*@3.FAPJ.32*/
@@ -669,9 +696,13 @@
         if ($('#fc-r-who', root) === inp && norm(inp.value) === q) suggest(root);
       });
     }
-    var hit = DATA.faculty.filter(function (f) {
-      return f._k.indexOf(q) >= 0 || String(f.en || '').toLowerCase().indexOf(q) >= 0;
-    }).slice(0, 8);
+    /*@3.FAPJ.68*/
+    var w = qwords(inp.value);
+    var hit = (w.length ? DATA.faculty.filter(function (f) {
+      var s = f._s || f._k;
+      for (var i = 0; i < w.length; i++) if (s.indexOf(w[i]) < 0) return false;
+      return true;
+    }) : []).slice(0, 8);
     var dir = searchDir(inp.value, hit.length ? 5 : 8);
     if (!hit.length && !dir.length) {
       /*@3.FAPJ.33*/

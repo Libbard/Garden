@@ -272,10 +272,18 @@
         return { title: x.title, url: x.url, kind: x.kind, why: x.why };
       });
     } else {
-      state.vals = { term: ctx.term || '', nature: [], q_style: [], helped: [],
+      /*@3.CORJ.70*/
+      state.vals = { term: validTerm(ctx.term), nature: [], q_style: [], helped: [],
                      instructor: ctx.instructor || '' };
       state.res = [];
     }
+  }
+
+  /*@3.CORJ.71*/
+  function validTerm(v) {
+    if (!v || !_terms) return v || '';
+    for (var i = 0; i < _terms.length; i++) if (_terms[i].term === v) return v;
+    return '';
   }
 
   /*@3.CORJ.64*/
@@ -587,14 +595,14 @@
 
     if (picked) {
       var src = box.getAttribute('data-src');
-      var known = _ins.list.some(function (f) {
-        return String(f.n || '').replace(/[\s,.]+/g, '').toLowerCase() ===
-               String(picked).replace(/[\s,.]+/g, '').toLowerCase();
-      });
-      var free = src === 'typed' || (src !== 'archive' && !known);
+      /*@3.CORJ.72*/
+      var arch = insFind(_ins.list, picked);
+      var rec = arch || insFind(_dir || [], picked);
+      var free = src === 'typed' || (src !== 'archive' && !arch);
       box.innerHTML = '<div class="crx-ins-on' + (free ? ' is-free' : '') + '">' +
         '<i class="fa-solid ' + (free ? 'fa-user-pen' : 'fa-chalkboard-user') + '" aria-hidden="true"></i>' +
-        '<b>' + esc(picked) + '</b>' +
+        '<b>' + esc(rec ? insLead(rec) : picked) + '</b>' +
+        (rec && insSub(rec) ? '<span class="crx-ins-ar">' + esc(insSub(rec)) + '</span>' : '') +
         (free ? '<span class="crx-ins-tag">' +
             esc(t('غيرُ مؤكَّدٍ من الأرشيف', 'Not matched in archive')) + '</span>' : '') +
         '<button type="button" class="crx-ins-x" data-a="ins-clear" aria-label="' +
@@ -621,12 +629,34 @@
     drawInsRes();
   }
 
+  /*@3.CORJ.73*/
+  function insKey(n) { return String(n || '').replace(/[\s,.]+/g, '').toLowerCase(); }
+  function insFind(list, name) {
+    var k = insKey(name);
+    if (!k) return null;
+    for (var i = 0; i < (list || []).length; i++) {
+      if (insKey(list[i].n) === k) return list[i];
+    }
+    return null;
+  }
+  /*@3.CORJ.74*/
+  function enDisp(n) {
+    var p = String(n || '').split(',');
+    var s = p.length < 2 ? String(n || '').trim()
+          : (p[1].trim() + ' ' + p.slice(0, 1).join('').trim());
+    return s.replace(/\s+/g, ' ').trim().toLowerCase()
+      .replace(/(^|[\s'-])([a-z])/g, function (_, a, b) { return a + b.toUpperCase(); })
+      .replace(/\bAl\s+/g, 'Al');
+  }
+  function insLead(f) { return (isAr() && f.a) ? f.a : enDisp(f.n); }
+  function insSub(f)  { return (isAr() && f.a) ? enDisp(f.n) : (f.a || ''); }
+
   /*@3.CORJ.36*/
   function insRows(list) {
     return list.slice(0, 40).map(function (f) {
       var last = (f.t && f.t[0]) ? (_ins.terms[f.t[0][0]] || f.t[0][0]) : '';
-      var lead = (isAr() && f.a) ? f.a : f.n;
-      var sub  = (isAr() && f.a) ? f.n : (f.a || '');
+      var lead = insLead(f);
+      var sub  = insSub(f);
       /*@3.CORJ.47*/
       var meta = f.dir
         ? t('من دليل الأساتذة', 'From the directory')

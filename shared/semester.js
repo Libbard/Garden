@@ -1671,6 +1671,27 @@
     try { localStorage.setItem(NUDGE_KEY, JSON.stringify(m)); } catch (e) {}
   }
 
+  /*@3.SEMJ.182*/
+  function pickedTerm() {
+    try {
+      var p = JSON.parse(localStorage.getItem('student_profile') || '{}') || {};
+      var v = p.picks && p.picks.term;
+      return /^\d{6}$/.test(String(v || '')) ? String(v) : '';
+    } catch (e) { return ''; }
+  }
+
+  /*@3.SEMJ.183*/
+  function bannerInsOf(code) {
+    var ins = (GardenData.courseMeta(code).instructors || [])[0];
+    if (!ins || !ins.name) return '';
+    var GF = window.GardenFaculty;
+    if (GF && GF.data()) {
+      var f = (ins.email && GF.byEmail(ins.email)) || GF.byBannerName(ins.name);
+      if (f && f.link && f.link.n) return f.link.n;
+    }
+    return String(ins.name);
+  }
+
   /*@3.SEMJ.171*/
   function rateNudge(code) {
     if (!window.GardenCourseRate || !/^[A-Z]{2,4}[0-9]{2,4}$/.test(String(code))) return;
@@ -1698,7 +1719,11 @@
       if (!b) return;
       close();
       if (b.getAttribute('data-nudge') === 'yes') {
-        GardenCourseRate.open({ code: code, name: info({ code: code }).name });
+        /*@3.SEMJ.184*/
+        GardenCourseRate.open({
+          code: code, name: info({ code: code }).name,
+          term: pickedTerm(), instructor: bannerInsOf(code),
+        });
       }
     });
     setTimeout(close, 20000);
