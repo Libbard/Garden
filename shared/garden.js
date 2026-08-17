@@ -645,8 +645,27 @@
         options: { enableMenu: false }
       };
       _mathLoading = new Promise((res) => {
+        /*@3.GARJ.573*/
+        const SCRIPT_ID = 'MathJax-script-live';
+        const ready = () => !!(window.MathJax && MathJax.typesetPromise);
+        var pending = document.getElementById(SCRIPT_ID);
+        const holder = document.getElementById('MathJax-script');
+        if (!pending && holder && holder.getAttribute('data-src') && !holder.getAttribute('src')) {
+          pending = document.createElement('script');
+          pending.id = SCRIPT_ID;
+          pending.async = true;
+          pending.src = holder.getAttribute('data-src');
+          (document.head || document.documentElement).appendChild(pending);
+        }
+        if (pending) {
+          if (ready()) return res(true);
+          pending.addEventListener('load', () => res(true));
+          pending.addEventListener('error', () => res(false));
+          setTimeout(() => res(ready()), 15000);
+          return;
+        }
         const s = document.createElement('script');
-        s.id = 'MathJax-script';
+        s.id = SCRIPT_ID;
         s.async = true;
         /*@3.GARJ.569*/
         s.src = ROOT + 'shared/vendor/mathjax/tex-mml-chtml.js';
@@ -7019,6 +7038,8 @@ window.GardenEv = window.GardenEv || function (n, p) {
   function inject() {
     var mj = document.getElementById('MathJax-script');
     if (!mj) return;
+    /*@3.GARJ.574*/
+    if (document.getElementById('MathJax-script-live')) return;
     var src = mj.getAttribute('data-src');
     if (!src || mj.getAttribute('src')) return;
     var el = document.createElement('script');
