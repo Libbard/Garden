@@ -224,7 +224,7 @@
     /*@3.MYRJ.11*/
     if (_all || _allBusy) return;
     _allBusy = true;
-    fetch(API + '/v1/plans', { cache: 'default' })
+    GardenFetch('/v1/plans', { cache: 'default' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) {
         var seen = {}, out = [];

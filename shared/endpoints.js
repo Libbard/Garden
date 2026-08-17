@@ -30,3 +30,10 @@ window.GardenEndpoints = {
   /*@3.ENDJ.9*/
   window.GardenEndpoints.telemetry = '';
 })();
+
+/*@3.ENDJ.11*/
+window.GardenFetch = function (path, init) {
+  var P = window.GardenPrefetch, q = P && P[path];
+  if (q) { delete P[path]; return q; }
+  return fetch(window.GardenEndpoints.publicData + path, init);
+};

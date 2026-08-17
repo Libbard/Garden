@@ -648,7 +648,8 @@
         const s = document.createElement('script');
         s.id = 'MathJax-script';
         s.async = true;
-        s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        /*@3.GARJ.569*/
+        s.src = ROOT + 'shared/vendor/mathjax/tex-mml-chtml.js';
         s.onload = () => res(true);
         s.onerror = () => res(false);
         document.head.appendChild(s);
@@ -3574,6 +3575,10 @@
     const subject = document.documentElement.getAttribute('data-subject');
     const moduleNum = document.documentElement.getAttribute('data-module');
     if (!subject || !moduleNum) return;
+    /*@3.GARJ.571*/
+    if (!/^[0-9]+$/.test(moduleNum)) return;
+    /*@3.GARJ.572*/
+    if (document.documentElement.hasAttribute('data-no-videos')) return;
 
     const moduleStr = `M${String(moduleNum).padStart(2, '0')}`;
     const jsonPath = `_vault/${moduleStr}_videos.json`;
@@ -4052,6 +4057,8 @@
   function initAlgoLoader() {
     const m = document.documentElement.getAttribute('data-module');
     if (!m || m === 'review' || m === 'midterm' || m === 'final' || isNaN(m)) return;
+    /*@3.GARJ.570*/
+    if (!document.querySelector('[id^="algo-widget-"]')) return;
     /*@3.GARJ.259*/
     const padded = 'M' + String(m).padStart(2, '0') + '_algo.js';
     if (document.querySelector(`script[src="${padded}"]`)) return;
@@ -6969,4 +6976,63 @@ window.GardenEv = window.GardenEv || function (n, p) {
   }
 
   window.GardenDraft = { get: get, set: set, clear: clear };
+})();
+
+/*@3.GARJ.565*/
+;(function () {
+  'use strict';
+  if (window.confetti) return;
+
+  var s0 = document.currentScript;
+  var root = (s0 && s0.src) ? s0.src.replace(/shared\/garden\.js(\?.*)?$/, '') : '';
+  var p = null;
+
+  function load() {
+    if (p) return p;
+    p = new Promise(function (ok) {
+      var el = document.createElement('script');
+      el.src = root + 'shared/vendor/confetti/confetti.browser.min.js';
+      el.onload = function () { ok(typeof window.confetti === 'function' ? window.confetti : null); };
+      el.onerror = function () { ok(null); };
+      (document.head || document.documentElement).appendChild(el);
+    });
+    return p;
+  }
+
+  function stub() {
+    var args = Array.prototype.slice.call(arguments);
+    return load().then(function (real) {
+      if (real && real !== stub) return real.apply(null, args);
+      return null;
+    });
+  }
+  stub.__gardenStub = true;
+
+  window.confetti = stub;
+  window.GardenConfetti = { ensure: load };
+})();
+
+/*@3.GARJ.566*/
+;(function () {
+  'use strict';
+
+  function inject() {
+    var mj = document.getElementById('MathJax-script');
+    if (!mj) return;
+    var src = mj.getAttribute('data-src');
+    if (!src || mj.getAttribute('src')) return;
+    var el = document.createElement('script');
+    el.id = 'MathJax-script-live';
+    el.async = true;
+    el.src = src;
+    (document.head || document.documentElement).appendChild(el);
+  }
+
+  /*@3.GARJ.568*/
+  function schedule() {
+    var idle = window.requestIdleCallback;
+    if (idle) idle(inject, { timeout: 300 }); else setTimeout(inject, 0);
+  }
+  if (document.readyState !== 'loading') schedule();
+  else document.addEventListener('DOMContentLoaded', schedule, { once: true });
 })();

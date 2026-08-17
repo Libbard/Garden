@@ -3435,7 +3435,7 @@
   var RATINGS = null;                     /*@3.SECJ.340*/
   function loadRatings() {
     if (!API) return;
-    fetch(API + '/v1/faculty/index.json', { cache: 'default' })
+    GardenFetch('/v1/faculty/index.json', { cache: 'default' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         if (!d || !d.faculty) return;
@@ -3504,7 +3504,7 @@
       _open = { kind: 'prof', arg: email || bannerName };
       if (f) {
         $('#sx-modal-title').textContent = GF.nameOf(f);
-        box.innerHTML = GF.detailHtml(f, { base: '', full: 1 });
+        GF.renderDetail(box, f, { base: '', full: 1 });
         return;
       }
       /*@3.SECJ.382*/
@@ -3751,7 +3751,7 @@
     paintCollegeMajor();
 
     /*@3.SECJ.365*/
-    fetch(API + '/v1/terms')
+    GardenFetch('/v1/terms')
       .then(function (r) { return r.ok ? r.json() : { terms: [] }; })
       .then(function (d) {
         var ts = (d.terms || []).filter(function (x) { return x.sections > 0; });
