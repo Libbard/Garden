@@ -88,7 +88,7 @@ html.na-full .na-doc-body { padding-block-start: .5rem; }
 .na-savedot {
   display: block; flex: 0 0 auto;
   inline-size: .5rem; block-size: .5rem; border-radius: 50%;
-  margin-block: .15rem; background: transparent;
+  margin-block: .15rem; margin-inline: auto; background: transparent;
 }
 .na-savedot[data-s="saving"] { background: #f59e0b; }
 .na-savedot[data-s="saved"] { background: var(--na-sel); }
@@ -311,11 +311,11 @@ html[dir="rtl"] .na-item[aria-current="true"] { box-shadow: inset -2px 0 0 0 var
   border-color: color-mix(in oklab, var(--na-sel) 45%, transparent);
   background: color-mix(in oklab, var(--na-sel) 12%, transparent);
 }
-.na-save { flex: 0 0 auto; font-size: .7rem; color: var(--text-muted); min-inline-size: 4.2rem; text-align: center; }
-.na-save[data-s="saving"] { color: #f59e0b; }
-.na-save[data-s="saved"] { color: var(--na-sel); }
-.na-save[data-s="error"] { color: #ef4444; }
-.na-save[data-s="pend"] { color: #94a3b8; }
+/*@3.NOAC.49*/
+.na-save {
+  position: absolute; inline-size: 1px; block-size: 1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
 
 /*@3.NOAC.45*/
 .na-loadfail {
@@ -330,6 +330,23 @@ html[dir="rtl"] .na-item[aria-current="true"] { box-shadow: inset -2px 0 0 0 var
   color: var(--text-primary);
 }
 .na-loadfail-retry:hover { border-color: var(--na-act); color: var(--na-act); }
+
+/*@3.NOAC.48*/
+.na-opening {
+  margin: 4rem auto; text-align: center; color: var(--text-muted);
+  display: flex; flex-direction: column; gap: .9rem; align-items: center;
+  font-size: .85rem;
+}
+.na-opening-spin {
+  inline-size: 2rem; block-size: 2rem; border-radius: 50%;
+  border: 3px solid color-mix(in oklab, var(--text-muted) 25%, transparent);
+  border-block-start-color: var(--na-act, #7c3aed);
+  animation: na-opening-spin .8s linear infinite;
+}
+@keyframes na-opening-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .na-opening-spin { animation: none; }
+}
 
 .na-doc-origin {
   flex: 0 0 auto; padding: .5rem .9rem; font-size: .74rem; color: var(--text-muted);
@@ -360,8 +377,16 @@ html[dir="rtl"] .na-item[aria-current="true"] { box-shadow: inset -2px 0 0 0 var
   --na-sheeth: var(--na-a4h);
   --na-desk: color-mix(in oklab, var(--bg-surface) 93%, #000);
 }
-/*@3.NOAC.23*/
-.na-zoom { zoom: var(--na-z, 1); position: relative; }
+/*@3.NOAC.47*/
+.na-zoom { position: relative; margin-inline: auto; }
+.na-tf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  inline-size: var(--na-pw);
+  transform: scale(var(--na-z, 1));
+  transform-origin: 0 0;
+}
 .na-page { margin-inline: auto; position: relative; inline-size: var(--na-pw); }
 
 .na-sheet {
@@ -658,14 +683,6 @@ html[dir="rtl"] .na-item[aria-current="true"] { box-shadow: inset -2px 0 0 0 var
   #na-pin, #na-export, #na-move-btn, #na-del { display: none; }
   .na-more { display: inline-flex; }
   .na-doc-title { min-inline-size: 0; }
-  .na-save { min-inline-size: 0; font-size: 0; }
-  .na-save[data-s="saving"]::before,
-  .na-save[data-s="saved"]::before,
-  .na-save[data-s="error"]::before {
-    content: ''; display: inline-block;
-    inline-size: .5rem; block-size: .5rem;
-    border-radius: 50%; background: currentColor;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -752,6 +769,9 @@ html[dir="ltr"] .na-undo { transform: translateX(-50%); }
 }
 
 .na-exp-fmts { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .45rem; margin-block-start: .8rem; }
+/*@3.NOAC.50*/
+.na-exp-tabs { margin-block-end: .4rem; }
+.na-exp-pane[hidden] { display: none; }
 .na-exp-f {
   display: flex; align-items: center; gap: .5rem; padding: .6rem .7rem;
   cursor: pointer; font-family: inherit; font-size: .82rem; text-align: start;
@@ -822,7 +842,7 @@ html.na-full .na-page[data-kind="board"] .na-sheet {
   block-size: calc(100vh - 8rem);
 }
 .na-page[data-kind="board"] ~ .nov-host,
-.na-zoom > .na-page[data-kind="board"] + .nov-host { z-index: 30; }
+.na-tf > .na-page[data-kind="board"] + .nov-host { z-index: 30; }
 
 /*@3.NOAC.27*/
 .na-guest-bar {

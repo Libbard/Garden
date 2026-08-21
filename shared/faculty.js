@@ -11,7 +11,8 @@
   var state = {
     data: null, view: [], shown: 0, PAGE: 48,
     q: '', subject: '', college: '', major: '', gender: 'all', gap: '',
-    sort: 'rk', min: 'on'
+    /*@3.FACJ.49*/
+    sort: 'new', min: 'off'
   };
 
   function isAr() { return document.documentElement.getAttribute('lang') !== 'en'; }
@@ -226,7 +227,10 @@
     mark('#fc-gap', !!state.gap);
   }
 
+  /*@3.FACJ.48*/
   var SORTS = [
+    { v: 'new',  ar: 'الأحدثُ تقييماً',  en: 'Recently rated', i: 'fa-clock' },
+    { v: 'old',  ar: 'الأقدمُ تقييماً',  en: 'Longest ago',    i: 'fa-clock-rotate-left' },
     { v: 'rk',   ar: 'الأعلى تقييماً',   en: 'Highest rated',  i: 'fa-star' },
     { v: 'n',    ar: 'الأكثر تقييماً',   en: 'Most rated',     i: 'fa-comment-dots' },
     { v: 'low',  ar: 'الأدنى تقييماً',   en: 'Lowest rated',   i: 'fa-arrow-down' },
@@ -265,6 +269,14 @@
       return true;
     });
     list.sort(function (a, b) {
+      if (state.sort === 'new' || state.sort === 'old') {
+        var la = a.lr || '', lb = b.lr || '';
+        /*@3.FACJ.50*/
+        if (!la !== !lb) return la ? -1 : 1;
+        if (la !== lb) return state.sort === 'new'
+          ? (la < lb ? 1 : -1) : (la > lb ? 1 : -1);
+        return b.n - a.n;
+      }
       if (state.sort === 'n') return b.n - a.n || (b.rk || 0) - (a.rk || 0);
       if (state.sort === 'low') return (a.rk || 0) - (b.rk || 0) || b.n - a.n;
       if (state.sort === 'name') return a.name.localeCompare(b.name, 'ar');
@@ -281,7 +293,7 @@
       ? t(list.length + ' أستاذاً', list.length + ' instructors')
       : '';
     $('#fc-clear').hidden = !(state.q || state.subject || state.college || state.major ||
-      state.gender !== 'all' || state.gap || state.min !== 'on');
+      state.gender !== 'all' || state.gap || state.min !== 'off');
     if (!list.length) {
       $('#fc-grid').innerHTML = '<div class="sx-state">' +
         '<i class="fa-solid fa-user-slash"></i>' +
@@ -557,11 +569,11 @@
     $('#fc-clear').addEventListener('click', function () {
       state.q = ''; $('#fc-q').value = '';
       state.subject = ''; state.college = ''; state.major = ''; state.gender = 'all';
-      state.gap = ''; state.min = 'on';
-      $('#fc-min').classList.add('on');
+      state.gap = ''; state.min = 'off';
+      $('#fc-min').classList.remove('on');
       buildFilters(); apply();
     });
-    $('#fc-min').classList.add('on');
+    $('#fc-min').classList.toggle('on', state.min === 'on');
 
     /*@3.FACJ.30*/
     document.addEventListener('garden:languageChanged', function () {

@@ -333,11 +333,33 @@
       try { this.canvases[cid].destroy(); } catch (e) {}
     }
     this.canvases = {};
+    /*@3.NOEJ.146*/
+    this._sw = 0;
+    this.sheetW();
     this.root.innerHTML = '';
-    this.doc.blocks.forEach(function (b) { self.root.appendChild(self.renderBlock(b)); });
-    this.root.appendChild(this.renderTail());
+    var frag = document.createDocumentFragment();
+    this.doc.blocks.forEach(function (b) { frag.appendChild(self.renderBlock(b)); });
+    frag.appendChild(this.renderTail());
+    this.root.appendChild(frag);
     this.paintBlockSel();
     this.layoutFree();
+    this.applyReadOnly();
+    if (this.opts.onLayout) this.opts.onLayout();
+  };
+
+  /*@3.NOEJ.147*/
+  Editor.prototype.renderInsert = function (at, blocks) {
+    var self = this;
+    this._sw = 0;
+    this.sheetW();
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < blocks.length; i++) frag.appendChild(this.renderBlock(blocks[i]));
+    var next = this.doc.blocks[at + blocks.length];
+    var anchor = next
+      ? this.root.querySelector(':scope > [data-bid="' + next.id + '"]')
+      : this.root.querySelector(':scope > .ne-tail');
+    if (!anchor) { this.render(); return; }
+    this.root.insertBefore(frag, anchor);
     this.applyReadOnly();
     if (this.opts.onLayout) this.opts.onLayout();
   };
@@ -1250,7 +1272,8 @@
     this.pushUndo(before);
     this._bsel = {};
     for (var i = 0; i < made.length; i++) this._bsel[made[i].id] = 1;
-    this.render();
+    /*@3.NOEJ.151*/
+    this.renderInsert(at, made);
     this.paintBlockSel();
     this.touch();
     this.emitState();
@@ -1273,9 +1296,13 @@
 
   /*@3.NOEJ.46*/
   /*@3.NOEJ.100*/
+  /*@3.NOEJ.145*/
   Editor.prototype.sheetW = function () {
-    return this.root.offsetWidth ||
-           Math.round(this.root.getBoundingClientRect().width) || 794;
+    if (this._sw > 0) return this._sw;
+    var w = this.root.offsetWidth ||
+            Math.round(this.root.getBoundingClientRect().width) || 794;
+    if (w > 0) this._sw = w;
+    return w;
   };
 
   Editor.prototype.zoomOf = function () {
@@ -1532,6 +1559,8 @@
   };
 
   Editor.prototype.layoutFree = function () {
+    /*@3.NOEJ.148*/
+    this._sw = 0;
     if (this.doc.fpv !== 2) this.migrateFp();
     for (var i = 0; i < this.doc.blocks.length; i++) {
       var b = this.doc.blocks[i];
@@ -2412,10 +2441,14 @@
     var before = this.snapshot();
     this.readAll();
     var live = B().liveBlocks ? B().liveBlocks(this.doc) : this.doc.blocks;
-    if (!live.length) this.doc.blocks.length = 0;
+    /*@3.NOEJ.150*/
+    var wiped = !live.length;
+    if (wiped) this.doc.blocks.length = 0;
+    var at = this.doc.blocks.length;
     for (var i = 0; i < blocks.length; i++) this.doc.blocks.push(blocks[i]);
     this.pushUndo(before);
-    this.render();
+    if (wiped) this.render();
+    else this.renderInsert(at, blocks);
     this.focusBlock(blocks[blocks.length - 1].id);
     this.touch();
     this.emitState();
@@ -3091,7 +3124,9 @@
         }
         self.insertAfter(id, nb);
         self.pushUndo(before);
-        self.render();
+        /*@3.NOEJ.152*/
+        var nbAt = self.blockAt(nb.id);
+        if (nbAt) self.renderInsert(nbAt.i, [nb]); else self.render();
         self.focusBlock(nb.id);
         self.touch();
         self.emitState();
@@ -3258,7 +3293,13 @@
       }
       for (var i = 0; i < blocks.length; i++) self.doc.blocks.splice(at + i, 0, blocks[i]);
       self.pushUndo(before);
-      self.render();
+      /*@3.NOEJ.149*/
+      if (hit && self.doc.blocks.indexOf(hit.b) === -1) {
+        var goneN = self.root.querySelector(':scope > [data-bid="' + hit.b.id + '"]');
+        if (goneN) goneN.remove();
+      }
+      self.renderInsert(at, blocks);
+      if (host) self.layoutFree();
       self.focusBlock(blocks[blocks.length - 1].id);
       self.touch();
       self.emitState();

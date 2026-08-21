@@ -332,6 +332,8 @@
 
     /*@3.NOIJ2.12*/
     this._down = function (e) {
+      /*@3.NOIJ2.27*/
+      self._cr = null;
       /*@3.NOIJ2.13*/
       var mod = penMods(e);
       if (e.button > 0 && !mod) return;

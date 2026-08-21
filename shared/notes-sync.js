@@ -2,11 +2,14 @@
 ;(function () {
   'use strict';
 
-  var PUSH_DEBOUNCE_MS = 2000;
+  /*@3.NOSJ2.9*/
+  var PUSH_IDLE_MS = 8000;
+  var PUSH_MAX_WAIT_MS = 30000;
   /*@3.NOSJ2.2*/
   var PENDING_LS = '__notesPending';
 
   var timers = {};
+  var firstAt = {};
   var inflight = {};
   var lastQuota = null;
   var reconciling = null;
@@ -177,16 +180,24 @@
   }
 
   function schedule(noteId) {
+    var now = Date.now();
+    if (firstAt[noteId] == null) firstAt[noteId] = now;
+    var wait = Math.min(PUSH_IDLE_MS, Math.max(0, firstAt[noteId] + PUSH_MAX_WAIT_MS - now));
     if (timers[noteId]) clearTimeout(timers[noteId]);
     timers[noteId] = setTimeout(function () {
       delete timers[noteId];
+      delete firstAt[noteId];
       push(noteId);
-    }, PUSH_DEBOUNCE_MS);
+    }, wait);
   }
 
   function flush() {
     var ids = Object.keys(timers);
-    ids.forEach(function (id) { clearTimeout(timers[id]); delete timers[id]; });
+    ids.forEach(function (id) {
+      clearTimeout(timers[id]);
+      delete timers[id];
+      delete firstAt[id];
+    });
     return Promise.all(ids.map(push));
   }
 

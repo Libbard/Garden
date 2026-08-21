@@ -415,6 +415,7 @@
       g.setTransform(d, 0, 0, d, 0, 0);
     });
     if (this.bound) { this.cam.x = 0; this.cam.y = -this.winY * this.cam.z; }
+    if (this.router) this.router.dropRect();
     this.paint();
   };
 
@@ -428,6 +429,8 @@
     this.base.style.insetBlockStart = target + 'px';
     this.wet.style.insetBlockStart = target + 'px';
     this.cam.y = -target * this.cam.z;
+    /*@3.NOCJ.64*/
+    if (this.router) this.router.dropRect();
     this.paint();
   };
 
@@ -525,11 +528,33 @@
     g.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
   }
 
+  /*@3.NOCJ.65*/
+  var CORNER_COS = 0.25;
+  var CORNER_MIN_SEG = 0.8;
+
+  function cornerFlags(pts) {
+    var out = new Array(pts.length);
+    for (var i = 1; i < pts.length - 1; i++) {
+      var ax = pts[i].x - pts[i - 1].x, ay = pts[i].y - pts[i - 1].y;
+      var bx = pts[i + 1].x - pts[i].x, by = pts[i + 1].y - pts[i].y;
+      var la = Math.sqrt(ax * ax + ay * ay), lb = Math.sqrt(bx * bx + by * by);
+      if (la < CORNER_MIN_SEG || lb < CORNER_MIN_SEG) continue;
+      if ((ax * bx + ay * by) / (la * lb) < CORNER_COS) out[i] = 1;
+    }
+    return out;
+  }
+
   /*@3.NOCJ.12*/
   function smoothPts(pts) {
     if (pts.length < 3) return pts;
+    var corner = cornerFlags(pts);
     var out = [pts[0]];
     for (var i = 1; i < pts.length - 1; i++) {
+      if (corner[i]) {
+        out.push(pts[i]);
+        out.push(pts[i]);
+        continue;
+      }
       out.push({
         x: (pts[i - 1].x + pts[i].x * 2 + pts[i + 1].x) / 4,
         y: (pts[i - 1].y + pts[i].y * 2 + pts[i + 1].y) / 4,
