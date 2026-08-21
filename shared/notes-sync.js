@@ -94,11 +94,17 @@
   }
 
   function push(noteId) {
-    if (!S() || !endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
+    if (!S() || !endpoint()) {
+      emit('garden:notesPushFailed', { id: noteId, reason: 'no-endpoint', local: true });
+      return Promise.resolve({ ok: false, reason: 'no-endpoint' });
+    }
     if (inflight[noteId]) return inflight[noteId];
 
     var p = vaultId().then(function (vid) {
-      if (!vid) return { ok: false, reason: 'no-vault' };
+      if (!vid) {
+        emit('garden:notesPushFailed', { id: noteId, reason: 'no-vault', local: true });
+        return { ok: false, reason: 'no-vault' };
+      }
       return S().getDoc(noteId).then(function (row) {
         if (!row) return { ok: false, reason: 'no-doc' };
         var raw = (typeof row.doc === 'string') ? row.doc : JSON.stringify(row.doc);
@@ -110,9 +116,14 @@
               markPending(noteId, r.body.error);
               lastQuota = r.body;
               quotaEvent(r.body.error, { id: noteId, bytes: r.body.bytes, max: r.body.max });
+              emit('garden:notesPushFailed', { id: noteId, reason: r.body.error, quota: true });
               return { ok: false, reason: r.body.error, quota: true };
             }
-            if (!r.ok) { markPending(noteId, 'http-' + r.status); return { ok: false, reason: 'http-' + r.status }; }
+            if (!r.ok) {
+              markPending(noteId, 'http-' + r.status);
+              emit('garden:notesPushFailed', { id: noteId, reason: 'http-' + r.status });
+              return { ok: false, reason: 'http-' + r.status };
+            }
             clearPending(noteId);
             if (r.body && r.body.note_bytes != null) lastQuota = r.body;
             return S().markClean(noteId, row.t).then(function () {
@@ -123,6 +134,7 @@
       });
     }).catch(function (e) {
       markPending(noteId, 'error');
+      emit('garden:notesPushFailed', { id: noteId, reason: 'error' });
       return { ok: false, reason: String((e && e.message) || e) };
     }).then(function (out) { delete inflight[noteId]; return out; });
 
@@ -178,6 +190,20 @@
     return Promise.all(ids.map(push));
   }
 
+  /*@3.NOSJ2.6*/
+  function chunked(ids, fn) {
+    var i = 0;
+    function step(acc) {
+      if (i >= ids.length) return Promise.resolve(acc);
+      var batch = ids.slice(i, i + 5);
+      i += 5;
+      return Promise.all(batch.map(fn)).then(function (rs) {
+        return step(acc.concat(rs));
+      });
+    }
+    return step([]);
+  }
+
   function reconcile(opts) {
     if (reconciling) return reconciling;
     var o = opts || {};
@@ -190,43 +216,58 @@
         if (!r.ok || !r.body) return { ok: false, reason: 'http-' + r.status };
         lastQuota = r.body;
         var remote = r.body.docs || {};
-        var live = o.liveIds || null;
+        var live = Array.isArray(o.liveIds) ? o.liveIds : null;
+        var tombs = (o.tombs && typeof o.tombs === 'object') ? o.tombs : {};
+        var authority = !!o.authority;
 
         /*@3.NOSJ2.4*/
         return st.manifest().then(function (local) {
           var toPull = [], toPush = [], toDropLocal = [], toDropRemote = [];
 
+          function dead(id) {
+            return tombs[id] != null && (!live || live.indexOf(id) === -1);
+          }
+
           Object.keys(remote).forEach(function (id) {
-            if (live && live.indexOf(id) === -1) { toDropRemote.push(id); return; }
             var l = local[id];
+            if (dead(id)) { if (authority) toDropRemote.push(id); return; }
             if (!l) { toPull.push(id); return; }
             if (l.dirty) { if (l.t >= remote[id].t) toPush.push(id); else toPull.push(id); return; }
             if (remote[id].t > l.t) toPull.push(id);
+            else if (l.t > remote[id].t) toPush.push(id);
           });
 
           Object.keys(local).forEach(function (id) {
             if (remote[id]) return;
-            if (live && live.indexOf(id) === -1) { toDropLocal.push(id); return; }
-            if (local[id].dirty) toPush.push(id);
-            else if (live) toDropLocal.push(id);
+            if (dead(id)) { toDropLocal.push(id); return; }
+            if (local[id].dirty) { toPush.push(id); return; }
+            /*@3.NOSJ2.7*/
+            if (live && live.indexOf(id) !== -1) toPush.push(id);
           });
 
-          var work = []
-            .concat(toPull.map(function (id) { return pull(id); }))
-            .concat(toPush.map(function (id) { return push(id); }))
-            .concat(toDropLocal.map(function (id) { return st.delDoc(id); }))
-            .concat(toDropRemote.map(function (id) {
+          var failedPulls = 0;
+          return chunked(toPull, function (id) {
+            return pull(id).then(function (res) {
+              if (!res || !res.ok) failedPulls++;
+              return res;
+            });
+          }).then(function () {
+            return chunked(toPush, push);
+          }).then(function () {
+            return Promise.all(toDropLocal.map(function (id) { return st.delDoc(id); }));
+          }).then(function () {
+            return Promise.all(toDropRemote.map(function (id) {
               return authed('DELETE', base(vid) + '/' + encodeURIComponent(id), vid)
                 .catch(function () { return null; });
             }));
-
-          return Promise.all(work).then(function () {
+          }).then(function () {
             emit('garden:notesReconciled', {
-              pulled: toPull.length, pushed: toPush.length,
+              pulled: toPull.length, pushed: toPush.length, failedPulls: failedPulls,
               droppedLocal: toDropLocal.length, droppedRemote: toDropRemote.length
             });
             return {
               ok: true, pulled: toPull.length, pushed: toPush.length,
+              failedPulls: failedPulls,
               droppedLocal: toDropLocal.length, droppedRemote: toDropRemote.length,
               quota: lastQuota
             };
@@ -249,6 +290,11 @@
   }
 
   window.addEventListener('online', function () { retryPending(); });
+
+  /*@3.NOSJ2.8*/
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') { try { flush(); } catch (e) {} }
+  });
 
   /*@3.NOSJ2.5*/
   function shareState(noteId) {

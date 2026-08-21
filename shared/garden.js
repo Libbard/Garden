@@ -4790,13 +4790,6 @@
     },
   };
 
-  /*@3.GARJ.326*/
-  function tinyHash(s) {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return (h >>> 0).toString(36);
-  }
-
   /*@3.GARJ.327*/
   function saveAiFeedback(vote, meta) {
     try {
@@ -5110,6 +5103,20 @@ ${baseRules}`) + regenSuffix;
       + '/' + aiSeg(o.variant, '1') + '.json';
   }
 
+  function aiRemoteGet(prompt, style) {
+    const base = (window.GardenEndpoints && window.GardenEndpoints.aiCache) || '';
+    if (!base || !prompt) return Promise.resolve(null);
+    const subject = document.documentElement.getAttribute('data-subject') || '';
+    return aiHash(aiIdentityString(prompt)).then(hash => {
+      const url = base.replace(/\/+$/, '') + '/' + aiKeyPath({
+        subject: subject, lang: currentLang, style: style || 'auto', hash: hash, variant: '1',
+      });
+      return fetch(url, { mode: 'cors', credentials: 'omit' });
+    }).then(r => (r && r.ok ? r.json() : null))
+      .then(j => (j && typeof j.text === 'string' && j.text.trim().length > 40 ? j : null))
+      .catch(() => null);
+  }
+
   /*@3.GARJ.582*/
   function aiIdentity(cardEl, scope, style) {
     const raw = extractCardContent(cardEl);
@@ -5119,21 +5126,6 @@ ${baseRules}`) + regenSuffix;
     return aiHash(identity).then(hash => ({
       hash, identity, prompt, scope: scope || 'card', style: style || 'auto', composed, raw
     }));
-  }
-
-  /*@3.GARJ.347*/
-  function aiCacheKey(title, content, layer, variant) {
-    const s = document.documentElement.getAttribute('data-subject') || '';
-    const m = document.documentElement.getAttribute('data-module') || '';
-    /*@3.GARJ.348*/
-    const keyBase = (title && title.length > 5)
-      ? title.substring(0, 50)
-      : (content || '').substring(0, 60);
-    /*@3.GARJ.349*/
-    return AI_CACHE_PREFIX + s + '_' + m + '_' + currentLang
-      + (layer ? '_' + layer : '')
-      + (variant ? '_' + variant : '')
-      + '_' + keyBase.replace(/\s+/g, '_');
   }
 
   function getAiCache(key) {
@@ -5240,6 +5232,7 @@ ${baseRules}`) + regenSuffix;
 
     /*@3.GARJ.363*/
     const intent = { scope: 'layer', style: 'auto', question: '' };
+    let aiSource = '';
     let lastAiText = '';
     let busy = false;
     let sysPromptNow = '';   /*@3.GARJ.364*/
@@ -5345,12 +5338,6 @@ ${baseRules}`) + regenSuffix;
       if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
     });
 
-    /*@3.GARJ.370*/
-    function currentKey() {
-      const variant = intent.scope + '-' + intent.style
-        + (intent.question ? '-q' + tinyHash(intent.question) : '');
-      return aiCacheKey(cardData.title, cardData.content, cardData.activeLayer, variant);
-    }
     function currentPrompt(regen) {
       const composed = composeCardData(cardData, intent.scope);
       return buildPrompt(composed, {
@@ -5539,21 +5526,8 @@ ${baseRules}`) + regenSuffix;
       resetFeedback();
       resetFollowupRow();
       threadEl.innerHTML = '';
-      const key = currentKey();
-
       const p = currentPrompt(!!opts.regen);
       sysPromptNow = p.systemPrompt;
-
-      if (!opts.force) {
-        const hit = getAiCache(key);
-        if (hit) {
-          lastAiText = hit;
-          thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: hit }];
-          const holder = newHolder();
-          playText(holder, hit, {}, () => { composer.style.display = ''; });
-          return;
-        }
-      }
 
       if (!GARDEN_AI_ENDPOINT) {
         threadEl.innerHTML = `
@@ -5566,7 +5540,6 @@ ${baseRules}`) + regenSuffix;
 
       busy = true;
       if (opts.regen) {
-        try { localStorage.removeItem(key); } catch (e) { }
         const regenBtn = overlay.querySelector('#ai-regen');
         if (regenBtn) {
           regenBtn.disabled = true;
@@ -5576,20 +5549,52 @@ ${baseRules}`) + regenSuffix;
       }
 
       const holder = newHolder();
-      runAI(
+      let key = '';
+      const settle = (text) => {
+        if (key) setAiCache(key, text);
+        lastAiText = text;
+        thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: text }];
+        composer.style.display = '';
+      };
+      const loadingMsg = opts.regen
+        ? aiT('جاري توليد شرح جديد...', 'Generating a fresh explanation...')
+        : aiT('جاري الشرح...', 'Generating explanation...');
+      const badge = opts.regen
+        ? `<div class="ai-fresh-badge"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ${aiT('شرح جديد', 'Fresh explanation')}</div>`
+        : '';
+      const live = () => runAI(
         [{ role: 'system', content: p.systemPrompt }, { role: 'user', content: p.userMsg }],
         holder,
-        {
-          badge: opts.regen ? `<div class="ai-fresh-badge"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ${aiT('شرح جديد', 'Fresh explanation')}</div>` : '',
-          loadingMsg: opts.regen ? aiT('جاري توليد شرح جديد...', 'Generating a fresh explanation...') : aiT('جاري الشرح...', 'Generating explanation...'),
-        },
-        (text) => {
-          setAiCache(key, text);
-          lastAiText = text;
-          thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: text }];
-          composer.style.display = '';
-        }
+        { badge: badge, loadingMsg: loadingMsg },
+        settle
       );
+
+      /*@3.GARJ.600*/
+      holder.innerHTML = `<div class="ai-loading">${waitRing()}<span class="ai-loading-msg">${loadingMsg}</span></div>`;
+
+      /*@3.GARJ.602*/
+      const HANDLED = 'handled';
+      aiHash(aiIdentityString(p)).then(hash => {
+        if (!document.body.contains(holder)) return HANDLED;
+        key = AI_CACHE_PREFIX + hash;
+        if (opts.regen) { try { localStorage.removeItem(key); } catch (e) { } }
+        const local = (!opts.force && !opts.regen) ? getAiCache(key) : null;
+        if (local) {
+          busy = false;
+          playText(holder, local, { badge: badge, loadingMsg: loadingMsg }, () => settle(local));
+          return HANDLED;
+        }
+        /*@3.GARJ.601*/
+        const askRemote = !opts.regen && !opts.force && !intent.question;
+        return askRemote ? aiRemoteGet(p, intent.style) : null;
+      }).then(hit2 => {
+        if (!document.body.contains(holder)) return;
+        if (hit2 === HANDLED) return;
+        if (!hit2) { live(); return; }
+        busy = false;
+        aiSource = hit2.model || '';
+        playText(holder, hit2.text, { badge: badge, loadingMsg: loadingMsg }, () => settle(hit2.text));
+      });
     }
 
     /*@3.GARJ.379*/

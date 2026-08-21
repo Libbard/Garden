@@ -33,6 +33,9 @@
         if (el.tagName.toLowerCase() === 'a' && name === 'href') keep = true;
         else if (el.tagName.toLowerCase() === 'img' && (name === 'src' || name === 'alt')) keep = true;
         else if (name === 'data-hl') keep = true;
+        /*@3.NOSJ3.6*/
+        else if (el.tagName.toLowerCase() === 'span' &&
+                 (name === 'data-fg' || name === 'data-ff' || name === 'data-fz')) keep = true;
         if (!keep) el.removeAttribute(attrs[k].name);
       }
     }

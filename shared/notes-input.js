@@ -3,6 +3,7 @@
 
   var MOUSE_TWIN_MS = 1500;
   var COMMIT_PX = 3;
+  var TWO_FINGER_GRACE_MS = 250;
   var PALM_AREA = 120;
   var FLAT_EPS = 0.02;
   var CEIL_FLOOR = 0.5;
@@ -263,6 +264,8 @@
         P.areaSeen = true;
         if (e.width >= PALM_AREA || e.height >= PALM_AREA) return 'reject';
       }
+      /*@3.NOIJ2.26*/
+      if (this.gestureCount() > 0) return 'gesture';
       if (this.drawingCount() > 0) return 'gesture';
       return 'draw';
     }
@@ -310,15 +313,16 @@
   };
 
   /*@3.NOIJ2.5*/
+  /*@3.NOIJ2.25*/
   Router.prototype.cancelProvisional = function () {
     for (var id in this.live) {
       var tr = this.live[id];
-      if (tr && tr.src === 'touch' && !tr.committed) {
-        this.onEnd(id, false);
-        this.gest[id] = { x: tr.last.x, y: tr.last.y,
-                          cx: tr.last.cx || 0, cy: tr.last.cy || 0, src: 'touch' };
-        delete this.live[id];
-      }
+      if (!tr || tr.src !== 'touch') continue;
+      if (tr.committed && now() - (tr.t0 || 0) > TWO_FINGER_GRACE_MS) continue;
+      this.onEnd(id, false);
+      this.gest[id] = { x: tr.last.x, y: tr.last.y,
+                        cx: tr.last.cx || 0, cy: tr.last.cy || 0, src: 'touch' };
+      delete this.live[id];
     }
   };
 

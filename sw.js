@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.1.75'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.1.81'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -34,6 +34,8 @@ var PRECACHE_URLS = [
   'shared/notes.css',
   'shared/notes-store.js',
   'shared/notes-model.js',
+  'shared/notes-quick.js',
+  'shared/notes-quick.css',
   'shared/notes-sync.js',
   'shared/notes-icons.js',
   'shared/notes-swatch.js',
@@ -182,7 +184,9 @@ var PRECACHE_URLS = [
   /*@0.SWJ.122*/
   'shared/vendor/fonts/garden/garden-fonts.css',
   'shared/vendor/fonts/garden/thmanyah-sans-400.woff2',
+  'shared/vendor/fonts/garden/thmanyah-sans-500.woff2',
   'shared/vendor/fonts/garden/thmanyah-sans-700.woff2',
+  'shared/vendor/fonts/garden/thmanyah-sans-900.woff2',
   'offline.html',
   'manifest.json',
   /*@0.SWJ.73*/

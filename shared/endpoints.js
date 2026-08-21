@@ -3,6 +3,9 @@ window.GardenEndpoints = {
   /*@3.ENDJ.2*/
   ai: 'https://gardin-main.xxli50xx.workers.dev',
 
+  /*@3.ENDJ.13*/
+  aiCache: 'https://ai.libbard.cc',
+
   /*@3.ENDJ.3*/
   push: 'https://garden-push.xxli50xx.workers.dev',
 

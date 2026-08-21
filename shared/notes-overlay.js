@@ -28,6 +28,7 @@
     this.favHost = o.favHost || null;
     this.onBand = o.onBand || function () {};
     this.onTap = o.onTap || function () {};
+    this.onPinch = o.onPinch || null;
     /*@3.NOOJ.14*/
     this.bound = o.bound !== false;
     this.hist = o.hist || null;
@@ -138,6 +139,9 @@
       onScroll: function (dx, dy) {
         self.scroller.scrollTop -= dy;
         self.scroller.scrollLeft -= dx;
+      },
+      onPinch: function (phase, f, cx, cy) {
+        if (self.onPinch) self.onPinch(phase, f, cx, cy);
       },
       onChange: function (d) {
         var out = {};
