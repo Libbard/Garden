@@ -2333,7 +2333,8 @@
       if (bounds) {
         a = Math.min(bounds[0], bounds[1]);
         b = Math.max(bounds[0], bounds[1]);
-        if (a === b) { a = 0; b = total; }
+        /*@3.NOEJ.144*/
+        if (a === b) return false;
       }
       if (b > a) {
         var parts = sliceRuns(rt, a, b);
@@ -2729,6 +2730,9 @@
     var root = this.root;
 
     root.addEventListener('pointerdown', function (e) {
+      /*@3.NOEJ.139*/
+      self._pdAt = { x: e.clientX, y: e.clientY };
+      self._imgDragged = false;
       var node = e.target.closest ? e.target.closest('[data-bid]') : null;
       if (node) self.focusBid = node.getAttribute('data-bid');
       var t = e.target;
@@ -2777,7 +2781,8 @@
       self.emitState();
     });
 
-    document.addEventListener('selectionchange', function () {
+    /*@3.NOEJ.141*/
+    this._onSelChange = function () {
       var edn = self.currentEditable();
       if (!edn) return;
       var s = window.getSelection();
@@ -2788,7 +2793,8 @@
         a: offsetIn(edn, r.startContainer, r.startOffset),
         b: offsetIn(edn, r.endContainer, r.endOffset) };
       self.emitState();
-    });
+    };
+    document.addEventListener('selectionchange', this._onSelChange);
 
     root.addEventListener('beforeinput', function (e) {
       var bn = e.target.closest ? e.target.closest('[data-bid]') : null;
@@ -2839,6 +2845,11 @@
     /*@3.NOEJ.48*/
     root.addEventListener('click', function (e) {
       if (self._eatClick) { self._eatClick = 0; e.preventDefault(); e.stopPropagation(); return; }
+      /*@3.NOEJ.140*/
+      if (self._pdAt && e.detail > 0 &&
+          Math.hypot(e.clientX - self._pdAt.x, e.clientY - self._pdAt.y) > 8) {
+        return;
+      }
       var lnk = e.target.closest ? e.target.closest('a[href]') : null;
       if (lnk && !self._selMode && !e.shiftKey) {
         var hrefC = B().normUrl(lnk.getAttribute('href'));
@@ -3183,8 +3194,19 @@
       if (!node) return;
       /*@3.NOEJ.4*/
       if (e.target.classList.contains('ne-code') ||
-          e.target.classList.contains('ne-tex') ||
-          e.target.tagName === 'INPUT') return;
+          e.target.classList.contains('ne-tex')) {
+        /*@3.NOEJ.137*/
+        e.preventDefault();
+        var flatTxt = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+        if (flatTxt) {
+          try { document.execCommand('insertText', false, flatTxt); }
+          catch (ep) {
+            e.target.textContent += flatTxt;
+          }
+        }
+        return;
+      }
+      if (e.target.tagName === 'INPUT') return;
 
       e.preventDefault();
       var res = SAN().fromClipboard(e.clipboardData);
@@ -3212,6 +3234,15 @@
 
       /*@3.NOEJ.116*/
       var host = hit && hit.b.fp ? hit.b : null;
+      /*@3.NOEJ.138*/
+      if (hit) {
+        for (var s = 0; s < blocks.length; s++) {
+          if (hit.b.ff && blocks[s].ff == null) blocks[s].ff = hit.b.ff;
+          if (hit.b.dir && blocks[s].dir == null) blocks[s].dir = hit.b.dir;
+          if (hit.b.al && blocks[s].al == null) blocks[s].al = hit.b.al;
+          if (hit.b.fs && blocks[s].fs == null) blocks[s].fs = hit.b.fs;
+        }
+      }
       if (hit && TEXTY[hit.b.ty] && !B().runsToText(hit.b.rt).trim() && blocks.length) {
         self.doc.blocks.splice(hit.i, 1);
         at = hit.i;
@@ -3232,6 +3263,13 @@
       self.touch();
       self.emitState();
     });
+
+    /*@3.NOEJ.143*/
+    root.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'none';
+    });
+    root.addEventListener('drop', function (e) { e.preventDefault(); });
 
     this._onDocClick = function (e) {
       if (self.menu && !e.target.closest('.ne-menu') &&
@@ -3600,11 +3638,14 @@
 
   Editor.prototype.destroy = function () {
     this.closeMenu();
+    /*@3.NOEJ.142*/
+    if (this.saveTimer) { clearTimeout(this.saveTimer); this.saveTimer = null; }
     for (var cid in (this.canvases || {})) {
       try { this.canvases[cid].destroy(); } catch (e) {}
     }
     this.canvases = {};
     document.removeEventListener('click', this._onDocClick);
+    document.removeEventListener('selectionchange', this._onSelChange);
     window.removeEventListener('scroll', this._onScroll, true);
   };
 

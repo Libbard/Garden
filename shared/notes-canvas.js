@@ -264,6 +264,7 @@
     /*@3.NOCJ.19*/
     this.bound = !!o.bound;
     this.onScroll = o.onScroll || function () {};
+    this.onPinch = o.onPinch || null;
     this.onBand = o.onBand || function () {};
     this.onAdd = o.onAdd || function () {};
     this.onTap = o.onTap || function () {};
@@ -1624,6 +1625,10 @@
         /*@3.NOCJ.42*/
         if (self.bound) {
           self.onScroll((d.cx || 0) - (prev.cx || 0), (d.cy || 0) - (prev.cy || 0));
+          /*@3.NOCJ.62*/
+          if (d.n > 1 && prev.d && d.d && self.onPinch) {
+            self.onPinch(d.d / Math.max(1e-3, prev.d), d.cx || 0, d.cy || 0);
+          }
           self._g = keep;
           return;
         }

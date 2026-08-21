@@ -68,8 +68,9 @@
       if (!n || n.id == null) continue;
       var body = String(n.body == null ? '' : n.body);
       var o = n.origin || null;
+      /*@3.NOMJ.6*/
       var label = o && o.title
-        ? o.title
+        ? (isAr() ? o.title : (o.title_en || o.title))
         : (n.course ? courseName(n.course) : L('ملاحظة سريعة', 'Quick note'));
       out.push({
         uid: 'quick:' + n.id,

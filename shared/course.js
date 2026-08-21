@@ -953,6 +953,16 @@
     toast(L('حُفظت ✓', 'Saved ✓'));
   }
 
+  function noteFromHash() {
+    var m = /^#note-(.+)$/.exec(location.hash || '');
+    if (!m) return;
+    var id = decodeURIComponent(m[1]);
+    var n = (S.meta && S.meta.notes || []).filter(function (x) { return String(x.id) === id; })[0];
+    if (!n) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    setTimeout(function () { openNote(n); }, 60);
+  }
+
   function openNote(n) {
     editing = { kind: 'note', id: n ? n.id : null };
     el('dlg-note-t').textContent = n ? L('تحرير الملاحظة', 'Edit note') : L('ملاحظةٌ جديدة', 'New note');
@@ -1239,9 +1249,13 @@
       }
 
       if (window.GardenCourseView) GardenCourseView.mount({ into: 'crs-rate', code: CODE });
+
+      /*@3.COUJ.61*/
+      noteFromHash();
     });
 
     bind();
+    window.addEventListener('hashchange', noteFromHash);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

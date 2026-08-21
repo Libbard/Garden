@@ -181,6 +181,27 @@
     }
   }
 
+  /*@3.GAHJ.100*/
+  var _qnLoad = 0;
+  function _openQuickNote(btn) {
+    if (window.GardenQuickNote) { GardenQuickNote.open({ opener: btn }); return; }
+    if (_qnLoad) return;
+    _qnLoad = 1;
+    if (btn) btn.setAttribute('aria-busy', 'true');
+    var s = document.createElement('script');
+    s.src = ROOT + 'shared/notes-quick.js';
+    s.onload = function () {
+      _qnLoad = 0;
+      if (btn) btn.removeAttribute('aria-busy');
+      if (window.GardenQuickNote) GardenQuickNote.open({ opener: btn });
+    };
+    s.onerror = function () {
+      _qnLoad = 0;
+      if (btn) btn.removeAttribute('aria-busy');
+    };
+    document.head.appendChild(s);
+  }
+
   function _openColor(code, btn) {
     if (btn) btn.setAttribute('aria-busy', 'true');
     _needCourseColor(function (ok) {
@@ -491,6 +512,22 @@
     themeBtn.addEventListener('click', function () { if (window.Garden && Garden.cycleTheme) Garden.cycleTheme(); });
     inline.appendChild(themeBtn);
 
+    /*@3.GAHJ.99*/
+    if (document.body.hasAttribute('data-no-notes') &&
+        !document.body.hasAttribute('data-notes-app')) {
+      var qnBtn = document.createElement('button');
+      qnBtn.className = 'g-menu-item toggle-btn';
+      qnBtn.type = 'button';
+      qnBtn.setAttribute('data-gh-quicknote', '');
+      qnBtn.setAttribute('data-title-ar', 'ملاحظة سريعة');
+      qnBtn.setAttribute('data-title-en', 'Quick note');
+      qnBtn.title = L('ملاحظة سريعة', 'Quick note');
+      qnBtn.setAttribute('aria-label', L('ملاحظة سريعة', 'Quick note'));
+      qnBtn.innerHTML = '<i class="fa-solid fa-feather-pointed" aria-hidden="true"></i>';
+      qnBtn.addEventListener('click', function () { _openQuickNote(qnBtn); });
+      inline.appendChild(qnBtn);
+    }
+
     /*@3.GAHJ.49*/
     var langBtn = document.createElement('button');
     langBtn.className = 'toggle-btn g-lang';
@@ -551,7 +588,7 @@
       /*@3.GAHJ.56*/
       if (window.GardenTint && GardenTint.applyTheme) {
         GardenTint.applyTheme();
-        if (isSubjectVariant && GardenTint.clearTheme) _watchBaseTheft();
+        if (GardenTint.clearTheme) _watchBaseTheft();
       }
       /*@3.GAHJ.57*/
     }

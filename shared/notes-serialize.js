@@ -47,7 +47,11 @@
     var st = [];
     if (b.dir === 'rtl' || b.dir === 'ltr') st.push('direction:' + b.dir);
     if (b.al) st.push('text-align:' + b.al);
-    if (b.ff) st.push('font-family:' + String(b.ff).replace(/["'<>;]/g, ''));
+    /*@3.NOSJ4.5*/
+    if (b.ff) {
+      var fc = (B().fontCss && B().fontCss(b.ff)) || b.ff;
+      st.push('font-family:&quot;' + String(fc).replace(/["'<>;&]/g, '') + '&quot;,sans-serif');
+    }
     return st.length ? ' style="' + st.join(';') + '"' : '';
   }
 
