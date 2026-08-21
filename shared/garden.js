@@ -5128,8 +5128,17 @@ ${baseRules}`) + regenSuffix;
     }));
   }
 
+  /*@3.GARJ.614*/
   function getAiCache(key) {
-    try { return localStorage.getItem(key); } catch { return null; }
+    let raw = null;
+    try { raw = localStorage.getItem(key); } catch { return null; }
+    if (!raw) return null;
+    if (raw.charAt(0) !== '{') return { text: raw, model: '', provider: '', tier: '' };
+    try {
+      const j = JSON.parse(raw);
+      if (typeof j.text !== 'string') return null;
+      return { text: j.text, model: j.model || '', provider: j.provider || '', tier: j.tier || '' };
+    } catch { return { text: raw, model: '', provider: '', tier: '' }; }
   }
 
   function setAiCache(key, value) {
@@ -5143,13 +5152,15 @@ ${baseRules}`) + regenSuffix;
       if (allKeys.length >= AI_CACHE_MAX) {
         allKeys.slice(0, allKeys.length - AI_CACHE_MAX + 5).forEach(k => localStorage.removeItem(k));
       }
-      localStorage.setItem(key, value);
+      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
     } catch { /*@3.GARJ.351*/ }
   }
 
   /*@3.GARJ.352*/
-  async function callAI(messages, onDelta, onThinking) {
+  async function callAI(messages, onDelta, onThinking, extra) {
     if (!GARDEN_AI_ENDPOINT) return { error: true, text: '' };
+    extra = extra || {};
+    const high = extra.tier === 'high';
 
     try {
       const res = await fetch(GARDEN_AI_ENDPOINT, {
@@ -5158,8 +5169,10 @@ ${baseRules}`) + regenSuffix;
         body: JSON.stringify({
           messages,
           /*@3.GARJ.353*/
-          max_tokens: 2000,
-          stream: !!onDelta
+          max_tokens: high ? 4000 : 2000,
+          stream: !!onDelta,
+          tier: high ? 'high' : 'base',
+          cache: extra.cache || undefined
         })
       });
 
@@ -5168,6 +5181,14 @@ ${baseRules}`) + regenSuffix;
         console.error('AI Proxy error:', res.status, err);
         return { error: true, text: '', errorData: err };
       }
+
+      /*@3.GARJ.608*/
+      const tag = {
+        model: res.headers.get('X-Garden-Model') || '',
+        provider: res.headers.get('X-Garden-Provider') || '',
+        tier: res.headers.get('X-Garden-Tier') || '',
+        escalated: res.headers.get('X-Garden-Escalated') === '1'
+      };
 
       const ctype = res.headers.get('Content-Type') || '';
       if (onDelta && ctype.includes('text/event-stream') && res.body) {
@@ -5188,6 +5209,7 @@ ${baseRules}`) + regenSuffix;
             if (payload === '[DONE]') continue;
             try {
               const j = JSON.parse(payload);
+              if (j.garden) { Object.assign(tag, j.garden); continue; }
               const delta = j.choices?.[0]?.delta || {};
               /*@3.GARJ.356*/
               if (delta.reasoning_content && !full && !thinkingNotified) {
@@ -5199,11 +5221,15 @@ ${baseRules}`) + regenSuffix;
             } catch (e) { /*@3.GARJ.357*/ }
           }
         }
-        return { error: false, text: full };
+        return Object.assign({ error: false, text: full }, tag);
       }
 
       const data = await res.json();
-      return { error: false, text: data.text || '' };
+      if (data.model) Object.assign(tag, {
+        model: data.model, provider: data.provider || '',
+        tier: data.tier || '', escalated: !!data.escalated
+      });
+      return Object.assign({ error: false, text: data.text || '' }, tag);
     } catch (e) {
       console.error('AI fetch failed:', e);
       return {
@@ -5232,7 +5258,9 @@ ${baseRules}`) + regenSuffix;
 
     /*@3.GARJ.363*/
     const intent = { scope: 'layer', style: 'auto', question: '' };
-    let aiSource = '';
+    /*@3.GARJ.611*/
+    let lastTag = { model: '', provider: '', tier: '', escalated: false, src: '' };
+    let regenCount = 0;
     let lastAiText = '';
     let busy = false;
     let sysPromptNow = '';   /*@3.GARJ.364*/
@@ -5278,7 +5306,7 @@ ${baseRules}`) + regenSuffix;
     overlay.innerHTML = `
       <div class="ai-modal">
         <div class="ai-modal-header">
-          <h3>${_AI_ICON_HEADER} ${aiT('DeepSeek يشرح', 'AI Explanation')}</h3>
+          <h3>${_AI_ICON_HEADER} ${aiT('شرح أعمق بالذكاء الاصطناعي', 'A Deeper AI Explanation')}</h3>
           <button class="ai-modal-close" id="ai-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
         <div class="ai-intent-bar">
@@ -5301,7 +5329,7 @@ ${baseRules}`) + regenSuffix;
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
             <span class="ai-btn-label">${aiT('نسخ', 'Copy')}</span>
           </button>
-          ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--regen" id="ai-regen" title="${aiT('تجاهل الكاش وتوليد شرح جديد', 'Bypass cache and generate a fresh explanation')}">${REGEN_INNER}</button>` : ''}
+          ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--regen" id="ai-regen" title="${aiT('اشرحها لي من زاوية أخرى', 'Explain it from another angle')}">${REGEN_INNER}</button>` : ''}
           <a class="ai-action-btn ai-svc-btn" href="https://chat.qwen.ai/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح Qwen', 'Copy the prompt and open Qwen')}">
             ${_AI_ICON_SVC} <span class="ai-btn-label">Qwen</span>
           </a>
@@ -5489,14 +5517,19 @@ ${baseRules}`) + regenSuffix;
           holder.innerHTML = '';
           streamEl = document.createElement('div');
           streamEl.className = 'ai-result ai-streaming';
+          streamEl.setAttribute('aria-live', 'off'); /*@3.GARJ.603*/
           holder.appendChild(streamEl);
         }
         streamEl.textContent = full; /*@3.GARJ.376*/
         scrollBottom();
       };
       var _t0 = Date.now();
-      callAI(messages, onDelta, onThinking).then(result => {
+      callAI(messages, onDelta, onThinking, { tier: opts.tier, cache: opts.cache }).then(result => {
         busy = false;
+        lastTag = {
+          model: result.model || '', provider: result.provider || '',
+          tier: result.tier || '', escalated: !!result.escalated, src: 'live'
+        };
         window.GardenEv('ai_answer', {
           ms: Date.now() - _t0,
           ch: (result && result.text) ? result.text.length : 0,
@@ -5526,6 +5559,12 @@ ${baseRules}`) + regenSuffix;
       resetFeedback();
       resetFollowupRow();
       threadEl.innerHTML = '';
+      if (opts.note) {
+        const n = document.createElement('div');
+        n.className = 'ai-user-q';
+        n.textContent = opts.note;
+        threadEl.appendChild(n);
+      }
       const p = currentPrompt(!!opts.regen);
       sysPromptNow = p.systemPrompt;
 
@@ -5551,7 +5590,9 @@ ${baseRules}`) + regenSuffix;
       const holder = newHolder();
       let key = '';
       const settle = (text) => {
-        if (key) setAiCache(key, text);
+        if (key) setAiCache(key, {
+          text: text, model: lastTag.model, provider: lastTag.provider, tier: lastTag.tier,
+        });
         lastAiText = text;
         thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: text }];
         composer.style.display = '';
@@ -5562,10 +5603,16 @@ ${baseRules}`) + regenSuffix;
       const badge = opts.regen
         ? `<div class="ai-fresh-badge"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ${aiT('شرح جديد', 'Fresh explanation')}</div>`
         : '';
+      /*@3.GARJ.612*/
+      const cacheMeta = {
+        subject: document.documentElement.getAttribute('data-subject') || '',
+        lang: currentLang, style: intent.style, promptVer: AI_PROMPT_VER,
+        store: !intent.question
+      };
       const live = () => runAI(
         [{ role: 'system', content: p.systemPrompt }, { role: 'user', content: p.userMsg }],
         holder,
-        { badge: badge, loadingMsg: loadingMsg },
+        { badge: badge, loadingMsg: loadingMsg, tier: opts.tier, cache: cacheMeta },
         settle
       );
 
@@ -5580,8 +5627,13 @@ ${baseRules}`) + regenSuffix;
         if (opts.regen) { try { localStorage.removeItem(key); } catch (e) { } }
         const local = (!opts.force && !opts.regen) ? getAiCache(key) : null;
         if (local) {
-          busy = false;
-          playText(holder, local, { badge: badge, loadingMsg: loadingMsg }, () => settle(local));
+          lastTag = {
+            model: local.model, provider: local.provider, tier: local.tier,
+            escalated: false, src: 'local',
+          };
+          /*@3.GARJ.604*/
+          playText(holder, local.text, { badge: badge, loadingMsg: loadingMsg },
+            () => { busy = false; settle(local.text); });
           return HANDLED;
         }
         /*@3.GARJ.601*/
@@ -5591,9 +5643,12 @@ ${baseRules}`) + regenSuffix;
         if (!document.body.contains(holder)) return;
         if (hit2 === HANDLED) return;
         if (!hit2) { live(); return; }
-        busy = false;
-        aiSource = hit2.model || '';
-        playText(holder, hit2.text, { badge: badge, loadingMsg: loadingMsg }, () => settle(hit2.text));
+        lastTag = {
+          model: hit2.model || '', provider: hit2.provider || '',
+          tier: hit2.tier || 'base', escalated: false, src: 'remote'
+        };
+        playText(holder, hit2.text, { badge: badge, loadingMsg: loadingMsg },
+          () => { busy = false; settle(hit2.text); });
       });
     }
 
@@ -5631,11 +5686,25 @@ ${baseRules}`) + regenSuffix;
           intent: intent.scope + '-' + intent.style,
           turns: Math.max(0, (thread.length - 2) / 2),
           ctype: cardData.type,
+          /*@3.GARJ.613*/
+          model: lastTag.model, provider: lastTag.provider,
+          tier: lastTag.tier, src: lastTag.src, lang: currentLang,
         });
         const fb = overlay.querySelector('#ai-fb');
-        if (fb) fb.innerHTML = vote === 'up'
-          ? `<span class="ai-fb-thanks"><i class="fa-solid fa-heart" aria-hidden="true"></i> ${aiT('شكراً! تقييمك يحسّن الشرح', 'Thanks! Your rating improves explanations')}</span>`
-          : `<span class="ai-fb-thanks">${aiT('جرّب «لم أفهم بعد» أو غيّر الأسلوب من الأعلى', 'Try "Still unclear" or switch the style above')}</span>`;
+        if (vote === 'up') {
+          if (fb) fb.innerHTML = `<span class="ai-fb-thanks"><i class="fa-solid fa-heart" aria-hidden="true"></i> ${aiT('شكراً! تقييمك يحسّن الشرح', 'Thanks! Your rating improves explanations')}</span>`;
+          return;
+        }
+        /*@3.GARJ.609*/
+        if (busy) {
+          if (fb) fb.innerHTML = `<span class="ai-fb-thanks">${aiT('انتظر انتهاء الشرح الحالي', 'Wait for the current explanation to finish')}</span>`;
+          return;
+        }
+        generate({
+          force: true, tier: 'high',
+          note: aiT('لم يعجبني — أعد الشرح بأقوى نموذج متاح',
+            'Not helpful — re-explain with the strongest model available'),
+        });
       }));
     }
     function resetFeedback() {
@@ -5731,7 +5800,11 @@ ${baseRules}`) + regenSuffix;
     overlay.querySelectorAll('.ai-svc-btn').forEach(a =>
       a.addEventListener('click', () => copyPrompt(a)));
 
-    overlay.querySelector('#ai-regen')?.addEventListener('click', () => generate({ regen: true, force: true }));
+    /*@3.GARJ.610*/
+    overlay.querySelector('#ai-regen')?.addEventListener('click', () => {
+      regenCount++;
+      generate({ regen: true, force: true, tier: regenCount >= 3 ? 'high' : 'base' });
+    });
     overlay.querySelector('#ai-retry')?.addEventListener('click', () => generate({ force: true }));
 
     /*@3.GARJ.387*/
