@@ -179,6 +179,8 @@
   /*@3.SEAJ.9*/
   var modUrlMap = null;
   function moduleUrl(code, m) {
+    /*@3.SEAJ.58*/
+    if (!index) return null;
     if (!modUrlMap) {
       modUrlMap = {};
       (index || []).forEach(function (it) {
@@ -535,8 +537,12 @@
     if (e.t === 'instructor') {
       /*@3.SEAJ.56*/
       if (e.mine) return (e.code ? e.code + ' · ' : '') + tx('دكتور مادتك', 'your instructor');
-      if (e.rate != null) return tx('التقييم ' + Math.round(e.rate) + '٪', Math.round(e.rate) + '% rating') +
-        (e.n ? ' · ' + tx('من ' + e.n, 'of ' + e.n) : '');
+      /*@3.SEAJ.59*/
+      if (window.GardenRating && GardenRating.facultyShown({ idx: e.rate, n: e.n })) {
+        return tx('التقييم ' + Math.round(e.rate) + '٪', Math.round(e.rate) + '% rating') +
+          (e.n ? ' · ' + tx('من ' + e.n, 'of ' + e.n) : '');
+      }
+      if (e.n) return GardenRating.facultyFew({ n: e.n });
       return e.code || tx('لا تقييمات بعد', 'no ratings yet');
     }
     if (e.t === 'lab') return tx('مختبر تفاعلي', 'Interactive lab') + (e.code ? ' · ' + e.code : '');
@@ -669,7 +675,8 @@
     _ph.classList.add('is-marquee');
   }
 
-  window.GardenSearch = { load: loadIndex, query: search, norm: norm };
+  /*@3.SEAJ.57*/
+  window.GardenSearch = { load: loadIndex, query: search, norm: norm, moduleUrl: moduleUrl };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

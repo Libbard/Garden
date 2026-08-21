@@ -406,6 +406,66 @@
     return null;
   }
 
+  /*@3.SCHJ.233*/
+  function bannerFocusRange() {
+    var by = { midterm: [], final: [] };
+    (schedule.exams || []).forEach(function (x) {
+      if (!x || !x.sx_crn || !x.date) return;
+      if (x.exam_type !== 'midterm' && x.exam_type !== 'final') return;
+      by[x.exam_type].push(x.date);
+    });
+    var out = {};
+    ['midterm', 'final'].forEach(function (k) {
+      var ds = by[k].slice().sort();
+      if (ds.length < 2) return;
+      var a = parseLocalDate(ds[0]); a.setDate(a.getDate() - 1);
+      var b = parseLocalDate(ds[ds.length - 1]); b.setDate(b.getDate() + 1);
+      out[k] = { start: fmtLocalDate(a), end: fmtLocalDate(b) };
+    });
+    return out;
+  }
+
+  function focusIsManual(kind) {
+    var st = schedule.settings || {};
+    var cur = (st.focus_periods || {})[kind] || {};
+    var auto = (st.focus_auto || {})[kind] || {};
+    if (!cur.start && !cur.end) return false;
+    return (cur.start || '') !== (auto.start || '') || (cur.end || '') !== (auto.end || '');
+  }
+
+  function syncFocusPeriods() {
+    var r = bannerFocusRange();
+    var kinds = Object.keys(r);
+    if (!kinds.length) return null;
+    var st = schedule.settings;
+    if (!st.focus_periods) st.focus_periods = { midterm: {}, final: {} };
+    var ask = {}, changed = false;
+
+    kinds.forEach(function (k) {
+      var want = r[k], cur = st.focus_periods[k] || {};
+      if (focusIsManual(k)) {
+        var rej = (st.focus_rejected || {})[k] || {};
+        if ((rej.start || '') === want.start && (rej.end || '') === want.end) return;
+        if (cur.start !== want.start || cur.end !== want.end) ask[k] = want;
+        return;
+      }
+      if (cur.start !== want.start || cur.end !== want.end) {
+        st.focus_periods[k] = { start: want.start, end: want.end };
+        changed = true;
+      }
+    });
+
+    if (changed || !st.focus_auto) {
+      st.focus_auto = {};
+      ['midterm', 'final'].forEach(function (k) {
+        var v = st.focus_periods[k] || {};
+        st.focus_auto[k] = { start: v.start || '', end: v.end || '' };
+      });
+      save();
+    }
+    return Object.keys(ask).length ? ask : null;
+  }
+
   function weekFocus(weekStart) {
     var fp = (schedule.settings || {}).focus_periods || {};
     var s = getWeekStartDate(weekStart);
@@ -532,10 +592,13 @@
     var doneIds = ov.completed_events || [];
 
     /*@3.SCHJ.57*/
+    /*@3.SCHJ.232*/
+    var RULES = window.GardenScheduleRules;
     if (withinTerm && !lecturesHidden) {
       schedule.lectures.forEach(function (l) {
         if (l.day !== dayName) return;
         if (cancelled.indexOf(l.id) !== -1) return;
+        if (RULES && !RULES.lectureOn(l, dateObj).on) return;
         var s = parseHM(l.start_time);
         if (s === null) return;
         var e = parseHM(l.end_time);
@@ -1905,6 +1968,14 @@
     var main = document.getElementById('lec-main-actions');
     var scope = document.getElementById('lec-del-scope');
     if (!scope) return;
+    /*@3.SCHJ.238*/
+    var stop = document.getElementById('del-lec-stop');
+    if (stop) {
+      var row = editingEvent && editingEvent.src === 'lecture'
+        ? (schedule.lectures || []).filter(function (l) { return l.id === editingEvent.id; })[0]
+        : null;
+      stop.hidden = !(row && row.sx_crn);
+    }
     if (main) main.style.display = 'none';
     scope.style.display = '';
     requestAnimationFrame(function () {
@@ -1996,23 +2067,91 @@
     adoptPending(arguments[0]);
   }
 
+  /*@3.SCHJ.235*/
+  var FOCUS_LBL = { midterm: ['أسبوع الميدتيرم', 'Midterm week'],
+                    final:   ['أسبوع الفاينل', 'Final week'] };
+
+  function focusSuggestHtml(ask) {
+    if (!ask) return '';
+    var rows = Object.keys(ask).map(function (k) {
+      var cur = (schedule.settings.focus_periods || {})[k] || {};
+      var was = (cur.start && cur.end) ? (cur.start + ' → ' + cur.end) : '—';
+      return '<span><b>' + escapeH(isAr() ? FOCUS_LBL[k][0] : FOCUS_LBL[k][1]) + '</b>' +
+        '<em dir="ltr">' + escapeH(was) + ' → ' +
+        escapeH(ask[k].start + ' → ' + ask[k].end) + '</em></span>';
+    }).join('');
+    return '<div class="sch-term-sug"><div class="sch-term-sug-h">' +
+        '<i class="fa-solid fa-file-pen" aria-hidden="true"></i><b>' +
+        (isAr() ? 'اختباراتُ شعبك تقول أسبوعاً آخر'
+                : 'Your sections’ exams suggest a different week') + '</b></div>' +
+      '<div class="sch-term-sug-l">' + rows + '</div>' +
+      '<p class="sch-editor-hint">' + (isAr()
+        ? 'المدى من أوّلِ اختبارٍ إلى آخِرِه في شعبك، ويوماً قبله ويوماً بعده. وفي أسابيع التركيز تُخفى المحاضراتُ المتكرّرة ولا يصلك تنبيهُها.'
+        : 'The span runs from your sections’ first exam to the last, plus a day either side. In focus weeks recurring lectures are hidden and their reminders stop.') + '</p>' +
+      '<div class="sch-modal-actions">' +
+        '<button class="sch-btn sch-btn-primary" id="focus-sug-apply">' +
+          (isAr() ? 'حدِّثها' : 'Update them') + '</button>' +
+        '<button class="sch-btn sch-btn-secondary" id="focus-sug-keep">' +
+          (isAr() ? 'أبقِ أسابيعي' : 'Keep mine') + '</button>' +
+      '</div></div>';
+  }
+
+  function wireFocusSuggest(ask) {
+    if (!ask) return;
+    var st = schedule.settings;
+    var ap = document.getElementById('focus-sug-apply');
+    if (ap) ap.addEventListener('click', function () {
+      Object.keys(ask).forEach(function (k) {
+        st.focus_periods[k] = { start: ask[k].start, end: ask[k].end };
+        if (!st.focus_auto) st.focus_auto = {};
+        st.focus_auto[k] = { start: ask[k].start, end: ask[k].end };
+      });
+      syncFocusFields();
+      save(); renderTermSuggest(); render();
+    });
+    var kp = document.getElementById('focus-sug-keep');
+    if (kp) kp.addEventListener('click', function () {
+      if (!st.focus_rejected) st.focus_rejected = {};
+      Object.keys(ask).forEach(function (k) {
+        st.focus_rejected[k] = { start: ask[k].start, end: ask[k].end };
+      });
+      save(); renderTermSuggest();
+    });
+  }
+
+  /*@3.SCHJ.236*/
+  function syncFocusFields() {
+    var fp = schedule.settings.focus_periods || {};
+    var map = { 'editor-mid-start': ['midterm', 'start'], 'editor-mid-end': ['midterm', 'end'],
+                'editor-fin-start': ['final', 'start'], 'editor-fin-end': ['final', 'end'] };
+    Object.keys(map).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = (fp[map[id][0]] || {})[map[id][1]] || '';
+      el.value = v;
+    });
+  }
+
   /*@3.SCHJ.156*/
   function renderTermSuggest() {
     var host = document.getElementById('editor-term-suggest');
     if (!host) return;
     var r = syncTermRange();
-    if (!r) { host.hidden = true; host.innerHTML = ''; return; }
+    /*@3.SCHJ.234*/
+    var fask = syncFocusPeriods();
     var st = schedule.settings;
     var rows = [];
-    if (r.start && r.start !== st.term_start_date) {
-      rows.push({ l: isAr() ? 'البداية' : 'Start', from: st.term_start_date || '—', to: r.start });
+    if (r) {
+      if (r.start && r.start !== st.term_start_date) {
+        rows.push({ l: isAr() ? 'البداية' : 'Start', from: st.term_start_date || '—', to: r.start });
+      }
+      if (r.end && r.end !== st.semester_end_date) {
+        rows.push({ l: isAr() ? 'النهاية' : 'End', from: st.semester_end_date || '—', to: r.end });
+      }
     }
-    if (r.end && r.end !== st.semester_end_date) {
-      rows.push({ l: isAr() ? 'النهاية' : 'End', from: st.semester_end_date || '—', to: r.end });
-    }
-    if (!rows.length) { host.hidden = true; host.innerHTML = ''; return; }
+    if (!rows.length && !fask) { host.hidden = true; host.innerHTML = ''; return; }
     host.hidden = false;
-    host.innerHTML =
+    host.innerHTML = (!rows.length ? '' :
       '<div class="sch-term-sug"><div class="sch-term-sug-h">' +
         '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><b>' +
         (isAr() ? 'شعبُك تقول مدًى مختلفاً' : 'Your sections suggest a different span') + '</b></div>' +
@@ -2028,7 +2167,9 @@
           (isAr() ? 'حدِّثها' : 'Update them') + '</button>' +
         '<button class="sch-btn sch-btn-secondary" id="term-sug-keep">' +
           (isAr() ? 'أبقِ تواريخي' : 'Keep mine') + '</button>' +
-      '</div></div>';
+      '</div></div>') + focusSuggestHtml(fask);
+
+    wireFocusSuggest(fask);
     var ap = document.getElementById('term-sug-apply');
     if (ap) ap.addEventListener('click', function () {
       if (r.start) { st.term_start_date = r.start; document.getElementById('editor-start').value = r.start; }
@@ -2242,8 +2383,35 @@
   }
 
   /*@3.SCHJ.225*/
+  /*@3.SCHJ.227*/
+  var OPEN_SECS = { term: 1, courses: 1, ics: 1, plans: 1, data: 1 };
+
+  /*@3.SCHJ.228*/
+  function openIntent(sec, tries) {
+    var box = document.getElementById('modal-editor');
+    /*@3.SCHJ.229*/
+    try { openEditor(); } catch (e) { try { console.error('openEditor:', e); } catch (_) {} }
+    var open = box && getComputedStyle(box).display !== 'none';
+    if (!open) {
+      if (tries > 0) setTimeout(function () { openIntent(sec, tries - 1); }, 300);
+      return;
+    }
+    /*@3.SCHJ.230*/
+    /*@3.SCHJ.231*/
+    var swPending = !!(navigator.serviceWorker && !navigator.serviceWorker.controller);
+    if (!swPending) {
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+    }
+    goEditorSec(sec);
+    if (sec !== 'term') return;
+    var start = document.getElementById('editor-start');
+    if (start) setTimeout(function () { try { start.focus(); } catch (e) {} }, 420);
+  }
+
   function runIntent() {
     var q = location.search || '';
+    var open = (/[?&]open=([a-z]+)/.exec(q) || [])[1] || '';
+    if (OPEN_SECS[open]) { openIntent(open, 2); return; }
     if (!/[?&]add=event/.test(q)) return;
     var d = (/[?&]d=(\d{4}-\d{2}-\d{2})/.exec(q) || [])[1] || null;
     var tm = (/[?&]t=(\d{2}:\d{2})/.exec(q) || [])[1] || null;
@@ -2999,12 +3167,70 @@
       }).join('') + '</div></div>';
   }
 
+  /*@3.SCHJ.239*/
+  var OPT_LBL = { all: ['كلَّها', 'everything'], lectures: ['محاضراتِها', 'its lectures'],
+                  exams: ['اختباراتِها', 'its exams'] };
+
+  function optOutHtml() {
+    var map = (schedule && schedule.sx_optout && typeof schedule.sx_optout === 'object')
+      ? schedule.sx_optout : {};
+    var crns = Object.keys(map);
+    if (!crns.length) return '';
+    return '<div class="sch-pending" style="margin-block-start:.9rem">' +
+      '<div class="sch-pending-h"><i class="fa-solid fa-link-slash" aria-hidden="true"></i><b>' +
+        (isAr() ? 'شعبٌ أوقفتَ جلبها من البانر' : 'Sections you stopped fetching') + '</b></div>' +
+      '<div class="sch-pending-list">' + crns.map(function (c) {
+        var sc = (map[c] && map[c].scope) || 'all';
+        var lbl = OPT_LBL[sc] || OPT_LBL.all;
+        return '<span class="sch-pending-i"><b dir="ltr">' + escapeH(c) + '</b>' +
+          '<span>' + escapeH(isAr() ? lbl[0] : lbl[1]) + '</span>' +
+          '<button class="sch-btn sch-btn-secondary" type="button" data-optback="' + escapeH(c) + '">' +
+            (isAr() ? 'استأنفْ' : 'Resume') + '</button></span>';
+      }).join('') + '</div>' +
+      '<p class="sch-editor-hint">' + (isAr()
+        ? 'لن تُبنى من البانر ما دامت هنا. والاستئنافُ يعيدها في أوّل فتحةٍ لصفحة الشعب.'
+        : 'They will not be rebuilt from Banner while listed here. Resuming brings them back next time you open the sections page.') + '</p>' +
+    '</div>';
+  }
+
+  /*@3.SCHJ.244*/
+  function dropCourseFromSemester(code) {
+    var sem = null;
+    try { sem = JSON.parse(localStorage.getItem(LS_SEMESTER) || 'null'); } catch (e) { return false; }
+    if (!sem || !Array.isArray(sem.courses)) return false;
+    var keep = sem.courses.filter(function (c) { return !c || c.code !== code; });
+    if (keep.length === sem.courses.length) return false;
+    sem.courses = keep;
+    sem.updated_at = new Date().toISOString();
+    try {
+      localStorage.setItem(LS_SEMESTER, JSON.stringify(sem));
+      localStorage.setItem('__syncT_' + LS_SEMESTER, String(Date.now()));
+    } catch (e) { return false; }
+    return true;
+  }
+
+  function wireOptBack(box) {
+    box.querySelectorAll('[data-optback]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var c = this.getAttribute('data-optback');
+        if (schedule.sx_optout) {
+          delete schedule.sx_optout[c];
+          if (!Object.keys(schedule.sx_optout).length) delete schedule.sx_optout;
+          save();
+        }
+        renderEditorCourses();
+      });
+    });
+  }
+
   function renderEditorCourses() {
     var box = document.getElementById('editor-courses');
     var courses = semesterCourses();
     if (!courses.length) {
       box.innerHTML = '<p class="sch-editor-hint">' +
-        (isAr() ? 'لا مواد في فصلك الخاص بعد — أضِفها من صفحة الفصل.' : 'No courses in your semester yet.') + '</p>';
+        (isAr() ? 'لا مواد في فصلك الخاص بعد — أضِفها من صفحة الفصل.' : 'No courses in your semester yet.') +
+        '</p>' + optOutHtml();
+      wireOptBack(box);
       return;
     }
     var lang = isAr() ? 'ar' : 'en';
@@ -3024,7 +3250,14 @@
       }).join('');
       return '<div class="sch-ecourse" data-ecode="' + escapeH(code) + '">' +
         '<div class="sch-ecourse-head"><span class="sch-ecourse-dot" style="background:' + color + '"></span>' +
-          escapeH(courseDisplayName(code)) + '</div>' +
+          '<span class="sch-ecourse-nm">' + escapeH(courseDisplayName(code)) + '</span>' +
+          /*@3.SCHJ.242*/
+          '<button class="sch-ecourse-x" type="button" data-ecdrop="' + escapeH(code) + '" ' +
+            'aria-label="' + escapeH(isAr() ? ('احذف ' + courseDisplayName(code) + ' من فصلك')
+                                            : ('Remove ' + courseDisplayName(code) + ' from your term')) + '" ' +
+            'title="' + escapeH(isAr() ? 'احذفها من فصلك' : 'Remove from your term') + '">' +
+            '<i class="fa-solid fa-trash" aria-hidden="true"></i></button>' +
+        '</div>' +
         '<div class="sch-daychips">' + chips + '</div>' +
         '<div class="sch-ecourse-row">' +
           '<div><label class="sch-label">' + (isAr() ? 'البداية' : 'Start') + '</label>' +
@@ -3065,6 +3298,29 @@
       sel.addEventListener('change', function () {
         var w = this.closest('.sch-ecourse').querySelector('.sch-room-wrap');
         if (w) w.style.display = this.value === 'remote' ? 'none' : '';
+      });
+    });
+    /*@3.SCHJ.240*/
+    box.insertAdjacentHTML('beforeend', optOutHtml());
+    wireOptBack(box);
+    /*@3.SCHJ.243*/
+    box.querySelectorAll('[data-ecdrop]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var code = this.getAttribute('data-ecdrop');
+        var nm = courseDisplayName(code);
+        askConfirm(
+          isAr() ? 'حذف مادة' : 'Remove course',
+          isAr() ? ('ستخرج «' + nm + '» من فصلك، وتُحذف أوقاتُها ومواعيدُها ومهامُّها. ولا يمكن التراجع.')
+                 : ('“' + nm + '” leaves your term; its times, deadlines and tasks are deleted. This cannot be undone.'),
+          isAr() ? 'احذفها' : 'Remove',
+          function () {
+            try { if (window.GardenData) GardenData.removeCourseTraces(code); } catch (e) {}
+            dropCourseFromSemester(code);
+            reloadState();
+            renderEditorCourses();
+            refreshEditorSurfaces();
+            render();
+          }, 'fa-trash');
       });
     });
     TP.build(box);
@@ -3512,6 +3768,26 @@
       }
       editingEvent = null; hideDeleteButtons(); closeModal('modal-add-lecture'); render();
     });
+    /*@3.SCHJ.237*/
+    on('del-lec-stop', 'click', function () {
+      if (editingEvent && editingEvent.src === 'lecture') {
+        var id = editingEvent.id;
+        var row = (schedule.lectures || []).filter(function (l) { return l.id === id; })[0];
+        var crn = row && row.sx_crn;
+        schedule.lectures = schedule.lectures.filter(function (l) { return l.id !== id; });
+        Object.keys(schedule.week_overrides).forEach(function (w) {
+          var o = schedule.week_overrides[w];
+          if (o && o.cancelled_lectures) o.cancelled_lectures = o.cancelled_lectures.filter(function (x) { return x !== id; });
+        });
+        /*@3.SCHJ.241*/
+        if (crn) {
+          if (!schedule.sx_optout || typeof schedule.sx_optout !== 'object') schedule.sx_optout = {};
+          schedule.sx_optout[String(crn)] = { at: new Date().toISOString(), scope: 'lectures' };
+        }
+        save();
+      }
+      editingEvent = null; hideDeleteButtons(); closeModal('modal-add-lecture'); render();
+    });
     on('del-study', 'click', function () {
       if (editingEvent && editingEvent.src === 'study') {
         schedule.study_blocks = schedule.study_blocks.filter(function (b) { return b.id !== editingEvent.id; });
@@ -3610,6 +3886,7 @@
     if (wasMissing || schedule.__needsSave) { delete schedule.__needsSave; save(); }
     /*@3.SCHJ.213*/
     syncTermRange();
+    syncFocusPeriods();
 
     /*@3.SCHJ.214*/
     if (window.MutationObserver && window.GardenSelect) {

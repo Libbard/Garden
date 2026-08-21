@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.0.63'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.1.75'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -31,6 +31,30 @@ var PRECACHE_URLS = [
   'shared/garden-header.js',
   'shared/dashboard.css',
   'shared/dashboard.js',
+  'shared/notes.css',
+  'shared/notes-store.js',
+  'shared/notes-model.js',
+  'shared/notes-sync.js',
+  'shared/notes-icons.js',
+  'shared/notes-swatch.js',
+  'shared/notes/unsplash.js',
+  'shared/notes-history.js',
+  'shared/notes-blocks.js',
+  'shared/notes-sanitize.js',
+  'shared/notes-code.js',
+  'shared/notes-editor.js',
+  'shared/notes-ink-codec.js',
+  'shared/notes-input.js',
+  'shared/notes-canvas.js',
+  'shared/notes-canvas-ui.js',
+  'shared/notes-dial.js',
+  'shared/notes-overlay.js',
+  'shared/notes-app.js',
+  'shared/notes-ribbon.js',
+  'shared/notes-mathlib.js',
+  'shared/notes-serialize.js',
+  'shared/notes-print.js',
+  'shared/notes-app.css',
   
   
   'shared/course-hub.css',
@@ -68,6 +92,7 @@ var PRECACHE_URLS = [
   'shared/gpa-setup.js',
   /*@0.SWJ.58*/
   'hub/settings.html',
+  'hub/notes.html',
   'shared/settings.css',
   'shared/settings.js',
   /*@0.SWJ.59*/
@@ -110,6 +135,7 @@ var PRECACHE_URLS = [
   'shared/course-rate.js',
   'shared/course-rate.css',
   'shared/course-rate-view.js',
+  'shared/report.js',
   'shared/course-rate-view.css',
   'hub/ratings.html',
   'shared/my-ratings.js',
@@ -153,6 +179,10 @@ var PRECACHE_URLS = [
   'shared/vendor/fonts/garden/cairo-latin-400-900.woff2',
   'shared/vendor/fonts/garden/inter-latin-400-900.woff2',
   'shared/vendor/fonts/garden/jetbrains-mono-latin-400-800.woff2',
+  /*@0.SWJ.122*/
+  'shared/vendor/fonts/garden/garden-fonts.css',
+  'shared/vendor/fonts/garden/thmanyah-sans-400.woff2',
+  'shared/vendor/fonts/garden/thmanyah-sans-700.woff2',
   'offline.html',
   'manifest.json',
   /*@0.SWJ.73*/

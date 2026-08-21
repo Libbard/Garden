@@ -202,13 +202,19 @@
     W = d;
 
     /*@3.GPSJ.26*/
+    /*@3.GPSJ.109*/
     (readJSON(ARCH, []) || []).forEach(function (a) {
+      var own = !a || !a.id || String(a.id).indexOf('gpa_L') === 0 || a.id === 'onb_prior';
       (a.courses || []).forEach(function (c) {
         if (!c || !c.code) return;
         var lv = (a.level != null) ? a.level : null;
         if (lv === null) { var pc = courseBy(c.code); lv = pc ? planLevel(pc) : null; }
         if (lv === null) lv = 'x';
-        (d.levels[lv] = d.levels[lv] || []).push({ code: c.code, grade: c.grade || '' });
+        (d.levels[lv] = d.levels[lv] || []).push({
+          code: c.code, grade: c.grade || '',
+          /*@3.GPSJ.110*/
+          from: own ? '' : a.id
+        });
       });
     });
     var sem = readJSON(SEM, null);
@@ -1274,11 +1280,13 @@
       return a && a.id && String(a.id).indexOf('gpa_L') !== 0 && a.id !== 'onb_prior';
     });
     Object.keys(W.levels).sort(function (a, b) { return (+a) - (+b); }).forEach(function (lv) {
-      if (!W.levels[lv].length) return;
+      /*@3.GPSJ.111*/
+      var mine = W.levels[lv].filter(function (x) { return !x.from; });
+      if (!mine.length) return;
       arch.push({
         id: 'gpa_L' + lv, level: (lv === 'x' ? null : +lv), name: levelName(+lv),
         name_ar: levelNameIn(+lv, 'ar'), name_en: levelNameIn(+lv, 'en'),
-        courses: W.levels[lv].map(function (x) {
+        courses: mine.map(function (x) {
           var c = courseBy(x.code), o = { code: x.code, grade: x.grade || null };
           if (c) o.credits = fCh(c);
           return o;

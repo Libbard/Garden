@@ -2,6 +2,40 @@
   'use strict';
 
   var CATALOG_REL = 'shared/data/courses_catalog.json';
+  var PREFS_KEY = 'dashboard_prefs';
+  var PINS_KEY = 'navOrder';
+
+  /*@3.BONJ.42*/
+  function readPins() {
+    if (window.GardenSideOrder) return GardenSideOrder.read();
+    try {
+      var p = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null');
+      var v = p && (p[PINS_KEY] || p.navPins);
+      return Array.isArray(v) ? v.filter(function (x) { return typeof x === 'string'; }) : [];
+    } catch (e) { return []; }
+  }
+
+  function writePins(list) {
+    if (window.GardenSideOrder) { GardenSideOrder.write(list); return; }
+    try {
+      var p = null;
+      try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null'); } catch (e2) {}
+      if (!p || typeof p !== 'object') p = {};
+      if (list && list.length) p[PINS_KEY] = list;
+      else delete p[PINS_KEY];
+      delete p.navPins;
+      localStorage.setItem(PREFS_KEY, JSON.stringify(p));
+    } catch (e) {}
+  }
+
+  function orderByPins(items) {
+    if (!readPins().length) return items;
+    if (window.GardenSideOrder && GardenSideOrder.sort) {
+      return GardenSideOrder.sort(items, function (it) { return it.page; });
+    }
+    return items;
+  }
+
   /*@3.BONJ.1*/
   var MODULES_FALLBACK = 15;
   var moduleCounts = null; /*@3.BONJ.2*/
@@ -22,6 +56,8 @@
       { page: 'semester', icon: 'fa-solid fa-graduation-cap',   ar: 'فصلي',     en: 'Semester', href: basePath + 'hub/index.html' },
       { page: 'schedule', icon: 'fa-solid fa-calendar-week',    ar: 'الجدول',    en: 'Schedule', href: basePath + 'hub/schedule.html' },
       { page: 'sections', icon: 'fa-solid fa-layer-group',      ar: 'الشعب',     en: 'Sections', href: basePath + 'hub/sections.html' },
+      /*@3.BONJ.35*/
+      { page: 'notes',    icon: 'fa-solid fa-note-sticky',      ar: 'ملاحظاتي',  en: 'Notes',    href: basePath + 'hub/notes.html' },
       /*@3.BONJ.6*/
       /*@3.BONJ.33*/
       { page: 'labs',     icon: 'fa-solid fa-flask',            ar: 'المختبر',   en: 'Labs',     href: basePath + 'hub/labs.html' },
@@ -33,6 +69,9 @@
       { page: 'ratings',  icon: 'fa-solid fa-star-half-stroke', ar: 'تقييماتي',  en: 'Ratings',  href: basePath + 'hub/ratings.html' },
       { page: 'tour',     icon: 'fa-solid fa-seedling',         ar: 'اكتشف',     en: 'Explore',  href: basePath + 'tour.html' }
     ];
+
+    /*@3.BONJ.34*/
+    items = orderByPins(items);
 
     /*@3.BONJ.7*/
     var F = window.GardenFlags;
@@ -80,12 +119,20 @@
     };
     moreBtn.addEventListener('click', function (e) {
       e.stopPropagation();
+      /*@3.BONJ.40*/
+      if (editing) { setEdit(false); return; }
       sheet.classList.toggle('on');
       syncMore();
     });
-    document.addEventListener('click', function () { sheet.classList.remove('on'); syncMore(); });
+    document.addEventListener('click', function () {
+      if (armed) return;
+      if (editing) { setEdit(false); return; }
+      sheet.classList.remove('on'); syncMore();
+    });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { sheet.classList.remove('on'); syncMore(); }
+      if (e.key !== 'Escape') return;
+      if (editing) { setEdit(false); return; }
+      sheet.classList.remove('on'); syncMore();
     });
     sheet.addEventListener('click', function (e) { e.stopPropagation(); });
 
@@ -94,29 +141,141 @@
 
     function layoutNav() {
       if (!nav.clientWidth) return;                 /*@3.BONJ.11*/
-      while (sheetIn.firstElementChild) nav.insertBefore(sheetIn.firstElementChild, moreBtn);
-      nav.classList.remove('bn-has-more');
-      sheet.classList.remove('on'); syncMore();
+      var moved;
+      while ((moved = sheetIn.querySelector('[data-bn-page]'))) nav.insertBefore(moved, moreBtn);
+      if (!editing) { sheet.classList.remove('on'); syncMore(); }
 
       if (overflows()) {
-        nav.classList.add('bn-has-more');
-        while (overflows() && nav.children.length > 2) {
+        while (overflows() && nav.querySelectorAll('[data-bn-page]').length > 1) {
           var last = moreBtn.previousElementSibling;
-          if (!last) break;
+          if (!last || !last.hasAttribute('data-bn-page')) break;
           sheetIn.insertBefore(last, sheetIn.firstChild);
         }
       }
-      if (sheetIn.children.length === 1) {
-        var only = sheetIn.firstElementChild;
-        nav.insertBefore(only, moreBtn);
-        nav.classList.remove('bn-has-more');
-        if (overflows()) { sheetIn.appendChild(only); nav.classList.add('bn-has-more'); }
-      }
-      if (!sheetIn.children.length) nav.classList.remove('bn-has-more');
 
       /*@3.BONJ.12*/
       moreBtn.classList.toggle('active', !!sheetIn.querySelector('.active'));
+      syncPinBtns();
+      syncHint();
+      if (editRow) sheetIn.appendChild(editRow);
+      nav.classList.add('bn-has-more');
     }
+
+    /*@3.BONJ.36*/
+    var editing = false, armed = false;
+
+    function applyPins() {
+      if (!readPins().length) return;
+      if (!(window.GardenSideOrder && GardenSideOrder.sort)) return;
+      var all = [].slice.call(nav.querySelectorAll('[data-bn-page]'))
+        .concat([].slice.call(sheetIn.querySelectorAll('[data-bn-page]')));
+      GardenSideOrder.sort(all, function (a) { return a.getAttribute('data-bn-page'); })
+        .forEach(function (a) { nav.insertBefore(a, moreBtn); });
+      layoutNav();
+    }
+
+    /*@3.BONJ.38*/
+    function fullOrder() {
+      return [].slice.call(nav.querySelectorAll('[data-bn-page]'))
+        .concat([].slice.call(sheetIn.querySelectorAll('[data-bn-page]')))
+        .map(function (a) { return a.getAttribute('data-bn-page'); });
+    }
+    function commitOrder() {
+      /*@3.BONJ.46*/
+      var seq = fullOrder(), seen = {};
+      seq.forEach(function (k) { seen[k] = 1; });
+      readPins().forEach(function (k) { if (!seen[k]) { seen[k] = 1; seq.push(k); } });
+      writePins(seq);
+    }
+
+    /*@3.BONJ.37*/
+    function moveItem(a, toBar) {
+      if (toBar) {
+        var bar = nav.querySelectorAll('[data-bn-page]');
+        nav.insertBefore(a, bar.length ? bar[bar.length - 1] : moreBtn);
+      } else {
+        sheetIn.appendChild(a);
+      }
+      layoutNav();
+      commitOrder();
+    }
+
+    /*@3.BONJ.39*/
+    var gdo = window.GardenDragOrder && window.GardenDragOrder(nav, {
+      sel: '[data-bn-page]',
+      axis: 'x',
+      enabled: function () { return editing; },
+      onDrop: function () { layoutNav(); commitOrder(); }
+    });
+    function swallowed() { return !!(gdo && gdo.swallowed()); }
+
+    function syncPinBtns() {
+      [].slice.call(document.querySelectorAll('[data-bn-page]')).forEach(function (a) {
+        var inBar = a.parentElement === nav;
+        var b = a.querySelector('.bn-pin');
+        if (!b) {
+          b = document.createElement('span');
+          b.className = 'bn-pin';
+          b.setAttribute('aria-hidden', 'true');
+          a.appendChild(b);
+        }
+        b.innerHTML = '<i class="fa-solid ' + (inBar ? 'fa-minus' : 'fa-plus') + '"></i>';
+      });
+    }
+
+    function setEdit(on) {
+      editing = !!on;
+      nav.classList.toggle('bn-edit', editing);
+      sheet.classList.toggle('bn-edit', editing);
+      if (editRow) {
+        editRow.setAttribute('aria-pressed', editing ? 'true' : 'false');
+        var lbl = editRow.querySelector('span');
+        if (lbl) lbl.textContent = editing
+          ? (isArNow() ? 'تمّ' : 'Done')
+          : (isArNow() ? 'رتّبِ الأيقونات' : 'Arrange icons');
+      }
+      if (editing) sheet.classList.add('on'); else sheet.classList.remove('on');
+      syncHint();
+      syncMore();
+    }
+
+    function isArNow() { return (localStorage.getItem('garden_lang') || 'ar') === 'ar'; }
+
+    /*@3.BONJ.41*/
+    var hint = document.createElement('div');
+    hint.className = 'bn-hint';
+    function paintHint() {
+      hint.textContent = isArNow()
+        ? 'اسحبِ الأيقونةَ لترتيبِها · واضغطْ عليها لنقلِها'
+        : 'Drag an icon to reorder \u00b7 tap it to move it';
+    }
+    paintHint();
+    document.addEventListener('garden:languageChanged', paintHint);
+    function syncHint() {
+      if (editing) sheetIn.insertBefore(hint, sheetIn.firstChild);
+      else if (hint.parentElement) hint.remove();
+    }
+
+    var editRow = document.createElement('button');
+    editRow.type = 'button';
+    editRow.className = 'bottom-nav-item bn-edit-row';
+    editRow.setAttribute('aria-pressed', 'false');
+    editRow.innerHTML = '<i class="fa-solid fa-sliders"></i><span class="bottom-nav-label">' +
+      (isArNow() ? 'رتّبِ الأيقونات' : 'Arrange icons') + '</span>';
+    editRow.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      setEdit(!editing);
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!editing) return;
+      var a = e.target.closest && e.target.closest('[data-bn-page]');
+      if (!a) return;
+      e.preventDefault(); e.stopPropagation();
+      if (swallowed()) return;
+      moveItem(a, a.parentElement !== nav);
+      setEdit(true);
+    }, true);
 
     var _lt = null, _ro = null;
     function relayoutNav() { clearTimeout(_lt); _lt = setTimeout(layoutNav, 60); }
@@ -129,6 +288,18 @@
 
     /*@3.BONJ.14*/
     document.addEventListener('garden:languageChanged', relabel);
+    window.GardenNav.setArrange = function (on) {
+      if (!on) { setEdit(false); return; }
+      /*@3.BONJ.44*/
+      if (getComputedStyle(nav).display === 'none') return;
+      /*@3.BONJ.45*/
+      armed = true;
+      setTimeout(function () { armed = false; }, 0);
+      setEdit(true);
+    };
+    document.addEventListener('garden:navOrderChanged', function () {
+      applyPins();
+    });
 
     /*@3.BONJ.15*/
     loadModuleCounts(basePath).then(function() {
@@ -263,7 +434,8 @@
   }
 
   /*@3.BONJ.31*/
-  window.GardenNav = { updateDueBadge: refreshBadge };
+  /*@3.BONJ.43*/
+  window.GardenNav = { updateDueBadge: refreshBadge, setArrange: function () {} };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

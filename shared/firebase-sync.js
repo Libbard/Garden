@@ -89,6 +89,9 @@
     /^my_tasks$/,
     /*@3.FISJ.19*/
     /^gpa_plan$/,
+    /*@3.FISJ.237*/
+    /^notes_index$/,
+    /^notes_folders$/,
     /*@3.FISJ.20*/
     /^__tomb_[A-Za-z0-9_.:-]+$/,
     /*@3.FISJ.21*/
@@ -127,8 +130,8 @@
   function setPushPending(v) {
     pushPending = !!v;
     try {
-      if (v) localStorage.setItem(PUSH_PENDING_LS, '1');
-      else localStorage.removeItem(PUSH_PENDING_LS);
+      if (v) _rawSet.call(localStorage, PUSH_PENDING_LS, '1');
+      else _rawRemove.call(localStorage, PUSH_PENDING_LS);
     } catch (e) {}
   }
 
@@ -237,6 +240,18 @@
         body: JSON.stringify({ sync: payload })
       });
       if (r.status === 401) await guardThrow(r);
+      /*@3.FISJ.239*/
+      if (r.status === 413) {
+        let info = null;
+        try { info = await r.json(); } catch (e) {}
+        const q = new Error('quota-' + ((info && info.error) || 'unknown'));
+        q.quota = true;
+        q.code = (info && info.error) || 'unknown';
+        q.key = (info && info.key) || null;
+        q.bytes = (info && info.bytes) || 0;
+        q.max = (info && info.max) || 0;
+        throw q;
+      }
       if (!r.ok) throw new Error('oracle-post-' + r.status);
       lockClear();
       return r.json();
@@ -252,6 +267,8 @@
   /*@3.FISJ.37*/
   const TS_PREFIX = '__syncT_';
   const _rawSet = Storage.prototype.setItem;
+  /*@3.FISJ.242*/
+  const _rawRemove = Storage.prototype.removeItem;
   function stampLocal(key, t) {
     try { _rawSet.call(localStorage, TS_PREFIX + key, String(t || hlcNow())); } catch (e) {}
   }
@@ -321,7 +338,8 @@
   }
 
   /*@3.FISJ.44*/
-  const MERGE_BY_ID = new Set(['quick_notes', 'my_tasks']);
+  /*@3.FISJ.238*/
+  const MERGE_BY_ID = new Set(['quick_notes', 'my_tasks', 'notes_index', 'notes_folders']);
 
   /*@3.FISJ.45*/
   const MERGE_DEEP = new Set([
@@ -1774,6 +1792,17 @@
 
     if (failed) {
       /*@3.FISJ.128*/
+      if (lastErr && lastErr.quota) {
+        setPushPending(false);
+        pushLastError = lastErr.message;
+        setStatus('error');
+        try {
+          window.dispatchEvent(new CustomEvent('garden:syncQuota', { detail: {
+            code: lastErr.code, key: lastErr.key, bytes: lastErr.bytes, max: lastErr.max
+          } }));
+        } catch (e) {}
+        return;
+      }
       setPushPending(true);
       pushLastError = String((lastErr && lastErr.message) || lastErr || 'push-failed');
       setStatus('error');
@@ -2060,13 +2089,14 @@
 
     Storage.prototype.removeItem = function (key) {
       origRemove.call(this, key);
+      /*@3.FISJ.243*/
       if (this === localStorage && !isSyncing) {
         /*@3.FISJ.166*/
         if (!NEVER_SYNC.has(key) &&
             (FIXED_SYNC_KEYS.includes(key) || DYNAMIC_PATTERNS.some(p => p.test(key)))) {
           stampLocal(key, hlcNow());
+          schedulePush();
         }
-        schedulePush();
       }
     };
   }
@@ -2253,7 +2283,38 @@
   }
 
   /*@3.FISJ.187*/
+  /*@3.FISJ.241*/
+  const QUOTA_TEXT = {
+    value_too_large: [
+      'عنصرٌ واحدٌ أكبرُ من الحدّ — أزِلْ رسماً أو صورةً من آخرِ ما حرّرتَه.',
+      'One item is over the limit — remove a drawing or image from what you last edited.'
+    ],
+    too_many_keys: [
+      'عددُ العناصر بلغ السقف — أرشِفْ قديمَك أو صدّرْه ثمّ احذفه.',
+      'You have hit the item count limit — archive or export older items, then delete them.'
+    ],
+    vault_quota: [
+      'مساحتُك ممتلئة — صدّرْ ما لا تحتاجه ثمّ احذفه لتعود المزامنة.',
+      'Your storage is full — export what you no longer need, then delete it to resume syncing.'
+    ]
+  };
+
+  function quotaMessage(d) {
+    const ar = document.documentElement.lang !== 'en';
+    const t = QUOTA_TEXT[(d && d.code) || ''] ||
+      ['توقّفت المزامنة لبلوغ حدٍّ — صدّرْ أو أرشِفْ ثمّ أعِدِ المحاولة.',
+       'Syncing stopped at a limit — export or archive, then try again.'];
+    let out = ar ? t[0] : t[1];
+    if (d && d.bytes && d.max) {
+      const k = (n) => Math.round(n / 1024) + (ar ? 'ك' : 'K');
+      out += ar ? ('  (' + k(d.bytes) + ' من ' + k(d.max) + ')')
+                : ('  (' + k(d.bytes) + ' of ' + k(d.max) + ')');
+    }
+    return out;
+  }
+
   window.GardenSync = {
+    quotaMessage: quotaMessage,
     showModal: showSyncModal,
     syncNow: () => userKey && storeReady && pullAll(userKey),
     getKey,
@@ -2284,6 +2345,8 @@
     prettyPair,
     /*@3.FISJ.235*/
     vaultHeaders: guardHeaders,
+    /*@3.FISJ.240*/
+    vaultId: () => { const k = getKey(); return k ? oracleDocId(k) : Promise.resolve(null); },
     devices: listDevices,
     forgetDevice,
     deviceId, deviceName,

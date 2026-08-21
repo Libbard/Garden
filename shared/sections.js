@@ -30,7 +30,7 @@
     term: null, all: [], view: [], shown: 0, PAGE: 60,
     q: '', cities: [], subjects: [],
     gender: 'all', status: 'all', mode: 'all', sort: 'code', prep: 'off',
-    mine: 'off', terms: null,
+    mine: 'off', terms: null, tpick: false,
     /*@3.SECJ.7*/
     college: '', major: '', grp: 'off', days: 'all',
     /*@3.SECJ.8*/
@@ -210,6 +210,26 @@
   }
 
   /*@3.SECJ.28*/
+  /*@3.SECJ.422*/
+  function askToast(msg, yesLabel, noLabel, onYes, onNo) {
+    var el = $('#sx-atoast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'sx-atoast'; el.className = 'sx-toast sx-atoast';
+      document.body.appendChild(el);
+    }
+    clearTimeout(actionToast._t);
+    el.innerHTML = '<span></span>' +
+      '<button type="button" data-yes></button><button type="button" data-no></button>';
+    $('span', el).textContent = msg;
+    var y = $('[data-yes]', el), n = $('[data-no]', el);
+    y.textContent = yesLabel; n.textContent = noLabel;
+    function close() { el.classList.remove('on'); }
+    y.onclick = function () { close(); if (onYes) onYes(); };
+    n.onclick = function () { close(); if (onNo) onNo(); };
+    requestAnimationFrame(function () { el.classList.add('on'); });
+  }
+
   function actionToast(msg, label, onAct, ms) {
     var el = $('#sx-atoast');
     if (!el) {
@@ -228,14 +248,17 @@
     actionToast._t = setTimeout(close, ms || 6000);
   }
 
+  /*@3.SECJ.421*/
   function askRemoveFromSchedule(crn) {
-    actionToast(
-      t('أُزيلت من المختارة — وما زالت في جدولك',
-        'Removed from your picks — still in your schedule'),
-      t('احذفها من الجدول', 'Remove from schedule'),
+    askToast(
+      t('أُزيلت من المختارة — أتحذفها من جدولك أيضاً؟',
+        'Removed from your picks — remove it from your schedule too?'),
+      t('احذفها من الجدول', 'Remove it'),
+      t('أبقِها', 'Keep it'),
       function () {
         var n = schUnregister(crn);
         paintBasket();
+        emitScheduleChanged();
         toast(n ? t('حُذفت من جدولك', 'Removed from your schedule')
                 : t('لم يبقَ منها شيء', 'Nothing left to remove'));
       });
@@ -272,7 +295,7 @@
       localStorage.setItem(PREF_KEY, JSON.stringify({
         cities: state.cities, subjects: state.subjects, gender: state.gender,
         status: state.status, mode: state.mode, sort: state.sort,
-        mine: state.mine, term: state.term,
+        mine: state.mine, term: state.term, tpick: state.tpick,
         college: state.college, major: state.major, grp: state.grp, dir: state.dir,
         days: state.days
       }));
@@ -286,7 +309,9 @@
       ['gender', 'status', 'mode', 'sort', 'mine', 'college', 'major', 'grp', 'dir', 'days'].forEach(function (k) {
         if (typeof p[k] === 'string') state[k] = p[k];
       });
-      return p.term || null;
+      /*@3.SECJ.424*/
+      if (typeof p.tpick === 'boolean') state.tpick = p.tpick;
+      return (state.tpick && p.term) || null;
     } catch (e) { return null; }
   }
 
@@ -400,7 +425,10 @@
   }
 
   function apply() {
-    var q = normAr(state.q.trim());
+    /*@3.SECJ.410*/
+    var GF0 = window.GardenFaculty;
+    var qw = GF0 && GF0.qPerson ? GF0.qPerson(state.q)
+                                : normAr(state.q.trim()).split(' ').filter(Boolean);
     var qCrns = crnSet(state.q.trim());
     var cities = state.cities, subs = state.subjects;
     /*@3.SECJ.46*/
@@ -424,9 +452,11 @@
       if (state.status === 'gone' && !s.gone) return false;
       if (state.mode !== 'all' && modeOf(s) !== state.mode) return false;
       if (state.days !== 'all' && dayPat(s) !== state.days) return false;
-      if (!q) return true;
+      if (!qw.length) return true;
       if (qCrns) return !!qCrns[String(s.crn)];
-      return hayOf(s, c).indexOf(q) >= 0;
+      var hay = hayOf(s, c);
+      for (var qi = 0; qi < qw.length; qi++) if (hay.indexOf(qw[qi]) < 0) return false;
+      return true;
     });
 
     /*@3.SECJ.49*/
@@ -913,7 +943,7 @@
   }
 
   /*@3.SECJ.371*/
-  function schRegister(crns) {
+  function schRegister(crns, opts) {
     var secs = [];
     (crns || []).forEach(function (c) { var s = secOf(c); if (s) secs.push(s); });
     var r = SXL().register(secs);
@@ -921,7 +951,70 @@
     schRegister.lastReport = r.report;
     /*@3.SECJ.373*/
     if (!r.saved) toast(t('تعذّر الحفظ — مساحةُ التخزين ممتلئة', 'Could not save — storage full'));
+    /*@3.SECJ.415*/
+    if (r.saved && r.n && !(opts && opts.noAdopt)) adoptCourses(secs);
     return r.n;
+  }
+
+  /*@3.SECJ.420*/
+  var dataP = null;
+  function withGardenData(cb) {
+    if (window.GardenData && GardenData.adoptPending) { cb(window.GardenData); return; }
+    if (!dataP) {
+      dataP = new Promise(function (res) {
+        var here = document.querySelector('script[src*="shared/sections.js"]');
+        var base = (here && here.src) ? here.src.replace(/sections\.js(\?.*)?$/, '') : 'shared/';
+        var el = document.createElement('script');
+        el.src = base + 'garden-data.js';
+        el.onload = function () { res(window.GardenData || null); };
+        el.onerror = function () { res(null); };
+        document.head.appendChild(el);
+      });
+    }
+    dataP.then(function (D) { if (D && D.adoptPending) cb(D); });
+  }
+
+  /*@3.SECJ.416*/
+  function adoptCourses(secs) {
+    var codes = [];
+    (secs || []).forEach(function (s) {
+      if (s && s.c && codes.indexOf(s.c) < 0) codes.push(s.c);
+    });
+    if (!codes.length) return;
+    withGardenData(function (D) {
+    D.adoptPending(codes).then(function (res) {
+      var added = (res && res.added) || [];
+      if (!added.length) return;
+      emitScheduleChanged();
+      actionToast(
+        t('أُضيفت ' + added.join('، ') + ' إلى فصلك',
+          added.join(', ') + ' added to your term'),
+        t('تراجعْ', 'Undo'),
+        function () { undoAdopt(added); }, 9000);
+    }, function () { /*@3.SECJ.417*/ });
+    });
+  }
+
+  /*@3.SECJ.418*/
+  function undoAdopt(codes) {
+    var sem = null;
+    try { sem = JSON.parse(localStorage.getItem('my_semester') || 'null'); } catch (e) { return; }
+    if (!sem || !Array.isArray(sem.courses)) return;
+    sem.courses = sem.courses.filter(function (c) { return !c || codes.indexOf(c.code) < 0; });
+    sem.updated_at = new Date().toISOString();
+    try {
+      localStorage.setItem('my_semester', JSON.stringify(sem));
+      localStorage.setItem('__syncT_my_semester', String(Date.now()));
+    } catch (e) { return; }
+    toast(t('أُخرجت من فصلك — وأوقاتُها باقيةٌ في جدولك',
+            'Removed from your term — their times stay in your schedule'));
+  }
+
+  /*@3.SECJ.419*/
+  function emitScheduleChanged() {
+    try {
+      window.dispatchEvent(new CustomEvent('garden:scheduleChanged', { detail: { from: 'sections' } }));
+    } catch (e) {}
   }
 
   /*@3.SECJ.115*/
@@ -2009,10 +2102,15 @@
   }
   /*@3.SECJ.199*/
   var HAY_GEN = 1;
+  /*@3.SECJ.409*/
+  var GFN = function (x) {
+    var GF = window.GardenFaculty;
+    return GF && GF.normPerson ? GF.normPerson(x) : normAr(x);
+  };
   function hayOf(s, c) {
     if (s._hg !== HAY_GEN) {
-      s._h = normAr([s.crn, s.c, s.q, unent(s.t), arTitle(s.c),
-                     facNames(s).join(' '), arProf(s), s.cm, c && c.ar].join(' '));
+      s._h = GFN([s.crn, s.c, s.q, unent(s.t), arTitle(s.c),
+                  profHay(s), s.cm, c && c.ar].join(' '));
       s._hg = HAY_GEN;
     }
     return s._h;
@@ -2049,32 +2147,24 @@
   }
   /*@3.SECJ.202*/
   /*@3.SECJ.391*/
-  var DIRAR = null;
+  /*@3.SECJ.408*/
+  var DIR_OK = false;
   function loadDirNames() {
     if (!window.GardenFaculty || !GardenFaculty.loadDir) return;
     GardenFaculty.loadDir(function (d) {
       if (!d || !d.people || !d.people.length) return;
-      var byMail = {}, byName = {};
       /*@3.SECJ.404*/
-      d.people.forEach(function (p) {
-        if (!p.a) return;
-        var rec = { a: p.a, s: p.s || 'ai' };
-        if (p.e) byMail[String(p.e).toLowerCase()] = rec;
-        var k = nameKey(p.n);
-        if (k && !byName[k]) byName[k] = rec;
-      });
-      DIRAR = { byMail: byMail, byName: byName };
+      DIR_OK = true;
       HAY_GEN++;
       if (state.all.length) apply();
     });
   }
   function dirRecOf(p) {
-    if (!DIRAR || !p) return null;
-    if (p.e && DIRAR.byMail[String(p.e).toLowerCase()]) return DIRAR.byMail[String(p.e).toLowerCase()];
-    var k = nameKey(p.n || p);
-    return (k && DIRAR.byName[k]) || null;
+    var GF = window.GardenFaculty;
+    if (!DIR_OK || !p || !GF || !GF.dirByEmail) return null;
+    return (p.e && GF.dirByEmail(p.e)) || GF.dirByName(p.n || p) || null;
   }
-  function dirArOf(p) { var r = dirRecOf(p); return r ? r.a : ''; }
+  function dirArOf(p) { var r = dirRecOf(p); return (r && r.a) || ''; }
 
   /*@3.SECJ.405*/
   function profName(p) {
@@ -2086,17 +2176,20 @@
       return GF.pickName({ ar: r.name, machine: !!r.mn, latin: r.en || lat });
     }
     var d = dirRecOf(p);
-    return GF.pickName({ ar: d ? d.a : '', machine: !d || d.s === 'ai', latin: lat });
+    return GF.pickName({ ar: (d && d.a) || '', machine: !d || !d.a || d.s === 'ai',
+                         latin: lat });
   }
 
-  function arProf(s) {
-    var out = [];
+  /*@3.SECJ.407*/
+  function profHay(s) {
+    var GF = window.GardenFaculty, out = [];
     (s.f || []).forEach(function (p) {
+      out.push(GF && GF.hayPerson ? GF.hayPerson(p) : String((p && p.n) || p || ''));
       var r = RATINGS ? rateOf(p) : null;
       if (r && r.name) out.push(r.name);
       /*@3.SECJ.393*/
-      var a = dirArOf(p);
-      if (a && out.indexOf(a) < 0) out.push(a);
+      var d = dirRecOf(p);
+      if (d && d._k) out.push(d._k);
     });
     return out.join(' ');
   }
@@ -2998,7 +3091,8 @@
           var pk = PICK_BY_ID[host.id];
           state[pk] = v; pickPaint(pk); queueMarquee(); apply();
         } else {
-          state.term = v; paintTermBtn(); queueMarquee(); loadTerm(v);
+          state.term = v; state.tpick = true;
+          paintTermBtn(); queueMarquee(); loadTerm(v);
         }
       });
     });
@@ -3367,30 +3461,24 @@
   }
 
   /*@3.SECJ.332*/
-  var TERM_AR = { First: 'الفصل الأول', Second: 'الفصل الثاني',
-                  Third: 'الفصل الثالث', Summer: 'الفصل الصيفي' };
-  var TERM_ORD = { First: 1, Second: 2, Third: 3, Summer: 4 };
-
-  function parseTerm(x) {
-    var d = String(x.description || '');
-    /*@3.SECJ.333*/
-    var m = d.match(/(First|Secon(?:d)?|Third|Summer)\s*Term\s*(\d{4})\s*-\s*(\d{4})/i);
-    var dip = /diploma/i.test(d);
-    if (m) {
-      var kind = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
-      if (kind === 'Secon') kind = 'Second';
-      return {
-        year: m[2] + ' – ' + m[3], ord: (dip ? 10 : 0) + (TERM_ORD[kind] || 9),
-        label: (isAr() ? TERM_AR[kind] : kind + ' Term') +
-               (dip ? (isAr() ? ' · دبلوم' : ' · Diploma') : '')
-      };
-    }
-    /*@3.SECJ.334*/
-    var y = String(x.term || '').slice(0, 4);
-    return {
-      year: /^\d{4}$/.test(y) ? (y + ' – ' + (parseInt(y, 10) + 1)) : t('غير مصنّف', 'Unclassified'),
-      ord: 99, label: d.replace(/\s*\(View Only\)\s*/i, '').trim() || x.term
+  function GT() {
+    return window.GardenTerms || {
+      parse: function (x) {
+        var c = String((x && x.term) || x || '');
+        return { term: c, year: c.slice(0, 4), ord: 9, label: c,
+                 full: c, kind: '', dip: false };
+      }
     };
+  }
+
+  /*@3.SECJ.425*/
+  function parseTerm(x) { return GT().parse(x); }
+
+  /*@3.SECJ.423*/
+  function byRecent(a, b) {
+    var G = window.GardenTerms;
+    if (G) return G.byRecent(a, b);
+    return String(b.term).localeCompare(String(a.term));
   }
 
   /*@3.SECJ.335*/
@@ -3443,6 +3531,11 @@
         d.faculty.forEach(function (f) {
           if (f.e) byEmail[String(f.e).toLowerCase()] = f;
           if (f.ln) byName[nameKey(f.ln)] = f;
+          /*@3.SECJ.411*/
+          (f.ex || []).forEach(function (e) {
+            var k = String(e).toLowerCase();
+            if (!byEmail[k]) byEmail[k] = f;
+          });
         });
         RATINGS = { byEmail: byEmail, byName: byName };
         HAY_GEN++;                       /*@3.SECJ.341*/
@@ -3465,7 +3558,9 @@
     var best = null;
     (s.f || []).forEach(function (p) {
       var r = rateOf(p);
-      if (r && r.rk != null && (best === null || r.rk > best)) best = r.rk;
+      /*@3.SECJ.413*/
+      if (!window.GardenRating || !GardenRating.facultyShown(r)) return;
+      if (r.rk != null && (best === null || r.rk > best)) best = r.rk;
     });
     return best;
   }
@@ -3483,8 +3578,16 @@
         '" title="' + esc(lbl) + '" aria-label="' + esc(lbl) + '">' +
         '<i class="fa-solid fa-pen-to-square"></i></button>';
     }
+    /*@3.SECJ.412*/
+    if (!window.GardenRating || !GardenRating.facultyShown(r)) {
+      return '<button class="sx-rate gd-rate-few" data-prof="' + esc((p && p.e) || '') +
+        '" data-profn="' + esc((p && p.n) || p || '') + '" title="' +
+        esc(GardenRating ? GardenRating.facultyWhy(r) : '') + '" aria-label="' +
+        esc(GardenRating ? GardenRating.facultyFew(r) : '') + '">' +
+        '<i class="fa-solid fa-users" aria-hidden="true"></i>' + (r.n || 0) + '</button>';
+    }
     var col = r.idx >= 80 ? '#10b981' : r.idx >= 60 ? '#f59e0b' : r.idx >= 40 ? '#f97316' : '#ef4444';
-    return '<button class="sx-rate' + (r.n < 3 ? ' is-small' : '') + '" style="color:' + col +
+    return '<button class="sx-rate" style="color:' + col +
       '" data-prof="' + esc((p && p.e) || '') + '" data-profn="' + esc((p && p.n) || p || '') +
       '" title="' +
       esc(t('مؤشّر التقييم ' + r.idx + '٪ من ' + r.n + ' تقييماً — اضغط للتفاصيل',
@@ -3728,8 +3831,15 @@
     bind();
     /*@3.SECJ.361*/
     try {
-      var qp = new URLSearchParams(location.search).get('q');
+      var sp = new URLSearchParams(location.search);
+      var qp = sp.get('q') || sp.get('code');
       if (qp) { state.q = qp; $('#sx-q').value = qp; }
+      /*@3.SECJ.414*/
+      if (sp.get('apply') === 'profile') {
+        var pr = loadProf();
+        if (pr.gender === 'Males' || pr.gender === 'Females') state.gender = pr.gender;
+        if (pr.campus_city) state.cities = [pr.campus_city];
+      }
     } catch (_) {}
     loadRatings();
     /*@3.SECJ.392*/
@@ -3760,9 +3870,7 @@
         /*@3.SECJ.366*/
         var ACTIVE = ['EMPTY', 'ARMED', 'LIVE', 'QUIET', 'POST'];
         var live = ts.filter(function (x) { return ACTIVE.indexOf(x.phase) >= 0; });
-        var pick = (live.length ? live : ts).slice().sort(function (a, b) {
-          return b.sections - a.sections;
-        })[0];
+        var pick = (live.length ? live : ts).slice().sort(byRecent)[0];
         /*@3.SECJ.367*/
         if (savedTerm && ts.some(function (x) { return x.term === savedTerm; })) {
           pick = ts.filter(function (x) { return x.term === savedTerm; })[0];

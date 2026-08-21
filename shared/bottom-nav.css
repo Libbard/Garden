@@ -14,6 +14,9 @@
   justify-content: space-around;
   align-items: center;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  /*@3.BONC.15*/
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @media (max-width: 768px) {
@@ -21,9 +24,40 @@
     display: flex;
   }
   body {
-    padding-bottom: 60px !important;
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+/*@3.BONC.16*/
+.bn-pin { display: none; }
+.bn-edit .bn-pin {
+  display: grid; place-items: center;
+  position: absolute; inset-block-start: -2px; inset-inline-end: -2px;
+  inline-size: 1.15rem; block-size: 1.15rem; border-radius: 50%;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  color: var(--text-secondary); font-size: .5rem;
+}
+/*@3.BONC.18*/
+.bn-sheet.bn-edit .bn-pin {
+  position: static; inline-size: 1.3rem; block-size: 1.3rem;
+  margin-inline-start: auto; margin-inline-end: 0;
+}
+.bottom-nav.bn-edit .bottom-nav-item { opacity: .85; touch-action: none; }
+.bottom-nav-item.gdo-drag {
+  opacity: 1; z-index: 2; color: var(--st-accent, #a78bfa);
+  background: color-mix(in srgb, var(--st-accent, #a78bfa) 14%, transparent);
+}
+.bn-hint {
+  padding: .3rem .55rem .45rem; font-size: .68rem; line-height: 1.45;
+  color: var(--text-muted); text-align: center;
+  border-block-end: 1px solid var(--border-color); margin-block-end: .25rem;
+}
+.bn-edit-row {
+  inline-size: 100%; background: transparent; border: 0;
+  color: var(--text-secondary); font-family: inherit; cursor: pointer;
+  border-block-start: 1px solid var(--border-color); margin-block-start: .25rem;
+}
+.bn-edit-row[aria-pressed="true"] { color: var(--st-accent, #a78bfa); }
 
 /*@3.BONC.2*/
 .bottom-nav-item {
@@ -55,6 +89,13 @@
 /*@3.BONC.3*/
 .bottom-nav-item { flex-shrink: 0; }
 .bottom-nav-label { white-space: nowrap; }
+/*@3.BONC.17*/
+.bottom-nav > .bottom-nav-item {
+  inline-size: 3.5rem; padding-inline: .15rem;
+}
+.bottom-nav > .bottom-nav-item .bottom-nav-label {
+  max-inline-size: 100%; overflow: hidden; text-overflow: ellipsis;
+}
 /*@3.BONC.4*/
 .bottom-nav .bn-more-item { display: none; }
 .bottom-nav.bn-has-more .bn-more-item { display: flex; }
@@ -156,7 +197,7 @@
   color: var(--st-accent, #a78bfa);
 }
 /*@3.BONC.13*/
-.bottom-nav-item .bottom-nav-label { font-size: .62rem; }
+.bottom-nav > .bottom-nav-item .bottom-nav-label { font-size: .62rem; }
 
 /*@3.BONC.14*/
 .bn-more-item i { font-size: 1.28rem; }

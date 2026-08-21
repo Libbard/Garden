@@ -154,9 +154,12 @@
       '<div class="ch-sec-h"><i class="fa-solid fa-star"></i>' +
         esc(tx('قيّمهم الطلاب في هذه المادة', 'Rated by students in this course')) + '</div>' +
       mine.map(function (f) {
-        var col = f.idx >= 80 ? '#10b981' : f.idx >= 60 ? '#f59e0b' : f.idx >= 40 ? '#f97316' : '#ef4444';
+        /*@3.COHJ.27*/
+        var shown = window.GardenRating ? GardenRating.facultyShown(f) : (f.idx != null);
+        var col = !shown ? 'var(--text-muted)'
+          : f.idx >= 80 ? '#10b981' : f.idx >= 60 ? '#f59e0b' : f.idx >= 40 ? '#f97316' : '#ef4444';
         return '<a class="ch-rated-row" href="faculty.html#' + encodeURIComponent(f.id) + '">' +
-          '<span class="ch-rated-n" style="color:' + col + '">' + (f.idx == null ? '—' : f.idx) + '</span>' +
+          '<span class="ch-rated-n" style="color:' + col + '">' + (shown ? f.idx : '—') + '</span>' +
           '<span class="ch-rated-name">' + esc(f.name) + '</span>' +
           '<span class="ch-rated-c">' + esc(tx(f.n + ' تقييماً', f.n + ' ratings')) + '</span>' +
           '<i class="fa-solid fa-chevron-left ch-rated-go"></i></a>';

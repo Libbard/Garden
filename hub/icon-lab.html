@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورقةُ الأيقونات · Icon Sheet</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('garden_theme') || 'dark';
+      var m = localStorage.getItem('garden_mod_theme');
+      document.documentElement.setAttribute('data-theme', t);
+      if (m) document.documentElement.setAttribute('data-mod-theme', m);
+    })();
+  </script>
+  <link rel="stylesheet" href="../shared/vendor/fonts/garden/garden-core.css">
+  <link rel="stylesheet" href="../shared/garden.css">
+  <link rel="stylesheet" href="../shared/skin.css">
+  <link rel="stylesheet" href="../shared/vendor/fontawesome/css/garden-icons.css">
+  <link rel="stylesheet" href="../shared/notes.css">
+  <style>
+    body { margin: 0; font-family: 'Cairo', sans-serif;
+           background: var(--bg-base); color: var(--text-primary); }
+    .il { max-inline-size: 980px; margin-inline: auto; padding: 1rem .8rem 4rem; }
+    h1 { font-size: 1.2rem; margin: .2rem 0 .1rem; }
+    h2 { font-size: .95rem; margin: 1.4rem 0 .5rem; }
+    .il-sub { font-size: .82rem; color: var(--text-muted); margin: 0 0 1rem; line-height: 1.75; }
+    .il-bar { display: flex; gap: .4rem; flex-wrap: wrap; margin-block: .8rem 1.2rem; }
+    .il-btn {
+      background: var(--bg-elevated); border: 1px solid var(--border-color);
+      color: var(--text-primary); border-radius: 9px; padding: .45rem .8rem;
+      font-family: inherit; font-size: .8rem; cursor: pointer;
+    }
+    .il-btn[aria-pressed="true"] {
+      color: #10b981; border-color: color-mix(in oklab, #10b981 50%, transparent);
+      background: color-mix(in oklab, #10b981 12%, transparent);
+    }
+    .il-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: .5rem; }
+    .il-cell {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: .8rem .5rem .55rem;
+      display: flex; flex-direction: column; align-items: center; gap: .5rem; text-align: center;
+    }
+    .il-box {
+      inline-size: 2.4rem; block-size: 2.4rem; border-radius: 10px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid transparent; color: var(--text-secondary);
+      font-size: var(--ni);
+    }
+    .il-cell[data-on="1"] .il-box {
+      color: #10b981; border-color: color-mix(in oklab, #10b981 45%, transparent);
+      background: color-mix(in oklab, #10b981 12%, transparent);
+    }
+    .il-n { font-size: .66rem; color: var(--text-muted);
+            unicode-bidi: isolate; direction: ltr; word-break: break-all; }
+    .il-l { font-size: .72rem; }
+    .il-warn { color: #ef4444; font-weight: 700; }
+    .il-note { font-size: .78rem; color: var(--text-muted); line-height: 1.8;
+               background: var(--bg-surface); border: 1px solid var(--border-color);
+               border-radius: 10px; padding: .7rem .8rem; margin-block: .8rem; }
+    .il-strip { display: flex; align-items: center; gap: .3rem; flex-wrap: wrap;
+                background: var(--bg-elevated); border: 1px solid var(--border-color);
+                border-radius: 12px; padding: .4rem .5rem; }
+  </style>
+</head>
+<!--@1.ICLH.2-->
+<body data-dev-only>
+<div class="il">
+  <h1>🎨 ورقةُ أيقونات الملاحظات</h1>
+  <p class="il-sub">
+    كلُّ أيقونةٍ في نظام الملاحظات، بمقاسٍ واحدٍ ومصدرِ لونٍ واحد.
+    بدّلِ الثيمَ والحالةَ وقلْ لي أيَّها يحتاج تغييراً — الاسمُ تحت كلِّ واحدة.
+    <strong>وأيُّ مربّعٍ فارغٍ يعني رمزاً ساقطاً من الخطِّ المقتطع</strong>، ويُبلَّغ عنه أحمرَ في الأسفل.
+  </p>
+
+  <div class="il-bar">
+    <button class="il-btn" data-theme-set="dark" type="button">داكن</button>
+    <button class="il-btn" data-theme-set="light" type="button">فاتح</button>
+    <button class="il-btn" data-theme-set="sepia" type="button">سيبيا</button>
+    <button class="il-btn" id="il-state" type="button" aria-pressed="false">أظهرْ حالةَ التفعيل</button>
+    <button class="il-btn" id="il-size" type="button">المقاس: 1rem</button>
+  </div>
+
+  <!--@1.ICLH.1-->
+  <div id="il-report" class="il-note"></div>
+
+  <h2>الشريطُ كما يُرى</h2>
+  <div class="il-strip" id="il-strip"></div>
+
+  <h2>عائلةُ الملاحظات — مركَّبةٌ من FontAwesome</h2>
+  <div class="il-grid" id="il-fam"></div>
+
+  <h2>أيقوناتُ الشريط والقوائم</h2>
+  <div class="il-grid" id="il-fa"></div>
+</div>
+
+<script src="../shared/notes-icons.js"></script>
+<script>
+(function () {
+  'use strict';
+  var NI = window.GardenNotesIcons || {};
+
+  var FAM = [
+    ['pen', 'قلم'], ['hand', 'يد'], ['select', 'تحديد'], ['lasso', 'لاسو'],
+    ['shapes', 'أشكال'], ['colour', 'لون'], ['undo', 'تراجع'], ['redo', 'إعادة'],
+    ['exit', 'إنهاء'],
+    ['eraserPen', 'ممحاة عاديّة'], ['eraserSmart', 'ممحاة ذكيّة'],
+    ['highlight', 'تظليل'], ['hiStraight', 'تظليل مستقيم'], ['hiWave', 'تظليل حرّ'],
+    ['star', 'أضِف للمفضّلة'], ['starOff', 'أزِلْ من المفضّلة'],
+    ['nibRound', 'سنٌّ دائريّ'], ['nibFine', 'سنٌّ رفيع'],
+    ['nibMarker', 'سنٌّ ثابت'], ['nibChisel', 'سنٌّ مشطوف'],
+    ['width', 'السماكة'],
+    ['palmAuto', 'راحة اليد: تلقائيّ'], ['palmAlways', 'راحة اليد: دائماً'],
+    ['palmNever', 'راحة اليد: مطفأ'], ['penBtn', 'أزرارُ القلم']
+  ];
+
+  var FA = [
+    ['heading', 'عنوان'], ['bold', 'غامق'], ['italic', 'مائل'], ['underline', 'تسطير'],
+    ['strikethrough', 'شطب'], ['list-ul', 'قائمة نقطيّة'], ['list-ol', 'قائمة مرقّمة'],
+    ['square-check', 'مهمّة'], ['quote-right', 'اقتباس'], ['code', 'كود'],
+    ['table', 'جدول'], ['square-root-variable', 'معادلة'], ['book-open', 'مكتبة'],
+    ['image', 'صورة'], ['link', 'رابط'], ['minus', 'فاصل'],
+    ['align-right', 'محاذاة يمين'], ['align-center', 'توسيط'], ['align-left', 'محاذاة يسار'],
+    ['arrow-up', 'أعلى'], ['arrow-down', 'أسفل'], ['trash', 'حذف'],
+    ['thumbtack', 'تثبيت'], ['folder-open', 'مجلّد'], ['file-export', 'تصدير'],
+    ['magnifying-glass-plus', 'تكبير'], ['magnifying-glass-minus', 'تصغير'],
+    ['expand', 'ملء الشاشة'], ['eye-dropper', 'قطّارة'], ['palette', 'لوحة ألوان'],
+    ['plus', 'إضافة'], ['xmark', 'إغلاق'], ['chevron-down', 'سهم'],
+    ['crop-simple', 'قصّ'], ['circle', 'دائرة'], ['square', 'مربّع'],
+    ['pen-nib', 'سنّ'], ['ban', 'منع'], ['bell', 'تنبيه'], ['box-archive', 'أرشفة']
+  ];
+
+  function cell(html, name, label) {
+    return '<div class="il-cell"><span class="il-box">' + html + '</span>' +
+      '<span class="il-l">' + label + '</span>' +
+      '<span class="il-n">' + name + '</span></div>';
+  }
+
+  document.getElementById('il-fam').innerHTML = FAM.map(function (r) {
+    return cell(NI[r[0]] || '', r[0], r[1]);
+  }).join('');
+
+  document.getElementById('il-fa').innerHTML = FA.map(function (r) {
+    return cell('<i class="fa-solid fa-' + r[0] + '" aria-hidden="true"></i>', 'fa-' + r[0], r[1]);
+  }).join('');
+
+  document.getElementById('il-strip').innerHTML =
+    ['hand', 'select', 'eraserPen', 'eraserSmart'].map(function (k) {
+      return '<span class="il-box">' + (NI[k] || '') + '</span>';
+    }).join('') +
+    '<span class="ndl-fav-sep"></span>' +
+    ['pen', 'highlight', 'hiStraight', 'nibFine', 'nibMarker', 'nibChisel', 'width', 'lasso']
+      .map(function (k) { return '<span class="il-box">' + (NI[k] || '') + '</span>'; }).join('') +
+    '<span style="margin-inline-start:auto"></span>' +
+    '<span class="il-box">' + (NI.palmAuto || '') + '</span>' +
+    '<span class="il-box">' + (NI.penBtn || '') + '</span>' +
+    '<span class="il-box">' + (NI.star || '') + '</span>';
+
+  function audit() {
+    var bad = [], nodes = document.querySelectorAll('.il-box i');
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var w = n.getBoundingClientRect().width;
+      var c = getComputedStyle(n, '::before').content;
+      if (!c || c === 'none' || c === 'normal' || w < 3) {
+        bad.push(n.className.replace(/fa-(solid|regular|brands)\s*/, '').trim());
+      }
+    }
+    var el = document.getElementById('il-report');
+    var total = nodes.length;
+    var mains = document.querySelectorAll('.il-box > i, .il-box > .ni > i:first-child');
+    var sizes = {};
+    for (var k = 0; k < mains.length; k++) sizes[getComputedStyle(mains[k]).fontSize] = 1;
+    var list = Object.keys(sizes);
+    el.innerHTML = bad.length
+      ? '<span class="il-warn">‏' + bad.length + ' من ' + total +
+        ' رمزاً لم يُرسم — ساقطٌ من الخطِّ المقتطع:</span><br>' +
+        '<span class="il-n">' + bad.join(' · ') + '</span>'
+      : '✅ ‏' + total + ' رمزاً كلُّها مرسومة · لا مربّعَ فارغ.<br>' +
+        'مقاسُ الأيقونة الأمّ: <span class="il-n">' + list.join(' · ') + '</span>' +
+        (list.length === 1 ? ' — واحدٌ لكلِّها.'
+                           : ' <span class="il-warn">— أكثرُ من مقاس!</span>') +
+        '<br>وشاراتُ التركيب أصغرُ عمداً (‏‎.56 من الأمّ) والشرطةُ أكبرُ (‏‎1.18) لتُقرأ فوقها.';
+  }
+
+  var bar = document.querySelector('.il-bar');
+  bar.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-theme-set]');
+    if (t) {
+      var v = t.getAttribute('data-theme-set');
+      document.documentElement.setAttribute('data-theme', v);
+      document.documentElement.removeAttribute('data-mod-theme');
+      [].forEach.call(bar.querySelectorAll('[data-theme-set]'), function (b) {
+        b.setAttribute('aria-pressed', b === t ? 'true' : 'false');
+      });
+      setTimeout(audit, 60);
+      return;
+    }
+    if (e.target.closest('#il-state')) {
+      var b2 = document.getElementById('il-state');
+      var on = b2.getAttribute('aria-pressed') !== 'true';
+      b2.setAttribute('aria-pressed', on ? 'true' : 'false');
+      [].forEach.call(document.querySelectorAll('.il-cell'), function (c) {
+        c.setAttribute('data-on', on ? '1' : '0');
+      });
+      return;
+    }
+    if (e.target.closest('#il-size')) {
+      var b3 = document.getElementById('il-size');
+      var steps = ['1rem', '1.15rem', '1.3rem', '.85rem'];
+      var cur = b3.getAttribute('data-i') || '0';
+      var nx = (parseInt(cur, 10) + 1) % steps.length;
+      b3.setAttribute('data-i', String(nx));
+      document.documentElement.style.setProperty('--ni', steps[nx]);
+      b3.textContent = 'المقاس: ' + steps[nx];
+      setTimeout(audit, 60);
+    }
+  });
+
+  var cur = document.documentElement.getAttribute('data-theme');
+  var btn = bar.querySelector('[data-theme-set="' + cur + '"]');
+  if (btn) btn.setAttribute('aria-pressed', 'true');
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(audit);
+  else setTimeout(audit, 400);
+})();
+</script>
+</body>
+</html>

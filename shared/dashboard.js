@@ -60,8 +60,19 @@
     prefs = p;
     return p;
   }
+  var OWN_PREFS = ['order', 'hidden', 'hideCompletedLevels', 'hideLevelsSection', 'courseStyle'];
   function savePrefs() {
-    try { localStorage.setItem(LS_PREFS, JSON.stringify(prefs)); } catch (e) {}
+    try {
+      var fresh = null;
+      try { fresh = JSON.parse(localStorage.getItem(LS_PREFS) || 'null'); } catch (e2) {}
+      if (!fresh || typeof fresh !== 'object') fresh = {};
+      for (var i = 0; i < OWN_PREFS.length; i++) {
+        var k = OWN_PREFS[i];
+        if (Object.prototype.hasOwnProperty.call(prefs, k)) fresh[k] = prefs[k];
+      }
+      prefs = fresh;
+      localStorage.setItem(LS_PREFS, JSON.stringify(fresh));
+    } catch (e) {}
   }
 
   /*@3.DASJ.9*/
@@ -85,6 +96,15 @@
   function animateBar(node, pct) {
     if (!node) return;
     node.style.width = pct + '%';
+  }
+
+  /*@3.DASJ.140*/
+  function setupDone() {
+    try {
+      if (window.GardenFirstRun && GardenFirstRun.completed) return !!GardenFirstRun.completed();
+      var st = JSON.parse(localStorage.getItem('onboarding_state') || 'null');
+      return !!(st && (st.completed_v || 0) > 0);
+    } catch (e) { return false; }
   }
 
   /*@3.DASJ.11*/
@@ -113,13 +133,18 @@
           h = new Intl.DateTimeFormat(isAr() ? 'ar-SA-u-ca-islamic-umalqura' : 'en-u-ca-islamic-umalqura',
             { day: 'numeric', month: 'long' }).format(now);
         } catch (e) {}
+        /*@3.DASJ.139*/
+        var done = setupDone();
+        var invite = tx('أكمل ملفك وإعدادات الموقع', 'Finish your profile and settings');
         return head('<i class="fa-solid fa-hand-sparkles"></i>', tx('أهلاً', 'Welcome')) +
-          '<div class="widget-body">' +
-            '<div style="font-size:1.05rem;font-weight:800;color:var(--text-primary)">' + greeting + '</div>' +
-            '<div class="widget-sub">' + esc(g) + (h ? ' · ' + esc(h) : '') + '</div>' +
-            (name ? '' : '<button class="widget-empty-cta" data-act="go-settings" style="margin-top:.5rem;align-self:flex-start">' +
-              esc(tx('عرّفنا باسمك', 'Tell us your name')) + '</button>') +
-          '</div>';
+          '<button type="button" class="widget-body dash-greet" data-act="wizard" data-wizard-entry ' +
+              'aria-label="' + esc(done ? tx('افتح معالج الإعداد', 'Open the setup wizard') : invite) + '" ' +
+              'title="' + esc(done ? tx('معالج الإعداد', 'Setup wizard') : invite) + '">' +
+            '<span class="dash-greet-n">' + greeting + '</span>' +
+            '<span class="widget-sub">' + esc(g) + (h ? ' · ' + esc(h) : '') + '</span>' +
+            (done ? '' : '<span class="dash-greet-cta">' +
+              '<i class="fa-solid fa-seedling" aria-hidden="true"></i>' + esc(invite) + '</span>') +
+          '</button>';
       }
     },
 
@@ -1036,10 +1061,12 @@
       src.remind_at = remind;
       if (!n && _noteCtx && _noteCtx.course) src.course = _noteCtx.course;
       _noteCtx = null;
-      D.convertNoteToTask(src);
+      /*@3.DASJ.138*/
+      (D.linkNoteToTask || D.convertNoteToTask)(src);
       closeNoteModal();
       renderWidgets(); renderTasks(); refreshNotesListModal();
-      toast(tx('حُوّلت إلى مهمة · أخرى', 'Moved to tasks · Other'));
+      toast(tx('أُضيفت مهمّةٌ مرتبطة — والملاحظةُ باقية',
+               'A linked task was added — the note stays'));
       return;
     }
 
@@ -1191,6 +1218,8 @@
     /*@3.DASJ.83*/
     if (name !== 'overview' && document.body.classList.contains('dash-customizing')) {
       document.body.classList.remove('dash-customizing');
+      if (window.GardenSideOrder) GardenSideOrder.setEdit(false);
+      if (window.GardenNav && GardenNav.setArrange) GardenNav.setArrange(false);
       var cbar = el('dash-cust-bar'); if (cbar) cbar.hidden = true;
       var ctog = document.querySelector('[data-act="toggle-cust"]'); if (ctog) ctog.classList.remove('active');
       renderWidgets();
@@ -1529,6 +1558,9 @@
       t.classList.toggle('active', on);
       var bar = el('dash-cust-bar'); if (bar) bar.hidden = !on;
       renderWidgets();
+      /*@3.DASJ.141*/
+      if (window.GardenSideOrder) GardenSideOrder.setEdit(on);
+      if (window.GardenNav && GardenNav.setArrange) GardenNav.setArrange(on);
     }
     else if (act === 'toggle-hide-levels') {
       /*@3.DASJ.110*/

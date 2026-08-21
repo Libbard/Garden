@@ -578,10 +578,16 @@
     /*@3.SEMJ.46*/
     if (ins) {
       var rt = '';
-      if (ins.rating && ins.rating.idx != null) {
+      /*@3.SEMJ.185*/
+      if (window.GardenRating && GardenRating.facultyShown(ins.rating)) {
         rt = '<span class="sem-rate" data-tone="' + rateTone(ins.rating.idx) + '">' +
           '<b>' + Math.round(ins.rating.idx) + '%</b>' +
           '<small>(' + (ins.rating.n || 0) + ')</small></span>';
+      } else if (ins.rating && ins.rating.n) {
+        rt = '<span class="sem-rate gd-rate-few" title="' +
+          esc(GardenRating ? GardenRating.facultyWhy(ins.rating) : '') + '">' +
+          '<i class="fa-solid fa-users" aria-hidden="true"></i>' +
+          '<small>' + (ins.rating.n || 0) + '</small></span>';
       }
       h += row('fa-chalkboard-user',
         '<button class="sem-linkish" type="button" data-ins-open="' + esc(entry.code) + '">' +
@@ -648,7 +654,9 @@
     h += '<div class="sem-c-a">' +
       act(i.mine, '../' + (i.path || '') + 'index.html', 'fa-book-open', L('المحتوى', 'Content')) +
       act(true, 'course.html?code=' + encodeURIComponent(entry.code), 'fa-id-card', L('البطاقة', 'Card')) +
-      act(i.real, 'sections.html?q=' + encodeURIComponent(entry.code), 'fa-layer-group', L('الشعب', 'Sections')) +
+      /*@3.SEMJ.187*/
+      act(i.real, 'sections.html?code=' + encodeURIComponent(entry.code) + '&apply=profile',
+          'fa-layer-group', L('الشعب', 'Sections')) +
     '</div>';
 
     h += '</article>';
@@ -870,6 +878,23 @@
     try { localStorage.setItem('__syncT_my_semester', String(Date.now())); } catch (e) {}
   }
   /*@3.SEMJ.60*/
+  /*@3.SEMJ.190*/
+  function archiveRecord(sem) {
+    var st = archiveStats({ courses: sem.courses });
+    return {
+      id: sem.id,
+      name: sem.name || sem.name_ar || sem.name_en,
+      /*@3.SEMJ.113*/
+      name_ar: sem.name_ar || sem.name,
+      name_en: sem.name_en || sem.name,
+      level: sem.level, term: sem.term, summer: !!sem.summer,
+      courses: sem.courses,
+      gpa: st.gpa, total_credits: st.credits,
+      created_at: sem.created_at,
+      archived_at: new Date().toISOString()
+    };
+  }
+
   function saveArchive(list) {
     try { localStorage.setItem('semester_archive', JSON.stringify(list)); } catch (e) {}
     try { localStorage.setItem('__syncT_semester_archive', String(Date.now())); } catch (e) {}
@@ -1253,6 +1278,13 @@
     lead.textContent = L(
       'أدخل رقم شعبة «' + nm + '» كما هو في البانر — ونجلب مواعيدها وقاعتها ودكتورها ومواعيد اختباراتها إلى جدولك.',
       'Enter the CRN of “' + nm + '” exactly as Banner shows it — we bring its times, room, instructor and exam dates into your schedule.');
+    /*@3.SEMJ.186*/
+    var a = document.createElement('a');
+    a.className = 'sem-linkish sem-crn-browse';
+    a.href = 'sections.html?code=' + encodeURIComponent(CRN.code) + '&apply=profile';
+    a.textContent = L('لا أعرف الرقم — تصفَّحْ شُعَبها', 'Don’t know it? Browse its sections');
+    lead.appendChild(document.createElement('br'));
+    lead.appendChild(a);
   }
 
   /*@3.SEMJ.147*/
@@ -1887,19 +1919,8 @@
   function doRoll() {
     var r = S.roll;
     if (!r || !S.sem) return;
-    var s = archiveStats({ courses: S.sem.courses });
     var arch = GardenData.archive() || [];
-    arch.push({
-      id: S.sem.id,
-      name: S.sem.name || S.sem.name_ar || S.sem.name_en,
-      name_ar: S.sem.name_ar || S.sem.name,
-      name_en: S.sem.name_en || S.sem.name,
-      level: S.sem.level, term: S.sem.term,
-      courses: S.sem.courses,
-      gpa: s.gpa, total_credits: s.credits,
-      created_at: S.sem.created_at,
-      archived_at: new Date().toISOString()
-    });
+    arch.push(archiveRecord(S.sem));
     saveArchive(arch);
     newSemester(r.pair, r.key);
     toast(L('أُرشف فصلُك السابق، وبدأ «' + r.pair.ar + '»',
@@ -1961,76 +1982,9 @@
   }
 
   /*@3.SEMJ.102*/
+  /*@3.SEMJ.188*/
   function traceOf(code, wipe) {
-    if (GardenData.courseTraces) return GardenData.courseTraces(code, wipe);
-    return localTraces(code, wipe);
-  }
-
-  function localTraces(code, wipe) {
-    var out = { lectures: 0, study: 0, exams: 0, tasks: 0, archived: 0, pending: 0, plans: 0 };
-    if (!code) return out;
-    var F = [['lectures', 'lectures'], ['study_blocks', 'study'], ['exams', 'exams']];
-    var s = GardenData.scheduleRaw(), dirty = false;
-    F.forEach(function (f) {
-      var list = s[f[0]] || [];
-      var keep = list.filter(function (x) { return !x || x.course_code !== code; });
-      out[f[1]] = list.length - keep.length;
-      if (out[f[1]] && wipe) { s[f[0]] = keep; dirty = true; }
-    });
-    var b = s.archived && s.archived[code];
-    if (b) {
-      F.forEach(function (f) { out.archived += (b[f[0]] || []).length; });
-      if (out.archived && wipe) { delete s.archived[code]; dirty = true; }
-    }
-    if (s.sx_pending && Array.isArray(s.sx_pending.courses)) {
-      var pc = s.sx_pending.courses.filter(function (c) { return !c || c.code !== code; });
-      out.pending = s.sx_pending.courses.length - pc.length;
-      if (out.pending && wipe) { s.sx_pending.courses = pc; dirty = true; }
-    }
-    /*@3.SEMJ.103*/
-    var ints = s.intensive;
-    if (ints && typeof ints === 'object') {
-      Object.keys(ints.plans || {}).forEach(function (tab) {
-        var p = ints.plans[tab];
-        if (!p || typeof p !== 'object') return;
-        if (Array.isArray(p.courses)) {
-          var kc = p.courses.filter(function (c) { return c !== code; });
-          out.plans += p.courses.length - kc.length;
-          if (kc.length !== p.courses.length && wipe) { p.courses = kc; dirty = true; }
-        }
-        if (Array.isArray(p.sessions)) {
-          var ks = p.sessions.filter(function (x) { return !x || x.course !== code; });
-          out.plans += p.sessions.length - ks.length;
-          if (ks.length !== p.sessions.length && wipe) { p.sessions = ks; dirty = true; }
-        }
-        ['exam_dates', 'modules'].forEach(function (k) {
-          if (p[k] && typeof p[k] === 'object' && p[k][code] !== undefined) {
-            out.plans++;
-            if (wipe) { delete p[k][code]; dirty = true; }
-          }
-        });
-      });
-      var ms = ints.module_status;
-      if (ms && typeof ms === 'object') {
-        Object.keys(ms).forEach(function (k) {
-          if (k.indexOf(code + '_') !== 0) return;
-          out.plans++;
-          if (wipe) { delete ms[k]; dirty = true; }
-        });
-      }
-    }
-    if (dirty) {
-      s.updated_at = new Date().toISOString();
-      try { localStorage.setItem('weekly_schedule', JSON.stringify(s)); } catch (e) {}
-      try { localStorage.setItem('__syncT_weekly_schedule', String(Date.now())); } catch (e) {}
-    }
-    var tl = GardenData.tasks();
-    out.tasks = tl.filter(function (t) { return t && t.course === code; }).length;
-    /*@3.SEMJ.104*/
-    if (out.tasks && wipe) {
-      tl.forEach(function (t) { if (t && t.course === code) GardenData.deleteTask(t.id); });
-    }
-    return out;
+    return GardenData.courseTraces(code, wipe);
   }
 
   function askRemove(code) {
@@ -2049,6 +2003,9 @@
     if (t.archived) bits.push(nOf(t.archived, ['حدث مؤرشف', 'حدثان مؤرشفان', 'أحداث مؤرشفة'], ['archived event', 'archived events'], true));
     /*@3.SEMJ.107*/
     if (t.plans) bits.push(nOf(t.plans, ['بند في خطط المذاكرة', 'بندان في خطط المذاكرة', 'بنود في خطط المذاكرة'], ['study-plan entry', 'study-plan entries'], true));
+    /*@3.SEMJ.189*/
+    if (t.dates) bits.push(nOf(t.dates, ['موعد من تقويمك', 'موعدان من تقويمك', 'مواعيد من تقويمك'],
+                               ['calendar deadline', 'calendar deadlines'], true));
 
     var body = '<p style="margin:0 0 .7rem;font-size:.86rem">' +
       esc(L('ستخرج ', 'Removing ')) + '<b>' + esc(i.name) + '</b>' +
@@ -2085,6 +2042,46 @@
     });
   }
 
+  /*@3.SEMJ.192*/
+  var ARCH_GRADES = ['', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
+
+  function gradeGridHtml(list) {
+    var rows = list.filter(function (c) {
+      return !(c.grade && GardenData.GPA_SCALE[c.grade] !== undefined);
+    });
+    if (!rows.length) return '';
+    return '<div class="sem-agrid">' + rows.map(function (c) {
+      var i = info(c);
+      return '<label class="sem-agrid-r">' +
+        '<span class="sem-agrid-n">' + esc(i.name) + '</span>' +
+        '<select class="sem-in" data-agrade="' + esc(c.code) + '">' +
+          ARCH_GRADES.map(function (g) {
+            return '<option value="' + esc(g) + '">' +
+              esc(g || L('بلا درجة', 'No grade')) + '</option>';
+          }).join('') +
+        '</select></label>';
+    }).join('') + '</div>';
+  }
+
+  function readGradeGrid() {
+    if (!S.sem || !Array.isArray(S.sem.courses)) return 0;
+    var n = 0;
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#dlg-ask [data-agrade]'), function (sel) {
+        var g = sel.value;
+        if (!g || GardenData.GPA_SCALE[g] === undefined) return;
+        var code = sel.getAttribute('data-agrade');
+        S.sem.courses.forEach(function (c) { if (c && c.code === code) { c.grade = g; n++; } });
+      });
+    if (!n) return 0;
+    S.sem.updated_at = new Date().toISOString();
+    try {
+      localStorage.setItem('my_semester', JSON.stringify(S.sem));
+      localStorage.setItem('__syncT_my_semester', String(Date.now()));
+    } catch (e) {}
+    return n;
+  }
+
   function askArchive() {
     var list = courses();
     var st = { credits: 0, graded: 0 };
@@ -2097,36 +2094,37 @@
       esc(L(' إلى الفصول السابقة بموادّه ودرجاته، وتبدأ بفصلٍ فارغ.',
              ' to your past semesters with its courses and grades, and start with an empty term.')) + '</p>';
     /*@3.SEMJ.112*/
+    /*@3.SEMJ.191*/
     if (st.graded < list.length) {
       body += '<div class="sem-note" data-kind="warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
         '<span>' + esc(L(
-          (list.length - st.graded) + ' من موادّك بلا درجة — تُؤرشَف بلا درجة ولا تدخل معدّلك. أدخِلها من صفحة المعدل أولاً إن شئت.',
-          (list.length - st.graded) + ' of your courses have no grade — they will be archived ungraded and won’t count toward your GPA.')) +
+          (list.length - st.graded) + ' من موادّك بلا درجة — أدخِلها الآن، أو أرشِفْها بلا درجةٍ وأضِفها لاحقاً من صفحة المعدل.',
+          (list.length - st.graded) + ' of your courses have no grade — set them now, or archive ungraded and add them later from the GPA page.')) +
         '</span></div>';
+      body += gradeGridHtml(list);
     }
     ask(L('أرشفة الفصل', 'Archive semester'), body, L('أرشِفه', 'Archive'), function () {
-      var s = archiveStats({ courses: S.sem.courses });
+      /*@3.SEMJ.194*/
+      readGradeGrid();
       var arch = GardenData.archive() || [];
-      arch.push({
-        id: S.sem.id,
-        name: S.sem.name || S.sem.name_ar || S.sem.name_en,
-        /*@3.SEMJ.113*/
-        name_ar: S.sem.name_ar || S.sem.name,
-        name_en: S.sem.name_en || S.sem.name,
-        level: S.sem.level, term: S.sem.term,
-        courses: S.sem.courses,
-        gpa: s.gpa, total_credits: s.credits,
-        created_at: S.sem.created_at,
-        archived_at: new Date().toISOString()
-      });
+      arch.push(archiveRecord(S.sem));
       /*@3.SEMJ.114*/
       try { localStorage.removeItem('my_semester'); } catch (e) {}
       try { localStorage.setItem('__syncT_my_semester', String(Date.now())); } catch (e) {}
       try { localStorage.removeItem('garden_semester_meta'); } catch (e) {}
       S.sem = null;
       saveArchive(arch);
+      /*@3.SEMJ.193*/
+      var moved = 0;
+      try {
+        var r = GardenData.archiveCourseEvents(list.map(function (c) { return c.code; }));
+        moved = (r && r.moved) || 0;
+      } catch (e) { moved = 0; }
       refresh();
-      toast(L('أُرشف فصلك', 'Semester archived'));
+      toast(moved
+        ? L('أُرشف فصلك — ونُقل ' + moved + ' حدثاً من جدولك إلى صناديقه',
+            'Semester archived — ' + moved + ' event' + (moved > 1 ? 's' : '') + ' moved out of your schedule')
+        : L('أُرشف فصلك', 'Semester archived'));
     });
   }
 
@@ -2145,14 +2143,7 @@
     ask(L('استرجاع فصل', 'Restore semester'), body, L('استرجِعه', 'Restore'), function () {
       var list = GardenData.archive() || [];
       if (S.sem && courses().length) {
-        var s = archiveStats({ courses: S.sem.courses });
-        list.push({
-          id: S.sem.id, name: S.sem.name || S.sem.name_ar,
-          name_ar: S.sem.name_ar || S.sem.name, name_en: S.sem.name_en || S.sem.name,
-          level: S.sem.level, term: S.sem.term,
-          courses: S.sem.courses, gpa: s.gpa, total_credits: s.credits,
-          created_at: S.sem.created_at, archived_at: new Date().toISOString()
-        });
+        list.push(archiveRecord(S.sem));
       }
       /*@3.SEMJ.115*/
       S.sem = {
@@ -2478,19 +2469,8 @@
              'Nothing is lost: you will find it under “Past semesters” below, and you can restore it as your current term any time.')) +
       '</span></div>';
     ask(L('فصلٌ جديد', 'New semester'), body, L('أرشِفْ وابدأ', 'Archive and start'), function () {
-      var s = archiveStats({ courses: S.sem.courses });
       var arch = GardenData.archive() || [];
-      arch.push({
-        id: S.sem.id,
-        name: S.sem.name || S.sem.name_ar || S.sem.name_en,
-        name_ar: S.sem.name_ar || S.sem.name,
-        name_en: S.sem.name_en || S.sem.name,
-        level: S.sem.level, term: S.sem.term,
-        courses: S.sem.courses,
-        gpa: s.gpa, total_credits: s.credits,
-        created_at: S.sem.created_at,
-        archived_at: new Date().toISOString()
-      });
+      arch.push(archiveRecord(S.sem));
       try { localStorage.removeItem('my_semester'); } catch (e) {}
       try { localStorage.setItem('__syncT_my_semester', String(Date.now())); } catch (e) {}
       try { localStorage.removeItem('garden_semester_meta'); } catch (e) {}

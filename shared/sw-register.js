@@ -155,6 +155,20 @@
     window.location.reload();
   });
 
+  /*@3.SWRJ.10*/
+  var _h = location.hostname;
+  var _local = (_h === 'localhost' || _h === '127.0.0.1' || _h === '[::1]' || _h === '::1');
+  if (_local) {
+    var _off = false;
+    try { _off = localStorage.getItem('garden_dev_nosw') === '1'; } catch (e) {}
+    if (_off) {
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        rs.forEach(function (r) { r.unregister(); });
+      }).catch(function () {});
+      return;
+    }
+  }
+
   window.addEventListener('load', function () {
     navigator.serviceWorker.register(ROOT + 'sw.js', { scope: ROOT }).then(function (reg) {
       /*@3.SWRJ.6*/

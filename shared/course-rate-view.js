@@ -45,23 +45,26 @@
     '</p></div>';
   }
 
-  /*@3.CORVJ.14*/
-  var WHYS = [
-    ['spam', 'إعلانٌ أو تكرار', 'Spam'],
-    ['wrong', 'معلومةٌ خاطئة', 'Wrong'],
-    ['rude', 'إساءة', 'Abusive'],
-    ['personal', 'يكشف هويّة', 'Doxxing'],
-    ['broken', 'رابطٌ معطوب', 'Broken link'],
-  ];
-
   /*@3.CORVJ.15*/
   function repBtn(kind, i) {
     if (flag('ratings.course.reportsOn', true) === false) return '';
-    return '<button type="button" class="gsf-btn gsf-btn--ghost cv-rep" ' +
+    return '<button type="button" class="gsf-btn gsf-btn--ghost gd-rep" data-cv-rep ' +
       'data-rep-k="' + esc(kind) + '" data-rep-i="' + i + '" ' +
       'title="' + esc(t('أبلغْ عن هذا', 'Report this')) + '" ' +
       'aria-label="' + esc(t('أبلغْ عن هذا', 'Report this')) + '">' +
       '<i class="fa-solid fa-flag" aria-hidden="true"></i></button>';
+  }
+
+  /*@3.CORVJ.17*/
+  function repContent(box, kind, i) {
+    var agg = box && box.__cvAgg;
+    if (!agg) return null;
+    if (kind === 'resource') {
+      var r = (agg.resources || [])[i];
+      return r ? r.url : null;
+    }
+    var l = (kind === 'explain' ? agg.explains : agg.advices) || [];
+    return l[i] ? l[i].t : null;
   }
 
   function texts(list, title, cls, kind) {
@@ -173,80 +176,27 @@
     return { reload: function () { load(box, code, o.term); } };
   }
 
-  /*@3.CORVJ.16*/
-  function fp(s) {
-    var enc = new TextEncoder().encode(String(s == null ? '' : s).trim());
-    return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
-      var a = Array.prototype.map.call(new Uint8Array(buf), function (x) {
-        return ('0' + x.toString(16)).slice(-2);
-      });
-      return a.join('').slice(0, 32);
-    });
-  }
-
-  /*@3.CORVJ.17*/
-  function repContent(box, kind, i) {
-    var agg = box && box.__cvAgg;
-    if (!agg) return null;
-    if (kind === 'resource') {
-      var r = (agg.resources || [])[i];
-      return r ? r.url : null;
-    }
-    var l = (kind === 'explain' ? agg.explains : agg.advices) || [];
-    return l[i] ? l[i].t : null;
-  }
-
-  /*@3.CORVJ.18*/
-  function repRow(btn) {
-    var host = btn.parentNode;
-    var old = host.querySelector('.cv-repbox');
-    if (old) { old.parentNode.removeChild(old); return; }
-    var d = document.createElement('div');
-    d.className = 'cv-repbox';
-    d.innerHTML = '<span class="cv-repq">' + esc(t('ما الخطب؟', 'What is wrong?')) + '</span>' +
-      WHYS.map(function (w) {
-        return '<button type="button" class="gsf-chip cv-repw" data-w="' + esc(w[0]) + '">' +
-          esc(isAr() ? w[1] : w[2]) + '</button>';
-      }).join('');
-    host.appendChild(d);
-  }
-
-  /*@3.CORVJ.19*/
-  function repSend(box, kind, i, why, host) {
-    var code = box.getAttribute('data-cv-box');
-    var text = repContent(box, kind, i);
-    if (!text || !API) return;
-    var say = function (msg) {
-      host.innerHTML = '<span class="cv-repdone">' + esc(msg) + '</span>';
-    };
-    say(t('يُرسَل…', 'Sending…'));
-    fp(text).then(function (h) {
-      var k = window.GardenSync && GardenSync.getKey && GardenSync.getKey();
-      return fetch(API + '/v1/report', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          kind: kind, code: code, target: h, why: why,
-          vault: (k && /^v[0-9a-f]{32}$/.test(k)) ? k : undefined,
-        }),
-      });
-    }).then(function (r) {
-      say(r && r.ok ? t('وصل بلاغُك — يُراجَع يدوياً.', 'Report received — reviewed by a human.')
-                    : t('تعذّر الإرسال.', 'Could not send.'));
-    }).catch(function () { say(t('تعذّر الإرسال.', 'Could not send.')); });
-  }
-
   document.addEventListener('click', function (e) {
     /*@3.CORVJ.20*/
-    var rb = e.target.closest && e.target.closest('.cv-rep');
-    if (rb) { repRow(rb); return; }
-    var rw = e.target.closest && e.target.closest('.cv-repw');
-    if (rw) {
+    /*@3.CORVJ.22*/
+    var R = window.GardenReport;
+    var rb = e.target.closest && e.target.closest('.gd-rep[data-cv-rep]');
+    if (rb) { if (R) R.toggle(rb.parentNode, rb.getAttribute('data-rep-k')); return; }
+    var rw = e.target.closest && e.target.closest('.gd-repw');
+    if (rw && R) {
       var host = rw.parentNode;
-      var owner = host.parentNode.querySelector('.cv-rep');
+      var owner = host.parentNode && host.parentNode.querySelector('.gd-rep[data-cv-rep]');
       var box2 = rw.closest('[data-cv-box]');
       if (owner && box2) {
-        repSend(box2, owner.getAttribute('data-rep-k'),
-                Number(owner.getAttribute('data-rep-i')), rw.getAttribute('data-w'), host);
+        var kind = owner.getAttribute('data-rep-k');
+        var text = repContent(box2, kind, Number(owner.getAttribute('data-rep-i')));
+        var why = rw.getAttribute('data-w');
+        if (text) {
+          host.innerHTML = '<span class="gd-repdone">…</span>';
+          R.fp(text).then(function (h) {
+            return R.send({ kind: kind, code: box2.getAttribute('data-cv-box'), target: h, why: why }, host);
+          });
+        }
       }
       return;
     }

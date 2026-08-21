@@ -87,7 +87,10 @@
   function render() {
     var host = q('#gip-list');
     if (!host) return;
-    var query = nrm(q('#gip-q').value);
+    var GFQ = window.GardenFaculty && window.GardenFaculty.qPerson
+      ? window.GardenFaculty : null;
+    var raw = q('#gip-q').value;
+    var query = GFQ ? GFQ.qPerson(raw) : nrm(raw).split(' ').filter(Boolean);
     var all = facultyList();
     var cur = current(code);
 
@@ -101,14 +104,16 @@
     }
 
     var rows;
-    if (!query) {
+    if (!query.length) {
       /*@3.INPJ.7*/
       rows = all.filter(function (f) { return f.courses && f.courses[code]; })
         .sort(function (a, b) { return (b.courses[code] || 0) - (a.courses[code] || 0); })
         .slice(0, HEAD);
     } else {
+      /*@3.INPJ.12*/
       rows = all.filter(function (f) {
-        return nrm(f.name).indexOf(query) >= 0 || nrm(f.en).indexOf(query) >= 0;
+        return GFQ ? GFQ.hitPerson(f._s || GFQ.hayPerson(f), query)
+                   : nrm(f.name).indexOf(query.join(' ')) >= 0;
       }).sort(function (a, b) {
         /*@3.INPJ.8*/
         var ac = (a.courses && a.courses[code]) ? 1 : 0;
@@ -119,12 +124,12 @@
     }
 
     var html = '';
-    if (!query && rows.length) {
+    if (!query.length && rows.length) {
       html += '<div class="gip-lbl">' + esc(L('أساتذةُ هذه المادة', 'Taught this course')) + '</div>';
     }
     if (!rows.length) {
       html += '<div class="gip-empty"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>' +
-        '<p>' + esc(query ? L('لا أستاذ بهذا الاسم', 'No instructor by that name')
+        '<p>' + esc(query.length ? L('لا أستاذ بهذا الاسم', 'No instructor by that name')
                           : L('لا نعرف من يدرّس هذه المادة — ابحث بالاسم.',
                               'We don’t know who teaches this course — search by name.')) + '</p></div>';
     }
@@ -143,10 +148,16 @@
             (taught ? (alt ? ' · ' : '') + esc(L('درّسها ' + taught + ' مرّة', taught + '× this course')) : '') +
           '</span>' +
         '</span>' +
-        (f.idx != null
+        /*@3.INPJ.13*/
+        ((window.GardenRating && GardenRating.facultyShown(f))
           ? '<span class="gip-rate" data-tone="' + tone(f.idx) + '"><b>' + Math.round(f.idx) +
             '%</b><small>(' + (f.n || 0) + ')</small></span>'
-          : '') +
+          : (f.n
+            ? '<span class="gip-rate gd-rate-few" title="' +
+              esc(GardenRating ? GardenRating.facultyWhy(f) : '') + '">' +
+              '<i class="fa-solid fa-users" aria-hidden="true"></i>' +
+              '<small>' + (f.n || 0) + '</small></span>'
+            : '')) +
         (on ? '<i class="fa-solid fa-check" aria-hidden="true" style="color:var(--st-ok,#10b981)"></i>' : '') +
       '</button>';
     });

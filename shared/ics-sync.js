@@ -219,15 +219,56 @@
   /*@3.ICSJ.29*/
   var CLUSTER_GAP = 12;
 
+  /*@3.ICSJ.75*/
+  function groupInbox(list) {
+    var withNo = (list || []).filter(function (x) { return x && x.no !== null && x.no !== undefined; })
+                     .sort(function (a, b) { return a.no - b.no; });
+    var loose = (list || []).filter(function (x) { return x && (x.no === null || x.no === undefined); });
+    var out = [], cur = null;
+    withNo.forEach(function (it) {
+      var code = it.code || '';
+      /*@3.ICSJ.76*/
+      var wall = !cur || (it.no - cur.hi > CLUSTER_GAP) || (code && cur.code && code !== cur.code);
+      if (wall) { cur = { lo: it.no, hi: it.no, code: code, items: [it], guess: '', score: 0 }; out.push(cur); }
+      else { cur.hi = it.no; cur.items.push(it); if (code && !cur.code) cur.code = code; }
+      /*@3.ICSJ.77*/
+      if (it.guess && (it.score || 0) > cur.score) { cur.guess = it.guess; cur.score = it.score || 0; }
+    });
+    loose.forEach(function (it) {
+      out.push({ lo: null, hi: null, code: it.code || '', items: [it], guess: it.guess || '', score: it.score || 0 });
+    });
+    return out;
+  }
+
+  /*@3.ICSJ.78*/
   function cluster(items) {
-    var nums = items.map(function (e) { return e.no; }).filter(function (n) { return n !== null; })
-                    .sort(function (a, b) { return a - b; });
-    var groups = [], g = null, i;
-    for (i = 0; i < nums.length; i++) {
-      if (!g || nums[i] - g.hi > CLUSTER_GAP) { g = { lo: nums[i], hi: nums[i] }; groups.push(g); }
-      else g.hi = nums[i];
+    return groupInbox(items).filter(function (g) { return g.lo !== null; })
+                            .map(function (g) { return { lo: g.lo, hi: g.hi }; });
+  }
+
+  /*@3.ICSJ.79*/
+  function addRange(s, lo, hi, code) {
+    var list = (s.ranges || []).filter(function (r) {
+      return r && typeof r.lo === 'number' && typeof r.hi === 'number' && r.code && r.lo <= r.hi;
+    });
+    var grew = true;
+    while (grew) {
+      grew = false;
+      list = list.filter(function (r) {
+        if (r.code !== code || r.hi < lo - 1 || r.lo > hi + 1) return true;
+        lo = Math.min(lo, r.lo); hi = Math.max(hi, r.hi); grew = true;
+        return false;
+      });
     }
-    return groups;
+    /*@3.ICSJ.80*/
+    var out = [];
+    list.forEach(function (r) {
+      if (r.hi < lo || r.lo > hi) { out.push(r); return; }
+      if (r.lo < lo) out.push({ lo: r.lo, hi: lo - 1, code: r.code });
+      if (r.hi > hi) out.push({ lo: hi + 1, hi: r.hi, code: r.code });
+    });
+    out.push({ lo: lo, hi: hi, code: code });
+    s.ranges = out;
   }
 
   /*@3.ICSJ.30*/
@@ -304,17 +345,23 @@
     if (s.uid_map[ev.uid] && codes.indexOf(s.uid_map[ev.uid]) > -1) {
       return { code: s.uid_map[ev.uid], why: 'saved', sure: true };
     }
+    /*@3.ICSJ.41*/
+    /*@3.ICSJ.81*/
+    if (ev.code && codes.indexOf(ev.code) > -1) return { code: ev.code, why: 'code', sure: true };
     /*@3.ICSJ.40*/
     if (ev.no !== null) {
+      var best = null, tie = false;
       for (var i = 0; i < s.ranges.length; i++) {
         var r = s.ranges[i];
-        if (ev.no >= r.lo - CLUSTER_GAP && ev.no <= r.hi + CLUSTER_GAP && codes.indexOf(r.code) > -1) {
-          return { code: r.code, why: 'cluster', sure: true };
-        }
+        if (!r || codes.indexOf(r.code) < 0) continue;
+        var d = ev.no < r.lo ? r.lo - ev.no : (ev.no > r.hi ? ev.no - r.hi : 0);
+        if (d > CLUSTER_GAP) continue;
+        if (!best || d < best.d) { best = { d: d, code: r.code }; tie = false; }
+        else if (d === best.d && r.code !== best.code) tie = true;
       }
+      /*@3.ICSJ.82*/
+      if (best && !tie) return { code: best.code, why: 'cluster', sure: true };
     }
-    /*@3.ICSJ.41*/
-    if (ev.code && codes.indexOf(ev.code) > -1) return { code: ev.code, why: 'code', sure: true };
     /*@3.ICSJ.42*/
     var g = guessCourse(ev.topic, codes);
     if (g && g.score >= GUESS_MIN && g.gap >= GUESS_GAP) {
@@ -361,8 +408,17 @@
     return list;
   }
 
-  function schedRaw() {
-    try { return JSON.parse(localStorage.getItem('weekly_schedule') || 'null'); } catch (e) { return null; }
+  /*@3.ICSJ.73*/
+  function schedRaw(create) {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem('weekly_schedule') || 'null'); } catch (e) { d = null; }
+    if (!d || typeof d !== 'object') {
+      if (!create) return null;
+      d = { version: 2, settings: {}, lectures: [], study_blocks: [], exams: [],
+            general_events: [], week_overrides: {}, archived: {} };
+    }
+    if (!Array.isArray(d.exams)) d.exams = [];
+    return d;
   }
   function schedWrite(s) {
     s.updated_at = new Date().toISOString();
@@ -397,8 +453,8 @@
     }
 
     if (isExam) {
-      var sch = schedRaw();
-      if (!sch || !Array.isArray(sch.exams)) return false;
+      var sch = schedRaw(true);
+      if (!sch) return 'blocked';
       var id = (link && link.store === 'exam') ? link.id : ('exam_ics_' + hash(ev.uid));
       var i = -1, k;
       for (k = 0; k < sch.exams.length; k++) if (sch.exams[k] && sch.exams[k].id === id) { i = k; break; }
@@ -420,13 +476,14 @@
         ics_uid: ev.uid
       };
       if (i > -1) sch.exams[i] = rec; else sch.exams.push(rec);
-      schedWrite(sch);
+      /*@3.ICSJ.74*/
+      if (!schedWrite(sch)) return 'blocked';
       s.links[ev.uid] = { store: 'exam', id: id, code: code, snap: snapOf(rec) };
       return true;
     }
 
     /*@3.ICSJ.50*/
-    if (!window.GardenData || !GardenData.courseMeta) return false;
+    if (!window.GardenData || !GardenData.courseMeta) return 'blocked';
     var meta = GardenData.courseMeta(code);
     var did = (link && link.store === 'date') ? link.id : ('ics_' + hash(ev.uid));
     var j = -1, n;
@@ -508,7 +565,7 @@
       s.stamp = stamp;
 
       var codes = myCourses();
-      var rep = { ok: true, added: 0, updated: 0, touched: 0, pending: 0, gone: 0, unchanged: same, total: events.length };
+      var rep = { ok: true, added: 0, updated: 0, touched: 0, pending: 0, gone: 0, blocked: 0, unchanged: same, total: events.length };
       var seen = {}, inbox = [];
 
       events.forEach(function (ev) {
@@ -521,6 +578,8 @@
           inbox.push({
             uid: ev.uid, raw: ev.raw, kind: ev.kind, no: ev.no,
             date: ev.dtstart.date, time: ev.dtstart.time,
+            /*@3.ICSJ.84*/
+            code: ev.code || '',
             guess: r2.code || '', score: Math.round((r2.score || 0) * 100), why: r2.why
           });
           return;
@@ -529,6 +588,8 @@
         var out = applyOne(ev, r2.code);
         if (out === 'touched') rep.touched++;
         else if (out === true) { if (had) rep.updated++; else rep.added++; }
+        /*@3.ICSJ.85*/
+        else rep.blocked++;
       });
 
       /*@3.ICSJ.56*/
@@ -562,13 +623,12 @@
     if (alsoCluster !== false) {
       var no = itemNo(uid);
       if (no !== null) {
+        /*@3.ICSJ.83*/
         var g = null;
-        s.inbox.forEach(function (it) {
-          if (it.no === null) return;
-          if (Math.abs(it.no - no) <= CLUSTER_GAP) { g = g || { lo: no, hi: no }; g.lo = Math.min(g.lo, it.no); g.hi = Math.max(g.hi, it.no); }
+        groupInbox(s.inbox).forEach(function (x) {
+          if (x.lo !== null && no >= x.lo && no <= x.hi) g = x;
         });
-        if (!g) g = { lo: no, hi: no };
-        s.ranges.push({ lo: g.lo, hi: g.hi, code: code });
+        addRange(s, g ? g.lo : no, g ? g.hi : no, code);
       }
     }
     save();
@@ -682,6 +742,7 @@
     /*@3.ICSJ.64*/
     _parse: parseICS,
     _read: readSummary,
+    groupInbox: groupInbox,
     _itemNo: itemNo,
     _cluster: cluster,
     _guess: guessCourse,

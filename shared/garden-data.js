@@ -473,6 +473,58 @@
   function semester() { return readJSON(LS.semester, null); }
   function archive() { return readJSON(LS.archive, []); }
 
+  /*@3.GADJ.133*/
+  var DEDUPE_STAMP = 'gd_archive_dedupe_v1';
+  function dedupeArchive(force) {
+    try { if (!force && localStorage.getItem(DEDUPE_STAMP)) return null; } catch (e) { return null; }
+    var list = readJSON(LS.archive, []);
+    if (!Array.isArray(list) || !list.length) {
+      try { localStorage.setItem(DEDUPE_STAMP, '1'); } catch (e) {}
+      return null;
+    }
+    var isWiz = function (a) {
+      return !!a && !!a.id && (String(a.id).indexOf('gpa_L') === 0 || a.id === 'onb_prior');
+    };
+    /*@3.GADJ.134*/
+    var real = {};
+    list.forEach(function (a) {
+      if (isWiz(a)) return;
+      (a.courses || []).forEach(function (c) { if (c && c.code) real[c.code] = c; });
+    });
+    if (!Object.keys(real).length) {
+      try { localStorage.setItem(DEDUPE_STAMP, '1'); } catch (e) {}
+      return null;
+    }
+
+    var removed = 0, lifted = 0, out = [];
+    list.forEach(function (a) {
+      if (!isWiz(a)) { out.push(a); return; }
+      var keep = (a.courses || []).filter(function (c) {
+        if (!c || !c.code || !real[c.code]) return true;
+        /*@3.GADJ.135*/
+        var orig = real[c.code];
+        if (c.grade && !orig.grade) { orig.grade = c.grade; lifted++; }
+        removed++;
+        return false;
+      });
+      if (!keep.length) return;
+      a.courses = keep;
+      out.push(a);
+    });
+
+    if (!removed) {
+      try { localStorage.setItem(DEDUPE_STAMP, '1'); } catch (e) {}
+      return null;
+    }
+    try {
+      localStorage.setItem('semester_archive_pre_dedupe', JSON.stringify(list));
+      localStorage.setItem(LS.archive, JSON.stringify(out));
+      localStorage.setItem('__syncT_' + LS.archive, String(Date.now()));
+      localStorage.setItem(DEDUPE_STAMP, '1');
+    } catch (e) { return null; }
+    return { removed: removed, lifted: lifted, before: list.length, after: out.length };
+  }
+
   /*@3.GADJ.45*/
 
   /*@3.GADJ.46*/
@@ -832,10 +884,90 @@
     out.tasks = tl.length - tk.length;
     if (out.tasks && wipe) writeTasks(tk);
 
+    /*@3.GADJ.130*/
+    out.dates = courseDatesTrace(code, wipe);
+
     return out;
   }
 
+  /*@3.GADJ.131*/
+  function courseDatesTrace(code, wipe) {
+    var m = courseMeta(code);
+    var list = m.dates || [];
+    if (!list.length) return 0;
+    var n = list.length;
+    if (!wipe) return n;
+
+    var uids = [];
+    list.forEach(function (d) { if (d && d.ics_uid) uids.push(d.ics_uid); });
+    m.dates = [];
+    saveCourseMeta(code, m);
+    dropIcsLinks(code, uids);
+    return n;
+  }
+
+  /*@3.GADJ.132*/
+  function dropIcsLinks(code, uids) {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem('garden_ics') || 'null'); } catch (e) { return; }
+    if (!s || !s.links || typeof s.links !== 'object') return;
+    var hit = 0;
+    Object.keys(s.links).forEach(function (uid) {
+      var l = s.links[uid];
+      if (!l) return;
+      var mine = (l.code === code) || (uids.indexOf(uid) > -1);
+      if (!mine) return;
+      delete s.links[uid];
+      hit++;
+    });
+    if (!hit) return;
+    try { localStorage.setItem('garden_ics', JSON.stringify(s)); } catch (e) {}
+  }
+
   function removeCourseTraces(code) { return courseTraces(code, true); }
+
+  /*@3.GADJ.136*/
+  function archiveCourseEvents(codes) {
+    var out = { moved: 0, courses: [] };
+    if (!codes || !codes.length) return out;
+    var s = scheduleRaw();
+    if (!s.archived || typeof s.archived !== 'object') s.archived = {};
+    var F = ['lectures', 'study_blocks', 'exams'];
+
+    codes.forEach(function (code) {
+      if (!code || String(code).indexOf('__CUSTOM_') === 0) return;
+      var bucket = s.archived[code] ||
+        { lectures: [], study_blocks: [], exams: [], archived_at: null };
+      var took = 0;
+      F.forEach(function (k) {
+        var keep = [], take = [];
+        (s[k] || []).forEach(function (e) {
+          if (e && e.course_code === code) take.push(e); else keep.push(e);
+        });
+        if (!take.length) return;
+        if (!Array.isArray(bucket[k])) bucket[k] = [];
+        bucket[k] = bucket[k].concat(take);
+        s[k] = keep;
+        took += take.length;
+      });
+      if (!took) return;
+      bucket.archived_at = new Date().toISOString();
+      s.archived[code] = bucket;
+      out.moved += took;
+      out.courses.push(code);
+    });
+
+    /*@3.GADJ.137*/
+    if (s.sx_pending && Array.isArray(s.sx_pending.courses)) {
+      s.sx_pending.courses = s.sx_pending.courses.filter(function (c) {
+        return !c || codes.indexOf(c.code) === -1;
+      });
+      if (!s.sx_pending.courses.length) delete s.sx_pending;
+    }
+
+    if (out.moved) writeSchedule(s);
+    return out;
+  }
 
   /*@3.GADJ.72*/
   function courseLearning(code, wipe) {
@@ -1126,10 +1258,13 @@
   }
 
   /*@3.GADJ.101*/
+  /*@3.GADJ.129*/
   function upsertTask(task) {
     var list = tasks();
-    var rec = {
-      id: task.id || ('task_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+    var id = task.id || ('task_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7));
+    var i = list.findIndex(function (x) { return x.id === id; });
+    var rec = Object.assign({}, (i > -1 ? list[i] : null) || {}, task, {
+      id: id,
       course: task.course || null,
       title: String(task.title || '').trim(),
       type: task.type || 'other',
@@ -1137,8 +1272,7 @@
       done: !!task.done,
       note: task.note || '',
       created_at: task.created_at || Date.now()
-    };
-    var i = list.findIndex(function (x) { return x.id === rec.id; });
+    });
     if (i > -1) list[i] = rec; else list.push(rec);
     writeTasks(list);
     return rec;
@@ -1193,7 +1327,6 @@
   }
 
   /*@3.GADJ.103*/
-  var NOTES_BACKUP = 'quick_notes_premigration';
 
   /*@3.GADJ.104*/
   function noteToTaskFields(n) {
@@ -1217,34 +1350,39 @@
   }
 
   /*@3.GADJ.106*/
-  function convertNoteToTask(note) {
+  /*@3.GADJ.127*/
+  function linkNoteToTask(note) {
     if (!note || !note.remind_at) return null;
     var f = noteToTaskFields(note);
+    f.origin = { type: 'note', uid: String(note.id || ''), src: 'quick' };
     var prev = tasks().filter(function (t) { return t.id === f.id; })[0];
     /*@3.GADJ.107*/
     var rec = prev || upsertTask(f);
     if (note.id) {
-      writeNotes(quickNotes().filter(function (x) { return x && x.id !== note.id; }));
+      var list = quickNotes(), at = -1, i;
+      for (i = 0; i < list.length; i++) if (list[i] && list[i].id === note.id) at = i;
+      var keep = { id: note.id, body: note.body || '', remind_at: note.remind_at,
+                   archived: !!note.archived, updated_at: Date.now() };
+      if (note.course) keep.course = note.course;
+      if (note.module != null) keep.module = note.module;
+      if (note.origin) keep.origin = note.origin;
+      if (at >= 0) {
+        list[at] = Object.assign({}, list[at], keep);
+      } else {
+        keep.created_at = note.created_at || Date.now();
+        list.push(keep);
+      }
+      writeNotes(list);
     }
     return rec;
   }
 
+  /*@3.GADJ.128*/
+  function convertNoteToTask(note) { return linkNoteToTask(note); }
+
   /*@3.GADJ.108*/
-  function migrateTimedNotes() {
-    var list = quickNotes();
-    if (!Array.isArray(list) || !list.length) return 0;
-    var timed = list.filter(function (n) { return n && n.remind_at && !n.archived; });
-    if (!timed.length) return 0;
-    /*@3.GADJ.109*/
-    try {
-      if (!localStorage.getItem(NOTES_BACKUP)) {
-        localStorage.setItem(NOTES_BACKUP, JSON.stringify({ at: Date.now(), notes: list }));
-      }
-    } catch (e) {}
-    var n = 0;
-    timed.forEach(function (note) { if (convertNoteToTask(note)) n++; });
-    return n;
-  }
+  /*@3.GADJ.109*/
+  function migrateTimedNotes() { return 0; }
 
   /*@3.GADJ.110*/
 
@@ -1458,6 +1596,8 @@
 
     semester: semester,
     archive: archive,
+    dedupeArchive: dedupeArchive,
+    archiveCourseEvents: archiveCourseEvents,
     courseDone: courseDone,
     finalExamDate: finalExamDate,
     coursePercent: coursePercent,
@@ -1494,6 +1634,7 @@
     quickNotes: quickNotes,
     upsertNote: upsertNote,
     setNoteReminder: setNoteReminder,
+    linkNoteToTask: linkNoteToTask,
     convertNoteToTask: convertNoteToTask,
     migrateTimedNotes: migrateTimedNotes,
     prefs: prefs,

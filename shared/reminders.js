@@ -248,6 +248,9 @@
       if (e) endMs = e.ms;
     }
 
+    /*@3.REMJ.88*/
+    var R = window.GardenScheduleRules;
+
     var out = [];
     lecs.forEach(function (l) {
       if (!l || !l.day || !l.start_time) return;
@@ -259,9 +262,12 @@
         var d = new Date(now);
         d.setDate(d.getDate() + i);
         if (d.getDay() !== dayIdx) continue;
+        /*@3.REMJ.89*/
+        var day0 = new Date(d); day0.setHours(0, 0, 0, 0);
+        if (R && !R.lectureOn(l, day0).on) continue;
         d.setHours(hm.h, hm.m, 0, 0);
         var startMs = d.getTime();
-        if (startMs > endMs) continue;
+        if (!R && startMs > endMs) continue;
         var fireAt = startMs - (s.lead.lectures || 0) * 60000;
         /*@3.REMJ.33*/
         if (fireAt > horizon) continue;
@@ -804,6 +810,8 @@
     document.addEventListener(ev, function () { if (load().enabled) sync(); });
   });
   window.addEventListener('garden:syncCompleted', function () { if (load().enabled) sync(); });
+  /*@3.REMJ.90*/
+  window.addEventListener('garden:scheduleChanged', function () { if (load().enabled) sync(); });
 
   /*@3.REMJ.86*/
   window.addEventListener('storage', function (e) {

@@ -27,6 +27,51 @@
   function skey(s) { return norm(s).replace(/[^ء-يa-z0-9]+/g, ' ').trim(); }
   function qwords(s) { return skey(s).split(' ').filter(Boolean); }
 
+  /*@3.FAPJ.81*/
+  function qPerson(s) {
+    s = String(s == null ? '' : s);
+    var at = s.indexOf('@');
+    return qwords(at > 0 ? s.slice(0, at) : s);
+  }
+  function hayPerson(p) {
+    if (!p) return '';
+    var out = [];
+    function put(v) { if (v) out.push(String(v)); }
+    /*@3.FAPJ.84*/
+    function mail(v) { if (v) out.push(String(v).split('@')[0]); }
+    function any(v) {
+      if (!v) return;
+      v = String(v);
+      if (v.indexOf('@') > 0) mail(v); else put(v);
+    }
+    /*@3.FAPJ.87*/
+    put(p.a); put(p.name); if (typeof p.n === 'string') put(p.n); put(p.en);
+    if (p.link) { put(p.link.n); mail(p.link.e); }
+    mail(p.e); mail(p.email);
+    /*@3.FAPJ.85*/
+    if (String(p.fkey || '').slice(0, 2) === 'e:') mail(p.fkey.slice(2));
+    var x = [].concat(p.x || [], p.alt || [], p.alias || [],
+                      p.ex || [], p.exn || [], p.exa || []);
+    for (var i = 0; i < x.length; i++) {
+      var t = x[i];
+      any(t && typeof t === 'object' ? (t.n || t.e) : t);
+    }
+    return skey(out.join(' '));
+  }
+  function hitPerson(hay, w) {
+    for (var i = 0; i < w.length; i++) if (hay.indexOf(w[i]) < 0) return false;
+    return true;
+  }
+  /*@3.FAPJ.82*/
+  function rankPerson(hay, w) {
+    if (!w.length) return 0;
+    var r = 0;
+    if (hay.indexOf(w[0]) === 0) r += 4;
+    if ((' ' + hay).indexOf(' ' + w[0]) >= 0) r += 2;
+    if ((' ' + hay + ' ').indexOf(' ' + w[0] + ' ') >= 0) r += 1;
+    return r;
+  }
+
   /*@3.FAPJ.2*/
   var DATA = null, LOADING = null, WAIT = [], FRESH = false, DATA_FAILED = false;
   /*@3.FAPJ.76*/
@@ -46,8 +91,7 @@
           f._k = norm(f.name);
           f._e = f.link && f.link.e ? String(f.link.e).toLowerCase() : null;
           /*@3.FAPJ.66*/
-          f._s = skey([f.name, f.en || '', (f.link && f.link.n) || '', f._e || '',
-                       (f.alias || []).join(' ')].join(' '));
+          f._s = hayPerson(f);
         });
         WAIT.splice(0).forEach(function (fn) { fn(d); });
       })
@@ -101,6 +145,8 @@
 
   /*@3.FAPJ.21*/
   var DIR = null, DIR_LOADING = false, DIR_WAIT = [], DIR_FAILED = false;
+  var DIR_MAIL = {}, DIR_NAME = {};
+  function bnk(s) { return String(s || '').toLowerCase().replace(/[^a-z]/g, ''); }
 
   function loadDir(cb) {
     if (DIR) { cb && cb(DIR); return; }
@@ -113,11 +159,23 @@
       .then(function (d) {
         DIR = d; DIR_LOADING = false;
         /*@3.FAPJ.22*/
+        /*@3.FAPJ.83*/
+        DIR_MAIL = {}; DIR_NAME = {};
         (d.people || []).forEach(function (p) {
-          var em = String(p.e || '').toLowerCase();
-          p._k = norm(p.a || '') + ' ' +
-                 String(p.n || '').toLowerCase() + ' ' +
-                 em + ' ' + em.replace(/[._@-]/g, ' ');
+          p._k = hayPerson(p);
+          if (p.e) DIR_MAIL[String(p.e).toLowerCase()] = p;
+          var nk = bnk(p.n);
+          if (nk && !DIR_NAME[nk]) DIR_NAME[nk] = p;
+          (p.x || []).forEach(function (t) {
+            t = String(t);
+            if (t.indexOf('@') > 0) {
+              var e2 = t.toLowerCase();
+              if (!DIR_MAIL[e2]) DIR_MAIL[e2] = p;
+            } else {
+              var k2 = bnk(t);
+              if (k2 && !DIR_NAME[k2]) DIR_NAME[k2] = p;
+            }
+          });
         });
         DIR_WAIT.splice(0).forEach(function (fn) { fn(d); });
       })
@@ -132,35 +190,29 @@
     if (!DIR) return [];
     /*@3.FAPJ.35*/
     /*@3.FAPJ.69*/
-    var w = qwords(q);
+    var w = qPerson(q);
     if (!w.length) return [];
-    var out = [];
+    var n = take || 8, out = [];
     var people = DIR.people || [];
-    for (var i = 0; i < people.length && out.length < (take || 8) * 4; i++) {
+    for (var i = 0; i < people.length && out.length < n * 6; i++) {
       var p = people[i];
       /*@3.FAPJ.23*/
       if (p.id) continue;
-      var all = true;
-      for (var j = 0; j < w.length; j++) {
-        if (p._k.indexOf(w[j]) < 0) { all = false; break; }
-      }
-      if (all) out.push(p);
+      if (hitPerson(p._k, w)) out.push(p);
     }
-    return out.slice(0, take || 8);
+    return out
+      .map(function (p, i) { return { p: p, r: rankPerson(p._k, w), i: i }; })
+      .sort(function (a, b) { return b.r - a.r || a.i - b.i; })
+      .slice(0, n)
+      .map(function (x) { return x.p; });
   }
 
   function dirByName(bannerName) {
-    if (!DIR || !bannerName) return null;
-    var k = String(bannerName).toLowerCase().replace(/[^a-z]/g, '');
-    if (!k) return null;
-    return (DIR.people || []).filter(function (p) {
-      return String(p.n || '').toLowerCase().replace(/[^a-z]/g, '') === k;
-    })[0] || null;
+    var k = bnk(bannerName);
+    return (k && DIR_NAME[k]) || null;
   }
   function dirByEmail(email) {
-    if (!DIR || !email) return null;
-    var e = String(email).toLowerCase();
-    return (DIR.people || []).filter(function (p) { return p.e === e; })[0] || null;
+    return (email && DIR_MAIL[String(email).toLowerCase()]) || null;
   }
 
   /*@3.FAPJ.24*/
@@ -184,20 +236,28 @@
   }
 
   /*@3.FAPJ.37*/
+  /*@3.FAPJ.89*/
   function nudge(n) {
     n = Number(n) || 0;
+    var min = window.GardenRating ? GardenRating.facultyMin() : 3;
     if (n === 0) return { ar: 'كن أوّل من يقيّمه', en: 'Be the first to rate them' };
-    if (n === 1) return { ar: 'رأيُك الثاني', en: 'Be the second voice' };
-    if (n === 2) return { ar: 'رأيُك الثالث يُخرجه من «عيّنة صغيرة»',
-                          en: 'A third rating lifts them out of “small sample”' };
-    return null;
+    if (n >= min) return null;
+    var left = min - n;
+    if (left === 1) return { ar: 'رأيُك يُعلن مؤشّرَه', en: 'Yours declares their score' };
+    if (left === 2) return { ar: 'رأيان يُعلنان مؤشّرَه', en: 'Two more declare their score' };
+    var ar = left <= 10 ? (left + ' آراءَ') : (left + ' رأياً');
+    return { ar: 'بقي ' + ar + ' ليُعلَن مؤشّرُه',
+             en: left + ' more ratings until their score is declared' };
   }
   function nudgeT(n) { var x = nudge(n); return x ? t(x.ar, x.en) : ''; }
 
   function byEmail(email) {
     if (!DATA || !email) return null;
     var e = String(email).toLowerCase();
-    return DATA.faculty.filter(function (f) { return f._e === e; })[0] || null;
+    return DATA.faculty.filter(function (f) { return f._e === e; })[0] ||
+           DATA.faculty.filter(function (f) {
+             return (f.ex || []).indexOf(e) >= 0;
+           })[0] || null;
   }
   function byId(id) {
     if (!DATA || !id) return null;
@@ -207,11 +267,17 @@
   /*@3.FAPJ.3*/
   function byBannerName(name) {
     if (!DATA || !name) return null;
-    var k = String(name).toLowerCase().replace(/[^a-z]/g, '');
+    var k = bnk(name);
     if (!k) return null;
     return DATA.faculty.filter(function (f) {
-      return f.link && f.link.n &&
-        String(f.link.n).toLowerCase().replace(/[^a-z]/g, '') === k;
+      return f.link && f.link.n && bnk(f.link.n) === k;
+    })[0] ||
+    /*@3.FAPJ.86*/
+    DATA.faculty.filter(function (f) {
+      for (var i = 0; i < (f.exn || []).length; i++) {
+        if (bnk(f.exn[i]) === k) return true;
+      }
+      return false;
     })[0] || null;
   }
 
@@ -300,6 +366,37 @@
           esc(t('تُجلب المحاورُ والتعليقات…', 'Loading axes and comments…')) + '</div>';
   }
 
+  /*@3.FAPJ.91*/
+  function axLabel(w, ch) {
+    var o = w && w.o;
+    if (!o || !o.length || ch === '-' || ch == null) return null;
+    var pick = ch === '2' ? o[0] : ch === '0' ? o[o.length - 1] : (o.length > 2 ? o[1] : null);
+    if (!pick) return null;
+    return { v: t(pick[0], pick[1]), tone: ch === '2' ? 'ok' : ch === '0' ? 'bad' : 'mid' };
+  }
+
+  function cmRow(c, W, canRep) {
+    var tag = c.cs ? c.cs.map(function (x) {
+                return '<span class="fc-cm-tag mono">' + esc(x) + '</span>'; }).join('')
+            : c.c ? '<span class="fc-cm-tag mono">' + esc(c.c) + '</span>'
+            : c.r ? '<span class="fc-cm-tag fc-cm-tag--raw">' + esc(c.r) + '</span>' : '';
+    var dig = String(c.a || '');
+    var ax = W.map(function (w, i) {
+      var L = axLabel(w, dig.charAt(i));
+      if (!L) return '';
+      return '<span class="fc-cm-ax" data-tone="' + L.tone + '">' +
+        '<b>' + esc(t(w.ar, w.en)) + '</b>' + esc(L.v) + '</span>';
+    }).join('');
+    var rep = (canRep && c.p && window.GardenReport)
+      ? GardenReport.button('faculty', c.p, c.c || '', { host: '.fc-cm' }) : '';
+    return '<div class="fc-cm">' +
+      '<div class="fc-cm-hd">' + tag +
+        (c.d ? '<span class="fc-cm-d mono">' + esc(c.d) + '</span>' : '') + rep + '</div>' +
+      (ax ? '<div class="fc-cm-axes">' + ax + '</div>' : '') +
+      (c.t ? '<p class="' + (hasAr(c.t) ? '' : 'ltr') + '">' + esc(c.t) + '</p>' : '') +
+    '</div>';
+  }
+
   /*@3.FAPJ.4*/
   function detailHtml(f, o) {
     o = o || {};
@@ -310,22 +407,28 @@
     var ambSet = {};
     (f.amb || []).forEach(function (c) { ambSet[c] = 1; });
 
-    var peers = (DATA.faculty || []).filter(function (x) { return x.n >= 3 && x.rk != null; });
+    /*@3.FAPJ.88*/
+    var GR = window.GardenRating;
+    var MIN = GR ? GR.facultyMin() : 3;
+    var shown = GR ? GR.facultyShown(f) : (f.idx != null);
+
+    var peers = (DATA.faculty || []).filter(function (x) { return x.n >= MIN && x.rk != null; });
     var below = peers.filter(function (x) { return (x.rk || 0) < (f.rk || 0); }).length;
-    var pct = (peers.length > 1 && f.rk != null && f.n >= 3)
+    var pct = (shown && peers.length > 1 && f.rk != null)
       ? Math.round(below * 100 / (peers.length - 1)) : null;
 
-    var head = '<div class="fc-d-head">' + ring(f.idx, 76) +
+    var head = '<div class="fc-d-head">' + ring(shown ? f.idx : null, 76) +
       '<div class="fc-d-h-t">' +
-        '<div class="fc-d-idx" style="color:' + tone(f.idx) + '">' + (f.idx == null ? '—' : f.idx + '٪') + '</div>' +
-        '<div class="fc-d-sub">' + t('المؤشّر المركّب · ', 'Composite score · ') +
+        '<div class="fc-d-idx" style="color:' + (shown ? tone(f.idx) : 'var(--text-muted)') + '">' +
+          (shown ? f.idx + '٪' : '—') + '</div>' +
+        '<div class="fc-d-sub">' +
+          (shown ? t('المؤشّر المركّب · ', 'Composite score · ') : '') +
           t(f.n + ' تقييماً', f.n + ' ratings') + '</div>' +
         (pct != null ? '<div class="fc-d-pct">' +
           t('أعلى من ' + pct + '٪ من الأساتذة المقيَّمين (' + peers.length + ')',
             'Above ' + pct + '% of rated instructors (' + peers.length + ')') + '</div>' : '') +
-        (f.n < 3 ? '<div class="fc-warn fc-warn--big">' +
-          t('عيّنةٌ صغيرة — اقرأه على أنه انطباعٌ لا حكم.',
-            'Small sample — read it as an impression, not a verdict.') + '</div>' +
+        (!shown ? '<div class="fc-warn fc-warn--big">' +
+          esc(GR ? GR.facultyWhy(f) : '') + '</div>' +
           (nudgeT(f.n) ? '<div class="fc-nudge"><i class="fa-solid fa-seedling"></i>' +
             esc(nudgeT(f.n)) + '</div>' : '') : '') +
       '</div></div>';
@@ -361,20 +464,22 @@
           'We could not link them to a Banner record confidently, so their sections are not shown.') +
         '</div></div>';
 
+    /*@3.FAPJ.90*/
     var cm = (f.cm || []);
+    var wrote = cm.filter(function (c) { return c.t; }).length;
+    var canRep = !window.GardenFlags || window.GardenFlags.get('ratings.course.reportsOn') !== false;
     var comments = cm.length
-      ? '<div class="fc-d-sec"><h4>' + t('ما كتبه الطلاب', 'What students wrote') +
+      ? '<div class="fc-d-sec"><h4>' + t('ما قاله الطلاب', 'What students said') +
         '<span class="fc-d-n">' + cm.length + '</span></h4>' +
-        '<div class="fc-cms">' + cm.map(function (c) {
-          var tag = c.cs ? c.cs.map(function (x) {
-                      return '<span class="fc-cm-tag mono">' + esc(x) + '</span>'; }).join('')
-                  : c.c ? '<span class="fc-cm-tag mono">' + esc(c.c) + '</span>'
-                  : c.r ? '<span class="fc-cm-tag fc-cm-tag--raw">' + esc(c.r) + '</span>' : '';
-          return '<div class="fc-cm">' + tag +
-            '<p class="' + (hasAr(c.t) ? '' : 'ltr') + '">' + esc(c.t) + '</p></div>';
-        }).join('') + '</div></div>'
+        (wrote < cm.length
+          ? '<p class="fc-cm-hint">' + esc(t(
+              'كلُّ تقييمٍ يظهر هنا — وما لا تعليقَ فيه يظهر بإجاباته وحدَها.',
+              'Every rating appears here — those without a comment show their answers alone.')) + '</p>'
+          : '') +
+        '<div class="fc-cms">' + cm.map(function (c) { return cmRow(c, W, canRep); }).join('') +
+        '</div></div>'
       : '<div class="fc-d-sec"><div class="fc-note"><i class="fa-solid fa-comment-slash"></i>' +
-        t('لا تعليقاتٍ مكتوبة — الأرقامُ وحدها.', 'No written comments — numbers only.') + '</div></div>';
+        t('لا تقييماتٍ بعد.', 'No ratings yet.') + '</div></div>';
 
     /*@3.FAPJ.6*/
     var canRate = !window.GardenFlags || window.GardenFlags.get('ratings.faculty.enabled');
@@ -762,11 +867,9 @@
       });
     }
     /*@3.FAPJ.68*/
-    var w = qwords(inp.value);
+    var w = qPerson(inp.value);
     var hit = (w.length ? DATA.faculty.filter(function (f) {
-      var s = f._s || f._k;
-      for (var i = 0; i < w.length; i++) if (s.indexOf(w[i]) < 0) return false;
-      return true;
+      return hitPerson(f._s || f._k, w);
     }) : []).slice(0, 8);
     var dir = searchDir(inp.value, hit.length ? 5 : 8);
     if (!hit.length && !dir.length) {
@@ -987,6 +1090,8 @@
     data: function () { return DATA; },
     loadDir: loadDir, searchDir: searchDir, dirByName: dirByName,
     dirByEmail: dirByEmail, dirDetailHtml: dirDetailHtml, arLine: arLine,
+    qPerson: qPerson, hayPerson: hayPerson, hitPerson: hitPerson,
+    rankPerson: rankPerson, normPerson: skey,
     nudge: nudge, nudgeT: nudgeT,
     dir: function () { return DIR; }
   };

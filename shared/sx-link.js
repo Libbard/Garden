@@ -160,15 +160,43 @@
   }
 
   /*@3.SXLJ.13*/
+  /*@3.SXLJ.44*/
   function registered() {
     var d = schLoad(), out = {};
     if (!d) return out;
-    boxes(d).forEach(function (b) {
-      (b.lectures || []).concat(b.exams || []).forEach(function (r) {
-        if (r.sx_crn) out[r.sx_crn] = 1;
-      });
+    (d.lectures || []).concat(d.exams || []).forEach(function (r) {
+      if (r && r.sx_crn) out[r.sx_crn] = 1;
     });
     return out;
+  }
+
+  /*@3.SXLJ.43*/
+  function optOuts(d) {
+    var o = d && d.sx_optout;
+    return (o && typeof o === 'object') ? o : {};
+  }
+  function optScope(d, crn) {
+    var e = optOuts(d)[String(crn)];
+    return e ? (e.scope || 'all') : '';
+  }
+  function optBlocks(d, crn, what) {
+    var s = optScope(d, crn);
+    return s === 'all' || s === what;
+  }
+  function setOptOut(crn, scope) {
+    var d = schLoad(true);
+    if (!d.sx_optout || typeof d.sx_optout !== 'object') d.sx_optout = {};
+    d.sx_optout[String(crn)] = { at: new Date().toISOString(),
+                                 scope: (scope === 'lectures' || scope === 'exams') ? scope : 'all' };
+    return schSave(d);
+  }
+  function clearOptOut(crn) {
+    var d = schLoad();
+    if (!d || !d.sx_optout) return false;
+    if (!d.sx_optout[String(crn)]) return false;
+    delete d.sx_optout[String(crn)];
+    if (!Object.keys(d.sx_optout).length) delete d.sx_optout;
+    return schSave(d);
   }
 
   /*@3.SXLJ.14*/
@@ -251,6 +279,8 @@
 
     /*@3.SXLJ.17*/
     var rep = { added: 0, updated: 0, kept: [] };
+    /*@3.SXLJ.47*/
+    var exAdded = 0;
     var snapStamped = false;      /*@3.SXLJ.18*/
 
     /*@3.SXLJ.19*/
@@ -290,7 +320,13 @@
     (secs || []).forEach(function (sec) {
       if (!sec || !sec.crn) return;
       var crn = String(sec.crn);
+      /*@3.SXLJ.45*/
+      var noLec = optBlocks(d, crn, 'lectures');
+      var noEx = optBlocks(d, crn, 'exams');
+      if (noLec && noEx) return;
       var rows = rowsFor(sec), added = 0;
+      if (noLec) rows.lectures = [];
+      if (noEx) rows.exams = [];
       rows.lectures.forEach(function (l) {
         var verdict = reconcile(l, lecSnap, function (cur, fresh) {
           cur.day = fresh.day;
@@ -330,7 +366,7 @@
         var k = x.course_code + '|' + x.date + '|' + x.exam_type;
         if (seenEx[k]) return;
         seenEx[k] = 1;
-        d.exams.push(x); have[x.id] = 1; added++;
+        d.exams.push(x); have[x.id] = 1; added++; exAdded++;
       });
       /*@3.SXLJ.42*/
       if (added) { n++; courses[sec.c] = { sec: sec, crn: crn }; }
@@ -338,7 +374,7 @@
     });
 
     /*@3.SXLJ.28*/
-    var dirty = rep.added || rep.updated || snapStamped;
+    var dirty = rep.added || rep.updated || exAdded || snapStamped;
     if (!dirty) return { n: 0, report: rep, saved: true };
     if (!n) { return { n: 0, report: rep, saved: schSave(d) }; }   /*@3.SXLJ.29*/
 
@@ -360,10 +396,18 @@
   }
 
   /*@3.SXLJ.30*/
-  function unregister(crn, sec) {
+  function unregister(crn, sec, opts) {
     var d = schLoad();
     if (!d) return 0;
     crn = String(crn);
+    /*@3.SXLJ.46*/
+    if (opts && opts.stopAuto) {
+      if (!d.sx_optout || typeof d.sx_optout !== 'object') d.sx_optout = {};
+      d.sx_optout[crn] = { at: new Date().toISOString(), scope: opts.stopAuto };
+    } else if (d.sx_optout && d.sx_optout[crn]) {
+      delete d.sx_optout[crn];
+      if (!Object.keys(d.sx_optout).length) delete d.sx_optout;
+    }
     var m = matcher(crn, sec), code = m.code, n = 0;
     boxes(d).forEach(function (box) {
       if (Array.isArray(box.lectures)) {
@@ -554,6 +598,9 @@
     rowsFor: rowsFor, matcher: matcher, boxes: boxes,
     has: has, registered: registered, crnsOfCourse: crnsOfCourse,
     register: register, unregister: unregister,
+    optScope: function (crn) { return optScope(schLoad() || {}, crn); },
+    setOptOut: setOptOut, clearOptOut: clearOptOut,
+    optOuts: function () { return optOuts(schLoad() || {}); },
     anyEventFor: anyEventFor, dropFromSemester: dropFromSemester,
     CITY_AR: CITY_AR,
     campusOf: campusOf, campusLabel: campusLabel, resetCampus: resetCampus,

@@ -10,6 +10,7 @@
     'ratings.course.resourcesOn': true,
     'ratings.course.reportsOn': true,
     'ratings.faculty.enabled': true,
+    'ratings.faculty.publicMin': 3,
     'labs.publicNav': true,
     'banner.syncEnabled': true,
     'alerts.enabled': true,
@@ -84,6 +85,116 @@
   };
 
   refresh(false);
+})();
+
+/*@3.GARJ.578*/
+;(function () {
+  'use strict';
+  if (window.GardenRating) return;
+
+  function isAr() {
+    return (document.documentElement.getAttribute('lang')
+      || localStorage.getItem('garden_lang') || 'ar') !== 'en';
+  }
+
+  function facultyMin() {
+    var F = window.GardenFlags;
+    var v = F && F.get('ratings.faculty.publicMin');
+    v = Number(v);
+    return (isFinite(v) && v >= 0) ? v : 3;
+  }
+
+  function nOf(f) { return Number(f && f.n) || 0; }
+
+  function facultyShown(f) {
+    return !!(f && f.idx != null && nOf(f) >= facultyMin());
+  }
+
+  function facultyIdx(f) { return facultyShown(f) ? f.idx : null; }
+
+  function facultyFew(f) {
+    var n = nOf(f);
+    if (!n) return isAr() ? 'لا تقييماتٍ بعد' : 'No ratings yet';
+    var ar = n === 1 ? 'رأيٌ واحد' : n === 2 ? 'رأيان' : n + ' آراء';
+    return isAr()
+      ? (ar + ' — لم يُعلَن بعد')
+      : (n + (n === 1 ? ' rating' : ' ratings') + ' — not declared yet');
+  }
+
+  function facultyWhy(f) {
+    var m = facultyMin();
+    return isAr()
+      ? ('المؤشّرُ لا يُعلَن قبل ' + m + ' تقييمات — وعند هذا الأستاذ ' + nOf(f) +
+         '. رأيُك يقرّبه من الإعلان.')
+      : ('The index is not declared below ' + m + ' ratings — this instructor has ' +
+         nOf(f) + '. Yours brings it closer.');
+  }
+
+  window.GardenRating = {
+    facultyMin: facultyMin,
+    facultyShown: facultyShown,
+    facultyIdx: facultyIdx,
+    facultyFew: facultyFew,
+    facultyWhy: facultyWhy
+  };
+})();
+
+; (function () {
+  'use strict';
+
+  function isAr() {
+    return (document.documentElement.getAttribute('lang')
+      || localStorage.getItem('garden_lang') || 'ar') !== 'en';
+  }
+
+  var KIND_AR = { First: 'الأول', Second: 'الثاني', Third: 'الثالث', Summer: 'الصيفي' };
+  var KIND_ORD = { First: 1, Second: 2, Third: 3, Summer: 4 };
+  var DESC_RE = /(First|Secon(?:d)?|Third|Summer)\s*Term\s*(\d{4})\s*-\s*(\d{4})/i;
+
+  function row(x) {
+    return (x && typeof x === 'object') ? x : { term: String(x == null ? '' : x) };
+  }
+
+  function mk(code, year, ord, kind, dip, label) {
+    return { term: code, year: year, ord: ord, kind: kind, dip: dip,
+             label: label, full: label + ' · ' + year };
+  }
+
+  function parse(x) {
+    var r = row(x), code = String(r.term || ''), d = String(r.description || '');
+    var dip = /diploma/i.test(d);
+    var m = d.match(DESC_RE);
+    if (m) {
+      var kind = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
+      /*@3.GARJ.598*/
+      if (kind === 'Secon') kind = 'Second';
+      var lbl = (isAr() ? 'الفصل ' + KIND_AR[kind] : kind + ' Term') +
+                (dip ? (isAr() ? ' · دبلوم' : ' · Diploma') : '');
+      return mk(code, m[2] + ' – ' + m[3],
+                (dip ? 10 : 0) + (KIND_ORD[kind] || 9), kind, dip, lbl);
+    }
+    /*@3.GARJ.599*/
+    var y = code.slice(0, 4);
+    var yr = /^\d{4}$/.test(y) ? (y + ' – ' + (parseInt(y, 10) + 1))
+                               : (isAr() ? 'غير مصنّف' : 'Unclassified');
+    var bare = d.replace(/\s*(\(View Only\))\s*/i, '').trim();
+    return mk(code, yr, 99, '', dip, bare || code || (isAr() ? 'فصل' : 'Term'));
+  }
+
+  function label(x, full) { var p = parse(x); return full ? p.full : p.label; }
+
+  function byRecent(a, b) {
+    var da = parse(a).ord >= 10 ? 1 : 0, db = parse(b).ord >= 10 ? 1 : 0;
+    if (da !== db) return da - db;
+    return String(row(b).term).localeCompare(String(row(a).term));
+  }
+
+  function sort(list) { return (list || []).slice().sort(byRecent); }
+
+  /*@3.GARJ.597*/
+  window.GardenTerms = {
+    parse: parse, label: label, byRecent: byRecent, sort: sort
+  };
 })();
 
 /*@3.GARJ.7*/
@@ -2764,6 +2875,20 @@
     });
 
     restoreHighlights();
+
+    /*@3.GARJ.575*/
+    openNoteFromHash();
+    window.addEventListener('hashchange', openNoteFromHash);
+  }
+
+  function openNoteFromHash() {
+    const m = /^#note-(.+)$/.exec(location.hash || '');
+    if (!m) return;
+    const id = decodeURIComponent(m[1]);
+    const note = loadNotes().find(n => String(n.id) === id);
+    if (!note) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    setTimeout(() => gotoNoteSource(note), 60);
   }
 
   /*@3.GARJ.177*/
@@ -2882,11 +3007,13 @@
       top  = Math.max(pad, (vh - h) / 2);
       left = Math.max(pad, (vw - w) / 2);
     } else {
-      const spaceAbove = rect.top - gap;
-      const spaceBelow = vh - rect.bottom - gap;
-      top = (spaceAbove >= 30 || spaceAbove >= spaceBelow)
+      /*@3.GARJ.576*/
+      const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      const osMenu = coarse ? 48 : 0;
+      const spaceAbove = rect.top - gap - pad;
+      top = (spaceAbove >= h)
           ? rect.top - h - gap
-          : rect.bottom + gap;
+          : rect.bottom + gap + osMenu;
       const cx = rect.left + rect.width / 2;
       left = Math.max(pad, Math.min(cx - w / 2, vw - w - pad));
     }
@@ -4001,7 +4128,10 @@
 
   function initKeys() {
     document.addEventListener('keydown', e => {
+      /*@3.GARJ.577*/
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.target.isContentEditable) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       switch (e.key) {
         case ' ': if (document.getElementById('fc-card')) { e.preventDefault(); flipCard(); } break;
         case 't': case 'T': cycleTheme(); break;
@@ -4319,6 +4449,22 @@
   const AI_CACHE_PREFIX = 'garden_ai_';
   const AI_CACHE_MAX = 50; /*@3.GARJ.291*/
 
+  /*@3.GARJ.595*/
+  const AI_CADENCE_REPLAY = true;
+  /*@3.GARJ.594*/
+  const AI_CADENCE = {
+    thinkMs: [700, 1500, 3200],
+    ttfbMs:  [900, 1800, 4200],
+    cps:     [22, 40, 70],
+    thinkShare: 0.5,
+    measured: false,
+  };
+  function cadPick(tri) {
+    const r = Math.random();
+    return r < 0.5 ? tri[0] + (tri[1] - tri[0]) * (r / 0.5)
+                   : tri[1] + (tri[2] - tri[1]) * ((r - 0.5) / 0.5);
+  }
+
   function aiT(ar, en) { return currentLang === 'ar' ? ar : en; }
 
   /*@3.GARJ.292*/
@@ -4331,6 +4477,8 @@
 
   /*@3.GARJ.293*/
   let AI_CATALOG = null;
+  /*@3.GARJ.588*/
+  let AI_CATALOG_READY = false;
   function loadAiCatalog() {
     if (AI_CATALOG !== null) return;
     AI_CATALOG = {}; /*@3.GARJ.294*/
@@ -4340,8 +4488,9 @@
       fetch(base + 'courses_catalog.json')
         .then(r => (r.ok ? r.json() : null))
         .then(j => { if (j && typeof j === 'object') AI_CATALOG = j; })
-        .catch(() => { });
-    } catch (e) { }
+        .catch(() => { })
+        .finally(() => { AI_CATALOG_READY = true; });
+    } catch (e) { AI_CATALOG_READY = true; }
   }
 
   /*@3.GARJ.295*/
@@ -4575,20 +4724,24 @@
   }
 
   /*@3.GARJ.321*/
+  /*@3.GARJ.590*/
+  function noLayer(d) { d.activeLayer = ''; return d; }
+
   function composeCardData(raw, scope) {
     if (scope === 'card' && raw.allLayersText) {
       const d = Object.assign({}, raw);
       d.content = raw.allLayersText;
       d.background = raw.svgBlock || '';
       d.svgOnly = false;
-      return d;
+      return noLayer(d);
     }
     if (scope === 'svg' && raw.svgBlock) {
       const d = Object.assign({}, raw);
       d.content = raw.svgBlock;
-      d.background = raw.content; /*@3.GARJ.322*/
+      /*@3.GARJ.592*/
+      d.background = raw.allLayersText || raw.content; /*@3.GARJ.322*/
       d.svgOnly = true; /*@3.GARJ.323*/
-      return d;
+      return noLayer(d);
     }
     return raw; /*@3.GARJ.324*/
   }
@@ -4662,16 +4815,20 @@
     const regenVariant = opts.regen || false;
     const prevText = opts.prevText || '';
     const subjectCode = document.documentElement.getAttribute('data-subject') || '';
-    const moduleNum = document.documentElement.getAttribute('data-module') || '';
     const L = currentLang;
 
     /*@3.GARJ.329*/
     const cat = (AI_CATALOG && AI_CATALOG[subjectCode]) || {};
     const nameEn = (cat.name_en || '').trim() || AI_COURSE_NAMES[subjectCode]?.en || '';
     const courseLabel = nameEn ? `${nameEn} (${subjectCode})` : subjectCode;
+    /*@3.GARJ.589*/
+    const rawModule = document.documentElement.getAttribute('data-module') || '';
+    const moduleNum = /^[0-9]+$/.test(rawModule) ? rawModule : '';
+
+    /*@3.GARJ.586*/
     let ctxLine = L === 'ar'
-      ? `المادة: ${courseLabel} | الوحدة: ${moduleNum}`
-      : `Course: ${courseLabel} | Module: ${moduleNum}`;
+      ? `المادة: ${courseLabel}`
+      : `Course: ${courseLabel}`;
 
     /*@3.GARJ.330*/
     const textbook = (cat.textbook || '').trim();
@@ -4793,8 +4950,8 @@ ${baseRules}`
 ${baseRules}`) + regenSuffix;
 
       userMsg = L === 'ar'
-        ? `${ctxLine}\nحديث البروفيسور — الوحدة ${moduleNum}\n\n${content}`
-        : `${ctxLine}\nProfessor's narrative — Module ${moduleNum}\n\n${content}`;
+        ? `${ctxLine}\nحديث البروفيسور${moduleNum ? ' — الوحدة ' + moduleNum : ''}\n\n${content}`
+        : `${ctxLine}\nProfessor's narrative${moduleNum ? ' — Module ' + moduleNum : ''}\n\n${content}`;
 
     /*@3.GARJ.340*/
     } else if (cardData.type === 'vault') {
@@ -4849,8 +5006,8 @@ ${baseRulesObj}`
 ${baseRulesObj}`) + regenSuffix;
 
       userMsg = L === 'ar'
-        ? `${ctxLine}\nأهداف الوحدة ${moduleNum}\n\n${content}`
-        : `${ctxLine}\nModule ${moduleNum} objectives\n\n${content}`;
+        ? `${ctxLine}\n${moduleNum ? 'أهداف الوحدة ' + moduleNum : 'أهداف التعلّم'}\n\n${content}`
+        : `${ctxLine}\n${moduleNum ? 'Module ' + moduleNum + ' objectives' : 'Learning objectives'}\n\n${content}`;
 
     /*@3.GARJ.343*/
     } else if (rawContent.length > 900) {
@@ -4904,6 +5061,64 @@ ${baseRules}`) + regenSuffix;
     }
 
     return { systemPrompt, userMsg };
+  }
+
+  /*@3.GARJ.583*/
+  const AI_PROMPT_VER = 1;
+  const AI_ID_SEP = '\u0000';
+
+  /*@3.GARJ.579*/
+  function aiNormalize(s) {
+    s = String(s == null ? '' : s);
+    if (s.normalize) s = s.normalize('NFC');
+    s = s.replace(/[\u0640\u064B-\u065F\u0670\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
+    s = s.replace(/\s+/g, ' ').trim();
+    return s.replace(/[A-Z]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 32); });
+  }
+
+  /*@3.GARJ.587*/
+  /*@3.GARJ.591*/
+  /*@3.GARJ.581*/
+  function aiIdentityString(p) {
+    return 'gai1' + AI_ID_SEP + aiNormalize(p.systemPrompt) + AI_ID_SEP + aiNormalize(p.userMsg);
+  }
+
+  /*@3.GARJ.580*/
+  function aiHash(str) {
+    const bytes = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', bytes).then(buf => {
+      const b = new Uint8Array(buf);
+      let out = '';
+      for (let i = 0; i < 8; i++) out += ('0' + b[i].toString(16)).slice(-2);
+      return out;
+    });
+  }
+
+  function aiSeg(v, dflt) {
+    const s = String(v == null || v === '' ? (dflt || '_') : v);
+    return s.replace(/[^A-Za-z0-9._-]/g, '_');
+  }
+
+  /*@3.GARJ.585*/
+  function aiKeyPath(o) {
+    o = o || {};
+    return 'ai/p' + aiSeg(o.promptVer, String(AI_PROMPT_VER))
+      + '/' + aiSeg(o.subject, '_')
+      + '/' + aiSeg(o.lang, 'ar')
+      + '/' + aiSeg(o.style, 'auto')
+      + '/' + aiSeg(o.hash)
+      + '/' + aiSeg(o.variant, '1') + '.json';
+  }
+
+  /*@3.GARJ.582*/
+  function aiIdentity(cardEl, scope, style) {
+    const raw = extractCardContent(cardEl);
+    const composed = composeCardData(raw, scope || 'card');
+    const prompt = buildPrompt(composed, { style: style || 'auto' });
+    const identity = aiIdentityString(prompt);
+    return aiHash(identity).then(hash => ({
+      hash, identity, prompt, scope: scope || 'card', style: style || 'auto', composed, raw
+    }));
   }
 
   /*@3.GARJ.347*/
@@ -5119,6 +5334,8 @@ ${baseRules}`) + regenSuffix;
 
     /*@3.GARJ.369*/
     const close = () => {
+      /*@3.GARJ.596*/
+      overlay.querySelectorAll('.ai-answer-holder').forEach(h => { if (h._aiStop) h._aiStop(); });
       overlay.classList.remove('open');
       setTimeout(() => overlay.remove(), 250);
     };
@@ -5214,6 +5431,62 @@ ${baseRules}`) + regenSuffix;
         '</svg></div>';
     }
 
+    /*@3.GARJ.593*/
+    function playText(holder, text, opts, onDone) {
+      opts = opts || {};
+      const finish = () => {
+        if (!document.body.contains(holder)) return;
+        holder.innerHTML = (opts.badge || '') + '<div class="ai-result">' + formatAiText(text) + '</div>';
+        typesetIn(holder);
+        scrollBottom();
+        if (onDone) onDone();
+      };
+      if (!AI_CADENCE_REPLAY || opts.instant) { finish(); return; }
+
+      holder.innerHTML = '<div class="ai-loading">' + waitRing() +
+        '<span class="ai-loading-msg">' +
+        (opts.loadingMsg || aiT('جاري الشرح...', 'Generating explanation...')) +
+        '</span></div>';
+
+      const thinking = Math.random() < AI_CADENCE.thinkShare;
+      const tThink = thinking ? cadPick(AI_CADENCE.thinkMs) : 0;
+      const tFirst = Math.max(tThink + 300, cadPick(AI_CADENCE.ttfbMs));
+      const cps = Math.max(8, cadPick(AI_CADENCE.cps));
+      let streamEl = null;
+
+      const timers = [];
+      const stop = () => timers.forEach(clearTimeout);
+      holder._aiStop = stop;
+
+      if (thinking) {
+        timers.push(setTimeout(() => {
+          const span = holder.querySelector('.ai-loading-msg');
+          if (span) span.textContent = aiT('يفكر بعمق في شرحك...', 'Thinking deeply about your explanation...');
+        }, tThink));
+      }
+
+      timers.push(setTimeout(function tick() {
+        if (!document.body.contains(holder)) return;
+        if (!streamEl) {
+          holder.innerHTML = '';
+          streamEl = document.createElement('div');
+          streamEl.className = 'ai-result ai-streaming';
+          streamEl.setAttribute('aria-live', 'off');
+          holder.appendChild(streamEl);
+        }
+        const t0 = Date.now();
+        const step = () => {
+          if (!document.body.contains(holder)) return;
+          const n = Math.floor((Date.now() - t0) / 1000 * cps);
+          if (n >= text.length) { finish(); return; }
+          streamEl.textContent = text.slice(0, n);
+          scrollBottom();
+          requestAnimationFrame(step);
+        };
+        step();
+      }, tFirst));
+    }
+
     /*@3.GARJ.375*/
     function runAI(messages, holder, opts, onOk) {
       holder.innerHTML = `<div class="ai-loading">${waitRing()}<span class="ai-loading-msg">${opts.loadingMsg || aiT('جاري الشرح...', 'Generating explanation...')}</span></div>`;
@@ -5277,9 +5550,7 @@ ${baseRules}`) + regenSuffix;
           lastAiText = hit;
           thread = [{ role: 'user', content: p.userMsg }, { role: 'assistant', content: hit }];
           const holder = newHolder();
-          holder.innerHTML = `<div class="ai-cached-badge"><i class="fa-solid fa-bolt" aria-hidden="true"></i> ${aiT('محفوظ مسبقاً', 'Cached')}</div><div class="ai-result">${formatAiText(hit)}</div>`;
-          typesetIn(holder);
-          composer.style.display = '';
+          playText(holder, hit, {}, () => { composer.style.display = ''; });
           return;
         }
       }
@@ -5622,16 +5893,23 @@ ${baseRules}`) + regenSuffix;
   }
 
   /*@3.GARJ.394*/
-  function initAiExplain() {
-    const targets = document.querySelectorAll(
+  /*@3.GARJ.584*/
+  function aiExplainTargets() {
+    const all = document.querySelectorAll(
       '.concept-card, .professor-card, .vault-section, .objectives-card, .accordion-item'
     );
-    targets.forEach(card => {
-      if (card.querySelector('.ai-explain-btn')) return; /*@3.GARJ.395*/
-      if (card.id === 'mcq-card' || card.id === 'final-score-screen') return;
+    const isQuiz = document.documentElement.getAttribute('data-page') === 'quiz';
+    return Array.prototype.filter.call(all, card => {
+      if (card.id === 'mcq-card' || card.id === 'final-score-screen') return false;
       /*@3.GARJ.396*/
-      if (document.documentElement.getAttribute('data-page') === 'quiz' &&
-        !card.classList.contains('accordion-item')) return;
+      if (isQuiz && !card.classList.contains('accordion-item')) return false;
+      return true;
+    });
+  }
+
+  function initAiExplain() {
+    aiExplainTargets().forEach(card => {
+      if (card.querySelector('.ai-explain-btn')) return; /*@3.GARJ.395*/
       /*@3.GARJ.397*/
       if (getComputedStyle(card).position === 'static') {
         card.style.position = 'relative'; /*@3.GARJ.398*/
@@ -6058,7 +6336,10 @@ ${baseRules}`) + regenSuffix;
     pick: selectOption, nextQ, retryQuiz, showQuizHint: showHint,
     recordQuiz, recordQuizByKey, quizLog: readQuizLog,
     fontUp: () => changeFontSize(1), fontDown: () => changeFontSize(-1), setFontSize: applyFontSize,
-    aiExplain: showAiModal, extractCard: extractCardContent
+    aiExplain: showAiModal, extractCard: extractCardContent,
+    aiTargets: aiExplainTargets, aiIdentity,
+    aiReady: () => AI_CATALOG_READY,
+    aiKey: { normalize: aiNormalize, identityString: aiIdentityString, hash: aiHash, path: aiKeyPath, promptVer: AI_PROMPT_VER }
   };
 
   /*@3.GARJ.448*/

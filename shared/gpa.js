@@ -36,10 +36,12 @@
       ? window.Garden.smartCount(n, ['ساعة', 'ساعتان', 'ساعات'], ['credit', 'credits'])
       : n + ' ' + (isAr() ? 'ساعة' : 'credits');
   }
-  function toast(msg) {
+  /*@3.GPAJ.103*/
+  function toast(msg, ms) {
     var t = $('#toast'); if (!t) return;
     t.textContent = msg; t.classList.add('is-on');
-    clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('is-on'); }, 2200);
+    clearTimeout(t._h);
+    t._h = setTimeout(function () { t.classList.remove('is-on'); }, ms || 2200);
   }
 
   /*@3.GPAJ.6*/
@@ -184,19 +186,48 @@
   /*@3.GPAJ.14*/
   function archivedByLevel() {
     /*@3.GPAJ.15*/
-    var declared = {};
-    (archive || []).forEach(function (a) { if (a && a.id && a.level != null) declared[a.id] = a.level; });
+    /*@3.GPAJ.100*/
+    var meta = {};
+    (archive || []).forEach(function (a) { if (a && a.id) meta[a.id] = a; });
 
     var buckets = {};
     gradesData.semesters.filter(function (s) { return !s.is_current; }).forEach(function (s) {
-      var semLv = (declared[s.id] != null) ? declared[s.id] : null;
+      var a = meta[s.id] || {};
+      var own = !!a.summer || !!s.summer || a.level != null;
+      if (own) {
+        var key = 'sem:' + s.id;
+        buckets[key] = {
+          lv: (a.level != null) ? a.level : null,
+          summer: !!(a.summer || s.summer),
+          name: archName(a.id ? a : s) || semName(s),
+          at: a.archived_at || '',
+          courses: (s.courses || []).slice()
+        };
+        return;
+      }
       (s.courses || []).forEach(function (c) {
-        var lv = (semLv != null) ? semLv : levelOf(c.code);
+        var lv = levelOf(c.code);
         var key = (lv === null) ? 'x' : String(lv);
         (buckets[key] = buckets[key] || { lv: lv, courses: [] }).courses.push(c);
       });
     });
     return buckets;
+  }
+
+  /*@3.GPAJ.101*/
+  function bucketOrder(buckets) {
+    return Object.keys(buckets).sort(function (a, b) {
+      var A = buckets[a], B = buckets[b];
+      var la = A.lv == null ? 99 : A.lv, lb = B.lv == null ? 99 : B.lv;
+      if (la !== lb) return la - lb;
+      return String(A.at || '').localeCompare(String(B.at || ''));
+    });
+  }
+
+  function bucketName(b) {
+    if (b.name) return b.name;
+    if (b.summer) return L('فصل صيفيّ', 'Summer term');
+    return levelName(b.lv);
   }
 
   /*@3.GPAJ.16*/
@@ -528,9 +559,8 @@
       '</div>';
     }
 
-    var order = keys.map(function (k) { return k === 'x' ? 99 : parseInt(k, 10); }).sort(function (a, b) { return a - b; });
-    order.forEach(function (n, idx) {
-      var key = (n === 99) ? 'x' : String(n);
+    /*@3.GPAJ.104*/
+    bucketOrder(buckets).forEach(function (key) {
       var b = buckets[key]; if (!b) return;
       var g = gpaOf(b.courses, false);
       var cr = b.courses.reduce(function (a, c) { return a + c.credits; }, 0);
@@ -541,7 +571,7 @@
       /*@3.GPAJ.36*/
       html += '<div class="gp-acc">' +
         '<button class="gp-acc-head" type="button" aria-expanded="false">' +
-          '<span>' + esc(levelName(b.lv)) + '</span>' +
+          '<span>' + esc(bucketName(b)) + '</span>' +
           '<span class="gp-acc-sum">' + b.courses.length + esc(L(' مواد · ', ' courses · ')) +
             '<span class="gp-num">' + cr + '</span>' + esc(L(' ساعة', ' cr')) + '</span>' +
           '<span class="gp-acc-gpa" data-tone="' + gpaTone(g) + '">' + g.toFixed(2) + '</span>' +
@@ -1706,12 +1736,26 @@
       gradesData = JSON.parse(localStorage.getItem(LS_GRADES) || 'null');
       if (!gradesData) gradesData = { semesters: [], updated_at: new Date().toISOString() };
 
+      /*@3.GPAJ.102*/
+      var fixed = null;
+      try {
+        if (window.GardenData && GardenData.dedupeArchive) fixed = GardenData.dedupeArchive();
+      } catch (e) { fixed = null; }
+      if (fixed && fixed.removed) archive = JSON.parse(localStorage.getItem(LS_ARCHIVE) || '[]');
+
       syncCurrentSemester();
       normalizeCurrentFlag();
       syncArchivedSemesters();
 
       render();
       bindEvents();
+      if (fixed && fixed.removed) {
+        toast(L('صُحِّح سجلُّك: حُذفت ' + fixed.removed + ' مادّةً مكرّرة' +
+                  (fixed.lifted ? ' ونُقلت ' + fixed.lifted + ' درجة' : '') + '.',
+                'Record repaired: ' + fixed.removed + ' duplicate course' +
+                  (fixed.removed > 1 ? 's' : '') + ' removed' +
+                  (fixed.lifted ? ', ' + fixed.lifted + ' grade(s) carried over' : '') + '.'), 9000);
+      }
 
       document.addEventListener('garden:languageChanged', render);
       document.addEventListener('garden:gradesChanged', function () {

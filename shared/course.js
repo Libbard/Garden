@@ -536,11 +536,17 @@
       esc(ins.name || L('بلا اسم', 'Unnamed')),
       f ? esc(L('من قائمة الأساتذة', 'from the faculty list'))
         : esc(L('اسمٌ كتبتَه بنفسك — لا تقييمَ له عندنا', 'a name you typed — no rating on file')),
-      f && f.idx != null
+      /*@3.COUJ.60*/
+      (f && window.GardenRating && GardenRating.facultyShown(f))
         ? '<button class="crs-rate" type="button" data-act="fac" data-tone="' + rateTone(f.idx) + '" ' +
           'title="' + esc(L('افتح بطاقةَ تقييمه', 'Open the rating card')) + '">' +
           '<b>' + Math.round(f.idx) + '%</b><small>(' + (f.n || 0) + ')</small></button>'
-        : '');
+        : (f && f.n
+          ? '<button class="crs-rate gd-rate-few" type="button" data-act="fac" ' +
+            'title="' + esc(GardenRating ? GardenRating.facultyWhy(f) : '') + '">' +
+            '<i class="fa-solid fa-users" aria-hidden="true"></i>' +
+            '<small>' + (f.n || 0) + '</small></button>'
+          : ''));
 
     /*@3.COUJ.30*/
     h += row('fa-envelope',

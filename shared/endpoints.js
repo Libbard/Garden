@@ -15,6 +15,9 @@ window.GardenEndpoints = {
   /*@3.ENDJ.6*/
   labs: 'https://labs.libbard.cc',
 
+  /*@3.ENDJ.12*/
+  unsplash: 'https://garden-unsplash.xxli50xx.workers.dev',
+
   /*@3.ENDJ.8*/
   telemetry: 'https://byte-telemetry.xxli50xx.workers.dev/t/b',
   

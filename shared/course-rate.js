@@ -48,14 +48,13 @@
   }
 
   /*@3.CORJ.3*/
-  var TERM_AR = { First: 'الفصل الأول', Second: 'الفصل الثاني', Third: 'الفصل الثالث', Summer: 'الصيفي' };
-  function termLabel(x) {
-    var d = String(x.description || '');
-    var m = d.match(/(First|Secon(?:d)?|Third|Summer)\s*Term\s*(\d{4})\s*-\s*(\d{4})/i);
-    if (!m) return x.term;
-    var kind = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
-    if (kind === 'Secon') kind = 'Second';
-    return (isAr() ? TERM_AR[kind] : kind + ' Term') + ' · ' + m[2] + '–' + m[3];
+  /*@3.CORJ.76*/
+  function shape(ts) {
+    var G = window.GardenTerms;
+    if (!G) return ts.map(function (x) { return { term: x.term, label: x.term }; });
+    return G.sort(ts).map(function (x) {
+      return { term: x.term, label: G.label(x, true) };
+    });
   }
   function fallbackTerms() {
     var y = new Date().getFullYear(), out = [];
@@ -74,9 +73,7 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) {
         var ts = (j && (j.terms || j.rows)) || [];
-        _terms = ts.length
-          ? ts.map(function (x) { return { term: x.term, label: termLabel(x) }; })
-          : fallbackTerms();
+        _terms = ts.length ? shape(ts) : fallbackTerms();
         return _terms;
       })
       .catch(function () { _terms = fallbackTerms(); return _terms; });

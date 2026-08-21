@@ -14,6 +14,9 @@
   var host = null;
   var busy = false;
 
+  /*@3.ICPJ.21*/
+  var picks = {};
+
   /*@3.ICPJ.2*/
   var STEPS = [
     { i: 'fa-right-to-bracket', ar: 'ادخل إلى البلاك بورد بحسابك الجامعي.', en: 'Sign in to Blackboard with your university account.' },
@@ -63,8 +66,13 @@
     var ICS = window.GardenICS;
     if (!ICS) { host.innerHTML = ''; return; }
     var s = ICS.state();
+    /*@3.ICPJ.22*/
+    var live = {};
+    (s.inbox || []).forEach(function (it) { live[it.uid] = 1; });
+    Object.keys(picks).forEach(function (k) { if (!live[k]) delete picks[k]; });
     host.innerHTML = s.url ? viewOn(s) : viewOff(s);
     wire();
+    batchBar();
   }
 
   /*@3.ICPJ.5*/
@@ -152,7 +160,8 @@
         '</p></div>';
     }
 
-    var groups = groupInbox(s.inbox);
+    /*@3.ICPJ.23*/
+    var groups = window.GardenICS.groupInbox(s.inbox);
     var codes = window.GardenICS.myCourses();
 
     var body = groups.map(function (g) {
@@ -160,6 +169,10 @@
         ? L(g.items.length + ' عناصرَ متجاورة', g.items.length + ' adjacent items')
         : L('عنصرٌ واحد', 'One item');
       var sug = g.guess && codes.indexOf(g.guess) > -1 ? g.guess : '';
+      var key = g.items[0].uid;
+      /*@3.ICPJ.24*/
+      var chosen = picks[key] !== undefined ? picks[key] : sug;
+      if (chosen && codes.indexOf(chosen) < 0) chosen = '';
 
       var rows = g.items.map(function (it) {
         return '<li class="ics-item">' +
@@ -171,10 +184,11 @@
 
       var opts = ['<option value="">' + esc(L('اختر المادة…', 'Pick a course…')) + '</option>']
         .concat(codes.map(function (c) {
-          return '<option value="' + esc(c) + '"' + (c === sug ? ' selected' : '') + '>' + esc(c) + '</option>';
+          return '<option value="' + esc(c) + '"' + (c === chosen ? ' selected' : '') + '>' + esc(c) + '</option>';
         })).join('');
 
-      return '<div class="ics-group" data-uid="' + esc(g.items[0].uid) + '">' +
+      return '<div class="ics-group" data-uid="' + esc(key) + '"' +
+          (picks[key] ? ' data-picked="1"' : '') + '>' +
         '<div class="ics-group-h">' +
           '<span class="ics-group-n">' + esc(head) + '</span>' +
           (sug ? '<span class="ics-guess"><i class="fa-solid fa-lightbulb"></i>' +
@@ -200,24 +214,17 @@
         'البلاك بورد لا يذكر اسمَ المادة في هذه العناصر، ولا نُدخلها جدولَك بالتخمين. اربط المجموعةَ مرّةً — وما يأتي بعدها من المادة نفسِها يُربط وحدَه.',
         'Blackboard does not name the course on these, and we will not guess. Assign a group once — later items from the same course land on their own.')) + '</p>' +
       body +
+      /*@3.ICPJ.25*/
+      '<div class="ics-batch" id="ics-batch" hidden>' +
+        '<span class="ics-batch-t"><i class="fa-solid fa-layer-group"></i>' +
+          esc(L('اخترتَ موادَّ لعدّة مجموعات', 'You picked courses for several groups')) + '</span>' +
+        '<button class="set-btn" id="ics-batch-clear">' +
+          '<i class="fa-solid fa-eraser"></i><span>' + esc(L('امسح الاختيارات', 'Clear')) + '</span></button>' +
+        '<button class="set-btn set-btn--primary" id="ics-batch-go">' +
+          '<i class="fa-solid fa-check-double"></i><span>' + esc(L('اربطها كلَّها', 'Assign them all')) +
+          ' <b class="ics-batch-n" id="ics-batch-n"></b></span></button>' +
+      '</div>' +
     '</div>';
-  }
-
-  function groupInbox(list) {
-    var GAP = 12;   /*@3.ICPJ.8*/
-    var withNo = list.filter(function (x) { return x.no !== null && x.no !== undefined; })
-                     .sort(function (a, b) { return a.no - b.no; });
-    var loose = list.filter(function (x) { return x.no === null || x.no === undefined; });
-
-    var out = [], cur = null;
-    withNo.forEach(function (it) {
-      if (!cur || it.no - cur.hi > GAP) { cur = { hi: it.no, items: [it], guess: '', score: 0 }; out.push(cur); }
-      else { cur.hi = it.no; cur.items.push(it); }
-      /*@3.ICPJ.9*/
-      if (it.guess && it.score > cur.score) { cur.guess = it.guess; cur.score = it.score; }
-    });
-    loose.forEach(function (it) { out.push({ items: [it], guess: it.guess || '', score: it.score || 0 }); });
-    return out;
   }
 
   /*@3.ICPJ.10*/
@@ -278,6 +285,26 @@
     el.setAttribute('data-kind', kind || '');
   }
 
+  /*@3.ICPJ.26*/
+  function batchBar() {
+    if (!host) return;
+    var bar = $('ics-batch');
+    if (!bar) return;
+    var n = 0;
+    host.querySelectorAll('.ics-group').forEach(function (g) {
+      var on = !!picks[g.getAttribute('data-uid')];
+      if (on) n++;
+      if (on) g.setAttribute('data-picked', '1'); else g.removeAttribute('data-picked');
+    });
+    bar.hidden = n < 2;
+    var nEl = $('ics-batch-n');
+    if (nEl) nEl.textContent = n < 2 ? '' : String(n);
+    /*@3.ICPJ.27*/
+    host.querySelectorAll('.ics-ok').forEach(function (b) {
+      b.classList.toggle('set-btn--primary', n < 2);
+    });
+  }
+
   function work(on) {
     busy = on;
     host.querySelectorAll('button').forEach(function (b) { b.disabled = on; });
@@ -297,7 +324,10 @@
       /*@3.ICPJ.13*/
       if (!bits.length) bits.push(L('لا جديد — كلُّ شيءٍ محدَّث', 'Nothing new — all up to date'));
       if (r.touched) bits.push(L(r.touched + ' عدّلتَها بيدك فلم نلمسها', r.touched + ' you edited — left untouched'));
-      msg(bits.join(' · '), 'ok');
+      /*@3.ICPJ.28*/
+      if (r.blocked) bits.push(L(r.blocked + ' تعذّر إدراجُها — أعد المحاولة',
+                                 r.blocked + ' could not be filed — try again'));
+      msg(bits.join(' · '), r.blocked ? 'bad' : 'ok');
       render();
       if (window.GardenSchedule && GardenSchedule.reload) GardenSchedule.reload();
     });
@@ -388,24 +418,52 @@
     });
 
     host.querySelectorAll('.ics-group').forEach(function (g) {
+      var key = g.getAttribute('data-uid');
+      var pick = g.querySelector('.ics-pick');
+      /*@3.ICPJ.29*/
+      pick.addEventListener('change', function () {
+        if (pick.value) picks[key] = pick.value; else delete picks[key];
+        batchBar();
+      });
       g.querySelector('.ics-ok').addEventListener('click', function () {
-        var code = g.querySelector('.ics-pick').value;
+        var code = pick.value;
         if (!code) { msg(L('اختر المادة أولاً.', 'Pick a course first.'), 'bad'); return; }
-        ICS.assign(g.getAttribute('data-uid'), code, true);
+        delete picks[key];
+        ICS.assign(key, code, true);
         doSync();
       });
       /*@3.ICPJ.15*/
       g.querySelector('.ics-no').addEventListener('click', function () {
-        var startUid = g.getAttribute('data-uid');
-        var inbox = ICS.state().inbox;
-        var start = null;
-        inbox.forEach(function (it) { if (it.uid === startUid) start = it; });
-        inbox.forEach(function (it) {
-          var near = start && start.no != null && it.no != null && Math.abs(it.no - start.no) <= 12;
-          if (near || it.uid === startUid) ICS.skip(it.uid);
+        /*@3.ICPJ.30*/
+        delete picks[key];
+        var mine = null;
+        ICS.groupInbox(ICS.state().inbox).forEach(function (x) {
+          if (x.items[0] && x.items[0].uid === key) mine = x;
         });
+        (mine ? mine.items : [{ uid: key }]).forEach(function (it) { ICS.skip(it.uid); });
         doSync();
       });
+    });
+
+    /*@3.ICPJ.31*/
+    var bgo = $('ics-batch-go');
+    if (bgo) bgo.addEventListener('click', function () {
+      if (busy) return;
+      var pairs = [];
+      host.querySelectorAll('.ics-group').forEach(function (g) {
+        var k = g.getAttribute('data-uid');
+        if (picks[k]) pairs.push([k, picks[k]]);
+      });
+      if (pairs.length < 2) return;
+      pairs.forEach(function (pr) { ICS.assign(pr[0], pr[1], true); });
+      picks = {};
+      doSync();
+    });
+    var bcl = $('ics-batch-clear');
+    if (bcl) bcl.addEventListener('click', function () {
+      picks = {};
+      host.querySelectorAll('.ics-pick').forEach(function (el) { el.value = ''; });
+      batchBar();
     });
   }
 

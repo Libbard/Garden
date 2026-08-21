@@ -124,6 +124,7 @@
   /*@3.FIRJ.14*/
   function isHome() { return /(^|\/)(index\.html)?$/.test(location.pathname); }
 
+  /*@3.FIRJ.20*/
   function boot() {
     if (!isHome()) return;
     /*@3.FIRJ.15*/
@@ -132,8 +133,15 @@
     if (!r) return;
     /*@3.FIRJ.16*/
     openAt = (typeof r === 'string') ? r : null;
-    /*@3.FIRJ.17*/
-    setTimeout(launch, 450);
+  }
+
+  /*@3.FIRJ.21*/
+  var warmed = false;
+  function warm() {
+    if (warmed || loading || window.GardenSetup) return;
+    warmed = true;
+    CSS.forEach(function (h) { loadCSS(h, function () {}); });
+    loadJS(JS, function () {});
   }
 
   window.addEventListener('hashchange', function () {
@@ -170,13 +178,20 @@
   function wireLabels() {
     labelEntries();
     document.addEventListener('garden:languageChanged', labelEntries);
+    /*@3.FIRJ.22*/
+    ['pointerenter', 'touchstart', 'focusin'].forEach(function (ev) {
+      document.addEventListener(ev, function (e) {
+        var t = e.target;
+        if (t && t.closest && t.closest('[data-wizard-entry],[data-act="wizard"]')) warm();
+      }, { passive: true, capture: true });
+    });
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { boot(); wireLabels(); });
   } else { boot(); wireLabels(); }
 
   window.GardenFirstRun = {
-    launch: launch, shouldRun: shouldRun, hasData: hasData,
+    launch: launch, shouldRun: shouldRun, hasData: hasData, warm: warm,
     completed: completed, relabel: labelEntries
   };
 })();

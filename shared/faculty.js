@@ -24,15 +24,6 @@
   var AR_RE = /[؀-ۿݐ-ݿ]/;
   function hasAr(s) { return AR_RE.test(String(s || '')); }
 
-  /*@3.FACJ.3*/
-  function norm(s) {
-    return String(s == null ? '' : s)
-      .replace(/[ً-ْٰـ]/g, '')
-      .replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي')
-      .replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
-      .replace(/\s+/g, ' ').trim().toLowerCase();
-  }
-
   /*@3.FACJ.4*/
   function tone(v) {
     if (v == null) return 'var(--text-muted)';
@@ -82,9 +73,9 @@
         state.data = d;
         (d.faculty || []).forEach(function (f) {
           /*@3.FACJ.8*/
-          f._s = norm(f.name) + ' ' + Object.keys(f.courses || {}).join(' ').toLowerCase() +
-                 ' ' + (f.other || []).join(' ').toLowerCase() +
-                 ' ' + norm((f.link && f.link.n) || '') + ' ' + String(f.en || '').toLowerCase();
+          f._sx = (f._s || GF.hayPerson(f)) + ' ' +
+                  GF.normPerson(Object.keys(f.courses || {}).join(' ') + ' ' +
+                                (f.other || []).join(' '));
         });
         buildFilters();
         paintStats();
@@ -251,9 +242,12 @@
   }
 
   function apply() {
-    var q = norm(state.q);
+    /*@3.FACJ.45*/
+    var qw = GF.qPerson(state.q);
     var list = ((state.data && state.data.faculty) || []).filter(function (f) {
-      if (state.min === 'on' && f.n < 3) return false;
+      /*@3.FACJ.47*/
+      if (state.min === 'on' && !(window.GardenRating
+            ? GardenRating.facultyShown(f) : f.n >= 3)) return false;
       if (state.gap) {
         var noCourse = !Object.keys(f.courses || {}).length;
         if (state.gap === 'linked' && !f.link) return false;
@@ -267,7 +261,7 @@
       if (state.major && (f.pg || []).indexOf(state.major) < 0) return false;
       /*@3.FACJ.17*/
       if (state.gender !== 'all' && String(f.g || '').indexOf(state.gender) < 0) return false;
-      if (q && f._s.indexOf(q) < 0) return false;
+      if (qw.length && !GF.hitPerson(f._sx, qw)) return false;
       return true;
     });
     list.sort(function (a, b) {
@@ -385,16 +379,18 @@
         return '<span class="fc-chip fc-chip--raw">' + esc(o) + '</span>';
       }).join('');
     }
-    var small = f.n < 3;
+    /*@3.FACJ.46*/
+    var shown = window.GardenRating ? GardenRating.facultyShown(f) : (f.idx != null);
+    var small = !shown;
     var main = nameOf(f), sub = subNameOf(f);
     return '<article class="fc-card' + (small ? ' is-small' : '') + '" data-id="' + esc(f.id) + '" tabindex="0">' +
       '<div class="fc-c-top">' +
-        ring(f.idx) +
+        ring(shown ? f.idx : null) +
         '<div class="fc-c-id">' +
           '<div class="fc-name' + (hasAr(main) ? '' : ' ltr') + '">' + esc(main) + '</div>' +
           '<div class="fc-n"><i class="fa-solid fa-comment-dots"></i>' +
             t(f.n + ' تقييماً', f.n + ' ratings') +
-            (small ? '<span class="fc-warn">' + t('عيّنة صغيرة', 'small sample') + '</span>' : '') +
+            (small ? '<span class="fc-warn">' + t('لم يُعلَن بعد', 'not declared yet') + '</span>' : '') +
           '</div>' +
           (sub ? '<div class="fc-link' + (hasAr(sub) ? '' : ' ltr') + '">' +
             '<i class="fa-solid fa-link"></i>' + esc(sub) + '</div>' : '') +
