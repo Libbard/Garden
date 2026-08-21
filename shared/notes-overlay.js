@@ -140,8 +140,8 @@
         self.scroller.scrollTop -= dy;
         self.scroller.scrollLeft -= dx;
       },
-      onPinch: function (f, cx, cy) {
-        if (self.onPinch) self.onPinch(f, cx, cy);
+      onPinch: function (phase, f, cx, cy) {
+        if (self.onPinch) self.onPinch(phase, f, cx, cy);
       },
       onChange: function (d) {
         var out = {};

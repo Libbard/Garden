@@ -2479,7 +2479,10 @@
     var v = ui().fs;
     if (v === 'fit' || v === 'auto' || v === 'wide') return v;
     var n = parseFloat(v);
-    return (FS_STEPS.indexOf(n) >= 0) ? n : 'auto';
+    /*@3.NOAJ.130*/
+    if (FS_STEPS.indexOf(n) >= 0) return n;
+    if (isFinite(n) && n >= PINCH_MIN && n <= PINCH_MAX) return n;
+    return 'auto';
   }
 
   function isBoardOpen() {
@@ -2555,37 +2558,72 @@
   }
 
   /*@3.NOAJ.123*/
-  var pinchQ = 0, pinchAcc = 1, pinchC = null, pinchEndT = 0;
-  function docPinch(factor, cx, cy) {
-    if (!isFinite(factor) || factor <= 0) return;
-    pinchAcc *= factor;
-    pinchC = { x: cx, y: cy };
-    if (pinchQ) return;
-    pinchQ = requestAnimationFrame(function () {
-      pinchQ = 0;
-      var f = pinchAcc;
-      pinchAcc = 1;
-      var body = els.docBody, stg = zoomStage();
-      if (!body || !stg || !isFinite(f) || f <= 0) return;
-      /*@3.NOAJ.126*/
-      var z0 = parseFloat(stg.style.getPropertyValue('--na-z')) || fsNow();
-      var z1 = Math.max(0.35, Math.min(3, z0 * f));
-      if (Math.abs(z1 - z0) < 0.0005) return;
-      var r = body.getBoundingClientRect();
-      var cxr = (pinchC ? pinchC.x : r.left + r.width / 2) - r.left;
-      var cyr = (pinchC ? pinchC.y : r.top + r.height / 2) - r.top;
-      var k = z1 / z0;
-      var sl = body.scrollLeft, st = body.scrollTop;
-      var zv = Math.round(z1 * 10000) / 10000;
-      stg.style.setProperty('--na-z', String(zv));
-      body.scrollLeft = (sl + cxr) * k - cxr;
-      body.scrollTop = (st + cyr) * k - cyr;
+  /*@3.NOAJ.129*/
+  var PINCH_MIN = 0.35, PINCH_MAX = 3;
+  var pz = null;
+  var pzQ = 0, pzEndT = 0;
+
+  function pinchBegin(cx, cy) {
+    var body = els.docBody, stg = zoomStage();
+    if (!body || !stg) return;
+    if (pz) pinchEnd();
+    var z0 = parseFloat(stg.style.getPropertyValue('--na-z')) || fsNow();
+    var r0 = stg.getBoundingClientRect();
+    var br = body.getBoundingClientRect();
+    pz = {
+      body: body, stg: stg, z0: z0, s: 1,
+      u0x: cx - r0.left, u0y: cy - r0.top,
+      k0x: r0.left - br.left + body.scrollLeft,
+      k0y: r0.top - br.top + body.scrollTop,
+      brL: br.left, brT: br.top,
+      cx: cx, cy: cy
+    };
+    stg.style.willChange = 'transform';
+    stg.style.transformOrigin = '0 0';
+  }
+
+  function pinchMove(factor, cx, cy) {
+    if (!pz) { pinchBegin(cx, cy); if (!pz) return; }
+    if (isFinite(factor) && factor > 0) {
+      pz.s = Math.max(PINCH_MIN / pz.z0, Math.min(PINCH_MAX / pz.z0, pz.s * factor));
+    }
+    pz.cx = cx; pz.cy = cy;
+    clearTimeout(pzEndT);
+    pzEndT = setTimeout(pinchEnd, 220);
+    if (pzQ) return;
+    pzQ = requestAnimationFrame(function () {
+      pzQ = 0;
+      if (!pz) return;
+      var tx = (pz.cx - pz.brL - (pz.k0x - pz.body.scrollLeft)) - pz.u0x * pz.s;
+      var ty = (pz.cy - pz.brT - (pz.k0y - pz.body.scrollTop)) - pz.u0y * pz.s;
+      pz.stg.style.transform =
+        'translate(' + Math.round(tx) + 'px,' + Math.round(ty) + 'px) scale(' + pz.s + ')';
       var lbl = document.getElementById('na-zoom-lbl');
-      if (lbl) lbl.textContent = Math.round(z1 * 100) + '%';
-      clearTimeout(pinchEndT);
-      /*@3.NOAJ.125*/
-      pinchEndT = setTimeout(function () { uiSet('fs', zv); applyFs(); }, 140);
+      if (lbl) lbl.textContent = Math.round(pz.z0 * pz.s * 100) + '%';
     });
+  }
+
+  function pinchEnd() {
+    clearTimeout(pzEndT);
+    if (pzQ) { cancelAnimationFrame(pzQ); pzQ = 0; }
+    var p = pz;
+    pz = null;
+    if (!p) return;
+    var z1 = Math.round(p.z0 * p.s * 10000) / 10000;
+    p.stg.style.transform = '';
+    p.stg.style.willChange = '';
+    if (Math.abs(z1 - p.z0) < 0.001) return;
+    p.stg.style.setProperty('--na-z', String(z1));
+    p.body.scrollLeft = p.k0x + p.u0x * p.s - (p.cx - p.brL);
+    p.body.scrollTop = p.k0y + p.u0y * p.s - (p.cy - p.brT);
+    uiSet('fs', z1);
+    applyFs();
+  }
+
+  function docPinch(phase, factor, cx, cy) {
+    if (phase === 'begin') pinchBegin(cx, cy);
+    else if (phase === 'end') pinchEnd();
+    else pinchMove(factor, cx, cy);
   }
 
   /*@3.NOAJ.124*/
@@ -2609,16 +2647,14 @@
       var a = pts[ids[0]], b = pts[ids[1]];
       var d = Math.hypot(b.x - a.x, b.y - a.y);
       var cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
-      if (prev && prev.d) {
-        docPinch(d / Math.max(1e-3, prev.d), cx, cy);
-        body.scrollLeft -= (cx - prev.x);
-        body.scrollTop -= (cy - prev.y);
-      }
+      if (!prev) pinchBegin(cx, cy);
+      else if (prev.d) pinchMove(d / Math.max(1e-3, prev.d), cx, cy);
       prev = { d: d, x: cx, y: cy };
     });
     function clearPt(e) {
+      if (pts[e.pointerId] == null) return;
       delete pts[e.pointerId];
-      if (Object.keys(pts).length < 2) prev = null;
+      if (Object.keys(pts).length < 2 && prev) { prev = null; pinchEnd(); }
     }
     body.addEventListener('pointerup', clearPt);
     body.addEventListener('pointercancel', clearPt);

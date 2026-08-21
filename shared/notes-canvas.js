@@ -1618,16 +1618,29 @@
 
       /*@3.NOCJ.21*/
       onGesture: function (phase, d) {
-        if (phase === 'end' || !d.n) { self._g = null; return; }
+        if (phase === 'end' || !d.n) {
+          /*@3.NOCJ.63*/
+          if (self._g && self._g.n > 1 && self.bound && self.onPinch) self.onPinch('end');
+          self._g = null;
+          return;
+        }
         var prev = self._g;
         var keep = { n: d.n, x: d.x, y: d.y, cx: d.cx, cy: d.cy, d: d.d };
-        if (!prev || prev.n !== d.n) { self._g = keep; return; }
+        if (!prev || prev.n !== d.n) {
+          if (self.bound && self.onPinch) {
+            if (prev && prev.n > 1 && d.n <= 1) self.onPinch('end');
+            if (d.n > 1) self.onPinch('begin', 1, d.cx || 0, d.cy || 0);
+          }
+          self._g = keep;
+          return;
+        }
         /*@3.NOCJ.42*/
         if (self.bound) {
-          self.onScroll((d.cx || 0) - (prev.cx || 0), (d.cy || 0) - (prev.cy || 0));
           /*@3.NOCJ.62*/
           if (d.n > 1 && prev.d && d.d && self.onPinch) {
-            self.onPinch(d.d / Math.max(1e-3, prev.d), d.cx || 0, d.cy || 0);
+            self.onPinch('move', d.d / Math.max(1e-3, prev.d), d.cx || 0, d.cy || 0);
+          } else {
+            self.onScroll((d.cx || 0) - (prev.cx || 0), (d.cy || 0) - (prev.cy || 0));
           }
           self._g = keep;
           return;
