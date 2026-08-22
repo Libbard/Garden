@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.1.90'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.1.92'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -202,7 +202,19 @@ function relOf(url) {
 }
 
 function digest12(buf) {
-  return crypto.subtle.digest('SHA-256', buf).then(function(h) {
+  /*@0.SWJ.125*/
+  var v = new Uint8Array(buf), i;
+  var binary = false;
+  for (i = 0; i < v.length; i++) if (v[i] === 0) { binary = true; break; }
+  if (!binary) {
+    var out8 = new Uint8Array(v.length), n = 0;
+    for (i = 0; i < v.length; i++) {
+      if (v[i] === 13 && i + 1 < v.length && v[i + 1] === 10) continue;
+      out8[n++] = v[i];
+    }
+    v = out8.subarray(0, n);
+  }
+  return crypto.subtle.digest('SHA-256', v).then(function(h) {
     var b = new Uint8Array(h), out = '';
     for (var i = 0; i < 6; i++) out += ('0' + b[i].toString(16)).slice(-2);
     return out;
@@ -215,6 +227,18 @@ function fullSync(cache) {
     return cache.add(new Request(url, { cache: 'reload' }))
                 .catch(function() { /*@0.SWJ.76*/ });
   }));
+}
+
+/*@0.SWJ.123*/
+function fetchVerified(cache, u, want) {
+  var bust = u + (u.indexOf('?') < 0 ? '?h=' : '&h=') + encodeURIComponent(want);
+  return fetch(new Request(bust, { cache: 'reload' })).then(function(r) {
+    if (!r || !r.ok) return false;
+    return r.clone().arrayBuffer().then(digest12).then(function(got) {
+      if (got !== want) return false;
+      return cache.put(u, r).then(function() { return true; });
+    });
+  }).catch(function() { return false; });
 }
 
 /*@0.SWJ.111*/
@@ -261,29 +285,37 @@ function knownState(cache, next) {
   });
 }
 
+/*@0.SWJ.124*/
 function applyDiff(cache, prev, next) {
   var urls = Object.keys(next.files);
+  var inMan = {};
+  urls.forEach(function(u) { inMan[u] = 1; });
   var keep = {};
   if (prev) {
     urls.forEach(function(u) { if (prev[u] && prev[u] === next.files[u]) keep[u] = 1; });
   }
+  var stored = {};
+  urls.forEach(function(u) { if (keep[u]) stored[u] = next.files[u]; });
   return cache.keys().then(function(existing) {
     /*@0.SWJ.112*/
     var drop = existing.filter(function(rq) {
       var rel = relOf(rq.url);
-      return rel !== STATE_KEY && !keep[rel];
+      return rel !== STATE_KEY && !inMan[rel];
     });
     return Promise.all(drop.map(function(rq) { return cache.delete(rq); }));
   }).then(function() {
     var need = urls.filter(function(u) { return !keep[u]; });
     return Promise.all(need.map(function(u) {
-      return cache.add(new Request(u, { cache: 'reload' })).catch(function() { /*@0.SWJ.118*/ });
+      /*@0.SWJ.118*/
+      return fetchVerified(cache, u, next.files[u]).then(function(ok) {
+        if (ok) stored[u] = next.files[u];
+      });
     }));
   }).then(function() {
     return cache.put(STATE_KEY, new Response(JSON.stringify({
       version: next.version,
       reset: String(next.reset === undefined ? '0' : next.reset),
-      files: next.files
+      files: stored
     }), { headers: { 'Content-Type': 'application/json' } }));
   });
 }
