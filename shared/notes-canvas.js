@@ -371,6 +371,9 @@
     return (isFinite(z) && z > 0.05) ? z : 1;
   };
 
+  var IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
   /*@3.NOCJ.67*/
   function probeCanvas(c) {
     if (!c.width || !c.height) return false;
@@ -419,15 +422,17 @@
     }
     var d = this.dpr(w, h);
     /*@3.NOCJ.66*/
+    /*@3.NOCJ.69*/
+    var maxB = IS_IOS ? 2800 : 4050;
     if (this.bound) {
-      var cap = Math.floor(4050 / Math.max(0.5, d));
+      var cap = Math.floor(maxB / Math.max(0.5, d));
       if (h > cap) {
         h = Math.max(600, cap);
         this.winH = h;
         if (this.winY > full - h) this.winY = Math.max(0, full - h);
       }
-    } else if (h * d > 4050 || w * d > 4050) {
-      d = Math.max(0.4, Math.min(4050 / h, 4050 / w));
+    } else if (h * d > maxB || w * d > maxB) {
+      d = Math.max(0.4, Math.min(maxB / h, maxB / w));
     }
     if (w === this.w && h === this.h && d === this._d && this._wy === this.winY) return;
     var self = this;

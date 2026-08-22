@@ -783,7 +783,9 @@
 
   /*@3.NOAJ.27*/
   function syncTitleDir() {
-    if (els.docTitle) els.docTitle.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    /*@3.NOAJ.145*/
+    var d = (ed && ed.docDir) ? ed.docDir() : (isAr() ? 'rtl' : 'ltr');
+    if (els.docTitle) els.docTitle.setAttribute('dir', d);
   }
 
   function renderQuota() {
@@ -1970,6 +1972,15 @@
       if (ribbon) ribbon.attach(ed);
       applyWidth();
       applyPages(1);
+      syncTitleDir();
+      /*@3.NOAJ.144*/
+      if (!doc.eng && !isBoard && document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+          if (edId !== id || !ed) return;
+          ed.captureEng();
+          persist(id, ed.doc);
+        });
+      }
       /*@3.NOAJ.86*/
       try { lastSaved[id] = JSON.stringify(ed.readAll()); } catch (eB) {}
       var addBtn = document.getElementById('na-addpg');

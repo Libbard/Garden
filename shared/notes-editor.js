@@ -186,6 +186,19 @@
     this.host.innerHTML = '';
     this.host.appendChild(this.root);
     this.render();
+    var selfE = this;
+    if (document.fonts && document.fonts.ready) {
+      /*@3.NOEJ.156*/
+      document.fonts.ready.then(function () {
+        if (selfE._engRecap) {
+          selfE._engRecap = false;
+          selfE.captureEng();
+          if (selfE.opts.onSave) selfE.opts.onSave(selfE.doc);
+        } else {
+          selfE.applyEng();
+        }
+      });
+    }
     this.bind();
     this.bindDrag();
     this.bindImgPan();
@@ -237,6 +250,8 @@
 
   Editor.prototype.touch = function () {
     this.dirty = true;
+    this._engStale = true;
+    if (this._engOn) this.applyEng();
     if (this.opts.onLayout) this.opts.onLayout();
     if (this.opts.onDirty) this.opts.onDirty();
     clearTimeout(this.saveTimer);
@@ -255,6 +270,7 @@
     }
     if (!this.doc.blocks.length) this.doc.blocks.push(B().blank('p'));
     this.dirty = false;
+    this.captureEng();
     if (this.opts.onSave) this.opts.onSave(this.doc);
     return this.doc;
   };
@@ -360,6 +376,7 @@
       : this.root.querySelector(':scope > .ne-tail');
     if (!anchor) { this.render(); return; }
     this.root.insertBefore(frag, anchor);
+    this.applyEng();
     this.applyReadOnly();
     if (this.opts.onLayout) this.opts.onLayout();
   };
@@ -381,15 +398,58 @@
     try { return (localStorage.getItem('garden_lang') || 'ar') === 'ar' ? 'rtl' : 'ltr'; }
     catch (e) { return 'rtl'; }
   }
-  function blockDir(b) {
+  /*@3.NOEJ.153*/
+  var DIR_CACHE = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function firstStrong(s, out) {
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if ((c >= 0x0590 && c <= 0x08FF) || (c >= 0xFB1D && c <= 0xFDFD) ||
+          (c >= 0xFE70 && c <= 0xFEFC)) { out.d = 'rtl'; return true; }
+      if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)) { out.d = 'ltr'; return true; }
+    }
+    return false;
+  }
+  function scanRt(rt, out) {
+    if (!Array.isArray(rt)) return false;
+    for (var i = 0; i < rt.length; i++) {
+      if (rt[i] && typeof rt[i].s === 'string' && firstStrong(rt[i].s, out)) return true;
+    }
+    return false;
+  }
+  function docDir(d) {
+    if (!d) return appDir();
+    if (d.bd === 'rtl' || d.bd === 'ltr') return d.bd;
+    if (DIR_CACHE && DIR_CACHE.has(d)) return DIR_CACHE.get(d);
+    var out = { d: '' };
+    var bs = d.blocks || [];
+    for (var i = 0; i < bs.length && !out.d; i++) {
+      var b = bs[i];
+      if (b.ty === 'code' || b.ty === 'math') continue;
+      if (scanRt(b.rt, out)) break;
+      var j, k;
+      if (Array.isArray(b.items)) {
+        for (j = 0; j < b.items.length && !out.d; j++) scanRt(b.items[j] && b.items[j].rt, out);
+      }
+      if (Array.isArray(b.rows)) {
+        for (j = 0; j < b.rows.length && !out.d; j++) {
+          var row = b.rows[j] || [];
+          for (k = 0; k < row.length && !out.d; k++) scanRt(row[k] && row[k].rt, out);
+        }
+      }
+    }
+    var dir = out.d || appDir();
+    if (DIR_CACHE) DIR_CACHE.set(d, dir);
+    return dir;
+  }
+  function blockDir(b, d) {
     if (b.ty === 'code') return 'ltr';
     if (b.dir === 'rtl' || b.dir === 'ltr') return b.dir;
-    return appDir();
+    return docDir(d);
   }
 
   Editor.prototype.applyStyleAttrs = function (wrap, b) {
     var bd = wrap.querySelector(':scope > .ne-body');
-    if (bd) bd.setAttribute('dir', blockDir(b));
+    if (bd) bd.setAttribute('dir', blockDir(b, this.doc));
     if (b.dir && b.dir !== 'auto') wrap.setAttribute('data-dir', b.dir);
     else wrap.removeAttribute('data-dir');
     if (b.al && b.al !== 'start') wrap.setAttribute('data-al', b.al);
@@ -503,14 +563,15 @@
     return g + tail;
   }
 
-  function markIsAr(b) {
-    var d = blockDir(b);
+  function markIsAr(b, dc) {
+    var d = blockDir(b, dc);
     if (d === 'rtl') return true;
     if (d === 'ltr') return false;
     return isAr();
   }
 
   Editor.prototype.renderBlock = function (b) {
+    var dd = this.doc;
     var wrap = el('div', 'ne-b ne-b-' + b.ty, { 'data-bid': b.id, 'data-ty': b.ty });
     this.applyStyleAttrs(wrap, b);
 
@@ -547,7 +608,7 @@
 
     var body = el('div', 'ne-body');
     /*@3.NOEJ.30*/
-    body.setAttribute('dir', blockDir(b));
+    body.setAttribute('dir', blockDir(b, dd));
     wrap.appendChild(body);
 
     if (TEXTY[b.ty]) {
@@ -563,7 +624,7 @@
       /*@3.NOEJ.3*/
       var tag = b.ty === 'h' ? ('h' + (b.lv || 2)) : 'div';
       var t = el(tag, 'ne-text', {
-        contenteditable: 'true', dir: blockDir(b),
+        contenteditable: 'true', dir: blockDir(b, dd),
         spellcheck: 'false', 'data-ph': placeholderFor(b)
       });
       t.innerHTML = B().runsToHtmlBidi(b.rt);
@@ -574,11 +635,11 @@
       var list = el(b.ty === 'ul' ? 'ul' : 'ol', 'ne-list');
       if (b.lsb) list.setAttribute('data-lsb', '1');
       var run = [];
-      var arL = markIsAr(b);
+      var arL = markIsAr(b, dd);
       (b.items || []).forEach(function (it) {
         var lv = Math.max(0, Math.min(5, it.lv || 0));
         var li = el('li', 'ne-li', { contenteditable: 'true',
-          dir: blockDir(b), spellcheck: 'false', 'data-lv': String(lv) });
+          dir: blockDir(b, dd), spellcheck: 'false', 'data-lv': String(lv) });
         li.innerHTML = B().runsToHtmlBidi(it.rt);
         /*@3.NOEJ.109*/
         var blank = B().runsToText(it.rt || []) === '';
@@ -639,7 +700,7 @@
         var tr = el('tr');
         row.forEach(function (c) {
           var td = el('td', 'ne-cell', { contenteditable: 'true',
-            dir: blockDir(b), spellcheck: 'false' });
+            dir: blockDir(b, dd), spellcheck: 'false' });
           /*@3.NOEJ.93*/
           if (c.al) td.setAttribute('data-cal', c.al);
           if (c.va) td.setAttribute('data-cva', c.va);
@@ -1568,6 +1629,7 @@
       this.applyFree(this.root.querySelector('[data-bid="' + b.id + '"]'), b);
     }
     this.dropTail();
+    this.applyEng();
     if (this.opts.onLayout) this.opts.onLayout();
   };
 
@@ -1596,6 +1658,53 @@
     }
     this.doc.fpv = 2;
   };
+
+  /*@3.NOEJ.154*/
+  Editor.prototype.captureEng = function () {
+    if (this.doc.kind === 'board') return;
+    if (document.fonts && document.fonts.status !== 'loaded') this._engRecap = true;
+    var y = {}, n = 0, i, b, node;
+    this.root.style.minBlockSize = '';
+    for (i = 0; i < this.doc.blocks.length; i++) {
+      b = this.doc.blocks[i];
+      if (b.fp) continue;
+      node = this.root.querySelector(':scope > [data-bid="' + b.id + '"]');
+      if (!node) continue;
+      y[b.id] = Math.round(node.offsetTop * 10) / 10;
+      n++;
+    }
+    if (!n) { delete this.doc.eng; return; }
+    this.doc.bd = docDir(this.doc);
+    this.doc.eng = { v: 1, w: 794, h: Math.round(this.root.offsetHeight), y: y };
+    this._engStale = false;
+    this.applyEng();
+  };
+
+  /*@3.NOEJ.155*/
+  Editor.prototype.applyEng = function () {
+    var eng = this.doc.eng;
+    var nodes = this.root.querySelectorAll(':scope > [data-bid]');
+    var i, node, tgt, dY;
+    if (this._engStale || !eng || !eng.y || eng.w !== 794 || this.doc.kind === 'board') {
+      if (!this._engOn) return;
+      this._engOn = false;
+      for (i = 0; i < nodes.length; i++) nodes[i].style.translate = '';
+      this.root.style.minBlockSize = '';
+      return;
+    }
+    this._engOn = true;
+    for (i = 0; i < nodes.length; i++) {
+      node = nodes[i];
+      if (node.hasAttribute('data-fp')) continue;
+      tgt = eng.y[node.getAttribute('data-bid')];
+      if (tgt == null) { node.style.translate = ''; continue; }
+      dY = Math.round((tgt - node.offsetTop) * 10) / 10;
+      node.style.translate = (dY > 0.6 || dY < -0.6) ? ('0 ' + dY + 'px') : '';
+    }
+    this.root.style.minBlockSize = (eng.h > 0) ? (eng.h + 'px') : '';
+  };
+
+  Editor.prototype.docDir = function () { return docDir(this.doc); };
 
   /*@3.NOEJ.90*/
   Editor.prototype.dropTail = function () {
@@ -2298,7 +2407,7 @@
       if (!node) return;
       self.applyStyleAttrs(node, hit.b);
       var eds = node.querySelectorAll('.ne-text, .ne-li, .ne-cell');
-      for (var i = 0; i < eds.length; i++) eds[i].setAttribute('dir', blockDir(hit.b));
+      for (var i = 0; i < eds.length; i++) eds[i].setAttribute('dir', blockDir(hit.b, self.doc));
     });
     this.pushUndo(before);
     this.touch();

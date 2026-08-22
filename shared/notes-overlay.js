@@ -168,6 +168,9 @@
       var selfW = this;
       this._scT = 0;
       this._onSc = function () {
+        /*@3.NOOJ.24*/
+        clearTimeout(selfW._scSettle);
+        selfW._scSettle = setTimeout(function () { selfW.syncWindow(); }, 140);
         if (selfW._scT) return;
         selfW._scT = requestAnimationFrame(function () {
           selfW._scT = 0;
