@@ -1565,7 +1565,12 @@
     list = clone.querySelectorAll('.nov-host');
     for (i = 0; i < list.length; i++) list[i].remove();
     /*@3.NOAJ.81*/
-    var srcC = stage.querySelectorAll('canvas');
+    /*@3.NOAJ.157*/
+    var srcAll = stage.querySelectorAll('canvas');
+    var srcC = [];
+    for (i = 0; i < srcAll.length; i++) {
+      if (!srcAll[i].closest || !srcAll[i].closest('.nov-host')) srcC.push(srcAll[i]);
+    }
     var dstC = clone.querySelectorAll('canvas');
     var zc = stageZoom() || 1;
     for (i = 0; i < dstC.length && i < srcC.length; i++) {
@@ -1704,8 +1709,10 @@
     var fmts = dlg.querySelector('#na-exp-fmts');
     var Sz = window.GardenNotesSerialize;
     if (fmts && Sz) {
+      /*@3.NOAJ.156*/
       var h = '<button type="button" class="na-exp-f" data-fmt="pdf">' +
-        '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span>PDF</span></button>';
+        '<i class="fa-solid fa-print" aria-hidden="true"></i><span>' +
+        esc(L('طباعة', 'Print')) + '</span></button>';
       var order = ['html', 'md', 'txt', 'json'];
       var ic = { html: 'fa-code', md: 'fa-hashtag', txt: 'fa-align-left', json: 'fa-file-arrow-down' };
       for (var i = 0; i < order.length; i++) {

@@ -86,11 +86,18 @@
   }
 
   /*@3.NOSJ4.2*/
+  function hid(b) {
+    var B = window.GardenNotesBlocks;
+    var a = (b.anc || b.ty === 'h') && B && B.anchorOf ? B.anchorOf(b) : '';
+    return a ? ' id="' + esc(a) + '"' : '';
+  }
+
   function blockHtml(b) {
     var s = styleOf(b);
     var lv = b.lv || 2;
     switch (b.ty) {
-      case 'h':       return '<h' + lv + s + '>' + runs(b.rt) + '</h' + lv + '>';
+      /*@3.NOSJ4.6*/
+      case 'h':       return '<h' + lv + s + hid(b) + '>' + runs(b.rt) + '</h' + lv + '>';
       case 'p':       return '<p' + s + '>' + runs(b.rt) + '</p>';
       case 'quote':   return '<blockquote' + s + '>' + runs(b.rt) + '</blockquote>';
       case 'callout': return '<div class="cal"' + s + '>' + runs(b.rt) + '</div>';

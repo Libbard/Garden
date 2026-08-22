@@ -348,6 +348,7 @@
 
   /*@3.NOEJ.35*/
   Editor.prototype.render = function () {
+    this._ancSeen = {};
     var self = this;
     this.closeMenu();
     this.closeMention();
@@ -590,6 +591,12 @@
   Editor.prototype.renderBlock = function (b) {
     var dd = this.doc;
     var wrap = el('div', 'ne-b ne-b-' + b.ty, { 'data-bid': b.id, 'data-ty': b.ty });
+    /*@3.NOEJ.198*/
+    var anc = (b.anc || b.ty === 'h') ? B().anchorOf(b) : '';
+    if (anc) {
+      if (!this._ancSeen) this._ancSeen = {};
+      if (!this._ancSeen[anc]) { this._ancSeen[anc] = 1; wrap.id = anc; }
+    }
     this.applyStyleAttrs(wrap, b);
 
     /*@3.NOEJ.75*/

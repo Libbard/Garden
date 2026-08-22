@@ -59,6 +59,9 @@
     return out;
   }
 
+  /*@3.NOMJ3.33*/
+  var FNUM = {}, FSEQ = 0, FPEND = '', FPENDL = [], FBACK = {};
+
   function harvest(lines) {
     var refs = {}, foot = {}, keep = [], i = 0;
     while (i < lines.length) {
@@ -181,6 +184,14 @@
         i += auto[0].length; continue;
       }
 
+      /*@3.NOMJ3.31*/
+      if (ch === '<' && s.slice(i, i + 4) === '<!--') {
+        var ce = s.indexOf('-->', i + 4);
+        flush();
+        i = ce < 0 ? s.length : ce + 3;
+        continue;
+      }
+
       /*@3.NOMJ3.5*/
       if (ch === '<' && /^<\/?[a-z][^<>]*>/i.test(s.slice(i))) {
         i += s.slice(i).match(/^<\/?[a-z][^<>]*>/i)[0].length; continue;
@@ -189,8 +200,14 @@
       /*@3.NOMJ3.6*/
       var fr = s.slice(i).match(/^\[\^([^\]]+)\]/);
       if (fr && foot[fr[1].toLowerCase()] != null) {
+        /*@3.NOMJ3.34*/
+        var flab = fr[1].toLowerCase();
+        if (!FNUM[flab]) FNUM[flab] = ++FSEQ;
+        if (!FPEND) FPEND = slug('fnref-' + flab);
+        if (FPENDL.indexOf(flab) < 0) FPENDL.push(flab);
         flush();
-        push(out, '[' + fr[1] + ']', Object.assign({}, st, { lk: '#' + slug('fn-' + fr[1]) }));
+        push(out, '\u2066[' + FNUM[flab] + ']\u2069',
+             Object.assign({}, st, { lk: '#' + slug('fn-' + flab) }));
         i += fr[0].length; continue;
       }
 
@@ -382,6 +399,15 @@
     var pendAnc = '';
     function add(b) {
       if (pendAnc && b && !b.anc) { b.anc = pendAnc; pendAnc = ''; }
+      /*@3.NOMJ3.35*/
+      if (FPEND && b && !b.anc) { b.anc = FPEND; }
+      if (FPENDL.length) {
+        for (var fb = 0; fb < FPENDL.length; fb++) {
+          if (b && b.anc) FBACK[FPENDL[fb]] = b.anc;
+        }
+        FPENDL = [];
+      }
+      FPEND = '';
       out.push(b);
       return b;
     }
@@ -416,6 +442,23 @@
         }
         while (isrc.length && !isrc[isrc.length - 1].trim()) isrc.pop();
         add(blank('code', { lang: '', src: isrc.join('\n') }));
+        continue;
+      }
+
+      /*@3.NOMJ3.30*/
+      if (t.slice(0, 4) === '<!--') {
+        var cEnd = t.indexOf('-->');
+        var cTail = '';
+        if (cEnd >= 0) { cTail = t.slice(cEnd + 3).trim(); i++; }
+        else {
+          i++;
+          while (i < lines.length && lines[i].indexOf('-->') < 0) i++;
+          if (i < lines.length) {
+            cTail = lines[i].slice(lines[i].indexOf('-->') + 3).trim();
+            i++;
+          }
+        }
+        if (cTail) { lines = lines.slice(0, i).concat([cTail], lines.slice(i)); }
         continue;
       }
 
@@ -684,24 +727,42 @@
       .replace(/\r\n?/g, '\n')
       .replace(/ /g, ' ')
       .split('\n');
+    FNUM = {}; FSEQ = 0; FPEND = ''; FPENDL = []; FBACK = {};
     var fm = frontMatter(lines);
     if (fm.at) lines = lines.slice(fm.at);
     var h = harvest(lines);
     var ctx = { refs: h.refs, foot: h.foot };
     var out = parseBlocks(h.lines, ctx, 0);
 
-    var keys = Object.keys(h.foot);
+    var keys = Object.keys(h.foot).filter(function (kk) { return FNUM[kk]; })
+      .sort(function (a, b) { return FNUM[a] - FNUM[b]; })
+      .concat(Object.keys(h.foot).filter(function (kk) { return !FNUM[kk]; }));
     if (keys.length) {
       out.push(blank('hr'));
       out.push(blank('h', { lv: 3, rt: [{ s: isAr() ? 'الحواشي' : 'Footnotes' }] }));
       for (var k = 0; k < keys.length; k++) {
+        /*@3.NOMJ3.36*/
+        var fno = FNUM[keys[k]] || (++FSEQ);
         out.push(blank('p', {
           anc: slug('fn-' + keys[k]),
-          rt: [{ s: '[' + keys[k] + '] ', b: 1 }].concat(inline(h.foot[keys[k]], ctx))
+          rt: [{ s: '\u2066[' + fno + ']\u2069 ', b: 1 }]
+            .concat(inline(h.foot[keys[k]], ctx))
+            .concat(FBACK[keys[k]]
+              ? [{ s: ' ' }, { s: '\u2066\u21a9\u2069', lk: '#' + FBACK[keys[k]] }]
+              : [])
         }));
       }
     }
-    if (fm.title) out.unshift(blank('h', { lv: 1, rt: [{ s: fm.title }] }));
+    /*@3.NOMJ3.32*/
+    if (fm.title) {
+      var head0 = out[0], htx = '';
+      if (head0 && head0.ty === 'h') {
+        htx = (head0.rt || []).map(function (r) { return r.s || ''; }).join('').trim();
+      }
+      if (htx !== String(fm.title).trim()) {
+        out.unshift(blank('h', { lv: 1, rt: [{ s: fm.title }] }));
+      }
+    }
     if (!out.length) out.push(blank('p'));
     return out;
   }

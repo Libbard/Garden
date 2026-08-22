@@ -459,6 +459,7 @@
 
   function apply() {
     /*@3.SECJ.410*/
+    EP = null; ccDrop();
     var GF0 = window.GardenFaculty;
     var qw = GF0 && GF0.qPerson ? GF0.qPerson(state.q)
                                 : normAr(state.q.trim()).split(' ').filter(Boolean);
@@ -769,6 +770,14 @@
               : '<b>' + seats + '</b> ' + t('مقعد', 'seats')) +
               (tba ? ' · ' + t(tba + ' لم تُعلَن', tba + ' TBA') : '') + '</span>' +
             (np ? '<span class="sx-grp-n"><b>' + np + '</b> ' + t('أستاذ', 'faculty') + '</span>' : '') +
+            /*@3.SECJ.453*/
+            (function () {
+              var x = browseCf(courseConflicts(code, eProf()));
+              return (x && x.length)
+                ? '<span class="sx-grp-n no is-elig" title="' + esc(cfLong(x).join(' \u00b7 ')) + '">' +
+                  '<i class="fa-solid fa-triangle-exclamation"></i> ' + esc(cfShort(x)) + '</span>'
+                : '';
+            })() +
             '<span class="cv-slot" data-cv-code="' + esc(code) + '"></span>' +
           '</span>' +
         '</button>' +
@@ -842,12 +851,22 @@
       }
       /*@3.SECJ.70*/
       var meF = byC[crn];
-      if (meF && !unlimited(meF.m) && !((meF.a || 0) > 0)) {
-        toast(t('هذه الشعبة ممتلئة — ستحتاج رفعَ تذكرةٍ لمساعد التسجيل في ' +
-                'الخدمات الذاتية لتسجيلها.',
-                'This section is full — you will need to raise a ticket with the ' +
-                'registration assistant in Self Service.'), 7000);
+      /*@3.SECJ.448*/
+      var msgs = [];
+      var cfB = meF ? browseCf(secConflicts(meF, loadProf())) : null;
+      if (cfB && cfB.length) {
+        msgs.push(t('تنبيه — ' + cfLong(cfB).join(' \u00b7 ') +
+                    '. أضفناها، وبوّابة الجامعة قد ترفضها.',
+                    'Heads-up — ' + cfLong(cfB).join(' \u00b7 ') +
+                    '. Added anyway; the portal may refuse it.'));
       }
+      if (meF && !unlimited(meF.m) && !((meF.a || 0) > 0)) {
+        msgs.push(t('هذه الشعبة ممتلئة — ستحتاج رفعَ تذكرةٍ لمساعد التسجيل في ' +
+                    'الخدمات الذاتية لتسجيلها.',
+                    'This section is full — you will need to raise a ticket with the ' +
+                    'registration assistant in Self Service.'));
+      }
+      if (msgs.length) toast(msgs.join(' \u00b7 '), msgs.length > 1 ? 10000 : 7000);
     }
     /*@3.SECJ.71*/
     if (i >= 0 && schHas(crn)) {
@@ -1310,6 +1329,13 @@
       '</span>';
     if (s.cm) badges += '<span class="sx-badge sx-badge--campus">' + esc(campusLabel(s.cm)) + '</span>';
     if (s.ch) badges += '<span class="sx-badge sx-badge--campus">' + esc(hours(s.ch)) + '</span>';
+    /*@3.SECJ.445*/
+    var cfC = browseCf(secConflicts(s, eProf()));
+    if (cfC && cfC.length) {
+      badges += '<span class="sx-badge sx-badge--warn" title="' +
+        esc(cfLong(cfC).join(' \u00b7 ')) + '"><i class="fa-solid fa-triangle-exclamation"></i>' +
+        esc(cfShort(cfC)) + '</span>';
+    }
 
     /*@3.SECJ.132*/
     var seats = capUnknown(max)
@@ -1958,6 +1984,25 @@
     return CAT_CORE.concat(extra);
   }
 
+  /*@3.SECJ.451*/
+  var RQ_CATS = { Colleges: 'co', Departments: 'dp', Programs: 'pg', Classes: 'cl' };
+  function restrToRq(r0) {
+    if (!r0) return null;
+    function side(o) {
+      var out = null;
+      for (var cat in RQ_CATS) {
+        var it = o && o[cat];
+        if (!it || !it.length) continue;
+        var codes = it.map(function (x) { return x && (x.c || x.n); }).filter(Boolean);
+        if (codes.length) (out = out || {})[RQ_CATS[cat]] = codes;
+      }
+      return out;
+    }
+    var m = side(r0.must) || {}, x = side(r0.cannot);
+    if (x) m.x = x;
+    return m;
+  }
+
   function reqsHtml(d) {
     var h = '';
 
@@ -2021,6 +2066,21 @@
     /*@3.SECJ.168*/
     h += '<div class="sx-sec-h">' + t('من يحقّ له التسجيل', 'Who may register') + '</div>';
     var r0 = d.restrictions;
+    /*@3.SECJ.446*/
+    var vcf = secConflicts({ rq: restrToRq(r0) }, loadProf());
+    if (vcf) {
+      h += '<div class="sx-req-g ' + (vcf.length ? 'bad' : 'ok') + '"><div class="sx-req-lead">' +
+        '<i class="fa-solid fa-' + (vcf.length ? 'circle-xmark' : 'circle-check') + '"></i>' +
+        (vcf.length ? t('حالتك: لا يصحّ لك التسجيل فيها', 'Your status: not eligible')
+                    : t('حالتك: تنطبق عليك شروط الأهليّة', 'Your status: eligible')) +
+        '</div>' +
+        (vcf.length
+          ? '<div class="sx-req-you">' +
+            cfLong(vcf).map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') +
+            '</div>'
+          : '') +
+        '</div>';
+    }
     if (!r0) {
       h += '<div class="sx-req-none">' + t('لم تُجلب بعدُ لهذه الشعبة — تُحصد تباعاً',
                                             'Not harvested yet for this section') + '</div>';
@@ -2436,6 +2496,7 @@
     var p = loadProf();
     for (var k in patch) if (Object.prototype.hasOwnProperty.call(patch, k)) p[k] = patch[k];
     try { localStorage.setItem(PROF_KEY, JSON.stringify(p)); } catch (e) {}
+    EP = null; ccDrop();
     return p;
   }
   /*@3.SECJ.215*/
@@ -2453,13 +2514,155 @@
   /*@3.SECJ.217*/
   var LV_AR = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس',
                'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر'];
+  /*@3.SECJ.449*/
+  var CLASS_AR = {
+    GY: 'السنة التأسيسية للدراسات العليا', GM: 'التأسيسيّ للدراسات العليا',
+    GR: 'الدراسات العليا', GD: 'الدبلوم العالي',
+    PY: 'السنة الأولى المشتركة', PL: 'الفصل الأول المشترك',
+    PM: 'التحضيريّ للإعلام الإلكتروني',
+    G1: 'الماجستير · المستوى الأول', G2: 'الماجستير · المستوى الثاني',
+    G3: 'الماجستير · المستوى الثالث', G4: 'الماجستير · المستوى الرابع',
+    G5: 'الماجستير · المستوى الخامس', G6: 'الماجستير · المستوى السادس'
+  };
+  var CLASS_EN = {
+    GY: 'Graduate Foundation Year', GM: 'Graduate Foundation',
+    GR: 'Graduate', GD: 'Graduate (Diploma)',
+    PY: 'Common First Year', PL: 'Common First Term',
+    PM: 'Prep Electronic Media Term',
+    G1: 'Graduate Level One', G2: 'Graduate Level Two',
+    G3: 'Graduate Level Three', G4: 'Graduate Level Four',
+    G5: 'Graduate Level Five', G6: 'Graduate Level Six'
+  };
   function levelLabel(code, name) {
     var n = parseInt(code, 10);
     if (isFinite(n) && n >= 1 && n <= 10 && /^0?\d$/.test(String(code)))
       return isAr() ? ('المستوى ' + LV_AR[n]) : ('Level ' + n);
-    return name || code;
+    var u = String(code == null ? '' : code).trim().toUpperCase();
+    return (isAr() ? CLASS_AR[u] : CLASS_EN[u]) || name || code;
   }
   function isStudyLevel(code) { return /^0?[1-9]$/.test(String(code)); }
+
+  /*@3.SECJ.441*/
+  function lvCode(v) {
+    var s = String(v == null ? '' : v).trim().toUpperCase();
+    var m = s.match(/^0?([1-9])$/);
+    return m ? '0' + m[1] : s;
+  }
+  function rqHas(list, code, lvl) {
+    if (!list || !list.length || !code) return false;
+    for (var i = 0; i < list.length; i++) {
+      var v = lvl ? lvCode(list[i]) : String(list[i]).toUpperCase();
+      if (v === code) return true;
+    }
+    return false;
+  }
+
+  /*@3.SECJ.442*/
+  var RQ_KEYS = [
+    { k: 'cl', lvl: true,  cat: 'Classes' },
+    { k: 'co', lvl: false, cat: 'Colleges' },
+    { k: 'dp', lvl: false, cat: 'Departments' }
+  ];
+  function mineOf(key, p) {
+    if (key === 'cl') return (p.levels || []).map(lvCode).filter(Boolean);
+    if (key === 'co') return p.college ? [String(p.college).toUpperCase()] : [];
+    if (key === 'dp') return p.department ? [String(p.department).toUpperCase()] : [];
+    return [];
+  }
+  function judgeable(p) {
+    return !!(p && ((p.levels && p.levels.length) || p.college || p.department));
+  }
+  function secConflicts(s, p) {
+    var rq = s && s.rq;
+    if (!rq || !judgeable(p)) return null;
+    var x = rq.x || {}, out = [];
+    RQ_KEYS.forEach(function (d) {
+      var mine = mineOf(d.k, p);
+      if (!mine.length) return;
+      var banned = mine.filter(function (v) { return rqHas(x[d.k], v, d.lvl); });
+      if (banned.length === mine.length) {
+        out.push({ k: d.k, cat: d.cat, side: 'x', v: banned });
+        return;
+      }
+      var must = rq[d.k];
+      if (must && must.length && !mine.some(function (v) { return rqHas(must, v, d.lvl); })) {
+        out.push({ k: d.k, cat: d.cat, side: 'm', v: must });
+      }
+    });
+    return out;
+  }
+
+  /*@3.SECJ.443*/
+  var CC_C = null, CC_IX = null;
+  function ccDrop() { CC_C = null; CC_IX = null; }
+  function ccKey(c) {
+    return window.GardenCode ? window.GardenCode.canon(c || '')
+                             : String(c || '').toUpperCase();
+  }
+  function ccIndex() {
+    if (CC_IX) return CC_IX;
+    CC_IX = {};
+    (state.all || []).forEach(function (s) {
+      if (s.gone) return;
+      var k = ccKey(s.c);
+      if (k) (CC_IX[k] = CC_IX[k] || []).push(s);
+    });
+    return CC_IX;
+  }
+  function courseConflicts(code, p) {
+    var k = ccKey(code);
+    if (!k || !judgeable(p)) return null;
+    CC_C = CC_C || {};
+    if (Object.prototype.hasOwnProperty.call(CC_C, k)) return CC_C[k];
+    var secs = ccIndex()[k] || [], best = null, known = false;
+    for (var i = 0; i < secs.length; i++) {
+      var c = secConflicts(secs[i], p);
+      if (!c) continue;
+      known = true;
+      if (!best || c.length < best.length) best = c;
+      if (best && !best.length) break;
+    }
+    CC_C[k] = known ? (best || []) : null;
+    return CC_C[k];
+  }
+
+  /*@3.SECJ.444*/
+  var CF_TX = {
+    cl: { x: ['مستواك مستثنًى صراحةً: ', 'Your level is explicitly excluded: '],
+          m: ['مقصورةٌ على المستويات: ', 'Limited to levels: '] },
+    co: { x: ['كلّيتك مستثناة: ', 'Your college is excluded: '],
+          m: ['مقصورةٌ على الكلّيات: ', 'Limited to colleges: '] },
+    dp: { x: ['قسمك مستثنًى: ', 'Your department is excluded: '],
+          m: ['مقصورةٌ على الأقسام: ', 'Limited to departments: '] }
+  };
+  function cfName(c, v) {
+    return c.k === 'cl' ? levelLabel(v, taxName('Classes', v)) : taxName(c.cat, v);
+  }
+  function cfLong(list) {
+    return (list || []).map(function (c) {
+      var names = c.v.map(function (v) { return cfName(c, v); }).join(isAr() ? '، ' : ', ');
+      var tx = CF_TX[c.k][c.side];
+      return t(tx[0] + names, tx[1] + names);
+    });
+  }
+  function cfShort(list) {
+    var c = (list || [])[0];
+    if (!c) return '';
+    if (c.k === 'cl') return c.side === 'x' ? t('خارج مستواك', 'Not for your level')
+                                            : t('لمستوًى آخر', 'Other levels');
+    if (c.k === 'co') return t('خارج كلّيتك', 'Other college');
+    return t('خارج قسمك', 'Other department');
+  }
+  /*@3.SECJ.454*/
+  function browseCf(list) {
+    if (!list || !list.length) return list;
+    return list.filter(function (c) {
+      return !(c.side === 'm' && (c.k === 'co' || c.k === 'dp'));
+    });
+  }
+  /*@3.SECJ.452*/
+  var EP = null;
+  function eProf() { return EP || (EP = loadProf()); }
 
   function taxName(cat, code) {
     var l = TAX && TAX[cat];
@@ -2932,10 +3135,29 @@
                 /*@3.SECJ.269*/
                 (ix[c].tr && ix[c].tr.length
                   ? '<em class="trk">' + esc(trackName(ix[c].tr)) + '</em>' : '') +
+                /*@3.SECJ.447*/
+                (function () {
+                  var x = browseCf(courseConflicts(c, d));
+                  return (x && x.length)
+                    ? '<em class="no" title="' + esc(cfLong(x).join(' \u00b7 ')) + '">' +
+                      esc(cfShort(x)) + '</em>' : '';
+                })() +
                 '<em>' + (ix[c].ch || '؟') + t(' س', 'cr') + '</em></button>';
             }).join('') + '</div>'
           : '<div class="sx-req-none">' + t('لا مواد متاحة بهذه الشروط',
                                             'No eligible courses under these settings') + '</div>') +
+        (function () {
+          var bad = open.filter(function (c) {
+            var x = browseCf(courseConflicts(c, d)); return !!(x && x.length);
+          });
+          if (!bad.length) return '';
+          return '<div class="sx-hint is-warn"><i class="fa-solid fa-triangle-exclamation"></i> ' +
+            t(bad.length + ' مادة تخالف شروطَ أهليّتك (مستواك أو كلّيتك أو قسمك) — ' +
+              'لك أن تختارها، لكنّ بوّابة الجامعة قد ترفضها: ',
+              bad.length + ' course(s) conflict with your eligibility — you may still ' +
+              'pick them, but the university portal may refuse: ') +
+            '<b>' + esc(bad.slice(0, 8).join('، ')) + '</b></div>';
+        })() +
         (later.length
           ? '<div class="sx-ts-yr" style="margin-top:1rem"><span>' +
               t('هذه المواد غير متاحة في هذا الفصل حتى الآن — اختر ما تريد ونُنبّهك فور توفّرها',
@@ -3211,7 +3433,8 @@
     if (p.department && s.rq.dp && s.rq.dp.indexOf(p.department) < 0) return false;
     /*@3.SECJ.294*/
     if (p.only_my_level && p.levels && p.levels.length && s.rq.cl) {
-      var hit = p.levels.some(function (l) { return s.rq.cl.indexOf(l) >= 0; });
+      /*@3.SECJ.450*/
+      var hit = p.levels.some(function (l) { return rqHas(s.rq.cl, lvCode(l), true); });
       if (!hit) return false;
     }
     return true;
