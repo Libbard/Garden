@@ -93,11 +93,21 @@
                 (fcss ? ' style="font-family:&quot;' + esc(fcss) + '&quot;,sans-serif"' : '') + '>';
         close = '</span>' + close;
       }
+      /*@3.NOBJ.20*/
       if (r.lk) {
-        var href = httpsOnly(r.lk);
-        if (href) {
-          open += '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer nofollow">';
+        var lkv = String(r.lk);
+        if (lkv.charAt(0) === '#') {
+          open += '<a class="ne-xl" href="' + esc(lkv) + '" data-nl="' + esc(lkv) + '">';
           close = '</a>' + close;
+        } else if (/^note:/i.test(lkv) && !/["'<>\s]/.test(lkv)) {
+          open += '<a class="ne-xl ne-xl--note" href="#" data-nl="' + esc(lkv) + '">';
+          close = '</a>' + close;
+        } else {
+          var href = httpsOnly(lkv);
+          if (href) {
+            open += '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer nofollow">';
+            close = '</a>' + close;
+          }
         }
       }
       return open + txt + close;
@@ -127,7 +137,12 @@
       else if (tag === 'span' && n.hasAttribute('data-fg')) next.fg = n.getAttribute('data-fg') || '';
       else if (tag === 'span' && n.hasAttribute('data-ff')) next.ff = n.getAttribute('data-ff') || '';
       else if (tag === 'span' && n.hasAttribute('data-fz')) next.fz = parseFloat(n.getAttribute('data-fz')) || 0;
-      else if (tag === 'a') { var h = httpsOnly(n.getAttribute('href')); if (h) next.lk = h; }
+      else if (tag === 'a') {
+        /*@3.NOBJ.21*/
+        var nl = n.getAttribute('data-nl');
+        if (nl) next.lk = nl;
+        else { var h = httpsOnly(n.getAttribute('href')); if (h) next.lk = h; }
+      }
       else if (tag === 'br') { out.push(Object.assign({}, st, { s: '\n' })); continue; }
       nodeRuns(n, next, out);
     }
@@ -160,23 +175,9 @@
     return rt.map(function (r) { return r.s == null ? '' : r.s; }).join('');
   }
 
-  /*@3.NOBJ.4*/
   function runsToMd(rt) {
-    if (!Array.isArray(rt)) return '';
-    return rt.map(function (r) {
-      var raw = r.s == null ? '' : r.s;
-      if (!raw.trim()) return raw;
-      var lead = raw.match(/^\s*/)[0];
-      var tail = raw.match(/\s*$/)[0];
-      var t = raw.slice(lead.length, raw.length - tail.length);
-      if (r.c) t = '`' + t + '`';
-      if (r.b) t = '**' + t + '**';
-      if (r.i) t = '*' + t + '*';
-      if (r.st) t = '~~' + t + '~~';
-      if (r.hl) t = '==' + t + '==';
-      if (r.lk) t = '[' + t + '](' + r.lk + ')';
-      return lead + t + tail;
-    }).join('').replace(/\n/g, '  \n');
+    var M = window.GardenNotesMd;
+    return M ? M.runsToMd(rt) : runsToText(rt);
   }
 
   function blank(ty, extra) {
@@ -194,6 +195,42 @@
     return Object.assign(b, extra || {});
   }
 
+  /*@3.NOBJ.22*/
+  function anchorOf(b) {
+    if (!b) return '';
+    if (b.anc) return String(b.anc);
+    var M = window.GardenNotesMd;
+    var t = runsToText(b.rt || []);
+    return (M && M.slug) ? M.slug(t) : '';
+  }
+
+  /*@3.NOBJ.19*/
+  function listHtml(b, runsFn, liAttr) {
+    var items = b.items || [];
+    var rootOrd = (b.ty === 'ol');
+    var out = '', open = [];
+    function tagOf(o) { return o ? 'ol' : 'ul'; }
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i] || {};
+      var lv = Math.max(0, Math.min(5, it.lv || 0));
+      var ord = (it.o != null) ? !!it.o : rootOrd;
+      while (open.length > lv + 1) { out += '</li></' + tagOf(open.pop()) + '>'; }
+      if (!open.length) { out += '<' + tagOf(ord) + '>'; open.push(ord); }
+      else if (open.length < lv + 1) { out += '<' + tagOf(ord) + '>'; open.push(ord); }
+      else {
+        out += '</li>';
+        if (open[open.length - 1] !== ord) {
+          out += '</' + tagOf(open.pop()) + '><' + tagOf(ord) + '>';
+          open.push(ord);
+        }
+      }
+      out += '<li' + (liAttr ? liAttr(it, i) : '') + '>' + runsFn(it.rt);
+    }
+    while (open.length) { out += '</li></' + tagOf(open.pop()) + '>'; }
+    return out;
+  }
+
+  /*@3.NOBJ.5*/
   function normalize(doc) {
     var d = (doc && typeof doc === 'object') ? doc : {};
     var blocks = Array.isArray(d.blocks) ? d.blocks : [];
@@ -264,244 +301,29 @@
   }
 
   function toMarkdown(doc) {
-    return liveBlocks(doc).map(function (b) {
-      switch (b.ty) {
-        case 'h':     return new Array((b.lv || 2) + 1).join('#') + ' ' + runsToMd(b.rt);
-        case 'p':     return runsToMd(b.rt);
-        case 'quote': return '> ' + runsToMd(b.rt);
-        case 'callout': return '> **!** ' + runsToMd(b.rt);
-        case 'todo':  return '- [' + (b.done ? 'x' : ' ') + '] ' + runsToMd(b.rt);
-        case 'ul':    return (b.items || []).map(function (it) { return '- ' + runsToMd(it.rt); }).join('\n');
-        case 'ol':    return (b.items || []).map(function (it, i) { return (i + 1) + '. ' + runsToMd(it.rt); }).join('\n');
-        case 'code':  return '```' + (b.lang || '') + '\n' + (b.src || '') + '\n```';
-        case 'math':  return b.display ? '$$\n' + (b.tex || '') + '\n$$' : '$' + (b.tex || '') + '$';
-        case 'tbl':   return tableMd(b);
-        case 'img':   return b.url ? '![' + (b.alt || '') + '](' + b.url + ')' : '';
-        case 'ink':   return '_[drawing]_';
-        case 'hr':    return '---';
-        default:      return '';
-      }
-    }).filter(function (x) { return x !== ''; }).join('\n\n');
-  }
-
-  function tableMd(b) {
-    var rows = b.rows || [];
-    if (!rows.length) return '';
-    var head = rows[0].map(function (c) { return runsToMd(c.rt) || ' '; });
-    var sep = head.map(function () { return '---'; });
-    var body = rows.slice(1).map(function (r) {
-      return '| ' + r.map(function (c) { return runsToMd(c.rt) || ' '; }).join(' | ') + ' |';
-    });
-    return ['| ' + head.join(' | ') + ' |', '| ' + sep.join(' | ') + ' |'].concat(body).join('\n');
+    var M = window.GardenNotesMd;
+    return M ? M.toMarkdown(doc) : toText(doc);
   }
 
   var TONES = ['ink', 'amber', 'rose', 'violet', 'emerald', 'sky',
                'lime', 'orange', 'red', 'pink', 'teal', 'indigo'];
 
-  /*@3.NOBJ.5*/
 
-  /*@3.NOBJ.14*/
+  /*@3.NOBJ.18*/
   function mdInline(text) {
-    var out = [], i = 0, buf = '', s = String(text == null ? '' : text);
-    function flush(st) {
-      if (!buf) return;
-      out.push(Object.assign({ s: buf }, st || {}));
-      buf = '';
-    }
-    var RULES = [
-      { open: '`',   key: 'c',  len: 1 },
-      { open: '***', keys: ['b', 'i'], len: 3 },
-      { open: '**',  key: 'b',  len: 2 },
-      { open: '~~',  key: 'st', len: 2 },
-      { open: '*',   key: 'i',  len: 1 },
-      { open: '_',   key: 'i',  len: 1 }
-    ];
-    while (i < s.length) {
-      var ch = s.charAt(i);
-      if (ch === '\\' && i + 1 < s.length) { buf += s.charAt(i + 1); i += 2; continue; }
-      if (ch === '[') {
-        var close = s.indexOf('](', i);
-        if (close > i) {
-          var end = s.indexOf(')', close + 2);
-          if (end > close) {
-            var label = s.slice(i + 1, close);
-            var href = httpsOnly(s.slice(close + 2, end).split(' ')[0]);
-            if (href) {
-              flush();
-              var inner = mdInline(label);
-              for (var k = 0; k < inner.length; k++) { inner[k].lk = href; out.push(inner[k]); }
-              i = end + 1;
-              continue;
-            }
-          }
-        }
-      }
-      var hit = null;
-      for (var r = 0; r < RULES.length; r++) {
-        var rule = RULES[r];
-        if (s.substr(i, rule.len) !== rule.open) continue;
-        var stop = s.indexOf(rule.open, i + rule.len);
-        if (stop < 0) continue;
-        hit = { rule: rule, stop: stop };
-        break;
-      }
-      if (hit) {
-        flush();
-        var body = s.slice(i + hit.rule.len, hit.stop);
-        var style = {};
-        if (hit.rule.keys) { for (var q = 0; q < hit.rule.keys.length; q++) style[hit.rule.keys[q]] = 1; }
-        else style[hit.rule.key] = 1;
-        if (hit.rule.key === 'c') {
-          out.push(Object.assign({ s: body }, style));
-        } else {
-          var kids = mdInline(body);
-          for (var d = 0; d < kids.length; d++) out.push(Object.assign(kids[d], style));
-        }
-        i = hit.stop + hit.rule.len;
-        continue;
-      }
-      buf += ch;
-      i++;
-    }
-    flush();
-    return out.filter(function (x) { return x.s; });
-  }
-
-  function mdRow(line) {
-    var t = line.trim().replace(/^\|/, '').replace(/\|$/, '');
-    return t.split('|').map(function (c) { return { rt: mdInline(c.trim()) }; });
+    var M = window.GardenNotesMd;
+    return M ? M.inline(text) : [{ s: String(text == null ? '' : text) }];
   }
 
   function looksMarkdown(text) {
-    var s = String(text || '');
-    if (!s) return false;
-    return /(^|\n)#{1,6}\s/.test(s) || /(^|\n)\s*[-*+]\s/.test(s) ||
-           /(^|\n)\s*\d+[.)]\s/.test(s) || /(^|\n)\s*>\s/.test(s) ||
-           /```/.test(s) || /(^|\n)\s*\|.*\|/.test(s) ||
-           /\*\*[^*\n]+\*\*/.test(s) || /(^|\n)\s*(-{3,}|\*{3,})\s*$/.test(s) ||
-           /!\[[^\]]*\]\(/.test(s);
+    var M = window.GardenNotesMd;
+    return M ? M.looksMarkdown(text) : false;
   }
 
   function fromMarkdown(text) {
-    var lines = String(text == null ? '' : text).replace(/\r\n?/g, '\n').split('\n');
-    var out = [], i = 0;
-
-    function push(b) { out.push(b); return b; }
-
-    while (i < lines.length) {
-      var line = lines[i];
-      var t = line.trim();
-
-      if (!t) { i++; continue; }
-
-      var fence = t.match(/^```+\s*([A-Za-z0-9+#._-]*)\s*$/);
-      if (fence) {
-        var lang = (fence[1] || '').toLowerCase();
-        var src = [];
-        i++;
-        while (i < lines.length && !/^```+\s*$/.test(lines[i].trim())) { src.push(lines[i]); i++; }
-        i++;
-        push(blank('code', { lang: lang, src: src.join('\n') }));
-        continue;
-      }
-
-      if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) { push(blank('hr')); i++; continue; }
-
-      var mth = t.match(/^\$\$(.*)$/);
-      if (mth) {
-        var tex = [];
-        if (/\$\$$/.test(t) && t.length > 3) {
-          tex.push(t.slice(2, -2));
-          i++;
-        } else {
-          tex.push(mth[1]); i++;
-          while (i < lines.length && !/\$\$\s*$/.test(lines[i])) { tex.push(lines[i]); i++; }
-          if (i < lines.length) { tex.push(lines[i].replace(/\$\$\s*$/, '')); i++; }
-        }
-        push(blank('math', { tex: tex.join('\n').trim(), display: 1 }));
-        continue;
-      }
-
-      var img = t.match(/^!\[([^\]]*)\]\(([^)\s]+)/);
-      if (img) {
-        var url = httpsOnly(img[2]);
-        if (url) { push(blank('img', { url: url, alt: img[1] || '' })); i++; continue; }
-      }
-
-      var head = t.match(/^(#{1,6})\s+(.*)$/);
-      if (head) {
-        push(blank('h', { lv: Math.min(3, head[1].length), rt: mdInline(head[2]) }));
-        i++;
-        continue;
-      }
-
-      if (/^\|.*\|/.test(t) && i + 1 < lines.length &&
-          /^\|?[\s:|-]+\|[\s:|-]*$/.test(lines[i + 1].trim())) {
-        var rows = [mdRow(lines[i])];
-        i += 2;
-        while (i < lines.length && /\|/.test(lines[i]) && lines[i].trim()) {
-          rows.push(mdRow(lines[i])); i++;
-        }
-        var cols = 0;
-        for (var rr = 0; rr < rows.length; rr++) cols = Math.max(cols, rows[rr].length);
-        for (var r2 = 0; r2 < rows.length; r2++) {
-          while (rows[r2].length < cols) rows[r2].push({ rt: [] });
-        }
-        push(blank('tbl', { cols: cols, st: 'head', rows: rows }));
-        continue;
-      }
-
-      var quote = t.match(/^>\s?(.*)$/);
-      if (quote) {
-        var qs = [quote[1]];
-        i++;
-        while (i < lines.length && /^\s*>\s?/.test(lines[i])) {
-          qs.push(lines[i].replace(/^\s*>\s?/, '')); i++;
-        }
-        push(blank('quote', { rt: mdInline(qs.join('\n')) }));
-        continue;
-      }
-
-      var todo = t.match(/^[-*+]\s+\[([ xX])\]\s+(.*)$/);
-      if (todo) {
-        push(blank('todo', { done: /[xX]/.test(todo[1]) ? 1 : 0, rt: mdInline(todo[2]) }));
-        i++;
-        continue;
-      }
-
-      var bullet = t.match(/^[-*+]\s+(.*)$/);
-      var num = t.match(/^\d+[.)]\s+(.*)$/);
-      if (bullet || num) {
-        var ty = bullet ? 'ul' : 'ol';
-        var items = [];
-        while (i < lines.length) {
-          var lt = lines[i].trim();
-          var lv = Math.floor((lines[i].match(/^\s*/)[0].length) / 2);
-          if (lt.match(/^[-*+]\s+\[([ xX])\]\s+/)) break;
-          var m2 = ty === 'ul' ? lt.match(/^[-*+]\s+(.*)$/) : lt.match(/^\d+[.)]\s+(.*)$/);
-          if (!m2) break;
-          var it = { rt: mdInline(m2[1]) };
-          if (lv > 0) it.lv = Math.min(5, lv);
-          items.push(it);
-          i++;
-        }
-        if (!items.length) { push(blank('p', { rt: mdInline(t) })); i++; continue; }
-        push(blank(ty, { items: items }));
-        continue;
-      }
-
-      var para = [t];
-      i++;
-      while (i < lines.length && lines[i].trim() &&
-             !/^(#{1,6}\s|>|\s*[-*+]\s|\s*\d+[.)]\s|```|\||\$\$|!\[)/.test(lines[i].trim()) &&
-             !/^(-{3,}|\*{3,}|_{3,})$/.test(lines[i].trim())) {
-        para.push(lines[i].trim()); i++;
-      }
-      push(blank('p', { rt: mdInline(para.join('\n')) }));
-    }
-
-    if (!out.length) out.push(blank('p'));
-    return out;
+    var M = window.GardenNotesMd;
+    if (M) return M.parse(text);
+    return [blank('p', { rt: [{ s: String(text == null ? '' : text) }] })];
   }
 
   var DIRS = ['auto', 'rtl', 'ltr'];
@@ -560,6 +382,8 @@
     readRuns: readRuns,
     runsToText: runsToText,
     runsToMd: runsToMd,
+    listHtml: listHtml,
+    anchorOf: anchorOf,
     httpsOnly: httpsOnly,
     normUrl: normUrl,
     esc: esc,

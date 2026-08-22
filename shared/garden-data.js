@@ -1377,6 +1377,17 @@
     return rec;
   }
 
+  /*@3.GADJ.138*/
+  function linkRichNote(note) {
+    if (!note || !note.id) return null;
+    var tid = 'task_note_' + note.id;
+    if (!note.remind_at) { deleteTask(tid); return null; }
+    var f = noteToTaskFields(note);
+    f.note = '';
+    f.origin = { type: 'note', uid: String(note.id), src: 'rich' };
+    return upsertTask(f);
+  }
+
   /*@3.GADJ.128*/
   function convertNoteToTask(note) { return linkNoteToTask(note); }
 
@@ -1460,7 +1471,9 @@
       return {
         id: t.id, source: 'task', editable: true,
         course: t.course || null, title: t.title, type: t.type,
-        due: t.due, done: !!t.done, note: t.note || ''
+        due: t.due, done: !!t.done, note: t.note || '',
+        /*@3.GADJ.139*/
+        origin: t.origin || null
       };
     });
 
@@ -1635,6 +1648,7 @@
     upsertNote: upsertNote,
     setNoteReminder: setNoteReminder,
     linkNoteToTask: linkNoteToTask,
+    linkRichNote: linkRichNote,
     convertNoteToTask: convertNoteToTask,
     migrateTimedNotes: migrateTimedNotes,
     prefs: prefs,

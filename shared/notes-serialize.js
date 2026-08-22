@@ -96,10 +96,8 @@
       case 'callout': return '<div class="cal"' + s + '>' + runs(b.rt) + '</div>';
       case 'todo':    return '<p class="td"' + s + '><span class="bx">' +
                         (b.done ? '&#10003;' : '&#160;') + '</span>' + runs(b.rt) + '</p>';
-      case 'ul':      return '<ul' + s + '>' + (b.items || []).map(function (it) {
-                        return '<li>' + runs(it.rt) + '</li>'; }).join('') + '</ul>';
-      case 'ol':      return '<ol' + s + '>' + (b.items || []).map(function (it) {
-                        return '<li>' + runs(it.rt) + '</li>'; }).join('') + '</ol>';
+      case 'ul':
+      case 'ol':      return '<div' + s + '>' + B().listHtml(b, runs) + '</div>';
       case 'code':    return '<pre dir="ltr" data-lang="' + esc(b.lang || '') + '">' +
                         esc(b.src || '') + '</pre>';
       case 'math':    return '<p class="mth" dir="ltr">' +

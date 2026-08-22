@@ -385,7 +385,7 @@
       var L = axLabel(w, dig.charAt(i));
       if (!L) return '';
       return '<span class="fc-cm-ax" data-tone="' + L.tone + '">' +
-        '<b>' + esc(t(w.ar, w.en)) + '</b>' + esc(L.v) + '</span>';
+        '<b>' + esc(t(w.ar, w.en)) + '</b><em>' + esc(L.v) + '</em></span>';
     }).join('');
     var rep = (canRep && c.p && window.GardenReport)
       ? GardenReport.button('faculty', c.p, c.c || '', { host: '.fc-cm' }) : '';

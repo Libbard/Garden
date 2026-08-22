@@ -707,6 +707,9 @@
     if (label) label.value = (ctx && ctx.text) || '';
     dlg.__ed = ed;
     dlg.__ctx = ctx;
+    /*@3.NORJ.26*/
+    try { dlg.dispatchEvent(new CustomEvent('garden:notesLinkOpen', { bubbles: true })); }
+    catch (eE) {}
     try { dlg.showModal(); } catch (e) {}
     setTimeout(function () { if (input) input.focus(); }, 40);
   };

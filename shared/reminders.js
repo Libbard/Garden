@@ -332,7 +332,10 @@
         body: tx('الموعد ', 'Due ') + fmtWhen(eventMs),
         fireAt: applyQuiet(fireAt),
         eventAt: eventMs,
-        url: 'index.html#tasks',
+        /*@3.REMJ.91*/
+        url: (t.origin && t.origin.type === 'note' && t.origin.uid)
+          ? ('hub/notes.html?id=' + encodeURIComponent(t.origin.uid))
+          : 'index.html#tasks',
         course: t.course || null
       });
     });

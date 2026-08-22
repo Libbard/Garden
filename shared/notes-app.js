@@ -969,6 +969,8 @@
     var shb = document.getElementById('na-share-btn');
     if (shb) shb.disabled = !on;
     /*@3.NOAJ.143*/
+    var rb0 = document.getElementById('na-remind-btn');
+    if (rb0) rb0.disabled = !on;
     ['naDel', 'naPin', 'naMove', 'naPage'].forEach(function (k) {
       if (els[k]) els[k].disabled = !on;
     });
@@ -984,6 +986,7 @@
   /*@3.NOAJ.139*/
   var MORE = [
     { id: 'na-pin',      icon: 'fa-thumbtack',   ar: 'تثبيت',        en: 'Pin' },
+    { id: 'na-remind-btn', icon: 'fa-bell',      ar: 'تنبيهٌ لهذه الملاحظة', en: 'Remind me' },
     { id: 'na-export',   icon: 'fa-file-export', ar: 'تصدير واستيراد', en: 'Export & import' },
     { id: 'na-move-btn', icon: 'fa-folder-open', ar: 'نقل إلى مجلّد', en: 'Move to folder' },
     { id: 'na-del',      icon: 'fa-trash',       ar: 'حذف',          en: 'Delete', danger: 1 }
@@ -1962,6 +1965,21 @@
         onSave: function (d) { persist(id, d); },
         onSelState: function (st) { if (ribbon) ribbon.setState(st); },
         onSelectAll: function () { selectEverything(); },
+        onNoteLink: function (t) { resolveNoteLink(t); },
+        noteList: function () {
+          return idxRead().filter(function (r) { return r.id !== edId && !r.a && r.t; })
+            .sort(function (x, y) { return (y.updated_at || 0) - (x.updated_at || 0); })
+            .slice(0, 80);
+        },
+        onLinkMiss: function () {
+          saveState('error', L('لا يوجد عنوانٌ بهذا الاسم في الملاحظة.',
+                               'No heading with that name in this note.'));
+        },
+        /*@3.NOAJ.147*/
+        onSelMode: function (on) {
+          if (overlay && overlay.setPick) overlay.setPick(!!on);
+          if (ribbon && ed) ribbon.setState(ed.selState());
+        },
         onLayout: function () { queueFit(); },
         onImagePaste: function () {
           saveState('error', L('الصور برابط خارجيّ', 'Images by link only'));
@@ -2104,6 +2122,85 @@
     if (St) St.putDoc(id, doc, now).then(go, go); else go();
   }
 
+  /*@3.NOAJ.148*/
+  function normTitle(t) {
+    return String(t == null ? '' : t).trim().toLowerCase()
+      .replace(/[\u064b-\u0652\u0640]/g, '').replace(/\s+/g, ' ');
+  }
+
+  function resolveNoteLink(target) {
+    var t = String(target || '').replace(/^note:/i, '');
+    if (!t) return;
+    if (t.charAt(0) !== '?') {
+      if (idxFind(t)) { openNote(t); return; }
+      saveState('error', L('الملاحظةُ المرتبطةُ لم تعد موجودة.', 'The linked note no longer exists.'));
+      return;
+    }
+    var want = '';
+    try { want = new URLSearchParams(t.slice(1)).get('t') || ''; } catch (e) { return; }
+    if (!want) return;
+    var all = idxRead(), i;
+    for (i = 0; i < all.length; i++) if ((all[i].t || '') === want) { openNote(all[i].id); return; }
+    var soft = normTitle(want);
+    for (i = 0; i < all.length; i++) if (normTitle(all[i].t) === soft) { openNote(all[i].id); return; }
+    askMakeNote(want);
+  }
+
+  function askMakeNote(title) {
+    var dlg = document.getElementById('na-confirm');
+    if (!dlg) { createNamed(title); return; }
+    pendDelete = null; pendMany = null; pendFolder = null;
+    pendMake = String(title).slice(0, 80);
+    confirmTitle('لا توجد ملاحظةٌ بهذا العنوان', 'No note with that title');
+    confirmSub('أتُنشئها الآن بهذا العنوان؟ ويبقى الرابطُ عاملاً بعدها.',
+               'Create it now with that title? The link will work from then on.');
+    confirmOkLabel('أنشئها', 'Create it');
+    var w = dlg.querySelector('[data-role="what"]');
+    if (w) w.textContent = pendMake;
+    try { dlg.showModal(); } catch (e) {}
+  }
+
+  function createNamed(title) {
+    var B0 = window.GardenNotesBlocks;
+    var id = newId('rn');
+    var now = Date.now();
+    var rec = { id: id, t: String(title).slice(0, 80), k: 'rich', o: {}, g: [], c: null,
+                f: (S.view.k === 'folder') ? S.view.id : null,
+                p: 0, a: 0, ca: now, updated_at: now, sz: 0 };
+    idxPut(rec);
+    var doc = { v: 1, blocks: [B0.blank('h', { lv: 1, rt: [{ s: rec.t }] }), B0.blank('p')] };
+    var St = window.GardenNotesStore;
+    var go = function () { reload({ keepOpen: true }); openNote(id, { focus: true }); };
+    if (St) St.putDoc(id, doc, now).then(go, go); else go();
+  }
+
+  /*@3.NOAJ.149*/
+  function setRemind(id, iso) {
+    var rec = idxFind(id);
+    if (!rec) return false;
+    if (iso) rec.r = iso; else { delete rec.r; delete rec.rd; }
+    rec.updated_at = Date.now();
+    idxPut(rec);
+    syncRemindTask(rec);
+    var Sy = window.GardenNotesSync;
+    if (Sy && Sy.schedule) Sy.schedule(id);
+    reload({ keepOpen: true });
+    return true;
+  }
+
+  /*@3.NOAJ.150*/
+  function syncRemindTask(rec) {
+    var G = window.GardenData;
+    if (!G || !G.linkRichNote) return;
+    var title = (rec.t || '').trim();
+    if (!title && ed && edId === rec.id) title = deriveTitle(ed.doc) || '';
+    try {
+      G.linkRichNote({ id: rec.id, title: title || L('ملاحظة', 'Note'),
+                       remind_at: rec.r || '', course: (rec.o && rec.o.c) || null,
+                       created_at: rec.ca || Date.now() });
+    } catch (e) {}
+  }
+
   /*@3.NOAJ.113*/
   function adoptQuick(qid) {
     var arr = [];
@@ -2166,6 +2263,7 @@
   var pendDelete = null;
   var pendMany = null;
   var pendFolder = null;
+  var pendMake = null;
 
   function confirmDelete(id, title) {
     var dlg = document.getElementById('na-confirm');
@@ -4121,6 +4219,72 @@
       if (ft && !ft.disabled) runExport(ft.getAttribute('data-fmt'));
     });
 
+    /*@3.NOAJ.153*/
+    var fillLinkPick = function () {
+      var sel = document.querySelector('#na-link [data-role="lpick"]');
+      if (!sel) return;
+      var html = '<option value="" data-gs-name-ar="\u0631\u0627\u0628\u0637\u064c \u062e\u0627\u0631\u062c\u064a\u0651" ' +
+                 'data-gs-name-en="External link">' + esc(L('\u0631\u0627\u0628\u0637\u064c \u062e\u0627\u0631\u062c\u064a\u0651 (\u0627\u0643\u062a\u0628\u0647 \u0628\u0646\u0641\u0633\u0643)',
+                                              'External link (type it below)')) + '</option>';
+      var anc = (ed && ed.anchors) ? ed.anchors() : [];
+      if (anc.length) {
+        html += '<optgroup label="' + esc(L('\u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629', 'In this note')) + '">';
+        anc.forEach(function (a) {
+          var pad = new Array(Math.max(0, (a.lv || 1) - 1) + 1).join('\u2003');
+          html += '<option value="#' + esc(a.a) + '">' + pad + esc(a.t) + '</option>';
+        });
+        html += '</optgroup>';
+      }
+      var others = idxRead().filter(function (r) { return r.id !== edId && !r.a; })
+        .sort(function (x, y) { return (y.updated_at || 0) - (x.updated_at || 0); }).slice(0, 60);
+      if (others.length) {
+        html += '<optgroup label="' + esc(L('\u0645\u0644\u0627\u062d\u0638\u0627\u062a\u064f\u0643', 'Your notes')) + '">';
+        others.forEach(function (r) {
+          html += '<option value="note:' + esc(r.id) + '">' +
+                  esc(r.t || L('\u0628\u0644\u0627 \u0639\u0646\u0648\u0627\u0646', 'Untitled')) + '</option>';
+        });
+        html += '</optgroup>';
+      }
+      sel.innerHTML = html;
+      sel.value = '';
+      if (window.GardenSelect && GardenSelect.enhance) {
+        try { GardenSelect.enhance(sel.parentNode || document); } catch (e) {}
+      }
+    };
+
+    /*@3.NOAJ.154*/
+    var rDlg = document.getElementById('na-remind');
+    var rBtn = document.getElementById('na-remind-btn');
+    if (rDlg) {
+      var rIn = rDlg.querySelector('[data-role="rwhen"]');
+      var openRemind = function () {
+        if (!edId) return;
+        var rec = idxFind(edId);
+        if (rIn) rIn.value = (rec && rec.r) ? String(rec.r).slice(0, 16) : '';
+        var w = rDlg.querySelector('[data-role="rwarn"]');
+        if (w) { w.textContent = ''; w.hidden = true; }
+        try { rDlg.showModal(); } catch (e) {}
+      };
+      if (rBtn) rBtn.addEventListener('click', openRemind);
+      rDlg.querySelector('[data-role="rok"]').addEventListener('click', function () {
+        var v = (rIn && rIn.value || '').trim();
+        var w = rDlg.querySelector('[data-role="rwarn"]');
+        if (!v) {
+          if (w) { w.textContent = L('اختَرْ موعداً أوّلاً، أو امسحِ التنبيه.',
+                                     'Pick a time first, or clear the reminder.'); w.hidden = false; }
+          return;
+        }
+        setRemind(edId, v);
+        try { rDlg.close(); } catch (e) {}
+        saveState('saved', L('ثُبِّت التنبيه', 'Reminder set'));
+      });
+      rDlg.querySelector('[data-role="rclear"]').addEventListener('click', function () {
+        setRemind(edId, '');
+        try { rDlg.close(); } catch (e) {}
+        saveState('saved', L('مُسِح التنبيه', 'Reminder cleared'));
+      });
+    }
+
     var lDlg = document.getElementById('na-link');
     if (lDlg) {
       /*@3.NOAJ.59*/
@@ -4137,7 +4301,12 @@
         var t = (lab && lab.value || '').trim();
         var ctx = lDlg.__ctx || null;
         var B0 = window.GardenNotesBlocks;
-        var v = raw ? (B0 && B0.normUrl ? B0.normUrl(raw) : raw) : '';
+        var Md = window.GardenNotesMd;
+        var v = raw
+          ? ((raw.charAt(0) === '#' || /^note:/i.test(raw)) && Md
+              ? Md.anyUrl(raw)
+              : (B0 && B0.normUrl ? B0.normUrl(raw) : raw))
+          : '';
         if (raw && !v) {
           linkWarn(L('عنوانٌ غيرُ مقبول — اكتبْ عنواناً مثل example.com أو https://example.com',
                      'Not a usable address — write something like example.com or https://example.com'));
@@ -4154,6 +4323,15 @@
         linkWarn('');
         try { lDlg.close(); } catch (e1) {}
       };
+      lDlg.addEventListener('garden:notesLinkOpen', fillLinkPick);
+      /*@3.NOAJ.155*/
+      var pick = lDlg.querySelector('[data-role="lpick"]');
+      if (pick) pick.addEventListener('change', function () {
+        if (!pick.value) return;
+        var inp2 = lDlg.querySelector('[data-role="url"]');
+        if (inp2) { inp2.value = pick.value; inp2.focus(); }
+        linkWarn('');
+      });
       lDlg.querySelector('[data-role="ok"]').addEventListener('click', applyLink);
       lDlg.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
@@ -4190,6 +4368,16 @@
         if (ribbon) ribbon.setState(ed.selState());
       });
     }
+
+    /*@3.NOAJ.152*/
+    document.addEventListener('pointerdown', function (e) {
+      if (!ed || !ribbon) return;
+      var t = e.target;
+      if (!t || !t.closest) return;
+      if (ed.root.contains(t)) return;
+      if (t.closest('.nr, .ne-menu, .ne-selhint, .nov-host, .nc-wrap, dialog[open], .nd, .gsf')) return;
+      setTimeout(function () { if (ed && ribbon) ribbon.setState(ed.selState()); }, 0);
+    }, true);
 
     els.tree.addEventListener('click', onTreeClick);
     els.items.addEventListener('click', onListClick);
@@ -4329,10 +4517,14 @@
         var id = pendDelete;
         var many = pendMany;
         var fid = pendFolder;
+        var mk = pendMake;
         pendDelete = null;
         pendMany = null;
         pendFolder = null;
+        pendMake = null;
         try { cDlg.close(); } catch (e) {}
+        /*@3.NOAJ.151*/
+        if (mk) { resetConfirm(); createNamed(mk); return; }
         if (fid) {
           folderDrop(fid);
           if (S.view.k === 'folder' && S.view.id === fid) {
@@ -4361,7 +4553,7 @@
         }
         if (id) doDelete(id);
       });
-      cDlg.addEventListener('cancel', function () { pendDelete = null; pendMany = null; pendFolder = null; });
+      cDlg.addEventListener('cancel', function () { pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; resetConfirm(); });
       cDlg.addEventListener('click', function (e) {
         if (e.target.closest('form[method="dialog"]')) { pendDelete = null; pendMany = null; }
       });

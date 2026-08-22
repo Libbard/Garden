@@ -949,7 +949,7 @@
     var self = this;
     this.els = this.els.filter(function (e) { return !self.sel[e.id]; });
     this.sel = {};
-    /*@3.NOCJ.70*/
+    /*@3.NOCJ.71*/
     if (this.tool === 'sel' && !this.pick) this.setTool('pen');
     this.paint(); this.commit(); this.emit();
     return true;
@@ -1642,7 +1642,7 @@
           }
           self.lasso = null;
           /*@3.NOCJ.8*/
-          /*@3.NOCJ.70*/
+          /*@3.NOCJ.73*/
           if (self.selected().length || self.pick) self.setTool('sel');
           else self.setTool('pen');
           self.paintWet(); self.emit();
@@ -1660,7 +1660,7 @@
             }
           }
           if (d.before && keep) { self.push(d.before); self.commit(); }
-          /*@3.NOCJ.70*/
+          /*@3.NOCJ.72*/
           if (self.tool === 'sel' && !self.selected().length && !self.pick) self.setTool('pen');
           self.paintWet(); self.emit();
           return;

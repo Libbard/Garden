@@ -537,14 +537,26 @@
   /*@3.SECJ.52*/
 
   /*@3.SECJ.53*/
+  /*@3.SECJ.437*/
   var CADENCE_S = { LIVE: 300, ARMED: 600, EMPTY: 1800, QUIET: 21600,
                     POST: 43200, ARCHIVE: 604800 };
+
+  function readCadence(d) {
+    var c = d && d.cadence;
+    if (!c || typeof c !== 'object') return;
+    Object.keys(CADENCE_S).forEach(function (k) {
+      var n = Number(c[k]);
+      if (isFinite(n) && n >= 60 && n <= 2678400) CADENCE_S[k] = Math.round(n);
+    });
+  }
 
   function readFresh(term) {
     var row = null;
     (state.terms || []).forEach(function (x) { if (x.term === term) row = x; });
     state.fresh = row && row.last_harvest ? (new Date(row.last_harvest).getTime() || 0) : 0;
     state.phase = (row && row.phase) || '';
+    /*@3.SECJ.438*/
+    state.next = row && row.next_run_at ? (new Date(row.next_run_at).getTime() || 0) : 0;
   }
 
   /*@3.SECJ.54*/
@@ -587,7 +599,11 @@
     if (!state.fresh) return '';
     var per = CADENCE_S[state.phase] || 0;
     var old = per ? (Date.now() - state.fresh) > per * 3000 : false;
-    var cad = cadenceWord();
+    /*@3.SECJ.439*/
+    var cad = (state.next && state.next > Date.now())
+      ? t('التحديثُ القادم ' + stampWord(state.next),
+          'next update ' + stampWord(state.next))
+      : cadenceWord();
     return '<span class="sx-fresh' + (old ? ' is-old' : '') + '" title="' +
       esc(t('آخرُ قراءةٍ من بانر', 'Last read from Banner')) + '">' +
       '<i class="fa-solid fa-rotate" aria-hidden="true"></i>' +
@@ -4020,6 +4036,8 @@
     GardenFetch('/v1/terms')
       .then(function (r) { return r.ok ? r.json() : { terms: [] }; })
       .then(function (d) {
+        /*@3.SECJ.440*/
+        readCadence(d);
         var ts = (d.terms || []).filter(function (x) { return x.sections > 0; });
         if (!ts.length) throw new Error('no-terms');
 
