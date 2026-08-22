@@ -1103,6 +1103,10 @@
   function persist(id, doc) {
     var St = window.GardenNotesStore, Sy = window.GardenNotesSync;
     if (!St) return;
+    /*@3.NOAJ.146*/
+    if (edId === id && ed && ed.captureEng && ed.doc === doc) {
+      try { ed.captureEng(); } catch (eG) {}
+    }
     var body = JSON.stringify(doc);
     if (lastSaved[id] === body) { saveState('', ''); return; }
     var mine = (edId === id);

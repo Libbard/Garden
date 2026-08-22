@@ -189,15 +189,17 @@
     var selfE = this;
     if (document.fonts && document.fonts.ready) {
       /*@3.NOEJ.156*/
-      document.fonts.ready.then(function () {
+      var engSettle = function () {
         if (selfE._engRecap) {
           selfE._engRecap = false;
           selfE.captureEng();
-          if (selfE.opts.onSave) selfE.opts.onSave(selfE.doc);
+          if (selfE.doc.eng && selfE.opts.onSave) selfE.opts.onSave(selfE.doc);
         } else {
           selfE.applyEng();
         }
-      });
+      };
+      document.fonts.ready.then(engSettle);
+      try { document.fonts.addEventListener('loadingdone', engSettle); } catch (eL) {}
     }
     this.bind();
     this.bindDrag();
@@ -1662,7 +1664,13 @@
   /*@3.NOEJ.154*/
   Editor.prototype.captureEng = function () {
     if (this.doc.kind === 'board') return;
-    if (document.fonts && document.fonts.status !== 'loaded') this._engRecap = true;
+    /*@3.NOEJ.157*/
+    var faceOk = true;
+    try {
+      faceOk = document.fonts.status === 'loaded' &&
+               document.fonts.check('16px "Thmanyah Sans"');
+    } catch (eF) {}
+    if (!faceOk) { this._engRecap = true; return; }
     var y = {}, n = 0, i, b, node;
     this.root.style.minBlockSize = '';
     for (i = 0; i < this.doc.blocks.length; i++) {
