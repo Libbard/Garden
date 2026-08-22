@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.1.96'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.1.97'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -280,7 +280,8 @@ function knownState(cache, next) {
   }).then(function(st) {
     /*@0.SWJ.115*/
     if (st && String(st.reset) !== want) return null;
-    if (st && st.files) return st.files;
+    /*@0.SWJ.126*/
+    if (st && st.files && st.vf === 1) return st.files;
     return derive(cache, Object.keys(next.files));
   });
 }
@@ -315,6 +316,8 @@ function applyDiff(cache, prev, next) {
     return cache.put(STATE_KEY, new Response(JSON.stringify({
       version: next.version,
       reset: String(next.reset === undefined ? '0' : next.reset),
+      /*@0.SWJ.127*/
+      vf: 1,
       files: stored
     }), { headers: { 'Content-Type': 'application/json' } }));
   });
