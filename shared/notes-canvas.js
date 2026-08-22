@@ -371,6 +371,22 @@
     return (isFinite(z) && z > 0.05) ? z : 1;
   };
 
+  /*@3.NOCJ.67*/
+  function probeCanvas(c) {
+    if (!c.width || !c.height) return false;
+    try {
+      var g = c.getContext('2d');
+      g.save();
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.fillStyle = '#000';
+      g.fillRect(c.width - 1, c.height - 1, 1, 1);
+      var a = g.getImageData(c.width - 1, c.height - 1, 1, 1).data[3];
+      g.clearRect(c.width - 1, c.height - 1, 1, 1);
+      g.restore();
+      return a > 0;
+    } catch (e) { return true; }
+  }
+
   Canvas.prototype.dpr = function (w, h) {
     var d = Math.min(4, Math.max(1, (window.devicePixelRatio || 1) * this.vz()));
     /*@3.NOCJ.53*/
@@ -402,18 +418,43 @@
       this.winH = h;
     }
     var d = this.dpr(w, h);
+    /*@3.NOCJ.66*/
+    if (this.bound) {
+      var cap = Math.floor(4050 / Math.max(0.5, d));
+      if (h > cap) {
+        h = Math.max(600, cap);
+        this.winH = h;
+        if (this.winY > full - h) this.winY = Math.max(0, full - h);
+      }
+    } else if (h * d > 4050 || w * d > 4050) {
+      d = Math.max(0.4, Math.min(4050 / h, 4050 / w));
+    }
     if (w === this.w && h === this.h && d === this._d && this._wy === this.winY) return;
-    this.w = w; this.h = h; this._d = d; this._wy = this.winY;
     var self = this;
-    [this.base, this.wet].forEach(function (c) {
-      c.width = Math.round(w * d);
-      c.height = Math.round(h * d);
-      c.style.width = w + 'px';
-      c.style.height = h + 'px';
-      c.style.insetBlockStart = self.winY + 'px';
-      var g = c.getContext('2d');
-      g.setTransform(d, 0, 0, d, 0, 0);
-    });
+    /*@3.NOCJ.68*/
+    function size(hh, dd) {
+      [self.base, self.wet].forEach(function (c) {
+        c.width = Math.round(w * dd);
+        c.height = Math.round(hh * dd);
+        c.style.width = w + 'px';
+        c.style.height = hh + 'px';
+        c.style.insetBlockStart = self.winY + 'px';
+        var g = c.getContext('2d');
+        g.setTransform(dd, 0, 0, dd, 0, 0);
+      });
+    }
+    size(h, d);
+    for (var t = 0; t < 3 && !probeCanvas(this.base); t++) {
+      if (this.bound && h > 600) {
+        h = Math.max(600, Math.floor(h * 0.7));
+        this.winH = h;
+        if (this.winY > full - h) this.winY = Math.max(0, full - h);
+      } else {
+        d = Math.max(0.4, d * 0.7);
+      }
+      size(h, d);
+    }
+    this.w = w; this.h = h; this._d = d; this._wy = this.winY;
     if (this.bound) { this.cam.x = 0; this.cam.y = -this.winY * this.cam.z; }
     if (this.router) this.router.dropRect();
     this.paint();
