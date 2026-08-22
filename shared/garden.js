@@ -197,6 +197,61 @@
   };
 })();
 
+/*@3.GARJ.615*/
+;(function () {
+  'use strict';
+  if (window.GardenCode) return;
+
+  var ALIAS = { ISLAM: 'ISLM' };
+  var PAGE_OF = { ISLM: 'ISLAM' };
+
+  function norm(code) {
+    return String(code == null ? '' : code).toUpperCase().replace(/\s+/g, '');
+  }
+  function split(code) {
+    var m = /^([A-Z]+)(\d[A-Z0-9]*)$/.exec(norm(code));
+    return m ? { s: m[1], n: m[2] } : null;
+  }
+  function canon(code) {
+    var p = split(code);
+    return (p && ALIAS[p.s]) ? (ALIAS[p.s] + p.n) : norm(code);
+  }
+  function page(code) {
+    var c = canon(code), p = split(c);
+    return (p && PAGE_OF[p.s]) ? (PAGE_OF[p.s] + p.n) : c;
+  }
+  function subject(code) { var p = split(code); return p ? p.s : ''; }
+  function same(a, b) { var x = canon(a); return !!x && x === canon(b); }
+
+  window.GardenCode = {
+    norm: norm, canon: canon, page: page, subject: subject, same: same
+  };
+})();
+
+/*@3.GARJ.616*/
+;(function () {
+  'use strict';
+  if (window.GardenHint) return;
+
+  function wire(btn) {
+    if (!btn || btn._gHint) return;
+    btn._gHint = 1;
+    function off() {
+      btn.classList.remove('is-on');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var on = btn.classList.toggle('is-on');
+      btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+    document.addEventListener('click', off);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') off(); });
+  }
+
+  window.GardenHint = { wire: wire };
+})();
+
 /*@3.GARJ.7*/
 
 ; (function () {

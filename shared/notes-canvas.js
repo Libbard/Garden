@@ -937,7 +937,8 @@
   Canvas.prototype.deselect = function () {
     this.sel = {};
     /*@3.NOCJ.59*/
-    if (this.tool === 'sel') this.setTool('pen');
+    /*@3.NOCJ.70*/
+    if (this.tool === 'sel' && !this.pick) this.setTool('pen');
     this.paintWet(); this.emit();
   };
 
@@ -948,7 +949,8 @@
     var self = this;
     this.els = this.els.filter(function (e) { return !self.sel[e.id]; });
     this.sel = {};
-    if (this.tool === 'sel') this.setTool('pen');
+    /*@3.NOCJ.70*/
+    if (this.tool === 'sel' && !this.pick) this.setTool('pen');
     this.paint(); this.commit(); this.emit();
     return true;
   };
@@ -1640,7 +1642,8 @@
           }
           self.lasso = null;
           /*@3.NOCJ.8*/
-          if (self.selected().length) self.setTool('sel');
+          /*@3.NOCJ.70*/
+          if (self.selected().length || self.pick) self.setTool('sel');
           else self.setTool('pen');
           self.paintWet(); self.emit();
           return;
@@ -1657,7 +1660,8 @@
             }
           }
           if (d.before && keep) { self.push(d.before); self.commit(); }
-          if (self.tool === 'sel' && !self.selected().length) self.setTool('pen');
+          /*@3.NOCJ.70*/
+          if (self.tool === 'sel' && !self.selected().length && !self.pick) self.setTool('pen');
           self.paintWet(); self.emit();
           return;
         }

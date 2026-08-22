@@ -799,8 +799,11 @@
     document.dispatchEvent(new CustomEvent('garden:navOrderChanged'));
   }
 
+  /*@3.GAHJ.101*/
+  var SIDE_FIXED = { home: 1 };
   function sideItems(scope) {
-    return [].slice.call(scope.querySelectorAll('.dash-side-item[data-side-key]'));
+    return [].slice.call(scope.querySelectorAll('.dash-side-item[data-side-key]'))
+      .filter(function (a) { return !SIDE_FIXED[a.getAttribute('data-side-key')]; });
   }
 
   /*@3.GAHJ.97*/
@@ -846,7 +849,7 @@
   function sideBind(side) {
     if (side._gdo) return;
     side._gdo = window.GardenDragOrder(side, {
-      sel: '.dash-side-item[data-side-key]',
+      sel: '.dash-side-item[data-side-key]:not([data-side-key="home"])',
       axis: 'y',
       enabled: function () { return sideEdit; },
       onDrop: sideCapture

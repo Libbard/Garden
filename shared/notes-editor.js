@@ -1189,6 +1189,31 @@
     this.emitState();
   };
 
+  /*@3.NOEJ.161*/
+  Editor.prototype.selectRangeBetween = function (aId, bId) {
+    var a = -1, b = -1, i;
+    for (i = 0; i < this.doc.blocks.length; i++) {
+      if (this.doc.blocks[i].id === aId) a = i;
+      if (this.doc.blocks[i].id === bId) b = i;
+    }
+    if (a < 0 || b < 0) return 0;
+    var lo = Math.min(a, b), hi = Math.max(a, b);
+    var sel = (this._bsel = {});
+    for (i = lo; i <= hi; i++) sel[this.doc.blocks[i].id] = 1;
+    this._bselLast = bId;
+    this.paintBlockSel();
+    this.emitState();
+    return (hi - lo) + 1;
+  };
+
+  Editor.prototype.endBlockDrag = function () {
+    var st = this._bdrag;
+    this._bdrag = null;
+    if (!st || !st.on) return;
+    this.root.removeAttribute('data-bdrag');
+    try { window.getSelection().removeAllRanges(); } catch (e) {}
+  };
+
   Editor.prototype.clearBlockSel = function () {
     if (!this._bsel || !Object.keys(this._bsel).length) return;
     this._bsel = {};
@@ -1693,7 +1718,7 @@
     var eng = this.doc.eng;
     var nodes = this.root.querySelectorAll(':scope > [data-bid]');
     var i, node, tgt, dY;
-    /*@3.NOEJ.158*/
+    /*@3.NOEJ.159*/
     var arr = (eng && eng.v === 2 && Array.isArray(eng.a) &&
                eng.a.length === this.doc.blocks.length) ? eng.a : null;
     var map = (eng && !arr && eng.y) ? eng.y : null;
@@ -2897,6 +2922,44 @@
                           t.classList.contains('ne-cell'))) self.focusEd = t;
     }, true);
 
+    /*@3.NOEJ.160*/
+    this._bdrag = null;
+    this._onBdragMove = function (e) {
+      var st = self._bdrag;
+      if (!st) return;
+      if (!(e.buttons & 1)) { self.endBlockDrag(); return; }
+      var hitEl = document.elementFromPoint(e.clientX, e.clientY);
+      var node = (hitEl && hitEl.closest) ? hitEl.closest('[data-bid]') : null;
+      if (!node || !root.contains(node)) return;
+      var id = node.getAttribute('data-bid');
+      if (!st.on) {
+        if (id === st.id) return;
+        if (Math.abs(e.clientY - st.y) < 6 && Math.abs(e.clientX - st.x) < 6) return;
+        st.on = true;
+        root.setAttribute('data-bdrag', '1');
+        var ae = document.activeElement;
+        if (ae && ae.blur && root.contains(ae)) { try { ae.blur(); } catch (eB) {} }
+      }
+      try { window.getSelection().removeAllRanges(); } catch (eS) {}
+      if (id !== st.at) { st.at = id; self.selectRangeBetween(st.id, id); }
+    };
+    this._onBdragStop = function () { self.endBlockDrag(); };
+    document.addEventListener('pointermove', this._onBdragMove);
+    document.addEventListener('pointerup', this._onBdragStop);
+    document.addEventListener('pointercancel', this._onBdragStop);
+
+    root.addEventListener('pointerdown', function (e) {
+      self.endBlockDrag();
+      if (self._selMode || e.button !== 0 || e.pointerType === 'touch') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+      var ce = e.target.closest ? e.target.closest('[contenteditable="true"]') : null;
+      if (!ce) return;
+      var bn = ce.closest('[data-bid]');
+      if (!bn) return;
+      self._bdrag = { id: bn.getAttribute('data-bid'), at: null,
+                      x: e.clientX, y: e.clientY, on: false };
+    });
+
     root.addEventListener('focusout', function (e) {
       if (!e.target.classList) return;
       var node = e.target.closest('[data-bid]');
@@ -3811,6 +3874,10 @@
     this.canvases = {};
     document.removeEventListener('click', this._onDocClick);
     document.removeEventListener('selectionchange', this._onSelChange);
+    /*@3.NOEJ.160*/
+    document.removeEventListener('pointermove', this._onBdragMove);
+    document.removeEventListener('pointerup', this._onBdragStop);
+    document.removeEventListener('pointercancel', this._onBdragStop);
     window.removeEventListener('scroll', this._onScroll, true);
   };
 

@@ -149,9 +149,11 @@
   });
 
   /*@3.FIRJ.18*/
+  /*@3.FIRJ.24*/
   function completed() {
     var st = readJSON(STATE, null);
-    return !!(st && (st.completed_v || 0) > 0);
+    if (st && (st.completed_v || 0) > 0) return true;
+    return hasData();
   }
   function isAr() {
     try { return (document.documentElement.getAttribute('lang') || 'ar') === 'ar'; }
@@ -172,7 +174,8 @@
       var i = a.querySelector('i.fa-solid');
       if (i) i.className = 'fa-solid ' + ico;
       /*@3.FIRJ.19*/
-      a.classList.toggle('set-btn--primary', !done);
+      /*@3.FIRJ.23*/
+      if (a.classList.contains('set-btn')) a.classList.toggle('set-btn--primary', !done);
     });
   }
   function wireLabels() {

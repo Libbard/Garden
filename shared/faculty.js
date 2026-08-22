@@ -542,23 +542,7 @@
       qt = setTimeout(function () { state.q = $('#fc-q').value; apply(); }, 120);
     });
     /*@3.FACJ.38*/
-    var hintB = $('#fc-hint');
-    if (hintB) {
-      hintB.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var on = hintB.classList.toggle('is-on');
-        hintB.setAttribute('aria-expanded', on ? 'true' : 'false');
-      });
-      document.addEventListener('click', function () {
-        hintB.classList.remove('is-on');
-        hintB.setAttribute('aria-expanded', 'false');
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        hintB.classList.remove('is-on');
-        hintB.setAttribute('aria-expanded', 'false');
-      });
-    }
+    window.GardenHint.wire($('#fc-hint'));
 
     $('#fc-more').addEventListener('click', more);
     $('#fc-min').addEventListener('click', function () {

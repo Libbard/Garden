@@ -1733,6 +1733,19 @@
     var imp = el('import-file');
     if (imp) imp.addEventListener('change', function () { if (imp.files[0]) importData(imp.files[0]); });
 
+    /*@3.DASJ.142*/
+    document.addEventListener('click', function (e) {
+      var m = el('fab-menu');
+      if (!m || !m.classList.contains('open')) return;
+      if (e.target.closest && (e.target.closest('#fab-menu') || e.target.closest('[data-act="fab"]'))) return;
+      m.classList.remove('open');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var m = el('fab-menu');
+      if (m) m.classList.remove('open');
+    });
+
     document.addEventListener('garden:languageChanged', function () {
       renderWidgets(); renderCourses(); renderLevels(); renderTasks();
       /*@3.DASJ.129*/

@@ -74,9 +74,29 @@
     var ap = h < 12 ? t('ص', 'AM') : t('م', 'PM');
     return (h % 12 || 12) + ':' + m + ' ' + ap;
   }
+  /*@3.SECJ.434*/
+  var DAY_ORD = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
+                  thursday: 4, friday: 5, saturday: 6 };
+  function dayRank(d) {
+    var v = DAY_ORD[d];
+    return v === undefined ? 9 : v;
+  }
+  function firstDay(m) {
+    var ds = (m && m.days) || [];
+    var r = 9;
+    for (var i = 0; i < ds.length; i++) r = Math.min(r, dayRank(ds[i]));
+    return r;
+  }
+  function byWeek(a, b) {
+    return firstDay(a) - firstDay(b) ||
+      String(a.begin || '').localeCompare(String(b.begin || ''));
+  }
   function dayList(ds) {
     var map = isAr() ? DAYS : DAYS_EN;
-    return (ds || []).map(function (d) { return map[d] || d; }).join('، ');
+    return (ds || []).slice()
+      .sort(function (a, b) { return dayRank(a) - dayRank(b); })
+      .map(function (d) { return map[d] || d; })
+      .join(isAr() ? '، ' : ', ');
   }
   /*@3.SECJ.16*/
   function dayPat(s) {
@@ -117,6 +137,8 @@
   }
   /*@3.SECJ.21*/
   function unlimited(max) { return !max || max >= 1000; }
+  /*@3.SECJ.435*/
+  function capUnknown(max) { return !max; }
 
   /*@3.SECJ.22*/
   function hours(v) {
@@ -414,14 +436,25 @@
 
   /*@3.SECJ.44*/
   var CRN_SEP = /[\s,;\u060C\n\t]+/;
-  var CRN_LIST = /^[0-9\s,;\u060C\n\t]+$/;
+  var CRN_ONE = /^\d{3,7}$/;
+  var CODE_ONE = /^[A-Za-z]{2,6}\d{1,4}[A-Za-z]?$/;
+  /*@3.SECJ.433*/
   function crnSet(q) {
-    if (!q || !CRN_LIST.test(q)) return null;
-    var parts = q.split(CRN_SEP).filter(function (x) { return /^\d{3,7}$/.test(x); });
+    if (!q) return null;
+    var parts = String(q).split(CRN_SEP).filter(Boolean);
     if (parts.length < 2) return null;          /*@3.SECJ.45*/
-    var set = {};
-    parts.forEach(function (x) { set[x] = 1; });
+    var set = { crn: {}, code: {} };
+    for (var i = 0; i < parts.length; i++) {
+      var x = parts[i];
+      if (CRN_ONE.test(x)) { set.crn[x] = 1; continue; }
+      if (CODE_ONE.test(x)) { set.code[window.GardenCode.canon(x)] = 1; continue; }
+      return null;
+    }
     return set;
+  }
+  function directHit(set, s) {
+    return !!(set.crn[String(s.crn)] ||
+              set.code[window.GardenCode.canon(s.c || '')]);
   }
 
   function apply() {
@@ -439,7 +472,7 @@
     }
     state.view = (picked ? state.all : pool()).filter(function (s) {
       if (picked) return !!picked[String(s.crn)];      /*@3.SECJ.47*/
-      if (!qCrns && !profFilter(s)) return false;
+      if (!(qCrns && qCrns.crn[String(s.crn)]) && !profFilter(s)) return false;
       var c = campusOf(s.cm);
       if (cities.length && cities.indexOf(c.city) < 0) return false;
       if (state.gender !== 'all' && c.g !== state.gender) return false;
@@ -448,12 +481,12 @@
       if (state.major) { if (inProgram(state.major, s.c || '') === false) return false; }
       else if (state.college && !inCollege2(state.college, s.c || '')) return false;
       if (state.status === 'open' && !(s.a > 0)) return false;
-      if (state.status === 'full' && s.a > 0) return false;
+      if (state.status === 'full' && (s.a > 0 || capUnknown(s.m))) return false;
       if (state.status === 'gone' && !s.gone) return false;
       if (state.mode !== 'all' && modeOf(s) !== state.mode) return false;
       if (state.days !== 'all' && dayPat(s) !== state.days) return false;
       if (!qw.length) return true;
-      if (qCrns) return !!qCrns[String(s.crn)];
+      if (qCrns) return directHit(qCrns, s);
       var hay = hayOf(s, c);
       for (var qi = 0; qi < qw.length; qi++) if (hay.indexOf(qw[qi]) < 0) return false;
       return true;
@@ -562,15 +595,36 @@
           (cad ? ' — ' + cad : '')) + '</span>';
   }
 
+  /*@3.SECJ.436*/
+  function facAnnounced() {
+    if (facAnnounced._t === state.term) return facAnnounced._v;
+    var any = false;
+    for (var i = 0; i < state.all.length; i++) {
+      if (((state.all[i].f) || []).length) { any = true; break; }
+    }
+    facAnnounced._t = state.term;
+    facAnnounced._v = any;
+    return any;
+  }
+
   function paintCount() {
-    var open = 0, full = 0, gone = 0, taken = 0;
+    var open = 0, full = 0, gone = 0, taken = 0, tba = 0;
     state.view.forEach(function (s) {
-      if (s.gone) gone++; else if (s.a > 0) open++; else full++;
+      if (s.gone) gone++;
+      else if (capUnknown(s.m)) tba++;
+      else if (s.a > 0) open++;
+      else full++;
       /*@3.SECJ.59*/
       if (unlimited(s.m)) return;
       taken += Math.max(0, s.m - Math.max(0, s.a == null ? 0 : s.a));
     });
     $('#sx-count').innerHTML =
+      (!facAnnounced() && state.all.length
+        ? '<span class="sx-note"><i class="fa-solid fa-hourglass-half"></i>' +
+          t('لم يُسنَد أساتذةُ هذا الفصل بعد — تظهر الأسماءُ وتقييماتُها فورَ إعلانها في البانر.',
+            'Instructors for this term are not assigned yet — names and ratings appear as soon as Banner announces them.') +
+          '</span>'
+        : '') +
       (state.prep === 'on'
         ? '<span class="sx-note"><i class="fa-solid fa-graduation-cap"></i>' +
           t('مواد السنة التحضيرية وحدها — شعبُها تُسجَّل تلقائياً',
@@ -579,6 +633,7 @@
       '<span><b>' + state.view.length + '</b> ' + t('شعبة', 'sections') + '</span>' +
       '<span style="color:#10b981"><b style="color:inherit">' + open + '</b> ' + t('بها مقاعد', 'open') + '</span>' +
       '<span style="color:#ef4444"><b style="color:inherit">' + full + '</b> ' + t('ممتلئة', 'full') + '</span>' +
+      (tba ? '<span><b>' + tba + '</b> ' + t('لم تُعلَن سعتُها', 'capacity TBA') + '</span>' : '') +
       (gone ? '<span><b>' + gone + '</b> ' + t('غير معروضة', 'not listed') + '</span>' : '') +
       /*@3.SECJ.60*/
       '<span class="sx-total"><b>' + fmt(taken) + '</b> ' +
@@ -669,10 +724,12 @@
     if (state.sort === 'code') order.sort();
 
     grid.innerHTML = order.map(function (code) {
-      var list = by[code], open = 0, seats = 0, noCap = false, profs = {};
+      var list = by[code], open = 0, seats = 0, noCap = false, tba = 0, profs = {};
       list.forEach(function (s) {
         if (s.a > 0) open++;
-        if (unlimited(s.m)) noCap = true; else seats += Math.max(0, s.a || 0);
+        if (capUnknown(s.m)) tba++;
+        else if (unlimited(s.m)) noCap = true;
+        else seats += Math.max(0, s.a || 0);
         facNames(s).forEach(function (n) { if (n) profs[n] = 1; });
       });
       var np = Object.keys(profs).length;
@@ -693,7 +750,8 @@
             '<span class="sx-grp-n' + (open ? ' ok' : ' no') + '"><b>' + open + '</b> ' +
               t('متاحة', 'open') + '</span>' +
             '<span class="sx-grp-n">' + (noCap ? t('بلا حدّ', 'unlimited')
-              : '<b>' + seats + '</b> ' + t('مقعد', 'seats')) + '</span>' +
+              : '<b>' + seats + '</b> ' + t('مقعد', 'seats')) +
+              (tba ? ' · ' + t(tba + ' لم تُعلَن', tba + ' TBA') : '') + '</span>' +
             (np ? '<span class="sx-grp-n"><b>' + np + '</b> ' + t('أستاذ', 'faculty') + '</span>' : '') +
             '<span class="cv-slot" data-cv-code="' + esc(code) + '"></span>' +
           '</span>' +
@@ -1159,9 +1217,14 @@
       (m.begin ? ' · ' + esc(examWord(m.begin)) : '') + '</span></div>';
   }
   var EMPTY_SLOT = '<div class="sx-slot sx-slot--none">···</div>';
+  function TBA_SLOT() {
+    return '<div class="sx-slot sx-slot--none"><i class="fa-solid fa-hourglass-half"></i>' +
+      '<b>' + esc(t('المواعيد لم تنزل بعد', 'Times not published yet')) + '</b></div>';
+  }
 
   /*@3.SECJ.127*/
   function bellKind(s) {
+    if (capUnknown(s.m)) return 'changes';
     return (s.a == null || s.a <= 0) ? 'seat' : 'changes';
   }
   function bellOn(s) {
@@ -1196,8 +1259,9 @@
     else               { accent = '#10b981'; glow = 'rgba(16,185,129,.09)'; }
 
     /*@3.SECJ.128*/
-    var cls = meetsOf(s, ['CLAS', 'VRTL']);
+    var cls = meetsOf(s, ['CLAS', 'VRTL']).slice().sort(byWeek);
     var slots = cls.map(slotClass);
+    if (!cls.length) slots.push(TBA_SLOT());
     while (slots.length < 2 || slots.length % 2) slots.push(EMPTY_SLOT);
     slots.push(slotExam(meetsOf(s, ['MEXM'])[0], t('ميد', 'Mid')));
     slots.push(slotExam(meetsOf(s, ['FEXM'])[0], t('فاينل', 'Final')));
@@ -1215,8 +1279,10 @@
           /*@3.SECJ.130*/
           return a + rateChip(p);
         }).join('، ') + '</div>'
-      : '<div class="sx-prof none"><i class="fa-solid fa-user-slash"></i>' +
-        t('لم يُعيَّن أستاذ', 'No instructor assigned') + '</div>';
+      : '<div class="sx-prof none"><i class="fa-solid ' +
+        (facAnnounced() ? 'fa-user-slash' : 'fa-hourglass-half') + '"></i>' +
+        (facAnnounced() ? t('لم يُعيَّن أستاذ', 'No instructor assigned')
+                        : t('الأستاذ يُعلَن لاحقاً', 'Instructor to be announced')) + '</div>';
 
     var badges = '';
     if (s.gone) badges += '<span class="sx-badge sx-badge--gone">' + t('غير معروضة', 'Not listed') + '</span>';
@@ -1224,13 +1290,17 @@
     var md = modeOf(s);
     badges += '<span class="sx-badge sx-badge--' +
       (md === 'mix' ? 'mix' : md === 'remote' ? 'remote' : 'campus') + '">' +
-      (md === 'mix' ? t('مختلط', 'Hybrid') : md === 'remote' ? t('عن بعد', 'Remote') : t('حضوري', 'On campus')) +
+      (md === 'mix' ? t('مدمج', 'Hybrid') : md === 'remote' ? t('عن بعد', 'Remote') : t('حضوري', 'On campus')) +
       '</span>';
     if (s.cm) badges += '<span class="sx-badge sx-badge--campus">' + esc(campusLabel(s.cm)) + '</span>';
     if (s.ch) badges += '<span class="sx-badge sx-badge--campus">' + esc(hours(s.ch)) + '</span>';
 
     /*@3.SECJ.132*/
-    var seats = noCap
+    var seats = capUnknown(max)
+      ? '<div class="sx-seats"><i class="fa-solid fa-hourglass-half" style="color:var(--text-muted);font-size:.8rem"></i>' +
+        '<div class="sx-left" style="margin-inline-end:auto">' +
+        t('لم تُعلَن السعة بعد', 'Capacity not announced yet') + '</div></div>'
+      : noCap
       ? '<div class="sx-seats"><i class="fa-solid fa-infinity" style="color:var(--sx-accent);font-size:.8rem"></i>' +
         '<div class="sx-left" style="margin-inline-end:auto">' + t('سعة غير محدودة', 'Unlimited capacity') + '</div></div>'
       : '<div class="sx-seats">' +
@@ -1411,10 +1481,23 @@
     return h;
   }
 
+  /*@3.SECJ.431*/
   function when(iso) {
     try {
-      return new Date(iso).toLocaleDateString(isAr() ? 'ar-SA' : 'en-GB',
-        { day: 'numeric', month: 'short' });
+      var d = new Date(iso), ms = Date.now() - d.getTime();
+      if (!isFinite(d.getTime())) return '';
+      var lc = isAr() ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB';
+      var hm = d.toLocaleTimeString(lc, { hour: '2-digit', minute: '2-digit', hour12: false });
+      if (ms >= 0 && ms < 60000) return t('الآن', 'just now');
+      if (ms >= 0 && ms < 3600000) {
+        var mn = Math.max(1, Math.round(ms / 60000));
+        return t('قبل ' + mn + ' د', mn + 'm ago');
+      }
+      if (ms >= 0 && ms < 86400000) {
+        var hr = Math.max(1, Math.round(ms / 3600000));
+        return t('قبل ' + hr + ' س · ' + hm, hr + 'h ago · ' + hm);
+      }
+      return d.toLocaleDateString(lc, { day: 'numeric', month: 'short' }) + ' · ' + hm;
     } catch (e) { return ''; }
   }
 
@@ -1611,6 +1694,23 @@
     });
   }
 
+  /*@3.SECJ.430*/
+  var AL_HIDE = 'sx_al_hidden';
+  function alHidden() {
+    try {
+      var v = JSON.parse(localStorage.getItem(AL_HIDE) || '[]');
+      return Array.isArray(v) ? v.map(String) : [];
+    } catch (e) { return []; }
+  }
+  function alHide(ids) {
+    var l = alHidden();
+    (Array.isArray(ids) ? ids : [ids]).forEach(function (id) {
+      id = String(id);
+      if (id && l.indexOf(id) < 0) l.unshift(id);
+    });
+    try { localStorage.setItem(AL_HIDE, JSON.stringify(l.slice(0, 300))); } catch (e) {}
+  }
+
   var WK_AR = { seat: 'مقعد', course: 'شعبة جديدة', changes: 'تغيّرات',
                 term: 'فصلٌ جديد' };
   var WK_EN = { seat: 'Seat', course: 'New section', changes: 'Changes',
@@ -1620,8 +1720,11 @@
     var S = GW().state(), ar = isAr();
     var h = '';
 
-    var al = S.alerts || [];
-    h += '<div class="sx-sec-h">' + t('التنبيهات', 'Alerts') + '</div>';
+    var hid = alHidden();
+    var al = (S.alerts || []).filter(function (a) { return hid.indexOf(String(a.id)) < 0; });
+    h += '<div class="sx-sec-h row">' + t('التنبيهات', 'Alerts') +
+      (al.length ? '<button type="button" class="sx-al-clr" data-alclear="1">' +
+        t('امسح الكل', 'Clear all') + '</button>' : '') + '</div>';
     if (!al.length) {
       h += '<div class="sx-state" style="padding:1.4rem"><i class="fa-solid fa-inbox"></i>' +
         t('لا تنبيهات بعد', 'No alerts yet') + '</div>';
@@ -1633,7 +1736,12 @@
                : t('في الصفحة فقط', 'In-page only');
         return '<li class="sx-al-i' + (a.read ? '' : ' unread') + '">' +
           '<div class="sx-al-h"><b>' + esc(a.title) + '</b>' +
-            '<span class="sx-al-t">' + esc(when(a.at)) + '</span></div>' +
+            '<span class="sx-al-t">' + esc(when(a.at)) + '</span>' +
+            '<button type="button" class="sx-al-x" data-aldel="' + esc(String(a.id)) + '"' +
+              ' aria-label="' + esc(t('احذف هذا التنبيه', 'Dismiss this alert')) + '"' +
+              ' title="' + esc(t('احذف هذا التنبيه', 'Dismiss this alert')) + '"' +
+              ' data-ar-title="احذف هذا التنبيه" data-en-title="Dismiss this alert">' +
+              '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>' +
           '<div class="sx-al-b">' + esc(a.body) + '</div>' +
           '<div class="sx-al-f"><span title="' + esc(a.push_err || '') + '">' + esc(st) + '</span>' +
             (a.crn ? '<button class="sx-al-go" data-hist="' + esc(a.crn) + '">' +
@@ -2052,15 +2160,18 @@
     if (!p) return null;
     if (!p._ix) {
       /*@3.SECJ.194*/
-      var ix = {}, subs = {}, cnt = {};
+      var ix = {}, subs = {}, cnt = {}, tot = 0;
       (p.courses || []).forEach(function (c) {
         ix[c.c] = c;
         var m = /^([A-Za-z]+)/.exec(c.c);
         if (!m) return;
         var s = m[1].toUpperCase();
         cnt[s] = (cnt[s] || 0) + 1;
+        tot++;
       });
-      for (var s2 in cnt) if (cnt[s2] > 1) subs[s2] = 1;
+      /*@3.SECJ.427*/
+      var own = Math.max(3, Math.ceil(tot * 0.15));
+      for (var s2 in cnt) if (cnt[s2] >= own) subs[s2] = 1;
       p._ix = ix; p._subs = subs;
     }
     return p._ix;
@@ -2317,6 +2428,8 @@
   /*@3.SECJ.216*/
   function passedSet(p) {
     var out = passedFromRecord();
+    /*@3.SECJ.432*/
+    (p.unpassed || []).forEach(function (c) { delete out[c]; });
     (p.passed_extra || []).forEach(function (c) { out[c] = 'me'; });
     return out;
   }
@@ -2344,7 +2457,7 @@
     var out = {};
     function eat(courses) {
       (courses || []).forEach(function (c) {
-        var code = String((c && c.code) || '').toUpperCase().replace(/\s+/g, '');
+        var code = window.GardenCode.canon((c && c.code) || '');
         if (!code) return;
         var g = (c && c.grade) || '';
         if (g && PASS_FAIL[g]) return;                 /*@3.SECJ.219*/
@@ -2440,12 +2553,18 @@
   function prereqMet(code, passed) {
     var rows = (PRE && PRE[code]) || null;
     if (!rows || !rows.length) return true;             /*@3.SECJ.232*/
-    var codes = rows.map(function (r) { return r.c; }).filter(Boolean);
-    if (!codes.length) return true;                     /*@3.SECJ.233*/
-    var anyAnd = rows.some(function (r) { return /and/i.test(r.op || ''); });
-    return anyAnd
-      ? codes.every(function (c) { return !!passed[c]; })
-      : codes.some(function (c) { return !!passed[c]; });
+    /*@3.SECJ.426*/
+    var groups = [], cur = null;
+    rows.forEach(function (r) {
+      var c = r && r.c;
+      if (!c) return;
+      if (cur && /^or$/i.test(String(r.op || ''))) { cur.push(c); return; }
+      cur = [c]; groups.push(cur);
+    });
+    if (!groups.length) return true;                    /*@3.SECJ.233*/
+    return groups.every(function (g) {
+      return g.some(function (c) { return !!passed[c]; });
+    });
   }
   var PRE = null;                                       /*@3.SECJ.234*/
 
@@ -2478,9 +2597,15 @@
       only_my_level: !!p.only_my_level,
       grad: !!p.grad,
       /*@3.SECJ.237*/
+      unpassed: (function () {
+        var un = {};
+        (p.unpassed || []).forEach(function (c) { un[c] = 1; });
+        return un;
+      })(),
       passed: (function () {
-        var rec = passedFromRecord(), out = {};
-        for (var k in rec) out[k] = 'rec';             /*@3.SECJ.238*/
+        var rec = passedFromRecord(), out = {}, un = {};
+        (p.unpassed || []).forEach(function (c) { un[c] = 1; });
+        for (var k in rec) if (!un[k]) out[k] = 'rec';  /*@3.SECJ.238*/
         (p.passed_extra || []).forEach(function (c) { if (!out[c]) out[c] = 'me'; });
         return out;
       })(),
@@ -2507,7 +2632,31 @@
     }
     paintSetup();
   }
-  function closeSetup() { $('#sx-setup').classList.remove('on'); }
+  /*@3.SECJ.428*/
+  function commitDraft(done) {
+    var d = W.draft;
+    if (!d) return;
+    var extra = Object.keys(d.passed).filter(function (c) { return d.passed[c] === 'me'; });
+    var patch = {
+      college: d.college, department: d.department,
+      college_key: d.college_key, program: d.program,
+      plan_version: d.plan_version || '',
+      campus_city: d.campus_city, gender: d.gender,
+      levels: d.levels, only_my_level: d.only_my_level,
+      grad: d.grad, passed_extra: extra, plan: d.plan,
+      watch: d.watch || [],
+      unpassed: Object.keys(d.unpassed || {}),
+      level: loadProf().level || (d.levels[0] ? String(parseInt(d.levels[0], 10)) : '')
+    };
+    if (done) patch.sx_setup_at = Date.now();
+    saveProf(patch);
+  }
+  function closeSetup() {
+    commitDraft(false);
+    $('#sx-setup').classList.remove('on');
+    if (profReady(loadProf())) { state.mine = 'on'; }
+    paintMe(); apply();
+  }
 
   /*@3.SECJ.244*/
   function rqValues(key, filterFn) {
@@ -2683,9 +2832,12 @@
       /*@3.SECJ.262*/
       if (!d._prefilled) {
         d._prefilled = true;
+        /*@3.SECJ.429*/
+        for (var pk in d.passed) if (d.passed[pk] === 'lv') delete d.passed[pk];
         codes.forEach(function (c) {
           /*@3.SECJ.263*/
           if (d.plan.indexOf(c) >= 0) return;
+          if (d.unpassed && d.unpassed[c]) return;
           if (!d.passed[c] && myLv && idx[c].lv && idx[c].lv < myLv) d.passed[c] = 'lv';
         });
       }
@@ -2935,23 +3087,10 @@
     if (W.step === STEP_ALERTS) { closeSetup(); return; }
     if (W.step === STEP_SAVE) {
       /*@3.SECJ.276*/
-      var extra = Object.keys(W.draft.passed).filter(function (c) {
-        return W.draft.passed[c] === 'me';
-      });
-      saveProf({
-        college: W.draft.college, department: W.draft.department,
-        /*@3.SECJ.277*/
-        college_key: W.draft.college_key, program: W.draft.program,
-        /*@3.SECJ.278*/
-        plan_version: W.draft.plan_version || '',
-        campus_city: W.draft.campus_city, gender: W.draft.gender,
-        levels: W.draft.levels, only_my_level: W.draft.only_my_level,
-        grad: W.draft.grad, passed_extra: extra, plan: W.draft.plan,
-        watch: W.draft.watch || [],
-        /*@3.SECJ.279*/
-        level: loadProf().level || (W.draft.levels[0] ? String(parseInt(W.draft.levels[0], 10)) : ''),
-        sx_setup_at: Date.now()
-      });
+      /*@3.SECJ.277*/
+      /*@3.SECJ.278*/
+      /*@3.SECJ.279*/
+      commitDraft(true);
       state.mine = 'on';
       paintMe(); apply();
       /*@3.SECJ.280*/
@@ -3229,7 +3368,10 @@
       paintMe();               /*@3.SECJ.311*/
     });
     $('#sx-setup-x').addEventListener('click', closeSetup);
-    $('#sx-back').addEventListener('click', function () { if (W.step) { W.step--; paintSetup(); } });
+    window.GardenHint.wire($('#sx-q-hint'));
+    $('#sx-back').addEventListener('click', function () {
+      if (W.step) { commitDraft(false); W.step--; paintSetup(); }
+    });
     $('#sx-next').addEventListener('click', setupNext);
     $('#sx-steps').addEventListener('click', function (e) {
       var b = e.target.closest('.sx-step');
@@ -3239,6 +3381,7 @@
       var d = W.draft;
       if (i > 0 && !(d.college || d.college_key)) return;
       if (i > 2 && !(d.gender && (d.campus_city || !hasCampuses()))) return;
+      commitDraft(false);
       W.step = i; paintSetup();
     });
     $('#sx-setup-body').addEventListener('change', function (e) {
@@ -3266,7 +3409,9 @@
       if (ci) {
         var dv = ci.dataset.v, dd = W.draft;
         if (ci.dataset.act === 'pass') {
-          if (dd.passed[dv]) delete dd.passed[dv]; else dd.passed[dv] = 'me';
+          dd.unpassed = dd.unpassed || {};
+          if (dd.passed[dv]) { delete dd.passed[dv]; dd.unpassed[dv] = 1; }
+          else { dd.passed[dv] = 'me'; delete dd.unpassed[dv]; }
         } else if (ci.dataset.act === 'watch') {
           dd.watch = dd.watch || [];
           var w = dd.watch.indexOf(dv);
@@ -3413,6 +3558,17 @@
           if (r.error) toast(t('تعذّر حفظ المتابعة', 'Could not save the watch'), 2400);
           else if (r.on) pushNudge(t('سننبّهك', 'We will alert you'));
         });
+        return;
+      }
+      var ad = e.target.closest('[data-aldel]');
+      if (ad) {
+        alHide(ad.getAttribute('data-aldel'));
+        $('#sx-modal-body').innerHTML = watchesHtml();
+        return;
+      }
+      if (e.target.closest('[data-alclear]')) {
+        alHide(((GW() && GW().state().alerts) || []).map(function (a) { return a.id; }));
+        $('#sx-modal-body').innerHTML = watchesHtml();
         return;
       }
       var wd = e.target.closest('[data-wdel]');
@@ -3738,7 +3894,7 @@
   var MODES = [
     { v: 'all',    ar: 'كل الطرق',      en: 'All methods',   i: 'fa-chalkboard-user' },
     { v: 'person', ar: 'حضوري كاملاً',   en: 'On campus',     i: 'fa-building' },
-    { v: 'mix',    ar: 'مختلط',         en: 'Hybrid',        i: 'fa-shuffle' },
+    { v: 'mix',    ar: 'مدمج',          en: 'Hybrid',        i: 'fa-shuffle' },
     { v: 'remote', ar: 'عن بعد كاملاً',  en: 'Fully remote',  i: 'fa-wifi' }
   ];
   var DAYPATS = [
