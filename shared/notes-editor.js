@@ -1671,19 +1671,19 @@
                document.fonts.check('16px "Thmanyah Sans"');
     } catch (eF) {}
     if (!faceOk) { this._engRecap = true; return; }
-    var y = {}, n = 0, i, b, node;
+    /*@3.NOEJ.158*/
+    var a = [], n = 0, i, b, node;
     this.root.style.minBlockSize = '';
     for (i = 0; i < this.doc.blocks.length; i++) {
       b = this.doc.blocks[i];
-      if (b.fp) continue;
-      node = this.root.querySelector(':scope > [data-bid="' + b.id + '"]');
-      if (!node) continue;
-      y[b.id] = Math.round(node.offsetTop * 10) / 10;
+      node = b.fp ? null : this.root.querySelector(':scope > [data-bid="' + b.id + '"]');
+      if (!node) { a.push(null); continue; }
+      a.push(Math.round(node.offsetTop));
       n++;
     }
     if (!n) { delete this.doc.eng; return; }
     this.doc.bd = docDir(this.doc);
-    this.doc.eng = { v: 1, w: 794, h: Math.round(this.root.offsetHeight), y: y };
+    this.doc.eng = { v: 2, w: 794, h: Math.round(this.root.offsetHeight), a: a };
     this._engStale = false;
     this.applyEng();
   };
@@ -1693,7 +1693,12 @@
     var eng = this.doc.eng;
     var nodes = this.root.querySelectorAll(':scope > [data-bid]');
     var i, node, tgt, dY;
-    if (this._engStale || !eng || !eng.y || eng.w !== 794 || this.doc.kind === 'board') {
+    /*@3.NOEJ.158*/
+    var arr = (eng && eng.v === 2 && Array.isArray(eng.a) &&
+               eng.a.length === this.doc.blocks.length) ? eng.a : null;
+    var map = (eng && !arr && eng.y) ? eng.y : null;
+    if (this._engStale || !eng || (!arr && !map) || eng.w !== 794 ||
+        this.doc.kind === 'board') {
       if (!this._engOn) return;
       this._engOn = false;
       for (i = 0; i < nodes.length; i++) nodes[i].style.translate = '';
@@ -1701,10 +1706,12 @@
       return;
     }
     this._engOn = true;
-    for (i = 0; i < nodes.length; i++) {
-      node = nodes[i];
-      if (node.hasAttribute('data-fp')) continue;
-      tgt = eng.y[node.getAttribute('data-bid')];
+    var at = {};
+    for (i = 0; i < nodes.length; i++) at[nodes[i].getAttribute('data-bid')] = nodes[i];
+    for (i = 0; i < this.doc.blocks.length; i++) {
+      node = at[this.doc.blocks[i].id];
+      if (!node || node.hasAttribute('data-fp')) continue;
+      tgt = arr ? arr[i] : map[this.doc.blocks[i].id];
       if (tgt == null) { node.style.translate = ''; continue; }
       dY = Math.round((tgt - node.offsetTop) * 10) / 10;
       node.style.translate = (dY > 0.6 || dY < -0.6) ? ('0 ' + dY + 'px') : '';
