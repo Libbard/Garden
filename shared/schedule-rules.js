@@ -101,6 +101,20 @@
     return { on: true, why: null };
   }
 
+  /*@3.SCRJ.4*/
+  function blockOn(b, dateObj) {
+    if (!b || !b.day || !dateObj) return { on: false, why: 'none' };
+    if (DAYS_ORDER[dateObj.getDay()] !== b.day) return { on: false, why: 'day' };
+    var d = day0(dateObj);
+    var wid = getWeekId(getWeekStartDate(d));
+    if (b.week_id != null) {
+      return b.week_id === wid ? { on: true, why: null } : { on: false, why: 'week' };
+    }
+    if (!inTerm(d)) return { on: false, why: 'term' };
+    if (b.excluded_weeks && b.excluded_weeks.indexOf(wid) !== -1) return { on: false, why: 'excluded' };
+    return { on: true, why: null };
+  }
+
   window.GardenScheduleRules = {
     DAYS_ORDER: DAYS_ORDER,
     settings: settings,
@@ -111,6 +125,7 @@
     overrideFor: overrideFor,
     inTerm: inTerm,
     weekFocus: weekFocus,
-    lectureOn: lectureOn
+    lectureOn: lectureOn,
+    blockOn: blockOn
   };
 })();

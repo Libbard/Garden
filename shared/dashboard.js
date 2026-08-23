@@ -218,8 +218,11 @@
         /*@3.DASJ.20*/
 
         if (!items.length) {
+          var note = hiddenNote(s);
           return head('<i class="fa-solid fa-calendar-day"></i>', tx('اليوم', 'Today'), 'hub/schedule.html') +
-            emptyState('<i class="fa-solid fa-calendar-day"></i>', tx('لا شيء مجدول اليوم', 'Nothing scheduled today'), tx('افتح الجدول', 'Open schedule'), 'go-schedule');
+            emptyState('<i class="fa-solid fa-calendar-day"></i>',
+                       note || tx('لا شيء مجدول اليوم', 'Nothing scheduled today'),
+                       tx('افتح الجدول', 'Open schedule'), 'go-schedule');
         }
         var list = items.slice(0, 4).map(function (i) {
           return '<a class="widget-item" href="hub/schedule.html"' + (i.done ? ' style="opacity:.5"' : '') + '>' +
@@ -364,6 +367,23 @@
   };
 
   /*@3.DASJ.33*/
+  /*@3.DASJ.143*/
+  function hiddenNote(s) {
+    if (!s || !s.hidden) return '';
+    if (s.hiddenWhy === 'term') {
+      return tx('خارج مدى الفصل — لا تُعرض المحاضرات المتكرّرة',
+                'Outside the term range — recurring lectures are not shown');
+    }
+    if (s.hiddenWhy === 'focus') {
+      var R = window.GardenScheduleRules;
+      var f = R ? R.weekFocus(new Date()) : { kind: null };
+      var kind = f.kind === 'midterm' ? tx('الميدتيرم', 'Midterm') : tx('الفاينل', 'Final');
+      return tx('أسبوع تركيز (' + kind + ') — المحاضرات المتكرّرة مخفية',
+                'Focus week (' + kind + ') — recurring lectures hidden');
+    }
+    return '';
+  }
+
   function intensiveToday() {
     var sch = null;
     try { sch = JSON.parse(localStorage.getItem('weekly_schedule') || 'null'); } catch (e) { return []; }

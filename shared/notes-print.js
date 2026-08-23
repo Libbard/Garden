@@ -269,6 +269,7 @@
       '.pgi .ne-rail,.pgi .ne-wgrip,.pgi .ne-rgrip,.pgi .ne-selhint,.pgi .na-pgbar,' +
         '.pgi .ne-code-bar,.pgi .ne-menu,.pgi .ne-img-ed,.pgi .ne-tex,.pgi .ne-tbl-bar,' +
         '.pgi .ne-cap-ed,.pgi .nc-selbar{visibility:hidden !important}' +
+      'mjx-assistive-mml{display:none !important}' +
       '.pgi [data-ph]::before{content:"" !important;opacity:0 !important}' +
       '.pgi *{caret-color:transparent}' +
       '.mink{position:absolute;pointer-events:none;z-index:9}' +
@@ -358,17 +359,23 @@
   }
 
   /*@3.NOPJ.9*/
+  /*@3.NOPJ.16*/
   function waitPaint(win) {
-    var imgs = win.document.images || [];
+    var imgs = [].slice.call(win.document.images || []);
     var jobs = [], i;
     for (i = 0; i < imgs.length; i++) {
-      if (imgs[i].complete) continue;
-      jobs.push(new Promise(function (res) {
-        var t = setTimeout(res, 4000);
-        var done = function () { clearTimeout(t); res(); };
-        imgs[i].addEventListener('load', done);
-        imgs[i].addEventListener('error', done);
-      }));
+      (function (im) {
+        im.setAttribute('loading', 'eager');
+        im.setAttribute('decoding', 'sync');
+        if (im.complete && im.naturalWidth) return;
+        jobs.push(new Promise(function (res) {
+          var t = setTimeout(res, 9000);
+          var done = function () { clearTimeout(t); res(); };
+          im.addEventListener('load', done, { once: true });
+          im.addEventListener('error', done, { once: true });
+          if (!im.complete) { var sv = im.currentSrc || im.src; im.src = sv; }
+        }));
+      }(imgs[i]));
     }
     if (win.document.fonts && win.document.fonts.ready) jobs.push(win.document.fonts.ready);
     return Promise.all(jobs);
@@ -386,13 +393,26 @@
     var sheets = (m.css || []).map(function (h) {
       return '<link rel="stylesheet" href="' + esc(h) + '">';
     }).join('');
+    /*@3.NOPJ.15*/
+    var rootAttr = '', ra = m.rootAttrs || {}, rk;
+    for (rk in ra) {
+      if (rk === 'dir' || rk === 'lang' || rk === 'data-theme') continue;
+      rootAttr += ' ' + rk + '="' + esc(String(ra[rk])) + '"';
+    }
     win.document.write('<!DOCTYPE html><html dir="' + (isA ? 'rtl' : 'ltr') +
-      '" lang="' + (isA ? 'ar' : 'en') + '" data-theme="light"><head><meta charset="UTF-8">' +
+      '" lang="' + (isA ? 'ar' : 'en') + '" data-theme="light"' + rootAttr +
+      '><head><meta charset="UTF-8">' +
       '<title>' + esc(m.title || L('ملاحظة', 'Note')) + '</title>' + sheets +
-      '<style>' + mirrorCss(g) + '</style>' + mjxStyles() + '</head><body>' +
+      mjxStyles() + '</head><body>' +
       '<p class="ldg">' + esc(L('يُجهَّز للطباعة…', 'Preparing to print…')) + '</p>' +
       '</body></html>');
     win.document.close();
+    var incss = (m.inlineCss || []).concat([mirrorCss(g)]);
+    for (var ic = 0; ic < incss.length; ic++) {
+      var stg = win.document.createElement('style');
+      stg.textContent = String(incss[ic]);
+      win.document.head.appendChild(stg);
+    }
 
     mirrorPages(doc, m).then(function (html) {
       if (win.closed) return;

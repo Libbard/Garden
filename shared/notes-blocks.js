@@ -2,7 +2,7 @@
 ;(function () {
   'use strict';
 
-  var MARKS = { b: 'b', i: 'i', u: 'u', st: 's', c: 'code' };
+  var MARKS = { b: 'b', i: 'i', u: 'u', st: 's', c: 'code', sb: 'sub', sp: 'sup' };
 
   var uidN = 0;
   function uid(p) {
@@ -133,6 +133,8 @@
       else if (tag === 'u') next.u = 1;
       else if (tag === 's' || tag === 'strike' || tag === 'del') next.st = 1;
       else if (tag === 'code') next.c = 1;
+      else if (tag === 'sub') next.sb = 1;
+      else if (tag === 'sup') next.sp = 1;
       else if (tag === 'mark') next.hl = n.getAttribute('data-hl') || 'amber';
       else if (tag === 'span' && n.hasAttribute('data-fg')) next.fg = n.getAttribute('data-fg') || '';
       else if (tag === 'span' && n.hasAttribute('data-ff')) next.ff = n.getAttribute('data-ff') || '';
@@ -165,6 +167,7 @@
   function sameMarks(a, b) {
     return !!a.b === !!b.b && !!a.i === !!b.i && !!a.u === !!b.u &&
            !!a.st === !!b.st && !!a.c === !!b.c &&
+           !!a.sb === !!b.sb && !!a.sp === !!b.sp &&
            (a.hl || '') === (b.hl || '') && (a.lk || '') === (b.lk || '') &&
            (a.fg || '') === (b.fg || '') && (a.ff || '') === (b.ff || '') &&
            (a.fz || 0) === (b.fz || 0);
@@ -183,7 +186,7 @@
   function blank(ty, extra) {
     var b = { id: uid(), ty: ty || 'p' };
     if (ty === 'h') b.lv = 2;
-    if (ty === 'ul' || ty === 'ol') b.items = [{ rt: [] }];
+    if (ty === 'ul' || ty === 'ol' || ty === 'dl') b.items = [{ rt: [] }];
     else if (ty === 'code') { b.lang = ''; b.src = ''; }
     else if (ty === 'tbl') { b.cols = 2; b.st = 'head'; b.rows = [[{ rt: [] }, { rt: [] }], [{ rt: [] }, { rt: [] }]]; }
     else if (ty === 'math') { b.tex = ''; b.display = 1; }
@@ -263,7 +266,7 @@
     if (b.ty === 'img') return !b.url;
     if (b.ty === 'code') return !String(b.src || '').trim();
     if (b.ty === 'math') return !String(b.tex || '').trim();
-    if (b.ty === 'ul' || b.ty === 'ol') {
+    if (b.ty === 'ul' || b.ty === 'ol' || b.ty === 'dl') {
       return !(b.items || []).some(function (it) { return runsToText(it.rt).trim(); });
     }
     if (b.ty === 'tbl') {
@@ -286,6 +289,8 @@
         case 'quote': return runsToText(b.rt);
         case 'callout': return runsToText(b.rt);
         case 'todo':  return (b.done ? '[x] ' : '[ ] ') + runsToText(b.rt);
+        case 'dl':    return (b.items || []).map(function (it) {
+          return (it.lv ? ': ' : '') + runsToText(it.rt); }).join('\n');
         case 'ul':    return (b.items || []).map(function (it) { return '- ' + runsToText(it.rt); }).join('\n');
         case 'ol':    return (b.items || []).map(function (it, i) { return (i + 1) + '. ' + runsToText(it.rt); }).join('\n');
         case 'code':  return b.src || '';

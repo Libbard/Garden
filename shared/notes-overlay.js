@@ -160,9 +160,15 @@
       redo: function () { return self.cv ? self.cv.redo() : false; }
     });
     this.wet = this.cv.wet;
-    this.wet.addEventListener('pointerdown', function () { self.dim(true); });
+    this.wet.addEventListener('pointerdown', function () {
+      self.drawing = true;
+      self.dim(true);
+    });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) {
-      self.wet.addEventListener(ev, function () { self.dim(false); });
+      self.wet.addEventListener(ev, function () {
+        self.drawing = false;
+        self.dim(false);
+      });
     });
     if (this.bound && this.scroller) {
       var selfW = this;
@@ -188,6 +194,12 @@
       else this.migrateRef(was);
     }
     return this.cv;
+  };
+
+  /*@3.NOOJ.25*/
+  Overlay.prototype.shiftY = function (regs) {
+    if (!this.cv || !this.cv.shiftY) return 0;
+    return this.cv.shiftY(regs);
   };
 
   /*@3.NOOJ.19*/

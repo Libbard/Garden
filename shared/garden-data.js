@@ -747,11 +747,28 @@
     if (!s) return out;
     out.exists = true;
 
+    /*@3.GADJ.140*/
+    var R = window.GardenScheduleRules;
+    var d0 = new Date(d); d0.setHours(0, 0, 0, 0);
+    var WHY_RANK = { term: 3, focus: 2, range: 1, cancelled: 1 };
+    var hidden = 0, why = null;
+
     out.lectures = (s.lectures || []).filter(function (l) {
-      return l && l.day === day && l.recurring;
+      if (!l || l.day !== day || !l.recurring) return false;
+      if (!R) return true;
+      var v = R.lectureOn(l, d0);
+      if (v.on) return true;
+      hidden++;
+      if (!why || (WHY_RANK[v.why] || 0) > (WHY_RANK[why] || 0)) why = v.why;
+      return false;
     });
     out.exams = (s.exams || []).filter(function (e) { return e && e.date === ds; });
-    out.blocks = (s.study_blocks || []).filter(function (b) { return b && b.day === day; });
+    out.blocks = (s.study_blocks || []).filter(function (b) {
+      if (!b || b.day !== day) return false;
+      return R ? R.blockOn(b, d0).on : true;
+    });
+    out.hidden = hidden;
+    out.hiddenWhy = why;
     out.count = out.lectures.length + out.exams.length + out.blocks.length;
     return out;
   }

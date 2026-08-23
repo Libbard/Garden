@@ -4261,6 +4261,10 @@
       .then(function (d) {
         /*@3.SECJ.440*/
         readCadence(d);
+        /*@3.SECJ.455*/
+        if (window.GardenSXLink && window.GardenSXLink.applyCampuses) {
+          window.GardenSXLink.applyCampuses(d && d.campuses);
+        }
         var ts = (d.terms || []).filter(function (x) { return x.sections > 0; });
         if (!ts.length) throw new Error('no-terms');
 

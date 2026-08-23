@@ -557,23 +557,6 @@
   };
 
 
-  function strokePath(g, pts) {
-    if (!pts.length) return;
-    g.beginPath();
-    if (pts.length === 1) {
-      g.moveTo(pts[0].x, pts[0].y);
-      g.lineTo(pts[0].x + 0.01, pts[0].y);
-      return;
-    }
-    g.moveTo(pts[0].x, pts[0].y);
-    for (var i = 1; i < pts.length - 1; i++) {
-      var mx = (pts[i].x + pts[i + 1].x) / 2;
-      var my = (pts[i].y + pts[i + 1].y) / 2;
-      g.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
-    }
-    g.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
-  }
-
   /*@3.NOCJ.65*/
   var CORNER_COS = 0.25;
   var CORNER_MIN_SEG = 0.8;
@@ -645,88 +628,125 @@
     return 0.82 + 0.36 * (n - Math.floor(n));
   }
 
+  /*@3.NOCJ.74*/
+  function inkGeom(el, k, map) {
+    var nib = NIBS[el.nib] || NIBS.round;
+    var sc = k || 1;
+    var base = (el.w || 2) * sc;
+    var raw = [], i, list = el.pts || [];
+    for (i = 0; i < list.length; i++) {
+      var p = list[i];
+      var px = (p && p.x != null) ? p.x : (p && p[0]);
+      var py = (p && p.y != null) ? p.y : (p && p[1]);
+      if (px == null || py == null) continue;
+      var q = map ? map(px, py) : { x: px * sc, y: py * sc };
+      raw.push({ x: q.x, y: q.y, p: (p && p.p != null) ? p.p : 0.55 });
+    }
+    if (!raw.length) return null;
+    var pts = smoothPts(raw);
+    var alpha = (el.o == null ? 1 : el.o) * (nib.grain ? 0.72 : 1);
+    if (pts.length === 1) {
+      return { kind: 'dot', alpha: alpha, grain: !!nib.grain,
+               x: pts[0].x, y: pts[0].y,
+               r: Math.max(0.4, widthAt(base, nib, pts[0].p, 0) / 2) };
+    }
+    /*@3.NOCJ.28*/
+    if (!nib.resp && !nib.chisel) {
+      return { kind: 'line', alpha: alpha, grain: false, pts: pts,
+               w: Math.max(0.5, widthAt(base, nib, 1, 0)) };
+    }
+    var angs = dirsOf(pts), left = [], right = [];
+    for (i = 0; i < pts.length; i++) {
+      var ang = angs[i];
+      var hw = widthAt(base, nib, pts[i].p, ang) / 2;
+      if (nib.grain) hw *= grainAt(i);
+      var nx = -Math.sin(ang) * hw, ny = Math.cos(ang) * hw;
+      left.push({ x: pts[i].x + nx, y: pts[i].y + ny });
+      right.push({ x: pts[i].x - nx, y: pts[i].y - ny });
+    }
+    var caps = null;
+    if (nib.round) {
+      caps = [{ x: pts[0].x, y: pts[0].y,
+                r: Math.max(0.3, widthAt(base, nib, pts[0].p, 0) / 2) },
+              { x: pts[pts.length - 1].x, y: pts[pts.length - 1].y,
+                r: Math.max(0.3, widthAt(base, nib, pts[pts.length - 1].p, 0) / 2) }];
+    }
+    return { kind: 'blob', alpha: alpha, grain: !!nib.grain,
+             left: left, right: right, caps: caps };
+  }
+
+  /*@3.NOCJ.75*/
+  function smoothInto(pts, api) {
+    api.move(pts[0].x, pts[0].y);
+    if (pts.length === 1) { api.line(pts[0].x + 0.01, pts[0].y); return; }
+    for (var i = 1; i < pts.length - 1; i++) {
+      api.quad(pts[i].x, pts[i].y,
+               (pts[i].x + pts[i + 1].x) / 2, (pts[i].y + pts[i + 1].y) / 2);
+    }
+    api.line(pts[pts.length - 1].x, pts[pts.length - 1].y);
+  }
+
+  function backInto(pts, api) {
+    for (var i = pts.length - 2; i >= 0; i--) {
+      api.quad(pts[i + 1].x, pts[i + 1].y,
+               (pts[i + 1].x + pts[i].x) / 2, (pts[i + 1].y + pts[i].y) / 2);
+    }
+    api.line(pts[0].x, pts[0].y);
+  }
+
+  function inkEmit(geom, api) {
+    if (!geom) return;
+    if (geom.kind === 'dot') { api.circle(geom.x, geom.y, geom.r); return; }
+    if (geom.kind === 'line') { smoothInto(geom.pts, api); return; }
+    smoothInto(geom.left, api);
+    api.line(geom.right[geom.right.length - 1].x, geom.right[geom.right.length - 1].y);
+    backInto(geom.right, api);
+    api.close();
+  }
+
   /*@3.NOCJ.2*/
   Canvas.prototype.paintStroke = function (g, el) {
-    var nib = NIBS[el.nib] || NIBS.round;
-    var z = this.cam.z;
-    var base = (el.w || 2) * z;
-
-    var raw = [];
-    for (var i = 0; i < el.pts.length; i++) {
-      var sp = this.toScreen(el.pts[i]);
-      raw.push({ x: sp.x, y: sp.y, p: el.pts[i].p == null ? 0.55 : el.pts[i].p });
-    }
-    var pts = smoothPts(raw);
-
+    var self = this;
+    var geom = inkGeom(el, this.cam.z, function (x, y) { return self.toScreen({ x: x, y: y }); });
+    if (!geom) return;
     g.save();
-    g.globalAlpha = (el.o == null ? 1 : el.o) * (nib.grain ? 0.72 : 1);
+    g.globalAlpha = geom.alpha;
     g.fillStyle = hexOf(el.c);
     g.strokeStyle = hexOf(el.c);
-
-    if (pts.length === 1) {
-      var r0 = widthAt(base, nib, pts[0].p, 0) / 2;
-      g.beginPath();
-      g.arc(pts[0].x, pts[0].y, Math.max(0.4, r0), 0, Math.PI * 2);
-      g.fill();
-      g.restore();
-      return;
-    }
-
-/*@3.NOCJ.28*/
-    if (!nib.resp && !nib.chisel) {
-      g.lineWidth = Math.max(0.5, widthAt(base, nib, 1, 0));
+    var api = {
+      move: function (x, y) { g.moveTo(x, y); },
+      line: function (x, y) { g.lineTo(x, y); },
+      quad: function (cx, cy, x, y) { g.quadraticCurveTo(cx, cy, x, y); },
+      close: function () { g.closePath(); },
+      circle: function (x, y, r) { g.arc(x, y, r, 0, Math.PI * 2); }
+    };
+    if (geom.kind === 'line') {
+      g.lineWidth = geom.w;
       g.lineJoin = 'round';
       g.lineCap = 'round';
-      strokePath(g, pts);
+      g.beginPath();
+      inkEmit(geom, api);
       g.stroke();
       g.restore();
       return;
     }
-
-    var angs = dirsOf(pts);
-    var left = [], right = [];
-    for (var k = 0; k < pts.length; k++) {
-      var ang = angs[k];
-      var hw = widthAt(base, nib, pts[k].p, ang) / 2;
-      if (nib.grain) hw *= grainAt(k);
-      var nx = -Math.sin(ang) * hw, ny = Math.cos(ang) * hw;
-      left.push({ x: pts[k].x + nx, y: pts[k].y + ny });
-      right.push({ x: pts[k].x - nx, y: pts[k].y - ny });
-    }
-
     g.beginPath();
-    g.moveTo(left[0].x, left[0].y);
-    for (var a = 1; a < left.length; a++) {
-      var mx = (left[a - 1].x + left[a].x) / 2, my = (left[a - 1].y + left[a].y) / 2;
-      g.quadraticCurveTo(left[a - 1].x, left[a - 1].y, mx, my);
-    }
-    g.lineTo(left[left.length - 1].x, left[left.length - 1].y);
-    g.lineTo(right[right.length - 1].x, right[right.length - 1].y);
-    for (var b = right.length - 2; b >= 0; b--) {
-      var mx2 = (right[b + 1].x + right[b].x) / 2, my2 = (right[b + 1].y + right[b].y) / 2;
-      g.quadraticCurveTo(right[b + 1].x, right[b + 1].y, mx2, my2);
-    }
-    g.lineTo(right[0].x, right[0].y);
-    g.closePath();
+    inkEmit(geom, api);
     g.fill();
-
-    if (nib.grain) {
+    /*@3.NOCJ.76*/
+    if (geom.grain) {
       g.save();
       g.globalAlpha = 0.34;
       g.translate(0.45, 0.45);
       g.fill();
       g.restore();
     }
-
-    if (nib.round) {
-      var hw0 = widthAt(base, nib, pts[0].p, 0) / 2;
-      var hwN = widthAt(base, nib, pts[pts.length - 1].p, 0) / 2;
-      g.beginPath();
-      g.arc(pts[0].x, pts[0].y, Math.max(0.3, hw0), 0, Math.PI * 2);
-      g.fill();
-      g.beginPath();
-      g.arc(pts[pts.length - 1].x, pts[pts.length - 1].y, Math.max(0.3, hwN), 0, Math.PI * 2);
-      g.fill();
+    if (geom.caps) {
+      for (var c = 0; c < geom.caps.length; c++) {
+        g.beginPath();
+        g.arc(geom.caps[c].x, geom.caps[c].y, geom.caps[c].r, 0, Math.PI * 2);
+        g.fill();
+      }
     }
     g.restore();
   };
@@ -1239,6 +1259,33 @@
                       ch: Math.round(self.contentH()) });
       return packed;
     });
+  };
+
+  /*@3.NOCJ.77*/
+  Canvas.prototype.shiftY = function (regs) {
+    if (!regs || !regs.length || !this.els.length) return 0;
+    var moved = 0;
+    function byOf(y) {
+      var d = 0;
+      for (var r = 0; r < regs.length; r++) {
+        if (regs[r].from <= y) d = regs[r].by; else break;
+      }
+      return d;
+    }
+    for (var i = 0; i < this.els.length; i++) {
+      var hit = 0;
+      eachPoint(this.els[i], function (x, y) {
+        var d = byOf(y);
+        if (d) hit = 1;
+        return [x, y + d];
+      });
+      moved += hit;
+    }
+    if (!moved) return 0;
+    this.growIfNeeded();
+    this.paint();
+    this.commit();
+    return moved;
   };
 
   Canvas.prototype.mapEl = function (el, ox, oy, nx, ny, s) {
@@ -1785,17 +1832,43 @@
   };
 
   /*@3.NOCJ.13*/
+  function n1(v) { return Math.round(v * 10) / 10; }
+
   function toSvg(els, w, h, opts) {
     var hx = (opts && typeof opts.hex === 'function') ? opts.hex : hexOf;
     var parts = (els || []).map(function (el) {
       var col = hx(el.c);
       var op = el.o == null ? 1 : el.o;
       if (el.ty === 'st') {
-        var d = el.pts.map(function (p, i) {
-          return (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
-        }).join(' ');
-        return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' +
-          (el.w || 2) + '" stroke-linecap="round" stroke-linejoin="round" opacity="' + op + '"/>';
+        var geom = inkGeom(el, (opts && opts.scale) || 1);
+        if (!geom) return '';
+        var d = [];
+        var api = {
+          move: function (X, Y) { d.push('M' + n1(X) + ' ' + n1(Y)); },
+          line: function (X, Y) { d.push('L' + n1(X) + ' ' + n1(Y)); },
+          quad: function (cx, cy, X, Y) {
+            d.push('Q' + n1(cx) + ' ' + n1(cy) + ' ' + n1(X) + ' ' + n1(Y));
+          },
+          close: function () { d.push('Z'); },
+          circle: function (X, Y, R) {
+            d.push('M' + n1(X - R) + ' ' + n1(Y) + 'a' + n1(R) + ' ' + n1(R) +
+                   ' 0 1 0 ' + n1(R * 2) + ' 0a' + n1(R) + ' ' + n1(R) +
+                   ' 0 1 0 ' + n1(-R * 2) + ' 0');
+          }
+        };
+        inkEmit(geom, api);
+        if (geom.caps) {
+          for (var cc = 0; cc < geom.caps.length; cc++) {
+            api.circle(geom.caps[cc].x, geom.caps[cc].y, geom.caps[cc].r);
+          }
+        }
+        if (geom.kind === 'line') {
+          return '<path d="' + d.join(' ') + '" fill="none" stroke="' + col +
+            '" stroke-width="' + n1(geom.w) + '" stroke-linecap="round" ' +
+            'stroke-linejoin="round" opacity="' + n1(geom.alpha) + '"/>';
+        }
+        return '<path d="' + d.join(' ') + '" fill="' + col +
+          '" fill-rule="nonzero" stroke="none" opacity="' + n1(geom.alpha) + '"/>';
       }
       var x = Math.min(el.x1, el.x2), y = Math.min(el.y1, el.y2);
       var ww = Math.abs(el.x2 - el.x1), hh = Math.abs(el.y2 - el.y1);
@@ -1821,6 +1894,8 @@
     TONES: TONES,
     NIBS: NIBS,
     toSvg: toSvg,
+    inkGeom: inkGeom,
+    inkEmit: inkEmit,
     isLight: isLight,
     setPaper: setPaper,
     themeIsLight: themeIsLight,

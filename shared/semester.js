@@ -663,15 +663,36 @@
     return h;
   }
 
+  /*@3.SEMJ.195*/
+  function midPct(arc) {
+    var mid = null;
+    (((arc && arc.flags) || [])).forEach(function (f) {
+      if (f && f.kind === 'midterm') mid = f.pct;
+    });
+    return mid === null ? 50 : mid;
+  }
+
+  function taken(entry, arc) {
+    if (GardenData.courseDone(entry)) return true;
+    if (arc && !arc.before && arc.pct >= midPct(arc)) return true;
+    return GardenData.coursePercent(entry) >= 50;
+  }
+
   /*@3.SEMJ.179*/
   function renderRateNudge() {
     var host = el('sem-rate-nudge');
     if (!host) return;
     var GF = window.GardenFaculty;
     if (!S.facultyReady || !GF) { host.hidden = true; return; }
+    /*@3.SEMJ.196*/
+    if (S.sem && S.sem.rate_note_off) { host.hidden = true; host.innerHTML = ''; return; }
+
+    var arc = termArc();
+    if (arc && arc.before) { host.hidden = true; host.innerHTML = ''; return; }
 
     var seen = {}, gaps = [];
     courses().forEach(function (entry) {
+      if (!taken(entry, arc)) return;
       var m = GardenData.courseMeta(entry.code);
       ((m && m.instructors) || []).forEach(function (ins) {
         if (!ins || !ins.name) return;
@@ -697,11 +718,15 @@
           ' من أساتذة فصلك:',
         gaps.length + ' of your instructors have few or no ratings:')) + ' ' +
         gaps.map(function (g) {
-          return '<a class="sem-nudge-b" href="faculty.html?rate=' +
+          return '<a class="sem-rnote-b" href="faculty.html?rate=' +
             encodeURIComponent(g.key) + '">' + esc(g.name) +
             '<small>' + esc(GF.nudgeT(g.n)) + '</small></a>';
         }).join('') +
-      '</span>';
+      '</span>' +
+      '<button class="sem-rnote-x" type="button" data-rnote-off="1"' +
+        ' aria-label="' + esc(L('أخفِ هذه الملاحظة', 'Hide this note')) + '"' +
+        ' data-ar-title="أخفِ هذه الملاحظة" data-en-title="Hide this note">' +
+        '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
   }
 
   function renderCourses() {
@@ -2364,6 +2389,16 @@
     on('lv-custom', 'click', function () { el('dlg-level').close(); openName(lvMode); });
 
     on('sem-roll-go', 'click', doRoll);
+    /*@3.SEMJ.197*/
+    var rnote = el('sem-rate-nudge');
+    if (rnote) rnote.addEventListener('click', function (e) {
+      if (!e.target.closest || !e.target.closest('[data-rnote-off]')) return;
+      if (!S.sem) return;
+      S.sem.rate_note_off = true;
+      save();
+      rnote.hidden = true; rnote.innerHTML = '';
+    });
+
     on('sem-roll-off', 'click', function () {
       if (!S.sem) return;
       S.sem.roll_off = rollKey();

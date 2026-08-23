@@ -107,7 +107,7 @@ function d(r) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/graph.ts
+//#region src/kernel/graph.ts
 function f(e, t) {
 	let n = e.findIndex((e) => e.localeCompare(t) > 0);
 	n === -1 ? e.push(t) : e.splice(n, 0, t);
@@ -159,7 +159,7 @@ function p(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/logic.ts
+//#region src/kernel/logic.ts
 function m(e) {
 	return e === "X" ? "X" : e === 1 ? 0 : 1;
 }
@@ -169,14 +169,14 @@ function h(e) {
 function ee(e) {
 	return e.some((e) => e === 1) ? 1 : e.every((e) => e === 0) ? 0 : "X";
 }
-function te(e) {
+function g(e) {
 	return e.some((e) => e === "X") ? "X" : e.reduce((e, t) => e ^ Number(t), 0);
 }
-function ne(e) {
+function te(e) {
 	let t = Math.floor(e.length / 2) + 1, n = e.filter((e) => e === 1).length, r = e.filter((e) => e === 0).length;
 	return n >= t ? 1 : r >= t ? 0 : "X";
 }
-function re(e, t, n = "X") {
+function ne(e, t, n = "X") {
 	switch (e) {
 		case "SWITCH":
 		case "BUTTON": return n;
@@ -191,11 +191,11 @@ function re(e, t, n = "X") {
 		case "OR": return ee(t);
 		case "NOR": return m(ee(t));
 		case "XOR":
-		case "ODD_PARITY": return te(t);
+		case "ODD_PARITY": return g(t);
 		case "XNOR":
-		case "EVEN_PARITY": return m(te(t));
+		case "EVEN_PARITY": return m(g(t));
 		case "MUX": {
-			let e = ie(t.length), n = 2 ** e, r = 0;
+			let e = re(t.length), n = 2 ** e, r = 0;
 			for (let i = 0; i < e; i += 1) {
 				let e = t[n + i] ?? "X";
 				if (e !== 0 && e !== 1) {
@@ -206,17 +206,17 @@ function re(e, t, n = "X") {
 			}
 			return t[r] ?? "X";
 		}
-		case "MAJORITY": return ne(t);
+		case "MAJORITY": return te(t);
 	}
 }
-function ie(e) {
+function re(e) {
 	let t = 1;
 	for (; 2 ** t + t < e;) t += 1;
 	return t;
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/expressions.ts
-function ae(e, t) {
+//#region src/kernel/expressions.ts
+function ie(e, t) {
 	let n = (e) => t[e] ?? "?", r = (e) => `(${t.map((e) => e || "?").join(` ${e} `)})`;
 	switch (e) {
 		case "SWITCH":
@@ -236,7 +236,7 @@ function ae(e, t) {
 		case "XNOR":
 		case "EVEN_PARITY": return `¬${r("⊕")}`;
 		case "MUX": {
-			let e = ie(t.length), r = 2 ** e;
+			let e = re(t.length), r = 2 ** e;
 			return `(${Array.from({ length: r }, (t, i) => `(${[...Array.from({ length: e }, (e, t) => {
 				let a = n(r + t);
 				return i >> t & 1 ? a : `¬(${a})`;
@@ -245,7 +245,7 @@ function ae(e, t) {
 		case "MAJORITY": return t.length === 3 ? `((${n(0)} · ${n(1)}) + (${n(0)} · ${n(2)}) + (${n(1)} · ${n(2)}))` : `MAJ(${t.map((e) => e || "?").join(", ")})`;
 	}
 }
-function oe(e, t, n) {
+function ae(e, t, n) {
 	let r = /* @__PURE__ */ new Map();
 	for (let e of t) {
 		let t = /^in-(\d+)$/.exec(e.target.portId);
@@ -258,7 +258,7 @@ function oe(e, t, n) {
 		return i.length === 1 ? n[i[0].source.nodeId] ?? "?" : "?";
 	});
 }
-function se(e) {
+function oe(e) {
 	let t = p(e), n = new Map(e.circuit.nodes.map((e) => [e.id, e])), r = {};
 	for (let e of t.orderedNodeIds) {
 		let i = n.get(e);
@@ -267,22 +267,22 @@ function se(e) {
 				r[i.id] = i.component === "CONSTANT_0" ? "0" : i.component === "CONSTANT_1" ? "1" : i.label || i.id;
 				continue;
 			}
-			r[i.id] = ae(i.component, oe(i, t.incomingWires.get(i.id) ?? [], r));
+			r[i.id] = ie(i.component, ae(i, t.incomingWires.get(i.id) ?? [], r));
 		}
 	}
 	for (let e of t.cycleNodeIds) r[e] = "?";
 	return r;
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/evaluate.ts
-function ce(e) {
+//#region src/kernel/evaluate.ts
+function se(e) {
 	let t = /^in-(\d+)$/.exec(e);
 	return t ? Number(t[1]) : null;
 }
-function le(e, t) {
+function ce(e, t) {
 	return e.component === "CONSTANT_0" ? 0 : e.component === "CONSTANT_1" ? 1 : t[e.id] ?? "X";
 }
-function ue(e, t, n, r) {
+function le(e, t, n, r) {
 	let i = /* @__PURE__ */ new Map();
 	for (let n of t) {
 		n.source.portId !== "out" && r.push({
@@ -291,7 +291,7 @@ function ue(e, t, n, r) {
 			nodeId: n.source.nodeId,
 			portId: n.source.portId
 		});
-		let t = ce(n.target.portId);
+		let t = se(n.target.portId);
 		if (t === null) {
 			r.push({
 				code: "INVALID_TARGET_PORT",
@@ -314,17 +314,17 @@ function ue(e, t, n, r) {
 		}), "X");
 	});
 }
-function de(e, t = e.session.inputValues) {
+function ue(e, t = e.session.inputValues) {
 	let n = p(e), r = {}, i = [], a = new Map(e.circuit.nodes.map((e) => [e.id, e]));
 	for (let e of n.orderedNodeIds) {
 		let o = a.get(e);
 		if (!o) continue;
 		if (o.role === "input") {
-			r[o.id] = le(o, t);
+			r[o.id] = ce(o, t);
 			continue;
 		}
-		let s = ue(o, n.incomingWires.get(o.id) ?? [], r, i);
-		r[o.id] = re(o.component, s);
+		let s = le(o, n.incomingWires.get(o.id) ?? [], r, i);
+		r[o.id] = ne(o.component, s);
 	}
 	for (let e of n.cycleNodeIds) r[e] = "X";
 	return {
@@ -335,14 +335,14 @@ function de(e, t = e.session.inputValues) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/karnaugh.ts
-function fe(e) {
+//#region src/kernel/karnaugh.ts
+function de(e) {
 	return e ^ e >> 1;
 }
-function pe(e, t) {
+function fe(e, t) {
 	return t === 0 ? "" : e.toString(2).padStart(t, "0");
 }
-function me(e, t) {
+function pe(e, t) {
 	if (e.length > 6) return {
 		available: !1,
 		variableNames: e,
@@ -355,7 +355,7 @@ function me(e, t) {
 		cells: [],
 		reason: "more-than-six-variables"
 	};
-	let n = Math.floor(e.length / 2), r = e.length - n, i = 2 ** n, a = 2 ** r, o = Array.from({ length: i }, (e, t) => pe(fe(t), n)), s = Array.from({ length: a }, (e, t) => pe(fe(t), r)), c = [];
+	let n = Math.floor(e.length / 2), r = e.length - n, i = 2 ** n, a = 2 ** r, o = Array.from({ length: i }, (e, t) => fe(de(t), n)), s = Array.from({ length: a }, (e, t) => fe(de(t), r)), c = [];
 	for (let e = 0; e < i; e += 1) for (let n = 0; n < a; n += 1) {
 		let r = `${o[e]}${s[n]}`, i = r === "" ? 0 : Number.parseInt(r, 2);
 		c.push({
@@ -377,13 +377,13 @@ function me(e, t) {
 		cells: c
 	};
 }
-function he(e, t, n = e.inputNodeIds) {
-	return me(n, e.rows.map((e) => e.outputs[t] ?? "X"));
+function me(e, t, n = e.inputNodeIds) {
+	return pe(n, e.rows.map((e) => e.outputs[t] ?? "X"));
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/simplify.ts
-var ge = (e) => [...e].filter((e) => e !== "-").length;
-function _e(e, t) {
+//#region src/kernel/simplify.ts
+var he = (e) => [...e].filter((e) => e !== "-").length;
+function ge(e, t) {
 	let n = 0, r = "";
 	for (let i = 0; i < e.length; i += 1) {
 		let a = e[i], o = t[i];
@@ -393,10 +393,10 @@ function _e(e, t) {
 	}
 	return n === 1 ? r : null;
 }
-function ve(e, t) {
+function _e(e, t) {
 	return /* @__PURE__ */ new Set([...e, ...t]);
 }
-function ye(e, t) {
+function ve(e, t) {
 	let n = [...new Set(t)].sort((e, t) => e - t).map((t) => ({
 		pattern: t.toString(2).padStart(e, "0"),
 		terms: /* @__PURE__ */ new Set([t]),
@@ -405,17 +405,17 @@ function ye(e, t) {
 	for (; n.length > 0;) {
 		let e = /* @__PURE__ */ new Map(), t = /* @__PURE__ */ new Set();
 		for (let r = 0; r < n.length; r += 1) for (let i = r + 1; i < n.length; i += 1) {
-			let a = _e(n[r].pattern, n[i].pattern);
+			let a = ge(n[r].pattern, n[i].pattern);
 			if (!a) continue;
 			t.add(n[r].pattern), t.add(n[i].pattern);
 			let o = e.get(a);
 			e.set(a, {
 				pattern: a,
-				terms: o ? ve(o.terms, ve(n[r].terms, n[i].terms)) : ve(n[r].terms, n[i].terms),
+				terms: o ? _e(o.terms, _e(n[r].terms, n[i].terms)) : _e(n[r].terms, n[i].terms),
 				used: !1
 			});
 		}
-		for (let e of n) t.has(e.pattern) || r.set(e.pattern, ve(r.get(e.pattern) ?? /* @__PURE__ */ new Set(), e.terms));
+		for (let e of n) t.has(e.pattern) || r.set(e.pattern, _e(r.get(e.pattern) ?? /* @__PURE__ */ new Set(), e.terms));
 		n = [...e.values()];
 	}
 	return [...r.entries()].sort(([e], [t]) => e.localeCompare(t)).map(([e, t]) => ({
@@ -423,11 +423,11 @@ function ye(e, t) {
 		terms: t
 	}));
 }
-function be(e, t, n) {
+function ye(e, t, n) {
 	let r = t.toString(2).padStart(n, "0");
 	return [...e].every((e, t) => e === "-" || e === r[t]);
 }
-function xe(e, t) {
+function be(e, t) {
 	let n = /* @__PURE__ */ new Set(), r = new Set(t);
 	for (let r of t) {
 		let t = e.map((e, t) => e.coveredMinterms.includes(r) ? t : -1).filter((e) => e >= 0);
@@ -476,7 +476,7 @@ function xe(e, t) {
 		exact: o <= 1e5
 	};
 }
-function Se(e, t) {
+function xe(e, t) {
 	let n = [...e].flatMap((e, n) => {
 		if (e === "-") return [];
 		let r = t[n] ?? "?";
@@ -486,30 +486,30 @@ function Se(e, t) {
 	let r = t.every((e) => e.length === 1);
 	return n.join(r ? "" : " · ");
 }
-function Ce(e, t) {
-	return e.length === 0 ? "0" : e.map((e) => Se(e, t)).join(" + ");
+function Se(e, t) {
+	return e.length === 0 ? "0" : e.map((e) => xe(e, t)).join(" + ");
 }
-var we = (e) => [...e].flatMap((e, t) => e === "-" ? [t] : []);
-function Te(e, t) {
+var Ce = (e) => [...e].flatMap((e, t) => e === "-" ? [t] : []);
+function we(e, t) {
 	return Array.from({ length: 2 ** t.length }, (n, r) => {
 		let i = [...e];
 		for (let [e, n] of t.entries()) i[n] = r >> e & 1 ? "1" : "0";
 		return i.join("");
 	});
 }
-function Ee(e, t, n, r) {
+function Te(e, t, n, r) {
 	let i = (t, n) => ({
 		law: t,
-		expression: Ce(n, e),
+		expression: Se(n, e),
 		termCount: n.length
 	}), a = t.map((e) => e.toString(2).padStart(r, "0"));
 	if (n.length === 0) return [i("minimal", [])];
 	let o = [i("sum-of-minterms", a)], s = n.map((e) => {
-		let t = we(e.pattern);
+		let t = Ce(e.pattern);
 		return {
 			pattern: e.pattern,
 			freeBits: t,
-			expansion: Te(e.pattern, t)
+			expansion: we(e.pattern, t)
 		};
 	}), c = [...new Set(s.flatMap((e) => e.expansion))].filter((e) => !a.includes(e)).sort();
 	c.length > 0 && o.push(i("dont-care", [...a, ...c]));
@@ -520,7 +520,7 @@ function Ee(e, t, n, r) {
 		let t = s.flatMap((t) => {
 			let n = [...t.pattern], r = t.freeBits.slice(Math.min(e, t.freeBits.length));
 			for (let r of t.freeBits.slice(0, e)) n[r] = "-";
-			return Te(n.join(""), r);
+			return we(n.join(""), r);
 		});
 		o.push(i("combining", t));
 	}
@@ -531,7 +531,7 @@ function Ee(e, t, n, r) {
 		law: "minimal"
 	}, d;
 }
-function De(e, t) {
+function Ee(e, t) {
 	let n = [...e].sort((e, t) => t.literalCount - e.literalCount || e.pattern.localeCompare(t.pattern));
 	for (let e = n.length - 1; e >= 0; --e) {
 		let r = n.filter((t, n) => n !== e), i = new Set(r.flatMap((e) => e.coveredMinterms));
@@ -539,7 +539,7 @@ function De(e, t) {
 	}
 	return n.sort((e, t) => e.pattern.localeCompare(t.pattern));
 }
-function Oe(e, t, n = []) {
+function De(e, t, n = []) {
 	if (e.length > 8) throw RangeError("Simplification supports at most 8 variables.");
 	let r = 2 ** e.length, i = [...new Set(t)].sort((e, t) => e - t), a = [...new Set(n)].filter((e) => !i.includes(e)).sort((e, t) => e - t);
 	if ([...i, ...a].some((e) => !Number.isInteger(e) || e < 0 || e >= r)) throw RangeError("Minterm is outside the supported variable range.");
@@ -558,38 +558,38 @@ function Oe(e, t, n = []) {
 			termCount: 0
 		}]
 	};
-	let o = ye(e.length, [...i, ...a]).map(({ pattern: t }) => ({
+	let o = ve(e.length, [...i, ...a]).map(({ pattern: t }) => ({
 		pattern: t,
-		coveredMinterms: i.filter((n) => be(t, n, e.length)),
-		literalCount: ge(t)
-	})).filter((e) => e.coveredMinterms.length > 0), s = xe(o, i), c = De(s.selected, i);
+		coveredMinterms: i.filter((n) => ye(t, n, e.length)),
+		literalCount: he(t)
+	})).filter((e) => e.coveredMinterms.length > 0), s = be(o, i), c = Ee(s.selected, i);
 	return {
 		variableNames: e,
 		minterms: i,
 		dontCares: a,
 		primeImplicants: o,
 		selectedImplicants: c,
-		expression: Ce(c.map((e) => e.pattern), e),
+		expression: Se(c.map((e) => e.pattern), e),
 		exact: s.exact,
 		literalCount: c.reduce((e, t) => e + t.literalCount, 0),
-		steps: Ee(e, i, c, e.length)
+		steps: Te(e, i, c, e.length)
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/kernel/truth-table.ts
-function ke(e) {
+//#region src/kernel/truth-table.ts
+function Oe(e) {
 	return e.circuit.nodes.filter((e) => e.role === "input" && (e.component === "SWITCH" || e.component === "BUTTON")).map((e) => e.id).sort((e, t) => e.localeCompare(t));
 }
-function Ae(e) {
+function ke(e) {
 	return e.circuit.nodes.filter((e) => e.role === "output").map((e) => e.id).sort((e, t) => e.localeCompare(t));
 }
-function je(e, t) {
+function Ae(e, t) {
 	return Object.fromEntries(e.map((n, r) => [n, t >> e.length - r - 1 & 1]));
 }
-function Me(e) {
-	let t = ke(e), n = Ae(e), r = 2 ** t.length, i = [], a = [], o = [];
+function je(e) {
+	let t = Oe(e), n = ke(e), r = 2 ** t.length, i = [], a = [], o = [];
 	for (let s = 0; s < r; s += 1) {
-		let r = je(t, s), c = de(e, r);
+		let r = Ae(t, s), c = ue(e, r);
 		s === 0 && a.push(...c.graphIssues), o.push(...c.evaluationIssues), i.push({
 			index: s,
 			inputs: r,
@@ -605,8 +605,8 @@ function Me(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/evidence/evidence-projection.ts
-function Ne(e) {
+//#region src/evidence/evidence-projection.ts
+function Me(e) {
 	let t = /* @__PURE__ */ new Map();
 	for (let n of e.circuit.nodes) {
 		let e = n.label.trim();
@@ -617,13 +617,13 @@ function Ne(e) {
 		return [e.id, n && t.get(n) === 1 ? n : e.id];
 	}));
 }
-function Pe(e) {
-	let t = Me(e), n = de(e, e.session.inputValues), r = Ne(e), i = t.inputNodeIds.map((e) => r[e] ?? e), a = {}, o = {};
-	for (let e of t.outputNodeIds) a[e] = he(t, e, i), o[e] = Oe(i, t.rows.filter((t) => t.outputs[e] === 1).map((e) => e.index), t.rows.filter((t) => t.outputs[e] === "X").map((e) => e.index));
+function Ne(e) {
+	let t = je(e), n = ue(e, e.session.inputValues), r = Me(e), i = t.inputNodeIds.map((e) => r[e] ?? e), a = {}, o = {};
+	for (let e of t.outputNodeIds) a[e] = me(t, e, i), o[e] = De(i, t.rows.filter((t) => t.outputs[e] === 1).map((e) => e.index), t.rows.filter((t) => t.outputs[e] === "X").map((e) => e.index));
 	return {
 		revision: e.revision,
 		values: n.values,
-		expressions: se(e),
+		expressions: oe(e),
 		truthTable: t,
 		karnaughByOutputId: a,
 		simplificationByOutputId: o,
@@ -631,25 +631,25 @@ function Pe(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/editor/symbol-geometry.ts
-var g = 120, _ = 80, v = 4, y = 116, b = 20, x = 100;
+//#region src/editor/symbol-geometry.ts
+var _ = 120, v = 80, y = 4, b = 116, Pe = 20, x = 100;
 function Fe(e, t) {
-	return t <= 1 ? _ / 2 : 16 + e * (48 / (t - 1));
+	return t <= 1 ? v / 2 : 16 + e * (48 / (t - 1));
 }
 function Ie(e) {
 	return Array.from({ length: e }, (t, n) => ({
-		x: v,
+		x: y,
 		y: Fe(n, e)
 	}));
 }
 function S(e, t, n, r) {
 	let i = typeof t == "function" ? t : () => t;
-	return [...e.map((e) => `M ${e.x} ${e.y} H ${i(e.y).toFixed(2)}`), `M ${n} ${r} H ${y}`];
+	return [...e.map((e) => `M ${e.x} ${e.y} H ${i(e.y).toFixed(2)}`), `M ${n} ${r} H ${b}`];
 }
 function Le(e) {
 	let t = "M 14 6 H 106 Q 116 6 116 16 V 48 Q 116 58 106 58 H 14 Q 4 58 4 48 V 16 Q 4 6 14 6 Z";
 	return {
-		width: g,
+		width: _,
 		height: 64,
 		bodyPaths: [t],
 		detailPaths: [],
@@ -676,18 +676,18 @@ function ze(e) {
 		},
 		radius: 6
 	} : void 0, n = [{
-		x: v,
+		x: y,
 		y: 40
 	}];
 	return {
-		width: g,
-		height: _,
+		width: _,
+		height: v,
 		bodyPaths: ["M 22 8 L 96 40 L 22 72 Z"],
 		detailPaths: [],
 		leadPaths: S(n, 22, Re(96, e), 40),
 		inputPorts: n,
 		outputPort: {
-			x: y,
+			x: b,
 			y: 40
 		},
 		...t ? { inversionBubble: t } : {}
@@ -702,14 +702,14 @@ function Be(e, t) {
 		radius: 6
 	} : void 0, r = Ie(e);
 	return {
-		width: g,
-		height: _,
+		width: _,
+		height: v,
 		bodyPaths: ["M 20 8 H 58 C 86 8 100 21 100 40 C 100 59 86 72 58 72 H 20 Z"],
 		detailPaths: [],
-		leadPaths: S(r, b, Re(x, t), 40),
+		leadPaths: S(r, Pe, Re(x, t), 40),
 		inputPorts: r,
 		outputPort: {
-			x: y,
+			x: b,
 			y: 40
 		},
 		...n ? { inversionBubble: n } : {}
@@ -735,14 +735,14 @@ function He(e, t, n) {
 		radius: 6
 	} : void 0, i = Ie(e);
 	return {
-		width: g,
-		height: _,
+		width: _,
+		height: v,
 		bodyPaths: ["M 24 8 C 54 10 84 18 100 40 C 84 62 54 70 24 72 C 40 55 40 25 24 8 Z"],
 		detailPaths: n ? ["M 16 8 C 32 25 32 55 16 72"] : [],
 		leadPaths: S(i, Ve, Re(x, t), 40),
 		inputPorts: i,
 		outputPort: {
-			x: y,
+			x: b,
 			y: 40
 		},
 		...r ? { inversionBubble: r } : {}
@@ -750,7 +750,7 @@ function He(e, t, n) {
 }
 function Ue() {
 	return {
-		width: g,
+		width: _,
 		height: 80,
 		bodyPaths: [
 			"M 4 40 H 24",
@@ -771,22 +771,22 @@ function Ue() {
 	};
 }
 function We(e, t, n) {
-	let r = Math.max(_, 24 + e * 26), i = Array.from({ length: e }, (t, n) => ({
-		x: v,
+	let r = Math.max(v, 24 + e * 26), i = Array.from({ length: e }, (t, n) => ({
+		x: y,
 		y: 24 + n * ((r - 48) / Math.max(1, e - 1))
 	})), a = e === 1 ? [{
-		x: v,
+		x: y,
 		y: r / 2
 	}] : i;
 	return {
-		width: g,
+		width: _,
 		height: r,
-		bodyPaths: [`M ${b} 6 H ${x} V ${r - 6} H ${b} Z`],
+		bodyPaths: [`M ${Pe} 6 H ${x} V ${r - 6} H ${Pe} Z`],
 		detailPaths: [],
-		leadPaths: S(a, b, x, r / 2),
+		leadPaths: S(a, Pe, x, r / 2),
 		inputPorts: a,
 		outputPort: {
-			x: y,
+			x: b,
 			y: r / 2
 		},
 		pinNames: t.slice(0, e),
@@ -794,26 +794,26 @@ function We(e, t, n) {
 	};
 }
 function Ge(e) {
-	let t = ie(e), n = 2 ** t, r = Math.max(_, 24 + n * 26), i = Array.from({ length: n }, (e, t) => ({
-		x: v,
+	let t = re(e), n = 2 ** t, r = Math.max(v, 24 + n * 26), i = Array.from({ length: n }, (e, t) => ({
+		x: y,
 		y: 22 + t * ((r - 44) / Math.max(1, n - 1))
 	})), a = Array.from({ length: t }, (e, n) => ({
 		x: Math.round(28 + (n + 1) * 68 / (t + 1)),
 		y: r + 18 - 6
 	})), o = Math.min(18, r / 5), s = (e) => r - 8 - o * (e - 28) / 68;
 	return {
-		width: g,
+		width: _,
 		height: r + 18,
 		bodyPaths: [`M 28 8 L 96 ${8 + o} V ${r - 8 - o} L 28 ${r - 8} Z`],
 		detailPaths: [],
 		leadPaths: [
 			...i.map((e) => `M ${e.x} ${e.y} H 28`),
 			...a.map((e) => `M ${e.x} ${s(e.x).toFixed(2)} V ${e.y}`),
-			`M 96 ${r / 2} H ${y}`
+			`M 96 ${r / 2} H ${b}`
 		],
 		inputPorts: [...i, ...a],
 		outputPort: {
-			x: y,
+			x: b,
 			y: r / 2
 		},
 		pinNames: [...Array.from({ length: n }, (e, t) => `D${t}`), ...Array.from({ length: t }, (e, t) => `S${t}`)],
@@ -916,7 +916,7 @@ function Xe(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/editor/selection-model.ts
+//#region src/editor/selection-model.ts
 var w = Object.freeze({
 	nodeIds: [],
 	wireIds: []
@@ -969,19 +969,19 @@ function it(e, t, n) {
 function at(e) {
 	return new TextEncoder().encode(JSON.stringify(e)).byteLength;
 }
-function ot(e, t, n) {
+function T(e, t, n) {
 	return [
 		...e,
 		t,
 		...n
 	].reduce((e, t) => e + at(t), 0);
 }
-function st(e, t, n, r) {
+function ot(e, t, n, r) {
 	for (; e.length > n;) e.shift();
-	for (; e.length > 0 && ot(e, t, []) > r;) e.shift();
+	for (; e.length > 0 && T(e, t, []) > r;) e.shift();
 	return e;
 }
-function T(e) {
+function E(e) {
 	let t = d(e);
 	return {
 		past: [],
@@ -990,17 +990,17 @@ function T(e) {
 		estimatedBytes: at(t)
 	};
 }
-function ct(e, t, n = {}) {
+function st(e, t, n = {}) {
 	if (t === e.present || JSON.stringify(t) === JSON.stringify(e.present)) return e;
-	let r = d(t), i = st([...e.past, d(e.present)], r, n.maximumEntries ?? 100, n.maximumBytes ?? 5242880);
+	let r = d(t), i = ot([...e.past, d(e.present)], r, n.maximumEntries ?? 100, n.maximumBytes ?? 5242880);
 	return {
 		past: i,
 		present: r,
 		future: [],
-		estimatedBytes: ot(i, r, [])
+		estimatedBytes: T(i, r, [])
 	};
 }
-function lt(e) {
+function ct(e) {
 	let t = e.past.at(-1);
 	if (!t) return e;
 	let n = e.past.slice(0, -1), r = d(t), i = [d(e.present), ...e.future];
@@ -1008,10 +1008,10 @@ function lt(e) {
 		past: n,
 		present: r,
 		future: i,
-		estimatedBytes: ot(n, r, i)
+		estimatedBytes: T(n, r, i)
 	};
 }
-function ut(e) {
+function lt(e) {
 	let t = e.future[0];
 	if (!t) return e;
 	let n = [...e.past, d(e.present)], r = d(t), i = e.future.slice(1);
@@ -1019,22 +1019,22 @@ function ut(e) {
 		past: n,
 		present: r,
 		future: i,
-		estimatedBytes: ot(n, r, i)
+		estimatedBytes: T(n, r, i)
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/domain/parse-workspace.ts
-var dt = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$/, ft = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/, pt = /^(out|in-(?:[0-9]|1[01]))$/, mt = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|([+-])(\d{2}):(\d{2}))$/i;
-function ht(e) {
+//#region src/domain/parse-workspace.ts
+var ut = /^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$/, dt = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/, ft = /^(out|in-(?:[0-9]|1[01]))$/, pt = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|([+-])(\d{2}):(\d{2}))$/i;
+function mt(e) {
 	return typeof e == "object" && !!e && !Array.isArray(e);
 }
-function E(e, t) {
+function D(e, t) {
 	return Object.prototype.hasOwnProperty.call(e, t);
 }
-function D(e, t) {
+function O(e, t) {
 	return `${e}/${String(t).replaceAll("~", "~0").replaceAll("/", "~1")}`;
 }
-function O(e, t, n, r, i = {}) {
+function k(e, t, n, r, i = {}) {
 	e.push({
 		code: t,
 		reason: n,
@@ -1042,72 +1042,72 @@ function O(e, t, n, r, i = {}) {
 		params: i
 	});
 }
-function gt(e) {
-	let t = mt.exec(e);
+function ht(e) {
+	let t = pt.exec(e);
 	if (!t) return !1;
 	let n = Number(t[1]), r = Number(t[2]), i = Number(t[3]), a = Number(t[4]), o = Number(t[5]), s = Number(t[6]), c = t[8] === void 0 ? 0 : Number(t[8]), l = t[9] === void 0 ? 0 : Number(t[9]);
 	if (n < 1 || r < 1 || r > 12 || a > 23 || o > 59 || s > 60 || c > 23 || l > 59) return !1;
 	let u = new Date(Date.UTC(n, r, 0)).getUTCDate();
 	return i >= 1 && i <= u;
 }
-function k(e, t, n, r, i) {
-	if (!ht(e)) return O(i, "SCHEMA_INVALID", "invalid_type", t, { expected: "object" }), null;
+function A(e, t, n, r, i) {
+	if (!mt(e)) return k(i, "SCHEMA_INVALID", "invalid_type", t, { expected: "object" }), null;
 	let a = new Set(r);
-	for (let n of Object.keys(e)) a.has(n) || O(i, "SCHEMA_INVALID", "unexpected_property", D(t, n), { property: n });
-	for (let r of n) E(e, r) || O(i, "SCHEMA_INVALID", "missing_property", D(t, r), { property: r });
+	for (let n of Object.keys(e)) a.has(n) || k(i, "SCHEMA_INVALID", "unexpected_property", O(t, n), { property: n });
+	for (let r of n) D(e, r) || k(i, "SCHEMA_INVALID", "missing_property", O(t, r), { property: r });
 	return e;
 }
-function A(e, t, n, r = {}) {
+function j(e, t, n, r = {}) {
 	if (typeof e != "string") {
-		O(n, "SCHEMA_INVALID", "invalid_type", t, { expected: "string" });
+		k(n, "SCHEMA_INVALID", "invalid_type", t, { expected: "string" });
 		return;
 	}
 	let i = [...e].length;
-	r.minimumLength !== void 0 && i < r.minimumLength && O(n, "SCHEMA_INVALID", "too_short", t, {
+	r.minimumLength !== void 0 && i < r.minimumLength && k(n, "SCHEMA_INVALID", "too_short", t, {
 		minimumLength: r.minimumLength,
 		actualLength: i
-	}), r.maximumLength !== void 0 && i > r.maximumLength && O(n, "SCHEMA_INVALID", "too_long", t, {
+	}), r.maximumLength !== void 0 && i > r.maximumLength && k(n, "SCHEMA_INVALID", "too_long", t, {
 		maximumLength: r.maximumLength,
 		actualLength: i
-	}), r.pattern && !r.pattern.test(e) && O(n, "SCHEMA_INVALID", "invalid_pattern", t, { pattern: r.pattern.source }), r.format === "date-time" && !gt(e) && O(n, "SCHEMA_INVALID", "invalid_format", t, { format: "date-time" });
+	}), r.pattern && !r.pattern.test(e) && k(n, "SCHEMA_INVALID", "invalid_pattern", t, { pattern: r.pattern.source }), r.format === "date-time" && !ht(e) && k(n, "SCHEMA_INVALID", "invalid_format", t, { format: "date-time" });
 }
-function j(e, t, n, r, i) {
+function M(e, t, n, r, i) {
 	if (typeof e != "number" || !Number.isFinite(e)) {
-		O(n, "SCHEMA_INVALID", "invalid_type", t, { expected: "finite-number" });
+		k(n, "SCHEMA_INVALID", "invalid_type", t, { expected: "finite-number" });
 		return;
 	}
-	(r !== void 0 && e < r || i !== void 0 && e > i) && O(n, "SCHEMA_INVALID", "out_of_range", t, {
+	(r !== void 0 && e < r || i !== void 0 && e > i) && k(n, "SCHEMA_INVALID", "out_of_range", t, {
 		minimum: r ?? null,
 		maximum: i ?? null,
 		actual: e
 	});
 }
-function _t(e, t, n, r, i) {
+function gt(e, t, n, r, i) {
 	if (typeof e != "number" || !Number.isInteger(e)) {
-		O(n, "SCHEMA_INVALID", "invalid_type", t, { expected: "integer" });
+		k(n, "SCHEMA_INVALID", "invalid_type", t, { expected: "integer" });
 		return;
 	}
-	(e < r || i !== void 0 && e > i) && O(n, "SCHEMA_INVALID", "out_of_range", t, {
+	(e < r || i !== void 0 && e > i) && k(n, "SCHEMA_INVALID", "out_of_range", t, {
 		minimum: r,
 		maximum: i ?? null,
 		actual: e
 	});
 }
-function M(e, t, n, r) {
-	e !== t && O(r, "SCHEMA_INVALID", "invalid_const", n, {
+function _t(e, t, n, r) {
+	e !== t && k(r, "SCHEMA_INVALID", "invalid_const", n, {
 		expected: t,
 		actual: typeof e == "string" || typeof e == "number" ? e : null
 	});
 }
 function N(e, t, n, r) {
-	(typeof e != "string" || !t.includes(e)) && O(r, "SCHEMA_INVALID", "invalid_enum", n, { allowed: t.join("|") });
+	(typeof e != "string" || !t.includes(e)) && k(r, "SCHEMA_INVALID", "invalid_enum", n, { allowed: t.join("|") });
 }
 function vt(e, t, n) {
-	e !== 0 && e !== 1 && O(n, "SCHEMA_INVALID", "invalid_enum", t, { allowed: "0|1" });
+	e !== 0 && e !== 1 && k(n, "SCHEMA_INVALID", "invalid_enum", t, { allowed: "0|1" });
 }
 function yt(e, t, r) {
-	let i = k(e, t, ["x", "y"], ["x", "y"], r);
-	i && (E(i, "x") && j(i.x, D(t, "x"), r, 0, n.width), E(i, "y") && j(i.y, D(t, "y"), r, 0, n.height));
+	let i = A(e, t, ["x", "y"], ["x", "y"], r);
+	i && (D(i, "x") && M(i.x, O(t, "x"), r, 0, n.width), D(i, "y") && M(i.y, O(t, "y"), r, 0, n.height));
 }
 function bt(e, t, a) {
 	let c = [
@@ -1118,29 +1118,29 @@ function bt(e, t, a) {
 		"labelPlacement",
 		"position",
 		"inputCount"
-	], l = k(e, t, c, [
+	], l = A(e, t, c, [
 		...c,
 		"constantValue",
 		"outputDisplay"
 	], a);
-	l && (E(l, "id") && A(l.id, D(t, "id"), a, { pattern: ft }), E(l, "role") && N(l.role, r, D(t, "role"), a), E(l, "component") && N(l.component, s, D(t, "component"), a), E(l, "label") && A(l.label, D(t, "label"), a, { maximumLength: n.maximumLabelLength }), E(l, "labelPlacement") && N(l.labelPlacement, i, D(t, "labelPlacement"), a), E(l, "position") && yt(l.position, D(t, "position"), a), E(l, "inputCount") && _t(l.inputCount, D(t, "inputCount"), a, 0, 12), E(l, "constantValue") && vt(l.constantValue, D(t, "constantValue"), a), E(l, "outputDisplay") && N(l.outputDisplay, o, D(t, "outputDisplay"), a));
+	l && (D(l, "id") && j(l.id, O(t, "id"), a, { pattern: dt }), D(l, "role") && N(l.role, r, O(t, "role"), a), D(l, "component") && N(l.component, s, O(t, "component"), a), D(l, "label") && j(l.label, O(t, "label"), a, { maximumLength: n.maximumLabelLength }), D(l, "labelPlacement") && N(l.labelPlacement, i, O(t, "labelPlacement"), a), D(l, "position") && yt(l.position, O(t, "position"), a), D(l, "inputCount") && gt(l.inputCount, O(t, "inputCount"), a, 0, 12), D(l, "constantValue") && vt(l.constantValue, O(t, "constantValue"), a), D(l, "outputDisplay") && N(l.outputDisplay, o, O(t, "outputDisplay"), a));
 }
 function xt(e, t, n) {
-	let r = k(e, t, ["nodeId", "portId"], ["nodeId", "portId"], n);
-	r && (E(r, "nodeId") && A(r.nodeId, D(t, "nodeId"), n, { pattern: ft }), E(r, "portId") && A(r.portId, D(t, "portId"), n, { pattern: pt }));
+	let r = A(e, t, ["nodeId", "portId"], ["nodeId", "portId"], n);
+	r && (D(r, "nodeId") && j(r.nodeId, O(t, "nodeId"), n, { pattern: dt }), D(r, "portId") && j(r.portId, O(t, "portId"), n, { pattern: ft }));
 }
 function St(e, t, r) {
-	let i = k(e, t, ["mode", "waypoints"], ["mode", "waypoints"], r);
-	if (!i || (E(i, "mode") && N(i.mode, a, D(t, "mode"), r), !E(i, "waypoints"))) return;
-	let o = D(t, "waypoints");
+	let i = A(e, t, ["mode", "waypoints"], ["mode", "waypoints"], r);
+	if (!i || (D(i, "mode") && N(i.mode, a, O(t, "mode"), r), !D(i, "waypoints"))) return;
+	let o = O(t, "waypoints");
 	if (!Array.isArray(i.waypoints)) {
-		O(r, "SCHEMA_INVALID", "invalid_type", o, { expected: "array" });
+		k(r, "SCHEMA_INVALID", "invalid_type", o, { expected: "array" });
 		return;
 	}
-	i.waypoints.length > n.maximumWaypoints && O(r, "SCHEMA_INVALID", "too_many_items", o, {
+	i.waypoints.length > n.maximumWaypoints && k(r, "SCHEMA_INVALID", "too_many_items", o, {
 		maximumItems: n.maximumWaypoints,
 		actualItems: i.waypoints.length
-	}), i.waypoints.forEach((e, t) => yt(e, D(o, t), r));
+	}), i.waypoints.forEach((e, t) => yt(e, O(o, t), r));
 }
 function Ct(e, t, r) {
 	let i = [
@@ -1149,8 +1149,8 @@ function Ct(e, t, r) {
 		"target",
 		"label",
 		"route"
-	], a = k(e, t, i, i, r);
-	a && (E(a, "id") && A(a.id, D(t, "id"), r, { pattern: ft }), E(a, "source") && xt(a.source, D(t, "source"), r), E(a, "target") && xt(a.target, D(t, "target"), r), E(a, "label") && A(a.label, D(t, "label"), r, { maximumLength: n.maximumLabelLength }), E(a, "route") && St(a.route, D(t, "route"), r));
+	], a = A(e, t, i, i, r);
+	a && (D(a, "id") && j(a.id, O(t, "id"), r, { pattern: dt }), D(a, "source") && xt(a.source, O(t, "source"), r), D(a, "target") && xt(a.target, O(t, "target"), r), D(a, "label") && j(a.label, O(t, "label"), r, { maximumLength: n.maximumLabelLength }), D(a, "route") && St(a.route, O(t, "route"), r));
 }
 function wt(e, t, r) {
 	let i = [
@@ -1158,38 +1158,38 @@ function wt(e, t, r) {
 		"height",
 		"nodes",
 		"wires"
-	], a = k(e, t, i, i, r);
+	], a = A(e, t, i, i, r);
 	if (a) {
-		if (E(a, "width") && M(a.width, n.width, D(t, "width"), r), E(a, "height") && M(a.height, n.height, D(t, "height"), r), E(a, "nodes")) {
-			let e = D(t, "nodes");
-			Array.isArray(a.nodes) ? (a.nodes.length > n.maximumNodes && O(r, "SCHEMA_INVALID", "too_many_items", e, {
+		if (D(a, "width") && _t(a.width, n.width, O(t, "width"), r), D(a, "height") && _t(a.height, n.height, O(t, "height"), r), D(a, "nodes")) {
+			let e = O(t, "nodes");
+			Array.isArray(a.nodes) ? (a.nodes.length > n.maximumNodes && k(r, "SCHEMA_INVALID", "too_many_items", e, {
 				maximumItems: n.maximumNodes,
 				actualItems: a.nodes.length
-			}), a.nodes.forEach((t, n) => bt(t, D(e, n), r))) : O(r, "SCHEMA_INVALID", "invalid_type", e, { expected: "array" });
+			}), a.nodes.forEach((t, n) => bt(t, O(e, n), r))) : k(r, "SCHEMA_INVALID", "invalid_type", e, { expected: "array" });
 		}
-		if (E(a, "wires")) {
-			let e = D(t, "wires");
-			Array.isArray(a.wires) ? (a.wires.length > n.maximumWires && O(r, "SCHEMA_INVALID", "too_many_items", e, {
+		if (D(a, "wires")) {
+			let e = O(t, "wires");
+			Array.isArray(a.wires) ? (a.wires.length > n.maximumWires && k(r, "SCHEMA_INVALID", "too_many_items", e, {
 				maximumItems: n.maximumWires,
 				actualItems: a.wires.length
-			}), a.wires.forEach((t, n) => Ct(t, D(e, n), r))) : O(r, "SCHEMA_INVALID", "invalid_type", e, { expected: "array" });
+			}), a.wires.forEach((t, n) => Ct(t, O(e, n), r))) : k(r, "SCHEMA_INVALID", "invalid_type", e, { expected: "array" });
 		}
 	}
 }
 function Tt(e, t, r) {
-	if (!ht(e)) {
-		O(r, "SCHEMA_INVALID", "invalid_type", t, { expected: "object" });
+	if (!mt(e)) {
+		k(r, "SCHEMA_INVALID", "invalid_type", t, { expected: "object" });
 		return;
 	}
 	let i = Object.entries(e);
-	i.length > n.maximumInputValues && O(r, "SCHEMA_INVALID", "too_many_properties", t, {
+	i.length > n.maximumInputValues && k(r, "SCHEMA_INVALID", "too_many_properties", t, {
 		maximumProperties: n.maximumInputValues,
 		actualProperties: i.length
 	});
-	for (let [e, n] of i) vt(n, D(t, e), r);
+	for (let [e, n] of i) vt(n, O(t, e), r);
 }
 function Et(e, t, r) {
-	let i = k(e, t, [
+	let i = A(e, t, [
 		"x",
 		"y",
 		"zoom"
@@ -1198,11 +1198,11 @@ function Et(e, t, r) {
 		"y",
 		"zoom"
 	], r);
-	i && (E(i, "x") && j(i.x, D(t, "x"), r), E(i, "y") && j(i.y, D(t, "y"), r), E(i, "zoom") && j(i.zoom, D(t, "zoom"), r, n.minimumZoom, n.maximumZoom));
+	i && (D(i, "x") && M(i.x, O(t, "x"), r), D(i, "y") && M(i.y, O(t, "y"), r), D(i, "zoom") && M(i.zoom, O(t, "zoom"), r, n.minimumZoom, n.maximumZoom));
 }
 function Dt(e, t, n) {
-	let r = k(e, t, ["inputValues", "viewport"], ["inputValues", "viewport"], n);
-	r && (E(r, "inputValues") && Tt(r.inputValues, D(t, "inputValues"), n), E(r, "viewport") && Et(r.viewport, D(t, "viewport"), n));
+	let r = A(e, t, ["inputValues", "viewport"], ["inputValues", "viewport"], n);
+	r && (D(r, "inputValues") && Tt(r.inputValues, O(t, "inputValues"), n), D(r, "viewport") && Et(r.viewport, O(t, "viewport"), n));
 }
 function Ot(r) {
 	let i = [], a = [
@@ -1216,25 +1216,25 @@ function Ot(r) {
 		"updatedAt",
 		"circuit",
 		"session"
-	], o = k(r, "", a, [...a, "sourcePresetId"], i);
+	], o = A(r, "", a, [...a, "sourcePresetId"], i);
 	if (!o) return {
 		ok: !1,
 		issues: i
 	};
-	if (E(o, "schemaVersion")) {
-		let e = D("", "schemaVersion");
-		typeof o.schemaVersion != "number" || !Number.isInteger(o.schemaVersion) ? O(i, "SCHEMA_INVALID", "invalid_type", e, { expected: "integer" }) : o.schemaVersion !== 1 && O(i, "UNSUPPORTED_VERSION", "unsupported_version", e, {
+	if (D(o, "schemaVersion")) {
+		let e = O("", "schemaVersion");
+		typeof o.schemaVersion != "number" || !Number.isInteger(o.schemaVersion) ? k(i, "SCHEMA_INVALID", "invalid_type", e, { expected: "integer" }) : o.schemaVersion !== 1 && k(i, "UNSUPPORTED_VERSION", "unsupported_version", e, {
 			supportedVersion: 1,
 			actualVersion: o.schemaVersion
 		});
 	}
-	return E(o, "kind") && M(o.kind, e, D("", "kind"), i), E(o, "labId") && M(o.labId, t, D("", "labId"), i), E(o, "artifactId") && A(o.artifactId, D("", "artifactId"), i, {
+	return D(o, "kind") && _t(o.kind, e, O("", "kind"), i), D(o, "labId") && _t(o.labId, t, O("", "labId"), i), D(o, "artifactId") && j(o.artifactId, O("", "artifactId"), i, {
 		maximumLength: n.maximumArtifactIdLength,
-		pattern: dt
-	}), E(o, "revision") && _t(o.revision, D("", "revision"), i, 0), E(o, "title") && A(o.title, D("", "title"), i, {
+		pattern: ut
+	}), D(o, "revision") && gt(o.revision, O("", "revision"), i, 0), D(o, "title") && j(o.title, O("", "title"), i, {
 		minimumLength: 1,
 		maximumLength: n.maximumTitleLength
-	}), E(o, "createdAt") && A(o.createdAt, D("", "createdAt"), i, { format: "date-time" }), E(o, "updatedAt") && A(o.updatedAt, D("", "updatedAt"), i, { format: "date-time" }), E(o, "sourcePresetId") && o.sourcePresetId !== null && A(o.sourcePresetId, D("", "sourcePresetId"), i, { maximumLength: n.maximumPresetIdLength }), E(o, "circuit") && wt(o.circuit, D("", "circuit"), i), E(o, "session") && Dt(o.session, D("", "session"), i), i.length > 0 ? {
+	}), D(o, "createdAt") && j(o.createdAt, O("", "createdAt"), i, { format: "date-time" }), D(o, "updatedAt") && j(o.updatedAt, O("", "updatedAt"), i, { format: "date-time" }), D(o, "sourcePresetId") && o.sourcePresetId !== null && j(o.sourcePresetId, O("", "sourcePresetId"), i, { maximumLength: n.maximumPresetIdLength }), D(o, "circuit") && wt(o.circuit, O("", "circuit"), i), D(o, "session") && Dt(o.session, O("", "session"), i), i.length > 0 ? {
 		ok: !1,
 		issues: i
 	} : {
@@ -1243,7 +1243,7 @@ function Ot(r) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/validator/validate-document.ts
+//#region src/validator/validate-document.ts
 var kt = /* @__PURE__ */ new Set(["BUFFER", "NOT"]), At = [
 	3,
 	6,
@@ -1423,7 +1423,7 @@ function Ft(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/validator/validate-command.ts
+//#region src/validator/validate-command.ts
 function F(e, t, n = {}) {
 	return {
 		code: e,
@@ -1582,7 +1582,7 @@ function It(e, t) {
 	}
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/state/reduce-command.ts
+//#region src/state/reduce-command.ts
 function Lt(e, t) {
 	let n = 1, r = `${e}-copy`;
 	for (; t.has(r);) n += 1, r = `${e}-copy-${n}`;
@@ -1758,7 +1758,7 @@ function Bt(e, t, n) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/editor/auto-layout.ts
+//#region src/editor/auto-layout.ts
 var Vt = {
 	grid: 40,
 	columnGap: 80,
@@ -1823,23 +1823,23 @@ function Wt(e, t = Vt) {
 		let n = e.length === 0 ? 0 : Math.max(...e.map(p));
 		ee += n + t.columnGap;
 	}
-	let te = s.map((e) => e.reduce((e, n) => e + m(n) + t.rowGap, -t.rowGap)), ne = Math.max(0, ...te), re = {};
+	let g = s.map((e) => e.reduce((e, n) => e + m(n) + t.rowGap, -t.rowGap)), te = Math.max(0, ...g), ne = {};
 	for (let [e, r] of s.entries()) {
-		let i = t.origin.y + Math.max(0, (ne - te[e]) / 2);
-		for (let a of r) re[a] = {
+		let i = t.origin.y + Math.max(0, (te - g[e]) / 2);
+		for (let a of r) ne[a] = {
 			x: Math.min(h[e], n.width - p(a)),
 			y: Math.min(Ht(i, t.grid), n.height - m(a))
 		}, i += m(a) + t.rowGap;
 	}
-	return re;
+	return ne;
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/domain/migrate-workspace.ts
+//#region src/domain/migrate-workspace.ts
 function Gt(e) {
 	return Ot(e);
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/persistence/checksum.ts
+//#region src/persistence/checksum.ts
 var Kt = new TextEncoder();
 function qt(e) {
 	return Array.isArray(e) ? e.map(qt) : e && typeof e == "object" ? Object.fromEntries(Object.entries(e).sort(([e], [t]) => e.localeCompare(t)).map(([e, t]) => [e, qt(t)])) : e;
@@ -1855,7 +1855,7 @@ async function Xt(e, t) {
 	return /^[a-f0-9]{64}$/.test(t) && await Yt(e) === t;
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/persistence/import-export.ts
+//#region src/persistence/import-export.ts
 var Zt = "digital-garden-lab-export";
 async function Qt(e, t) {
 	return {
@@ -1902,7 +1902,7 @@ async function en(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/persistence/share-envelope.ts
+//#region src/persistence/share-envelope.ts
 var tn = "digital-garden-circuit-share";
 async function nn(e) {
 	let t = d(e);
@@ -1914,7 +1914,7 @@ async function nn(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/persistence/share-codec.ts
+//#region src/persistence/share-codec.ts
 var rn = new TextEncoder(), an = new TextDecoder();
 function on(e) {
 	let t = "";
@@ -1995,7 +1995,7 @@ async function dn(e, t) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/persistence/local-artifact-store.ts
+//#region src/persistence/local-artifact-store.ts
 var R = `garden_labs_${t}`, z = `${R}:artifact`, B = `${R}:backup`, V = `${R}:staging`;
 async function H(e) {
 	if (!e) return null;
@@ -2270,7 +2270,7 @@ function yn(e, t) {
 	return _n.filter((e) => (!t || e.category === t) && (!n || [e.kind, ...e.keywords].some((e) => e.toLocaleLowerCase("en").includes(n))));
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/app/free-build/presets.ts
+//#region src/app/free-build/presets.ts
 function W(r, i, a, o) {
 	let s = a.map((e) => ({
 		id: e.id,
@@ -5417,7 +5417,7 @@ function wn(e) {
 	return Cn[e] ?? "ch4";
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/editor/viewport-controller.ts
+//#region src/editor/viewport-controller.ts
 function G(e) {
 	return Math.min(n.maximumZoom, Math.max(n.minimumZoom, e));
 }
@@ -5677,7 +5677,7 @@ function Wn(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/editor/route-geometry.ts
+//#region src/editor/route-geometry.ts
 function Gn(e, t) {
 	let n = e.nodes.find((e) => e.id === t.source.nodeId), r = e.nodes.find((e) => e.id === t.target.nodeId);
 	if (!n || !r) return {
@@ -5707,7 +5707,7 @@ function Kn(e) {
 	return e.length === 0 ? "" : e.map((e, t) => `${t === 0 ? "M" : "L"} ${e.x} ${e.y}`).join(" ");
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/app/render.ts
+//#region src/app/render.ts
 var qn = "http://www.w3.org/2000/svg";
 function J(e, t = {}) {
 	let n = document.createElementNS(qn, e);
@@ -6326,7 +6326,7 @@ function cr(e) {
 	return !t || !n ? 0 : Math.hypot(t.x - n.x, t.y - n.y);
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/evidence/signal-view.ts
+//#region src/evidence/signal-view.ts
 function lr(e, t) {
 	return e.circuit.nodes.map((e) => ({
 		nodeId: e.id,
@@ -6338,7 +6338,7 @@ function lr(e, t) {
 	}));
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/evidence/truth-table-view.ts
+//#region src/evidence/truth-table-view.ts
 function ur(e) {
 	return {
 		columns: [...e.inputNodeIds.map((e) => ({
@@ -6355,7 +6355,7 @@ function ur(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/evidence/karnaugh-view.ts
+//#region src/evidence/karnaugh-view.ts
 function dr(e) {
 	return {
 		map: e,
@@ -6366,7 +6366,7 @@ function dr(e) {
 	};
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/app/ai-explain.ts
+//#region src/app/ai-explain.ts
 var fr = "https://gardin-main.xxli50xx.workers.dev", pr = "/api/ai", mr = /* @__PURE__ */ new Set([
 	"localhost",
 	"127.0.0.1",
@@ -6443,16 +6443,95 @@ function Cr(e, t) {
 		content: n
 	}];
 }
-async function wr(e, t, n) {
-	let r;
+var wr = "LAB231", Tr = "auto";
+function Er() {
+	return window.Garden ?? null;
+}
+function Dr() {
+	return Er()?.aiKey ?? null;
+}
+function Or() {
+	let e = window.GardenEndpoints;
+	return e?.aiCache ? e.aiCache.replace(/\/+$/, "") : "";
+}
+async function kr(e, t) {
+	let n = Dr(), r = Or();
+	if (!n || !r || e.length < 2) return null;
 	try {
-		r = await fetch(hr(), {
+		let i = await n.hash(n.identityString({
+			systemPrompt: e[0].content,
+			userMsg: e[1].content
+		}));
+		for (let e of ["best", "1"]) {
+			let a = r + "/" + n.path({
+				promptVer: 1,
+				subject: wr,
+				lang: t,
+				style: Tr,
+				hash: i,
+				variant: e
+			}), o = await fetch(a, {
+				mode: "cors",
+				credentials: "omit"
+			});
+			if (!o.ok) continue;
+			let s = await o.json();
+			if (typeof s.text == "string" && s.text.trim().length > 40) return s.text;
+		}
+	} catch {}
+	return null;
+}
+var Ar = {
+	thinkMs: [
+		700,
+		1500,
+		3200
+	],
+	ttfbMs: [
+		900,
+		1800,
+		4200
+	],
+	cps: [
+		77,
+		95,
+		117
+	],
+	thinkShare: 1
+};
+function jr() {
+	return Er()?.aiCadence ?? Ar;
+}
+function Mr(e) {
+	let t = Math.random();
+	return t < .5 ? e[0] + (e[1] - e[0]) * (t / .5) : e[1] + (e[2] - e[1]) * ((t - .5) / .5);
+}
+var Nr = (e) => new Promise((t) => {
+	setTimeout(t, e);
+});
+async function Pr(e, t, n) {
+	let r = jr(), i = Math.random() < r.thinkShare, a = i ? Mr(r.thinkMs) : 0, o = Math.max(a + 300, Mr(r.ttfbMs)), s = Math.max(8, Mr(r.cps));
+	i ? (await Nr(a), n(), await Nr(o - a)) : await Nr(o);
+	let c = Math.max(1, Math.round(s * 70 / 1e3));
+	for (let n = c; n < e.length; n += c) t(e.slice(0, n)), await Nr(70);
+	t(e);
+}
+async function Fr(e, t, n, r = "ar") {
+	let i;
+	try {
+		i = await fetch(hr(), {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				messages: e,
-				max_tokens: 1200,
-				stream: !0
+				max_tokens: 4e3,
+				stream: !0,
+				cache: {
+					subject: wr,
+					lang: r,
+					style: Tr,
+					promptVer: 1
+				}
 			})
 		});
 	} catch {
@@ -6461,12 +6540,12 @@ async function wr(e, t, n) {
 			reason: "offline"
 		};
 	}
-	if (!r.ok) return {
+	if (!i.ok) return {
 		ok: !1,
 		reason: "unavailable"
 	};
-	if (!(r.headers.get("Content-Type") ?? "").includes("text/event-stream") || !r.body) try {
-		let e = (await r.json()).choices?.[0]?.message?.content ?? "";
+	if (!(i.headers.get("Content-Type") ?? "").includes("text/event-stream") || !i.body) try {
+		let e = (await i.json()).choices?.[0]?.message?.content ?? "";
 		return e.trim() ? (t(e), {
 			ok: !0,
 			text: e
@@ -6480,32 +6559,32 @@ async function wr(e, t, n) {
 			reason: "unavailable"
 		};
 	}
-	let i = r.body.getReader(), a = new TextDecoder(), o = "", s = "", c = !1;
+	let a = i.body.getReader(), o = new TextDecoder(), s = "", c = "", l = !1;
 	for (;;) {
-		let { done: e, value: r } = await i.read();
+		let { done: e, value: r } = await a.read();
 		if (e) break;
-		o += a.decode(r, { stream: !0 });
-		let l = o.split("\n\n");
-		o = l.pop() ?? "";
-		for (let e of l) for (let r of e.split("\n")) {
+		s += o.decode(r, { stream: !0 });
+		let i = s.split("\n\n");
+		s = i.pop() ?? "";
+		for (let e of i) for (let r of e.split("\n")) {
 			if (!r.startsWith("data:")) continue;
 			let e = r.slice(5).trim();
 			if (!(!e || e === "[DONE]")) try {
 				let r = JSON.parse(e).choices?.[0]?.delta;
 				if (!r) continue;
-				r.reasoning_content && !s && !c && (c = !0, n()), r.content && (s += r.content, t(s));
+				r.reasoning_content && !c && !l && (l = !0, n()), r.content && (c += r.content, t(c));
 			} catch {}
 		}
 	}
-	return s.trim() ? {
+	return c.trim() ? {
 		ok: !0,
-		text: s
+		text: c
 	} : {
 		ok: !1,
 		reason: "empty"
 	};
 }
-function Tr(e) {
+function Ir(e) {
 	let t = document.createDocumentFragment(), n = null;
 	for (let r of e.split("\n")) {
 		let e = r.trim();
@@ -6522,24 +6601,24 @@ function Tr(e) {
 		if (/^[-*•]\s+/.test(e)) {
 			n || (n = document.createElement("ul"), n.className = "cx-ai-list", t.appendChild(n));
 			let r = document.createElement("li");
-			Er(r, e.replace(/^[-*•]\s+/, "")), n.appendChild(r);
+			Lr(r, e.replace(/^[-*•]\s+/, "")), n.appendChild(r);
 			continue;
 		}
 		n = null;
 		let i = document.createElement("p");
-		i.className = "cx-ai-p", Er(i, e), t.appendChild(i);
+		i.className = "cx-ai-p", Lr(i, e), t.appendChild(i);
 	}
 	return t;
 }
-function Er(e, t) {
+function Lr(e, t) {
 	for (let [n, r] of t.split("**").entries()) if (r) if (n % 2 == 1) {
 		let t = document.createElement("strong");
 		t.textContent = r, e.appendChild(t);
 	} else e.appendChild(document.createTextNode(r));
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/app/panels.ts
-var Dr = {
+//#region src/app/panels.ts
+var Rr = {
 	essentials: {
 		ar: "العناصر الأساسية",
 		en: "Essentials"
@@ -6552,11 +6631,11 @@ var Dr = {
 		ar: "عناصر توافقية",
 		en: "Combinational blocks"
 	}
-}, Or = [
+}, zr = [
 	"essentials",
 	"gates",
 	"combinational"
-], kr = /* @__PURE__ */ new Set([
+], Br = /* @__PURE__ */ new Set([
 	"AND",
 	"NAND",
 	"OR",
@@ -6565,7 +6644,7 @@ var Dr = {
 	"XNOR",
 	"ODD_PARITY",
 	"EVEN_PARITY"
-]), Ar = {
+]), Vr = {
 	MUX: [
 		[3, "2:1"],
 		[6, "4:1"],
@@ -6580,7 +6659,7 @@ var Dr = {
 function Y(e, t, n) {
 	return e === "ar" ? t : n;
 }
-function jr(e) {
+function Hr(e) {
 	let t = document.createElement("i");
 	return t.className = `fa-solid fa-${e}`, t.setAttribute("aria-hidden", "true"), t;
 }
@@ -6588,11 +6667,11 @@ function X(e, t, n) {
 	let r = document.createElement(e);
 	return t && (r.className = t), n !== void 0 && (r.textContent = n), r;
 }
-function Mr(e) {
+function Ur(e) {
 	let t = X("button", "cx-collapse");
 	return t.type = "button", t.addEventListener("click", e), t;
 }
-var Nr = [
+var Wr = [
 	"SWITCH",
 	"LED",
 	"PROBE",
@@ -6602,20 +6681,20 @@ var Nr = [
 	"XOR",
 	"NAND"
 ];
-function Pr(e, t, n, r, i) {
+function Gr(e, t, n, r, i) {
 	let a = t ? Y(n, `إظهار ${r.ar}`, `Show ${r.en}`) : Y(n, `طيّ ${r.ar}`, `Collapse ${r.en}`);
 	e.title = a, e.setAttribute("aria-label", a), e.setAttribute("aria-expanded", String(!t));
 	let o = document.documentElement.getAttribute("dir") === "rtl", s = t ? i === "start" : i === "end";
 	e.textContent = (o ? !s : s) ? "‹" : "›";
 }
-var Fr = class {
+var Kr = class {
 	constructor(e) {
 		this.locale = "ar", this.open = /* @__PURE__ */ new Set(["essentials"]), this.query = "", this.armed = null, this.collapsed = !1, this.callbacks = e, this.element = X("section", "cx-panel cx-library");
 		let t = X("header", "cx-panel-head");
-		t.appendChild(X("h2", "cx-panel-title", "العناصر")), this.collapseButton = Mr(() => this.setCollapsed(!this.collapsed)), t.appendChild(this.collapseButton), this.element.appendChild(t);
+		t.appendChild(X("h2", "cx-panel-title", "العناصر")), this.collapseButton = Ur(() => this.setCollapsed(!this.collapsed)), t.appendChild(this.collapseButton), this.element.appendChild(t);
 		let n = X("div", "cx-lib-search");
 		this.search = document.createElement("input"), this.search.type = "search", this.search.className = "cx-lib-input", this.search.autocomplete = "off", this.search.spellcheck = !1, n.appendChild(this.search), this.element.appendChild(n), this.note = X("p", "cx-lib-note"), this.element.appendChild(this.note), this.list = X("div", "cx-lib-list"), this.element.appendChild(this.list), this.rail = X("div", "cx-lib-rail");
-		for (let e of Nr) {
+		for (let e of Wr) {
 			let t = _n.find((t) => t.kind === e);
 			if (!t) continue;
 			let n = X("button", "cx-rail-btn");
@@ -6628,7 +6707,7 @@ var Fr = class {
 	setLocale(e) {
 		this.locale = e;
 		let t = this.element.querySelector(".cx-panel-title");
-		t && (t.textContent = Y(e, "العناصر", "Components")), this.search.placeholder = Y(e, "ابحث باسم العنصر…", "Search components…"), this.search.setAttribute("aria-label", Y(e, "ابحث في العناصر", "Search components")), Pr(this.collapseButton, this.collapsed, e, {
+		t && (t.textContent = Y(e, "العناصر", "Components")), this.search.placeholder = Y(e, "ابحث باسم العنصر…", "Search components…"), this.search.setAttribute("aria-label", Y(e, "ابحث في العناصر", "Search components")), Gr(this.collapseButton, this.collapsed, e, {
 			ar: "العناصر",
 			en: "components"
 		}, "start"), this.syncRailLabels(), this.renderNote(), this.renderList();
@@ -6640,7 +6719,7 @@ var Fr = class {
 		}
 	}
 	setCollapsed(e) {
-		this.collapsed = e, this.element.classList.toggle("is-collapsed", e), Pr(this.collapseButton, e, this.locale, {
+		this.collapsed = e, this.element.classList.toggle("is-collapsed", e), Gr(this.collapseButton, e, this.locale, {
 			ar: "العناصر",
 			en: "components"
 		}, "start"), this.syncRailLabels(), this.callbacks.onCollapseChange(e);
@@ -6656,13 +6735,13 @@ var Fr = class {
 	renderList() {
 		this.list.replaceChildren();
 		let e = this.query.length > 0, t = e ? new Set(yn(this.query).map((e) => e.kind)) : null;
-		for (let n of Or) {
+		for (let n of zr) {
 			let r = _n.filter((e) => e.category === n).filter((e) => !t || t.has(e.kind));
 			if (e && r.length === 0) continue;
 			let i = X("div", "cx-lib-group"), a = X("button", "cx-lib-toggle");
 			a.type = "button";
 			let o = e || this.open.has(n);
-			if (a.setAttribute("aria-expanded", String(o)), a.append(X("span", "cx-lib-name", Y(this.locale, Dr[n].ar, Dr[n].en)), X("span", "cx-lib-count", String(r.length))), a.addEventListener("click", () => {
+			if (a.setAttribute("aria-expanded", String(o)), a.append(X("span", "cx-lib-name", Y(this.locale, Rr[n].ar, Rr[n].en)), X("span", "cx-lib-count", String(r.length))), a.addEventListener("click", () => {
 				this.open.has(n) ? this.open.delete(n) : this.open.add(n), this.renderList();
 			}), i.appendChild(a), o) {
 				let e = X("div", "cx-lib-grid");
@@ -6676,7 +6755,7 @@ var Fr = class {
 		}
 		this.list.childElementCount === 0 && this.list.appendChild(X("p", "cx-empty", Y(this.locale, "لا عنصر بهذا الاسم.", "No component matches that name.")));
 	}
-}, Ir = {
+}, qr = {
 	free: {
 		ar: "ابدأ من الصفر",
 		en: "Start from scratch"
@@ -6693,12 +6772,12 @@ var Fr = class {
 		ar: "الفصل ٤ · المنطق التوافقي",
 		en: "Ch.4 · Combinational logic"
 	}
-}, Lr = [
+}, Jr = [
 	"free",
 	"ch2",
 	"ch3",
 	"ch4"
-], Rr = class {
+], Yr = class {
 	constructor(e, t) {
 		this.locale = "ar", this.open = !1, this.current = e, this.onPick = t, this.element = X("div", "cx-menu"), this.button = X("button", "cx-menu-btn"), this.button.type = "button", this.button.setAttribute("aria-haspopup", "listbox"), this.button.addEventListener("click", () => this.setOpen(!this.open)), this.element.appendChild(this.button), this.panel = X("div", "cx-menu-panel"), this.panel.setAttribute("role", "listbox"), this.element.appendChild(this.panel), document.addEventListener("pointerdown", (e) => {
 			this.open && !this.element.contains(e.target) && this.setOpen(!1);
@@ -6723,10 +6802,10 @@ var Fr = class {
 		this.button.replaceChildren();
 		let t = X("span", "cx-menu-value", e?.name ?? "—");
 		t.dir = "ltr", this.button.append(X("span", "cx-menu-hint", Y(this.locale, "المثال", "Example")), t, X("span", "cx-menu-caret")), this.panel.replaceChildren();
-		for (let e of Lr) {
+		for (let e of Jr) {
 			let t = xn.filter((t) => wn(t.id) === e);
 			if (t.length === 0) continue;
-			let n = X("p", "cx-menu-group", Y(this.locale, Ir[e].ar, Ir[e].en));
+			let n = X("p", "cx-menu-group", Y(this.locale, qr[e].ar, qr[e].en));
 			this.panel.appendChild(n);
 			for (let e of t) {
 				let t = X("button", "cx-menu-item" + (e.id === this.current ? " is-on" : ""));
@@ -6739,14 +6818,14 @@ var Fr = class {
 		}
 	}
 };
-function zr(e) {
+function Xr(e) {
 	return new Promise((t) => {
 		let n = X("div", "cx-modal"), r = X("div", "cx-modal-box");
 		r.setAttribute("role", "dialog"), r.setAttribute("aria-modal", "true");
 		let i = X("div", "cx-modal-head");
 		i.appendChild(X("h3", "cx-modal-title", e.title));
 		let a = X("button", "cx-modal-x");
-		a.appendChild(jr("xmark")), a.type = "button", a.setAttribute("aria-label", e.cancelText), i.appendChild(a), r.appendChild(i), e.note && r.appendChild(X("p", "cx-modal-note", e.note));
+		a.appendChild(Hr("xmark")), a.type = "button", a.setAttribute("aria-label", e.cancelText), i.appendChild(a), r.appendChild(i), e.note && r.appendChild(X("p", "cx-modal-note", e.note));
 		let o = null;
 		if (e.label !== void 0) {
 			let t = X("label", "cx-modal-label", e.label), n = X("input", "cx-modal-input");
@@ -6766,7 +6845,7 @@ function zr(e) {
 		}), document.body.appendChild(n), (o ?? l).focus(), o?.select();
 	});
 }
-var Br = class {
+var Zr = class {
 	constructor(e) {
 		this.locale = "ar", this.open = !1, this.callbacks = e, this.element = X("div", "cx-menu cx-slots"), this.button = X("button", "cx-icon-btn"), this.button.type = "button", this.button.setAttribute("aria-haspopup", "menu");
 		let t = J("svg", {
@@ -6803,7 +6882,7 @@ var Br = class {
 		e.length === 0 && this.panel.appendChild(X("p", "cx-slot-empty", Y(this.locale, "لا محفوظات بعد. احفظ نسختك الأولى باسمٍ تتذكّره.", "No saves yet. Store your first copy under a name you will recognise.")));
 		for (let t of e) {
 			let e = X("div", "cx-slot"), n = X("button", "cx-slot-open");
-			n.type = "button", n.append(X("span", "cx-slot-name", t.name), X("span", "cx-slot-date", Vr(t.updatedAt, this.locale))), n.addEventListener("click", () => {
+			n.type = "button", n.append(X("span", "cx-slot-name", t.name), X("span", "cx-slot-date", Qr(t.updatedAt, this.locale))), n.addEventListener("click", () => {
 				this.setOpen(!1), this.callbacks.onOpen(t.id);
 			}), e.appendChild(n);
 			let r = X("div", "cx-slot-actions"), i = this.slotAction("floppy-disk", Y(this.locale, "استبدله بعملك الحالي", "Replace with current work"));
@@ -6812,7 +6891,7 @@ var Br = class {
 			});
 			let a = this.slotAction("pen", Y(this.locale, "إعادة التسمية", "Rename"));
 			a.addEventListener("click", async () => {
-				let e = await zr({
+				let e = await Xr({
 					title: Y(this.locale, "إعادة تسمية النسخة", "Rename this copy"),
 					label: Y(this.locale, "الاسم الجديد", "New name"),
 					value: t.name,
@@ -6823,7 +6902,7 @@ var Br = class {
 			});
 			let o = this.slotAction("trash", Y(this.locale, "حذف", "Delete"));
 			o.addEventListener("click", async () => {
-				await zr({
+				await Xr({
 					title: Y(this.locale, "حذف النسخة", "Delete this copy"),
 					note: Y(this.locale, `ستُحذف «${t.name}» نهائياً ولا يمكن استرجاعها.`, `“${t.name}” will be deleted permanently and cannot be recovered.`),
 					confirmText: Y(this.locale, "احذفها", "Delete it"),
@@ -6834,7 +6913,7 @@ var Br = class {
 		}
 		let t = X("button", "cx-slot-add");
 		t.type = "button", t.textContent = Y(this.locale, "＋ حفظ نسخة باسم", "＋ Save a copy"), t.addEventListener("click", async () => {
-			let t = await zr({
+			let t = await Xr({
 				title: Y(this.locale, "حفظ نسخة باسم", "Save a copy"),
 				label: Y(this.locale, "اسم النسخة", "Copy name"),
 				value: Y(this.locale, `نسختي ${e.length + 1}`, `My copy ${e.length + 1}`),
@@ -6847,10 +6926,10 @@ var Br = class {
 	}
 	slotAction(e, t) {
 		let n = X("button", "cx-slot-action");
-		return n.appendChild(jr(e)), n.type = "button", n.title = t, n.setAttribute("aria-label", t), n;
+		return n.appendChild(Hr(e)), n.type = "button", n.title = t, n.setAttribute("aria-label", t), n;
 	}
 };
-function Vr(e, t) {
+function Qr(e, t) {
 	let n = new Date(e);
 	return Number.isNaN(n.getTime()) ? "" : new Intl.DateTimeFormat(t === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
 		day: "numeric",
@@ -6859,7 +6938,7 @@ function Vr(e, t) {
 		minute: "2-digit"
 	}).format(n);
 }
-var Hr = {
+var $r = {
 	top: {
 		ar: "فوق",
 		en: "Top"
@@ -6872,7 +6951,7 @@ var Hr = {
 		ar: "تحت",
 		en: "Bottom"
 	}
-}, Ur = class {
+}, ei = class {
 	constructor(e) {
 		this.locale = "ar", this.open = !1, this.node = null, this.callbacks = e, this.element = X("section", "cx-props"), this.toggle = X("button", "cx-props-toggle"), this.toggle.type = "button", this.toggle.setAttribute("aria-expanded", "false"), this.toggle.addEventListener("click", () => {
 			this.open = !this.open, this.render();
@@ -6909,11 +6988,11 @@ var Hr = {
 			"center",
 			"bottom"
 		]) {
-			let n = X("button", "cx-segment-btn" + (t.labelPlacement === e ? " is-on" : ""), Y(this.locale, Hr[e].ar, Hr[e].en));
+			let n = X("button", "cx-segment-btn" + (t.labelPlacement === e ? " is-on" : ""), Y(this.locale, $r[e].ar, $r[e].en));
 			n.type = "button", n.setAttribute("aria-pressed", String(t.labelPlacement === e)), n.addEventListener("click", () => this.callbacks.onUpdateNode(t.id, { labelPlacement: e })), s.appendChild(n);
 		}
 		o.appendChild(s), this.body.appendChild(o);
-		let c = Ar[t.component];
+		let c = Vr[t.component];
 		if (c) {
 			let e = X("div", "cx-field");
 			e.appendChild(X("span", "cx-field-label", Y(this.locale, "السعة", "Capacity")));
@@ -6927,7 +7006,7 @@ var Hr = {
 			}
 			e.appendChild(n), this.body.appendChild(e);
 		}
-		if (kr.has(t.component)) {
+		if (Br.has(t.component)) {
 			let e = X("label", "cx-field");
 			e.appendChild(X("span", "cx-field-label", Y(this.locale, "عدد المداخل", "Inputs")));
 			let n = document.createElement("input");
@@ -6953,7 +7032,7 @@ var Hr = {
 			e.appendChild(n), this.body.appendChild(e);
 		}
 	}
-}, Wr = {
+}, ti = {
 	truth: {
 		ar: "جدول الحقيقة",
 		en: "Truth table"
@@ -6970,29 +7049,29 @@ var Hr = {
 		ar: "اشرح لي",
 		en: "Explain"
 	}
-}, Gr = [
+}, ni = [
 	"truth",
 	"karnaugh",
 	"signals",
 	"explain"
-], Kr = class {
+], ri = class {
 	constructor(e, t, n) {
 		this.collapsed = !1, this.locale = "ar", this.tab = "truth", this.expanded = !1, this.showInternalSignals = !1, this.latest = null, this.explainContext = null, this.onExpandChange = e, this.onCollapseChange = t, this.onApplyRow = n, this.element = X("section", "cx-panel cx-evidence");
 		let r = X("header", "cx-panel-head");
 		r.appendChild(X("h2", "cx-panel-title", "التحليل والنتائج")), this.expandButton = X("button", "cx-icon-btn"), this.expandButton.type = "button", this.expandButton.addEventListener("click", () => {
 			this.expanded = !this.expanded, this.element.classList.toggle("is-expanded", this.expanded), this.syncExpandButton(), this.onExpandChange(this.expanded);
-		}), r.appendChild(this.expandButton), this.collapseButton = Mr(() => this.setCollapsed(!this.collapsed)), r.appendChild(this.collapseButton), this.element.appendChild(r), this.tabsBar = X("div", "cx-tabs"), this.tabsBar.setAttribute("role", "tablist"), this.element.appendChild(this.tabsBar), this.body = X("div", "cx-evidence-body"), this.element.appendChild(this.body);
+		}), r.appendChild(this.expandButton), this.collapseButton = Ur(() => this.setCollapsed(!this.collapsed)), r.appendChild(this.collapseButton), this.element.appendChild(r), this.tabsBar = X("div", "cx-tabs"), this.tabsBar.setAttribute("role", "tablist"), this.element.appendChild(this.tabsBar), this.body = X("div", "cx-evidence-body"), this.element.appendChild(this.body);
 	}
 	setLocale(e) {
 		this.locale = e;
 		let t = this.element.querySelector(".cx-panel-title");
-		t && (t.textContent = Y(e, "التحليل والنتائج", "Analysis & evidence")), this.syncExpandButton(), Pr(this.collapseButton, this.collapsed, e, {
+		t && (t.textContent = Y(e, "التحليل والنتائج", "Analysis & evidence")), this.syncExpandButton(), Gr(this.collapseButton, this.collapsed, e, {
 			ar: "التحليل",
 			en: "analysis"
 		}, "end"), this.renderTabs(), this.renderBody();
 	}
 	setCollapsed(e) {
-		this.collapsed = e, this.element.classList.toggle("is-collapsed", e), Pr(this.collapseButton, e, this.locale, {
+		this.collapsed = e, this.element.classList.toggle("is-collapsed", e), Gr(this.collapseButton, e, this.locale, {
 			ar: "التحليل",
 			en: "analysis"
 		}, "end"), this.expandButton.hidden = e, this.onCollapseChange(e);
@@ -7009,9 +7088,9 @@ var Hr = {
 	}
 	renderTabs() {
 		this.tabsBar.replaceChildren();
-		for (let e of Gr) {
+		for (let e of ni) {
 			let t = X("button", "cx-tab" + (this.tab === e ? " is-active" : ""));
-			t.type = "button", t.setAttribute("role", "tab"), t.setAttribute("aria-selected", String(this.tab === e)), t.textContent = Y(this.locale, Wr[e].ar, Wr[e].en), t.addEventListener("click", () => {
+			t.type = "button", t.setAttribute("role", "tab"), t.setAttribute("aria-selected", String(this.tab === e)), t.textContent = Y(this.locale, ti[e].ar, ti[e].en), t.addEventListener("click", () => {
 				this.tab = e, this.renderTabs(), this.renderBody();
 			}), this.tabsBar.appendChild(t);
 		}
@@ -7040,22 +7119,32 @@ var Hr = {
 			let e = 2 - xr(t.presetId, this.locale), n = a.querySelector(".cx-ai-p, .cx-ai-h") !== null;
 			c.textContent = n ? Y(this.locale, `اشرح مرّةً أخرى (${e} متبقّية)`, `Explain again (${e} left)`) : Y(this.locale, "اشرح لي هذا المثال", "Explain this example"), c.disabled = n && e <= 0, c.title = c.disabled ? Y(this.locale, "انتهت إعادتاك لهذا المثال.", "You have used both regenerations for this example.") : "";
 		};
-		o ? a.replaceChildren(Tr(o)) : a.appendChild(X("p", "cx-ai-idle", Y(this.locale, "شرحٌ مكتوبٌ لهذه الدائرة بعينها: فكرتُها · كيف تعمل بواباتُها · مثالٌ من الواقع · موضعُها في الكتاب.", "A written explanation of this exact circuit: the idea, how its gates work, a real-world use, and where it sits in the textbook."))), c.addEventListener("click", async () => {
+		o ? a.replaceChildren(Ir(o)) : a.appendChild(X("p", "cx-ai-idle", Y(this.locale, "شرحٌ مكتوبٌ لهذه الدائرة بعينها: فكرتُها · كيف تعمل بواباتُها · مثالٌ من الواقع · موضعُها في الكتاب.", "A written explanation of this exact circuit: the idea, how its gates work, a real-world use, and where it sits in the textbook."))), c.addEventListener("click", async () => {
 			let e = 2 - xr(t.presetId, this.locale), n = a.querySelector(".cx-ai-p, .cx-ai-h") !== null;
 			if (n && e <= 0) return;
 			c.disabled = !0;
 			let r = X("p", "cx-ai-status", Y(this.locale, "يقرأ دائرتك…", "Reading your circuit…"));
 			a.replaceChildren(r);
-			let i = await wr(Cr(t, this.locale), (e) => a.replaceChildren(Tr(e)), () => {
+			let i = Cr(t, this.locale), o = (e) => {
+				a.replaceChildren(Ir(e));
+			}, s = () => {
 				r.textContent = Y(this.locale, "يفكّر…", "Thinking…");
-			});
-			if (i.ok) br(t.presetId, this.locale, i.text), n && Sr(t.presetId, this.locale), a.replaceChildren(Tr(i.text));
+			};
+			if (!n) {
+				let e = await kr(i, this.locale);
+				if (e) {
+					await Pr(e, o, s), br(t.presetId, this.locale, e), a.replaceChildren(Ir(e)), l(), c.disabled = !1;
+					return;
+				}
+			}
+			let u = await Fr(i, o, s, this.locale);
+			if (u.ok) br(t.presetId, this.locale, u.text), n && Sr(t.presetId, this.locale), a.replaceChildren(Ir(u.text));
 			else {
 				let [e, t] = {
 					offline: ["لا اتصال بالشبكة الآن.", "No network connection right now."],
 					unavailable: ["خدمةُ الشرح غير متاحة الآن — جرّب بعد قليل.", "The explain service is unavailable — try again shortly."],
 					empty: ["لم يصل شرحٌ — أعد المحاولة.", "No explanation came back — try again."]
-				}[i.reason] ?? ["تعذّر الشرح.", "Explanation failed."];
+				}[u.reason] ?? ["تعذّر الشرح.", "Explanation failed."];
 				a.replaceChildren(X("p", "cx-ai-error", Y(this.locale, e, t)));
 			}
 			l(), c.disabled = !1;
@@ -7102,7 +7191,7 @@ var Hr = {
 		}
 		let a = X("thead");
 		a.appendChild(i), r.appendChild(a);
-		let o = X("tbody"), s = Xr(e);
+		let o = X("tbody"), s = si(e);
 		for (let n of e.truthTable.rows) {
 			let e = X("tr", n.index === s ? "is-current" : "");
 			e.tabIndex = 0, e.setAttribute("role", "button"), e.setAttribute("aria-label", `Apply row ${n.index}`);
@@ -7152,7 +7241,7 @@ var Hr = {
 					let e = X("div", "cx-kmap-legend");
 					for (let [t, n] of o.entries()) {
 						let i = X("span", `cx-legend-item cx-kmap-group--${t % 6}`);
-						i.dir = "ltr", i.textContent = Yr(n.pattern, r.variableNames), e.appendChild(i);
+						i.dir = "ltr", i.textContent = oi(n.pattern, r.variableNames), e.appendChild(i);
 					}
 					i.appendChild(e);
 				}
@@ -7165,11 +7254,11 @@ var Hr = {
 		n.appendChild(X("span", "cx-derivation-label", Y(this.locale, "التبسيط الجبري — خطوة بخطوة", "Algebraic simplification — step by step"))), n.appendChild(X("span", "cx-derivation-count", Y(this.locale, `${e.minterms.length} صغرى · ${e.literalCount} حرفاً في الناتج`, `${e.minterms.length} minterms · ${e.literalCount} literals`))), t.appendChild(n);
 		let r = X("ol", "cx-steps");
 		for (let t of e.steps) {
-			let e = X("li", `cx-step is-${t.law}`), n = X("span", "cx-step-law", Y(this.locale, qr[t.law].ar, qr[t.law].en));
+			let e = X("li", `cx-step is-${t.law}`), n = X("span", "cx-step-law", Y(this.locale, ii[t.law].ar, ii[t.law].en));
 			e.appendChild(n);
 			let i = X("code", "cx-step-expr", t.expression);
 			i.dir = "ltr", e.appendChild(i);
-			let a = Jr[t.law];
+			let a = ai[t.law];
 			if (a) {
 				let t = X("span", "cx-step-rule", a);
 				t.dir = "ltr", e.appendChild(t);
@@ -7178,7 +7267,7 @@ var Hr = {
 		}
 		return t.appendChild(r), t;
 	}
-}, qr = {
+}, ii = {
 	"sum-of-minterms": {
 		ar: "مجموع الصغريات من الجدول",
 		en: "Sum of minterms from the table"
@@ -7199,13 +7288,13 @@ var Hr = {
 		ar: "الصورة الصغرى",
 		en: "Minimal form"
 	}
-}, Jr = {
+}, ai = {
 	idempotent: "x + x = x",
 	combining: "xy + xy′ = x",
 	"sum-of-minterms": "F = Σm",
 	"dont-care": "d → 1"
 };
-function Yr(e, t) {
+function oi(e, t) {
 	let n = t.every((e) => e.length === 1), r = [...e].flatMap((e, n) => {
 		if (e === "-") return [];
 		let r = t[n] ?? "?";
@@ -7213,7 +7302,7 @@ function Yr(e, t) {
 	});
 	return r.length === 0 ? "1" : r.join(n ? "" : " · ");
 }
-function Xr(e) {
+function si(e) {
 	let t = e.truthTable.inputNodeIds;
 	if (t.length === 0) return -1;
 	let n = 0;
@@ -7225,8 +7314,8 @@ function Xr(e) {
 	return n;
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/app/messages.ts
-function Zr(e, t) {
+//#region src/app/messages.ts
+function ci(e, t) {
 	let n = t === "ar";
 	switch (e.code) {
 		case "COMBINATIONAL_CYCLE": return n ? "لا يمكن: هذا يُغلق حلقةً على نفسها. الدائرة التوافقية تسير في اتجاه واحد من المدخل إلى المخرج." : "Not allowed: this closes a loop. A combinational circuit flows one way, input to output.";
@@ -7241,7 +7330,7 @@ function Zr(e, t) {
 	}
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/app/lab-view.ts
+//#region src/app/lab-view.ts
 function Z(e, t, n) {
 	let r = document.createElement(e);
 	return t && (r.className = t), n !== void 0 && (r.textContent = n), r;
@@ -7262,21 +7351,21 @@ var $ = {
 	narrow: "M10 4v6H4M14 20v-6h6M4 10l6-6M20 14l-6 6",
 	share: "M10 14a4 4 0 0 0 6 .5l3-3a4 4 0 0 0-5.7-5.7l-1.7 1.7M14 10a4 4 0 0 0-6-.5l-3 3a4 4 0 0 0 5.7 5.7l1.7-1.7"
 };
-function Qr(e) {
+function li(e) {
 	let t = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	t.setAttribute("viewBox", "0 0 24 24"), t.setAttribute("class", "cx-glyph"), t.setAttribute("aria-hidden", "true"), t.setAttribute("focusable", "false");
 	let n = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	return n.setAttribute("d", e), t.appendChild(n), t;
 }
-var $r = class {
+var ui = class {
 	constructor(e, t, n) {
-		this.selection = w, this.armed = null, this.resumeButton = null, this.wideCanvas = !1, this.slotList = [], this.toggleCount = 0, this.hintTimer = null, this.locale = t, this.savedArtifact = n ?? null, this.history = T(Sn(e).artifact), this.saver = ei(), this.slotStore = ti(), this.element = Z("div", "cx-lab");
+		this.selection = w, this.armed = null, this.resumeButton = null, this.wideCanvas = !1, this.slotList = [], this.toggleCount = 0, this.hintTimer = null, this.locale = t, this.savedArtifact = n ?? null, this.history = E(Sn(e).artifact), this.saver = di(), this.slotStore = fi(), this.element = Z("div", "cx-lab");
 		let r = Z("header", "cx-bar"), i = Z("div", "cx-bar-title");
 		this.taskLine = Z("p", "cx-task"), i.appendChild(this.taskLine), r.appendChild(i);
 		let a = Z("div", "cx-bar-tools");
-		this.presetSelect = new Rr(Sn(e).id, (e) => this.loadPreset(e)), a.appendChild(this.presetSelect.element);
+		this.presetSelect = new Yr(Sn(e).id, (e) => this.loadPreset(e)), a.appendChild(this.presetSelect.element);
 		let o = Z("div", "cx-group");
-		this.undoButton = this.iconButton($.undo, "تراجع (Ctrl+Z)", "Undo (Ctrl+Z)", () => this.undo()), this.redoButton = this.iconButton($.redo, "إعادة (Ctrl+Y)", "Redo (Ctrl+Y)", () => this.redo()), this.duplicateButton = this.iconButton($.duplicate, "تكرار المحدَّد (Ctrl+D)", "Duplicate selection (Ctrl+D)", () => this.duplicateSelection()), this.deleteButton = this.iconButton($.remove, "حذف المحدَّد (Delete)", "Delete selection (Delete)", () => this.deleteSelection()), o.append(this.undoButton, this.redoButton, this.duplicateButton, this.deleteButton), a.appendChild(o), this.slots = new Br({
+		this.undoButton = this.iconButton($.undo, "تراجع (Ctrl+Z)", "Undo (Ctrl+Z)", () => this.undo()), this.redoButton = this.iconButton($.redo, "إعادة (Ctrl+Y)", "Redo (Ctrl+Y)", () => this.redo()), this.duplicateButton = this.iconButton($.duplicate, "تكرار المحدَّد (Ctrl+D)", "Duplicate selection (Ctrl+D)", () => this.duplicateSelection()), this.deleteButton = this.iconButton($.remove, "حذف المحدَّد (Delete)", "Delete selection (Delete)", () => this.deleteSelection()), o.append(this.undoButton, this.redoButton, this.duplicateButton, this.deleteButton), a.appendChild(o), this.slots = new Zr({
 			list: () => this.slotList,
 			onSaveNew: (e) => void this.saveSlot(e),
 			onOverwrite: (e) => void this.saveSlot(this.slotList.find((t) => t.id === e)?.name ?? "", e),
@@ -7295,10 +7384,10 @@ var $r = class {
 		let l = Z("div", "cx-group");
 		l.appendChild(this.wideButton), l.append(this.textButton("−", "تصغير", "Zoom out", () => this.canvas.zoomBy(1 / 1.2)), this.textButton("+", "تكبير", "Zoom in", () => this.canvas.zoomBy(1.2)), this.textButton("Fit", "ملاءمة الدائرة", "Fit circuit", () => this.canvas.fitTo(this.artifact))), a.appendChild(l), r.appendChild(a), this.element.appendChild(r);
 		let u = Z("div", "cx-columns"), d = Z("div", "cx-side");
-		this.library = new Fr({
+		this.library = new Kr({
 			onPick: (e) => this.armComponent(e),
 			onCollapseChange: (e) => this.element.classList.toggle("is-library-collapsed", e)
-		}), this.properties = new Ur({ onUpdateNode: (e, t) => this.dispatch({
+		}), this.properties = new ei({ onUpdateNode: (e, t) => this.dispatch({
 			type: "node.update",
 			nodeId: e,
 			patch: t
@@ -7315,12 +7404,12 @@ var $r = class {
 			onConnect: (e, t) => this.connect(e, t),
 			onPlace: (e) => this.placeArmed(e),
 			onRejectConnection: () => this.setHint(Q(this.locale, "وصّل من مخرَجِ عنصرٍ إلى مدخلِ آخر.", "Drag from a component output to another component input."), "error")
-		}), f.appendChild(this.canvas.element), this.hintLine = Z("p", "cx-hint"), this.hintLine.setAttribute("role", "status"), f.appendChild(this.hintLine), u.appendChild(f), this.evidence = new Kr((e) => this.element.classList.toggle("is-evidence-expanded", e), (e) => this.element.classList.toggle("is-evidence-collapsed", e), (e) => this.applyInputRow(e)), this.evidence.explainContext = (e) => this.buildExplainContext(e), u.appendChild(this.evidence.element), this.element.appendChild(u);
+		}), f.appendChild(this.canvas.element), this.hintLine = Z("p", "cx-hint"), this.hintLine.setAttribute("role", "status"), f.appendChild(this.hintLine), u.appendChild(f), this.evidence = new ri((e) => this.element.classList.toggle("is-evidence-expanded", e), (e) => this.element.classList.toggle("is-evidence-collapsed", e), (e) => this.applyInputRow(e)), this.evidence.explainContext = (e) => this.buildExplainContext(e), u.appendChild(this.evidence.element), this.element.appendChild(u);
 		let p = Z("div", "cx-foot");
 		if (this.saveLine = Z("span", "cx-save"), p.appendChild(this.saveLine), this.savedArtifact) {
 			let e = Z("button", "cx-resume");
 			e.type = "button", this.resumeButton = e, e.addEventListener("click", () => {
-				this.history = T(this.savedArtifact), this.selection = w, this.presetSelect.value = this.savedArtifact.sourcePresetId ?? "free-build", e.remove(), this.refresh(!0), requestAnimationFrame(() => this.canvas.fitTo(this.artifact));
+				this.history = E(this.savedArtifact), this.selection = w, this.presetSelect.value = this.savedArtifact.sourcePresetId ?? "free-build", e.remove(), this.refresh(!0), requestAnimationFrame(() => this.canvas.fitTo(this.artifact));
 			}), p.appendChild(e);
 		}
 		this.element.appendChild(p), this.onKeyDown = (e) => this.handleKey(e), document.addEventListener("keydown", this.onKeyDown), this.onResize = () => this.syncShellMetrics(), window.addEventListener("resize", this.onResize), this.syncShellMetrics();
@@ -7348,9 +7437,9 @@ var $r = class {
 		let t = Bt(this.artifact, e, { updatedAt: (/* @__PURE__ */ new Date()).toISOString() });
 		if (!t.ok) {
 			let e = t.issues[0];
-			return e && this.setHint(Zr(e, this.locale), "error"), !1;
+			return e && this.setHint(ci(e, this.locale), "error"), !1;
 		}
-		return this.history = ct(this.history, t.artifact), this.pruneSelection(), this.refresh(!1), this.scheduleSave(), !0;
+		return this.history = st(this.history, t.artifact), this.pruneSelection(), this.refresh(!1), this.scheduleSave(), !0;
 	}
 	armComponent(e) {
 		this.armed = this.armed === e ? null : e, this.library.setArmed(this.armed), this.canvas.setArmedComponent(this.armed), this.setHint(this.armed ? Q(this.locale, `انقر اللوحة لوضع ${this.armed}.`, `Click the canvas to place ${this.armed}.`) : "");
@@ -7374,7 +7463,7 @@ var $r = class {
 		this.dispatch({
 			type: "node.add",
 			node: n
-		}) && (n.role === "input" && (this.history = ct(this.history, {
+		}) && (n.role === "input" && (this.history = st(this.history, {
 			...this.artifact,
 			session: {
 				...this.artifact.session,
@@ -7430,7 +7519,7 @@ var $r = class {
 		});
 	}
 	undo() {
-		let e = lt(this.history);
+		let e = ct(this.history);
 		if (e === this.history) {
 			this.setHint(Q(this.locale, "لا خطوة سابقة.", "Nothing to undo."));
 			return;
@@ -7438,7 +7527,7 @@ var $r = class {
 		this.history = e, this.pruneSelection(), this.refresh(!1), this.scheduleSave();
 	}
 	redo() {
-		let e = ut(this.history);
+		let e = lt(this.history);
 		if (e === this.history) {
 			this.setHint(Q(this.locale, "لا خطوة تالية.", "Nothing to redo."));
 			return;
@@ -7492,7 +7581,7 @@ var $r = class {
 		};
 	}
 	loadPreset(e) {
-		this.history = T(Sn(e).artifact), this.selection = w, this.toggleCount = 0, this.armed = null, this.library.setArmed(null), this.canvas.setArmedComponent(null), this.setHint(e === "free-build" ? Q(this.locale, "لوحةٌ فارغة. ابدأ بمفتاحٍ من المكتبة.", "Empty canvas. Start with a SWITCH from the library.") : ""), this.refresh(!0), this.scheduleSave(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact));
+		this.history = E(Sn(e).artifact), this.selection = w, this.toggleCount = 0, this.armed = null, this.library.setArmed(null), this.canvas.setArmedComponent(null), this.setHint(e === "free-build" ? Q(this.locale, "لوحةٌ فارغة. ابدأ بمفتاحٍ من المكتبة.", "Empty canvas. Start with a SWITCH from the library.") : ""), this.refresh(!0), this.scheduleSave(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact));
 	}
 	toggleInput(e) {
 		let t = this.artifact.session.inputValues[e] === 1 ? 0 : 1;
@@ -7575,17 +7664,17 @@ var $r = class {
 			this.setHint(Q(this.locale, "تعذّرت قراءةُ هذه المحفوظة.", "That save could not be read."), "error");
 			return;
 		}
-		this.history = T(t), this.selection = w, this.presetSelect.value = t.sourcePresetId ?? "free-build", this.refresh(!0), this.scheduleSave(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact)), this.setHint(Q(this.locale, "فُتحت المحفوظة.", "Save opened."));
+		this.history = E(t), this.selection = w, this.presetSelect.value = t.sourcePresetId ?? "free-build", this.refresh(!0), this.scheduleSave(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact)), this.setHint(Q(this.locale, "فُتحت المحفوظة.", "Save opened."));
 	}
 	toggleWideCanvas() {
 		this.wideCanvas = !this.wideCanvas, this.library.setCollapsed(this.wideCanvas), this.evidence.setCollapsed(this.wideCanvas), this.syncWideButton(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact));
 	}
 	syncWideButton() {
 		let e = this.wideCanvas ? Q(this.locale, "أعِد الحجم الطبيعي", "Restore panels") : Q(this.locale, "وسّع اللوحة", "Maximise canvas");
-		this.wideButton.replaceChildren(Qr(this.wideCanvas ? $.narrow : $.widen)), this.wideButton.title = e, this.wideButton.setAttribute("aria-label", e), this.wideButton.setAttribute("aria-pressed", String(this.wideCanvas)), this.wideButton.dataset.arTitle = this.wideCanvas ? "أعِد الحجم الطبيعي" : "وسّع اللوحة", this.wideButton.dataset.enTitle = this.wideCanvas ? "Restore panels" : "Maximise canvas";
+		this.wideButton.replaceChildren(li(this.wideCanvas ? $.narrow : $.widen)), this.wideButton.title = e, this.wideButton.setAttribute("aria-label", e), this.wideButton.setAttribute("aria-pressed", String(this.wideCanvas)), this.wideButton.dataset.arTitle = this.wideCanvas ? "أعِد الحجم الطبيعي" : "وسّع اللوحة", this.wideButton.dataset.enTitle = this.wideCanvas ? "Restore panels" : "Maximise canvas";
 	}
 	adoptSharedArtifact(e) {
-		this.history = T(e), this.selection = w, this.presetSelect.value = e.sourcePresetId ?? "free-build", this.refresh(!0), requestAnimationFrame(() => this.canvas.fitTo(this.artifact)), this.setHint(Q(this.locale, "فُتحت دائرةٌ مشارَكة. عدّلها كما تشاء، واحفظها باسمٍ لتبقى عندك.", "Opened a shared circuit. Edit it freely, and save a named copy to keep it."));
+		this.history = E(e), this.selection = w, this.presetSelect.value = e.sourcePresetId ?? "free-build", this.refresh(!0), requestAnimationFrame(() => this.canvas.fitTo(this.artifact)), this.setHint(Q(this.locale, "فُتحت دائرةٌ مشارَكة. عدّلها كما تشاء، واحفظها باسمٍ لتبقى عندك.", "Opened a shared circuit. Edit it freely, and save a named copy to keep it."));
 	}
 	async shareLink() {
 		let e = await un(this.artifact);
@@ -7597,7 +7686,7 @@ var $r = class {
 		try {
 			await navigator.clipboard.writeText(t), this.setHint(Q(this.locale, "نُسخ رابطُ الدائرة.", "Circuit link copied."));
 		} catch {
-			await zr({
+			await Xr({
 				title: Q(this.locale, "رابط الدائرة", "Circuit link"),
 				label: Q(this.locale, "انسخه من هنا", "Copy it from here"),
 				value: t,
@@ -7626,7 +7715,7 @@ var $r = class {
 				this.setHint(Q(this.locale, e, t), "error");
 				return;
 			}
-			this.history = T(n.artifact), this.selection = w, this.presetSelect.value = n.artifact.sourcePresetId ?? this.presetSelect.value, this.refresh(!0), this.scheduleSave(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact)), this.setHint(Q(this.locale, "استُوردت الآلة.", "Circuit imported."));
+			this.history = E(n.artifact), this.selection = w, this.presetSelect.value = n.artifact.sourcePresetId ?? this.presetSelect.value, this.refresh(!0), this.scheduleSave(), requestAnimationFrame(() => this.canvas.fitTo(this.artifact)), this.setHint(Q(this.locale, "استُوردت الآلة.", "Circuit imported."));
 		}), e.click();
 	}
 	storeViewport(e) {
@@ -7677,7 +7766,7 @@ var $r = class {
 				}
 			}
 		});
-		let t = Pe(this.artifact);
+		let t = Ne(this.artifact);
 		this.canvas.render(this.artifact, t.values, this.selection), this.evidence.update(this.artifact, t);
 		let n = this.selection.nodeIds.length === 1 ? this.artifact.circuit.nodes.find((e) => e.id === this.selection.nodeIds[0]) ?? null : null;
 		this.properties.update(n), this.syncEditButtons();
@@ -7688,28 +7777,28 @@ var $r = class {
 	}
 	iconButton(e, t, n, r) {
 		let i = Z("button", "cx-icon-btn");
-		return i.type = "button", i.appendChild(Qr(e)), i.dataset.arTitle = t, i.dataset.enTitle = n, i.addEventListener("click", r), i;
+		return i.type = "button", i.appendChild(li(e)), i.dataset.arTitle = t, i.dataset.enTitle = n, i.addEventListener("click", r), i;
 	}
 	textButton(e, t, n, r) {
 		let i = Z("button", "cx-icon-btn cx-icon-btn--text", e);
 		return i.type = "button", i.dataset.arTitle = t, i.dataset.enTitle = n, i.addEventListener("click", r), i;
 	}
 };
-function ei() {
+function di() {
 	try {
 		return localStorage.setItem("garden_labs_probe", "1"), localStorage.removeItem("garden_labs_probe"), new gn(new fn(localStorage));
 	} catch {
 		return null;
 	}
 }
-function ti() {
+function fi() {
 	try {
 		return localStorage.setItem("garden_labs_probe", "1"), localStorage.removeItem("garden_labs_probe"), new hn(localStorage);
 	} catch {
 		return null;
 	}
 }
-function ni() {
+function pi() {
 	try {
 		return new fn(localStorage).load().then((e) => e.ok ? d(e.artifact) : null).catch(() => null);
 	} catch {
@@ -7717,27 +7806,27 @@ function ni() {
 	}
 }
 //#endregion
-//#region labs/cs231-combinational-circuit-builder/src/main.ts
-function ri() {
+//#region src/main.ts
+function mi() {
 	try {
 		return localStorage.getItem("garden_lang") === "en" ? "en" : "ar";
 	} catch {
 		return "ar";
 	}
 }
-async function ii() {
+async function hi() {
 	let e = location.hash.replace(/^#/, "");
 	if (!e.startsWith("circuit=")) return null;
 	let t = await dn(e, () => `artifact:shared.${Date.now().toString(36)}`);
 	return history.replaceState(null, "", `${location.pathname}${location.search}`), t.ok ? t.artifact : null;
 }
-async function ai() {
+async function gi() {
 	let e = document.querySelector("[data-lab-root]");
 	if (!e) return;
-	let t = new URLSearchParams(location.search).get("preset"), n = await ii(), r = n || t ? null : await ni(), i = new $r(t, ri(), r ?? void 0);
-	e.replaceChildren(i.element), n && i.adoptSharedArtifact(n), document.addEventListener("garden:languageChanged", () => i.setLocale(ri()));
+	let t = new URLSearchParams(location.search).get("preset"), n = await hi(), r = n || t ? null : await pi(), i = new ui(t, mi(), r ?? void 0);
+	e.replaceChildren(i.element), n && i.adoptSharedArtifact(n), document.addEventListener("garden:languageChanged", () => i.setLocale(mi()));
 }
-document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => void ai()) : ai();
+document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => void gi()) : gi();
 //#endregion
 
 //# sourceMappingURL=lab-cs231.js.map

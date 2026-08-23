@@ -473,12 +473,14 @@
   }
 
   /*@3.SXLJ.39*/
+  /*@3.SXLJ.48*/
   var CITY_AR = {
     'Riyadh': 'الرياض', 'Jeddah': 'جدة', 'Dammam': 'الدمام', 'Online': 'عن بعد',
     'Abha': 'أبها', 'Medinah': 'المدينة المنورة', 'Qasim': 'القصيم', 'Jazan': 'جازان',
     'Ahasa': 'الأحساء', 'Tabuk': 'تبوك', 'Najran': 'نجران', 'Jubail': 'الجبيل',
     'Hail': 'حائل', 'Yanbu': 'ينبع', 'Jouf': 'الجوف', 'Taif': 'الطائف',
     'Ula': 'العلا', 'Qurayyat': 'القريات', 'Undetermined': 'غير محدّد',
+    'Baha': 'الباحة', 'Mahayil Asir': 'محايل عسير',
     'RI Online': 'عن بعد — RI', 'Riyadh-Online': 'الرياض · عن بعد',
     'Dammam-Online': 'الدمام · عن بعد', 'Jeddah-Online': 'جدة · عن بعد'
   };
@@ -500,6 +502,23 @@
     return city + ' · ' + (isAr() ? (c.g === 'Males' ? 'طلاب' : 'طالبات') : c.g);
   }
   function resetCampus() { _cc = {}; }
+  /*@3.SXLJ.49*/
+  var LAT_RE = /[A-Za-z0-9]/;
+  function applyCampuses(map) {
+    if (!map || typeof map !== 'object') return false;
+    var hit = 0;
+    Object.keys(map).forEach(function (k) {
+      var v = map[k];
+      if (!k || typeof v !== 'string') return;
+      v = v.trim();
+      if (!v || LAT_RE.test(v) || v.length > 40) return;
+      if (CITY_AR[k] === v) return;
+      CITY_AR[k] = v;
+      hit++;
+    });
+    if (hit) resetCampus();
+    return hit > 0;
+  }
 
   /*@3.SXLJ.33*/
 
@@ -512,6 +531,7 @@
     _termsP = fetch(API + '/v1/terms')
       .then(function (r) { return r.ok ? r.json() : { terms: [] }; })
       .then(function (d) {
+        applyCampuses(d && d.campuses);
         var ts = (d.terms || []).filter(function (x) { return x.sections > 0; });
         if (!ts.length) throw new Error('no-terms');
         return ts;
@@ -604,6 +624,7 @@
     anyEventFor: anyEventFor, dropFromSemester: dropFromSemester,
     CITY_AR: CITY_AR,
     campusOf: campusOf, campusLabel: campusLabel, resetCampus: resetCampus,
+    applyCampuses: applyCampuses,
     terms: terms, rankedTerms: rankedTerms, savedTerm: savedTerm,
     catalog: catalog, cachedCatalog: cachedCatalog, find: find,
     ready: function () { return !!API; }

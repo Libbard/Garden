@@ -4510,9 +4510,10 @@
   const AI_CADENCE = {
     thinkMs: [700, 1500, 3200],
     ttfbMs:  [900, 1800, 4200],
-    cps:     [22, 40, 70],
-    thinkShare: 0.5,
-    measured: false,
+    /*@3.GARJ.617*/
+    cps:     [77, 95, 117],
+    thinkShare: 1,
+    measured: 'cps+share',
   };
   function cadPick(tri) {
     const r = Math.random();
@@ -6168,10 +6169,15 @@ ${baseRules}`) + regenSuffix;
       var cancelled = overrides.cancelled_lectures || [];
       var completed = overrides.completed_events || [];
 
+      /*@3.GARJ.619*/
+      var R = window.GardenScheduleRules;
+      var d0 = new Date(now); d0.setHours(0, 0, 0, 0);
+
       var todayEvents = [];
       lectures.forEach(function (l) {
         if (!l || l.day !== dayKey || !l.recurring) return;
         if (cancelled.indexOf(l.id) !== -1) return;
+        if (R && !R.lectureOn(l, d0).on) return;
         todayEvents.push({
           id: l.id, start: l.start_time || '', course: l.course_code || '',
           done: completed.indexOf(l.id) !== -1
@@ -6179,7 +6185,8 @@ ${baseRules}`) + regenSuffix;
       });
       studyBlocks.forEach(function (b) {
         if (!b || b.day !== dayKey) return;
-        if (b.week_id != null && b.week_id !== wid) return;
+        if (R ? !R.blockOn(b, d0).on
+              : (b.week_id != null && b.week_id !== wid)) return;
         todayEvents.push({
           id: b.id, start: b.start_time || '', course: b.course_code || '',
           done: completed.indexOf(b.id) !== -1
@@ -6472,7 +6479,9 @@ ${baseRules}`) + regenSuffix;
     aiExplain: showAiModal, extractCard: extractCardContent,
     aiTargets: aiExplainTargets, aiIdentity,
     aiReady: () => AI_CATALOG_READY,
-    aiKey: { normalize: aiNormalize, identityString: aiIdentityString, hash: aiHash, path: aiKeyPath, promptVer: AI_PROMPT_VER }
+    aiKey: { normalize: aiNormalize, identityString: aiIdentityString, hash: aiHash, path: aiKeyPath, promptVer: AI_PROMPT_VER },
+    /*@3.GARJ.618*/
+    aiCadence: AI_CADENCE
   };
 
   /*@3.GARJ.448*/

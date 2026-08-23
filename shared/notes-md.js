@@ -87,7 +87,7 @@
 
   var HTML_MARK = {
     b: 'b', strong: 'b', i: 'i', em: 'i', u: 'u', s: 'st', del: 'st',
-    strike: 'st', mark: 'hl', code: 'c'
+    strike: 'st', mark: 'hl', code: 'c', sub: 'sb', sup: 'sp'
   };
 
   function push(out, s, st) {
@@ -103,6 +103,9 @@
     if (c === '`') { var n = 0; while (s.charAt(i + n) === '`') n++; return { k: 'c', n: n, ch: c }; }
     if (c === '=' && s.charAt(i + 1) === '=') return { k: 'hl', n: 2, ch: c };
     if (c === '~' && s.charAt(i + 1) === '~') return { k: 'st', n: 2, ch: c };
+    /*@3.NOMJ3.37*/
+    if (c === '~') return { k: 'sb', n: 1, ch: c };
+    if (c === '^') return { k: 'sp', n: 1, ch: c };
     if (c === '*' || c === '_') {
       var m = 0; while (s.charAt(i + m) === c) m++;
       if (m > 3) m = 3;
@@ -161,7 +164,7 @@
       }
 
       /*@3.NOMJ3.3*/
-      var tag = s.slice(i).match(/^<(\/?)(b|strong|i|em|u|s|del|strike|mark|code|br)\s*\/?>/i);
+      var tag = s.slice(i).match(/^<(\/?)(b|strong|i|em|u|s|del|strike|mark|code|sub|sup|br)\s*\/?>/i);
       if (tag) {
         var nm = tag[2].toLowerCase();
         if (nm === 'br') { flush(); push(out, '\n', st); i += tag[0].length; continue; }
@@ -195,6 +198,14 @@
       /*@3.NOMJ3.5*/
       if (ch === '<' && /^<\/?[a-z][^<>]*>/i.test(s.slice(i))) {
         i += s.slice(i).match(/^<\/?[a-z][^<>]*>/i)[0].length; continue;
+      }
+
+      /*@3.NOMJ3.42*/
+      if (ch === ':') {
+        var EM = window.GardenNotesEmoji;
+        var sc = EM ? s.slice(i).match(EM.RE) : null;
+        var hit = sc ? EM.get(sc[1]) : '';
+        if (hit) { buf += hit; i += sc[0].length; continue; }
       }
 
       /*@3.NOMJ3.6*/
@@ -310,7 +321,8 @@
             j++;
           }
         }
-        if (stop > 0) {
+        if (stop > 0 && (d0.k !== 'sb' && d0.k !== 'sp' ||
+                        !/(^|[^\\])\s/.test(s.slice(i + d0.n, stop)))) {
           flush();
           var body2 = s.slice(i + d0.n, stop);
           if (d0.k === 'c') {
@@ -342,13 +354,30 @@
 
   var HTML_BLOCK = /^ {0,3}<\/?(div|p|section|article|table|thead|tbody|tr|td|th|ul|ol|li|h[1-6]|pre|blockquote|details|summary|figure|figcaption|span|center|font)\b/i;
 
+  var ALIGN_CLS = {
+    center: 'center', centre: 'center', middle: 'center',
+    start: 'start', end: 'end', justify: 'justify'
+  };
+
   /*@3.NOMJ3.26*/
   function takeAnchor(line, hold) {
     var t = String(line == null ? '' : line);
     var got = '';
     t = t.replace(/<a\s+(?:name|id)\s*=\s*["']?([^"'>\s]+)["']?[^>]*>\s*(?:<\/a>)?/gi,
       function (all, id) { if (!got) got = id; return ''; });
-    t = t.replace(/\s*\{#([^}\s]+)\}\s*$/, function (all, id) { if (!got) got = id; return ''; });
+    /*@3.NOMJ3.39*/
+    t = t.replace(/\s*\{([#.][^}]*)\}\s*$/, function (all, body) {
+      var toks = String(body).split(/\s+/), q;
+      for (q = 0; q < toks.length; q++) {
+        var tk = toks[q];
+        if (tk.charAt(0) === '#') { if (!got) got = tk.slice(1); }
+        else if (tk.charAt(0) === '.' && hold) {
+          var cls = tk.slice(1).toLowerCase();
+          if (ALIGN_CLS[cls]) hold.al = ALIGN_CLS[cls];
+        }
+      }
+      return '';
+    });
     if (got && hold) hold.a = slug(got);
     return t;
   }
@@ -366,6 +395,10 @@
   function isBreak(t) { return /^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})$/.test(t); }
   function fenceAt(t) { return t.match(/^ {0,3}(`{3,}|~{3,})\s*([^`]*)$/); }
   function bulletAt(t) { return t.match(/^ {0,9}([\-*+])[ \t]+(.*)$/); }
+  function defAt(t) {
+    var m = String(t == null ? '' : t).match(/^ {0,3}:[ \t]+(.*)$/);
+    return m ? m[1] : null;
+  }
   function numberAt(t) { return t.match(/^ {0,9}(\d{1,9})([.)])[ \t]+(.*)$/); }
   function tableSep(t) { return !!t && /\|/.test(t) && /^ {0,3}\|?[\s:|\-]*\-[\s:|\-]*\|?\s*$/.test(t); }
 
@@ -493,6 +526,7 @@
         var htxt = takeAnchor(h[2], hold).trim();
         var hb = blank('h', { lv: h[1].length, rt: inline(htxt, ctx) });
         if (hold.a) hb.anc = hold.a;
+        if (hold.al) hb.al = hold.al;
         add(hb);
         i++;
         continue;
@@ -550,6 +584,25 @@
         }
         add(blank('tbl', { cols: cols, st: 'head', rows: rows }));
         continue;
+      }
+
+      /*@3.NOMJ3.40*/
+      if (t && !defAt(t) && defAt((lines[i + 1] || '').trim()) &&
+          !/^#{1,6}\s/.test(t) && !/^ {0,3}>/.test(t) && !isBreak(t) && !fenceAt(t) &&
+          !bulletAt(raw) && !numberAt(raw) && !tableSep(lines[i + 1] || '')) {
+        var dItems = [];
+        while (i < lines.length) {
+          var dt = lines[i].trim();
+          if (!dt) break;
+          var dm = defAt(dt);
+          if (dm) dItems.push({ rt: inline(dm, ctx), lv: 1 });
+          else if (defAt((lines[i + 1] || '').trim()) &&
+                   !bulletAt(lines[i]) && !numberAt(lines[i])) dItems.push({ rt: inline(dt, ctx) });
+          else break;
+          i++;
+        }
+        if (dItems.length > 1) { add(blank('dl', { items: dItems })); continue; }
+        i -= dItems.length;
       }
 
       if (bulletAt(raw) || numberAt(raw)) { i = readList(lines, i, out, ctx); continue; }
@@ -800,6 +853,9 @@
       else if (r.i) t = '*' + t + '*';
       if (r.u) t = '<u>' + t + '</u>';
       if (r.st) t = '~~' + t + '~~';
+      /*@3.NOMJ3.38*/
+      if (r.sb) t = '~' + t + '~';
+      if (r.sp) t = '^' + t + '^';
       if (r.hl) t = '==' + t + '==';
       if (r.lk) t = '[' + t + '](' + r.lk + ')';
       return lead + t + tail;
@@ -858,7 +914,14 @@
         prev = b.ty;
       } else prev = null;
       switch (b.ty) {
-        case 'h':     return new Array(Math.min(6, b.lv || 2) + 1).join('#') + ' ' + runsToMd(b.rt);
+        case 'h': {
+          /*@3.NOMJ3.41*/
+          var at = [];
+          if (b.anc) at.push('#' + b.anc);
+          if (b.al && b.al !== 'start') at.push('.' + b.al);
+          return new Array(Math.min(6, b.lv || 2) + 1).join('#') + ' ' + runsToMd(b.rt) +
+                 (at.length ? ' {' + at.join(' ') + '}' : '');
+        }
         case 'p':     return runsToMd(b.rt);
         case 'quote': return '> ' + runsToMd(b.rt).replace(/\n/g, '\n> ');
         case 'callout': {
@@ -869,6 +932,9 @@
                  runsToMd(crt).replace(/\n/g, '\n> ');
         }
         case 'todo':  return '- [' + (b.done ? 'x' : ' ') + '] ' + runsToMd(b.rt);
+        case 'dl':    return (b.items || []).map(function (it) {
+          return (it.lv ? ': ' : '') + runsToMd(it.rt).replace(/\n/g, ' ');
+        }).join('\n');
         case 'ul':
         case 'ol':    return listMd(b, alt);
         case 'code':  return '```' + (b.lang || '') + '\n' + (b.src || '') + '\n```';

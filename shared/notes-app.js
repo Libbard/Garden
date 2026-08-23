@@ -1103,7 +1103,7 @@
   /*@3.NOAJ.26*/
   var lastSaved = {};
 
-  function persist(id, doc) {
+  function persist(id, doc, quiet) {
     var St = window.GardenNotesStore, Sy = window.GardenNotesSync;
     if (!St) return;
     /*@3.NOAJ.146*/
@@ -1120,14 +1120,17 @@
       var rec = idxFind(id);
       if (rec) {
         rec.t = typed || rec.t || deriveTitle(doc) || L('بلا عنوان', 'Untitled');
-        rec.updated_at = t;
+        /*@3.NOAJ.166*/
+        if (!quiet) rec.updated_at = t;
         rec.sz = res.bytes;
         idxPut(rec);
       }
       /*@3.NOAJ.119*/
       if (Sy) {
-        saveState('saving', L('يُزامَن…', 'Syncing…'));
+        if (!quiet) saveState('saving', L('يُزامَن…', 'Syncing…'));
         Sy.schedule(id);
+      } else if (quiet) {
+        saveState('', '');
       } else {
         saveState('saved', L('محفوظة', 'Saved'));
         setTimeout(function () { if (els.save && els.save.getAttribute('data-s') === 'saved') saveState('', ''); }, 1800);
@@ -1639,6 +1642,86 @@
     };
   }
 
+  /*@3.NOAJ.161*/
+  var _pdfMod = null;
+  function needPdf() {
+    if (window.GardenNotesPdf) return Promise.resolve(window.GardenNotesPdf);
+    if (_pdfMod) return _pdfMod;
+    _pdfMod = new Promise(function (res, rej) {
+      var base = '';
+      var probe = document.querySelector('script[src*="notes-app.js"]');
+      if (probe) base = (probe.getAttribute('src') || '').replace(/notes-app\.js.*$/, '');
+      var v = (probe && (probe.getAttribute('src') || '').split('?')[1]) || '';
+      var el = document.createElement('script');
+      el.src = base + 'notes-pdf.js' + (v ? ('?' + v) : '');
+      el.onload = function () {
+        if (window.GardenNotesPdf) res(window.GardenNotesPdf);
+        else rej(new Error('no api'));
+      };
+      el.onerror = function () { _pdfMod = null; rej(new Error('load')); };
+      document.head.appendChild(el);
+    });
+    return _pdfMod;
+  }
+
+  function pdfMeta() {
+    var pm = metaOf(idxFind(edId));
+    pm.land = false;
+    pm.pageW = Math.round(pageWpx());
+    pm.pageH = Math.round(pageH());
+    pm.pages = growPages();
+    pm.html = printClone();
+    pm.inkBox = printInkBox();
+    pm.css = printCss();
+    pm.inlineCss = printInlineCss();
+    pm.rootAttrs = printRootAttrs();
+    pm.dir = isAr() ? 'rtl' : 'ltr';
+    return pm;
+  }
+
+  function expMsg(txt) {
+    var p = document.querySelector('#na-exp .na-pg-hint');
+    if (p) p.textContent = txt;
+  }
+
+  /*@3.NOAJ.162*/
+  function exportPdfNative() {
+    if (!ed || !ed.doc) return;
+    try { ed.save(); } catch (e) {}
+    var dlg = document.getElementById('na-exp');
+    var keep = dlg ? dlg.querySelector('.na-pg-hint') : null;
+    var was = keep ? keep.textContent : '';
+    var btns = dlg ? dlg.querySelectorAll('.na-exp-f') : [];
+    var q;
+    for (q = 0; q < btns.length; q++) btns[q].disabled = true;
+    expMsg(L('يُكتب ملفُّ PDF… قد يستغرق ثوانيَ في الملاحظات الطويلة.',
+             'Writing the PDF… long notes take a few seconds.'));
+    needPdf().then(function (api) {
+      return api.save(pdfMeta(), ed.doc);
+    }).then(function (r) {
+      /*@3.NOAJ.163*/
+      var miss = 0, k;
+      for (k in (r.missing || {})) miss += r.missing[k];
+      var kb = Math.round(r.size / 1024);
+      expMsg(L('حُفظ الملفّ: ' + r.pages + ' صفحة · ' + kb + ' كيلوبايت.',
+               'Saved: ' + r.pages + ' pages · ' + kb + ' KB.') +
+             (miss ? L(' و' + miss + ' رمزاً لم يحمله الخطُّ فلم يُرسم.',
+                       ' ' + miss + ' glyphs the font lacks were skipped.') : '') +
+             (r.imgFail ? L(' و' + r.imgFail + ' صورةً تعذّر تضمينُها (‏موقعُها يمنع القراءة).',
+                            ' ' + r.imgFail + ' images could not be embedded (host blocks reading).') : ''));
+      setTimeout(function () {
+        try { dlg.close(); } catch (e2) {}
+        if (keep) keep.textContent = was;
+      }, 1800);
+    })['catch'](function (e) {
+      expMsg(L('تعذّر كتابةُ الملفّ. ' + (e && e.message ? e.message : ''),
+               'Could not write the file. ' + (e && e.message ? e.message : '')));
+    })['finally'](function () {
+      for (var z = 0; z < btns.length; z++) btns[z].disabled = false;
+      syncExport();
+    });
+  }
+
   function exportPdf() {
     if (!ed || !ed.doc || !window.GardenNotesPrint) return;
     try { ed.save(); } catch (e) {}
@@ -1669,6 +1752,8 @@
       }
     }
     pm.css = printCss();
+    pm.inlineCss = printInlineCss();
+    pm.rootAttrs = printRootAttrs();
     pm.dir = isAr() ? 'rtl' : 'ltr';
     GardenNotesPrint.print(ed.doc, pm);
   }
@@ -1680,6 +1765,28 @@
       var h = links[i].getAttribute('href') || '';
       if (/garden-header\.css|bottom-nav\.css/.test(h)) continue;
       out.push(links[i].href);
+    }
+    return out;
+  }
+
+  /*@3.NOAJ.164*/
+  function printInlineCss() {
+    var out = [], tags = document.querySelectorAll('style');
+    for (var i = 0; i < tags.length; i++) {
+      var id = tags[i].id || '';
+      if (/^claude-|^grammarly|-extension$/.test(id)) continue;
+      var t = tags[i].textContent || '';
+      if (t) out.push(t);
+    }
+    return out;
+  }
+
+  function printRootAttrs() {
+    var out = {}, a = document.documentElement.attributes, i;
+    for (i = 0; i < a.length; i++) {
+      var n = a[i].name;
+      if (n === 'dir' || n === 'lang' || n === 'data-theme') continue;
+      out[n] = a[i].value;
     }
     return out;
   }
@@ -1713,6 +1820,9 @@
       var h = '<button type="button" class="na-exp-f" data-fmt="pdf">' +
         '<i class="fa-solid fa-print" aria-hidden="true"></i><span>' +
         esc(L('طباعة', 'Print')) + '</span></button>';
+      h += '<button type="button" class="na-exp-f" data-fmt="pdfx">' +
+        '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span>' +
+        esc(L('تصدير PDF', 'Export PDF')) + '</span></button>';
       var order = ['html', 'md', 'txt', 'json'];
       var ic = { html: 'fa-code', md: 'fa-hashtag', txt: 'fa-align-left', json: 'fa-file-arrow-down' };
       for (var i = 0; i < order.length; i++) {
@@ -1744,6 +1854,8 @@
     }
     var pdf = dlg.querySelector('[data-fmt="pdf"]');
     if (pdf) pdf.disabled = (EXP_SCOPE !== 'one');
+    var pdfx = dlg.querySelector('[data-fmt="pdfx"]');
+    if (pdfx) pdfx.disabled = (EXP_SCOPE !== 'one');
   }
 
   function richInView() {
@@ -1827,6 +1939,7 @@
     var Sz = window.GardenNotesSerialize;
     var dlg = document.getElementById('na-exp');
     if (!Sz) return;
+    if (fmt === 'pdfx') { exportPdfNative(); return; }
     if (fmt === 'pdf') { try { dlg.close(); } catch (e) {} exportPdf(); return; }
 
     if (EXP_SCOPE === 'one') {
@@ -1934,6 +2047,10 @@
         return { loadFail: true };
       });
     }).then(function (row) {
+      if (edId !== id) return null;
+      /*@3.NOAJ.165*/
+      return new Promise(function (go) { setTimeout(function () { go(row); }, 0); });
+    }).then(function (row) {
       if (edId !== id) return;
       if (row && row.loadFail) { renderLoadError(id); return; }
       var doc = (row && row.doc) || { v: 1, blocks: [] };
@@ -1987,7 +2104,11 @@
           if (overlay && overlay.setPick) overlay.setPick(!!on);
           if (ribbon && ed) ribbon.setState(ed.selState());
         },
+        busy: function () { return !!(overlay && overlay.drawing); },
         onLayout: function () { queueFit(); },
+        onEngShift: function (regs) {
+          if (overlay && overlay.shiftY) overlay.shiftY(regs);
+        },
         onImagePaste: function () {
           saveState('error', L('الصور برابط خارجيّ', 'Images by link only'));
         }
@@ -2003,11 +2124,12 @@
       applyPages(1);
       syncTitleDir();
       /*@3.NOAJ.144*/
-      if (!doc.eng && !isBoard && document.fonts && document.fonts.ready) {
+      if ((!doc.eng || doc.eng.pbv !== GardenNotesEditor.PBV) &&
+          !isBoard && document.fonts && document.fonts.ready) {
         document.fonts.ready.then(function () {
           if (edId !== id || !ed) return;
           ed.captureEng();
-          persist(id, ed.doc);
+          persist(id, ed.doc, true);
         });
       }
       /*@3.NOAJ.86*/
@@ -2031,7 +2153,8 @@
             var cur = ed ? ed.doc : null;
             if (!cur) return;
             cur.ov = (d.ink || (d.shapes && d.shapes.length)) ? d : null;
-            ed.touch();
+            /*@3.NOAJ.167*/
+            ed.mark();
             growPages();
           },
           onPinch: docPinch,
@@ -4679,6 +4802,7 @@
 
   window.GardenNotesApp = {
     editor: function () { return ed; },
+    pdfMeta: pdfMeta,
     reload: reload,
     open: openNote,
     create: createNote,
