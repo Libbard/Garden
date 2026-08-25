@@ -614,13 +614,6 @@
     return t('كلَّ ' + w, 'every ' + w);
   }
 
-  /*@3.SECJ.55*/
-  function cadenceWord() {
-    var s = CADENCE_S[state.phase];
-    if (!s) return '';
-    var w = everyWord(s);
-    return t('تُحدَّث ' + w, 'refreshes ' + w);
-  }
 
   /*@3.SECJ.57*/
   /*@3.SECJ.465*/
@@ -641,7 +634,6 @@
     if ((state.hold && state.hold > now) || state.fail >= FAIL_DOWN) return 'stopped';
     if (state.fail > 0 || (per && age > per * 3)) return 'slow';
     if (state.phase === 'ARCHIVE') return 'archive';
-    if (state.next && state.next <= now) return 'due';
     return 'live';
   }
 
@@ -653,18 +645,10 @@
     return (state.hold && state.hold > now) ? inWord(state.hold) : nxt;
   }
 
-  function freshTail(kind) {
-    var per = CADENCE_S[state.phase] || 0;
-    var w = nextWord();
-    if (kind === 'stopped' || kind === 'slow') {
-      return w ? t('نعاود ' + w, 'retrying ' + w)
-               : (per ? t('نعيد المحاولة ' + everyWord(per), 'retrying ' + everyWord(per)) : '');
-    }
-    if (kind === 'archive') {
-      return w ? t('المراجعةُ التالية ' + w, 'next review ' + w) : cadenceWord();
-    }
-    if (kind === 'due') return t('يُحدَّث الآن', 'updating now');
-    return w ? t('التحديثُ التالي ' + w, 'next update ' + w) : cadenceWord();
+  /*@3.SECJ.473*/
+  function freshTail() {
+    if (!autoOn() || !state.poll || state.poll <= Date.now()) return '';
+    return t('التحديثُ التالي ' + inWord(state.poll), 'next update ' + inWord(state.poll));
   }
 
   /*@3.SECJ.466*/
@@ -673,46 +657,75 @@
     var w = nextWord();
     var E = per ? everyWord(per) : '';
     var again = w ? t('ونعاود ' + w, 'and we retry ' + w)
-                  : (E ? t('ونعيد المحاولة ' + E, 'and we retry ' + E) : t('ونعيد المحاولة', 'and we keep retrying'));
+                  : (E ? t('ونعيد المحاولة ' + E, 'and we retry ' + E)
+                       : t('ونعيد المحاولة', 'and we keep retrying'));
+    var head;
     if (kind === 'stopped') {
-      return t('بانر متوقّفٌ عن الردّ الآن، ' + again +
+      head = t('بانر متوقّفٌ عن الردّ الآن، ' + again +
                '. والمعروضُ أمامك آخرُ قراءةٍ نجحت — الشعبُ صحيحةٌ لكنّها قد لا تكون أحدثَ من ذلك.',
                'Banner is not responding right now, ' + again +
                '. What you see is the last successful read — accurate, but possibly not the latest.');
-    }
-    if (kind === 'slow') {
-      return t('بانرُ الجامعةِ بطيءٌ الآن ولم تكتمل آخرُ محاولةِ قراءة، ' + again + '.',
+    } else if (kind === 'slow') {
+      head = t('بانرُ الجامعةِ بطيءٌ الآن ولم تكتمل آخرُ محاولةِ قراءة، ' + again + '.',
                'Banner is slow right now and the last read did not complete, ' + again + '.');
-    }
-    if (kind === 'archive') {
-      return t('نسخةٌ أرشيفيّة — هذا فصلٌ منتهٍ، فشعبُه لقطةٌ ثابتة' +
+    } else if (kind === 'archive') {
+      head = t('نسخةٌ أرشيفيّة — هذا فصلٌ منتهٍ، فشعبُه لقطةٌ ثابتة' +
                (E ? ' نراجعها ' + E : '') + '.',
                'Archived copy — this term has ended, so its sections are a fixed snapshot' +
                (E ? ', reviewed ' + E : '') + '.');
+    } else {
+      head = t('نسخةٌ حيّة — الشعبُ تُقرأ من بانر ' + (E ? E + ' ' : '') + 'وكلُّ شيءٍ يعمل.',
+               'Live copy — sections are read from Banner ' + (E ? E + ' ' : '') +
+               'and everything is working.');
     }
-    if (kind === 'due') {
-      return t('يُحدَّث الآن — حان موعدُ القراءة من بانر، وتظهر نتيجتُها خلال دقائق.',
-               'Updating now — a read from Banner is due, and its result appears within minutes.');
-    }
-    return t('نسخةٌ حيّة — القراءةُ تصل من بانر ' + (E || '') + ' وكلُّ شيءٍ يعمل.',
-             'Live copy — we read from Banner ' + (E || '') + ' and everything is working.');
+    /*@3.SECJ.469*/
+    var tailMsg = autoOn()
+      ? t(' والصفحةُ تجلب الجديدَ من تلقائها؛ أوقفْ ذلك من الزرِّ بجانبها.',
+          ' This page fetches updates on its own; you can pause that with the button beside it.')
+      : t(' والصفحةُ لا تجلب جديداً من تلقائها — شغّلِ التحديثَ التلقائيَّ من الزرِّ بجانبها، ' +
+          'أو حدِّثِ الصفحةَ متى شئت.',
+          ' This page does not fetch on its own — turn on auto-refresh with the button beside it, ' +
+          'or reload the page whenever you like.');
+    return head + tailMsg;
+  }
+
+  function autoHtml() {
+    var on = autoOn();
+    var ar = on ? 'أوقفِ التحديثَ التلقائيّ' : 'شغّلِ التحديثَ التلقائيّ';
+    var en = on ? 'Pause auto-refresh' : 'Turn on auto-refresh';
+    return '<button type="button" class="sx-auto' + (on ? ' is-on' : '') + '" data-auto' +
+      ' aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + esc(t(ar, en)) +
+      '" title="' + esc(t(ar, en)) + '" data-ar-title="' + esc(ar) +
+      '" data-en-title="' + esc(en) + '">' +
+      '<i class="fa-solid ' + (on ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i>' +
+      '<span>' + esc(t('تحديثٌ تلقائيّ', 'Auto-refresh')) + '</span></button>';
   }
 
   /*@3.SECJ.58*/
   var FRESH_ICON = { stopped: 'fa-plug-circle-xmark', slow: 'fa-triangle-exclamation',
-                     due: 'fa-rotate fa-spin', archive: 'fa-box-archive', live: 'fa-rotate' };
+                     archive: 'fa-box-archive', live: 'fa-rotate' };
   function freshHtml() {
     if (!state.fresh) return '';
-    var kind = freshState(), tail = freshTail(kind), msg = freshMsg(kind);
+    var kind = freshState(), tail = freshTail(), msg = freshMsg(kind);
     /*@3.SECJ.468*/
-    var on = !!document.querySelector('.sx-fresh.is-open');
-    return '<button type="button" class="sx-fresh is-' + kind + (on ? ' is-open' : '') +
-      '" data-fresh aria-expanded="' + (on ? 'true' : 'false') + '" title="' + esc(msg) + '">' +
+    var cur = document.querySelector('.sx-fresh');
+    var open = !!(cur && cur.classList.contains('is-open'));
+    /*@3.SECJ.471*/
+    if (cur && cur === document.activeElement) setTimeout(function () {
+      var n = document.querySelector('.sx-fresh');
+      if (n) n.focus();
+    }, 0);
+    /*@3.SECJ.470*/
+    return '<span class="sx-fresh-wrap">' +
+      '<button type="button" class="sx-fresh is-' + kind + (open ? ' is-open' : '') +
+      '" data-fresh aria-expanded="' + (open ? 'true' : 'false') +
+      '" aria-controls="sx-fresh-msg" title="' + esc(msg) + '">' +
       '<i class="fa-solid ' + FRESH_ICON[kind] + '" aria-hidden="true"></i>' +
       '<span class="sx-fresh-line">' +
       esc(t('حُدِّثت البيانات ', 'Updated ') + stampWord(state.fresh) +
-          (tail ? ' · ' + tail : '')) + '</span>' +
-      '<span class="sx-fresh-msg">' + esc(msg) + '</span></button>';
+          (tail ? ' · ' + tail : '')) + '</span></button>' +
+      '<span class="sx-fresh-msg" id="sx-fresh-msg">' + esc(msg) + '</span>' +
+      autoHtml() + '</span>';
   }
 
   /*@3.SECJ.467*/
@@ -724,8 +737,11 @@
   }
   function wireFreshMsg() {
     document.addEventListener('click', function (e) {
-      var b = e.target && e.target.closest ? e.target.closest('[data-fresh]') : null;
+      var el = e.target && e.target.closest ? e.target : null;
+      var a = el && el.closest('[data-auto]');
+      var b = el && el.closest('[data-fresh]');
       shutFresh(b);
+      if (a) { setAuto(!autoOn()); return; }
       if (!b) return;
       var on = !b.classList.contains('is-open');
       b.classList.toggle('is-open', on);
@@ -739,14 +755,33 @@
   /*@3.SECJ.462*/
   var freshTimer = null, freshTick = null;
 
+  var AUTO_KEY = 'garden_sections_auto';
+  function autoOn() {
+    try { return localStorage.getItem(AUTO_KEY) === 'on'; } catch (e) { return false; }
+  }
+  function setAuto(on) {
+    try { localStorage.setItem(AUTO_KEY, on ? 'on' : 'off'); } catch (e) {}
+    armFresh();
+    /*@3.SECJ.475*/
+    paintCount();
+    if (on) pullTerms(true);
+  }
+
   function freshPeriod() {
     var per = CADENCE_S[state.phase] || 300;
     return Math.min(Math.max(per, 60), 900) * 1000;
   }
 
+  /*@3.SECJ.474*/
+  function live(u) {
+    return u + (u.indexOf('?') < 0 ? '?' : '&') + '_=' + Date.now();
+  }
+
   function pullCatalog() {
-    if (_open) return;
-    fetch(API + '/v1/catalog/' + state.term + '.json', { cache: 'no-store' })
+    /*@3.SECJ.472*/
+    if (_open) { pullCatalog._want = true; return; }
+    pullCatalog._want = false;
+    fetch(live(API + '/v1/catalog/' + state.term + '.json'), { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         if (!d || !d.sections) return;
@@ -757,11 +792,12 @@
       .catch(function () {});
   }
 
-  function pullTerms() {
-    if (pullTerms._busy || document.hidden || !state.term) return;
+  function pullTerms(force) {
+    if (pullTerms._busy || !state.term) return;
+    if (!force && (document.hidden || !autoOn())) return;
     pullTerms._busy = true;
     pullTerms._at = Date.now();
-    fetch(API + '/v1/terms', { cache: 'no-store' })
+    fetch(live(API + '/v1/terms'), { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         if (!d || !d.terms) return;
@@ -770,9 +806,9 @@
         var ts = d.terms.filter(function (x) { return x.sections > 0; });
         if (ts.length) state.terms = ts;
         readFresh(state.term);
-        paintCount();
         armFresh();
-        if (state.fresh && state.fresh !== was) pullCatalog();
+        paintCount();
+        if (pullCatalog._want || (state.fresh && state.fresh !== was)) pullCatalog();
       })
       .catch(function () {})
       .then(function () { pullTerms._busy = false; });
@@ -780,10 +816,15 @@
 
   function armFresh() {
     if (freshTimer) clearInterval(freshTimer);
-    freshTimer = setInterval(pullTerms, freshPeriod());
+    freshTimer = null;
+    state.poll = 0;
+    if (autoOn()) {
+      freshTimer = setInterval(pullTerms, freshPeriod());
+      state.poll = Date.now() + freshPeriod();
+    }
     /*@3.SECJ.463*/
     if (!freshTick) freshTick = setInterval(function () {
-      if (!document.hidden && state.fresh) paintCount();
+      if (autoOn() && !document.hidden && state.fresh) paintCount();
     }, 30000);
   }
 
@@ -792,7 +833,7 @@
     document.addEventListener('visibilitychange', function () {
       if (document.hidden || !state.term) return;
       if (state.fresh) paintCount();
-      if (Date.now() - (pullTerms._at || 0) > freshPeriod() / 2) pullTerms();
+      if (autoOn() && Date.now() - (pullTerms._at || 0) > freshPeriod() / 2) pullTerms();
     });
   }
 
