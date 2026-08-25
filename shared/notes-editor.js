@@ -339,6 +339,17 @@
     return true;
   };
 
+  /*@3.NOEJ.253*/
+  Editor.prototype.softTouch = function () {
+    if (!this._ro || !this.natOk() || !this.doc.eng || this._engStale) {
+      this.touch();
+      return;
+    }
+    if (DIR_CACHE) DIR_CACHE.delete(this.doc);
+    if (this.opts.onLayout) this.opts.onLayout();
+    this.mark();
+  };
+
   Editor.prototype.touch = function () {
     this._engStale = true;
     /*@3.NOEJ.181*/
@@ -612,6 +623,12 @@
     this.doc.blocks.forEach(function (b) { frag.appendChild(self.renderBlock(b)); });
     frag.appendChild(this.renderTail());
     this.root.appendChild(frag);
+    /*@3.NOEJ.252*/
+    this._nat = null;
+    this._natIdx = null;
+    this._engStale = true;
+    /*@3.NOEJ.254*/
+    this.roLater();
     this.paintBlockSel();
     this.layoutFree();
     this.applyReadOnly();
@@ -630,7 +647,12 @@
       ? this.root.querySelector(':scope > [data-bid="' + next.id + '"]')
       : this.root.querySelector(':scope > .ne-tail');
     if (!anchor) { this.render(); return; }
+    var fresh = [].slice.call(frag.children);
     this.root.insertBefore(frag, anchor);
+    var ids = [];
+    for (i = 0; i < blocks.length; i++) ids.push(blocks[i].id);
+    if (!this.natSplice(at, 0, ids)) { this._nat = null; this._engStale = true; this.settled(); }
+    for (i = 0; i < fresh.length; i++) this.roAdd(fresh[i]);
     this.applyEng();
     this.applyReadOnly();
     if (this.opts.onLayout) this.opts.onLayout();
@@ -646,7 +668,9 @@
     this._sw = 0;
     this.sheetW();
     var fresh = this.renderBlock(hit.b);
+    this.roDrop(node);
     this.root.replaceChild(fresh, node);
+    this.roAdd(fresh);
     this.applyEng();
     this.applyReadOnly();
     this.paintBlockSel();
@@ -660,7 +684,13 @@
     var node = this.root.querySelector(':scope > [data-bid="' + id + '"]');
     if (!node) { this.render(); return false; }
     this.dropCanvas(id);
+    this.roDrop(node);
     node.parentNode.removeChild(node);
+    var ix = this.natIdx();
+    var at = ix ? ix[id] : null;
+    if (at != null && this.natSplice(at, 1, [])) {
+      if (this.reflowEng()) return true;
+    } else { this._nat = null; this._engStale = true; this.settled(); }
     this.applyEng();
     if (this.opts.onLayout) this.opts.onLayout();
     return true;
@@ -1498,7 +1528,6 @@
     return null;
   }
 
-  /*@3.NOEJ.250*/
   Editor.prototype.caretIn = function (id, slotK, at) {
     var fresh = this.root.querySelector('[data-bid="' + id + '"]');
     if (!fresh) return;
@@ -1511,7 +1540,6 @@
     selectRange(t, at, at);
   };
 
-  /*@3.NOEJ.250*/
   Editor.prototype.joinItems = function (id, k) {
     var hit = this.blockAt(id);
     if (!hit || !LISTY[hit.b.ty] || !hit.b.items) return false;
@@ -1533,7 +1561,6 @@
     return true;
   };
 
-  /*@3.NOEJ.250*/
   Editor.prototype.joinBlocks = function (prevId, curId) {
     var ph = this.blockAt(prevId), ch = this.blockAt(curId);
     if (!ph || !ch || ph.i >= ch.i) return false;
@@ -1564,14 +1591,12 @@
     return true;
   };
 
-  /*@3.NOEJ.250*/
   Editor.prototype.flowNeighbour = function (i, dir) {
     var bs = this.doc.blocks, j = i + dir;
     while (j >= 0 && j < bs.length && bs[j].fp) j += dir;
     return (j >= 0 && j < bs.length) ? bs[j] : null;
   };
 
-  /*@3.NOEJ.250*/
   Editor.prototype.joinAt = function (id, edn, dir) {
     var hit = this.blockAt(id);
     if (!hit || hit.b.fp) return false;
@@ -1604,7 +1629,6 @@
     return null;
   };
 
-  /*@3.NOEJ.251*/
   Editor.prototype.pasteRun = function (cd, node) {
     var self = this;
     if (!node) node = this.pasteHost();
@@ -1667,6 +1691,8 @@
       if (goneN) goneN.remove();
     }
     this.renderInsert(at, blocks);
+    /*@3.NOEJ.255*/
+    if (!this.natOk()) { this._nat = null; this._engStale = true; this.settled(); }
     if (host) this.layoutFree();
     this.focusBlock(blocks[blocks.length - 1].id);
     this.touch();
@@ -1711,6 +1737,8 @@
         : this.root.querySelector(':scope > .ne-tail');
       if (anchor) this.root.insertBefore(node, anchor);
       else this.root.appendChild(node);
+      if (this.natMove(hit.i, to)) this.reflowEng();
+      else { this._nat = null; this._engStale = true; this.settled(); }
       this.applyEng();
       if (this.opts.onLayout) this.opts.onLayout();
     }
@@ -2692,7 +2720,9 @@
   Editor.prototype.captureEng = function () {
     if (this.doc.kind === 'board') return;
     /*@3.NOEJ.213*/
-    if (!this._engStale && this.doc.eng && this.doc.eng.pbv === PBV) return;
+    if (!this._engStale && !this._engVerify &&
+        this.doc.eng && this.doc.eng.pbv === PBV) return;
+    this._engVerify = false;
     /*@3.NOEJ.157*/
     var faceOk = true;
     try {
@@ -2790,35 +2820,61 @@
       this._engPass = 0;
     }
     /*@3.NOEJ.209*/
-    if (this.opts.onEngShift && oldA) {
-      var off = this.root.offsetTop || 0, regs = [], any = false;
-      for (i = 0; i < n; i++) {
-        if (oldA[i] == null || out.a[i] == null) continue;
-        var dz = out.pb[i] - (oldPb ? oldPb[i] : 0);
-        if (!regs.length || regs[regs.length - 1].by !== dz) {
-          regs.push({ from: oldA[i] + off, by: dz });
-        }
-        if (dz) any = true;
+    if (this.opts.onEngShift && oldA) this.emitShift(oldA, oldPb, out);
+  };
+
+  Editor.prototype.emitShift = function (oldA, oldPb, out) {
+    var off = this.root.offsetTop || 0, regs = [], any = false, i;
+    var n = Math.min(oldA.length, out.a.length);
+    for (i = 0; i < n; i++) {
+      if (oldA[i] == null || out.a[i] == null) continue;
+      var dz = out.pb[i] - (oldPb ? oldPb[i] : 0);
+      if (!regs.length || regs[regs.length - 1].by !== dz) {
+        regs.push({ from: oldA[i] + off, by: dz });
       }
-      if (any) this.opts.onEngShift(regs);
+      if (dz) any = true;
     }
+    if (any) this.opts.onEngShift(regs);
   };
 
   /*@3.NOEJ.208*/
   Editor.prototype.breakGuard = function (top, hgt, nds, mine) {
-    var ph = this.pageH(), off = this.root.offsetTop || 0;
+    var n = top.length, i;
+    var gap = new Array(n), lh = new Array(n), ids = new Array(n);
+    var prevBot = 0, first = true, std = 0;
+    var bs = this.doc.blocks;
+    for (i = 0; i < n; i++) {
+      ids[i] = bs[i] ? bs[i].id : '';
+      lh[i] = 0;
+      if (top[i] == null) { gap[i] = null; continue; }
+      var g = (first ? top[i] : (top[i] - prevBot)) - (mine[i] || 0);
+      gap[i] = g > 0 ? g : 0;
+      if (!first && !std && gap[i] > 0) std = gap[i];
+      first = false;
+      prevBot = top[i] + (hgt[i] || 0);
+    }
+    this._nat = { gap: gap, hgt: hgt.slice(), lh: lh, ids: ids,
+                  std: std, n: n,
+                  ph: this.pageH(), pad: this.root.offsetTop || 0 };
+    this._natIdx = null;
+    return this.breakCalc();
+  };
+
+  Editor.prototype.breakCalc = function () {
+    var nat = this._nat;
+    if (!nat) return null;
+    var ph = nat.ph || this.pageH();
+    var off = nat.pad == null ? (this.root.offsetTop || 0) : nat.pad;
     var pad = off > 0 ? off : 16;
     var room = ph - pad * 2;
-    var n = top.length, i;
+    var gap = nat.gap, hgt = nat.hgt, lh = nat.lh;
+    var bs = this.doc.blocks, n = gap.length, i;
     var a = new Array(n), pb = new Array(n), m = new Array(n);
-    var y = 0, acc = 0, prevBot = 0, first = true;
+    var y = 0, acc = 0;
     this._engBot = 0;
     for (i = 0; i < n; i++) {
-      if (top[i] == null) { a[i] = null; pb[i] = acc; m[i] = 0; continue; }
-      var gap = (first ? top[i] : (top[i] - prevBot)) - (mine[i] || 0);
-      if (!(gap > 0)) gap = 0;
-      first = false;
-      y += gap;
+      if (gap[i] == null) { a[i] = null; pb[i] = acc; m[i] = 0; continue; }
+      y += gap[i];
       var t = y + off, h = hgt[i] || 0;
       var pg = Math.floor(t / ph);
       var limit = (pg + 1) * ph - pad - CUT_SAFE;
@@ -2827,15 +2883,21 @@
         if (h <= room) {
           /*@3.NOEJ.215*/
           d = (pg + 1) * ph + pad - t;
-        } else if (this.doc.blocks[i] && this.doc.blocks[i].ty === 'tbl') {
+        } else if (bs[i] && bs[i].ty === 'tbl') {
           /*@3.NOEJ.221*/
           d = 0;
         } else {
           /*@3.NOEJ.216*/
-          var lh = lineOf(nds && nds[i]);
-          if (lh > 4) {
-            var over = (limit - t) % lh;
-            if (over > 0.5) d = lh - over;
+          var L = lh[i];
+          if (!L) {
+            L = lineOf(bs[i]
+              ? this.root.querySelector(':scope > [data-bid="' + bs[i].id + '"]')
+              : null);
+            lh[i] = L;
+          }
+          if (L > 4) {
+            var over = (limit - t) % L;
+            if (over > 0.5) d = L - over;
           }
         }
       }
@@ -2843,11 +2905,153 @@
       else { d = 0; m[i] = 0; }
       a[i] = y;
       pb[i] = acc;
-      prevBot = top[i] + h;
       y += h;
       if (y > this._engBot) this._engBot = y;
     }
     return { a: a, pb: pb, m: m };
+  };
+
+  Editor.prototype.natIdx = function () {
+    var nat = this._nat;
+    if (!nat) return null;
+    if (this._natIdx && this._natIdx.n === nat.ids.length) return this._natIdx.m;
+    var m = {}, i;
+    for (i = 0; i < nat.ids.length; i++) m[nat.ids[i]] = i;
+    this._natIdx = { n: nat.ids.length, m: m };
+    return m;
+  };
+
+  Editor.prototype.natSplice = function (at, del, ids) {
+    var nat = this._nat;
+    if (!nat) return false;
+    if (at < 0 || at > nat.ids.length) return false;
+    var add = ids ? ids.length : 0, i;
+    var g = nat.std || 2.4;
+    var ng = [], nh = [], nl = [];
+    for (i = 0; i < add; i++) { ng.push(g); nh.push(0); nl.push(0); }
+    if (at === 0 && add && nat.gap.length && nat.gap[0] != null) {
+      ng[0] = nat.gap[0];
+      if (del < nat.gap.length) nat.gap[del] = g;
+    }
+    Array.prototype.splice.apply(nat.gap, [at, del].concat(ng));
+    Array.prototype.splice.apply(nat.hgt, [at, del].concat(nh));
+    Array.prototype.splice.apply(nat.lh, [at, del].concat(nl));
+    Array.prototype.splice.apply(nat.ids, [at, del].concat(ids || []));
+    nat.n = nat.ids.length;
+    this._natIdx = null;
+    return true;
+  };
+
+  Editor.prototype.natMove = function (from, to) {
+    var nat = this._nat;
+    if (!nat || from === to) return false;
+    if (from < 0 || from >= nat.ids.length || to < 0 || to >= nat.ids.length) return false;
+    var keys = ['gap', 'hgt', 'lh', 'ids'], k;
+    for (k = 0; k < keys.length; k++) {
+      var arr = nat[keys[k]];
+      arr.splice(to, 0, arr.splice(from, 1)[0]);
+    }
+    this._natIdx = null;
+    return true;
+  };
+
+  Editor.prototype.natOk = function () {
+    var nat = this._nat, bs = this.doc.blocks;
+    if (!nat || nat.ids.length !== bs.length) return false;
+    if (this.doc.kind === 'board') return false;
+    return true;
+  };
+
+  Editor.prototype.reflowEng = function () {
+    if (!this.natOk()) return false;
+    var out = this.breakCalc();
+    if (!out) return false;
+    var bs = this.doc.blocks, mk = {}, i;
+    for (i = 0; i < bs.length; i++) if (out.m[i] > 0) mk[bs[i].id] = out.m[i];
+    var nat0 = this._nat;
+    var pad0 = (nat0 && nat0.pad > 0) ? nat0.pad : (this.root.offsetTop || 16);
+    var oldA = (this.doc.eng && Array.isArray(this.doc.eng.a) &&
+                this.doc.eng.a.length === bs.length) ? this.doc.eng.a : null;
+    var oldPb = (this.doc.eng && Array.isArray(this.doc.eng.pb) &&
+                 this.doc.eng.pb.length === bs.length) ? this.doc.eng.pb : null;
+    this.doc.eng = { v: 3, w: 794, h: Math.round(this._engBot + pad0),
+                     a: out.a, pb: out.pb, mk: mk, pbv: PBV };
+    this._engStale = false;
+    this._natRe = (this._natRe || 0) + 1;
+    if (this._natRe > 300) { this._natRe = 0; this._engVerify = true; }
+    this._roOff = true;
+    this.applyEng();
+    this._roOff = false;
+    if (this.opts.onEngShift && oldA) this.emitShift(oldA, oldPb, out);
+    if (this.opts.onLayout) this.opts.onLayout();
+    if (this.opts.onGeom) this.opts.onGeom();
+    return true;
+  };
+
+  Editor.prototype.roBind = function () {
+    if (!window.ResizeObserver || this._ro) return;
+    var self = this;
+    this._ro = new ResizeObserver(function (ents) { self.onSizes(ents); });
+  };
+
+  Editor.prototype.roLater = function () {
+    if (!window.ResizeObserver || this._roQ) return;
+    var self = this;
+    var run = function () {
+      self._roQ = 0;
+      if (!self.root || !self.root.isConnected) return;
+      self.roAll();
+    };
+    this._roQ = window.requestAnimationFrame
+      ? requestAnimationFrame(run) : setTimeout(run, 0);
+  };
+
+  Editor.prototype.roAll = function () {
+    this.roBind();
+    if (!this._ro) return;
+    this._ro.disconnect();
+    var kids = this.root.children, i, k;
+    for (i = 0; i < kids.length; i++) {
+      k = kids[i];
+      if (!k.hasAttribute || !k.hasAttribute('data-bid')) continue;
+      if (k.hasAttribute('data-fp')) continue;
+      this._ro.observe(k);
+    }
+  };
+
+  Editor.prototype.roAdd = function (node) {
+    this.roBind();
+    if (!this._ro || !node || !node.hasAttribute) return;
+    if (!node.hasAttribute('data-bid') || node.hasAttribute('data-fp')) return;
+    this._ro.observe(node);
+  };
+
+  Editor.prototype.roDrop = function (node) {
+    if (!this._ro || !node) return;
+    try { this._ro.unobserve(node); } catch (eU) {}
+  };
+
+  Editor.prototype.onSizes = function (ents) {
+    if (this._roOff || !this.natOk()) return;
+    var eng = this.doc.eng;
+    if (!eng || eng.v !== 3) return;
+    var nat = this._nat, idx = this.natIdx();
+    if (!idx) return;
+    var changed = false, e, node, id, i, h;
+    for (e = 0; e < ents.length; e++) {
+      node = ents[e].target;
+      if (!node.parentNode || node.hasAttribute('data-fp')) continue;
+      id = node.getAttribute('data-bid');
+      i = idx[id];
+      if (i == null || nat.ids[i] !== id) return;
+      h = node.getBoundingClientRect().height;
+      if (Math.abs((nat.hgt[i] || 0) - h) < 0.5) continue;
+      nat.hgt[i] = h;
+      nat.lh[i] = 0;
+      changed = true;
+    }
+    if (!changed) return;
+    this.reflowEng();
   };
 
   /*@3.NOEJ.240*/
@@ -2861,6 +3065,7 @@
       list[i].removeAttribute('data-brkm');
     }
     this.root.style.minBlockSize = '';
+    this._mbSet = '';
     this._engOn = false;
   };
 
@@ -2893,11 +3098,13 @@
     /*@3.NOEJ.234*/
     if (!ok) { if (this._engOn) this.clearMargins(); return; }
     this._engOn = true;
-    var map = this.bidMap(), i, node, want;
-    for (i = 0; i < this.doc.blocks.length; i++) {
-      node = map[this.doc.blocks[i].id];
-      if (!node || node.hasAttribute('data-fp')) continue;
-      want = eng.mk[this.doc.blocks[i].id] || 0;
+    var kids = this.root.children, i, node, want, id;
+    for (i = 0; i < kids.length; i++) {
+      node = kids[i];
+      if (!node.hasAttribute || !node.hasAttribute('data-bid')) continue;
+      if (node.hasAttribute('data-fp')) continue;
+      id = node.getAttribute('data-bid');
+      want = eng.mk[id] || 0;
       if ((node.__bd || 0) === want) continue;
       node.__bd = want;
       if (want > 0) {
@@ -2908,7 +3115,8 @@
         node.removeAttribute('data-brkm');
       }
     }
-    this.root.style.minBlockSize = (eng.h > 0) ? (eng.h + 'px') : '';
+    var mb = (eng.h > 0) ? (eng.h + 'px') : '';
+    if (this._mbSet !== mb) { this._mbSet = mb; this.root.style.minBlockSize = mb; }
   };
 
   Editor.prototype.docDir = function () { return docDir(this.doc); };
@@ -4354,7 +4562,7 @@
         var preL = node.querySelector('.ne-code');
         if (hitL && preL && document.activeElement !== preL) paintCode(preL, hitL.b);
       }
-      self.touch();
+      self.softTouch();
     });
 
     /*@3.NOEJ.201*/
@@ -4765,7 +4973,6 @@
         return;
       }
 
-      /*@3.NOEJ.250*/
       if ((e.key === 'Backspace' || e.key === 'Delete') && !mod &&
           e.target.isContentEditable &&
           (e.target.classList.contains('ne-text') ||
@@ -4874,11 +5081,9 @@
       if (e.target.tagName === 'INPUT') return;
 
       e.preventDefault();
-      /*@3.NOEJ.251*/
       self.pasteRun(e.clipboardData, node);
     });
 
-    /*@3.NOEJ.251*/
     this._onDocPaste = function (e) {
       if (!self.root || !self.root.isConnected) return;
       var t = e.target;
@@ -4890,7 +5095,6 @@
       var host = self.pasteHost();
       if (!host) return;
       e.preventDefault();
-      /*@3.NOEJ.251*/
       if (!self.pasteRun(e.clipboardData, host) && clipAny()) self.pasteBlocks();
     };
     document.addEventListener('paste', this._onDocPaste);
@@ -5280,8 +5484,8 @@
     }
     this.canvases = {};
     document.removeEventListener('click', this._onDocClick);
-    /*@3.NOEJ.251*/
     if (this._onDocPaste) document.removeEventListener('paste', this._onDocPaste);
+    if (this._ro) { try { this._ro.disconnect(); } catch (eR) {} this._ro = null; }
     document.removeEventListener('selectionchange', this._onSelChange);
     /*@3.NOEJ.167*/
     document.removeEventListener('pointermove', this._onBdragMove);

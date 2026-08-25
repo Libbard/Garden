@@ -2289,6 +2289,8 @@
         },
         busy: function () { return !!(overlay && overlay.drawing); },
         onLayout: function () { queueFit(); },
+        /*@3.NOAJ.180*/
+        onGeom: function () { growPages(); },
         onEngShift: function (regs) {
           if (overlay && overlay.shiftY) overlay.shiftY(regs);
         },
@@ -2952,7 +2954,8 @@
   }
 
   var WIDTHS = ['a4', 'land', 'full'];
-  var PAGE_MAX = 200;
+  /*@3.NOAJ.181*/
+  var PAGE_MAX = 900;
 
   var VIEW_FS = { a4: 'auto', land: 'wide', full: 'fit' };
 
