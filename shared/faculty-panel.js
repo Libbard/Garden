@@ -82,23 +82,43 @@
     LOADING = true;
     /*@3.FAPJ.16*/
     var want = FRESH; FRESH = false;
-    (want ? fetch(API + '/v1/faculty/cards.json', { cache: 'reload' })
-          : GardenFetch('/v1/faculty/cards.json', { cache: 'default' }))
-      .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); })
-      .then(function (d) {
-        DATA = d; LOADING = false;
-        (d.faculty || []).forEach(function (f) {
-          f._k = norm(f.name);
-          f._e = f.link && f.link.e ? String(f.link.e).toLowerCase() : null;
-          /*@3.FAPJ.66*/
-          f._s = hayPerson(f);
-        });
-        WAIT.splice(0).forEach(function (fn) { fn(d); });
-      })
-      .catch(function () {
-        LOADING = false; DATA_FAILED = true;
-        WAIT.splice(0).forEach(function (fn) { fn(null); });
+
+    function get() {
+      return (want ? fetch(API + '/v1/faculty/cards.json', { cache: 'reload' })
+                   : GardenFetch('/v1/faculty/cards.json', { cache: 'default' }))
+        .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); });
+    }
+
+    function adopt(d, meta) {
+      var again = !!DATA;
+      DATA = d; LOADING = false; DATA_FAILED = false;
+      (d.faculty || []).forEach(function (f) {
+        f._k = norm(f.name);
+        f._e = f.link && f.link.e ? String(f.link.e).toLowerCase() : null;
+        /*@3.FAPJ.66*/
+        f._s = hayPerson(f);
       });
+      /*@3.FAPJ.93*/
+      if (again) {
+        try {
+          document.dispatchEvent(new CustomEvent('garden:facultyRefreshed', {
+            detail: { stale: !!(meta && meta.stale) }
+          }));
+        } catch (e) {}
+        return;
+      }
+      WAIT.splice(0).forEach(function (fn) { fn(d); });
+    }
+
+    /*@3.FAPJ.92*/
+    var FB = window.GardenFallback;
+    var run = FB ? FB.through('faculty:cards', get, { onData: adopt })
+                 : get().then(adopt);
+
+    run.catch(function () {
+      LOADING = false; DATA_FAILED = true;
+      WAIT.splice(0).forEach(function (fn) { fn(null); });
+    });
   }
 
   /*@3.FAPJ.77*/

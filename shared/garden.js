@@ -6459,6 +6459,45 @@ ${baseRules}`) + regenSuffix;
     _bootPage();
   }
 
+  var MODULE_VISITS_LS = 'garden_module_visits';
+
+  function moduleVisitStore() {
+    var raw = null;
+    try { raw = localStorage.getItem(MODULE_VISITS_LS); } catch (e) { return {}; }
+    if (!raw) return {};
+    try {
+      var d = JSON.parse(raw);
+      return (d && typeof d === 'object') ? d : {};
+    } catch (e) { return {}; }
+  }
+
+  function moduleVisits(code) {
+    var all = moduleVisitStore();
+    var out = {};
+    var pre = String(code || '') + '_';
+    Object.keys(all).forEach(function (k) {
+      if (k.indexOf(pre) !== 0) return;
+      var v = all[k];
+      out[k.slice(pre.length)] = (v && typeof v === 'object') ? (parseInt(v.n, 10) || 0) : (parseInt(v, 10) || 0);
+    });
+    return out;
+  }
+
+  /*@3.GARJ.620*/
+  function noteModuleVisit(code, mod) {
+    var n = parseInt(mod, 10);
+    if (!code || !(n > 0)) return false;
+    var all = moduleVisitStore();
+    var k = String(code) + '_' + n;
+    var d0 = new Date(); d0.setHours(0, 0, 0, 0);
+    var day = d0.getTime();
+    var cur = all[k];
+    if (cur && typeof cur === 'object' && cur.d === day) return false;
+    all[k] = { n: ((cur && typeof cur === 'object' ? parseInt(cur.n, 10) : parseInt(cur, 10)) || 0) + 1, d: day };
+    try { localStorage.setItem(MODULE_VISITS_LS, JSON.stringify(all)); return true; }
+    catch (e) { return false; }
+  }
+
   window.Garden = {
     cycleTheme, toggleLanguage, setLanguage, applyTheme,
     /*@3.GARJ.447*/
@@ -6481,7 +6520,9 @@ ${baseRules}`) + regenSuffix;
     aiReady: () => AI_CATALOG_READY,
     aiKey: { normalize: aiNormalize, identityString: aiIdentityString, hash: aiHash, path: aiKeyPath, promptVer: AI_PROMPT_VER },
     /*@3.GARJ.618*/
-    aiCadence: AI_CADENCE
+    aiCadence: AI_CADENCE,
+    moduleVisits: moduleVisits,
+    noteModuleVisit: noteModuleVisit
   };
 
   /*@3.GARJ.448*/
@@ -7153,6 +7194,15 @@ ${baseRules}`) + regenSuffix;
     }
   }
   trackSemesterVisit();
+
+  function trackModuleVisit() {
+    var root = document.documentElement;
+    var code = root.getAttribute('data-subject') || '';
+    var mod = root.getAttribute('data-module') || '';
+    if (!code || !/^[0-9]+$/.test(mod) || +mod < 1) return;
+    if (window.Garden && Garden.noteModuleVisit) Garden.noteModuleVisit(code, +mod);
+  }
+  trackModuleVisit();
 
   /*@3.GARJ.525*/
 

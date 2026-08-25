@@ -103,6 +103,9 @@
 
   function readAll() {
     S.sem = GardenData.semester();
+    S.termClash = null;
+    try { S.termClash = (GardenData.syncTermRange() || {}).conflict || null; } catch (e) {}
+    try { GardenData.dropProgressCache(); } catch (e) {}
     S.sched = GardenData.scheduleRaw();
     S.deadlines = GardenData.allDeadlines();
     S.pending = GardenData.pendingSections ? GardenData.pendingSections() : [];
@@ -165,9 +168,41 @@
     };
   }
 
+  function renderTermClash() {
+    var host = el('sem-term-clash');
+    if (!host) return;
+    var r = S.termClash;
+    if (!r || (!r.start && !r.end)) { host.hidden = true; host.innerHTML = ''; return; }
+    host.hidden = false;
+    host.style.setProperty('--tint', 'var(--st-warn, #f59e0b)');
+    host.innerHTML = '<i class="fa-solid fa-calendar-xmark" aria-hidden="true"></i>' +
+      '<span>' + esc(L(
+        'شعبُك تقول إنّ فصلك من ' + fmtD(r.start) + ' إلى ' + fmtD(r.end) +
+          ' — وتاريخُ فصلك المحفوظُ غيرُ ذلك، فكلُّ نسبةٍ هنا محسوبةٌ عليه.',
+        'Your sections say your term runs ' + fmtD(r.start) + ' to ' + fmtD(r.end) +
+          ' — your saved term dates differ, and every percentage here is measured against them.')) +
+      ' <button class="sem-linkish" type="button" data-term-take="1">' +
+      esc(L('اعتمدْ تاريخَ الشعب', 'Use the sections’ dates')) + '</button></span>';
+  }
+
+  function adoptTermRange() {
+    var r = S.termClash;
+    if (!r) return;
+    var s = GardenData.scheduleRaw();
+    var st = s.settings || (s.settings = {});
+    if (r.start) st.term_start_date = r.start;
+    if (r.end) st.semester_end_date = r.end;
+    st.term_auto = { start: st.term_start_date, end: st.semester_end_date };
+    delete st.term_rejected;
+    GardenData.writeSchedule(s);
+    refresh();
+    toast(L('اعتُمد تاريخُ الشعب', 'Sections’ dates applied'));
+  }
+
   function renderArc() {
     var arc = termArc();
     var box = el('sem-arc'), empty = el('sem-arc-empty');
+    renderTermClash();
     if (!arc) { box.hidden = true; empty.hidden = false; return; }
     box.hidden = false; empty.hidden = true;
 
@@ -236,7 +271,7 @@
     var credits = 0, sumPct = 0, done = 0;
     list.forEach(function (c) {
       credits += info(c).credits;
-      sumPct += GardenData.coursePercent(c);
+      sumPct += GardenData.coursePercent(c, { deadlines: S.deadlines });
       if (GardenData.courseDone(c)) done++;
     });
     var pct = list.length ? Math.round(sumPct / list.length) : 0;
@@ -517,7 +552,7 @@
   function courseCard(entry) {
     var i = info(entry);
     var st = i.real ? GardenData.courseStats(entry.code) : null;
-    var pct = GardenData.coursePercent(entry);
+    var pct = GardenData.coursePercent(entry, { deadlines: S.deadlines });
     var sec = sectionOf(entry.code);
     var ins = instructorOf(entry.code);
     var nx = nextForCourse(entry.code);
@@ -675,7 +710,7 @@
   function taken(entry, arc) {
     if (GardenData.courseDone(entry)) return true;
     if (arc && !arc.before && arc.pct >= midPct(arc)) return true;
-    return GardenData.coursePercent(entry) >= 50;
+    return GardenData.coursePercent(entry, { deadlines: S.deadlines }) >= 50;
   }
 
   /*@3.SEMJ.179*/
@@ -751,6 +786,22 @@
 
   /*@3.SEMJ.53*/
 
+  var PACE_GRACE_DAYS = 7;
+
+  /*@3.SEMJ.201*/
+  function courseWindow(entry, arc) {
+    var a = parseD(arc.start), b = parseD(arc.end);
+    if (!a || !b) return null;
+    var add = entry && entry.added_at ? parseD(String(entry.added_at).slice(0, 10)) : null;
+    if (add && add > a) a = add;
+    if (b <= a) return null;
+    var now = new Date(); now.setHours(0, 0, 0, 0);
+    var total = Math.round((b - a) / 86400000);
+    if (total <= 0) return null;
+    var gone = Math.max(0, Math.round((now - a) / 86400000));
+    return { days: gone, pct: Math.max(0, Math.min(100, Math.round((gone / total) * 100))) };
+  }
+
   function renderRhythm() {
     var mins = weeklyMinutes();
     var days = (S.sched.settings && S.sched.settings.active_days) ||
@@ -775,20 +826,45 @@
     /*@3.SEMJ.54*/
     var arc = termArc();
     var lag = el('sem-lag');
-    if (!arc || arc.before || arc.pct < 10) { lag.hidden = true; return; }
+    if (!arc || arc.before || arc.after) { lag.hidden = true; return; }
 
-    var live = courses().filter(function (c) { return !GardenData.courseDone(c) && info(c).real; });
-    var worst = null, sum = 0, n = 0;
-    live.forEach(function (c) {
-      var p = GardenData.coursePercent(c);
-      sum += p; n++;
-      var gap = arc.pct - p;
-      if (!worst || gap > worst.gap) worst = { c: c, gap: gap, pct: p };
+    var live = [], young = 0;
+    courses().forEach(function (c) {
+      if (GardenData.courseDone(c) || !info(c).real) return;
+      var w = courseWindow(c, arc);
+      if (!w) return;
+      if (w.days < PACE_GRACE_DAYS) { young++; return; }
+      live.push({
+        c: c,
+        pct: GardenData.coursePercent(c, { deadlines: S.deadlines }),
+        exp: w.pct
+      });
     });
-    if (!n) { lag.hidden = true; return; }
+    live.forEach(function (x) { x.gap = x.exp - x.pct; });
 
-    var avg = Math.round(sum / n);
-    var q = Math.max(0, Math.min(1, avg / arc.pct));   /*@3.SEMJ.55*/
+    if (!live.length) {
+      if (!young) { lag.hidden = true; return; }
+      lag.hidden = false;
+      lag.style.setProperty('--tint', 'var(--st-info, #38bdf8)');
+      lag.innerHTML = '<i class="fa-solid fa-hourglass-start" aria-hidden="true"></i>' +
+        '<span>' + esc(L(
+          'موادُّك أُضيفت للتوّ — يبدأ قياسُ الإيقاع بعد أسبوعٍ من إضافة المادة.',
+          'Your courses were just added — pace tracking starts a week after a course is added.')) +
+        '</span><span class="sem-note-tag">' +
+        esc(L('لم يبدأ بعد', 'Not yet')) + '</span>';
+      return;
+    }
+
+    var sum = 0, expSum = 0, worst = null;
+    live.forEach(function (x) {
+      sum += x.pct; expSum += x.exp;
+      if (!worst || x.gap > worst.gap) worst = x;
+    });
+    var avg = Math.round(sum / live.length);
+    var exp = Math.round(expSum / live.length);
+    if (exp <= 0) { lag.hidden = true; return; }
+
+    var q = Math.max(0, Math.min(1, avg / exp));   /*@3.SEMJ.55*/
     lag.hidden = false;
     lag.style.setProperty('--tint', GardenData.qualityColor01(q));
 
@@ -799,24 +875,34 @@
                'All your courses are keeping pace with your term — or ahead of it.');
     } else if (q >= 0.75) {
       tag = L('جيد', 'On track'); icon = 'fa-circle-check';
-      body = L('أنت قريبٌ من إيقاع فصلك — متوسّطُ تقدّمك ' + avg + '٪ وقد انقضى ' + arc.pct + '٪.',
-               'You’re close to your term’s pace — ' + avg + '% average progress against ' + arc.pct + '% elapsed.');
+      body = L('أنت قريبٌ من إيقاع فصلك — متوسّطُ تقدّمك ' + avg + '٪ والمتوقَّع ' + exp + '٪.',
+               'You’re close to your term’s pace — ' + avg + '% average progress against ' + exp + '% expected.');
     } else if (q >= 0.5) {
       tag = L('متأخّر قليلاً', 'Slipping'); icon = 'fa-circle-exclamation';
-      body = L('انقضى ' + arc.pct + '٪ من فصلك ومتوسّطُ تقدّمك ' + avg + '٪.',
-               arc.pct + '% of your term has passed and your average progress is ' + avg + '%.');
+      body = L('المتوقَّع عند هذه النقطة ' + exp + '٪ ومتوسّطُ تقدّمك ' + avg + '٪.',
+               exp + '% is expected by now and your average progress is ' + avg + '%.');
     } else {
       tag = L('متأخّر', 'Behind'); icon = 'fa-triangle-exclamation';
-      body = L('انقضى ' + arc.pct + '٪ من فصلك ومتوسّطُ تقدّمك ' + avg + '٪ فقط.',
-               arc.pct + '% of your term has passed and your average progress is only ' + avg + '%.');
+      body = L('المتوقَّع عند هذه النقطة ' + exp + '٪ ومتوسّطُ تقدّمك ' + avg + '٪ فقط.',
+               exp + '% is expected by now and your average progress is only ' + avg + '%.');
     }
 
     var tail = '';
     if (worst && worst.gap > 20) {
-      var wi = info(worst.c);
-      tail = ' <b>' + esc(wi.name) + '</b>' +
-        esc(L(' عند ' + worst.pct + '٪ — أبعدُ موادّك عن إيقاعه.',
-              ' is at ' + worst.pct + '% — the furthest behind.'));
+      /*@3.SEMJ.202*/
+      var tied = live.filter(function (x) { return x.gap >= worst.gap - 2; });
+      if (tied.length === 1) {
+        tail = ' <b>' + esc(info(worst.c).name) + '</b>' +
+          esc(L(' عند ' + worst.pct + '٪ — أبعدُ موادّك عن إيقاعه.',
+                ' is at ' + worst.pct + '% — the furthest behind.'));
+      } else if (tied.length >= live.length) {
+        tail = ' ' + esc(L('وموادُّك كلُّها سواءٌ في هذا — لا مادّةَ أبعدُ من أختِها.',
+                           'And your courses are all level here — none is further behind than the rest.'));
+      } else {
+        tail = ' ' + esc(L('وأبعدُها سواءٌ: ', 'Furthest, and level: ')) +
+          tied.map(function (x) { return '<b>' + esc(info(x.c).name) + '</b>'; })
+              .join(L('، ', ', '));
+      }
     }
     lag.innerHTML = '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
       '<span>' + esc(body) + tail + '</span>' +
@@ -1633,6 +1719,15 @@
         '</button>' +
       '</div>' +
       '<div class="sem-menu" style="margin-top:.7rem">' +
+        '<button class="sem-mrow" type="button" data-cm="progress">' +
+          '<i class="fa-solid fa-chart-line" aria-hidden="true"></i>' +
+          '<span class="sem-mrow-b"><span class="sem-mrow-t">' +
+            esc(L('تقدّمك في المادة', 'Your progress')) + '</span>' +
+            '<span class="sem-mrow-s">' + esc(progressWord(entry.code)) + '</span></span>' +
+          '<span class="sem-badge">' + progressPct(entry) + '%</span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="sem-menu" style="margin-top:.7rem">' +
         menuRow('retake', 'fa-repeat', L('أعِد المادة', 'Retake the course'),
                 L('رسبتُ فيها وأدرسها من جديد — يُمسح تقديرُها وتعود جارية',
                   'I failed it and I’m taking it again — its grade is cleared and it reopens'), false) +
@@ -1690,11 +1785,105 @@
     '</button>';
   }
 
+  function progressPct(entry) { return GardenData.coursePercent(entry, { deadlines: S.deadlines }); }
+
+  function progressWord(code) {
+    if (!GardenData.courseProgress) return '';
+    var p = GardenData.courseProgress(code, { deadlines: S.deadlines });
+    if (p.mode === 'manual') {
+      return L('تقييمُك أنت — ' + p.mastered + ' من ' + p.modules + ' وحدةً أتقنتَها',
+               'Your own rating — ' + p.mastered + ' of ' + p.modules + ' modules mastered');
+    }
+    if (!p.known) {
+      return L('لا أثرَ بعد — افتحْ وحدةً أو قيّمْ نفسَك',
+               'No signal yet — open a module or rate yourself');
+    }
+    var bits = [];
+    if (p.quizzes) bits.push(nOf(p.quizzes, ['اختبار', 'اختباران', 'اختبارات'],
+                                 ['quiz', 'quizzes'], true));
+    if (p.cardsStrong) bits.push(nOf(p.cardsStrong, ['بطاقة متقنة', 'بطاقتان متقنتان', 'بطاقات متقنة'],
+                                     ['card mastered', 'cards mastered']));
+    if (p.visited) bits.push(L('فتحتَ ' + nOf(p.visited, ['وحدة', 'وحدتين', 'وحدات'], ['', '']),
+                               p.visited + (p.visited === 1 ? ' module' : ' modules') + ' opened'));
+    if (p.mastered) bits.push(L('أتقنتَ ' + nOf(p.mastered, ['وحدة', 'وحدتين', 'وحدات'], ['', '']),
+                                p.mastered + ' mastered'));
+    if (p.work) bits.push(L(p.work.done + ' من ' + p.work.total + ' واجباً',
+                            p.work.done + '/' + p.work.total + ' coursework'));
+    return bits.join(' \u00b7 ');
+  }
+
+  /*@3.SEMJ.203*/
+  function openProgress(code) {
+    var entry = courses().filter(function (c) { return c.code === code; })[0];
+    if (!entry) return;
+    menuCode = code;
+    var i = info(entry);
+    var p = GardenData.courseProgress(code, { deadlines: S.deadlines });
+    var auto = p.mode !== 'manual';
+
+    var rows = p.perModule.map(function (m) {
+      var why = [];
+      if (m.mastered) why.push(L('أتقنتَها', 'mastered'));
+      if (m.quiz) why.push(L('اختبارُها', 'quiz'));
+      if (m.cardsTotal) why.push(L(m.cardsStrong + '/' + m.cardsTotal + ' بطاقة',
+                                   m.cardsStrong + '/' + m.cardsTotal + ' cards'));
+      if (m.visits) why.push(L(
+        m.visits === 1 ? 'فتحتَها يوماً واحداً'
+                       : (m.visits === 2 ? 'فتحتَها يومين' : 'فتحتَها ' + m.visits + ' أيّام'),
+        m.visits + (m.visits === 1 ? ' day' : ' days') + ' opened'));
+      return '<button class="sem-mrow' + (m.mastered ? ' is-on' : '') + '" type="button"' +
+        ' data-mmod="' + m.mod + '">' +
+        '<i class="fa-solid ' + (m.mastered ? 'fa-circle-check' : 'fa-regular fa-circle') +
+          '" aria-hidden="true"></i>' +
+        '<span class="sem-mrow-b"><span class="sem-mrow-t">' +
+          esc(L('الوحدة ' + m.mod, 'Module ' + m.mod)) + '</span>' +
+        '<span class="sem-mrow-s">' +
+          esc(why.length ? why.join(' \u00b7 ') : L('لا أثرَ بعد', 'nothing yet')) +
+        '</span></span>' +
+        '<span class="sem-badge"' + (m.score >= 0.75 ? ' data-tone="ok"' : '') + '>' +
+          Math.round(m.score * 100) + '%</span>' +
+      '</button>';
+    }).join('');
+
+    var body =
+      '<div class="sem-note" style="--tint:' + esc(GardenData.qualityColor01(p.pct / 100)) + '">' +
+        '<i class="fa-solid fa-chart-line" aria-hidden="true"></i>' +
+        '<span><b>' + p.pct + '%</b> \u2014 ' + esc(auto
+          ? L('يُحسب من عملك: اختباراتُ الوحدات وبطاقاتُها وأيّامُ فتحِها وواجباتُك المنجَزة \u2014 وما وسمتَه متقَناً يُحسب كاملاً.',
+              'Measured from your work: module quizzes, flashcards, days opened and completed coursework \u2014 anything you mark mastered counts in full.')
+          : L('من تقييمك أنت وحدَه \u2014 الوحداتُ التي وسمتَها متقَنة.',
+              'From your own rating only \u2014 the modules you marked mastered.')) + '</span>' +
+      '</div>' +
+      '<div class="sem-menu">' +
+        menuRow('pauto', 'fa-wand-magic-sparkles', L('قياسٌ تلقائيّ', 'Measure automatically'),
+                L('من عملك في الموقع وواجباتك', 'From your work here and your coursework'), auto) +
+        menuRow('pman', 'fa-hand', L('أقيّم نفسي', 'I rate myself'),
+                L('التقدّمُ = الوحداتُ التي وسمتَها متقَنة', 'Progress = the modules you marked mastered'),
+                !auto) +
+      '</div>' +
+      '<p class="sem-sec-d" style="margin:.9rem 0 .4rem">' +
+        esc(L('اضغطْ وحدةً لتبدّل «أتقنتُها» \u2014 وهو الوسمُ نفسُه الذي تضعه في الخطّة المكثّفة.',
+              'Tap a module to toggle \u201cmastered\u201d \u2014 the same mark you set in your intensive plan.')) +
+        ' <a class="sem-linkish" href="schedule.html">' +
+        esc(L('افتحِ الخطّة المكثّفة', 'Open the intensive plan')) + '</a></p>' +
+      '<div class="sem-menu">' + rows + '</div>';
+
+    ask(i.name, body, L('إغلاق', 'Close'), null);
+    el('ask-ok').className = 'sem-btn';
+  }
+
   function courseMenuAct(act) {
     var code = menuCode;
     var entry = courses().filter(function (c) { return c.code === code; })[0];
     if (!entry) return;
     if (act === 'remove') { el('dlg-ask').close(); askRemove(code); return; }
+    if (act === 'progress') { openProgress(code); return; }
+    if (act === 'pauto' || act === 'pman') {
+      GardenData.setProgressMode(code, act === 'pman' ? 'manual' : 'auto');
+      refresh();
+      openProgress(code);
+      return;
+    }
     /*@3.SEMJ.89*/
     if (act === 'color') { openColor(code); return; }
 
@@ -2003,11 +2192,17 @@
     el('ask-ok').className = 'sem-btn sem-btn--danger';
     el('ask-ok').textContent = okText;
     askFn = fn;
-    el('dlg-ask').showModal();
+    var dlg = el('dlg-ask');
+    if (!dlg.open) dlg.showModal();
   }
 
   /*@3.SEMJ.102*/
   /*@3.SEMJ.188*/
+  /*@3.SEMJ.199*/
+  function tracesReady() {
+    return !!(window.GardenData && typeof GardenData.courseTraces === 'function');
+  }
+
   function traceOf(code, wipe) {
     return GardenData.courseTraces(code, wipe);
   }
@@ -2015,10 +2210,15 @@
   function askRemove(code) {
     var entry = courses().filter(function (c) { return c.code === code; })[0];
     if (!entry) return;
+    /*@3.SEMJ.200*/
+    if (!tracesReady()) {
+      toast(L('حدِّثِ الصفحةَ ثمّ أعِدِ الإخراج', 'Refresh the page, then remove again'));
+      return;
+    }
     /*@3.SEMJ.105*/
     var i = info(entry), t;
     try { t = traceOf(code); }
-    catch (e) { t = { lectures: 0, study: 0, exams: 0, tasks: 0, archived: 0, pending: 0, plans: 0 }; }
+    catch (e) { t = { lectures: 0, study: 0, exams: 0, tasks: 0, archived: 0, pending: 0, plans: 0, dates: 0 }; }
     var bits = [];
     if (t.lectures) bits.push(nOf(t.lectures, ['محاضرة', 'محاضرتان', 'محاضرات'], ['lecture', 'lectures']));
     /*@3.SEMJ.106*/
@@ -2054,13 +2254,15 @@
       /*@3.SEMJ.110*/
       S.sem.courses = courses().filter(function (c) { return c.code !== code; });
       save();
-      var gone = { lectures: 0, study: 0, exams: 0, tasks: 0, archived: 0, pending: 0, plans: 0 };
+      var gone = { lectures: 0, study: 0, exams: 0, tasks: 0, archived: 0, pending: 0, plans: 0, dates: 0 };
       try { gone = traceOf(code, true); } catch (e) {}
       try { GardenData.rebuildGrades(); } catch (e) {}
       /*@3.SEMJ.111*/
       S.sched = GardenData.scheduleRaw();
       refresh();
-      var n = gone.lectures + gone.study + gone.exams + gone.tasks + gone.archived + gone.plans;
+      /*@3.SEMJ.198*/
+      var n = gone.lectures + gone.study + gone.exams + gone.tasks +
+              gone.archived + gone.plans + gone.dates;
       toast(n
         ? L('أُخرجت ومُحي أثرُها (' + n + ')', 'Removed with its ' + n + ' items')
         : L('أُخرجت من فصلك', 'Removed from your term'));
@@ -2324,6 +2526,18 @@
 
       var more = t.closest && t.closest('[data-more]');
       if (more) { openCourseMenu(more.getAttribute('data-more')); return; }
+
+      if (t.closest && t.closest('[data-term-take]')) { adoptTermRange(); return; }
+
+      var mMod = t.closest && t.closest('[data-mmod]');
+      if (mMod) {
+        var mn = parseInt(mMod.getAttribute('data-mmod'), 10);
+        GardenData.setModuleMastery(menuCode, mn, !GardenData.moduleMastery(menuCode, mn));
+        S.sched = GardenData.scheduleRaw();
+        refresh();
+        openProgress(menuCode);
+        return;
+      }
 
       var mAct = t.closest && t.closest('[data-cm]');
       if (mAct) { courseMenuAct(mAct.getAttribute('data-cm')); return; }

@@ -552,12 +552,169 @@
   }
 
   /*@3.GADJ.47*/
-  function coursePercent(entry) {
+  /*@3.GADJ.141*/
+  var PROG_W = { quiz: 0.60, cards: 0.40, visit: 0.12, work: 0.15 };
+  var VISIT_FULL = 3;
+  var CARD_STRONG = 21;
+
+  /*@3.GADJ.144*/
+  function moduleVisits(code) {
+    if (!window.Garden || typeof Garden.moduleVisits !== 'function') return {};
+    try { return Garden.moduleVisits(code) || {}; } catch (e) { return {}; }
+  }
+
+  function masteryKey(code, mod) { return code + '_' + mod; }
+
+  function masteryMap(sched) {
+    var s = sched || scheduleRaw();
+    var i = s && s.intensive;
+    return (i && i.module_status && typeof i.module_status === 'object') ? i.module_status : {};
+  }
+
+  function moduleMastery(code, mod) {
+    return masteryMap()[masteryKey(code, mod)] === 'mastered';
+  }
+
+  function setModuleMastery(code, mod, on) {
+    var s = scheduleRaw();
+    if (!s.intensive || typeof s.intensive !== 'object') {
+      s.intensive = { active: null, plans: {}, module_status: {}, updated_at: null };
+    }
+    if (!s.intensive.module_status || typeof s.intensive.module_status !== 'object') {
+      s.intensive.module_status = {};
+    }
+    var k = masteryKey(code, mod);
+    if (on) s.intensive.module_status[k] = 'mastered';
+    else delete s.intensive.module_status[k];
+    s.intensive.updated_at = new Date().toISOString();
+    dropProgressCache();
+    return writeSchedule(s);
+  }
+
+  function progressMode(code) {
+    return courseMeta(code).progress_mode === 'manual' ? 'manual' : 'auto';
+  }
+
+  function setProgressMode(code, mode) {
+    var m = courseMeta(code);
+    if (mode === 'manual') m.progress_mode = 'manual';
+    else delete m.progress_mode;
+    dropProgressCache();
+    return saveCourseMeta(code, m);
+  }
+
+  function quizDoneMap(code) {
+    var out = {};
+    quizLog(code).forEach(function (a) { if (a && a.k != null) out[String(a.k)] = 1; });
+    var total = moduleCount(code);
+    for (var m = 1; m <= total; m++) {
+      if (out[String(m)]) continue;
+      try {
+        if (localStorage.getItem('garden_' + code + '_m' + m + '_quiz') !== null) out[String(m)] = 1;
+      } catch (e) {}
+    }
+    return out;
+  }
+
+  function moduleScore(sig) {
+    if (sig.mastered) return 1;
+    var core = sig.cardsTotal
+      ? (PROG_W.quiz * (sig.quiz ? 1 : 0) + PROG_W.cards * (sig.cardsStrong / sig.cardsTotal))
+      : (sig.quiz ? 1 : 0);
+    var v = Math.min(1, sig.visits / VISIT_FULL);
+    return Math.min(1, core + PROG_W.visit * v * (1 - core));
+  }
+
+  function courseWork(code, deadlines) {
+    var list = deadlines || allDeadlines();
+    var done = 0, total = 0;
+    list.forEach(function (d) {
+      if (!d || d.course !== code || d.source === 'exam') return;
+      total++;
+      if (d.done) done++;
+    });
+    return total ? { done: done, total: total } : null;
+  }
+
+  var sigCache = {};
+  function dropProgressCache() { sigCache = {}; }
+
+  function moduleSignals(code) {
+    if (sigCache[code]) return sigCache[code];
+    var total = moduleCount(code);
+    var visits = moduleVisits(code);
+    var ms = masteryMap();
+    var quizzes = quizDoneMap(code);
+    var list = [];
+    for (var m = 1; m <= total; m++) {
+      var cards = moduleCards(code, m);
+      var strong = 0;
+      cards.forEach(function (c) { if (c && c.interval && c.interval >= CARD_STRONG) strong++; });
+      list.push({
+        mod: m,
+        mastered: ms[masteryKey(code, m)] === 'mastered',
+        quiz: !!quizzes[String(m)],
+        visits: parseInt(visits[String(m)], 10) || 0,
+        cardsTotal: cards.length,
+        cardsStrong: strong
+      });
+    }
+    sigCache[code] = list;
+    return list;
+  }
+
+  function courseProgress(code, opts) {
+    var o = opts || {};
+    var out = {
+      pct: 0, known: false, mode: 'auto',
+      modules: 0, mastered: 0, quizzes: 0, visited: 0,
+      cards: 0, cardsStrong: 0, work: null, perModule: []
+    };
+    if (!isRealCourse(code)) return out;
+
+    var total = moduleCount(code);
+    out.modules = total;
+    out.mode = progressMode(code);
+
+    var sum = 0;
+    moduleSignals(code).forEach(function (base) {
+      var sig = {
+        mod: base.mod, mastered: base.mastered, quiz: base.quiz,
+        visits: base.visits, cardsTotal: base.cardsTotal, cardsStrong: base.cardsStrong
+      };
+      if (sig.mastered) out.mastered++;
+      if (sig.quiz) out.quizzes++;
+      if (sig.visits) out.visited++;
+      out.cards += sig.cardsTotal;
+      out.cardsStrong += sig.cardsStrong;
+      sig.score = out.mode === 'manual' ? (sig.mastered ? 1 : 0) : moduleScore(sig);
+      sum += sig.score;
+      out.perModule.push(sig);
+    });
+
+    out.work = courseWork(code, o.deadlines);
+
+    if (out.mode === 'manual') {
+      out.known = true;
+      out.pct = total ? Math.round((out.mastered / total) * 100) : 0;
+      return out;
+    }
+
+    var modAvg = total ? (sum / total) : 0;
+    var blended = (out.work && out.work.total)
+      ? ((1 - PROG_W.work) * modAvg + PROG_W.work * (out.work.done / out.work.total))
+      : modAvg;
+    out.pct = Math.round(blended * 100);
+    out.known = !!(out.quizzes || out.cardsStrong || out.visited || out.mastered ||
+                   (out.work && out.work.done));
+    return out;
+  }
+
+  function coursePercent(entry, opts) {
     if (!entry) return 0;
     if (courseDone(entry)) return 100;
     if (entry.custom || !isRealCourse(entry.code)) return 0;
-    var st = courseStats(entry.code);
-    return st.totalQuizzes ? Math.round((st.quizzesDone / st.totalQuizzes) * 100) : 0;
+    return courseProgress(entry.code, opts).pct;
   }
 
   function semesterProgress() {
@@ -572,10 +729,11 @@
     out.done = sem.courses.filter(function (c) { return c && courseDone(c); }).length;
 
     var sumPct = 0;
+    var dl = allDeadlines();
     sem.courses.forEach(function (c) {
       if (!c) return;
       var info = courseInfo(c.code);
-      var pct = coursePercent(c);
+      var pct = coursePercent(c, { deadlines: dl });
       var due = (isRealCourse(c.code) && !courseDone(c)) ? dueCards(c.code) : 0;
       sumPct += pct;
       out.credits += (info && info.credits) || c.credits || 3;
@@ -779,6 +937,59 @@
     s.updated_at = new Date().toISOString();
     try { localStorage.setItem(LS.schedule, JSON.stringify(s)); return true; }
     catch (e) { return false; }
+  }
+
+  /*@3.GADJ.142*/
+  function bannerTermRange(sched) {
+    var start = '', end = '';
+    (sched.lectures || []).forEach(function (l) {
+      if (!l || !l.sx_crn || !l.start_date) return;
+      if (!start || l.start_date < start) start = l.start_date;
+    });
+    (sched.exams || []).forEach(function (x) {
+      if (!x || !x.sx_crn || x.exam_type !== 'final' || !x.date) return;
+      if (!end || x.date > end) end = x.date;
+    });
+    return { start: start, end: end };
+  }
+
+  /*@3.GADJ.143*/
+  function termIsManual(st) {
+    var a = st.term_auto || {};
+    if (!st.term_start_date && !st.semester_end_date) return false;
+    return (st.term_start_date || '') !== (a.start || '') ||
+           (st.semester_end_date || '') !== (a.end || '');
+  }
+
+  function syncTermRange(sched, opts) {
+    var o = opts || {};
+    var own = !sched;
+    var s = sched || scheduleRaw();
+    var st = s.settings || (s.settings = {});
+    var r = bannerTermRange(s);
+    if (!r.start && !r.end) return { changed: false, conflict: null };
+
+    if (termIsManual(st)) {
+      var rej = st.term_rejected || {};
+      if ((rej.start || '') === (r.start || '') && (rej.end || '') === (r.end || '')) {
+        return { changed: false, conflict: null };
+      }
+      if ((r.start && r.start !== st.term_start_date) ||
+          (r.end && r.end !== st.semester_end_date)) {
+        return { changed: false, conflict: r };
+      }
+      return { changed: false, conflict: null };
+    }
+
+    var changed = false;
+    if (r.start && st.term_start_date !== r.start) { st.term_start_date = r.start; changed = true; }
+    if (r.end && st.semester_end_date !== r.end) { st.semester_end_date = r.end; changed = true; }
+    if (changed || !st.term_auto) {
+      st.term_auto = { start: st.term_start_date, end: st.semester_end_date };
+      changed = true;
+    }
+    if (changed && own && o.save !== false) writeSchedule(s);
+    return { changed: changed, conflict: null };
   }
 
   function scheduleRaw() {
@@ -1631,6 +1842,14 @@
     courseDone: courseDone,
     finalExamDate: finalExamDate,
     coursePercent: coursePercent,
+    courseProgress: courseProgress,
+    dropProgressCache: dropProgressCache,
+    moduleVisits: moduleVisits,
+    moduleMastery: moduleMastery,
+    setModuleMastery: setModuleMastery,
+    progressMode: progressMode,
+    setProgressMode: setProgressMode,
+    syncTermRange: syncTermRange,
     semesterProgress: semesterProgress,
 
     gpaSummary: gpaSummary,
@@ -1641,6 +1860,7 @@
     todaySessions: todaySessions,
 
     scheduleRaw: scheduleRaw,
+    writeSchedule: writeSchedule,
     courseExams: courseExams,
     upsertExam: upsertExam,
     deleteExam: deleteExam,
@@ -1697,6 +1917,7 @@
 
   /*@3.GADJ.126*/
   window.addEventListener('garden:syncCompleted', function () {
+    dropProgressCache();
     try {
       if (migrateTimedNotes() > 0) {
         window.dispatchEvent(new CustomEvent('garden:notesMigrated'));

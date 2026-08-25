@@ -98,6 +98,7 @@
     /^garden_labs_[a-z0-9-]+:(artifact|slots|slot:[a-z0-9]+)$/,
     /*@3.FISJ.204*/
     /^garden_ics$/,
+    /^garden_module_visits$/,
   ];
   /*@3.FISJ.22*/
   const NEVER_SYNC = new Set([
@@ -127,6 +128,7 @@
   let pushPending = (function () {
     try { return localStorage.getItem(PUSH_PENDING_LS) === '1'; } catch (e) { return false; }
   })();
+  let pushQuota = null;
   function setPushPending(v) {
     pushPending = !!v;
     try {
@@ -359,6 +361,7 @@
     /^garden_[A-Z0-9]+_m\d+_(fc|quiz|ret)$/,
     /*@3.FISJ.48*/
     /^garden_[A-Z0-9]+_quizlog$/,
+    /^garden_module_visits$/,
   ];
   function isDeepKey(k) {
     return MERGE_DEEP.has(k) || MERGE_DEEP_PATTERNS.some(p => p.test(k));
@@ -1795,6 +1798,9 @@
       if (lastErr && lastErr.quota) {
         setPushPending(false);
         pushLastError = lastErr.message;
+        /*@3.FISJ.244*/
+        pushQuota = { code: lastErr.code, key: lastErr.key,
+                      bytes: lastErr.bytes, max: lastErr.max };
         setStatus('error');
         try {
           window.dispatchEvent(new CustomEvent('garden:syncQuota', { detail: {
@@ -1809,6 +1815,7 @@
       return;
     }
     pushLastError = null;
+    pushQuota = null;
     setStatus('synced');
     setPushPending(false);
     localStorage.setItem('garden_sync_last', String(now));
@@ -2323,6 +2330,7 @@
     /*@3.FISJ.188*/
     status: () => syncStatus,
     pending: () => !!pushPending,
+    quotaBlock: () => pushQuota,
     lastSync: () => Number(localStorage.getItem('garden_sync_last') || 0) || null,
 
     /*@3.FISJ.189*/

@@ -64,6 +64,22 @@
     '</div>';
   }
 
+  /*@3.FACJ.51*/
+  document.addEventListener('garden:facultyRefreshed', function () {
+    var d = GF.data && GF.data();
+    if (!d) return;
+    state.data = d;
+    (d.faculty || []).forEach(function (f) {
+      f._sx = (f._s || GF.hayPerson(f)) + ' ' +
+              GF.normPerson(Object.keys(f.courses || {}).join(' ') + ' ' +
+                            (f.other || []).join(' '));
+    });
+    buildFilters();
+    paintStats();
+    paintHow();
+    apply();
+  });
+
   /*@3.FACJ.7*/
   function load() {
     var g = $('#fc-grid');

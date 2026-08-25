@@ -91,6 +91,28 @@
       '</figure>';
   }
 
+
+  /*@3.NOPJ.18*/
+  var CAL_UI = {
+    note:      { t: '#1273cc', ar: 'ملاحظة', en: 'Note' },
+    tip:       { t: '#0a8f4d', ar: 'فائدة',  en: 'Tip' },
+    important: { t: '#3f4d63', ar: 'مهمّ',    en: 'Important' },
+    warning:   { t: '#b8730a', ar: 'تحذير',  en: 'Warning' },
+    caution:   { t: '#cc2f2f', ar: 'تنبيه',  en: 'Caution' }
+  };
+
+  function calHtml(b, s) {
+    var k = String(b.cal || 'note').toLowerCase();
+    var c = CAL_UI[k] || CAL_UI.note;
+    var rt = (b.rt || []).slice();
+    if (rt.length && rt[0] && rt[0].cl) rt = rt.slice(1);
+    var isar = true;
+    try { isar = (localStorage.getItem('garden_lang') || 'ar') === 'ar'; } catch (e) {}
+    return '<div class="cal cal-' + k + '"' + s + '>' +
+      '<div class="cal-h">' + esc(isar ? c.ar : c.en) + '</div>' +
+      '<div class="cal-b">' + runs(rt) + '</div></div>';
+  }
+
   function blockHtml(b) {
     var s = styleOf(b);
     var lv = b.lv || 2;
@@ -98,7 +120,7 @@
       case 'h':       return '<h' + lv + s + '>' + runs(b.rt) + '</h' + lv + '>';
       case 'p':       return '<p' + s + '>' + runs(b.rt) + '</p>';
       case 'quote':   return '<blockquote' + s + '>' + runs(b.rt) + '</blockquote>';
-      case 'callout': return '<div class="cal"' + s + '>' + runs(b.rt) + '</div>';
+      case 'callout': return calHtml(b, s);
       case 'todo':    return '<p class="td"' + s + '><span class="bx">' +
                         (b.done ? '&#10003;' : '&#160;') + '</span>' + runs(b.rt) + '</p>';
       case 'ul':
@@ -205,7 +227,14 @@
       'h1{font-size:16pt}h2{font-size:13.5pt}h3{font-size:11.5pt}' +
       'p{margin:0 0 6pt}ul,ol{margin:0 0 6pt;padding-inline-start:16pt}li{margin-bottom:2pt}' +
       'blockquote{margin:0 0 7pt;padding-inline-start:9pt;border-inline-start:2pt solid #d1d5db;color:#4b5563}' +
-      '.cal{margin:0 0 7pt;padding:6pt 8pt;background:#f9fafb;border:.5pt solid #e5e7eb;border-radius:4pt}' +
+      '.cal{margin:0 0 7pt;padding:5pt 9pt;border:0;border-inline-start:2.5pt solid #9ca3af;border-radius:5pt;background:#fafbfc;break-inside:avoid}' +
+      '.cal .cal-h{font-weight:800;font-size:8.5pt;margin-bottom:2.5pt;letter-spacing:.01em}' +
+      '.cal .cal-b{margin:0}' +
+      '.cal-note{border-inline-start-color:#1273cc;background:#f2f7fd}.cal-note .cal-h{color:#1273cc}' +
+      '.cal-tip{border-inline-start-color:#0a8f4d;background:#f1faf5}.cal-tip .cal-h{color:#0a8f4d}' +
+      '.cal-important{border-inline-start-color:#3f4d63;background:#f5f6f8}.cal-important .cal-h{color:#3f4d63}' +
+      '.cal-warning{border-inline-start-color:#b8730a;background:#fdf8ef}.cal-warning .cal-h{color:#b8730a}' +
+      '.cal-caution{border-inline-start-color:#cc2f2f;background:#fdf3f3}.cal-caution .cal-h{color:#cc2f2f}' +
       '.td .bx{display:inline-block;width:8pt;height:8pt;border:.8pt solid #9ca3af;' +
         'border-radius:2pt;margin-inline-end:5pt;text-align:center;line-height:8pt;font-size:7pt}' +
       '.cd{font-family:ui-monospace,Consolas,monospace;font-size:9pt;line-height:1.6;' +
@@ -245,7 +274,13 @@
       crop = { y0: Math.max(0, m.crop.y0 || 0) };
       pages = Math.max(1, Math.min(200, Math.ceil(m.crop.h / ph)));
     }
-    return { land: land, pw: pw, ph: ph, pages: pages, crop: crop };
+    var p0 = 0, pn = pages;
+    if (m.range) {
+      var ra = Math.max(1, Math.min(pages, m.range.from | 0));
+      var rb = Math.max(ra, Math.min(pages, m.range.to | 0));
+      p0 = ra - 1; pn = rb - ra + 1;
+    }
+    return { land: land, pw: pw, ph: ph, pages: pages, p0: p0, pn: pn, crop: crop };
   }
 
   /*@3.NOPJ.8*/
@@ -348,7 +383,8 @@
         if (!tpl.content.querySelector('.ne-root')) { tpl = null; }
       }
       var baseY = g.crop ? g.crop.y0 : 0;
-      for (i = 0; i < g.pages; i++) {
+      /*@3.NOPJ.17*/
+      for (i = g.p0; i < g.p0 + g.pn; i++) {
         var body = inner;
         if (tpl) body = pruneSlice(tpl, spans, i, g.ph, baseY);
         out += '<section class="pgw"><div class="pgi" style="inset-block-start:' +

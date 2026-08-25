@@ -31,7 +31,9 @@
     panel: true,
     acc: 'folders',
     reading: false,
-    width: 'wide'
+    width: 'wide',
+    blanks: [],
+    blanksHid: false
   };
 
   function isAr() {
@@ -861,9 +863,9 @@
       els.count.textContent = list.length
         ? (isAr() ? list.length + ' ملاحظة' : list.length + ' notes') : '';
     }
-    els.items.innerHTML = list.length
+    els.items.innerHTML = blanksBar() + (list.length
       ? list.map(rowHtml).join('')
-      : emptyHtml();
+      : emptyHtml());
     /*@3.NOAJ.57*/
     paintPicked();
   }
@@ -1100,6 +1102,106 @@
     return '';
   }
 
+  var TEXT_TY = { p: 1, h: 1, quote: 1, callout: 1, todo: 1, ul: 1, ol: 1, dl: 1 };
+
+  /*@3.NOAJ.169*/
+  function docHasContent(doc) {
+    var B = window.GardenNotesBlocks;
+    if (!doc) return false;
+    if (doc.ov && (doc.ov.ink || (doc.ov.shapes && doc.ov.shapes.length))) return true;
+    var bl = doc.blocks || [], i, k;
+    for (i = 0; i < bl.length; i++) {
+      var b = bl[i];
+      if (!b) continue;
+      if (!TEXT_TY[b.ty]) return true;
+      if (b.rt && B && B.runsToText(b.rt).trim()) return true;
+      var it = b.items || [];
+      for (k = 0; k < it.length; k++) {
+        if (it[k] && it[k].rt && B && B.runsToText(it[k].rt).trim()) return true;
+        if (it[k] && it[k].dt && B && B.runsToText(it[k].dt).trim()) return true;
+        if (it[k] && it[k].dd && B && B.runsToText(it[k].dd).trim()) return true;
+      }
+    }
+    return false;
+  }
+
+  function notPh(v) {
+    v = String(v == null ? '' : v).trim();
+    return (v === 'بلا عنوان' || v === 'Untitled') ? '' : v;
+  }
+
+  function isBlankRec(rec, doc) {
+    if (!rec) return false;
+    if (notPh(rec.t)) return false;
+    return !docHasContent(doc);
+  }
+
+  function dropBlank(id) {
+    var Sy = window.GardenNotesSync;
+    idxDrop(id);
+    if (Sy) Sy.remove(id);
+    else if (window.GardenNotesStore) window.GardenNotesStore.delDoc(id);
+    delete lastSaved[id];
+  }
+
+  function leaveProvisional(id, doc) {
+    var rec = id ? idxFind(id) : null;
+    if (!rec || !rec.pv) return false;
+    if (!isBlankRec(rec, doc)) return false;
+    dropBlank(id);
+    return true;
+  }
+
+  /*@3.NOAJ.170*/
+  function scanBlanks() {
+    var St = window.GardenNotesStore;
+    if (!St || !St.getDoc) return;
+    var cand = idxRead().filter(function (r) {
+      if (!r || r.pv || r.id === edId) return false;
+      if ((r.sz | 0) > 400) return false;
+      var t = String(r.t || '').trim();
+      return !t || t === 'بلا عنوان' || t === 'Untitled';
+    }).slice(0, 200);
+    if (!cand.length) { S.blanks = []; return; }
+    var hits = [];
+    cand.reduce(function (chain, r) {
+      return chain.then(function () {
+        return St.getDoc(r.id).then(function (row) {
+          /*@3.NOAJ.171*/
+          if (row && row.doc && isBlankRec(r, row.doc)) hits.push(r.id);
+        })['catch'](function () {});
+      });
+    }, Promise.resolve()).then(function () {
+      S.blanks = hits;
+      if (hits.length) renderList();
+    });
+  }
+
+  function blanksBar() {
+    var n = S.blanks.length;
+    if (!n || S.blanksHid) return '';
+    return '<div class="na-sweep" role="status">' +
+      '<i class="fa-solid fa-broom" aria-hidden="true"></i>' +
+      '<span>' + esc(L(n + ' ملاحظةً فارغةً بلا عنوانٍ ولا محتوى.',
+                       n + ' notes are empty — no title, no content.')) + '</span>' +
+      '<button type="button" class="na-sweep-go" data-role="sweep">' +
+      esc(L('أزِلْها', 'Remove them')) + '</button>' +
+      '<button type="button" class="na-sweep-x" data-role="sweep-x" aria-label="إخفاء" ' +
+      'data-ar-title="إخفاء" data-en-title="Dismiss">' +
+      '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>';
+  }
+
+  function sweepBlanks() {
+    var ids = S.blanks.slice(), i;
+    for (i = 0; i < ids.length; i++) dropBlank(ids[i]);
+    S.blanks = [];
+    reload({ keepOpen: true });
+    saveState('saved', L('أُزيلت ' + ids.length, ids.length + ' removed'));
+    setTimeout(function () {
+      if (els.save && els.save.getAttribute('data-s') === 'saved') saveState('', '');
+    }, 2200);
+  }
+
   /*@3.NOAJ.26*/
   var lastSaved = {};
 
@@ -1119,7 +1221,9 @@
       lastSaved[id] = body;
       var rec = idxFind(id);
       if (rec) {
-        rec.t = typed || rec.t || deriveTitle(doc) || L('بلا عنوان', 'Untitled');
+        /*@3.NOAJ.172*/
+        rec.t = notPh(typed) || notPh(rec.t) || deriveTitle(doc) || '';
+        if (rec.pv && (typed || docHasContent(doc))) delete rec.pv;
         /*@3.NOAJ.166*/
         if (!quiet) rec.updated_at = t;
         rec.sz = res.bytes;
@@ -1507,6 +1611,48 @@
   }
 
   var EXP_SCOPE = 'one';
+  var EXP_RNG = { on: false, a: 1, b: 1 };
+
+  /*@3.NOAJ.168*/
+  function pageRange() {
+    if (EXP_SCOPE !== 'one' || !EXP_RNG.on) return null;
+    var n = expTotalPages();
+    var a = Math.max(1, Math.min(n, EXP_RNG.a | 0));
+    var b = Math.max(a, Math.min(n, EXP_RNG.b | 0));
+    if (a === 1 && b >= n) return null;
+    return { from: a, to: b };
+  }
+
+  function expTotalPages() {
+    var n = 1;
+    try { n = growPages(); } catch (e) {}
+    return Math.max(1, n | 0);
+  }
+
+  function syncRange() {
+    var dlg = document.getElementById('na-exp');
+    if (!dlg) return;
+    var box = dlg.querySelector('#na-exp-rng');
+    if (!box) return;
+    var one = (EXP_SCOPE === 'one') && !!ed;
+    box.hidden = !one;
+    if (!one) return;
+    var n = expTotalPages();
+    if (EXP_RNG.b < 1 || EXP_RNG.b > n) EXP_RNG.b = n;
+    if (EXP_RNG.a < 1 || EXP_RNG.a > n) EXP_RNG.a = 1;
+    [].forEach.call(box.querySelectorAll('[data-rng]'), function (b) {
+      var on = (b.getAttribute('data-rng') === 'pick') === EXP_RNG.on;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var row = box.querySelector('#na-rng-row');
+    if (row) row.hidden = !EXP_RNG.on;
+    var ia = box.querySelector('#na-rng-a'), ib = box.querySelector('#na-rng-b');
+    if (ia) { ia.max = String(n); if (document.activeElement !== ia) ia.value = String(EXP_RNG.a); }
+    if (ib) { ib.max = String(n); if (document.activeElement !== ib) ib.value = String(EXP_RNG.b); }
+    var tot = box.querySelector('#na-rng-tot');
+    if (tot) tot.textContent = L('من ' + n + ' صفحة', 'of ' + n + ' pages');
+  }
 
   function metaOf(rec) {
     return {
@@ -1586,6 +1732,37 @@
       try { img.src = srcC[i].toDataURL('image/png'); } catch (eC) {}
       dstC[i].parentNode.replaceChild(img, dstC[i]);
     }
+    /*@3.NOAJ.175*/
+    var srcD = stage.querySelectorAll('.ne-dgm');
+    var dstD = clone.querySelectorAll('.ne-dgm');
+    for (i = 0; i < dstD.length && i < srcD.length; i++) {
+      var sv = srcD[i].querySelector('svg');
+      var host = dstD[i];
+      if (!sv) {
+        var preF = host.parentNode ? host.parentNode.querySelector('.ne-code') : null;
+        if (preF) preF.hidden = false;
+        host.remove();
+        continue;
+      }
+      var dr = sv.getBoundingClientRect();
+      var dw = Math.max(1, Math.round(dr.width / zc));
+      var dh = Math.max(1, Math.round(dr.height / zc));
+      var dimg = document.createElement('img');
+      dimg.setAttribute('alt', sv.getAttribute('aria-label') || '');
+      dimg.style.cssText = 'display:block;margin:0 auto;inline-size:' + dw +
+        'px;block-size:' + dh + 'px';
+      try {
+        var c2 = sv.cloneNode(true);
+        c2.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        c2.setAttribute('width', String(dw));
+        c2.setAttribute('height', String(dh));
+        var raw = new XMLSerializer().serializeToString(c2);
+        dimg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(raw);
+      } catch (eD) {}
+      host.textContent = '';
+      host.appendChild(dimg);
+    }
+
     /*@3.NOAJ.82*/
     list = clone.querySelectorAll('[contenteditable]');
     for (i = 0; i < list.length; i++) list[i].removeAttribute('spellcheck');
@@ -1676,6 +1853,7 @@
     pm.inlineCss = printInlineCss();
     pm.rootAttrs = printRootAttrs();
     pm.dir = isAr() ? 'rtl' : 'ltr';
+    pm.range = pageRange();
     return pm;
   }
 
@@ -1730,6 +1908,7 @@
     pm.pageW = Math.round(pageWpx());
     pm.pageH = Math.round(pageH());
     pm.pages = growPages();
+    pm.range = pageRange();
     pm.spans = printSpans();
     pm.html = printClone();
     pm.inkBox = printInkBox();
@@ -1811,6 +1990,7 @@
     var dlg = document.getElementById('na-exp');
     if (!dlg) return;
     EXP_SCOPE = ed ? 'one' : 'all';
+    EXP_RNG = { on: false, a: 1, b: expTotalPages() };
     setExpTab('out');
     impMsg('', '');
     var fmts = dlg.querySelector('#na-exp-fmts');
@@ -1856,6 +2036,7 @@
     if (pdf) pdf.disabled = (EXP_SCOPE !== 'one');
     var pdfx = dlg.querySelector('[data-fmt="pdfx"]');
     if (pdfx) pdfx.disabled = (EXP_SCOPE !== 'one');
+    syncRange();
   }
 
   function richInView() {
@@ -1998,7 +2179,7 @@
     if (ed && edId === id && !(opts && opts.remount)) { setMob('doc'); return; }
     setMob('doc');
     if (ed && edId && edId !== id) {
-      try { ed.save(); } catch (e) {}
+      if (!leaveProvisional(edId, ed.doc)) { try { ed.save(); } catch (e) {} }
       try { ed.destroy(); } catch (e2) {}
     }
     if (overlay) { try { overlay.destroy(); } catch (e3) {} overlay = null; }
@@ -2007,7 +2188,7 @@
 
     if (els.docTitle) {
       els.docTitle.disabled = false;
-      els.docTitle.value = rec.t || '';
+      els.docTitle.value = notPh(rec.t);
       syncTitleDir();
     }
     setDocActions(true);
@@ -2084,9 +2265,11 @@
         hist: hist,
         onDirty: function () {
           saveState('saving', L('يُحفظ…', 'Saving…'));
-          growPages();
+          /*@3.NOAJ.177*/
+          queueGrow();
         },
-        onSave: function (d) { persist(id, d); },
+        /*@3.NOAJ.174*/
+        onSave: function (d, q) { persist(id, d, !!q); },
         onSelState: function (st) { if (ribbon) ribbon.setState(st); },
         onSelectAll: function () { selectEverything(); },
         onNoteLink: function (t) { resolveNoteLink(t); },
@@ -2123,6 +2306,16 @@
       applyWidth();
       applyPages(1);
       syncTitleDir();
+      /*@3.NOAJ.173*/
+      if (!notPh(rec.t) && docHasContent(doc)) {
+        var dt = deriveTitle(doc);
+        if (dt) {
+          rec.t = dt;
+          idxPut(rec);
+          if (els.docTitle) els.docTitle.value = dt;
+          reload({ keepOpen: true });
+        }
+      }
       /*@3.NOAJ.144*/
       if ((!doc.eng || doc.eng.pbv !== GardenNotesEditor.PBV) &&
           !isBoard && document.fonts && document.fonts.ready) {
@@ -2212,7 +2405,8 @@
   }
 
   function closeNote() {
-    if (ed) { try { ed.save(); } catch (e) {} }
+    var gone = leaveProvisional(edId, ed && ed.doc);
+    if (ed && !gone) { try { ed.save(); } catch (e) {} }
     if (hist) { hist.onChange = null; hist.reset(); }
     ed = null; edId = null;
     if (els.app) els.app.removeAttribute('data-kind');
@@ -2239,7 +2433,7 @@
     } catch (e) {}
 
     var rec = { id: id, t: '', k: board ? 'board' : 'rich', o: origin, g: [], c: null, f: null,
-                p: 0, a: 0, ca: now, updated_at: now, sz: 0 };
+                p: 0, a: 0, ca: now, updated_at: now, sz: 0, pv: 1 };
     if (S.view.k === 'folder') rec.f = S.view.id;
     if (S.view.k === 'course' && !rec.o.c) rec.o.c = S.view.code;
     if (S.view.k === 'tag') rec.g = [S.view.tag];
@@ -3091,10 +3285,18 @@
     var sTop = sheet.getBoundingClientRect().top;
     var used = 0, i;
     if (root) {
-      var kids = root.children;
-      for (i = 0; i < kids.length; i++) {
-        if (kids[i].classList && kids[i].classList.contains('ne-tail')) continue;
-        used = Math.max(used, (kids[i].getBoundingClientRect().bottom - sTop) / z);
+      /*@3.NOAJ.176*/
+      var kids = root.children, k;
+      for (i = kids.length - 1; i >= 0; i--) {
+        k = kids[i];
+        if (k.classList && k.classList.contains('ne-tail')) continue;
+        if (k.hasAttribute && k.hasAttribute('data-fp')) continue;
+        used = (k.getBoundingClientRect().bottom - sTop) / z;
+        break;
+      }
+      var free = root.querySelectorAll(':scope > [data-bid][data-fp]');
+      for (i = 0; i < free.length; i++) {
+        used = Math.max(used, (free[i].getBoundingClientRect().bottom - sTop) / z);
       }
     }
     /*@3.NOAJ.24*/
@@ -3107,12 +3309,28 @@
     return used;
   }
 
+  /*@3.NOAJ.178*/
+  function engBottom() {
+    var d = ed && ed.doc;
+    if (d && d.eng && d.eng.h > 0 && !ed._engStale) {
+      var ovh = 0;
+      if (d.ov && d.ov.ch > 0 && d.ov.rw > 0) {
+        var sh = document.getElementById('na-sheet');
+        var sc = sh ? ((sh.offsetWidth || sh.getBoundingClientRect().width) / d.ov.rw) : 1;
+        if (!isFinite(sc) || sc <= 0 || sc > 6) sc = 1;
+        ovh = d.ov.ch * sc;
+      }
+      return Math.max(d.eng.h, ovh);
+    }
+    return contentBottom();
+  }
+
   function neededPages() {
     var sheet = document.getElementById('na-sheet');
     if (!sheet) return 1;
     var h = pageH();
     if (h < 40) return 1;
-    var used = contentBottom() + covH();
+    var used = engBottom() + covH();
     var n = Math.ceil((used - 4) / h);
     if (!isFinite(n) || n < 1) n = 1;
     return Math.min(PAGE_MAX, n);
@@ -3974,6 +4192,13 @@
   function onListClick(e) {
     /*@3.NOAJ.127*/
     if (swipeAte) { swipeAte = 0; e.preventDefault(); return; }
+    var sw = e.target.closest('[data-role="sweep"],[data-role="sweep-x"]');
+    if (sw) {
+      e.preventDefault();
+      if (sw.getAttribute('data-role') === 'sweep') sweepBlanks();
+      else { S.blanksHid = true; renderList(); }
+      return;
+    }
     var row = e.target.closest('.na-row');
     if (!row) return;
     var uid = row.getAttribute('data-uid');
@@ -4069,6 +4294,15 @@
 
   var _fitQ = 0;
   var _pageRO = null;
+
+  var _growQ = 0;
+  function queueGrow() {
+    if (_growQ) return;
+    _growQ = requestAnimationFrame(function () {
+      _growQ = 0;
+      growPages();
+    });
+  }
 
   function queueFit() {
     if (_fitQ) return;
@@ -4345,9 +4579,26 @@
       }
       var sc = e.target.closest('[data-scope]');
       if (sc) { EXP_SCOPE = sc.getAttribute('data-scope'); syncExport(); return; }
+      var rg = e.target.closest('[data-rng]');
+      if (rg) { EXP_RNG.on = rg.getAttribute('data-rng') === 'pick'; syncRange(); return; }
       var ft = e.target.closest('[data-fmt]');
       if (ft && !ft.disabled) runExport(ft.getAttribute('data-fmt'));
     });
+
+    var expDlg = document.getElementById('na-exp');
+    if (expDlg) {
+      expDlg.addEventListener('input', function (e) {
+        var t = e.target;
+        if (!t || (t.id !== 'na-rng-a' && t.id !== 'na-rng-b')) return;
+        var v = parseInt(t.value, 10);
+        if (!isFinite(v)) return;
+        if (t.id === 'na-rng-a') EXP_RNG.a = v; else EXP_RNG.b = v;
+      });
+      expDlg.addEventListener('change', function (e) {
+        var t = e.target;
+        if (t && (t.id === 'na-rng-a' || t.id === 'na-rng-b')) syncRange();
+      });
+    }
 
     /*@3.NOAJ.153*/
     var fillLinkPick = function () {
@@ -4741,7 +4992,7 @@
     });
 
     window.addEventListener('beforeunload', function () {
-      if (ed) { try { ed.save(); } catch (e) {} }
+      if (ed && !leaveProvisional(edId, ed.doc)) { try { ed.save(); } catch (e) {} }
     });
     window.addEventListener('garden:syncQuota', onQuota);
     window.addEventListener('garden:notesQuota', onQuota);
@@ -4751,7 +5002,10 @@
       idxSynced = true;
       runReconcile(true);
     });
-    window.addEventListener('garden:notesReconciled', function () { reload({ keepOpen: true }); });
+    window.addEventListener('garden:notesReconciled', function () {
+      reload({ keepOpen: true });
+      scanBlanks();
+    });
     window.addEventListener('garden:notesPulled', function (e) {
       /*@3.NOAJ.120*/
       if (e.detail && e.detail.id === edId && !ed) openNote(edId, { remount: true });
@@ -4798,6 +5052,7 @@
     } catch (e) {}
 
     runReconcile(false);
+    setTimeout(scanBlanks, 1500);
   }
 
   window.GardenNotesApp = {

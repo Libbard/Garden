@@ -57,7 +57,11 @@
       out += cls ? ('<span class="cd-' + cls + '">' + esc(txt) + '</span>') : esc(txt);
     }
 
+    /*@3.NOCJ2.4*/
+    var last = -1;
     while (i < n) {
+      if (i === last) { push('', s.charAt(i)); i++; continue; }
+      last = i;
       var ch = s.charAt(i);
 
       if (lineComment && s.substr(i, lineComment.length) === lineComment) {
@@ -108,10 +112,13 @@
 
       if (/[A-Za-z_$@#]/.test(ch)) {
         var w = i;
+        /*@3.NOCJ2.3*/
+        if (ch === '@') w++;
         while (w < n && /[A-Za-z0-9_$#]/.test(s.charAt(w))) w++;
         var word = s.slice(i, w);
-        var low = (lang === 'sql') ? word.toLowerCase() : word;
-        if (kw[low] || kw[word]) push('kw', word);
+        var bare = word.charAt(0) === '@' ? word.slice(1) : word;
+        var low = (lang === 'sql') ? bare.toLowerCase() : bare;
+        if (kw[low] || kw[bare]) push('kw', word);
         else if (s.charAt(w) === '(') push('fn', word);
         else if (/^[A-Z]/.test(word) && lang !== 'sql') push('ty', word);
         else push('', word);

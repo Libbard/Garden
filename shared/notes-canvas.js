@@ -3,19 +3,40 @@
 
   var C = function () { return window.GardenInkCodec; };
 
+  /*@3.NOCJ.78*/
   var TONES = {
     ink:     { dark: '#e5e7eb', light: '#111827' },
+    red:     { dark: '#ff7a7a', light: '#d61f26' },
+    orange:  { dark: '#ff9f45', light: '#e2600b' },
+    yellow:  { dark: '#ffd94a', light: '#c99a00' },
+    lime:    { dark: '#b8e34b', light: '#6a9c00' },
+    emerald: { dark: '#3ddc8a', light: '#0a8f4d' },
+    teal:    { dark: '#2fd8d0', light: '#00868f' },
+    sky:     { dark: '#5ab8ff', light: '#1273cc' },
+    indigo:  { dark: '#8b8cff', light: '#3b3ec7' },
+    violet:  { dark: '#c78bff', light: '#8225c9' },
+    pink:    { dark: '#ff85c0', light: '#cc177a' },
+    brown:   { dark: '#c99274', light: '#8a5230' },
     amber:   { dark: '#fbbf24', light: '#b45309' },
-    rose:    { dark: '#fb7185', light: '#be123c' },
-    violet:  { dark: '#a78bfa', light: '#6d28d9' },
-    emerald: { dark: '#34d399', light: '#047857' },
-    sky:     { dark: '#38bdf8', light: '#0369a1' },
-    lime:    { dark: '#a3e635', light: '#4d7c0f' },
-    orange:  { dark: '#fb923c', light: '#c2410c' },
-    red:     { dark: '#f87171', light: '#b91c1c' },
-    pink:    { dark: '#f472b6', light: '#be185d' },
-    teal:    { dark: '#2dd4bf', light: '#0f766e' },
-    indigo:  { dark: '#818cf8', light: '#4338ca' }
+    rose:    { dark: '#fb7185', light: '#be123c' }
+  };
+
+  /*@3.NOCJ.80*/
+  var HI_TONES = {
+    yellow:  { dark: '#ffe14d', light: '#ffe14d' },
+    lime:    { dark: '#c3f14a', light: '#c3f14a' },
+    emerald: { dark: '#7cf0b0', light: '#7cf0b0' },
+    teal:    { dark: '#6cebe2', light: '#6cebe2' },
+    sky:     { dark: '#8ad4ff', light: '#8ad4ff' },
+    indigo:  { dark: '#a9aaff', light: '#a9aaff' },
+    violet:  { dark: '#d9adff', light: '#d9adff' },
+    pink:    { dark: '#ffa8d2', light: '#ffa8d2' },
+    orange:  { dark: '#ffbc70', light: '#ffbc70' },
+    red:     { dark: '#ff9d9d', light: '#ff9d9d' },
+    amber:   { dark: '#ffd166', light: '#ffd166' },
+    rose:    { dark: '#ffa3ba', light: '#ffa3ba' },
+    brown:   { dark: '#e0bda6', light: '#e0bda6' },
+    ink:     { dark: '#c9ccd4', light: '#c9ccd4' }
   };
 
   /*@3.NOCJ.11*/
@@ -24,7 +45,11 @@
     fine:   { scale: 0.45, min: 0.78, resp: 0.30, chisel: 0, round: 1 },
     marker: { scale: 1.55, min: 1.00, resp: 0.00, chisel: 0, round: 0 },
     flat:   { scale: 1.30, min: 0.45, resp: 0.35, chisel: 1, round: 0 },
-    pencil: { scale: 0.95, min: 0.42, resp: 0.62, chisel: 0, round: 1, grain: 1 }
+    /*@3.NOCJ.79*/
+    pencil: { scale: 0.88, min: 0.46, resp: 0.58, chisel: 0, round: 1,
+              grain: 1, speck: 3.0, spread: 1.15, dust: 0.46 },
+    chalk:  { scale: 1.85, min: 0.74, resp: 0.24, chisel: 0, round: 0,
+              grain: 1, speck: 4.2, spread: 1.35, dust: 0.30 }
   };
   var CHISEL_ANGLE = -Math.PI / 4;
 
@@ -67,6 +92,9 @@
   function paperLum() {
     return _paperOverride ? relLum(_paperOverride) : docLum();
   }
+
+  /*@3.NOCJ.83*/
+  var HI_DARK = 0.45;
 
   function themeIsLight() {
     var l = docLum();
@@ -127,6 +155,19 @@
     var c = TONES[name] || TONES.ink;
     return isLight() ? c.light : c.dark;
   }
+
+  function hiHexOf(name) {
+    if (typeof name === 'string' && name.charAt(0) === '#' && name.length === 7) {
+      return name.toLowerCase();
+    }
+    var c = HI_TONES[name];
+    if (!c) return hexOf(name);
+    return isLight() ? c.light : c.dark;
+  }
+
+  function inkHex(el) {
+    return el && el.hi ? hiHexOf(el.c) : hexOf(el.c);
+  }
   function uid() {
     return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
@@ -138,7 +179,7 @@
   var TOOL_DEF = {
     pen:   { color: 'ink',   width: 4,  nib: 'round' },
     pencil:{ color: 'ink',   width: 3,  nib: 'pencil' },
-    hi:    { color: 'amber', width: 26, nib: 'marker' },
+    hi:    { color: 'yellow', width: 26, nib: 'marker' },
     era:   { color: 'ink',   width: 12, nib: 'round' },
     sel:   { color: 'ink',   width: 4,  nib: 'round' },
     lasso: { color: 'ink',   width: 4,  nib: 'round' },
@@ -288,6 +329,8 @@
     /*@3.NOCJ.23*/
     this.eraseMode = 'whole';
     this.hiStraight = 1;
+    this.hiMode = 'text';
+    this.snapText = (opts && opts.snapText) || null;
 
     this.cam = { x: 0, y: 0, z: 1 };
     this.fitZ = 1;
@@ -575,6 +618,11 @@
 
   /*@3.NOCJ.12*/
   function smoothPts(pts) {
+    var once = smoothOnce(pts);
+    return (once.length > 5) ? smoothOnce(once) : once;
+  }
+
+  function smoothOnce(pts) {
     if (pts.length < 3) return pts;
     var corner = cornerFlags(pts);
     var out = [pts[0]];
@@ -644,7 +692,9 @@
     }
     if (!raw.length) return null;
     var pts = smoothPts(raw);
-    var alpha = (el.o == null ? 1 : el.o) * (nib.grain ? 0.72 : 1);
+    var alpha = (el.o == null ? 1 : el.o) *
+                (nib.speck ? (1 - (nib.dust || 0.4)) : (nib.grain ? 0.72 : 1));
+    if (el.hi && !isLight()) alpha *= HI_DARK;
     if (pts.length === 1) {
       return { kind: 'dot', alpha: alpha, grain: !!nib.grain,
                x: pts[0].x, y: pts[0].y,
@@ -671,8 +721,45 @@
               { x: pts[pts.length - 1].x, y: pts[pts.length - 1].y,
                 r: Math.max(0.3, widthAt(base, nib, pts[pts.length - 1].p, 0) / 2) }];
     }
+    var spk = null;
+    if (nib.speck) spk = speckle(pts, angs, base, nib);
     return { kind: 'blob', alpha: alpha, grain: !!nib.grain,
-             left: left, right: right, caps: caps };
+             left: left, right: right, caps: caps, speck: spk,
+             dust: nib.dust || 0 };
+  }
+
+  var SPECK_MAX = 2600;
+
+  function speckle(pts, angs, base, nib) {
+    var out = [], i, j;
+    var per = nib.speck || 3;
+    var cap = SPECK_MAX;
+    for (i = 0; i < pts.length && out.length < cap; i++) {
+      var hw = widthAt(base, nib, pts[i].p, angs[i]) / 2;
+      if (hw < 0.25) continue;
+      var ang = angs[i] || 0;
+      var nx = -Math.sin(ang), ny = Math.cos(ang);
+      var n = Math.max(1, Math.round(per * (0.45 + 0.55 * pts[i].p)));
+      for (j = 0; j < n; j++) {
+        var h1 = rnd(i * 7.13 + j * 3.71);
+        var h2 = rnd(i * 2.37 + j * 9.19 + 5.5);
+        var h3 = rnd(i * 5.51 + j * 1.93 + 11.2);
+        var t = (h1 * 2 - 1) * (nib.spread || 1);
+        var d = t * hw;
+        out.push({
+          x: pts[i].x + nx * d + (h2 - 0.5) * hw * 0.5,
+          y: pts[i].y + ny * d + (h3 - 0.5) * hw * 0.5,
+          r: Math.max(0.22, hw * (0.16 + 0.24 * h3)),
+          a: Math.max(0.06, (1 - Math.min(1, Math.abs(t))) * 0.72 + 0.12)
+        });
+      }
+    }
+    return out.length ? out : null;
+  }
+
+  function rnd(seed) {
+    var n = Math.sin(seed * 12.9898) * 43758.5453;
+    return n - Math.floor(n);
   }
 
   /*@3.NOCJ.75*/
@@ -711,8 +798,8 @@
     if (!geom) return;
     g.save();
     g.globalAlpha = geom.alpha;
-    g.fillStyle = hexOf(el.c);
-    g.strokeStyle = hexOf(el.c);
+    g.fillStyle = inkHex(el);
+    g.strokeStyle = inkHex(el);
     var api = {
       move: function (x, y) { g.moveTo(x, y); },
       line: function (x, y) { g.lineTo(x, y); },
@@ -734,7 +821,17 @@
     inkEmit(geom, api);
     g.fill();
     /*@3.NOCJ.76*/
-    if (geom.grain) {
+    if (geom.speck) {
+      g.save();
+      var sp = geom.speck, sa = geom.alpha;
+      for (var q = 0; q < sp.length; q++) {
+        g.globalAlpha = sa * sp[q].a * (geom.dust ? (1 - geom.dust * 0.4) : 1);
+        g.beginPath();
+        g.arc(sp[q].x, sp[q].y, sp[q].r, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.restore();
+    } else if (geom.grain) {
       g.save();
       g.globalAlpha = 0.34;
       g.translate(0.45, 0.45);
@@ -1322,6 +1419,34 @@
 
 
   /*@3.NOCJ.26*/
+  function snapHi(cv, st) {
+    var pts = st.pts;
+    if (!pts || pts.length < 2) return false;
+    var x0 = pts[0].x, x1 = pts[0].x, y0 = pts[0].y, y1 = pts[0].y, i;
+    for (i = 1; i < pts.length; i++) {
+      if (pts[i].x < x0) x0 = pts[i].x;
+      if (pts[i].x > x1) x1 = pts[i].x;
+      if (pts[i].y < y0) y0 = pts[i].y;
+      if (pts[i].y > y1) y1 = pts[i].y;
+    }
+    if (x1 - x0 < 4 && y1 - y0 < 4) return false;
+    var line = null;
+    try { line = cv.snapText({ x0: x0, x1: x1, y0: y0, y1: y1 }); } catch (e) { return false; }
+    if (!line || !(line.h > 2) || !(line.x1 - line.x0 > 2)) return false;
+    var ax, bx;
+    /*@3.NOCJ.81*/
+    if (line.sx1 - line.sx0 > 2) { ax = line.sx0; bx = line.sx1; }
+    else {
+      ax = Math.max(x0, line.x0); bx = Math.min(x1, line.x1);
+      if (bx - ax < 3) { ax = line.x0; bx = line.x1; }
+    }
+    var my = line.y + line.h / 2;
+    st.w = Math.max(6, line.h * 0.86);
+    st.nib = 'marker';
+    st.pts = [{ x: ax, y: my, p: 0.6 }, { x: bx, y: my, p: 0.6 }];
+    return true;
+  }
+
   function straighten(st) {
     var pts = st.pts;
     if (!pts || pts.length < 2) return;
@@ -1377,6 +1502,14 @@
 
   Canvas.prototype.setStraight = function (on) {
     this.hiStraight = on ? 1 : 0;
+    if (this.hiMode !== 'text') this.hiMode = on ? 'line' : 'free';
+    this.emit();
+  };
+
+  Canvas.prototype.setHiMode = function (m) {
+    var v = (m === 'line' || m === 'free') ? m : 'text';
+    this.hiMode = v;
+    this.hiStraight = (v === 'free') ? 0 : 1;
     this.emit();
   };
 
@@ -1483,7 +1616,7 @@
   Canvas.prototype.emit = function () {
     this.onState({
       tool: this.tool, color: this.color, width: this.width, nib: this.nib,
-      eraseMode: this.eraseMode, straight: this.hiStraight,
+      eraseMode: this.eraseMode, straight: this.hiStraight, hiMode: this.hiMode,
       zoom: this.userZ, fit: this.fitZ, selection: this.selected().length,
       canUndo: this.hist ? this.hist.canUndo() : !!this.undoS.length,
       canRedo: this.hist ? this.hist.canRedo() : !!this.redoS.length,
@@ -1569,7 +1702,8 @@
         var hi = self.tool === 'hi';
         self.live[id] = {
           id: uid(), ty: 'st', c: self.color, w: hi ? self.width / NIBS.marker.scale : self.width,
-          nib: hi ? 'marker' : self.nib, o: hi ? 0.32 : self.opacity, hi: hi ? 1 : 0,
+          /*@3.NOCJ.82*/
+          nib: hi ? 'marker' : self.nib, o: hi ? 0.8 : self.opacity, hi: hi ? 1 : 0,
           pts: [{ x: wp.x, y: wp.y, p: pt.p }]
         };
         self.paintWet();
@@ -1718,7 +1852,11 @@
         if (!keep) { self.paintWet(); return; }
         if (st.ty === 'st' && st.pts.length < 1) { self.paintWet(); return; }
         /*@3.NOCJ.25*/
-        if (st.ty === 'st' && st.hi && self.hiStraight) straighten(st);
+        if (st.ty === 'st' && st.hi) {
+          var snapped = false;
+          if (self.hiMode === 'text' && self.snapText) snapped = snapHi(self, st);
+          if (!snapped && self.hiMode !== 'free') straighten(st);
+        }
         if (st.ty !== 'st' &&
             Math.abs(st.x2 - st.x1) < 2 && Math.abs(st.y2 - st.y1) < 2) {
           self.paintWet(); return;
@@ -1837,7 +1975,7 @@
   function toSvg(els, w, h, opts) {
     var hx = (opts && typeof opts.hex === 'function') ? opts.hex : hexOf;
     var parts = (els || []).map(function (el) {
-      var col = hx(el.c);
+      var col = el.hi ? hiHexOf(el.c) : hx(el.c);
       var op = el.o == null ? 1 : el.o;
       if (el.ty === 'st') {
         var geom = inkGeom(el, (opts && opts.scale) || 1);
@@ -1891,7 +2029,9 @@
   window.GardenCanvas = {
     mount: function (host, opts) { return new Canvas(host, opts); },
     hexOf: hexOf,
+    hiHexOf: hiHexOf,
     TONES: TONES,
+    HI_TONES: HI_TONES,
     NIBS: NIBS,
     toSvg: toSvg,
     inkGeom: inkGeom,

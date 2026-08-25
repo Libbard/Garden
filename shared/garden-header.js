@@ -183,8 +183,8 @@
 
   /*@3.GAHJ.100*/
   var _qnLoad = 0;
-  function _openQuickNote(btn) {
-    if (window.GardenQuickNote) { GardenQuickNote.open({ opener: btn }); return; }
+  function _openQuickNote(btn, id) {
+    if (window.GardenQuickNote) { GardenQuickNote.open({ opener: btn, id: id }); return; }
     if (_qnLoad) return;
     _qnLoad = 1;
     if (btn) btn.setAttribute('aria-busy', 'true');
@@ -193,7 +193,7 @@
     s.onload = function () {
       _qnLoad = 0;
       if (btn) btn.removeAttribute('aria-busy');
-      if (window.GardenQuickNote) GardenQuickNote.open({ opener: btn });
+      if (window.GardenQuickNote) GardenQuickNote.open({ opener: btn, id: id });
     };
     s.onerror = function () {
       _qnLoad = 0;
@@ -201,6 +201,21 @@
     };
     document.head.appendChild(s);
   }
+
+  /*@3.GAHJ.102*/
+  function _quickFromHash() {
+    var m = /(?:^|[#&])qn-([A-Za-z0-9_.-]+)/.exec(location.hash || '');
+    if (!m) return;
+    try { history.replaceState(null, '', location.pathname + location.search); }
+    catch (e) {}
+    _openQuickNote(null, m[1]);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _quickFromHash);
+  } else {
+    setTimeout(_quickFromHash, 0);
+  }
+  window.addEventListener('hashchange', _quickFromHash);
 
   function _openColor(code, btn) {
     if (btn) btn.setAttribute('aria-busy', 'true');
@@ -655,12 +670,13 @@
         { key: 'semester', href: ROOT + 'hub/index.html', icon: 'fa-graduation-cap', ar: 'فصلي', en: 'Semester' },
         { key: 'schedule', href: ROOT + 'hub/schedule.html', icon: 'fa-calendar-week', ar: 'الجدول', en: 'Schedule' },
         { key: 'gpa', href: ROOT + 'hub/gpa.html', icon: 'fa-chart-line', ar: 'المعدل', en: 'GPA' },
+        /*@3.GAHJ.71*/
+        /*@3.GAHJ.103*/
+        { key: 'faculty', href: ROOT + 'hub/faculty.html', icon: 'fa-chalkboard-user', ar: 'الأساتذة', en: 'Faculty' },
         /*@3.GAHJ.69*/
         { key: 'labs', href: ROOT + 'hub/labs.html', icon: 'fa-flask', ar: 'المختبر', en: 'Labs' },
         /*@3.GAHJ.70*/
         { key: 'sections', href: ROOT + 'hub/sections.html', icon: 'fa-layer-group', ar: 'الشعب', en: 'Sections' },
-        /*@3.GAHJ.71*/
-        { key: 'faculty', href: ROOT + 'hub/faculty.html', icon: 'fa-chalkboard-user', ar: 'الأساتذة', en: 'Faculty' },
         { key: 'ratings', href: ROOT + 'hub/ratings.html', icon: 'fa-star-half-stroke', ar: 'تقييماتي', en: 'My ratings' },
         /*@3.GAHJ.93*/
         { key: 'notes', href: ROOT + 'hub/notes.html', icon: 'fa-note-sticky', ar: 'ملاحظاتي', en: 'My notes' }

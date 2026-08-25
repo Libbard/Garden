@@ -244,7 +244,11 @@
       if (!b.id) b.id = uid();
       /*@3.NOBJ.7*/
       if (b.ty === 'sticky') { b.ty = 'p'; if (!Array.isArray(b.rt)) b.rt = []; delete b.tone; }
-      if (b.ty === 'img') { b.url = httpsOnly(b.url); }
+      if (b.ty === 'img') {
+        b.url = httpsOnly(b.url);
+        /*@3.NOBJ.23*/
+        if (b.lk != null) { var lkN = normUrl(b.lk); if (lkN) b.lk = lkN; else delete b.lk; }
+      }
       out.push(b);
     }
     if (!out.length) out.push(blank('p'));

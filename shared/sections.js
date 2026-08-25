@@ -38,7 +38,8 @@
     /*@3.SECJ.9*/
     dir: '',
     /*@3.SECJ.10*/
-    fresh: 0, phase: ''
+    fresh: 0, phase: '',
+    next: 0, fail: 0, hold: 0
   };
 
   /*@3.SECJ.11*/
@@ -337,38 +338,54 @@
     } catch (e) { return null; }
   }
 
+  /*@3.SECJ.458*/
+  function paintCatalog(term, d, again) {
+    state.term = term;
+    state.all = d.sections || [];
+    readFresh(term);
+    GRAD = null;             /*@3.SECJ.33*/
+    if (!again) seedBasketFromSchedule();
+    buildFilters();
+    /*@3.SECJ.34*/
+    if (!again && profReady(loadProf()) && state.mine !== 'off') state.mine = 'on';
+    paintMe();
+    if (!again) savePrefs();
+    apply();
+    /*@3.SECJ.35*/
+    if (!again) setTimeout(function () {
+      try { schAnnounce(schReconcileRegistered()); } catch (e) {}
+    }, 400);
+  }
+
   /*@3.SECJ.32*/
   function loadTerm(term) {
     var grid = $('#sx-grid');
     grid.innerHTML = '<div class="sx-state"><i class="fa-solid fa-spinner fa-spin"></i>' +
       t('يُحمَّل الكتالوج…', 'Loading catalog…') + '</div>';
-    return fetch(API + '/v1/catalog/' + term + '.json')
-      .then(function (r) {
-        if (!r.ok) throw new Error('catalog-' + r.status);
-        return r.json();
-      })
-      .then(function (d) {
-        state.term = term;
-        state.all = d.sections || [];
-        readFresh(term);
-        GRAD = null;             /*@3.SECJ.33*/
-        seedBasketFromSchedule();
-        buildFilters();
-        /*@3.SECJ.34*/
-        if (profReady(loadProf()) && state.mine !== 'off') state.mine = 'on';
-        paintMe();
-        savePrefs();
-        apply();
-        /*@3.SECJ.35*/
-        setTimeout(function () {
-          try { schAnnounce(schReconcileRegistered()); } catch (e) {}
-        }, 400);
-      })
-      .catch(function (e) {
-        grid.innerHTML = '<div class="sx-state"><i class="fa-solid fa-triangle-exclamation"></i>' +
-          t('تعذّر تحميل الكتالوج', 'Could not load the catalog') +
-          '<div style="font-size:.76rem;margin-top:.4rem">' + esc(e.message) + '</div></div>';
-      });
+
+    function get() {
+      return fetch(API + '/v1/catalog/' + term + '.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error('catalog-' + r.status);
+          return r.json();
+        });
+    }
+
+    /*@3.SECJ.456*/
+    var FB = window.GardenFallback;
+    var drawn = 0;
+    /*@3.SECJ.457*/
+    function draw(d) { paintCatalog(term, d, drawn++ > 0); }
+
+    var run = FB
+      ? FB.through('catalog:' + term, get, { onData: draw })
+      : get().then(draw);
+
+    return run.catch(function (e) {
+      grid.innerHTML = '<div class="sx-state"><i class="fa-solid fa-triangle-exclamation"></i>' +
+        t('تعذّر تحميل الكتالوج', 'Could not load the catalog') +
+        '<div style="font-size:.76rem;margin-top:.4rem">' + esc(e.message) + '</div></div>';
+    });
   }
 
   /*@3.SECJ.36*/
@@ -558,6 +575,9 @@
     state.phase = (row && row.phase) || '';
     /*@3.SECJ.438*/
     state.next = row && row.next_run_at ? (new Date(row.next_run_at).getTime() || 0) : 0;
+    /*@3.SECJ.459*/
+    state.fail = Math.max(0, Number(row && row.fail) || 0);
+    state.hold = row && row.hold_until ? (new Date(row.hold_until).getTime() || 0) : 0;
   }
 
   /*@3.SECJ.54*/
@@ -566,24 +586,43 @@
     if (n === 2) return two;
     return (n >= 3 && n <= 10) ? (n + ' ' + few) : (n + ' ' + one);
   }
+
+  /*@3.SECJ.460*/
+  function spanWord(sec) {
+    sec = Math.max(0, Math.round(sec));
+    if (sec < 60) return t('أقلَّ من دقيقة', 'under a minute');
+    if (sec < 3600) {
+      var m = Math.round(sec / 60);
+      return t(arCount(m, 'دقيقة', 'دقيقتين', 'دقائق'), m + ' min');
+    }
+    if (sec < 86400) {
+      var h = Math.round(sec / 3600);
+      return t(arCount(h, 'ساعة', 'ساعتين', 'ساعات'), h + (h === 1 ? ' hour' : ' hours'));
+    }
+    /*@3.SECJ.56*/
+    var d = Math.round(sec / 86400);
+    if (d === 7) return t('أسبوع', 'a week');
+    return t(arCount(d, 'يوم', 'يومين', 'أيّام'), d + (d === 1 ? ' day' : ' days'));
+  }
+  function agoWord(ms) {
+    var w = spanWord((Date.now() - ms) / 1000);
+    return t('قبل ' + w, w + ' ago');
+  }
+  function inWord(ms) {
+    var w = spanWord((ms - Date.now()) / 1000);
+    return t('بعد ' + w, 'in ' + w);
+  }
+  function everyWord(sec) {
+    var w = spanWord(sec);
+    return t('كلَّ ' + w, 'every ' + w);
+  }
+
   /*@3.SECJ.55*/
   function cadenceWord() {
     var s = CADENCE_S[state.phase];
     if (!s) return '';
-    if (s < 3600) {
-      var m = Math.round(s / 60);
-      return t('تُحدَّث كل ' + arCount(m, 'دقيقة', 'دقيقتين', 'دقائق'),
-               'refreshes every ' + m + ' min');
-    }
-    if (s < 86400) {
-      var h = Math.round(s / 3600);
-      return t('تُحدَّث كل ' + arCount(h, 'ساعة', 'ساعتين', 'ساعات'),
-               'refreshes every ' + h + (h === 1 ? ' hour' : ' hours'));
-    }
-    /*@3.SECJ.56*/
-    var dd = Math.round(s / 86400);
-    return t('تُحدَّث كل ' + (dd === 7 ? 'أسبوع' : arCount(dd, 'يوم', 'يومين', 'أيام')),
-             'refreshes every ' + (dd === 7 ? 'week' : dd + ' days'));
+    var w = everyWord(s);
+    return t('تُحدَّث ' + w, 'refreshes ' + w);
   }
 
   /*@3.SECJ.57*/
@@ -595,21 +634,126 @@
     } catch (e) { return ''; }
   }
 
+  /*@3.SECJ.461*/
+  var FAIL_DOWN = 3;
+  function freshState() {
+    var per = CADENCE_S[state.phase] || 0;
+    var now = Date.now();
+    var age = state.fresh ? (now - state.fresh) / 1000 : 1e9;
+    if ((state.hold && state.hold > now) || state.fail >= FAIL_DOWN) return 'stopped';
+    if (state.fail > 0 || (per && age > per * 3)) return 'slow';
+    if (state.phase === 'ARCHIVE') return 'archive';
+    if (state.next && state.next <= now) return 'due';
+    return 'live';
+  }
+
+  function freshWords(kind) {
+    var per = CADENCE_S[state.phase] || 0;
+    var now = Date.now();
+    var A = state.fresh ? agoWord(state.fresh) : t('غيرُ معروف', 'unknown');
+    /*@3.SECJ.439*/
+    var nxt = (state.next && state.next > now) ? inWord(state.next) : '';
+    var E = per ? everyWord(per) : '';
+    /*@3.SECJ.464*/
+    var retry = (state.hold && state.hold > now) ? inWord(state.hold) : (nxt || '');
+    if (kind === 'stopped') {
+      return { n: t('بانر متوقّف', 'Banner is down'),
+               s: t('آخرُ قراءةٍ ' + A + (retry ? ' · نعاود ' + retry : ' · ونعيد المحاولة'),
+                    'last read ' + A + (retry ? ' · retrying ' + retry : ' · retrying')) };
+    }
+    if (kind === 'slow') {
+      var again = retry ? t('نعاود ' + retry, 'retrying ' + retry)
+                        : (E ? t('نعيد المحاولة ' + E, 'retrying ' + E) : '');
+      return { n: t('بانر بطيء', 'Banner is slow'),
+               s: t('آخرُ قراءةٍ ' + A + (again ? ' · ' + again : ''),
+                    'last read ' + A + (again ? ' · ' + again : '')) };
+    }
+    if (kind === 'archive') {
+      return { n: t('نسخةٌ أرشيفيّة', 'Archived copy'),
+               s: t('حُدِّثت ' + A + (nxt ? ' · المراجعةُ التالية ' + nxt : ''),
+                    'updated ' + A + (nxt ? ' · next review ' + nxt : '')) };
+    }
+    if (kind === 'due') {
+      return { n: t('يُحدَّث الآن', 'Updating now'),
+               s: t('آخرُ قراءةٍ ' + A, 'last read ' + A) };
+    }
+    return { n: t('نسخةٌ حيّة', 'Live copy'),
+             s: t('حُدِّثت ' + A + (nxt ? ' · التالية ' + nxt : (E ? ' · ' + cadenceWord() : '')),
+                  'updated ' + A + (nxt ? ' · next ' + nxt : (E ? ' · ' + cadenceWord() : ''))) };
+  }
+
   /*@3.SECJ.58*/
+  var FRESH_ICON = { stopped: 'fa-plug-circle-xmark', slow: 'fa-triangle-exclamation',
+                     due: 'fa-rotate fa-spin', archive: 'fa-box-archive', live: 'fa-rotate' };
   function freshHtml() {
     if (!state.fresh) return '';
-    var per = CADENCE_S[state.phase] || 0;
-    var old = per ? (Date.now() - state.fresh) > per * 3000 : false;
-    /*@3.SECJ.439*/
-    var cad = (state.next && state.next > Date.now())
-      ? t('التحديثُ القادم ' + stampWord(state.next),
-          'next update ' + stampWord(state.next))
-      : cadenceWord();
-    return '<span class="sx-fresh' + (old ? ' is-old' : '') + '" title="' +
-      esc(t('آخرُ قراءةٍ من بانر', 'Last read from Banner')) + '">' +
-      '<i class="fa-solid fa-rotate" aria-hidden="true"></i>' +
-      esc(t('حُدِّثت البيانات ', 'updated ') + stampWord(state.fresh) +
-          (cad ? ' — ' + cad : '')) + '</span>';
+    var kind = freshState(), w = freshWords(kind);
+    var loud = (kind === 'slow' || kind === 'stopped');
+    return '<span class="sx-fresh is-' + kind + '"' + (loud ? ' role="status"' : '') +
+      ' title="' + esc(t('آخرُ قراءةٍ من بانر: ', 'Last read from Banner: ') +
+                       stampWord(state.fresh)) + '">' +
+      '<i class="fa-solid ' + FRESH_ICON[kind] + '" aria-hidden="true"></i>' +
+      '<b>' + esc(w.n) + '</b>' + esc(' · ' + w.s) + '</span>';
+  }
+
+  /*@3.SECJ.462*/
+  var freshTimer = null, freshTick = null;
+
+  function freshPeriod() {
+    var per = CADENCE_S[state.phase] || 300;
+    return Math.min(Math.max(per, 60), 900) * 1000;
+  }
+
+  function pullCatalog() {
+    if (_open) return;
+    fetch(API + '/v1/catalog/' + state.term + '.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.sections) return;
+        var FB = window.GardenFallback;
+        if (FB && FB.save) FB.save('catalog:' + state.term, d);
+        paintCatalog(state.term, d, true);
+      })
+      .catch(function () {});
+  }
+
+  function pullTerms() {
+    if (pullTerms._busy || document.hidden || !state.term) return;
+    pullTerms._busy = true;
+    pullTerms._at = Date.now();
+    fetch(API + '/v1/terms', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.terms) return;
+        readCadence(d);
+        var was = state.fresh;
+        var ts = d.terms.filter(function (x) { return x.sections > 0; });
+        if (ts.length) state.terms = ts;
+        readFresh(state.term);
+        paintCount();
+        armFresh();
+        if (state.fresh && state.fresh !== was) pullCatalog();
+      })
+      .catch(function () {})
+      .then(function () { pullTerms._busy = false; });
+  }
+
+  function armFresh() {
+    if (freshTimer) clearInterval(freshTimer);
+    freshTimer = setInterval(pullTerms, freshPeriod());
+    /*@3.SECJ.463*/
+    if (!freshTick) freshTick = setInterval(function () {
+      if (!document.hidden && state.fresh) paintCount();
+    }, 30000);
+  }
+
+  function wireFresh() {
+    armFresh();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden || !state.term) return;
+      if (state.fresh) paintCount();
+      if (Date.now() - (pullTerms._at || 0) > freshPeriod() / 2) pullTerms();
+    });
   }
 
   /*@3.SECJ.436*/
@@ -4281,6 +4425,7 @@
         state.term = pick.term;
         $('#sx-term').innerHTML = termOptions(ts, pick.term);
         paintTermBtn(); paintSort(); wireTermFoot();
+        wireFresh();
         return loadTerm(pick.term);
       })
       .catch(function () {

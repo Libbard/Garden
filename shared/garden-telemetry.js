@@ -316,19 +316,56 @@
 
 
   var perf = {};
+  var perfSent = false;
+
+  var PERF_MAX_MS = 60000;
+
+  /*@3.GATJ.38*/
+  function clock() {
+    return (typeof performance !== 'undefined' && performance &&
+            typeof performance.now === 'function') ? performance.now() : 0;
+  }
+
+  /*@3.GATJ.32*/
+  var firstHidden = (document.visibilityState === 'hidden') ? 0 : Infinity;
+  (function () {
+    function mark() {
+      if (firstHidden === Infinity && document.visibilityState === 'hidden') {
+        firstHidden = clock();
+      }
+    }
+    document.addEventListener('visibilitychange', mark, true);
+    window.addEventListener('pagehide', mark, true);
+  })();
 
   function watchPerf() {
     if (typeof PerformanceObserver !== 'function') return;
     try {
       new PerformanceObserver(function (l) {
         var e = l.getEntries();
-        if (e.length) perf.lcp = Math.round(e[e.length - 1].startTime);
+        /*@3.GATJ.33*/
+        for (var i = e.length - 1; i >= 0; i--) {
+          if (e[i].startTime < firstHidden && e[i].startTime <= PERF_MAX_MS) {
+            perf.lcp = Math.round(e[i].startTime);
+            break;
+          }
+        }
       }).observe({ type: 'largest-contentful-paint', buffered: true });
     } catch (e) { }
+    /*@3.GATJ.34*/
     try {
+      var sum = 0, first = 0, last = 0;
       new PerformanceObserver(function (l) {
         l.getEntries().forEach(function (x) {
-          if (!x.hadRecentInput) perf.cls = Math.round(((perf.cls || 0) + x.value * 1000)) / 1;
+          if (x.hadRecentInput) return;
+          if (sum && x.startTime - first < 5000 && x.startTime - last < 1000) {
+            sum += x.value;
+          } else {
+            sum = x.value; first = x.startTime;
+          }
+          last = x.startTime;
+          var v = Math.round(sum * 1000);
+          if (!perf.cls || v > perf.cls) perf.cls = v;
         });
       }).observe({ type: 'layout-shift', buffered: true });
     } catch (e) { }
@@ -342,7 +379,10 @@
     } catch (e) { }
     try {
       var nav = performance.getEntriesByType('navigation')[0];
-      if (nav) perf.ttfb = Math.round(nav.responseStart);
+      /*@3.GATJ.37*/
+      if (nav && nav.responseStart > 0 && nav.responseStart <= PERF_MAX_MS) {
+        perf.ttfb = Math.round(nav.responseStart);
+      }
     } catch (e) { }
   }
 
@@ -458,7 +498,14 @@
 
   function leave() {
     ev('p_leave', { a: Math.round(attn / 1000), sd: Math.max(maxScroll, scrollDepth()) });
-    if (perf.lcp || perf.inp || perf.cls || perf.ttfb) ev('perf', perf);
+    /*@3.GATJ.35*/
+    if (!perfSent && (perf.lcp || perf.inp || perf.cls || perf.ttfb)) {
+      perfSent = true;
+      /*@3.GATJ.36*/
+      perf.pv = 2;
+      if (firstHidden === 0) perf.bg = 1;
+      ev('perf', perf);
+    }
     flush(true);
   }
 

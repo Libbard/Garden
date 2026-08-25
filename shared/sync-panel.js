@@ -59,7 +59,26 @@
     if (/vault-locked/.test(m))          return L('حسابُك محميّ — أدخل ما فعّلتَ به الحماية.', 'Your account is protected — enter what you protected it with.');
     if (/google-in-use/.test(m))         return L('حسابُ قوقل هذا مرتبطٌ بحسابٍ آخر.', 'That Google account is linked to another account.');
     if (/guard-unavailable/.test(m))     return L('تعذّر الوصولُ إلى خادم الحماية. أعد المحاولة.', 'Could not reach the protection server. Try again.');
-    return L('تعذّر إتمامُ العملية. تحقّق من اتصالك.', 'Could not complete. Check your connection.');
+    return downWord();
+  }
+
+  /*@3.SYPJ.46*/
+  /*@3.SYPJ.48*/
+  function downWord() {
+    if (navigator.onLine === false) {
+      return L('لا اتصالَ بالإنترنت عندك الآن. عملُك محفوظٌ في جهازك وسيُرفَع حين يعود الاتصال.',
+               'You are offline. Your work is saved on this device and will upload when you are back.');
+    }
+    var g = G(), q = g && g.quotaBlock && g.quotaBlock();
+    if (q) {
+      var why = (g.quotaMessage ? g.quotaMessage(q) : '');
+      return L('المزامنةُ متوقّفةٌ عند حدٍّ لا عن عطلٍ في الخادم. ',
+               'Syncing stopped at a limit, not a server fault. ') + why +
+        L(' وبقيّةُ عملك محفوظةٌ في جهازك، ولن تُستأنف المزامنةُ حتى تُعالَج.',
+          ' The rest of your work is safe on this device, and syncing will not resume until this is handled.');
+    }
+    return L('خادمُ المزامنة متوقّفٌ مؤقّتاً للصيانة وسيعود قريباً. عملُك محفوظٌ في جهازك ولم يضِع منه شيء.',
+             'The sync server is briefly down for maintenance and will be back soon. Your work is saved on this device and nothing is lost.');
   }
 
   /*@3.SYPJ.4*/
@@ -202,7 +221,10 @@
       synced:  L('كلُّ شيءٍ محفوظ', 'Everything is saved'),
       loading: L('جارٍ الحفظ…', 'Saving…'),
       pending: L('تغييراتٌ لم تُرفع بعد', 'Changes not uploaded yet'),
-      error:   L('تعذّر الاتصال', 'Connection trouble'),
+      /*@3.SYPJ.47*/
+      error:   (navigator.onLine === false)
+                 ? L('لا اتصالَ بالإنترنت', 'You are offline')
+                 : L('الخادمُ متوقّفٌ مؤقّتاً للصيانة', 'Server briefly down for maintenance'),
       offline: L('مرتبط', 'Linked'),
       off:     L('على هذا الجهاز فقط', 'This device only'),
       unconfirmed: L('مفتاحُك جاهز — ولم يصل الخادمَ بعد', 'Your key is ready — the server has not seen it yet'),
@@ -210,6 +232,8 @@
     };
     var sub = (st === 'off')
       ? L('عملُك محفوظٌ هنا ولن يتبعك إلى جهازٍ آخر.', 'Your work lives here and will not follow you elsewhere.')
+      : (st === 'error')
+      ? downWord()
       : (st === 'unconfirmed')
       ? L('لا تعتمد عليه حتى تنجح مزامنةٌ واحدة — اضغط زرَّ المزامنة بجانبه.',
           'Do not rely on it until one sync succeeds — press the sync button beside it.')

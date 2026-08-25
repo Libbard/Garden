@@ -193,7 +193,11 @@
         var now = Date.now();
         if (now - lastCheck < 60000) return;   /*@3.SWRJ.8*/
         lastCheck = now;
-        try { reg.update(); } catch (e) {}
+        /*@3.SWRJ.11*/
+        try {
+          var up = reg.update();
+          if (up && typeof up.catch === 'function') up.catch(function () {});
+        } catch (e) {}
       }
       checkForUpdate();
       document.addEventListener('visibilitychange', function () {

@@ -962,7 +962,7 @@
           /*@3.NOPJ2.51*/
           uni = [];
           for (k = 0; k < glyphs.length; k++) uni.push([]);
-          uni[rtl ? glyphs.length - 1 : 0] = seq[0].u;
+          uni[0] = seq[0].u;
         }
       } else if (LIG_SPLIT[cp]) {
         /*@3.NOPJ2.39*/
@@ -1377,6 +1377,13 @@
              ph: g.ph, pw: g.pw, pages: g.pages };
   }
 
+  function sliceRange(pages, range) {
+    if (!range) return pages;
+    var a = Math.max(1, Math.min(pages.length, range.from | 0));
+    var b = Math.max(a, Math.min(pages.length, range.to | 0));
+    return pages.slice(a - 1, b);
+  }
+
   function paginate(h, meta) {
     var ph = h.ph || meta.pageH || 1123;
     /*@3.NOPJ2.33*/
@@ -1385,7 +1392,7 @@
     n = Math.min(400, n);
     var pages = [];
     for (var i = 0; i < n; i++) {
-      pages.push({ top: i * ph, runs: [], boxes: [], imgs: [], inks: [], links: [],
+      pages.push({ top: i * ph, oi: i, runs: [], boxes: [], imgs: [], inks: [], links: [],
                    emo: [] });
     }
     function place(list, key, getY, getH) {
@@ -1408,6 +1415,22 @@
       pages[p].runs.push(r);
     }
     return pages;
+  }
+
+  /*@3.NOPJ2.73*/
+  function trimBlank(pages, inks, meta) {
+    var floorN = Math.max(1, (meta && meta.pages) || 0);
+    var far = 0, i;
+    for (i = 0; i < (inks || []).length; i++) {
+      if ((inks[i].y1 || 0) > far) far = inks[i].y1 || 0;
+    }
+    while (pages.length > floorN) {
+      var lp = pages[pages.length - 1];
+      if (lp.runs.length || lp.boxes.length || lp.imgs.length ||
+          lp.links.length || lp.emo.length) break;
+      if (far > lp.top) break;
+      pages.pop();
+    }
   }
 
   /*@3.NOPJ2.18*/
@@ -1809,10 +1832,12 @@
       ]));
     }
 
+    var nAll = h.nAll || pages.length;
+    var oiMap = h.oiMap || null;
     var destOf = {}, dk = Object.keys(h.dests);
     for (i = 0; i < dk.length; i++) {
       var dd = h.dests[dk[i]];
-      var pi = Math.max(0, Math.min(pages.length - 1, Math.floor(dd.y / ph)));
+      var pi = Math.max(0, Math.min(nAll - 1, Math.floor(dd.y / ph)));
       destOf[dk[i]] = { p: pi, y: phPt - (dd.y - pi * ph) * PT };
     }
 
@@ -1856,8 +1881,11 @@
           } else {
             var t = destOf[lk.to];
             if (!t) continue;
+            /*@3.NOPJ2.71*/
+            var tp = oiMap ? oiMap[t.p] : t.p;
+            if (tp == null) continue;
             an.push(doc.add('<< /Type /Annot /Subtype /Link /Border [0 0 0] /Rect ' + rect +
-              ' /Dest [' + pageIds[t.p] + ' 0 R /XYZ 0 ' + num(t.y) + ' null] >>'));
+              ' /Dest [' + pageIds[tp] + ' 0 R /XYZ 0 ' + num(t.y) + ' null] >>'));
           }
         }
         /*@3.NOPJ2.44*/
@@ -1873,13 +1901,19 @@
 
       var outlineId = 0;
       var marks = h.marks.slice().sort(function (a, b) { return a.y - b.y; });
+      /*@3.NOPJ2.72*/
+      marks = marks.filter(function (mk) {
+        var pi2 = Math.max(0, Math.min(nAll - 1, Math.floor(mk.y / ph)));
+        return !oiMap || oiMap[pi2] != null;
+      });
       if (marks.length) {
         outlineId = doc.reserve();
         var itemIds = marks.map(function () { return doc.reserve(); });
         for (var mi = 0; mi < marks.length; mi++) {
           var mk = marks[mi];
-          var pIdx = Math.max(0, Math.min(pages.length - 1, Math.floor(mk.y / ph)));
-          var my = phPt - (mk.y - pIdx * ph) * PT;
+          var pAbs = Math.max(0, Math.min(nAll - 1, Math.floor(mk.y / ph)));
+          var pIdx = oiMap ? oiMap[pAbs] : pAbs;
+          var my = phPt - (mk.y - pAbs * ph) * PT;
           doc.set(itemIds[mi], '<< /Title ' + utf16be(mk.t) + ' /Parent ' + outlineId + ' 0 R' +
             (mi > 0 ? (' /Prev ' + itemIds[mi - 1] + ' 0 R') : '') +
             (mi < marks.length - 1 ? (' /Next ' + itemIds[mi + 1] + ' 0 R') : '') +
@@ -1907,15 +1941,23 @@
     }).then(function (m) {
       mounted = m;
       var h = harvest(m.doc, meta);
-      var pages = paginate(h, meta);
-
+      /*@3.NOPJ2.70*/
+      var all = paginate(h, meta);
       var ph = h.ph || meta.pageH || 1123;
       return inkLayers(m.doc, meta, docModel, h.org).then(function (inks) {
+      trimBlank(all, inks, meta);
+      h.nAll = all.length;
+      var pages = sliceRange(all, meta.range);
+      h.oiMap = {};
+      for (var oq = 0; oq < pages.length; oq++) h.oiMap[pages[oq].oi] = oq;
       for (var ii = 0; ii < inks.length; ii++) {
         var yTop = inks[ii].y0, yBot = inks[ii].y1, q;
         var a = Math.max(0, Math.floor(yTop / ph));
-        var b = Math.min(pages.length - 1, Math.floor(yBot / ph));
-        for (q = a; q <= b; q++) pages[q].inks.push(inks[ii]);
+        var b = Math.min(h.nAll - 1, Math.floor(yBot / ph));
+        for (q = a; q <= b; q++) {
+          var np = h.oiMap[q];
+          if (np != null) pages[np].inks.push(inks[ii]);
+        }
       }
 
       var need = {};
@@ -1968,7 +2010,8 @@
       var a = document.createElement('a');
       var name = String(meta.title || L('ملاحظة', 'Note'))
         .replace(/[\\/:*?"<>|]/g, '-').slice(0, 60).trim() || 'note';
-      a.href = url; a.download = name + '.pdf';
+      var rg = meta.range ? ('-p' + meta.range.from + '-' + meta.range.to) : '';
+      a.href = url; a.download = name + rg + '.pdf';
       document.body.appendChild(a);
       a.click();
       setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 4000);

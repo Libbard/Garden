@@ -394,6 +394,22 @@
 
   function isBreak(t) { return /^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})$/.test(t); }
   function fenceAt(t) { return t.match(/^ {0,3}(`{3,}|~{3,})\s*([^`]*)$/); }
+  /*@3.NOMJ3.46*/
+  var CAL_ALIAS = {
+    note: 'note', info: 'note', abstract: 'note', summary: 'note',
+    tip: 'tip', hint: 'tip', success: 'tip', check: 'tip',
+    important: 'important', question: 'important', example: 'important',
+    warning: 'warning', warn: 'warning', attention: 'warning',
+    caution: 'caution', danger: 'caution', error: 'caution', bug: 'caution'
+  };
+  function dirAt(t) { return t.match(/^ {0,3}(:{3,})[ 	]*(.*)$/); }
+  function dirKind(info) {
+    var s0 = String(info || '').trim();
+    if (!s0) return '';
+    var w = s0.match(/^\{?\.?([A-Za-z]+)/);
+    if (!w) return '';
+    return CAL_ALIAS[w[1].toLowerCase()] || '';
+  }
   function bulletAt(t) { return t.match(/^ {0,9}([\-*+])[ \t]+(.*)$/); }
   function defAt(t) {
     var m = String(t == null ? '' : t).match(/^ {0,3}:[ \t]+(.*)$/);
@@ -462,7 +478,33 @@
           src.push(lines[i].slice(Math.min(strip, indentOf(lines[i])))); i++;
         }
         i++;
-        add(blank('code', { lang: lang, src: src.join('\n') }));
+        var cbk = blank('code', { lang: lang, src: src.join('\n') });
+        /*@3.NOMJ3.44*/
+        if (/^mermaid$/i.test(String(lang || '').trim())) cbk.dgm = 1;
+        add(cbk);
+        continue;
+      }
+
+      var dm = dirAt(t);
+      if (dm && dm[2]) {
+        var dlen = dm[1].length, depth = 1, body = [];
+        i++;
+        while (i < lines.length) {
+          var dt = lines[i].trim();
+          var dn = dirAt(dt);
+          if (dn && dn[1].length >= dlen) {
+            if (!dn[2]) { depth--; if (!depth) { i++; break; } }
+            else depth++;
+          }
+          body.push(lines[i]); i++;
+        }
+        var dkind = dirKind(dm[2]);
+        var dinner = parseBlocks(body, ctx, 0);
+        for (var dz = 0; dz < dinner.length; dz++) {
+          var db = dinner[dz];
+          if (dkind && db.ty === 'p') { db.ty = 'callout'; db.cal = dkind; }
+          add(db);
+        }
         continue;
       }
 
@@ -555,13 +597,8 @@
           if (ib.ty === 'p') {
             ib.ty = (alert && ALERT[kind]) ? 'callout' : 'quote';
             /*@3.NOMJ3.21*/
-            if (alert && ALERT[kind]) {
-              ib.cal = kind;
-              if (z === 0) {
-                ib.rt = [{ s: (isAr() ? ALERT[kind].ar : ALERT[kind].en) + ' \u2014 ', b: 1, cl: 1 }]
-                  .concat(ib.rt || []);
-              }
-            }
+            /*@3.NOMJ3.45*/
+            if (alert && ALERT[kind]) ib.cal = kind;
           }
           add(ib);
         }
@@ -613,6 +650,27 @@
         if (iu) { add(blank('img', { url: iu, alt: im[1] || '' })); i++; continue; }
       }
 
+      /*@3.NOMJ3.48*/
+      var iml = t.match(/^\[!\[([^\]]*)\]\(\s*([^)\s]+)[^)]*\)\]\(\s*([^)\s]+)[^)]*\)\s*$/);
+      if (iml) {
+        var ilu = extUrl(iml[2]);
+        var ilh = anyUrl(iml[3]);
+        if (ilu) {
+          add(blank('img', ilh ? { url: ilu, alt: iml[1] || '', lk: ilh }
+                                : { url: ilu, alt: iml[1] || '' }));
+          i++; continue;
+        }
+      }
+
+      /*@3.NOMJ3.47*/
+      var imr = t.match(/^!\[([^\]]*)\](?:[ ]?\[([^\]]*)\])?\s*$/);
+      if (imr) {
+        var rk = (imr[2] || imr[1] || '').toLowerCase().trim();
+        var rdef = rk && ctx && ctx.refs ? ctx.refs[rk] : null;
+        var ru = rdef ? extUrl(rdef.u) : '';
+        if (ru) { add(blank('img', { url: ru, alt: imr[1] || '' })); i++; continue; }
+      }
+
       /*@3.NOMJ3.12*/
       if (HTML_BLOCK.test(t)) {
         var htm = [];
@@ -644,7 +702,19 @@
     return out;
   }
 
+  /*@3.NOMJ3.43*/
   function peel(html, ctx) {
+    var SAN = window.GardenNotesSanitize;
+    if (SAN && SAN.fromHtml) {
+      try {
+        var got = SAN.fromHtml(String(html));
+        if (got && got.length) return got;
+      } catch (eH) {}
+    }
+    return peelFlat(html, ctx);
+  }
+
+  function peelFlat(html, ctx) {
     var txt = String(html)
       .replace(/<(script|style)[\s\S]*?<\/\1>/gi, '')
       .replace(/<br\s*\/?>/gi, '\n')
@@ -940,7 +1010,10 @@
         case 'code':  return '```' + (b.lang || '') + '\n' + (b.src || '') + '\n```';
         case 'math':  return b.display ? '$$\n' + (b.tex || '') + '\n$$' : '$' + (b.tex || '') + '$';
         case 'tbl':   return tableMd(b);
-        case 'img':   return b.url ? '![' + (b.alt || '') + '](' + b.url + ')' : '';
+        case 'img':   return b.url
+          ? (b.lk ? '[![' + (b.alt || '') + '](' + b.url + ')](' + b.lk + ')'
+                  : '![' + (b.alt || '') + '](' + b.url + ')')
+          : '';
         case 'ink':   return '_[drawing]_';
         case 'hr':    return '---';
         default:      return '';

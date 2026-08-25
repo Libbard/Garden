@@ -20,17 +20,20 @@
     return (window.GardenCanvas && GardenCanvas.hexOf) ? GardenCanvas.hexOf(t) : '#888';
   }
 
-  var TONES = ['ink', 'amber', 'rose', 'violet', 'emerald', 'sky',
-               'lime', 'orange', 'red', 'pink', 'teal', 'indigo'];
+  /*@3.NODJ.38*/
+  var TONES = ['ink', 'red', 'orange', 'yellow', 'lime', 'emerald',
+               'teal', 'sky', 'indigo', 'violet', 'pink', 'brown'];
   var TONE_AR = {
-    ink: 'الحبر', amber: 'كهرماني', rose: 'وردي', violet: 'بنفسجي',
-    emerald: 'زمردي', sky: 'سماوي', lime: 'ليموني', orange: 'برتقالي',
-    red: 'أحمر', pink: 'زهري', teal: 'فيروزي', indigo: 'نيلي'
+    ink: 'الحبر', red: 'أحمر', orange: 'برتقالي', yellow: 'أصفر',
+    lime: 'ليموني', emerald: 'أخضر', teal: 'فيروزي', sky: 'أزرق',
+    indigo: 'نيلي', violet: 'بنفسجي', pink: 'زهري', brown: 'بنّي',
+    amber: 'كهرماني', rose: 'وردي'
   };
   var TONE_EN = {
-    ink: 'Ink', amber: 'Amber', rose: 'Rose', violet: 'Violet',
-    emerald: 'Emerald', sky: 'Sky', lime: 'Lime', orange: 'Orange',
-    red: 'Red', pink: 'Pink', teal: 'Teal', indigo: 'Indigo'
+    ink: 'Ink', red: 'Red', orange: 'Orange', yellow: 'Yellow',
+    lime: 'Lime', emerald: 'Green', teal: 'Teal', sky: 'Blue',
+    indigo: 'Indigo', violet: 'Violet', pink: 'Pink', brown: 'Brown',
+    amber: 'Amber', rose: 'Rose'
   };
 
   var PEN_W = [1.2, 2.4, 4, 7, 12];
@@ -39,7 +42,9 @@
     { k: 'round',  ar: 'مدوّرة',  en: 'Round' },
     { k: 'fine',   ar: 'رفيعة',   en: 'Fine' },
     { k: 'marker', ar: 'ثابتة',   en: 'Marker' },
-    { k: 'flat',   ar: 'مشطوفة',  en: 'Chisel' }
+    { k: 'flat',   ar: 'مشطوفة',  en: 'Chisel' },
+    { k: 'pencil', ar: 'رصاص',    en: 'Pencil' },
+    { k: 'chalk',  ar: 'طباشير',  en: 'Chalk' }
   ];
   var SHAPES = [
     { k: 'rect', icon: 'fa-square',           ar: 'مستطيل', en: 'Rectangle' },
@@ -52,15 +57,20 @@
 
   var NIB_ICON = {
     round: ICONS.nibRound, fine: ICONS.nibFine,
-    marker: ICONS.nibMarker, flat: ICONS.nibChisel
+    marker: ICONS.nibMarker, flat: ICONS.nibChisel,
+    pencil: '<i class="fa-solid fa-pencil" aria-hidden="true"></i>',
+    chalk: '<i class="fa-solid fa-brush" aria-hidden="true"></i>'
   };
 
   var LASSO_SVG = (window.GardenNotesIcons || {}).lasso || '';
 
   /*@3.NODJ.1*/
   var RING1 = [
-    { k: 'pen',   icon: 'fa-pen',           ar: 'قلم',        en: 'Pen',         tool: 'pen',   ring: 'nib' },
-    { k: 'pencil', icon: 'fa-pencil',       ar: 'رصاص',       en: 'Pencil',      tool: 'pencil' },
+    { k: 'pen',   icon: 'fa-pen',           ar: 'قلم',        en: 'Pen',         tool: 'pen' },
+    /*@3.NODJ.39*/
+    { k: 'nib',   icon: 'fa-pen-nib',       ar: 'رأسُ القلم', en: 'Pen tip',     ring: 'nib' },
+    { k: 'color', icon: 'fa-palette',       ar: 'اللون',      en: 'Colour',      ring: 'color' },
+    { k: 'size',  html: ICONS.width,        ar: 'السماكة',    en: 'Thickness',   ring: 'size' },
     { k: 'hi',    icon: 'fa-highlighter',   ar: 'فسفوري',     en: 'Highlighter', tool: 'hi',    ring: 'hiw' },
     { k: 'era',   html: ICONS.eraser,       ar: 'ممحاة',      en: 'Eraser',      tool: 'era', ring: 'era' },
     { k: 'shape', icon: 'fa-shapes',        ar: 'أشكال',      en: 'Shapes',      ring: 'shape' },
@@ -68,8 +78,6 @@
     { k: 'lasso', html: LASSO_SVG,          ar: 'لاسو حرّ',   en: 'Free lasso',  tool: 'lasso' },
     { k: 'sel',   icon: 'fa-arrow-pointer', ar: 'تحديد',      en: 'Select',      tool: 'sel' },
     { k: 'hand',  icon: 'fa-hand',          ar: 'تمرير الصفحة', en: 'Scroll page', tool: 'hand' },
-    { k: 'color', icon: 'fa-palette',       ar: 'اللون',      en: 'Colour',      ring: 'color' },
-    { k: 'size',  html: ICONS.width,        ar: 'السماكة',    en: 'Thickness',   ring: 'size' },
     { k: 'undo',  icon: 'fa-rotate-left',   ar: 'تراجع',      en: 'Undo' },
     { k: 'redo',  icon: 'fa-rotate-right',  ar: 'إعادة',      en: 'Redo' },
     { k: 'exit',  icon: 'fa-xmark',         ar: 'إنهاء الرسم', en: 'Exit drawing' }
@@ -125,9 +133,9 @@
   var FAV_DEFAULTS = [
     { tool: 'pen', color: 'ink',     width: 4, nib: 'round' },
     { tool: 'pen', color: 'red',     width: 4, nib: 'round' },
-    { tool: 'pen', color: 'emerald', width: 4, nib: 'round' },
     { tool: 'pen', color: 'sky',     width: 4, nib: 'round' },
-    { tool: 'hi',  color: 'amber',   width: 26, nib: 'marker', straight: 1 },
+    { tool: 'pen', color: 'ink',     width: 4, nib: 'pencil' },
+    { tool: 'hi',  color: 'yellow',  width: 26, nib: 'marker', straight: 1 },
     { tool: 'lasso', color: 'ink',   width: 4, nib: 'round' }
   ];
 
@@ -200,6 +208,11 @@
                                  : L('ممحاة ذكيّة', 'Smart eraser');
     }
     if (f.tool === 'lasso' || f.tool === 'sel' || f.tool === 'hand') return tn;
+    if (f.tool === 'pen' && (f.nib === 'pencil' || f.nib === 'chalk')) {
+      var nn = (f.nib === 'pencil') ? L('رصاص', 'Pencil') : L('طباشير', 'Chalk');
+      return nn + ' · ' + (TONE_AR[f.color] ? L(TONE_AR[f.color], TONE_EN[f.color]) : f.color) +
+             ' · ' + f.width;
+    }
     if (f.tool === 'hi') {
       return L('تظليل', 'Highlight') + ' · ' +
         (TONE_AR[f.color] ? L(TONE_AR[f.color], TONE_EN[f.color]) : f.color) + ' · ' +
@@ -737,12 +750,14 @@
       });
       /*@3.NODJ.12*/
       if (kind === 'hiw') {
-        out2.push({ k: 'str:1', ar: 'تظليل مستقيم على سطر واحد', en: 'Straight one-line highlight',
-                    pressed: !!(cv && cv.hiStraight),
-                    html: ICONS.hiStraight });
-        out2.push({ k: 'str:0', ar: 'تظليل حرّ يتبع يدك', en: 'Free highlight that follows your hand',
-                    pressed: !!(cv && !cv.hiStraight),
-                    html: ICONS.hiWave });
+        /*@3.NODJ.40*/
+        var hm = (cv && cv.hiMode) || 'text';
+        out2.push({ k: 'hm:text', ar: 'يلتقط سطرَ النصّ ويظلّله', en: 'Snaps to the line of text',
+                    pressed: hm === 'text', icon: 'fa-align-center' });
+        out2.push({ k: 'hm:line', ar: 'تظليل مستقيم حيثما رسمت', en: 'Straight, wherever you draw',
+                    pressed: hm === 'line', html: ICONS.hiStraight });
+        out2.push({ k: 'hm:free', ar: 'تظليل حرّ يتبع يدك', en: 'Free highlight that follows your hand',
+                    pressed: hm === 'free', html: ICONS.hiWave });
       }
       return out2;
     }
@@ -764,9 +779,14 @@
       });
     }
     if (kind === 'color') {
+      var isHi = !!(cv && cv.tool === 'hi');
+      var swHex = function (t) {
+        if (isHi && window.GardenCanvas && GardenCanvas.hiHexOf) return GardenCanvas.hiHexOf(t);
+        return hexOf(t);
+      };
       var out = TONES.map(function (t) {
         return { k: 'c:' + t, ar: TONE_AR[t], en: TONE_EN[t],
-                 cls: 'ndl-sw', style: '--t:' + hexOf(t),
+                 cls: 'ndl-sw', style: '--t:' + swHex(t),
                  pressed: cv && cv.color === t, html: '' };
       });
       out.push({ k: 'c:custom', icon: 'fa-eye-dropper',
@@ -953,6 +973,7 @@
     else if (k === 'z:out') cv.setUserZoom(cv.userZ / 1.25);
     else if (k.indexOf('era:') === 0) cv.setEraseMode(k.slice(4));
     else if (k.indexOf('str:') === 0) cv.setStraight(k.slice(4) === '1');
+    else if (k.indexOf('hm:') === 0 && cv.setHiMode) cv.setHiMode(k.slice(3));
     else if (k === 'z:100') cv.resetZoom();
     else if (k === 'z:fit') cv.resetZoom();
     this.sync();

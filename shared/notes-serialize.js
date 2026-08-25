@@ -92,6 +92,28 @@
     return a ? ' id="' + esc(a) + '"' : '';
   }
 
+
+  /*@3.NOSJ4.7*/
+  var CAL_UI = {
+    note:      { t: '#1273cc', ar: 'ملاحظة', en: 'Note' },
+    tip:       { t: '#0a8f4d', ar: 'فائدة',  en: 'Tip' },
+    important: { t: '#3f4d63', ar: 'مهمّ',    en: 'Important' },
+    warning:   { t: '#b8730a', ar: 'تحذير',  en: 'Warning' },
+    caution:   { t: '#cc2f2f', ar: 'تنبيه',  en: 'Caution' }
+  };
+
+  function calHtml(b, s) {
+    var k = String(b.cal || 'note').toLowerCase();
+    var c = CAL_UI[k] || CAL_UI.note;
+    var rt = (b.rt || []).slice();
+    if (rt.length && rt[0] && rt[0].cl) rt = rt.slice(1);
+    var isar = true;
+    try { isar = (localStorage.getItem('garden_lang') || 'ar') === 'ar'; } catch (e) {}
+    return '<div class="cal cal-' + k + '"' + s + '>' +
+      '<div class="cal-h">' + esc(isar ? c.ar : c.en) + '</div>' +
+      '<div class="cal-b">' + runs(rt) + '</div></div>';
+  }
+
   function blockHtml(b) {
     var s = styleOf(b);
     var lv = b.lv || 2;
@@ -100,7 +122,7 @@
       case 'h':       return '<h' + lv + s + hid(b) + '>' + runs(b.rt) + '</h' + lv + '>';
       case 'p':       return '<p' + s + '>' + runs(b.rt) + '</p>';
       case 'quote':   return '<blockquote' + s + '>' + runs(b.rt) + '</blockquote>';
-      case 'callout': return '<div class="cal"' + s + '>' + runs(b.rt) + '</div>';
+      case 'callout': return calHtml(b, s);
       case 'todo':    return '<p class="td"' + s + '><span class="bx">' +
                         (b.done ? '&#10003;' : '&#160;') + '</span>' + runs(b.rt) + '</p>';
       case 'ul':
@@ -127,7 +149,14 @@
     '.hd h1{margin:0;font-size:1.6rem}.hd .sub{font-size:.8rem;color:#9ca3af;margin-top:.2rem}' +
     'p{margin:0 0 .6rem}ul,ol{margin:0 0 .6rem;padding-inline-start:1.4rem}' +
     'blockquote{margin:0 0 .7rem;padding-inline-start:.7rem;border-inline-start:3px solid #d1d5db;color:#4b5563}' +
-    '.cal{margin:0 0 .7rem;padding:.6rem .8rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.5rem}' +
+    '.cal{margin:0 0 .7rem;padding:.55rem .9rem;border:0;border-inline-start:3px solid #9ca3af;border-radius:12px;background:#fafbfc}' +
+    '.cal .cal-h{font-weight:800;font-size:.8rem;margin-bottom:.22rem;letter-spacing:.01em}' +
+    '.cal .cal-b{margin:0}' +
+    '.cal-note{border-inline-start-color:#1273cc;background:#f2f7fd}.cal-note .cal-h{color:#1273cc}' +
+    '.cal-tip{border-inline-start-color:#0a8f4d;background:#f1faf5}.cal-tip .cal-h{color:#0a8f4d}' +
+    '.cal-important{border-inline-start-color:#3f4d63;background:#f5f6f8}.cal-important .cal-h{color:#3f4d63}' +
+    '.cal-warning{border-inline-start-color:#b8730a;background:#fdf8ef}.cal-warning .cal-h{color:#b8730a}' +
+    '.cal-caution{border-inline-start-color:#cc2f2f;background:#fdf3f3}.cal-caution .cal-h{color:#cc2f2f}' +
     '.td .bx{display:inline-block;inline-size:1em;block-size:1em;border:1px solid #9ca3af;' +
       'border-radius:.2rem;margin-inline-end:.4rem;text-align:center;line-height:1em;font-size:.8em}' +
     'pre{font-family:ui-monospace,Consolas,monospace;font-size:.86rem;line-height:1.6;' +

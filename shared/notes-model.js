@@ -92,7 +92,8 @@
         },
         updated_at: stamp(n.updated_at, stamp(n.created_at, 0)),
         created_at: stamp(n.created_at, 0),
-        href: (o && o.page) ? (ROOT + o.page) : (ROOT + 'index.html'),
+        /*@3.NOMJ.7*/
+        href: (o && o.page) ? (ROOT + o.page + '#qn-' + n.id) : (ROOT + 'index.html'),
         editable: true
       });
     }

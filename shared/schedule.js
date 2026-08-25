@@ -362,48 +362,10 @@
     if (st.semester_end_date && dateObj > parseLocalDate(st.semester_end_date)) return false;
     return true;
   }
-  /*@3.SCHJ.46*/
-  function bannerTermRange() {
-    var start = '', end = '';
-    (schedule.lectures || []).forEach(function (l) {
-      if (!l || !l.sx_crn || !l.start_date) return;
-      if (!start || l.start_date < start) start = l.start_date;
-    });
-    (schedule.exams || []).forEach(function (x) {
-      if (!x || !x.sx_crn || x.exam_type !== 'final' || !x.date) return;
-      if (!end || x.date > end) end = x.date;
-    });
-    return { start: start, end: end };
-  }
-
-  /*@3.SCHJ.47*/
-  function termIsManual() {
-    var st = schedule.settings || {};
-    var a = st.term_auto || {};
-    if (!st.term_start_date && !st.semester_end_date) return false;
-    return (st.term_start_date || '') !== (a.start || '') ||
-           (st.semester_end_date || '') !== (a.end || '');
-  }
-
-  /*@3.SCHJ.48*/
   function syncTermRange() {
-    var r = bannerTermRange();
-    if (!r.start && !r.end) return null;
-    var st = schedule.settings;
-    if (termIsManual()) {
-      /*@3.SCHJ.49*/
-      var rej = st.term_rejected || {};
-      if ((rej.start || '') === (r.start || '') && (rej.end || '') === (r.end || '')) return null;
-      if ((r.start && r.start !== st.term_start_date) ||
-          (r.end && r.end !== st.semester_end_date)) return r;
-      return null;
-    }
-    var changed = false;
-    if (r.start && st.term_start_date !== r.start) { st.term_start_date = r.start; changed = true; }
-    if (r.end && st.semester_end_date !== r.end) { st.semester_end_date = r.end; changed = true; }
-    if (changed) { st.term_auto = { start: st.term_start_date, end: st.semester_end_date }; save(); }
-    else if (!st.term_auto) { st.term_auto = { start: st.term_start_date, end: st.semester_end_date }; save(); }
-    return null;
+    var res = GardenData.syncTermRange(schedule, { save: false });
+    if (res.changed) save();
+    return res.conflict;
   }
 
   /*@3.SCHJ.233*/
