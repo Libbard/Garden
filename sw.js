@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.2.45'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.2.78'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -16,6 +16,8 @@ var PRECACHE_URLS = [
   'shared/garden-data.js',
   /*@0.SWJ.108*/
   'shared/garden-telemetry.js',
+  /*@0.SWJ.128*/
+  'shared/garden-fallback.js',
   /*@0.SWJ.43*/
   'shared/bilingual-name.js',
   /*@0.SWJ.44*/
