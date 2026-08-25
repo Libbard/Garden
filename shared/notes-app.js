@@ -4454,9 +4454,9 @@
       var ceP = t && t.closest ? t.closest('[contenteditable="true"]') : null;
       if (ceP) return;
       var cvP = inkCv();
-      var hasB = window.GardenNotesEditor && GardenNotesEditor.hasClip && GardenNotesEditor.hasClip();
+      /*@3.NOAJ.179*/
       var hasI = !!(cvP && cvP.clip && cvP.clip.length);
-      if (!hasB && !hasI) return;
+      if (!hasI) return;
       e.preventDefault();
       if (ribbon) ribbon.clipAct('paste');
       return;

@@ -602,11 +602,8 @@
     /*@3.SECJ.56*/
     var d = Math.round(sec / 86400);
     if (d === 7) return t('أسبوع', 'a week');
-    return t(arCount(d, 'يوم', 'يومين', 'أيّام'), d + (d === 1 ? ' day' : ' days'));
-  }
-  function agoWord(ms) {
-    var w = spanWord((Date.now() - ms) / 1000);
-    return t('قبل ' + w, w + ' ago');
+    return t(d > 10 ? d + ' يوماً' : arCount(d, 'يوم', 'يومين', 'أيّام'),
+             d + (d === 1 ? ' day' : ' days'));
   }
   function inWord(ms) {
     var w = spanWord((ms - Date.now()) / 1000);
@@ -626,6 +623,7 @@
   }
 
   /*@3.SECJ.57*/
+  /*@3.SECJ.465*/
   function stampWord(ms) {
     try {
       var d = new Date(ms), lc = isAr() ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB';
@@ -647,39 +645,57 @@
     return 'live';
   }
 
-  function freshWords(kind) {
-    var per = CADENCE_S[state.phase] || 0;
+  function nextWord() {
     var now = Date.now();
-    var A = state.fresh ? agoWord(state.fresh) : t('غيرُ معروف', 'unknown');
     /*@3.SECJ.439*/
     var nxt = (state.next && state.next > now) ? inWord(state.next) : '';
-    var E = per ? everyWord(per) : '';
     /*@3.SECJ.464*/
-    var retry = (state.hold && state.hold > now) ? inWord(state.hold) : (nxt || '');
-    if (kind === 'stopped') {
-      return { n: t('بانر متوقّف', 'Banner is down'),
-               s: t('آخرُ قراءةٍ ' + A + (retry ? ' · نعاود ' + retry : ' · ونعيد المحاولة'),
-                    'last read ' + A + (retry ? ' · retrying ' + retry : ' · retrying')) };
-    }
-    if (kind === 'slow') {
-      var again = retry ? t('نعاود ' + retry, 'retrying ' + retry)
-                        : (E ? t('نعيد المحاولة ' + E, 'retrying ' + E) : '');
-      return { n: t('بانر بطيء', 'Banner is slow'),
-               s: t('آخرُ قراءةٍ ' + A + (again ? ' · ' + again : ''),
-                    'last read ' + A + (again ? ' · ' + again : '')) };
+    return (state.hold && state.hold > now) ? inWord(state.hold) : nxt;
+  }
+
+  function freshTail(kind) {
+    var per = CADENCE_S[state.phase] || 0;
+    var w = nextWord();
+    if (kind === 'stopped' || kind === 'slow') {
+      return w ? t('نعاود ' + w, 'retrying ' + w)
+               : (per ? t('نعيد المحاولة ' + everyWord(per), 'retrying ' + everyWord(per)) : '');
     }
     if (kind === 'archive') {
-      return { n: t('نسخةٌ أرشيفيّة', 'Archived copy'),
-               s: t('حُدِّثت ' + A + (nxt ? ' · المراجعةُ التالية ' + nxt : ''),
-                    'updated ' + A + (nxt ? ' · next review ' + nxt : '')) };
+      return w ? t('المراجعةُ التالية ' + w, 'next review ' + w) : cadenceWord();
+    }
+    if (kind === 'due') return t('يُحدَّث الآن', 'updating now');
+    return w ? t('التحديثُ التالي ' + w, 'next update ' + w) : cadenceWord();
+  }
+
+  /*@3.SECJ.466*/
+  function freshMsg(kind) {
+    var per = CADENCE_S[state.phase] || 0;
+    var w = nextWord();
+    var E = per ? everyWord(per) : '';
+    var again = w ? t('ونعاود ' + w, 'and we retry ' + w)
+                  : (E ? t('ونعيد المحاولة ' + E, 'and we retry ' + E) : t('ونعيد المحاولة', 'and we keep retrying'));
+    if (kind === 'stopped') {
+      return t('بانر متوقّفٌ عن الردّ الآن، ' + again +
+               '. والمعروضُ أمامك آخرُ قراءةٍ نجحت — الشعبُ صحيحةٌ لكنّها قد لا تكون أحدثَ من ذلك.',
+               'Banner is not responding right now, ' + again +
+               '. What you see is the last successful read — accurate, but possibly not the latest.');
+    }
+    if (kind === 'slow') {
+      return t('بانرُ الجامعةِ بطيءٌ الآن ولم تكتمل آخرُ محاولةِ قراءة، ' + again + '.',
+               'Banner is slow right now and the last read did not complete, ' + again + '.');
+    }
+    if (kind === 'archive') {
+      return t('نسخةٌ أرشيفيّة — هذا فصلٌ منتهٍ، فشعبُه لقطةٌ ثابتة' +
+               (E ? ' نراجعها ' + E : '') + '.',
+               'Archived copy — this term has ended, so its sections are a fixed snapshot' +
+               (E ? ', reviewed ' + E : '') + '.');
     }
     if (kind === 'due') {
-      return { n: t('يُحدَّث الآن', 'Updating now'),
-               s: t('آخرُ قراءةٍ ' + A, 'last read ' + A) };
+      return t('يُحدَّث الآن — حان موعدُ القراءة من بانر، وتظهر نتيجتُها خلال دقائق.',
+               'Updating now — a read from Banner is due, and its result appears within minutes.');
     }
-    return { n: t('نسخةٌ حيّة', 'Live copy'),
-             s: t('حُدِّثت ' + A + (nxt ? ' · التالية ' + nxt : (E ? ' · ' + cadenceWord() : '')),
-                  'updated ' + A + (nxt ? ' · next ' + nxt : (E ? ' · ' + cadenceWord() : ''))) };
+    return t('نسخةٌ حيّة — القراءةُ تصل من بانر ' + (E || '') + ' وكلُّ شيءٍ يعمل.',
+             'Live copy — we read from Banner ' + (E || '') + ' and everything is working.');
   }
 
   /*@3.SECJ.58*/
@@ -687,13 +703,37 @@
                      due: 'fa-rotate fa-spin', archive: 'fa-box-archive', live: 'fa-rotate' };
   function freshHtml() {
     if (!state.fresh) return '';
-    var kind = freshState(), w = freshWords(kind);
-    var loud = (kind === 'slow' || kind === 'stopped');
-    return '<span class="sx-fresh is-' + kind + '"' + (loud ? ' role="status"' : '') +
-      ' title="' + esc(t('آخرُ قراءةٍ من بانر: ', 'Last read from Banner: ') +
-                       stampWord(state.fresh)) + '">' +
+    var kind = freshState(), tail = freshTail(kind), msg = freshMsg(kind);
+    /*@3.SECJ.468*/
+    var on = !!document.querySelector('.sx-fresh.is-open');
+    return '<button type="button" class="sx-fresh is-' + kind + (on ? ' is-open' : '') +
+      '" data-fresh aria-expanded="' + (on ? 'true' : 'false') + '" title="' + esc(msg) + '">' +
       '<i class="fa-solid ' + FRESH_ICON[kind] + '" aria-hidden="true"></i>' +
-      '<b>' + esc(w.n) + '</b>' + esc(' · ' + w.s) + '</span>';
+      '<span class="sx-fresh-line">' +
+      esc(t('حُدِّثت البيانات ', 'Updated ') + stampWord(state.fresh) +
+          (tail ? ' · ' + tail : '')) + '</span>' +
+      '<span class="sx-fresh-msg">' + esc(msg) + '</span></button>';
+  }
+
+  /*@3.SECJ.467*/
+  function shutFresh(keep) {
+    var o = document.querySelector('.sx-fresh.is-open');
+    if (!o || o === keep) return;
+    o.classList.remove('is-open');
+    o.setAttribute('aria-expanded', 'false');
+  }
+  function wireFreshMsg() {
+    document.addEventListener('click', function (e) {
+      var b = e.target && e.target.closest ? e.target.closest('[data-fresh]') : null;
+      shutFresh(b);
+      if (!b) return;
+      var on = !b.classList.contains('is-open');
+      b.classList.toggle('is-open', on);
+      b.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.code === 'Escape') shutFresh(null);
+    });
   }
 
   /*@3.SECJ.462*/
@@ -4426,6 +4466,7 @@
         $('#sx-term').innerHTML = termOptions(ts, pick.term);
         paintTermBtn(); paintSort(); wireTermFoot();
         wireFresh();
+    wireFreshMsg();
         return loadTerm(pick.term);
       })
       .catch(function () {
