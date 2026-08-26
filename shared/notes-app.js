@@ -990,6 +990,17 @@
   }
 
 
+  /*@3.NOAJ.197*/
+  var _noteT = 0;
+  function edNote(msg) {
+    if (!msg) return;
+    saveState('', String(msg));
+    clearTimeout(_noteT);
+    _noteT = setTimeout(function () {
+      if (els.save && !els.save.getAttribute('data-s')) saveState('', '');
+    }, 5200);
+  }
+
   function saveState(s, txt) {
     /*@3.NOAJ.105*/
     /*@3.NOAJ.138*/
@@ -1267,6 +1278,7 @@
     if (Sy) Sy.remove(id);
     else if (window.GardenNotesStore) window.GardenNotesStore.delDoc(id);
     delete lastSaved[id];
+    delete lastSig[id];
   }
 
   function leaveProvisional(id, doc) {
@@ -1329,6 +1341,16 @@
 
   /*@3.NOAJ.26*/
   var lastSaved = {};
+  /*@3.NOAJ.196*/
+  var lastSig = {};
+  var DERIVED = { eng: 1, fpv: 1 };
+  function contentSig(doc) {
+    try {
+      return JSON.stringify(doc, function (k, v) {
+        return DERIVED[k] ? undefined : v;
+      });
+    } catch (e) { return null; }
+  }
 
   /*@3.NOAJ.192*/
   function docPreview(doc) {
@@ -1359,18 +1381,21 @@
     }
     var body = JSON.stringify(doc);
     if (lastSaved[id] === body) { saveState('', ''); return; }
+    var sig = contentSig(doc);
+    var moved = (sig == null) || (lastSig[id] !== sig);
     var mine = (edId === id);
     var typed = mine && els.docTitle ? els.docTitle.value.trim() : '';
     var t = Date.now();
     St.putDoc(id, body, t).then(function (res) {
       lastSaved[id] = body;
+      lastSig[id] = sig;
       var rec = idxFind(id);
       if (rec) {
         /*@3.NOAJ.172*/
         rec.t = notPh(typed) || notPh(rec.t) || deriveTitle(doc) || '';
         if (rec.pv && (typed || docHasContent(doc))) delete rec.pv;
         /*@3.NOAJ.166*/
-        if (!quiet) rec.updated_at = t;
+        if (!quiet && moved) rec.updated_at = t;
         rec.sz = res.bytes;
         /*@3.NOAJ.193*/
         rec.x = docPreview(doc);
@@ -2404,6 +2429,7 @@
       if (row && row.loadFail) { renderLoadError(id); return; }
       var doc = (row && row.doc) || { v: 1, blocks: [] };
       lastSaved[id] = JSON.stringify(doc);
+      lastSig[id] = contentSig(doc);
       /*@3.NOAJ.5*/
       els.docBody.innerHTML =
         '<div class="na-zoom" id="na-zoom">' +
@@ -2454,6 +2480,7 @@
           saveState('error', L('لا يوجد عنوانٌ بهذا الاسم في الملاحظة.',
                                'No heading with that name in this note.'));
         },
+        onNote: function (m) { edNote(m); },
         /*@3.NOAJ.147*/
         onSelMode: function (on) {
           if (overlay && overlay.setPick) overlay.setPick(!!on);
@@ -2506,7 +2533,11 @@
         });
       }
       /*@3.NOAJ.86*/
-      try { lastSaved[id] = JSON.stringify(ed.readAll()); } catch (eB) {}
+      try {
+        var d0 = ed.readAll();
+        lastSaved[id] = JSON.stringify(d0);
+        lastSig[id] = contentSig(d0);
+      } catch (eB) {}
       var addBtn = document.getElementById('na-addpg');
       if (addBtn) addBtn.addEventListener('click', addPage);
       var delBtn = document.getElementById('na-delpg');
@@ -2522,12 +2553,12 @@
           sheet: host,
           favHost: document.getElementById('na-favs'),
           data: doc.ov || null,
-          onChange: function (d) {
+          onChange: function (d, quiet) {
             var cur = ed ? ed.doc : null;
             if (!cur) return;
             cur.ov = (d.ink || (d.shapes && d.shapes.length)) ? d : null;
             /*@3.NOAJ.167*/
-            ed.mark();
+            ed.mark(!!quiet);
             growPages();
           },
           onPinch: docPinch,

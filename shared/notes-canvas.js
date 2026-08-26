@@ -306,6 +306,7 @@
     /*@3.NOCJ.19*/
     this.bound = !!o.bound;
     this.onScroll = o.onScroll || function () {};
+    this.onWin = o.onWin || null;
     this.onPinch = o.onPinch || null;
     this.onBand = o.onBand || function () {};
     this.onAdd = o.onAdd || function () {};
@@ -447,6 +448,15 @@
     return d;
   };
 
+  /*@3.NOCJ.87*/
+  Canvas.prototype.covers = function (vTop, vH) {
+    if (vTop == null || !(vH > 0)) return true;
+    var slack = Math.max(0, this.winH - vH);
+    var m = Math.min(24, slack / 2);
+    return this.winY <= vTop - m + 0.5 &&
+           this.winY + this.winH >= vTop + vH + m - 0.5;
+  };
+
   Canvas.prototype.resize = function () {
     /*@3.NOCJ.6*/
     this.wrap.style.blockSize = this.expanded ? '' : (this.pageH + 'px');
@@ -509,16 +519,19 @@
     }
     this.w = w; this.h = h; this._d = d; this._wy = this.winY;
     if (this.bound) { this.cam.x = 0; this.cam.y = -this.winY * this.cam.z; }
+    if (this.bound && this.onWin) { try { this.onWin(); } catch (eW) {} }
     if (this.router) this.router.dropRect();
     this.paint();
   };
 
   /*@3.NOCJ.52*/
-  Canvas.prototype.setWindow = function (y) {
+  Canvas.prototype.setWindow = function (y, vTop, vH) {
     if (!this.bound || !this.winH || this.winH >= this.pageH) return;
     var target = Math.max(0, Math.min(this.pageH - this.winH, Math.round(y)));
-    if (Math.abs(target - this.winY) < this.winH * 0.2) return;
-    this.winY = target;
+    if (Math.abs(target - this.winY) < 0.5) return;
+    if (!this.covers(vTop, vH) || Math.abs(target - this.winY) >= this.winH * 0.2) {
+      this.winY = target;
+    } else return;
     this._wy = target;
     this.base.style.insetBlockStart = target + 'px';
     this.wet.style.insetBlockStart = target + 'px';
@@ -1349,7 +1362,8 @@
   };
 
 
-  Canvas.prototype.commit = function () {
+  /*@3.NOCJ.88*/
+  Canvas.prototype.commit = function (quiet) {
     var self = this;
     var strokes = this.els.filter(function (e) { return e.ty === 'st'; });
     var shapes = this.els.filter(function (e) { return e.ty !== 'st'; });
@@ -1358,7 +1372,7 @@
       return { tool: e.hi ? 'hi' : 'pen', color: e.c, w: e.w, nib: e.nib, o: e.o, pts: e.pts };
     })).then(function (packed) {
       self.onChange({ ink: packed, shapes: shapes, w: self.w, h: self.pageH,
-                      ch: Math.round(self.contentH()) });
+                      ch: Math.round(self.contentH()) }, quiet);
       return packed;
     });
   };
@@ -1386,7 +1400,7 @@
     if (!moved) return 0;
     this.growIfNeeded();
     this.paint();
-    this.commit();
+    this.commit(true);
     return moved;
   };
 

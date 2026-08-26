@@ -93,6 +93,7 @@
   };
 
   /*@3.NOOJ.21*/
+  /*@3.NOOJ.30*/
   Overlay.prototype.syncWindow = function () {
     if (!this.cv || !this.bound || !this.cv.setWindow) return;
     var z = zoomOf(this.stage) || 1;
@@ -100,7 +101,7 @@
     var sr = this.scroller.getBoundingClientRect();
     var yTop = (sr.top - wr.top) / z;
     var vhW = sr.height / z;
-    this.cv.setWindow(yTop - Math.max(0, (this.cv.winH - vhW) / 2));
+    this.cv.setWindow(yTop - Math.max(0, (this.cv.winH - vhW) / 2), yTop, vhW);
   };
 
   /*@3.NOOJ.27*/
@@ -247,6 +248,7 @@
     var self = this;
     this.cv = GardenCanvas.mount(this.host, {
       height: 400,
+      onWin: function () { self.syncWindow(); },
       hist: this.hist,
       snapText: function (bx) { return self.lineUnder(bx); },
       /*@3.NOOJ.8*/
@@ -258,12 +260,12 @@
       onPinch: function (phase, f, cx, cy) {
         if (self.onPinch) self.onPinch(phase, f, cx, cy);
       },
-      onChange: function (d) {
+      onChange: function (d, quiet) {
         var out = {};
         for (var k in d) if (Object.prototype.hasOwnProperty.call(d, k)) out[k] = d[k];
         out.ch = d.ch || 0;
         out.rw = A4W;
-        self.onChange(out);
+        self.onChange(out, quiet);
       },
       onState: function () { self.sync(); },
       onBand: function (r) { self.onBand(r); },
@@ -344,7 +346,7 @@
     var els = this.cv.els, i;
     for (i = 0; i < els.length; i++) this.cv.mapEl(els[i], 0, 0, 0, 0, k);
     this.cv.paint();
-    this.cv.commit();
+    this.cv.commit(true);
     return els.length;
   };
 
