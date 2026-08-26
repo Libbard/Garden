@@ -169,6 +169,13 @@
   function inkHex(el) {
     return el && el.hi ? hiHexOf(el.c) : hexOf(el.c);
   }
+
+  /*@3.NOCJ.89*/
+  function inkSafe(el) {
+    var K = C();
+    if (!K || typeof K.canCarry !== 'function' || K.canCarry(el.c)) return el.c;
+    return inkHex(el);
+  }
   function uid() {
     return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
@@ -1369,7 +1376,7 @@
     var shapes = this.els.filter(function (e) { return e.ty !== 'st'; });
     /*@3.NOCJ.45*/
     return C().pack(strokes.map(function (e) {
-      return { tool: e.hi ? 'hi' : 'pen', color: e.c, w: e.w, nib: e.nib, o: e.o, pts: e.pts };
+      return { tool: e.hi ? 'hi' : 'pen', color: inkSafe(e), w: e.w, nib: e.nib, o: e.o, pts: e.pts };
     })).then(function (packed) {
       self.onChange({ ink: packed, shapes: shapes, w: self.w, h: self.pageH,
                       ch: Math.round(self.contentH()) }, quiet);

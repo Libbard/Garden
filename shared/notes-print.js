@@ -113,6 +113,19 @@
       '<div class="cal-b">' + runs(rt) + '</div></div>';
   }
 
+  /*@3.NOPJ.19*/
+  function codeHtml(b) {
+    if (/^mermaid$/i.test(String(b.lang || '').trim())) {
+      var M = window.GardenNotesMermaid;
+      var live = b.id
+        ? document.querySelector('[data-bid="' + String(b.id).replace(/"/g, '') + '"] svg[data-nmd]')
+        : null;
+      var baked = (live && M && typeof M.bake === 'function') ? M.bake(live) : null;
+      if (baked) return '<div class="dgm">' + baked.svg + '</div>';
+    }
+    return '<pre class="cd" dir="ltr">' + esc(b.src || '') + '</pre>';
+  }
+
   function blockHtml(b) {
     var s = styleOf(b);
     var lv = b.lv || 2;
@@ -125,7 +138,7 @@
                         (b.done ? '&#10003;' : '&#160;') + '</span>' + runs(b.rt) + '</p>';
       case 'ul':
       case 'ol':      return '<div' + s + '>' + B().listHtml(b, runs) + '</div>';
-      case 'code':    return '<pre class="cd" dir="ltr">' + esc(b.src || '') + '</pre>';
+      case 'code':    return codeHtml(b);
       case 'tbl':     return tblHtml(b, s);
       case 'img':     return imgHtml(b);
       case 'gap':     return '<div style="height:' + Math.round((b.h || 40) * 0.75) + 'pt"></div>';
@@ -249,6 +262,8 @@
       '.fg img{max-width:100%;display:block;border-radius:4pt}' +
       '.fg figcaption{font-size:8.5pt;color:#6b7280;text-align:center;margin-top:3pt}' +
       '.ink{margin:0 0 8pt;break-inside:avoid}' +
+      '.dgm{margin:0 0 8pt;break-inside:avoid;text-align:center}' +
+      '.dgm svg{max-inline-size:100%;block-size:auto}' +
       '.ink svg{max-width:100%;height:auto;display:block}' +
       '.ovl{border-top:.5pt dashed #e5e7eb;padding-top:6pt;margin-top:10pt}' +
       '.ovl-t{font-size:8pt;color:#9ca3af;margin-bottom:4pt}' +

@@ -2839,13 +2839,54 @@
       : purgeZeroWhy();
     document.getElementById('purge-run').disabled = (n === 0);
   }
+  /*@3.SCHJ.246*/
+  function purgeLinkedCrns(m) {
+    var out = [];
+    (schedule.lectures || []).forEach(function (l) {
+      if (l && l.sx_crn && m.lectures.indexOf(l.id) !== -1 && out.indexOf(l.sx_crn) === -1) out.push(l.sx_crn);
+    });
+    (schedule.exams || []).forEach(function (x) {
+      if (x && x.sx_crn && m.exams.indexOf(x.id) !== -1 && out.indexOf(x.sx_crn) === -1) out.push(x.sx_crn);
+    });
+    return out;
+  }
+
+  function offerStopFetch(crns) {
+    if (!crns.length) return;
+    askConfirm(
+      isAr() ? 'أتوقف جلبها من البانر؟' : 'Stop fetching from Banner?',
+      isAr() ? ('حُذفت. وشعبُ ' + crns.join('، ') + ' يعيدها جلبُ البانر عند أوّل فتحةٍ لصفحة الشعب. ' +
+                'أنوقف جلبَها؟ يمكنك استئنافُه من هذه الإعدادات متى شئت.')
+             : ('Deleted. Banner will bring ' + crns.join(', ') + ' back next time you open the sections page. ' +
+                'Stop fetching them? You can resume from these settings at any time.'),
+      isAr() ? 'أوقف جلبها' : 'Stop fetching',
+      function () {
+        if (!schedule.sx_optout || typeof schedule.sx_optout !== 'object') schedule.sx_optout = {};
+        crns.forEach(function (c) {
+          schedule.sx_optout[String(c)] = { at: new Date().toISOString(), scope: 'all' };
+        });
+        save();
+        refreshEditorSurfaces();
+        renderEditorCourses();
+        render();
+      }, 'fa-link-slash');
+  }
+
   function runPurge() {
     var m = purgeMatches(), n = purgeCount(m);
     if (!n) return;
+    /*@3.SCHJ.248*/
+    var linkedCrns = purgeLinkedCrns(m);
+    var warn = linkedCrns.length
+      ? (isAr() ? (' ومنها ' + linkedCrns.length + ' شعبةً مجلوبةً من البانر (' + linkedCrns.join('، ') +
+                   ') يعيدها الجلبُ ما لم توقفه — وسنعرض عليك إيقافَه بعد الحذف.')
+                : (' ' + linkedCrns.length + ' of them come from Banner (' + linkedCrns.join(', ') +
+                   ') and will return unless you stop fetching them — we will offer that next.'))
+      : '';
     askConfirm(
       isAr() ? 'تنظيف الأحداث' : 'Clean up events',
-      isAr() ? ('سيُحذف ' + n + ' عنصراً نهائياً. متابعة؟')
-             : ('This will permanently delete ' + n + ' items. Continue?'),
+      (isAr() ? ('سيُحذف ' + n + ' عنصراً نهائياً.' + warn + ' متابعة؟')
+              : ('This will permanently delete ' + n + ' items.' + warn + ' Continue?')),
       isAr() ? 'حذف المحدَّد' : 'Delete selected',
       function () {
         schedule.lectures = schedule.lectures.filter(function (l) { return m.lectures.indexOf(l.id) === -1; });
@@ -2867,6 +2908,7 @@
         closeModal('modal-purge');
         refreshEditorSurfaces();
         render();
+        offerStopFetch(linkedCrns);
       }, 'fa-trash');
   }
   /*@3.SCHJ.180*/
@@ -3210,7 +3252,9 @@
         return '<button type="button" class="sch-daychip' + (days.indexOf(d) !== -1 ? ' on' : '') +
           '" data-ecdaych="' + d + '">' + escapeH(DAY_SHORT[lang][d]) + '</button>';
       }).join('');
-      return '<div class="sch-ecourse" data-ecode="' + escapeH(code) + '">' +
+      /*@3.SCHJ.245*/
+      var base0 = escapeH(JSON.stringify({ start: start, dur: dur, attend: attend, form: form, room: room }));
+      return '<div class="sch-ecourse" data-ecode="' + escapeH(code) + '" data-ec0="' + base0 + '">' +
         '<div class="sch-ecourse-head"><span class="sch-ecourse-dot" style="background:' + color + '"></span>' +
           '<span class="sch-ecourse-nm">' + escapeH(courseDisplayName(code)) + '</span>' +
           /*@3.SCHJ.242*/
@@ -3333,24 +3377,42 @@
       var room = attend === 'in_person' ? (card.querySelector('.ec-room').value || '') : '';
       var end = addMinutes(start, dur);
       /*@3.SCHJ.198*/
-      var tagByDay = {}, tagAny = '';
-      schedule.lectures.forEach(function (l) {
-        if (l.course_code !== code || !l.sx_crn) return;
-        tagByDay[l.day] = l.sx_crn;
-        tagAny = tagAny || l.sx_crn;
+      /*@3.SCHJ.247*/
+      var base = {};
+      try { base = JSON.parse(card.getAttribute('data-ec0') || '{}') || {}; } catch (e) { base = {}; }
+      var setTime = (start !== base.start) || (dur !== base.dur);
+      var setForm = (form !== base.form) || (attend !== base.attend) || (room !== base.room);
+      var prev = schedule.lectures.filter(function (l) { return l.course_code === code; });
+      var byDay = {}, tagAny = '', srcRow = prev[0] || null;
+      prev.forEach(function (l) {
+        (byDay[l.day] || (byDay[l.day] = [])).push(l);
+        if (!tagAny && l.sx_crn) tagAny = l.sx_crn;
       });
-      schedule.lectures = schedule.lectures.filter(function (l) { return l.course_code !== code; });
+      var keepRows = [];
       lecDays.forEach(function (d) {
+        var cur = byDay[d];
+        if (cur && cur.length) {
+          cur.forEach(function (l) {
+            if (setTime) { l.start_time = start; l.end_time = end; l.duration = dur; }
+            if (setForm) { l.kind = form; l.attendance = attend; l.room = attend === 'in_person' ? room : ''; }
+            keepRows.push(l);
+          });
+          delete byDay[d];
+          return;
+        }
         var row = {
           id: 'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
           course_code: code, day: d, start_time: start, end_time: end,
           room: room, kind: form, attendance: attend, recurring: true,
           color: getCourseColor(code), duration: dur
         };
-        var tag = tagByDay[d] || tagAny;
-        if (tag) row.sx_crn = tag;
-        schedule.lectures.push(row);
+        if (tagAny) row.sx_crn = tagAny;
+        if (srcRow && srcRow.start_date) row.start_date = srcRow.start_date;
+        if (srcRow && srcRow.end_date) row.end_date = srcRow.end_date;
+        keepRows.push(row);
       });
+      schedule.lectures = schedule.lectures.filter(function (l) { return l.course_code !== code; })
+                                           .concat(keepRows);
       /*@3.SCHJ.199*/
       var mods = card.querySelectorAll('.ec-mod');
       if (mods.length) {

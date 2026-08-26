@@ -76,42 +76,59 @@
   }
 
   /*@3.SXLJ.9*/
+  /*@3.SXLJ.50*/
   function rowsFor(sec) {
-    var lec = [], ex = [];
-    (sec.mg || []).forEach(function (m, mi) {
-      var kind = EXAM_KIND[m.type];
-      if (kind) {
-        var dt = iso(m.start_date);
-        if (!dt) return;
-        /*@3.SXLJ.10*/
-        var raw = examHM(m.begin);
-        ex.push({
-          id: 'sx_' + sec.crn + '_x' + mi,
-          course_code: sec.c, date: dt,
-          start_time: raw, end_time: examHM(m.end), all_day: false,
-          exam_type: kind, room: m.room || '',
-          notes: t('شعبة ', 'Section ') + sec.crn,
-          sx_crn: String(sec.crn)
-        });
-        ex[ex.length - 1].sx_snap = exSnap(ex[ex.length - 1]);
-        return;
-      }
-      if (m.type !== 'CLAS' && m.type !== 'VRTL') return;
-      (m.days || []).forEach(function (day) {
-        lec.push({
-          id: 'sx_' + sec.crn + '_' + mi + '_' + day,
-          course_code: sec.c, day: day,
-          start_time: hm24(m.begin), end_time: hm24(m.end),
-          room: m.type === 'CLAS' ? (m.room || '') : '',
-          kind: 'lecture',
-          attendance: m.type === 'CLAS' ? 'in_person' : 'remote',
-          start_date: iso(m.start_date) || '',
-          end_date: iso(m.end_date) || '',
-          recurring: true, sx_crn: String(sec.crn)
-        });
-        lec[lec.length - 1].sx_snap = lecSnap(lec[lec.length - 1]);
+    var lec = [], ex = [], crn = String(sec.crn);
+    var mg = (sec.mg || []).map(function (m, mi) { return { m: m, mi: mi }; });
+    var rk = {};
+    function slot(pfx) { rk[pfx] = (rk[pfx] || 0) + 1; return pfx + '#' + (rk[pfx] - 1); }
+    function order(list, keyOf) {
+      return list.sort(function (a, b) {
+        var x = keyOf(a.m), y = keyOf(b.m);
+        return x < y ? -1 : x > y ? 1 : a.mi - b.mi;
       });
-    });
+    }
+
+    order(mg.filter(function (o) { return o.m.type === 'CLAS' || o.m.type === 'VRTL'; }),
+          function (m) { return hm24(m.begin); })
+      .forEach(function (o) {
+        var m = o.m;
+        (m.days || []).forEach(function (day) {
+          var s = slot(day);
+          var r = {
+            id: 'sx_' + crn + '_' + s.replace('#', '_'),
+            course_code: sec.c, day: day,
+            start_time: hm24(m.begin), end_time: hm24(m.end),
+            room: m.type === 'CLAS' ? (m.room || '') : '',
+            kind: 'lecture',
+            attendance: m.type === 'CLAS' ? 'in_person' : 'remote',
+            start_date: iso(m.start_date) || '',
+            end_date: iso(m.end_date) || '',
+            recurring: true, sx_crn: crn, sx_slot: s
+          };
+          r.sx_snap = lecSnap(r);
+          lec.push(r);
+        });
+      });
+
+    order(mg.filter(function (o) { return !!EXAM_KIND[o.m.type]; }),
+          function (m) { return iso(m.start_date); })
+      .forEach(function (o) {
+        var m = o.m, kind = EXAM_KIND[m.type], dt = iso(m.start_date);
+        if (!dt) return;
+        var s = slot('x:' + kind);
+        var r = {
+          id: 'sx_' + crn + '_x' + kind + '_' + s.split('#')[1],
+          course_code: sec.c, date: dt,
+          /*@3.SXLJ.10*/
+          start_time: examHM(m.begin), end_time: examHM(m.end), all_day: false,
+          exam_type: kind, room: m.room || '',
+          notes: t('شعبة ', 'Section ') + crn,
+          sx_crn: crn, sx_slot: s
+        };
+        r.sx_snap = exSnap(r);
+        ex.push(r);
+      });
     return { lectures: lec, exams: ex };
   }
 
@@ -159,6 +176,20 @@
     return hit;
   }
 
+  /*@3.SXLJ.51*/
+  function linked(crn) {
+    var d = schLoad();
+    if (!d) return false;
+    crn = String(crn);
+    var hit = false;
+    boxes(d).forEach(function (b) {
+      (b.lectures || []).concat(b.exams || []).forEach(function (r) {
+        if (r && r.sx_crn === crn) hit = true;
+      });
+    });
+    return hit;
+  }
+
   /*@3.SXLJ.13*/
   /*@3.SXLJ.44*/
   function registered() {
@@ -190,12 +221,15 @@
                                  scope: (scope === 'lectures' || scope === 'exams') ? scope : 'all' };
     return schSave(d);
   }
-  function clearOptOut(crn) {
-    var d = schLoad();
-    if (!d || !d.sx_optout) return false;
-    if (!d.sx_optout[String(crn)]) return false;
+  function clearOptOutIn(d, crn) {
+    if (!d || !d.sx_optout || !d.sx_optout[String(crn)]) return false;
     delete d.sx_optout[String(crn)];
     if (!Object.keys(d.sx_optout).length) delete d.sx_optout;
+    return true;
+  }
+  function clearOptOut(crn) {
+    var d = schLoad();
+    if (!clearOptOutIn(d, crn)) return false;
     return schSave(d);
   }
 
@@ -264,34 +298,54 @@
     return n;
   }
 
-  function register(secs) {
+  function register(secs, opts) {
+    opts = opts || {};
     var d = schLoad(true);
-    var have = {}, seenEx = {};
-    d.lectures.concat(d.exams).forEach(function (r) { if (r.id) have[r.id] = 1; });
+    var seenEx = {};
     d.exams.forEach(function (x) {
       seenEx[x.course_code + '|' + x.date + '|' + x.exam_type] = 1;
     });
 
-    /*@3.SXLJ.16*/
-    var byId = {};
-    d.lectures.forEach(function (r) { if (r && r.id) byId[r.id] = r; });
-    d.exams.forEach(function (r) { if (r && r.id) byId[r.id] = r; });
-
     /*@3.SXLJ.17*/
-    var rep = { added: 0, updated: 0, kept: [] };
+    var rep = { added: 0, updated: 0, adopted: 0, kept: [], blocked: [] };
     /*@3.SXLJ.47*/
     var exAdded = 0;
     var snapStamped = false;      /*@3.SXLJ.18*/
 
+    /*@3.SXLJ.16*/
+    /*@3.SXLJ.52*/
+    var claimed = [];
+    function pick(list, tests) {
+      for (var ti = 0; ti < tests.length; ti++) {
+        for (var i = 0; i < list.length; i++) {
+          var r = list[i];
+          if (!r || claimed.indexOf(r) >= 0) continue;
+          if (tests[ti](r)) { claimed.push(r); return r; }
+        }
+      }
+      return null;
+    }
+    function ladder(fresh, crn, sameKind) {
+      return [
+        function (r) { return r.sx_crn === crn && !!r.sx_slot && r.sx_slot === fresh.sx_slot; },
+        function (r) { return r.sx_crn === crn && !r.sx_slot && sameKind(r); },
+        function (r) { return r.id === fresh.id; },
+        function (r) { return !r.sx_crn && r.course_code === fresh.course_code && sameKind(r); }
+      ];
+    }
+
     /*@3.SXLJ.19*/
-    function reconcile(fresh, snapOf, apply) {
-      var cur = byId[fresh.id];
+    function reconcile(cur, fresh, snapOf, apply) {
       if (!cur) return 'add';
+      /*@3.SXLJ.56*/
+      var adopting = !cur.sx_crn;
+      if (adopting) { cur.sx_crn = fresh.sx_crn; rep.adopted++; }
+      if (!cur.sx_slot && fresh.sx_slot) { cur.sx_slot = fresh.sx_slot; snapStamped = true; }
       var stored = cur.sx_snap;
       if (!stored) {
         /*@3.SXLJ.20*/
         if (snapOf(cur) === snapOf(fresh)) { cur.sx_snap = snapOf(fresh); snapStamped = true; return 'same'; }
-        return 'keep';
+        return adopting ? 'adopt' : 'keep';
       }
       if (snapOf(cur) !== stored) return 'keep';        /*@3.SXLJ.21*/
       if (stored === snapOf(fresh)) return 'same';      /*@3.SXLJ.22*/
@@ -321,62 +375,71 @@
       if (!sec || !sec.crn) return;
       var crn = String(sec.crn);
       /*@3.SXLJ.45*/
+      /*@3.SXLJ.55*/
+      /*@3.SXLJ.53*/
+      if (opts.force) { if (clearOptOutIn(d, crn)) snapStamped = true; }
       var noLec = optBlocks(d, crn, 'lectures');
       var noEx = optBlocks(d, crn, 'exams');
-      if (noLec && noEx) return;
-      var rows = rowsFor(sec), added = 0;
-      if (noLec) rows.lectures = [];
-      if (noEx) rows.exams = [];
+      if (noLec && noEx) { rep.blocked.push(crn); return; }
+      var rows = rowsFor(sec), added = 0, touched = 0;
+      if (noLec) { rows.lectures = []; rep.blocked.push(crn); }
+      if (noEx) { rows.exams = []; if (!noLec) rep.blocked.push(crn); }
       rows.lectures.forEach(function (l) {
-        var verdict = reconcile(l, lecSnap, function (cur, fresh) {
-          cur.day = fresh.day;
-          cur.start_time = fresh.start_time; cur.end_time = fresh.end_time;
-          cur.room = fresh.room; cur.attendance = fresh.attendance; cur.kind = fresh.kind;
+        var cur = pick(d.lectures, ladder(l, crn, function (r) { return r.day === l.day; }));
+        var verdict = reconcile(cur, l, lecSnap, function (c, fresh) {
+          c.day = fresh.day;
+          c.start_time = fresh.start_time; c.end_time = fresh.end_time;
+          c.room = fresh.room; c.attendance = fresh.attendance; c.kind = fresh.kind;
           /*@3.SXLJ.25*/
         });
         if (verdict === 'add') {
-          d.lectures.push(l); byId[l.id] = l; have[l.id] = 1; added++; rep.added++;
+          d.lectures.push(l); claimed.push(l); added++; touched++; rep.added++;
         } else if (verdict === 'update') {
-          rep.updated++; added++;
+          rep.updated++; added++; touched++;
+        } else if (verdict === 'adopt') {
+          touched++;
+          var w0 = describeLec(cur, l);
+          if (w0) rep.kept.push({ code: l.course_code, crn: crn, why: w0 });
         } else if (verdict === 'keep') {
-          var why = describeLec(byId[l.id], l);
+          var why = describeLec(cur, l);
           if (why) rep.kept.push({ code: l.course_code, crn: crn, why: why });
         }
       });
       rows.exams.forEach(function (x) {
         /*@3.SXLJ.26*/
-        if (byId[x.id]) {
-          var v = reconcile(x, exSnap, function (cur, fresh) {
-            cur.date = fresh.date;
-            cur.start_time = fresh.start_time; cur.end_time = fresh.end_time;
-            cur.room = fresh.room; cur.exam_type = fresh.exam_type;
-          });
-          if (v === 'update') { rep.updated++; added++; }
-          else if (v === 'keep') {
-            var cur2 = byId[x.id];
-            var bits2 = [];
-            if ((cur2.date || '') !== (x.date || '')) bits2.push(t('التاريخ ', 'Date ') + x.date);
-            if ((cur2.room || '') !== (x.room || '')) bits2.push(t('القاعة ', 'Room ') + (x.room || '—'));
-            if (bits2.length) rep.kept.push({ code: x.course_code, crn: crn, why: bits2.join(' · ') });
-          }
+        var cur = pick(d.exams, ladder(x, crn, function (r) { return r.exam_type === x.exam_type; }));
+        if (!cur) {
+          /*@3.SXLJ.27*/
+          var k = x.course_code + '|' + x.date + '|' + x.exam_type;
+          if (seenEx[k]) return;
+          seenEx[k] = 1;
+          d.exams.push(x); claimed.push(x); added++; touched++; exAdded++;
           return;
         }
-        if (have[x.id]) return;
-        /*@3.SXLJ.27*/
-        var k = x.course_code + '|' + x.date + '|' + x.exam_type;
-        if (seenEx[k]) return;
-        seenEx[k] = 1;
-        d.exams.push(x); have[x.id] = 1; added++; exAdded++;
+        var v = reconcile(cur, x, exSnap, function (c, fresh) {
+          c.date = fresh.date;
+          c.start_time = fresh.start_time; c.end_time = fresh.end_time;
+          c.room = fresh.room; c.exam_type = fresh.exam_type;
+        });
+        if (v === 'update') { rep.updated++; added++; touched++; }
+        else if (v === 'adopt') { touched++; }
+        else if (v === 'keep') {
+          var bits2 = [];
+          if ((cur.date || '') !== (x.date || '')) bits2.push(t('التاريخ ', 'Date ') + x.date);
+          if ((cur.room || '') !== (x.room || '')) bits2.push(t('القاعة ', 'Room ') + (x.room || '—'));
+          if (bits2.length) rep.kept.push({ code: x.course_code, crn: crn, why: bits2.join(' · ') });
+        }
       });
       /*@3.SXLJ.42*/
-      if (added) { n++; courses[sec.c] = { sec: sec, crn: crn }; }
+      if (touched) { n++; courses[sec.c] = { sec: sec, crn: crn }; }
       mergeInstructors(sec.c, sec.f);
     });
 
     /*@3.SXLJ.28*/
-    var dirty = rep.added || rep.updated || exAdded || snapStamped;
-    if (!dirty) return { n: 0, report: rep, saved: true };
-    if (!n) { return { n: 0, report: rep, saved: schSave(d) }; }   /*@3.SXLJ.29*/
+    var dirty = rep.added || rep.updated || rep.adopted || exAdded || snapStamped;
+    if (!dirty) return { n: n, report: rep, saved: true };
+    /*@3.SXLJ.54*/
+    if (!n || opts.pending === false) { return { n: n, report: rep, saved: schSave(d) }; }   /*@3.SXLJ.29*/
 
     var pend = (d.sx_pending && typeof d.sx_pending === 'object') ? d.sx_pending : null;
     var keep = (pend && Array.isArray(pend.courses)) ? pend.courses : [];
@@ -616,7 +679,7 @@
     hm24: hm24, iso: iso, examHM: examHM,
     lecSnap: lecSnap, exSnap: exSnap,
     rowsFor: rowsFor, matcher: matcher, boxes: boxes,
-    has: has, registered: registered, crnsOfCourse: crnsOfCourse,
+    has: has, linked: linked, registered: registered, crnsOfCourse: crnsOfCourse,
     register: register, unregister: unregister,
     optScope: function (crn) { return optScope(schLoad() || {}, crn); },
     setOptOut: setOptOut, clearOptOut: clearOptOut,

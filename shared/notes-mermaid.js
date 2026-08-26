@@ -269,6 +269,45 @@
   }
 
   /*@3.NOMJ4.4*/
+  /*@3.NOMJ4.14*/
+  var BAKE = ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap',
+              'stroke-linejoin', 'stroke-opacity', 'fill-opacity', 'opacity', 'color',
+              'stop-color', 'stop-opacity', 'flood-color', 'font-family', 'font-size',
+              'font-weight', 'font-style', 'text-anchor', 'dominant-baseline',
+              'letter-spacing', 'direction', 'display', 'visibility'];
+
+  function bake(live, w, h) {
+    if (!live || !live.cloneNode) return null;
+    var win = live.ownerDocument && live.ownerDocument.defaultView;
+    if (!win) return null;
+    var r = live.getBoundingClientRect();
+    var bw = Math.round(w || r.width), bh = Math.round(h || r.height);
+    if (bw < 2 || bh < 2) return null;
+    var copy;
+    try { copy = live.cloneNode(true); } catch (e) { return null; }
+    var a = [live].concat([].slice.call(live.querySelectorAll('*')));
+    var b = [copy].concat([].slice.call(copy.querySelectorAll('*')));
+    if (a.length !== b.length) return null;
+    for (var i = 0; i < a.length; i++) {
+      if (b[i].tagName && String(b[i].tagName).toLowerCase() === 'style') continue;
+      var cs = win.getComputedStyle(a[i]);
+      var css = '', k, v;
+      for (k = 0; k < BAKE.length; k++) {
+        v = cs.getPropertyValue(BAKE[k]);
+        if (v) css += BAKE[k] + ':' + v + ';';
+      }
+      if (css) b[i].setAttribute('style', css);
+    }
+    var st = copy.querySelectorAll('style'), q;
+    for (q = st.length - 1; q >= 0; q--) if (st[q].parentNode) st[q].parentNode.removeChild(st[q]);
+    copy.setAttribute('width', String(bw));
+    copy.setAttribute('height', String(bh));
+    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!copy.getAttribute('viewBox')) copy.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
+    try { return { svg: new XMLSerializer().serializeToString(copy), w: bw, h: bh }; }
+    catch (e2) { return null; }
+  }
+
   function render(host, src) {
     if (!host) return Promise.resolve(false);
     var code = String(src == null ? '' : src).trim();
@@ -307,5 +346,6 @@
     });
   }
 
-  window.GardenNotesMermaid = { ensure: ensure, render: render, isDark: themeIsDark };
+  window.GardenNotesMermaid = { ensure: ensure, render: render, isDark: themeIsDark,
+                                bake: bake };
 })();

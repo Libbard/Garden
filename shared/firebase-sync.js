@@ -416,6 +416,19 @@
   }
   function _canonStr(x) { return JSON.stringify(_canon(x)); }
 
+  /*@3.FISJ.245*/
+  const BOOKKEEP = { notes_index: ['sz', 'x'] };
+  function _canonBk(x, bk) {
+    if (!bk || !bk.length || !_isObj(x)) return _canonStr(x);
+    const o = {};
+    for (const k in x) {
+      if (!Object.prototype.hasOwnProperty.call(x, k)) continue;
+      if (bk.indexOf(k) >= 0) continue;
+      o[k] = x[k];
+    }
+    return _canonStr(o);
+  }
+
   /*@3.FISJ.53*/
   function _tk(path, id) { return path ? path + '/' + id : String(id); }
 
@@ -1995,12 +2008,12 @@
   }
 
   /*@3.FISJ.153*/
-  function _walkTrack(before, after, now, path, tomb, ctx, depth) {
+  function _walkTrack(before, after, now, path, tomb, ctx, depth, bk) {
     if ((depth || 0) > 6) return;
 
     if (_isIdArr(after) && Array.isArray(before)) {
       const prev = {};
-      before.forEach(x => { if (x && x.id != null) prev[String(x.id)] = _canonStr(x); });
+      before.forEach(x => { if (x && x.id != null) prev[String(x.id)] = _canonBk(x, bk); });
       const alive = new Set();
       after.forEach(x => {
         if (!x || x.id == null) return;
@@ -2009,7 +2022,7 @@
         const was = prev[id];
         if (was === undefined) {                    /*@3.FISJ.154*/
           if (!x.updated_at) { x.updated_at = now; ctx.touched = true; }
-        } else if (_canonStr(x) !== was) {          /*@3.FISJ.155*/
+        } else if (_canonBk(x, bk) !== was) {       /*@3.FISJ.155*/
           x.updated_at = now; ctx.touched = true;
         }
       });
@@ -2051,7 +2064,7 @@
     const tomb = _readTomb(localStorage.getItem(tk));
     const ctx = { touched: false, gone: false };
 
-    _walkTrack(before, after, now, '', tomb, ctx, 0);
+    _walkTrack(before, after, now, '', tomb, ctx, 0, BOOKKEEP[key] || null);
 
     if (ctx.gone) {
       /*@3.FISJ.159*/

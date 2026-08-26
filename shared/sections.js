@@ -1218,6 +1218,8 @@
 
   function schLoad(create) { return SXL().schLoad(create); }
   function schHas(crn) { return SXL().has(crn, secOf(crn)); }
+  /*@3.SECJ.476*/
+  function schLinked(crn) { return SXL().linked(crn); }
   /*@3.SECJ.95*/
   function schReconcileRegistered() {
     if (!state.all || !state.all.length) return null;
@@ -1229,7 +1231,8 @@
     state.all.forEach(function (x) { known[String(x.crn)] = 1; });
     crns = crns.filter(function (c) { return known[c]; });
     if (!crns.length) return null;
-    schRegister(crns);
+    /*@3.SECJ.477*/
+    schRegister(crns, { pending: false, noAdopt: true });
     return schRegister.lastReport || null;
   }
 
@@ -1264,7 +1267,7 @@
   function schRegister(crns, opts) {
     var secs = [];
     (crns || []).forEach(function (c) { var s = secOf(c); if (s) secs.push(s); });
-    var r = SXL().register(secs);
+    var r = SXL().register(secs, opts);
     /*@3.SECJ.372*/
     schRegister.lastReport = r.report;
     /*@3.SECJ.373*/
@@ -3716,17 +3719,25 @@
       if (sh) { e.stopPropagation(); showOneSection(sh.dataset.show); return; }
       if (e.target.closest('#sx-bk-add')) {
         var list = basket();
-        var todo = list.filter(function (c) { return !schHas(c); });
+        /*@3.SECJ.479*/
+        var todo = list.filter(function (c) { return !schLinked(c); });
         if (!todo.length) {
           toast(t('كلُّها في جدولك أصلاً', 'All of them are already in your schedule'));
           return;
         }
-        var n = schRegister(todo);
-        if (n) {
-          paintBasket();
-          toast(t('أُضيفت ' + n + ' شعبة إلى جدولك',
-                  n + ' section' + (n > 1 ? 's' : '') + ' added to your schedule'));
-        }
+        schRegister(todo, { force: true });
+        paintBasket();
+        /*@3.SECJ.478*/
+        var rp = schRegister.lastReport || {};
+        var say = [];
+        if (rp.added) say.push(t('أُضيفت ' + rp.added + ' موعداً', rp.added + ' entries added'));
+        if (rp.adopted) say.push(t('ورُبط ' + rp.adopted + ' موعداً كان في جدولك',
+                                   rp.adopted + ' already in your schedule were linked'));
+        var miss = todo.filter(function (c) { return !schLinked(c); });
+        if (miss.length) say.push(t('وتعذّرت ' + miss.length + ' (' + miss.join('، ') + ')',
+                                    miss.length + ' could not be added (' + miss.join(', ') + ')'));
+        toast(say.length ? say.join(' · ')
+                         : t('لا جديدَ يُضاف — كلُّها في جدولك', 'Nothing new — they are all in your schedule'));
         return;
       }
       var cp = e.target.closest('#sx-bk-copy');

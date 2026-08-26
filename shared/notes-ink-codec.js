@@ -2,7 +2,7 @@
 ;(function () {
   'use strict';
 
-  var VER = 2;
+  var VER = 3;
   var NIBS = ['round', 'fine', 'marker', 'flat'];
   var Q = 8;
   var P_MAX = 63;
@@ -80,7 +80,12 @@
 
   function encodeStrokes(strokes) {
     var w = new Writer();
-    w.raw(VER);
+    /*@3.NOICJ.7*/
+    var need = 2, z;
+    for (z = 0; z < strokes.length; z++) {
+      if (colorIndex(strokes[z].color) === HEX_MARK) { need = VER; break; }
+    }
+    w.raw(need);
     w.u(strokes.length);
 
     for (var s = 0; s < strokes.length; s++) {
@@ -90,7 +95,13 @@
       /*@3.NOICJ.4*/
       w.raw(Math.max(0, NIBS.indexOf(st.nib || 'round')));
       w.u(Math.round((st.w || 2) * 4));
-      w.u(colorIndex(st.color));
+      /*@3.NOICJ.6*/
+      var ci = colorIndex(st.color);
+      w.u(ci);
+      if (ci === HEX_MARK) {
+        var hb = hexBytes(st.color);
+        w.raw(hb[0]); w.raw(hb[1]); w.raw(hb[2]);
+      }
       w.u(pts.length);
 
       var px = 0, py = 0;
@@ -112,7 +123,7 @@
     var r = new Reader(u8);
     var ver = r.raw();
     /*@3.NOICJ.5*/
-    if (ver !== 1 && ver !== VER) return [];
+    if (ver < 1 || ver > VER) return [];
     var n = r.u();
     var out = [];
 
@@ -120,7 +131,14 @@
       var tool = TOOLS[r.raw()] || 'pen';
       var nib = (ver >= 2) ? (NIBS[r.raw()] || 'round') : 'round';
       var width = r.u() / 4;
-      var color = colorName(r.u());
+      var cidx = r.u();
+      var color;
+      if (ver >= 3 && cidx === HEX_MARK) {
+        var r8 = r.raw(), g8 = r.raw(), b8 = r.raw();
+        color = hexOfBytes(r8, g8, b8);
+      } else {
+        color = colorName(cidx);
+      }
       var cnt = r.u();
       var pts = [];
       var px = 0, py = 0;
@@ -135,12 +153,33 @@
     return out;
   }
 
-  var PALETTE = ['ink', 'amber', 'rose', 'violet', 'emerald', 'sky', 'lime', 'orange', 'red', 'pink', 'teal', 'indigo'];
+  var PALETTE = ['ink', 'amber', 'rose', 'violet', 'emerald', 'sky', 'lime', 'orange', 'red', 'pink', 'teal', 'indigo',
+                 'yellow', 'brown'];
+  var HEX_MARK = 63;
+  var HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
   function colorIndex(c) {
-    var i = PALETTE.indexOf(c);
+    var s = String(c == null ? '' : c);
+    if (HEX_RE.test(s)) return HEX_MARK;
+    var i = PALETTE.indexOf(s);
     return i < 0 ? 0 : i;
   }
   function colorName(i) { return PALETTE[i] || 'ink'; }
+
+  function hexBytes(c) {
+    var s = String(c).slice(1);
+    return [parseInt(s.slice(0, 2), 16) & 0xff,
+            parseInt(s.slice(2, 4), 16) & 0xff,
+            parseInt(s.slice(4, 6), 16) & 0xff];
+  }
+  function hexOfBytes(a, b, c) {
+    function two(n) { var h = (n & 0xff).toString(16); return h.length < 2 ? '0' + h : h; }
+    return '#' + two(a) + two(b) + two(c);
+  }
+  function canCarry(c) {
+    var s = String(c == null ? '' : c);
+    return HEX_RE.test(s) || PALETTE.indexOf(s) >= 0;
+  }
 
   function toB64(u8) {
     var s = '';
@@ -228,6 +267,8 @@
     stats: stats,
     gzipOk: gzipOk,
     PALETTE: PALETTE,
+    canCarry: canCarry,
+    HEX_MARK: HEX_MARK,
     NIBS: NIBS,
     VER: VER,
     RDP_EPS: RDP_EPS

@@ -1945,14 +1945,19 @@
       dimg.setAttribute('alt', sv.getAttribute('aria-label') || '');
       dimg.style.cssText = 'display:block;margin:0 auto;inline-size:' + dw +
         'px;block-size:' + dh + 'px';
+      /*@3.NOAJ.198*/
+      var baked = null;
       try {
-        var c2 = sv.cloneNode(true);
-        c2.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        c2.setAttribute('width', String(dw));
-        c2.setAttribute('height', String(dh));
-        var raw = new XMLSerializer().serializeToString(c2);
-        dimg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(raw);
-      } catch (eD) {}
+        var Mm = window.GardenNotesMermaid;
+        baked = (Mm && Mm.bake) ? Mm.bake(sv, dw, dh) : null;
+      } catch (eD) { baked = null; }
+      if (!baked) {
+        var preB = host.parentNode ? host.parentNode.querySelector('.ne-code') : null;
+        if (preB) preB.hidden = false;
+        host.remove();
+        continue;
+      }
+      dimg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(baked.svg);
       host.textContent = '';
       host.appendChild(dimg);
     }

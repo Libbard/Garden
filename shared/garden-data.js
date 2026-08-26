@@ -1319,6 +1319,8 @@
       completed: false, completed_at: null, grade: null,
       from_sections: true
     };
+    /*@3.GADJ.145*/
+    if (Array.isArray(c.crns) && c.crns.length) e.crns = c.crns.map(String);
     if (!courseInfo(c.code)) {
       e.custom = true;
       e.external = true;
@@ -1350,11 +1352,6 @@
         list = list.filter(function (c) { return codes.indexOf(c.code) !== -1; });
       }
       var s = scheduleRaw();
-      if (!list.length) {
-        if (s.sx_pending) { delete s.sx_pending; writeSchedule(s); }
-        return { added: [], semester: semester() };
-      }
-
       var sem = semester();
       if (!sem || typeof sem !== 'object') {
         var ar = (localStorage.getItem('garden_lang') || 'ar') === 'ar';
@@ -1369,6 +1366,27 @@
       if (!Array.isArray(sem.courses)) sem.courses = [];
       if (!s.archived || typeof s.archived !== 'object') s.archived = {};
 
+      /*@3.GADJ.147*/
+      var raw = (s.sx_pending && Array.isArray(s.sx_pending.courses)) ? s.sx_pending.courses : [];
+      var stamped = false;
+      raw.forEach(function (c) {
+        if (!c || !c.code || !Array.isArray(c.crns) || !c.crns.length) return;
+        if (codes && codes.length && codes.indexOf(c.code) === -1) return;
+        var cur = sem.courses.filter(function (x) { return x && x.code === c.code; })[0];
+        if (!cur) return;
+        if (!Array.isArray(cur.crns)) cur.crns = [];
+        c.crns.forEach(function (k) {
+          k = String(k);
+          if (cur.crns.indexOf(k) === -1) { cur.crns.push(k); stamped = true; }
+        });
+      });
+
+      if (!list.length) {
+        if (stamped) writeSemester(sem);
+        if (s.sx_pending) { delete s.sx_pending; writeSchedule(s); }
+        return { added: [], semester: sem };
+      }
+
       var added = [];
       list.forEach(function (c) {
         if (sem.courses.some(function (x) { return x && x.code === c.code; })) return;
@@ -1377,8 +1395,13 @@
         /*@3.GADJ.91*/
         var b = s.archived[c.code];
         if (b) {
+          /*@3.GADJ.146*/
           ['lectures', 'study_blocks', 'exams'].forEach(function (k) {
-            s[k] = (s[k] || []).concat(b[k] || []);
+            var live = s[k] || [], seen = {};
+            live.forEach(function (r) { if (r && r.id) seen[r.id] = 1; });
+            s[k] = live.concat((b[k] || []).filter(function (r) {
+              return r && (!r.id || !seen[r.id]);
+            }));
           });
           delete s.archived[c.code];
         }

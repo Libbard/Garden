@@ -473,19 +473,36 @@
 
   /*@3.SEMJ.36*/
 
+  /*@3.SEMJ.205*/
+  function semesterCrn(code) {
+    var list = (S.sem && S.sem.courses) || [];
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i];
+      if (c && c.code === code && Array.isArray(c.crns) && c.crns.length) return String(c.crns[0]);
+    }
+    return null;
+  }
+
   /*@3.SEMJ.37*/
   function sectionOf(code) {
     var rows = (S.sched.lectures || []).filter(function (x) {
       return x && x.course_code === code;
     });
-    if (!rows.length) return null;
+    /*@3.SEMJ.207*/
+    if (!rows.length) {
+      var kept = semesterCrn(code);
+      return kept ? { crn: kept, room: '', remote: false, days: [], time: '', label: '', empty: true }
+                  : null;
+    }
     var days = [], crn = null, room = '', remote = false;
+    /*@3.SEMJ.206*/
     rows.forEach(function (r) {
       if (days.indexOf(r.day) === -1) days.push(r.day);
       if (!crn && r.sx_crn) crn = r.sx_crn;
       if (!room && r.room) room = r.room;
       if (r.attendance === 'remote') remote = true;
     });
+    if (!crn) crn = semesterCrn(code);
     var order = GardenData.DAYS_ORDER;
     days.sort(function (a, b) { return order.indexOf(a) - order.indexOf(b); });
     return {
@@ -638,8 +655,12 @@
       var extra = [];
       if (sec.room) extra.push(sec.room);
       if (sec.remote) extra.push(L('عن بُعد', 'Remote'));
+      /*@3.SEMJ.208*/
       h += row('fa-clock',
-        esc(sec.label + ' · ' + sec.time) +
+        (sec.empty
+          ? esc(L('مربوطةٌ — ولا مواعيدَ لها في جدولك',
+                  'Linked — but it has no times in your schedule'))
+          : esc(sec.label + ' · ' + sec.time)) +
           (extra.length ? ' <span class="sem-r-dim">· ' + esc(extra.join(' · ')) + '</span>' : ''),
         '',
         /*@3.SEMJ.139*/
@@ -647,7 +668,8 @@
             esc(entry.code) + '" data-crn="' + esc(sec.crn) + '" title="' +
             esc(L('شعبتُك — اعرضها أو فُكّ ربطَها', 'Your section — inspect it or unlink')) + '">' +
             esc(sec.crn) + '</button>'
-          : '');
+          : '',
+        !!sec.empty);
     } else {
       /*@3.SEMJ.140*/
       h += row('fa-clock', esc(L('لا شعبة في جدولك', 'No section in your schedule')), '',
@@ -1494,7 +1516,8 @@
     }
 
     var s = CRN.sec;
-    var linked = SXL().has(String(s.crn), s);
+    /*@3.SEMJ.204*/
+    var linked = SXL().linked(String(s.crn));
     var other = CRN.code && s.c !== CRN.code;
     var f = crnFacts(s);
     var title = crnTitle(s);
@@ -1594,13 +1617,13 @@
     var s = CRN.sec;
     if (!s || CRN.busy || !SXL()) return;
     CRN.busy = true;
-    var r = SXL().register([s]);
+    var r = SXL().register([s], { force: true });
     CRN.busy = false;
     if (!r.saved) {
       toast(L('تعذّر الحفظ — مساحةُ التخزين ممتلئة', 'Could not save — storage is full'));
       return;
     }
-    if (!r.report.added && !r.report.updated) {
+    if (!r.report.added && !r.report.updated && !r.report.adopted) {
       toast(L('لا جديدَ في هذه الشعبة يُضاف لجدولك', 'Nothing new in this section to add'));
       renderCrn();
       return;
