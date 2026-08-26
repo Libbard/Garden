@@ -17,6 +17,16 @@
   var PBV = 5;
   /*@3.NOEJ.220*/
   var CUT_SAFE = 10;
+  /*@3.NOEJ.281*/
+  var WIN_MIN = 300;
+  function winSwitch() {
+    try {
+      var v = localStorage.getItem('garden_notes_win');
+      return v === '0' ? 0 : 1;
+    } catch (e) { return 1; }
+  }
+  var WIN_PAD = 1600;
+  var WIN_SPAN = 70;
   var TYPE_GROUP_MS = 900;
   var TYPE_GROUP_MAX = 4000;
   var UNDO_MAX = 120;
@@ -266,7 +276,8 @@
           selfE.applyEng();
         }
       };
-      document.fonts.ready.then(engSettle);
+      this._onFaces = engSettle;
+      document.fonts.ready.then(function () { if (selfE._onFaces) engSettle(); });
       try { document.fonts.addEventListener('loadingdone', engSettle); } catch (eL) {}
     }
     this.bind();
@@ -281,7 +292,7 @@
     var self = this;
     clearTimeout(this._setT);
     this._setT = setTimeout(function () {
-      if (!self.root || !self.root.isConnected) return;
+      if (self._destroyed || !self.root || !self.root.isConnected) return;
       self._engStale = true;
       self.captureEng();
       if (self.doc.eng && self.opts.onSave) self.opts.onSave(self.doc, true);
@@ -321,7 +332,7 @@
     this._undoB = Math.max(0, (this._undoB || 0) - (popped ? popped.length : 0));
     this.doc = JSON.parse(popped);
     this.render();
-    this.touch(true);
+    this.touch();
     this.emitState();
     return true;
   };
@@ -334,7 +345,7 @@
     this._undoB = (this._undoB || 0) + cur.length;
     this.doc = JSON.parse(this.redo.pop());
     this.render();
-    this.touch(true);
+    this.touch();
     this.emitState();
     return true;
   };
@@ -350,19 +361,22 @@
     this.mark();
   };
 
-  Editor.prototype.touch = function () {
+  Editor.prototype.touch = function (soft) {
     this._engStale = true;
     /*@3.NOEJ.181*/
     if (DIR_CACHE) DIR_CACHE.delete(this.doc);
     if (this._engOn) this.applyEng();
     if (this.opts.onLayout) this.opts.onLayout();
-    this.mark();
+    this.mark(soft);
   };
 
   /*@3.NOEJ.211*/
-  Editor.prototype.mark = function () {
+  Editor.prototype.mark = function (soft) {
     this.dirty = true;
-    if (this.opts.onDirty) this.opts.onDirty();
+    if (!soft) {
+      this._loud = 1;
+      if (this.opts.onDirty) this.opts.onDirty();
+    }
     this.arm();
   };
 
@@ -388,7 +402,9 @@
     if (!this.doc.blocks.length) this.doc.blocks.push(B().blank('p'));
     this.dirty = false;
     this.captureEng();
-    if (this.opts.onSave) this.opts.onSave(this.doc);
+    var loud = !!this._loud;
+    this._loud = 0;
+    if (this.opts.onSave) this.opts.onSave(this.doc, !loud);
     return this.doc;
   };
 
@@ -428,8 +444,12 @@
       var t = recs[i].target;
       if (t && t.nodeType !== 1) t = t.parentNode;
       var n = (t && t.closest) ? t.closest('[data-bid]') : null;
-      if (n) this._dirty[n.getAttribute('data-bid')] = 1;
-      else if (recs[i].type === 'childList') this._dirty = null;
+      if (!n) {
+        if (recs[i].type !== 'childList') continue;
+        this._dirty = null;
+        return;
+      }
+      this._dirty[n.getAttribute('data-bid')] = 1;
     }
   };
 
@@ -598,7 +618,7 @@
         }
       }
     }
-    if (hit) { this.render(); this.touch(); }
+    if (hit) { this.render(); this.touch(true); }
     return hit;
   };
 
@@ -618,20 +638,31 @@
     /*@3.NOEJ.146*/
     this._sw = 0;
     this.sheetW();
+    /*@3.NOEJ.302*/
+    this._win = null;
+    this._winA = null;
+    this._winB = null;
     this.root.innerHTML = '';
-    var frag = document.createDocumentFragment();
-    this.doc.blocks.forEach(function (b) { frag.appendChild(self.renderBlock(b)); });
-    frag.appendChild(this.renderTail());
-    this.root.appendChild(frag);
     /*@3.NOEJ.252*/
     this._nat = null;
     this._natIdx = null;
     this._engStale = true;
+    var rng = null;
+    if (this.natLoad()) {
+      this._engStale = false;
+      if (this.winOk()) rng = this.winPin(this.winRange());
+    }
+    var frag = document.createDocumentFragment();
+    if (!rng) this.doc.blocks.forEach(function (b) { frag.appendChild(self.renderBlock(b)); });
+    frag.appendChild(this.renderTail());
+    this.root.appendChild(frag);
+    if (rng) { this.winBind(); this.winSet(rng[0], rng[1]); this.freeSync(); }
     /*@3.NOEJ.254*/
     this.roLater();
     this.paintBlockSel();
     this.layoutFree();
     this.applyReadOnly();
+    this.reAct();
     if (this.opts.onLayout) this.opts.onLayout();
   };
 
@@ -645,7 +676,17 @@
     var next = this.doc.blocks[at + blocks.length];
     var anchor = next
       ? this.root.querySelector(':scope > [data-bid="' + next.id + '"]')
-      : this.root.querySelector(':scope > .ne-tail');
+      : (this._winB && this._winB.parentNode === this.root
+         ? this._winB : this.root.querySelector(':scope > .ne-tail'));
+    /*@3.NOEJ.301*/
+    if (!anchor && this._win) {
+      var ids0 = [];
+      for (var w = 0; w < blocks.length; w++) ids0.push(blocks[w].id);
+      if (!this.natSplice(at, 0, ids0)) { this._nat = null; this._engStale = true; this.settled(); }
+      else this.reflowEng();
+      this.winApply(true);
+      return;
+    }
     if (!anchor) { this.render(); return; }
     var fresh = [].slice.call(frag.children);
     this.root.insertBefore(frag, anchor);
@@ -653,7 +694,9 @@
     for (i = 0; i < blocks.length; i++) ids.push(blocks[i].id);
     if (!this.natSplice(at, 0, ids)) { this._nat = null; this._engStale = true; this.settled(); }
     for (i = 0; i < fresh.length; i++) this.roAdd(fresh[i]);
-    this.applyEng();
+    /*@3.NOEJ.268*/
+    if (this.natSync(fresh) && this.natOk()) this.reflowEng();
+    else this.applyEng();
     this.applyReadOnly();
     if (this.opts.onLayout) this.opts.onLayout();
   };
@@ -663,6 +706,8 @@
     var hit = this.blockAt(id);
     if (!hit) { this.render(); return false; }
     var node = this.root.querySelector(':scope > [data-bid="' + id + '"]');
+    /*@3.NOEJ.291*/
+    if (!node && this._win) return true;
     if (!node) { this.render(); return false; }
     this.dropCanvas(id);
     this._sw = 0;
@@ -671,9 +716,12 @@
     this.roDrop(node);
     this.root.replaceChild(fresh, node);
     this.roAdd(fresh);
-    this.applyEng();
+    /*@3.NOEJ.269*/
+    if (this.natSync([fresh]) && this.natOk()) this.reflowEng();
+    else this.applyEng();
     this.applyReadOnly();
     this.paintBlockSel();
+    this.reAct();
     if (hit.b.fp) this.layoutFree();
     if (this.opts.onLayout) this.opts.onLayout();
     return true;
@@ -682,6 +730,14 @@
   /*@3.NOEJ.232*/
   Editor.prototype.renderDrop = function (id) {
     var node = this.root.querySelector(':scope > [data-bid="' + id + '"]');
+    /*@3.NOEJ.292*/
+    if (!node && this._win) {
+      var ixW = this.natIdx();
+      var atW = ixW ? ixW[id] : null;
+      if (atW != null && this.natSplice(atW, 1, [])) { this.reflowEng(); this.winApply(true); return true; }
+      this._nat = null; this._engStale = true; this.settled();
+      return true;
+    }
     if (!node) { this.render(); return false; }
     this.dropCanvas(id);
     this.roDrop(node);
@@ -1529,6 +1585,8 @@
   }
 
   Editor.prototype.caretIn = function (id, slotK, at) {
+    /*@3.NOEJ.300*/
+    if (this._win) this.winShow(id);
     var fresh = this.root.querySelector('[data-bid="' + id + '"]');
     if (!fresh) return;
     var t = slotK >= 0
@@ -1591,6 +1649,36 @@
     return true;
   };
 
+  /*@3.NOEJ.266*/
+  Editor.prototype.unlistItem = function (id, k) {
+    var hit = this.blockAt(id);
+    if (!hit || !LISTY[hit.b.ty] || !hit.b.items || !hit.b.items[k]) return false;
+    var node = this.root.querySelector(':scope > [data-bid="' + id + '"]');
+    if (!node) return false;
+    this.readBlock(node);
+    var b = hit.b;
+    if (b.items.length < 2) {
+      this.convert(id, 'p');
+      this.caretIn(id, -1, 0);
+      return true;
+    }
+    var before = this.snapshot();
+    var p = B().blank('p');
+    p.rt = joinRuns([b.items[k].rt || []]);
+    var key = ['ff', 'dir', 'al', 'fs'], q;
+    for (q = 0; q < key.length; q++) if (b[key[q]] != null) p[key[q]] = b[key[q]];
+    b.items.splice(k, 1);
+    this.doc.blocks.splice(hit.i, 0, p);
+    this.pushUndo(before);
+    this.renderOne(id);
+    var pAt = this.blockAt(p.id);
+    if (pAt) this.renderInsert(pAt.i, [p]); else this.render();
+    this.caretIn(p.id, -1, 0);
+    this.touch();
+    this.emitState();
+    return true;
+  };
+
   Editor.prototype.flowNeighbour = function (i, dir) {
     var bs = this.doc.blocks, j = i + dir;
     while (j >= 0 && j < bs.length && bs[j].fp) j += dir;
@@ -1605,9 +1693,16 @@
       var lis = node ? [].slice.call(node.querySelectorAll('.ne-li')) : [];
       var k = lis.indexOf(edn);
       if (k < 0) return false;
-      if (dir < 0 && k > 0) return this.joinItems(id, k);
-      if (dir > 0 && k < lis.length - 1) return this.joinItems(id, k + 1);
-      if (dir > 0) return false;
+      /*@3.NOEJ.258*/
+      if (dir < 0) {
+        if (parseInt(edn.getAttribute('data-lv') || '0', 10) > 0) {
+          return this.indentItem(node, hit.b, edn, -1);
+        }
+        if (k > 0) return this.joinItems(id, k);
+        return this.unlistItem(id, 0);
+      }
+      if (k < lis.length - 1) return this.joinItems(id, k + 1);
+      return false;
     }
     var nb = this.flowNeighbour(hit.i, dir < 0 ? -1 : 1);
     if (!nb) return false;
@@ -2111,6 +2206,8 @@
 
   /*@3.NOEJ.174*/
   Editor.prototype.flashBlock = function (id) {
+    /*@3.NOEJ.299*/
+    if (this._win) this.winShow(String(id).replace(/"/g, ''));
     var node = this.root.querySelector('[data-bid="' + String(id).replace(/"/g, '') + '"]');
     if (!node) return false;
     try { node.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
@@ -2491,6 +2588,36 @@
     return true;
   };
 
+  /*@3.NOEJ.256*/
+  Editor.prototype.coarse = function () {
+    if (this._coarse == null) {
+      try { this._coarse = !!(window.matchMedia && matchMedia('(hover: none)').matches); }
+      catch (e) { this._coarse = false; }
+    }
+    return this._coarse;
+  };
+
+  Editor.prototype.touchAct = function (id) {
+    var prev = this._actId
+      ? this.root.querySelector(':scope > [data-bid="' + this._actId + '"]') : null;
+    if (prev) prev.removeAttribute('data-act');
+    this._actId = id || '';
+    if (!id) { this.chromeTo(null); return; }
+    var node = this.root.querySelector(':scope > [data-bid="' + id + '"]');
+    if (!node) return;
+    node.setAttribute('data-act', '1');
+    this.chromeTo(node);
+  };
+
+  /*@3.NOEJ.257*/
+  Editor.prototype.reAct = function () {
+    if (!this._actId) return;
+    var node = this.root.querySelector(':scope > [data-bid="' + this._actId + '"]');
+    if (!node) { this._actId = ''; return; }
+    node.setAttribute('data-act', '1');
+    this.chromeTo(node);
+  };
+
   Editor.prototype.makeFree = function (id) {
     var hit = this.blockAt(id);
     if (!hit || hit.b.fp) return false;
@@ -2620,6 +2747,7 @@
       list[i][1].style.left = '';
     }
     this.doc.fpv = 2;
+    if (list.length) this.mark(true);
   };
 
   function offRel(node, base) {
@@ -2717,11 +2845,27 @@
 
   /*@3.NOEJ.154*/
   /*@3.NOEJ.238*/
-  Editor.prototype.captureEng = function () {
+  Editor.prototype.captureEng = function (full) {
     if (this.doc.kind === 'board') return;
+    /*@3.NOEJ.311*/
+    if (this._engIn) { if (full) this._engStale = true; return; }
+    this._engIn = 1;
+    try { this.engPass(full); } finally { this._engIn = 0; }
+  };
+
+  Editor.prototype.engPass = function (full) {
+    /*@3.NOEJ.284*/
+    if (this._win) {
+      if (!full) { this.winSettle(); return; }
+      this.winClear();
+    }
     /*@3.NOEJ.213*/
-    if (!this._engStale && !this._engVerify &&
-        this.doc.eng && this.doc.eng.pbv === PBV) return;
+    if (!this._engStale && !this._engVerify && this._nat &&
+        this.doc.eng && this.doc.eng.pbv === PBV) {
+      this.winBind();
+      if (this.winOk()) this.winApply(false);
+      return;
+    }
     this._engVerify = false;
     /*@3.NOEJ.157*/
     var faceOk = true;
@@ -2739,13 +2883,15 @@
     var mine = new Array(n), live = 0;
     /*@3.NOEJ.241*/
     var r0 = this.root.getBoundingClientRect().top;
+    /*@3.NOEJ.279*/
+    var z = this.zoomOf() || 1;
     for (i = 0; i < n; i++) {
       b = bs[i];
       node = b.fp ? null : map[b.id];
       if (!node) { top[i] = null; hgt[i] = 0; nds[i] = null; mine[i] = 0; continue; }
       var rr = node.getBoundingClientRect();
-      top[i] = rr.top - r0;
-      hgt[i] = rr.height;
+      top[i] = (rr.top - r0) / z;
+      hgt[i] = rr.height / z;
       nds[i] = node;
       /*@3.NOEJ.239*/
       mine[i] = node.__bd || 0;
@@ -2773,34 +2919,14 @@
     var mk = {};
     for (i = 0; i < n; i++) if (out.m[i] > 0) mk[bs[i].id] = out.m[i];
     this.doc.eng = { v: 3, w: 794, h: Math.round(this._engBot + pad0),
-                     a: out.a, pb: out.pb, mk: mk, pbv: PBV };
+                     a: out.a, pb: out.pb, mk: mk, pbv: PBV, nat: this.natPack() };
     this._engStale = false;
     this.applyEng();
-    var round, carry, worst, act, err, e2;
-    for (round = 0; round < 2; round++) {
-      carry = 0; worst = 0;
-      for (i = 0; i < n; i++) {
-        if (!nds[i] || out.a[i] == null) continue;
-        act = nds[i].getBoundingClientRect().top - r0;
-        err = act - out.a[i];
-        if (!(out.m[i] > 0)) continue;
-        e2 = err - carry;
-        if (Math.abs(e2) > 0.4) {
-          out.m[i] = Math.max(0, Math.round((out.m[i] - e2) * 100) / 100);
-          carry += e2;
-          if (Math.abs(e2) > worst) worst = Math.abs(e2);
-        }
-      }
-      if (!worst) break;
-      mk = {};
-      for (i = 0; i < n; i++) if (out.m[i] > 0) mk[bs[i].id] = out.m[i];
-      this.doc.eng.mk = mk;
-      this.applyEng();
-    }
+    this.mkFix(out, nds, r0, z);
     this._engBot = 0;
     for (i = 0; i < n; i++) {
       if (!nds[i] || out.a[i] == null) continue;
-      out.a[i] = nds[i].getBoundingClientRect().top - r0;
+      out.a[i] = (nds[i].getBoundingClientRect().top - r0) / z;
       var bot = out.a[i] + hgt[i];
       if (bot > this._engBot) this._engBot = bot;
     }
@@ -2813,7 +2939,7 @@
       if (pass < 3 && this.tableGuard(out.a, map)) {
         this._engPass = pass;
         this._engStale = true;
-        this.captureEng();
+        this.engPass(true);
         this._engPass = 0;
         return;
       }
@@ -2821,6 +2947,39 @@
     }
     /*@3.NOEJ.209*/
     if (this.opts.onEngShift && oldA) this.emitShift(oldA, oldPb, out);
+    /*@3.NOEJ.298*/
+    this.winBind();
+    if (this.winOk()) this.winApply(true);
+  };
+
+  /*@3.NOEJ.277*/
+  Editor.prototype.mkFix = function (out, nds, r0, z) {
+    var bs = this.doc.blocks, n = Math.min(bs.length, out.m.length);
+    var map = nds ? null : this.bidMap();
+    var round, carry, worst, i, node, act, e2, mk, any = false;
+    if (r0 == null) r0 = this.root.getBoundingClientRect().top;
+    if (!(z > 0.05)) z = this.zoomOf() || 1;
+    for (round = 0; round < 2; round++) {
+      carry = 0; worst = 0;
+      for (i = 0; i < n; i++) {
+        if (!(out.m[i] > 0) || out.a[i] == null) continue;
+        node = nds ? nds[i] : map[bs[i].id];
+        if (!node) continue;
+        act = (node.getBoundingClientRect().top - r0) / z;
+        e2 = (act - out.a[i]) - carry;
+        if (Math.abs(e2) <= 0.4) continue;
+        out.m[i] = Math.max(0, Math.round((out.m[i] - e2) * 100) / 100);
+        carry += e2;
+        any = true;
+        if (Math.abs(e2) > worst) worst = Math.abs(e2);
+      }
+      if (!worst) break;
+      mk = {};
+      for (i = 0; i < bs.length; i++) if (out.m[i] > 0) mk[bs[i].id] = out.m[i];
+      this.doc.eng.mk = mk;
+      this.applyEng();
+    }
+    return any;
   };
 
   Editor.prototype.emitShift = function (oldA, oldPb, out) {
@@ -2911,6 +3070,68 @@
     return { a: a, pb: pb, m: m };
   };
 
+  function rleOut(arr) {
+    var out = [], i, v, n = 0, cur;
+    for (i = 0; i < arr.length; i++) {
+      v = arr[i];
+      if (n && v === cur) { n++; continue; }
+      if (n) out.push(n === 1 ? cur : [n, cur]);
+      cur = v; n = 1;
+    }
+    if (n) out.push(n === 1 ? cur : [n, cur]);
+    return out;
+  }
+
+  function rleIn(src, len) {
+    if (!Array.isArray(src)) return null;
+    var out = [], i, e, k;
+    for (i = 0; i < src.length; i++) {
+      e = src[i];
+      if (Array.isArray(e)) {
+        if (!(e[0] > 0)) return null;
+        for (k = 0; k < e[0]; k++) out.push(e[1]);
+      } else out.push(e);
+      if (out.length > len) return null;
+    }
+    return out.length === len ? out : null;
+  }
+
+  /*@3.NOEJ.312*/
+  Editor.prototype.natPack = function () {
+    var nat = this._nat, bs = this.doc.blocks;
+    if (!nat || nat.ids.length !== bs.length) return null;
+    var g = new Array(bs.length), h = new Array(bs.length), i, v;
+    for (i = 0; i < bs.length; i++) {
+      v = nat.gap[i];
+      g[i] = (v == null) ? null : Math.round(v * 100) / 100;
+      v = nat.hgt[i];
+      h[i] = (v == null) ? 0 : Math.round(v * 100) / 100;
+    }
+    return { n: bs.length, g: rleOut(g), h: rleOut(h),
+             std: Math.round((nat.std || 0) * 100) / 100,
+             ph: Math.round(nat.ph || 0), pad: Math.round(nat.pad || 0) };
+  };
+
+  Editor.prototype.natLoad = function () {
+    var eng = this.doc.eng, bs = this.doc.blocks;
+    if (!eng || eng.v !== 3 || eng.pbv !== PBV || eng.w !== 794) return false;
+    if (!Array.isArray(eng.a) || eng.a.length !== bs.length) return false;
+    if (this.doc.kind === 'board') return false;
+    var nt = eng.nat;
+    if (!nt || nt.n !== bs.length) return false;
+    if (!(nt.ph > 200) || Math.abs(nt.ph - this.pageH()) > 1) return false;
+    var gap = rleIn(nt.g, bs.length), hgt = rleIn(nt.h, bs.length);
+    if (!gap || !hgt) return false;
+    var i;
+    var ids = new Array(bs.length), lh = new Array(bs.length);
+    for (i = 0; i < bs.length; i++) { ids[i] = bs[i].id; lh[i] = 0; }
+    this._nat = { gap: gap, hgt: hgt, lh: lh, ids: ids,
+                  std: nt.std || 2.4, n: bs.length,
+                  ph: nt.ph, pad: nt.pad || 0 };
+    this._natIdx = null;
+    return true;
+  };
+
   Editor.prototype.natIdx = function () {
     var nat = this._nat;
     if (!nat) return null;
@@ -2955,6 +3176,27 @@
     return true;
   };
 
+  /*@3.NOEJ.262*/
+  Editor.prototype.natSync = function (nodes) {
+    var nat = this._nat, idx = this.natIdx();
+    if (!nat || !idx || !nodes) return false;
+    var i, id, k, h, hit = false;
+    var zn = this.zoomOf() || 1;
+    for (i = 0; i < nodes.length; i++) {
+      if (!nodes[i] || !nodes[i].getAttribute) continue;
+      if (nodes[i].hasAttribute('data-fp')) continue;
+      id = nodes[i].getAttribute('data-bid');
+      k = idx[id];
+      if (k == null || nat.ids[k] !== id) continue;
+      h = nodes[i].getBoundingClientRect().height / zn;
+      if (Math.abs((nat.hgt[k] || 0) - h) < 0.5) continue;
+      nat.hgt[k] = h;
+      nat.lh[k] = 0;
+      hit = true;
+    }
+    return hit;
+  };
+
   Editor.prototype.natOk = function () {
     var nat = this._nat, bs = this.doc.blocks;
     if (!nat || nat.ids.length !== bs.length) return false;
@@ -2975,7 +3217,7 @@
     var oldPb = (this.doc.eng && Array.isArray(this.doc.eng.pb) &&
                  this.doc.eng.pb.length === bs.length) ? this.doc.eng.pb : null;
     this.doc.eng = { v: 3, w: 794, h: Math.round(this._engBot + pad0),
-                     a: out.a, pb: out.pb, mk: mk, pbv: PBV };
+                     a: out.a, pb: out.pb, mk: mk, pbv: PBV, nat: this.natPack() };
     this._engStale = false;
     this._natRe = (this._natRe || 0) + 1;
     if (this._natRe > 300) { this._natRe = 0; this._engVerify = true; }
@@ -2986,6 +3228,244 @@
     if (this.opts.onLayout) this.opts.onLayout();
     if (this.opts.onGeom) this.opts.onGeom();
     return true;
+  };
+
+  /*@3.NOEJ.280*/
+  Editor.prototype.winOk = function () {
+    /*@3.NOEJ.307*/
+    if (this.opts.win === false) return false;
+    if (this.opts.win !== true && !winSwitch()) return false;
+    if (this.doc.kind === 'board') return false;
+    if (!this.natOk()) return false;
+    var eng = this.doc.eng, bs = this.doc.blocks;
+    if (!eng || eng.v !== 3 || !Array.isArray(eng.a) || eng.a.length !== bs.length) return false;
+    if (bs.length < WIN_MIN) return false;
+    if (this._bdrag || this._drag || this._wdrag || this._rdrag) return false;
+    if (this._bsel) { for (var q in this._bsel) if (this._bsel[q]) return false; }
+    return !!this.scroller();
+  };
+
+  /*@3.NOEJ.285*/
+  Editor.prototype.winBase = function (sc) {
+    return this.root.getBoundingClientRect().top -
+           sc.getBoundingClientRect().top + sc.scrollTop;
+  };
+
+  Editor.prototype.winRange = function () {
+    var sc = this.scroller();
+    if (!sc) return null;
+    var eng = this.doc.eng, nat = this._nat, n = this.doc.blocks.length;
+    var z = this.zoomOf() || 1;
+    var base = this.winBase(sc);
+    var top = (sc.scrollTop - base) / z - WIN_PAD;
+    var bot = (sc.scrollTop - base + sc.clientHeight) / z + WIN_PAD;
+    var from = -1, to = -1, i, y0, y1;
+    for (i = 0; i < n; i++) {
+      if (eng.a[i] == null) continue;
+      y0 = eng.a[i];
+      y1 = y0 + (nat.hgt[i] || 0);
+      if (y1 < top) continue;
+      if (y0 > bot) break;
+      if (from < 0) from = i;
+      to = i;
+    }
+    if (from < 0) { from = 0; to = Math.min(n - 1, WIN_SPAN); }
+    return [from, to];
+  };
+
+  /*@3.NOEJ.282*/
+  Editor.prototype.winKeep = function () {
+    var out = [], ce = this.currentEditable();
+    var nd = ce && ce.closest ? ce.closest('[data-bid]') : null;
+    if (nd && nd.parentNode === this.root) out.push(nd.getAttribute('data-bid'));
+    if (this._actId) out.push(this._actId);
+    var bs = this.doc.blocks, i;
+    for (i = 0; i < bs.length; i++) if (bs[i].prov) out.push(bs[i].id);
+    return out;
+  };
+
+  Editor.prototype.winPin = function (rng) {
+    var keep = this.winKeep(), i, hit, k;
+    for (i = 0; i < keep.length; i++) {
+      hit = this.blockAt(keep[i]);
+      if (!hit) continue;
+      k = hit.i;
+      if (k >= rng[0] && k <= rng[1]) continue;
+      if (k < rng[0] && rng[0] - k <= WIN_SPAN) { rng[0] = k; continue; }
+      if (k > rng[1] && k - rng[1] <= WIN_SPAN) { rng[1] = k; continue; }
+      /*@3.NOEJ.303*/
+      var ce = this.currentEditable();
+      if (ce && ce.closest && ce.closest('[data-bid="' + keep[i] + '"]')) {
+        try { ce.blur(); } catch (eB) {}
+      }
+    }
+    return rng;
+  };
+
+  /*@3.NOEJ.283*/
+  Editor.prototype.winPad = function (which) {
+    var key = which === 'a' ? '_winA' : '_winB';
+    if (this[key] && this[key].parentNode === this.root) return this[key];
+    var el = document.createElement('div');
+    el.className = 'ne-win';
+    el.setAttribute('data-win', which);
+    el.setAttribute('aria-hidden', 'true');
+    this[key] = el;
+    return el;
+  };
+
+  /*@3.NOEJ.286*/
+  Editor.prototype.winSet = function (from, to) {
+    var bs = this.doc.blocks, root = this.root, eng = this.doc.eng, nat = this._nat;
+    var i, node, id, k;
+    var idx = {}, live = {};
+    for (i = 0; i < bs.length; i++) idx[bs[i].id] = i;
+    var kids = root.querySelectorAll(':scope > [data-bid]');
+    var out = [];
+    for (i = 0; i < kids.length; i++) {
+      id = kids[i].getAttribute('data-bid');
+      k = idx[id];
+      if (k != null && (bs[k].fp || (k >= from && k <= to))) { live[id] = kids[i]; continue; }
+      out.push(kids[i]);
+    }
+    /*@3.NOEJ.304*/
+    for (i = 0; i < out.length; i++) {
+      id = out[i].getAttribute('data-bid');
+      this.readBlock(out[i]);
+      this.dropCanvas(id);
+      this.roDrop(out[i]);
+      out[i].remove();
+    }
+    this._sw = 0;
+    this.sheetW();
+    var padB = this.winPad('b');
+    if (padB.parentNode !== root) {
+      var tail = root.querySelector(':scope > .ne-tail');
+      if (tail) root.insertBefore(padB, tail); else root.appendChild(padB);
+    }
+    var anchor = padB;
+    for (i = to; i >= from; i--) {
+      node = live[bs[i].id];
+      if (!node) {
+        node = this.renderBlock(bs[i]);
+        root.insertBefore(node, anchor);
+        this.roAdd(node);
+      } else if (node.nextSibling !== anchor) {
+        root.insertBefore(node, anchor);
+      }
+      node.classList.remove('ne-w0');
+      anchor = node;
+    }
+    var padA = this.winPad('a');
+    if (padA.nextSibling !== anchor || padA.parentNode !== root) {
+      root.insertBefore(padA, anchor);
+    }
+    /*@3.NOEJ.305*/
+    var a0 = eng.a[0] || 0;
+    var aH = Math.max(0, (eng.a[from] || 0) - a0);
+    var bot = (eng.a[to] || 0) + (nat.hgt[to] || 0);
+    var pad0 = (nat && nat.pad > 0) ? nat.pad : (root.offsetTop || 16);
+    var bH = Math.max(0, (eng.h - pad0) - bot);
+    padA.style.blockSize = aH.toFixed(2) + 'px';
+    padB.style.blockSize = bH.toFixed(2) + 'px';
+    if (anchor && anchor.classList) anchor.classList.add('ne-w0');
+    this.freeSync();
+    this._win = { from: from, to: to };
+    /*@3.NOEJ.308*/
+    if (!this._winSaid) {
+      this._winSaid = 1;
+      try {
+        console.info('[notes] نافذةُ الرسم: ' + ((to - from) + 1) + ' من ' +
+          bs.length + ' كتلة · العتبة ' + WIN_MIN + ' · التصديرُ والطباعةُ ' +
+          'من النموذجِ كاملاً');
+      } catch (eL) {}
+    }
+    this.applyEng();
+    this.applyReadOnly();
+    this.paintBlockSel();
+    this.reAct();
+    if (this.opts.onLayout) this.opts.onLayout();
+    return true;
+  };
+
+  /*@3.NOEJ.287*/
+  Editor.prototype.winApply = function (force) {
+    if (!this.winOk()) { if (this._win) this.winClear(); return false; }
+    var rng = this.winRange();
+    if (!rng) return false;
+    rng = this.winPin(rng);
+    var cur = this._win;
+    if (!force && cur && cur.from === rng[0] && cur.to === rng[1]) return false;
+    return this.winSet(rng[0], rng[1]);
+  };
+
+  /*@3.NOEJ.288*/
+  Editor.prototype.winClear = function () {
+    if (!this._win) return false;
+    var bs = this.doc.blocks, root = this.root, i, node;
+    var live = this.bidMap();
+    var padB = (this._winB && this._winB.parentNode === root) ? this._winB : null;
+    var anchor = padB || root.querySelector(':scope > .ne-tail');
+    this._sw = 0;
+    this.sheetW();
+    for (i = bs.length - 1; i >= 0; i--) {
+      node = live[bs[i].id];
+      if (!node) {
+        node = this.renderBlock(bs[i]);
+        root.insertBefore(node, anchor);
+        this.roAdd(node);
+      } else if (node.nextSibling !== anchor) {
+        root.insertBefore(node, anchor);
+      }
+      node.classList.remove('ne-w0');
+      anchor = node;
+    }
+    if (this._winA && this._winA.parentNode) this._winA.remove();
+    if (this._winB && this._winB.parentNode) this._winB.remove();
+    this._win = null;
+    this.applyEng();
+    this.applyReadOnly();
+    this.paintBlockSel();
+    this.reAct();
+    return true;
+  };
+
+  /*@3.NOEJ.289*/
+  Editor.prototype.winShow = function (id) {
+    if (!this._win) return true;
+    var hit = this.blockAt(id);
+    if (!hit) return false;
+    var k = hit.i;
+    if (k >= this._win.from && k <= this._win.to) return true;
+    var n = this.doc.blocks.length;
+    this.winSet(Math.max(0, k - WIN_SPAN), Math.min(n - 1, k + WIN_SPAN));
+    return true;
+  };
+
+  /*@3.NOEJ.306*/
+  Editor.prototype.winSettle = function () {
+    var live = this.root.querySelectorAll(':scope > [data-bid]');
+    var arr = [], i;
+    for (i = 0; i < live.length; i++) arr.push(live[i]);
+    if (this.natSync(arr)) this.reflowEng();
+    else this.applyEng();
+  };
+
+  /*@3.NOEJ.290*/
+  Editor.prototype.winBind = function () {
+    if (this._winTie) return;
+    var self = this;
+    this._winTie = function () {
+      if (self._winQ) return;
+      self._winQ = requestAnimationFrame(function () {
+        self._winQ = 0;
+        if (!self.root || !self.root.isConnected) return;
+        self.winApply(false);
+      });
+    };
+    var sc = this.scroller();
+    if (sc) { sc.addEventListener('scroll', this._winTie, { passive: true }); this._winSc = sc; }
+    window.addEventListener('resize', this._winTie, { passive: true });
   };
 
   Editor.prototype.roBind = function () {
@@ -3038,13 +3518,15 @@
     var nat = this._nat, idx = this.natIdx();
     if (!idx) return;
     var changed = false, e, node, id, i, h;
+    var zo = this.zoomOf() || 1;
     for (e = 0; e < ents.length; e++) {
       node = ents[e].target;
       if (!node.parentNode || node.hasAttribute('data-fp')) continue;
       id = node.getAttribute('data-bid');
       i = idx[id];
-      if (i == null || nat.ids[i] !== id) return;
-      h = node.getBoundingClientRect().height;
+      /*@3.NOEJ.261*/
+      if (i == null || nat.ids[i] !== id) continue;
+      h = node.getBoundingClientRect().height / zo;
       if (Math.abs((nat.hgt[i] || 0) - h) < 0.5) continue;
       nat.hgt[i] = h;
       nat.lh[i] = 0;
@@ -3140,6 +3622,29 @@
   };
 
   /*@3.NOEJ.47*/
+  Editor.prototype.freeIn = function (b) {
+    if (!b || !b.fp || !this.root) return false;
+    if (this.root.querySelector(':scope > [data-bid="' + b.id + '"]')) return true;
+    var anchor = (this._winB && this._winB.parentNode === this.root)
+      ? this._winB : this.root.querySelector(':scope > .ne-tail');
+    var node = this.renderBlock(b);
+    this._sw = 0;
+    this.sheetW();
+    if (anchor) this.root.insertBefore(node, anchor);
+    else this.root.appendChild(node);
+    this.applyReadOnly();
+    return true;
+  };
+
+  Editor.prototype.freeSync = function () {
+    var bs = this.doc.blocks, i, any = false;
+    for (i = 0; i < bs.length; i++) {
+      if (!bs[i].fp) continue;
+      if (this.freeIn(bs[i])) any = true;
+    }
+    return any;
+  };
+
   Editor.prototype.addFree = function (ty, xPx, yPx, extra, prov) {
     var W = this.sheetW();
     xPx = Math.max(0, xPx - 6);
@@ -3157,7 +3662,16 @@
     /*@3.NOEJ.104*/
     if (prov) { b.prov = 1; this._provBefore = before; }
     else this.pushUndo(before);
-    this.render();
+    if (!this.freeIn(b)) { this.render(); }
+    else if (this.natSplice(this.doc.blocks.length - 1, 0, [b.id])) {
+      /*@3.NOEJ.313*/
+      var atF = this.doc.blocks.length - 1;
+      this._nat.gap[atF] = null;
+      this._nat.hgt[atF] = 0;
+      this.reflowEng();
+    } else {
+      this._nat = null; this._engStale = true; this.settled();
+    }
     this.layoutFree();
     this.focusBlock(b.id);
     if (!prov) this.touch();
@@ -3267,6 +3781,8 @@
   };
 
   Editor.prototype.focusBlock = function (id, atEnd) {
+    /*@3.NOEJ.297*/
+    if (this._win) this.winShow(id);
     var node = this.root.querySelector('[data-bid="' + id + '"]');
     if (!node) return;
     var t = node.querySelector('.ne-text, .ne-li, .ne-code, .ne-tex, .ne-img-url, .ne-cell');
@@ -3282,12 +3798,47 @@
   };
 
 
+  /*@3.NOEJ.260*/
+  Editor.prototype.seenBox = function (sc) {
+    var s = sc.getBoundingClientRect();
+    var top = s.top, bot = s.bottom;
+    var vv = window.visualViewport;
+    if (vv && vv.height > 0) {
+      var vTop = vv.offsetTop || 0, vBot = vTop + vv.height;
+      if (vTop > top) top = vTop;
+      if (vBot < bot) bot = vBot;
+    }
+    return { top: top, bottom: bot };
+  };
+
   Editor.prototype.keepInView = function (t) {
     var sc = this.scroller();
     if (!sc || !t) return;
-    var r = t.getBoundingClientRect(), s = sc.getBoundingClientRect();
+    var r = t.getBoundingClientRect(), s = this.seenBox(sc);
+    if (s.bottom - s.top < 40) return;
     if (r.bottom > s.top + 4 && r.top < s.bottom - 4) return;
     try { t.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+    /*@3.NOEJ.264*/
+    var r2 = t.getBoundingClientRect();
+    var over = r2.bottom - (s.bottom - 6);
+    if (over > 0) sc.scrollTop += over;
+  };
+
+  /*@3.NOEJ.265*/
+  Editor.prototype.caretSeen = function () {
+    var sc = this.scroller();
+    if (!sc) return;
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    var edn = this.currentEditable();
+    if (!edn || !this.root.contains(edn)) return;
+    var r = sel.getRangeAt(0).getBoundingClientRect();
+    if (!r || (!r.height && !r.top)) r = edn.getBoundingClientRect();
+    var s = this.seenBox(sc);
+    if (s.bottom - s.top < 40) return;
+    var pad = 24;
+    if (r.bottom > s.bottom - pad) sc.scrollTop += (r.bottom - (s.bottom - pad));
+    else if (r.top < s.top + pad) sc.scrollTop -= ((s.top + pad) - r.top);
   };
 
   Editor.prototype.runsRef = function (edn) {
@@ -4399,6 +4950,13 @@
   };
 
 
+  /*@3.NOEJ.267*/
+  var BIN_KEY = {
+    deleteContentBackward: 'Backspace',
+    deleteContentForward: 'Delete',
+    insertParagraph: 'Enter'
+  };
+
   function keyOf(e) {
     var I = window.GardenInkInput;
     return (I && I.keyOf) ? I.keyOf(e) : String(e.key || '').toLowerCase();
@@ -4519,10 +5077,28 @@
     };
     document.addEventListener('selectionchange', this._onSelChange);
 
+    /*@3.NOEJ.259*/
     root.addEventListener('beforeinput', function (e) {
       var bn = e.target.closest ? e.target.closest('[data-bid]') : null;
       if (bn) self.typeGroup(bn.getAttribute('data-bid'));
+      var key = BIN_KEY[e.inputType];
+      if (!key || self._binGo) return;
+      var t = e.target;
+      if (!t || !t.isContentEditable) return;
+      if (!(t.classList.contains('ne-text') || t.classList.contains('ne-li'))) return;
+      self._binGo = 1;
+      var took = false;
+      try {
+        took = !t.dispatchEvent(new KeyboardEvent('keydown', {
+          key: key, code: key, bubbles: true, cancelable: true
+        }));
+      } catch (eB) { took = false; }
+      self._binGo = 0;
+      if (took) e.preventDefault();
     });
+
+    /*@3.NOEJ.273*/
+    root.addEventListener('input', function () { self.caretSeen(); });
 
     root.addEventListener('input', function (e) {
       var node = e.target.closest('[data-bid]');
@@ -4567,6 +5143,8 @@
 
     /*@3.NOEJ.201*/
     root.addEventListener('pointerover', function (e) {
+      /*@3.NOEJ.309*/
+      if ((e.pointerType && e.pointerType !== 'mouse') || self.coarse()) return;
       if (self._drag || self._bdrag || self._wdrag || self._rdrag) return;
       var t = e.target;
       if (!t || !t.closest) return;
@@ -4579,7 +5157,9 @@
       if (nb && nb.parentNode === root) self.chromeTo(nb);
     });
 
-    root.addEventListener('pointerleave', function () {
+    root.addEventListener('pointerleave', function (e) {
+      /*@3.NOEJ.310*/
+      if ((e && e.pointerType && e.pointerType !== 'mouse') || self.coarse()) return;
       if (self._drag || self._bdrag || self._wdrag || self._rdrag) return;
       self.chromeTo(null);
     });
@@ -5176,6 +5756,14 @@
 
     /*@3.NOEJ.124*/
     root.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      if (!self.coarse()) return;
+      var bn = e.target.closest ? e.target.closest(':scope > [data-bid]') : null;
+      if (!bn) bn = e.target.closest ? e.target.closest('[data-bid]') : null;
+      if (bn && bn.parentNode === self.root) self.touchAct(bn.getAttribute('data-bid'));
+    }, true);
+
+    root.addEventListener('pointerdown', function (e) {
       var rg = e.target.closest('.ne-rgrip');
       if (!rg) return;
       var rnode = rg.closest('[data-bid][data-fp]');
@@ -5473,6 +6061,14 @@
   };
 
   Editor.prototype.destroy = function () {
+    /*@3.NOEJ.296*/
+    if (this._winTie) {
+      if (this._winSc) { try { this._winSc.removeEventListener('scroll', this._winTie); } catch (eW) {} }
+      try { window.removeEventListener('resize', this._winTie); } catch (eW2) {}
+      if (this._winQ) { try { cancelAnimationFrame(this._winQ); } catch (eW3) {} this._winQ = 0; }
+      this._winTie = null;
+      this._winSc = null;
+    }
     this.closeMenu();
     this.closeMention();
     /*@3.NOEJ.142*/
@@ -5492,6 +6088,27 @@
     document.removeEventListener('pointerup', this._onBdragStop);
     document.removeEventListener('pointercancel', this._onBdragStop);
     window.removeEventListener('scroll', this._onScroll, true);
+    if (this._onFaces) {
+      try { document.fonts.removeEventListener('loadingdone', this._onFaces); } catch (eF) {}
+      this._onFaces = null;
+    }
+    if (this._mo) { try { this._mo.disconnect(); } catch (eM) {} this._mo = null; }
+    if (this._setT) { clearTimeout(this._setT); this._setT = null; }
+    if (this._roQ) {
+      try { cancelAnimationFrame(this._roQ); } catch (eQ) {}
+      this._roQ = 0;
+    }
+    this._dirty = null;
+    this._bidx = null;
+    this._natIdx = null;
+    this._nat = null;
+    this.undo.length = 0;
+    this.redo.length = 0;
+    this._undoB = 0;
+    this.root.__ed = null;
+    this._winA = null;
+    this._winB = null;
+    this._destroyed = 1;
   };
 
   var TBL_ALIGN = [

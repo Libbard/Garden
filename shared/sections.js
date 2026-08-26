@@ -662,7 +662,7 @@
     var head;
     if (kind === 'stopped') {
       head = t('بانر متوقّفٌ عن الردّ الآن، ' + again +
-               '. والمعروضُ أمامك آخرُ قراءةٍ نجحت — الشعبُ صحيحةٌ لكنّها قد لا تكون أحدثَ من ذلك.',
+               '. والمعروضُ أمامك آخرُ قراءةٍ نجحت — الشعبُ صحيحةٌ لكنّها قد لا تكون الأحدث.',
                'Banner is not responding right now, ' + again +
                '. What you see is the last successful read — accurate, but possibly not the latest.');
     } else if (kind === 'slow') {
@@ -680,9 +680,9 @@
     }
     /*@3.SECJ.469*/
     var tailMsg = autoOn()
-      ? t(' والصفحةُ تجلب الجديدَ من تلقائها؛ أوقفْ ذلك من الزرِّ بجانبها.',
+      ? t(' والصفحةُ تجلب الجديدَ آلياً؛ أوقفْ ذلك من الزرِّ بالجانب.',
           ' This page fetches updates on its own; you can pause that with the button beside it.')
-      : t(' والصفحةُ لا تجلب جديداً من تلقائها — شغّلِ التحديثَ التلقائيَّ من الزرِّ بجانبها، ' +
+      : t(' والصفحةُ لا تجلب جديد آلياً — شغّلِ التحديثَ التلقائيَّ من الزرِّ بالجانب، ' +
           'أو حدِّثِ الصفحةَ متى شئت.',
           ' This page does not fetch on its own — turn on auto-refresh with the button beside it, ' +
           'or reload the page whenever you like.');

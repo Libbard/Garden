@@ -36,6 +36,50 @@
   var AR = '؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿';
   var BIDI_RUN = new RegExp('[A-Za-z](?:[^' + AR + '<>&]*[^\\s' + AR + '<>&])?', 'g');
 
+  /*@3.NOBJ.24*/
+  var PAIR = { '(': ')', '[': ']', '{': '}',
+               '\u00ab': '\u00bb', '\u201c': '\u201d', '\u2039': '\u203a' };
+  var SHUT = (function () {
+    var m = {}, k;
+    for (k in PAIR) if (Object.prototype.hasOwnProperty.call(PAIR, k)) m[PAIR[k]] = k;
+    return m;
+  })();
+
+  function evenPair(s, open, shut) {
+    var d = 0, i, c;
+    for (i = 0; i < s.length; i++) {
+      c = s.charAt(i);
+      if (c === open) d++;
+      else if (c === shut) { d--; if (d < 0) return false; }
+    }
+    return d === 0;
+  }
+
+  function pairSpan(txt, a, b) {
+    var ch;
+    while (b > a + 1) {
+      ch = txt.charAt(b - 1);
+      if (!SHUT[ch] || evenPair(txt.slice(a, b), SHUT[ch], ch)) break;
+      b--;
+    }
+    return [a, b];
+  }
+
+  function wrapRuns(txt) {
+    BIDI_RUN.lastIndex = 0;
+    var out = '', at = 0, m, sp, a, b;
+    while ((m = BIDI_RUN.exec(txt)) !== null) {
+      sp = pairSpan(txt, m.index, m.index + m[0].length);
+      a = sp[0] < at ? at : sp[0];
+      b = sp[1];
+      if (b <= a) continue;
+      out += txt.slice(at, a) + '<bdi>' + txt.slice(a, b) + '</bdi>';
+      at = b;
+      BIDI_RUN.lastIndex = b;
+    }
+    return out + txt.slice(at);
+  }
+
   function isolate(html) {
     var out = '', i = 0;
     while (i <= html.length) {
@@ -43,7 +87,7 @@
       var amp = html.indexOf('&', i);
       var stop = (lt < 0) ? amp : (amp < 0 ? lt : Math.min(lt, amp));
       var chunk = stop < 0 ? html.slice(i) : html.slice(i, stop);
-      out += chunk.replace(BIDI_RUN, function (m) { return '<bdi>' + m + '</bdi>'; });
+      out += wrapRuns(chunk);
       if (stop < 0) break;
       var end = html.indexOf(html.charAt(stop) === '<' ? '>' : ';', stop);
       if (end < 0) { out += html.slice(stop); break; }

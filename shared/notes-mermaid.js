@@ -132,11 +132,44 @@
 
   var PAINT = ['fill', 'stroke', 'color', 'stop-color', 'flood-color', 'lighting-color'];
 
+  /*@3.NOMJ4.12*/
+  var FREE_RE = /#[0-9a-f]{3,8}\b|\brgba?\([^)]*\)|\bhsla?\([^)]*\)/gi;
+
+  /*@3.NOMJ4.13*/
+  var MIX = {
+    fill: ['26%', 'bg'], stroke: ['62%', 'bd'], color: ['70%', 'tx'],
+    'stop-color': ['26%', 'bg'], 'flood-color': ['26%', 'bg'], 'lighting-color': ['26%', 'bg']
+  };
+
+  function freeOf(prop, val) {
+    if (!val) return val;
+    var v = String(val);
+    if (v.indexOf('var(') !== -1) return v;
+    var mix = MIX[prop];
+    if (!mix) return v;
+    return v.replace(FREE_RE, function (hit) {
+      return 'color-mix(in oklab, ' + hit + ' ' + mix[0] + ', var(--nd-' + mix[1] + '))';
+    });
+  }
+
+  var DECL_RE = /(^|[;{\s])(fill|stroke|color|stop-color|flood-color|lighting-color)(\s*:\s*)([^;}]+)/gi;
+
+  function deFree(text) {
+    return String(text == null ? '' : text).replace(DECL_RE, function (hit, lead, prop, sep, val) {
+      var p = prop.toLowerCase();
+      var body = val, tail = '';
+      var imp = /\s*!important\s*$/i.exec(body);
+      if (imp) { tail = body.slice(imp.index); body = body.slice(0, imp.index); }
+      var fixed = freeOf(p, body);
+      return fixed === body ? hit : (lead + prop + sep + fixed + tail);
+    });
+  }
+
   function deTokenSvg(svg) {
     if (!svg) return;
     var styles = svg.querySelectorAll('style'), i;
     for (i = 0; i < styles.length; i++) {
-      styles[i].textContent = deHard(deToken(styles[i].textContent));
+      styles[i].textContent = deFree(deHard(deToken(styles[i].textContent)));
     }
     var all = svg.querySelectorAll('*'), j, n, p, val;
     for (i = 0; i < all.length; i++) {
@@ -150,11 +183,16 @@
         } else if (val && HARD[String(val).trim().toLowerCase()]) {
           n.removeAttribute(p);
           n.style.setProperty(p, 'var(--nd-' + HARD[String(val).trim().toLowerCase()] + ')');
+        } else if (val && FREE_RE.test(val)) {
+          FREE_RE.lastIndex = 0;
+          n.removeAttribute(p);
+          n.style.setProperty(p, freeOf(p, val));
         }
+        FREE_RE.lastIndex = 0;
       }
       val = n.getAttribute('style');
       if (val) {
-        var fixed = deHard(deToken(val));
+        var fixed = deFree(deHard(deToken(val)));
         if (fixed !== val) n.setAttribute('style', fixed);
       }
     }

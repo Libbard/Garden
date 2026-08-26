@@ -95,6 +95,7 @@
 
   /*@3.NOCJ.83*/
   var HI_DARK = 0.45;
+  var HI_FLAT = 0.55;
 
   function themeIsLight() {
     var l = docLum();
@@ -420,6 +421,9 @@
   /*@3.NOCJ.67*/
   function probeCanvas(c) {
     if (!c.width || !c.height) return false;
+    /*@3.NOCJ.86*/
+    var area = c.width * c.height;
+    if (c.__okArea >= area) return true;
     try {
       var g = c.getContext('2d');
       g.save();
@@ -429,7 +433,8 @@
       var a = g.getImageData(c.width - 1, c.height - 1, 1, 1).data[3];
       g.clearRect(c.width - 1, c.height - 1, 1, 1);
       g.restore();
-      return a > 0;
+      if (a > 0) { c.__okArea = area; return true; }
+      return false;
     } catch (e) { return true; }
   }
 
@@ -694,7 +699,7 @@
     var pts = smoothPts(raw);
     var alpha = (el.o == null ? 1 : el.o) *
                 (nib.speck ? (1 - (nib.dust || 0.4)) : (nib.grain ? 0.72 : 1));
-    if (el.hi && !isLight()) alpha *= HI_DARK;
+    if (el.hi) alpha *= isLight() ? HI_FLAT : (HI_DARK * HI_FLAT * 2);
     if (pts.length === 1) {
       return { kind: 'dot', alpha: alpha, grain: !!nib.grain,
                x: pts[0].x, y: pts[0].y,
@@ -1832,11 +1837,14 @@
         if (self.drag) {
           var d = self.drag;
           self.drag = null;
-          if (d.kind === 'band' && keep) {
+          if (d.kind === 'band') {
+            /*@3.NOCJ.85*/
             if (d.to) {
-              self.onBand({ x: Math.min(d.from.x, d.to.x), y: Math.min(d.from.y, d.to.y),
-                            w: Math.abs(d.to.x - d.from.x), h: Math.abs(d.to.y - d.from.y) });
-            } else {
+              if (keep) {
+                self.onBand({ x: Math.min(d.from.x, d.to.x), y: Math.min(d.from.y, d.to.y),
+                              w: Math.abs(d.to.x - d.from.x), h: Math.abs(d.to.y - d.from.y) });
+              }
+            } else if (keep || self.pick) {
               self.onTap({ x: d.from.x, y: d.from.y });
             }
           }

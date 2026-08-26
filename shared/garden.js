@@ -2594,6 +2594,7 @@
       });
     }
   }
+  let _hashLangSwitched = false;
   let _gardenSelRange = null;   /*@3.GARJ.152*/
   let _gardenSelAnchor = null;
   let _gardenSelText = '';
@@ -2633,6 +2634,8 @@
         free: !!n.free || !n.highlight,
         highlightOnly: !!n.highlightOnly,
         date: n.date || new Date().toISOString().split('T')[0],
+        ts: n.ts || 0,
+        ut: n.ut || n.ts || 0,
         lang: n.lang || currentLang,
         anchor: n.anchor || (n.highlight && !n.free ? { text: n.highlight, occurrence: 0 } : null),
         blockIndex: (n.blockIndex != null ? n.blockIndex : -1)
@@ -2662,6 +2665,132 @@
     const block = el && el.closest ? el.closest('[data-bilingual]') : null;
     if (!block) return -1;
     return bilingualBlocks().indexOf(block);
+  }
+
+  /*@3.GARJ.621*/
+  let _corpus = null, _corpusN = -1;
+  function langCorpus() {
+    const blocks = bilingualBlocks();
+    if (_corpus && _corpusN === blocks.length) return _corpus;
+    const out = { ar: [], en: [] };
+    blocks.forEach(b => {
+      ['ar', 'en'].forEach(l => {
+        const tpl = b.querySelector('.content-' + l);
+        if (!tpl) return;
+        out[l].push(tpl.content ? tpl.content.textContent : tpl.textContent);
+      });
+    });
+    _corpus = { ar: out.ar.join('\n'), en: out.en.join('\n') };
+    _corpusN = blocks.length;
+    return _corpus;
+  }
+
+  /*@3.GARJ.622*/
+  function langOfAnchor(text) {
+    if (!text) return null;
+    const c = langCorpus();
+    const a = c.ar.indexOf(text) !== -1, e = c.en.indexOf(text) !== -1;
+    if (a && !e) return 'ar';
+    if (e && !a) return 'en';
+    return null;
+  }
+
+  /*@3.GARJ.623*/
+  function noteLang(note) {
+    const t = (note.anchor && note.anchor.text) || note.highlight || '';
+    const guess = langOfAnchor(t);
+    if (guess) return guess;
+    const root = getContentRoot();
+    if (t && root && root.textContent.indexOf(t) !== -1) return currentLang;
+    return note.lang || currentLang;
+  }
+
+  /*@3.GARJ.624*/
+  function hashNoteLang() {
+    const m = /^#note-(.+)$/.exec(location.hash || '');
+    if (!m) return null;
+    let note = null;
+    try {
+      const id = decodeURIComponent(m[1]);
+      note = loadNotes().find(n => String(n.id) === id);
+    } catch (_) { return null; }
+    if (!note || note.free) return null;
+    return langOfAnchor((note.anchor && note.anchor.text) || note.highlight || '');
+  }
+
+  /*@3.GARJ.625*/
+  function markOf(id, scope) {
+    const q = '[data-note-id="' + id + '"]';
+    return (scope || document).querySelector('.user-highlight' + q + ', .user-highlight-txt' + q);
+  }
+
+  /*@3.GARJ.626*/
+  function svgHost(node) {
+    const el = node && node.nodeType === 3 ? node.parentNode : node;
+    if (!el || !el.ownerSVGElement || !el.closest) return null;
+    return el.closest('tspan, text');
+  }
+
+  /*@3.GARJ.627*/
+  function highlightSvg(host, id, color) {
+    const txt = host.closest('text') || host;
+    if (!txt.parentNode) return;
+    if (!host.hasAttribute('data-note-id')) {
+      host.setAttribute('data-note-id', id);
+      host.classList.add('user-highlight-txt');
+    }
+    let box = null;
+    try { box = host.getBBox(); } catch (_) { return; }
+    if (!box || box.width <= 0 || box.height <= 0) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    const rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('x', (box.x - 3).toFixed(2));
+    rect.setAttribute('y', (box.y - 2).toFixed(2));
+    rect.setAttribute('width', (box.width + 6).toFixed(2));
+    rect.setAttribute('height', (box.height + 4).toFixed(2));
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('class', 'user-highlight');
+    rect.setAttribute('data-note-id', id);
+    if (color) {
+      rect.setAttribute('data-color', isCustomColor(color) ? 'custom' : color);
+      if (isCustomColor(color)) {
+        const { r: cr, g, b } = hexToRgb(color);
+        rect.style.setProperty('--hl', cr + ',' + g + ',' + b);
+      }
+    }
+    const tr = txt.getAttribute('transform');
+    if (tr) rect.setAttribute('transform', tr);
+    txt.parentNode.insertBefore(rect, txt);
+  }
+
+  /*@3.GARJ.628*/
+  function landOn(el, done) {
+    const soft = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    try { el.scrollIntoView({ behavior: soft ? 'smooth' : 'auto', block: 'center' }); } catch (_) { }
+    let last = null, n = 0;
+    const tick = () => {
+      if (!el.isConnected) return;
+      const top = Math.round(el.getBoundingClientRect().top);
+      const still = last !== null && Math.abs(top - last) < 2;
+      last = top; n++;
+      if (!still && n < 14) { setTimeout(tick, 70); return; }
+      /*@3.GARJ.629*/
+      const r = el.getBoundingClientRect();
+      const h = window.innerHeight || 0;
+      if (r.top < 8 || r.bottom > h - 8) { try { el.scrollIntoView({ block: 'center' }); } catch (_) { } }
+      const at = el.getBoundingClientRect();
+      done(at);
+      /*@3.GARJ.639*/
+      setTimeout(() => {
+        if (!el.isConnected) return;
+        const r2 = el.getBoundingClientRect();
+        if (Math.abs(r2.top - at.top) < 4) return;
+        const h2 = window.innerHeight || 0;
+        if (r2.top < 8 || r2.bottom > h2 - 8) { try { el.scrollIntoView({ block: 'center' }); } catch (_) { } }
+        done(el.getBoundingClientRect());
+      }, 520);
+    };
+    setTimeout(tick, 70);
   }
 
   /*@3.GARJ.157*/
@@ -2729,6 +2858,9 @@
       if (node === ec) e = eo;
       if (s >= e) return;
       try {
+        /*@3.GARJ.630*/
+        const host = svgHost(node);
+        if (host) { highlightSvg(host, id, color); return; }
         const r = document.createRange();
         r.setStart(node, s); r.setEnd(node, e);
         const mark = document.createElement('mark');
@@ -2746,13 +2878,40 @@
     });
   }
 
+
+  /*@3.GARJ.640*/
+  function revealFor(node) {
+    let el = node && node.nodeType === 3 ? node.parentNode : node;
+    const root = getContentRoot();
+    let n = 0;
+    while (el && el !== root && el.nodeType === 1 && n++ < 40) {
+      if (el.tagName === 'DETAILS' && !el.open) el.open = true;
+      if (el.hasAttribute('hidden')) el.removeAttribute('hidden');
+      if (el.classList.contains('accordion-item') && !el.classList.contains('open')) {
+        const tr = el.querySelector('.accordion-trigger');
+        if (tr) tr.click(); else el.classList.add('open');
+      }
+      if (el.classList.contains('depth-layer') && !el.classList.contains('active')) {
+        const card = el.closest('.concept-card');
+        const key = el.getAttribute('data-layer');
+        const tab = (card && key) ? card.querySelector('.depth-tab[data-layer="' + key + '"]') : null;
+        if (tab) tab.click();
+        else {
+          if (card) card.querySelectorAll('.depth-layer').forEach(l => l.classList.remove('active'));
+          el.classList.add('active');
+        }
+      }
+      el = el.parentElement;
+    }
+  }
+
   /*@3.GARJ.162*/
-  function findAndHighlight(note) {
+  function findAndHighlight(note, reveal) {
     const root = getContentRoot();
     if (!root) return false;
     const text = (note.anchor && note.anchor.text) || note.highlight;
     if (!text) return false;
-    if (root.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`)) return true;
+    if (markOf(note.id, root)) return true;
     const occurrence = (note.anchor && note.anchor.occurrence) || 0;
     const full = root.textContent;
     let idx, from = 0, count = 0, found = -1;
@@ -2764,6 +2923,8 @@
     if (found === -1) return false;        /*@3.GARJ.163*/
     const range = rangeFromCharOffsets(root, found, found + text.length);
     if (!range) return false;
+    /*@3.GARJ.641*/
+    if (reveal) revealFor(range.startContainer);
     highlightRange(range, note.id, note.color);
     return true;
   }
@@ -2776,6 +2937,12 @@
       while (m.firstChild) parent.insertBefore(m.firstChild, m);
       parent.removeChild(m);
       parent.normalize();
+    });
+    /*@3.GARJ.631*/
+    document.querySelectorAll('rect.user-highlight').forEach(r => r.remove());
+    document.querySelectorAll('.user-highlight-txt').forEach(t => {
+      t.classList.remove('user-highlight-txt');
+      t.removeAttribute('data-note-id');
     });
   }
 
@@ -2902,7 +3069,7 @@
 
     /*@3.GARJ.172*/
     mainContent?.addEventListener('click', (e) => {
-      const mark = e.target.closest('mark.user-highlight');
+      const mark = e.target.closest('.user-highlight, .user-highlight-txt');
       if (!mark) return;
       /*@3.GARJ.173*/
       if ((window.getSelection()?.toString() || '').trim().length > 3) return;
@@ -2916,7 +3083,7 @@
       if (!e.target.closest('.notes-tooltip, .notes-panel, .mobile-note-bar, .notes-cp-primary, .notes-cp-extended, .notes-cp-hidden-input')) {
         hideNotesTooltip();
       }
-      if (!e.target.closest('.note-pop, mark.user-highlight, .notes-panel, .notes-cp-primary, .notes-cp-extended, .notes-cp-hidden-input')) {
+      if (!e.target.closest('.note-pop, .user-highlight, .user-highlight-txt, .notes-panel, .notes-cp-primary, .notes-cp-extended, .notes-cp-hidden-input')) {
         hideNotePop();
       }
     });
@@ -3035,6 +3202,9 @@
       free: false,
       highlightOnly: true,
       date: new Date().toISOString().split('T')[0],
+      /*@3.GARJ.642*/
+      ts: Date.now(),
+      ut: Date.now(),
       lang: currentLang,
       anchor: anchor
     });
@@ -3072,7 +3242,8 @@
       const cx = rect.left + rect.width / 2;
       left = Math.max(pad, Math.min(cx - w / 2, vw - w - pad));
     }
-    el.style.top  = Math.max(pad, top)  + 'px';
+    /*@3.GARJ.638*/
+    el.style.top  = Math.max(pad, Math.min(top, vh - h - pad)) + 'px';
     el.style.left = Math.max(0,   left) + 'px';
   }
 
@@ -3230,7 +3401,7 @@
         requestAnimationFrame(() => placeFloating(pop, rect, 12));
       };
       /*@3.GARJ.187*/
-      const existingMarks = Array.from(document.querySelectorAll('mark.user-highlight[data-note-id="' + note.id + '"]'));
+      const existingMarks = Array.from(document.querySelectorAll('.user-highlight[data-note-id="' + note.id + '"]'));
       wireColorPicker(colorsRow, (c) => {
         const notes = loadNotes();
         const i = notes.findIndex(n => String(n.id) === String(note.id));
@@ -3418,7 +3589,9 @@
           notes[i].title = title || smartTitle(notes[i].highlight) || nL('ملاحظة', 'Note');
           notes[i].body = body;
           notes[i].color = color;
-          notes[i].lang = currentLang;
+          notes[i].ut = Date.now();
+          /*@3.GARJ.636*/
+          if (isFree || !notes[i].lang) notes[i].lang = currentLang;
           if (body) notes[i].highlightOnly = false;   /*@3.GARJ.193*/
         }
       } else {
@@ -3431,6 +3604,8 @@
           free: isFree,
           highlightOnly: false,
           date: new Date().toISOString().split('T')[0],
+          ts: Date.now(),
+          ut: Date.now(),
           lang: currentLang,
           anchor: isFree ? null : anchor
         };
@@ -3477,15 +3652,34 @@
   function gotoNoteSource(note) {
     if (note.free) { showNotePop(note, null); return; }       /*@3.GARJ.196*/
     closeNotesPanel();
+    /*@3.GARJ.632*/
+    const want = noteLang(note);
+    let switched = _hashLangSwitched;
+    _hashLangSwitched = false;
+    if (want !== currentLang) {
+      switched = true;
+      setLanguage(want);
+      /*@3.GARJ.633*/
+      clearTimeout(window._notesRestoreT);
+      restoreHighlights();
+    }
+    const say = () => {
+      if (!switched) return;
+      notesToast(want === 'ar'
+        ? 'عُرضت الصفحة بالعربية — لغة هذه الملاحظة'
+        : 'Page shown in English — this note\u2019s language');
+    };
     setTimeout(() => {
       /*@3.GARJ.197*/
-      let mark = document.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`);
-      if (!mark) { findAndHighlight(note); mark = document.querySelector(`mark.user-highlight[data-note-id="${note.id}"]`); }
+      let mark = markOf(note.id);
+      if (mark) revealFor(mark);
+      if (!mark) { findAndHighlight(note, true); mark = markOf(note.id); }
       if (mark) {
-        mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        say();
         mark.classList.add('flash');
         setTimeout(() => mark.classList.remove('flash'), 1700);
-        setTimeout(() => showNotePop(note, mark.getBoundingClientRect()), 360);
+        /*@3.GARJ.634*/
+        landOn(mark, (r) => showNotePop(note, r));
         return;
       }
       /*@3.GARJ.198*/
@@ -3493,16 +3687,17 @@
       const bi = note.anchor && note.anchor.blockIndex != null ? note.anchor.blockIndex : (note.blockIndex != null ? note.blockIndex : -1);
       const block = (bi >= 0 && bi < blocks.length) ? blocks[bi] : null;
       if (block) {
-        block.scrollIntoView({ behavior: 'smooth', block: 'center' });
         block.classList.add('note-block-flash');
         setTimeout(() => block.classList.remove('note-block-flash'), 1700);
-        setTimeout(() => showNotePop(note, block.getBoundingClientRect()), 360);
-        notesToast(nL('عُرضت الملاحظة عند فقرتها (النص بلغة أخرى)', 'Shown at its paragraph (text is in the other language)'));
+        landOn(block, (r) => showNotePop(note, r));
+        /*@3.GARJ.635*/
+        notesToast(nL('عُرضت عند فقرتها — لم يُعثر على النصِّ نفسِه',
+                      'Shown at its paragraph — the text itself was not found'));
         return;
       }
       /*@3.GARJ.199*/
       showNotePop(note, null);
-    }, 240);
+    }, switched ? 320 : 240);
   }
 
   /*@3.GARJ.200*/
@@ -3755,7 +3950,7 @@
         const id = parseInt(btn.getAttribute('data-del-id'));
         let notes = loadNotes().filter(n => n.id !== id);
         saveNotes(notes);
-        document.querySelector(`mark.user-highlight[data-note-id="${id}"]`) && restoreHighlights();
+        markOf(id) && restoreHighlights();
         updateNotesCount();
         const card = btn.closest('.note-card');
         card.classList.add('removing');
@@ -4381,6 +4576,9 @@
 
   /*@3.GARJ.276*/
   function init() {
+    /*@3.GARJ.637*/
+    const hLang = hashNoteLang();
+    if (hLang && hLang !== currentLang) { currentLang = hLang; _hashLangSwitched = true; }
     setLanguage(currentLang);
     initDepthTabs(); initAccordion(); initFlashcards(); initQuiz();
 
@@ -6499,6 +6697,7 @@ ${baseRules}`) + regenSuffix;
   }
 
   window.Garden = {
+
     cycleTheme, toggleLanguage, setLanguage, applyTheme,
     /*@3.GARJ.447*/
     localize,

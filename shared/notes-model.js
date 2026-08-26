@@ -34,6 +34,13 @@
     return isFinite(n) ? n : (fallback || 0);
   }
 
+  /*@3.NOMJ.8*/
+  function dayStamp(v) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v == null ? '' : v));
+    if (!m) return stamp(v, 0);
+    return new Date(+m[1], +m[2] - 1, +m[3], 12, 0, 0).getTime();
+  }
+
   function firstLine(s, max) {
     var t = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
     if (!t) return '';
@@ -141,8 +148,9 @@
             page: null
           },
           highlight: n.highlight || '',
-          updated_at: stamp(n.date, 0),
-          created_at: stamp(n.date, 0),
+          updated_at: stamp(n.ut || n.ts, dayStamp(n.date)),
+          created_at: stamp(n.ts, dayStamp(n.date)),
+          approx: !(n.ut || n.ts),
           href: moduleHref(code, mod) + '#note-' + encodeURIComponent(n.id),
           editable: false
         });
@@ -217,7 +225,8 @@
         src: 'rich',
         id: String(r.id),
         title: r.t || L('بلا عنوان', 'Untitled'),
-        excerpt: '',
+        /*@3.NOMJ.9*/
+        excerpt: r.x || '',
         color: r.c || null,
         pinned: !!r.p,
         archived: !!r.a,
