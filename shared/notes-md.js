@@ -480,7 +480,9 @@
         i++;
         var cbk = blank('code', { lang: lang, src: src.join('\n') });
         /*@3.NOMJ3.44*/
-        if (/^mermaid$/i.test(String(lang || '').trim())) cbk.dgm = 1;
+        var CC = window.GardenNotesCode;
+        if (CC && CC.isMermaid ? CC.isMermaid(lang)
+                               : /^(mermaid|mmd)$/i.test(String(lang || '').trim())) cbk.dgm = 1;
         add(cbk);
         continue;
       }

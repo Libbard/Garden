@@ -106,6 +106,30 @@
                                   en: 'Palm rejection: off — finger writes too' }
   };
 
+  /*@3.NODJ.47*/
+  function tiltNow() {
+    var I = window.GardenInkInput;
+    return (I && I.tiltMode && I.tiltMode() === 'off') ? 'off' : 'auto';
+  }
+
+  function tiltSeen() {
+    var I = window.GardenInkInput;
+    return !!(I && I.tiltSeen && I.tiltSeen());
+  }
+
+  function tiltLabel() {
+    if (tiltNow() === 'off') {
+      return ['ميلُ القلم: مطفأ — زاويةُ الرأسِ ثابتة',
+              'Pen tilt: off — the nib keeps a fixed angle'];
+    }
+    if (tiltSeen()) {
+      return ['ميلُ القلم: يعمل — قلمُك يبلّغ ميلَه والرأسُ يدور معه',
+              'Pen tilt: live — your pen reports tilt and the nib follows it'];
+    }
+    return ['ميلُ القلم: جاهز — لم يبلّغ قلمُك ميلاً بعدُ',
+            'Pen tilt: ready — your pen has not reported tilt yet'];
+  }
+
   function palmNow() {
     var I = window.GardenInkInput;
     var m = I && I.palmMode ? I.palmMode() : 'auto';
@@ -140,7 +164,7 @@
   ];
 
   /*@3.NODJ.35*/
-  var RECENT_KEY = 'garden_ink_recent', RECENT_MAX = 2;
+  var RECENT_KEY = 'garden_ink_recent', RECENT_MAX = 5;
 
   function recents() {
     try {
@@ -161,6 +185,7 @@
     if (!cv) return false;
     if (cv.tool === 'hand' || cv.tool === 'era') return false;
     var f = { tool: cv.tool, color: cv.color, width: cv.width, nib: cv.nib };
+    if (cv.tool === 'hi') f.straight = cv.straight ? 1 : 0;
     if (knownFav(f)) return false;
     var list = recents().filter(function (x) { return favKey(x) !== favKey(f); });
     list.unshift(f);
@@ -208,9 +233,12 @@
                                  : L('ممحاة ذكيّة', 'Smart eraser');
     }
     if (f.tool === 'lasso' || f.tool === 'sel' || f.tool === 'hand') return tn;
-    if (f.tool === 'pen' && (f.nib === 'pencil' || f.nib === 'chalk')) {
-      var nn = (f.nib === 'pencil') ? L('رصاص', 'Pencil') : L('طباشير', 'Chalk');
-      return nn + ' · ' + (TONE_AR[f.color] ? L(TONE_AR[f.color], TONE_EN[f.color]) : f.color) +
+    /*@3.NODJ.50*/
+    if (f.tool === 'pen') {
+      var nn = null;
+      for (i = 0; i < NIBS.length; i++) if (NIBS[i].k === f.nib) nn = L(NIBS[i].ar, NIBS[i].en);
+      return (nn || tn) + ' · ' +
+             (TONE_AR[f.color] ? L(TONE_AR[f.color], TONE_EN[f.color]) : f.color) +
              ' · ' + f.width;
     }
     if (f.tool === 'hi') {
@@ -263,9 +291,13 @@
       var star = e.target.closest('[data-fav-star]');
       if (star) { self.toggleFav(); return; }
       if (e.target.closest('[data-palm]')) { self.cyclePalm(); return; }
+      if (e.target.closest('[data-tilt]')) { self.toggleTilt(); return; }
       if (e.target.closest('[data-penbtn]')) { self.penBtnDialog(); return; }
       var szb = e.target.closest('[data-fixsize]');
       if (szb) { self.sizePop(szb); return; }
+      /*@3.NODJ.42*/
+      var clb = e.target.closest('[data-fixcol]');
+      if (clb) { self.colorPop(clb); return; }
       var fix = e.target.closest('[data-fix]');
       var rec = fix ? null : e.target.closest('[data-recent]');
       var chip = fix || rec || e.target.closest('[data-fav]');
@@ -288,40 +320,88 @@
   };
 
   /*@3.NODJ.15*/
+  /*@3.NODJ.49*/
   function favIcon(f) {
     if (f.tool === 'era') return f.mode === 'part' ? ICONS.eraserPen : ICONS.eraserSmart;
     if (f.tool === 'hi') return f.straight ? ICONS.hiStraight : ICONS.hiWave;
     if (f.tool === 'lasso') return LASSO_SVG;
+    if (f.tool === 'pen') return NIB_ICON[f.nib] || NIB_ICON.round;
     var t = null, k;
     for (k = 0; k < RING1.length; k++) if (RING1[k].tool === f.tool) t = RING1[k];
     if (t && t.html) return t.html;
     return '<i class="fa-solid ' + ((t && t.icon) || 'fa-pen') + '" aria-hidden="true"></i>';
   }
 
+  /*@3.NODJ.44*/
   function sizeChip(cv) {
     var w = (cv && cv.width) || 4;
-    var d = Math.max(4, Math.min(16, w * 1.35));
-    var name = L('حجمُ الرأس', 'Nib size');
+    var nib = (cv && cv.nib) || 'round';
+    var bar = Math.max(1.5, Math.min(7, w * 0.55));
+    var nm = null, i;
+    for (i = 0; i < NIBS.length; i++) if (NIBS[i].k === nib) nm = NIBS[i];
+    var name = L('رأسُ القلم وسماكتُه', 'Pen nib and thickness') +
+      (nm ? ' — ' + L(nm.ar, nm.en) + ' · ' + w : '');
     return '<button type="button" class="ndl-fav ndl-fav-size" data-fixsize="1"' +
       ' aria-haspopup="true" aria-expanded="false"' +
       ' aria-label="' + esc(name) + '" title="' + esc(name) + '">' +
-      '<span class="ndl-fav-dot" style="inline-size:' + d + 'px;block-size:' + d + 'px"></span>' +
+      '<span class="ndl-nib-i" aria-hidden="true">' + (NIB_ICON[nib] || NIB_ICON.round) + '</span>' +
+      '<span class="ndl-nib-w" aria-hidden="true" style="block-size:' + bar.toFixed(1) + 'px"></span>' +
       '</button>';
   }
 
+  function curHex(cv) {
+    if (!cv) return hexOf('ink');
+    var K = window.GardenCanvas;
+    if (cv.tool === 'hi' && K && K.hiHexOf) return K.hiHexOf(cv.color);
+    return hexOf(cv.color);
+  }
+
+  function colorChip(cv) {
+    var name = L('لونُ القلم', 'Pen colour');
+    return '<button type="button" class="ndl-fav ndl-fav-col" data-fixcol="1"' +
+      ' aria-haspopup="true" aria-expanded="false"' +
+      ' aria-label="' + esc(name) + '" title="' + esc(name) + '">' +
+      '<span class="ndl-col-dot" style="--t:' + curHex(cv) + '"></span>' +
+      '</button>';
+  }
+
+  /*@3.NODJ.43*/
+  var RAMP = [0.78, 0.58, 0.40, 0.22, 0, -0.18, -0.34, -0.50, -0.66];
+
+  function shadesOf(tone, cv) {
+    var K = window.GardenCanvas;
+    var base = (cv && cv.tool === 'hi' && K && K.hiHexOf) ? K.hiHexOf(tone) : hexOf(tone);
+    var mix = K && K.mixHex;
+    return RAMP.map(function (k) {
+      if (!k) return { hex: base, base: 1 };
+      if (!mix) return { hex: base, base: 0 };
+      return { hex: mix(base, k > 0 ? '#ffffff' : '#000000', Math.abs(k)), base: 0 };
+    });
+  }
+
   /*@3.NODJ.21*/
+  /*@3.NODJ.51*/
   function favChip(f, attr, i) {
     var plain = f.tool === 'era' || f.tool === 'lasso' || f.tool === 'sel' || f.tool === 'hand';
-    return '<button type="button" class="ndl-fav" ' + attr + '="' + i + '"' +
+    var inky = f.tool === 'pen' || f.tool === 'hi';
+    var bar = inky
+      ? '<span class="ndl-nib-w" aria-hidden="true" style="block-size:' +
+        Math.max(1.5, Math.min(7, (f.width || 4) * (f.tool === 'hi' ? 0.16 : 0.55))).toFixed(1) +
+        'px"></span>'
+      : '';
+    return '<button type="button" class="ndl-fav' + (inky ? ' ndl-fav-ink' : '') + '" ' +
+      attr + '="' + i + '"' +
       (plain ? '' : ' data-tint="1" style="--t:' + hexOf(f.color) + '"') +
       ' aria-label="' + esc(favName(f)) + '" title="' + esc(favName(f)) + '">' +
-      favIcon(f) + '</button>';
+      '<span class="ndl-nib-i" aria-hidden="true">' + favIcon(f) + '</span>' + bar +
+      '</button>';
   }
 
   /*@3.NODJ.17*/
   Dial.prototype.paintFavs = function () {
     if (!this.favBar) return;
     var h = FAV_FIXED.map(function (f, i) { return favChip(f, 'data-fix', i); }).join('');
+    h += colorChip(this.getCv());
     h += sizeChip(this.getCv());
     h += '<span class="ndl-fav-sep" aria-hidden="true"></span>';
     h += favs().map(function (f, i) { return favChip(f, 'data-fav', i); }).join('');
@@ -332,6 +412,12 @@
     }
     var pm = palmNow(), pu = PALM_UI[pm];
     h += '<span class="ndl-fav-tail">';
+    var tl = tiltLabel();
+    h += '<button type="button" class="ndl-fav ndl-fav-opt" data-tilt="1"' +
+      ' aria-pressed="' + (tiltNow() === 'auto' ? 'true' : 'false') + '"' +
+      ' data-live="' + (tiltNow() === 'auto' && tiltSeen() ? '1' : '0') + '"' +
+      ' aria-label="' + esc(L(tl[0], tl[1])) + '" title="' + esc(L(tl[0], tl[1])) + '">' +
+      (ICONS.tilt || '<i class="fa-solid fa-pen-nib" aria-hidden="true"></i>') + '</button>';
     h += '<button type="button" class="ndl-fav ndl-fav-opt" data-palm="1"' +
       ' aria-label="' + esc(L(pu.ar, pu.en)) + '" title="' + esc(L(pu.ar, pu.en)) + '">' +
       ICONS[pu.icon] + '</button>';
@@ -344,6 +430,15 @@
       ICONS.star + '</button></span>';
     this.favBar.innerHTML = h;
     i18n(this.favBar);
+  };
+
+  /*@3.NODJ.46*/
+  Dial.prototype.rec = function (used) {
+    if (!used) return;
+    var k = favKey(used);
+    if (k === this._lastUsed) return;
+    this._lastUsed = k;
+    if (noteRecent(used)) this.paintFavs();
   };
 
   /*@3.NODJ.30*/
@@ -386,6 +481,93 @@
     setTimeout(function () { document.addEventListener('pointerdown', self._szOut, true); }, 0);
   };
 
+  Dial.prototype.colorPop = function (btn) {
+    var self = this, cv = this.getCv();
+    if (this._clPop) { this.closeColorPop(); return; }
+    if (!cv) return;
+    var pop = document.createElement('div');
+    pop.className = 'ndl-clpop';
+    pop.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    pop.innerHTML =
+      '<div class="ndl-clrow" data-role="base">' + TONES.map(function (t) {
+        return '<button type="button" class="ndl-clb" data-tone="' + t + '"' +
+          ' style="--t:' + (cv.tool === 'hi' && window.GardenCanvas && GardenCanvas.hiHexOf
+                            ? GardenCanvas.hiHexOf(t) : hexOf(t)) + '"' +
+          ' aria-pressed="' + (cv.color === t ? 'true' : 'false') + '"' +
+          ' aria-label="' + esc(L(TONE_AR[t], TONE_EN[t])) + '"' +
+          ' title="' + esc(L(TONE_AR[t], TONE_EN[t])) + '"></button>';
+      }).join('') +
+      '<button type="button" class="ndl-clb ndl-clb--pick" data-custom="1"' +
+      ' aria-label="' + esc(L('لون مخصّص', 'Custom colour')) + '"' +
+      ' title="' + esc(L('لون مخصّص', 'Custom colour')) + '">' +
+      '<i class="fa-solid fa-eye-dropper" aria-hidden="true"></i></button></div>' +
+      '<div class="ndl-clramp" data-role="ramp" hidden></div>';
+    document.body.appendChild(pop);
+    var r = btn.getBoundingClientRect();
+    var pr = pop.getBoundingClientRect();
+    pop.style.position = 'fixed';
+    pop.style.insetBlockStart = Math.round(Math.min(innerHeight - pr.height - 8,
+                                                    r.bottom + 6)) + 'px';
+    pop.style.insetInlineStart = '';
+    var left = isAr() ? (r.right - pr.width) : r.left;
+    pop.style.left = Math.round(Math.max(8, Math.min(left, innerWidth - pr.width - 8))) + 'px';
+    btn.setAttribute('aria-expanded', 'true');
+    this._clPop = pop;
+
+    var paintRamp = function (tone) {
+      var box = pop.querySelector('[data-role="ramp"]');
+      if (!box) return;
+      box.hidden = false;
+      box.innerHTML = '<span class="ndl-clname">' +
+        esc(L(TONE_AR[tone], TONE_EN[tone])) + '</span>' +
+        shadesOf(tone, cv).map(function (s) {
+          return '<button type="button" class="ndl-clb ndl-clb--sh' + (s.base ? ' is-base' : '') +
+            '" data-hex="' + (s.base ? tone : s.hex) + '" style="--t:' + s.hex + '"' +
+            ' aria-pressed="' + (cv.color === (s.base ? tone : s.hex) ? 'true' : 'false') + '"' +
+            ' aria-label="' + esc(L(TONE_AR[tone], TONE_EN[tone])) + ' ' + s.hex + '"></button>';
+        }).join('');
+      i18n(box);
+    };
+
+    pop.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-tone]');
+      if (t) {
+        var tone = t.getAttribute('data-tone');
+        cv.setColor(tone);
+        self.sync();
+        paintRamp(tone);
+        var q = pop.querySelectorAll('[data-tone]');
+        for (var i = 0; i < q.length; i++) {
+          q[i].setAttribute('aria-pressed', q[i] === t ? 'true' : 'false');
+        }
+        return;
+      }
+      var sh = e.target.closest('[data-hex]');
+      if (sh) {
+        cv.setColor(sh.getAttribute('data-hex'));
+        self.sync();
+        self.closeColorPop();
+        return;
+      }
+      if (e.target.closest('[data-custom]')) {
+        self.closeColorPop();
+        self.pickCustom(btn);
+      }
+    });
+    if (typeof cv.color === 'string' && cv.color.charAt(0) !== '#') paintRamp(cv.color);
+    this._clOut = function (e) { if (pop && !pop.contains(e.target)) self.closeColorPop(); };
+    setTimeout(function () { document.addEventListener('pointerdown', self._clOut, true); }, 0);
+  };
+
+  Dial.prototype.closeColorPop = function () {
+    if (this._clOut) { document.removeEventListener('pointerdown', this._clOut, true); this._clOut = null; }
+    if (this._clPop) { try { this._clPop.remove(); } catch (e) {} this._clPop = null; }
+    if (this.favBar) {
+      var b = this.favBar.querySelector('[data-fixcol]');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    }
+  };
+
   Dial.prototype.closeSizePop = function () {
     if (this._szOut) { document.removeEventListener('pointerdown', this._szOut, true); this._szOut = null; }
     if (this._szPop) { try { this._szPop.remove(); } catch (e) {} this._szPop = null; }
@@ -393,6 +575,19 @@
       var b = this.favBar.querySelector('[data-fixsize]');
       if (b) b.setAttribute('aria-expanded', 'false');
     }
+  };
+
+  /*@3.NODJ.48*/
+  Dial.prototype.toggleTilt = function () {
+    var I = window.GardenInkInput;
+    if (!I || !I.setTiltMode) return;
+    var next = tiltNow() === 'auto' ? 'off' : 'auto';
+    I.setTiltMode(next);
+    this.paintFavs();
+    this.syncFavs();
+    var cv = this.getCv();
+    if (cv && cv.paint) cv.paint();
+    return next;
   };
 
   Dial.prototype.cyclePalm = function () {
@@ -652,6 +847,19 @@
     for (i = 0; i < fixed.length; i++) {
       chips = FAV_FIXED[Number(fixed[i].getAttribute('data-fix'))];
       fixed[i].setAttribute('aria-pressed', favKey(chips) === key ? 'true' : 'false');
+    }
+    /*@3.NODJ.45*/
+    var cb = this.favBar.querySelector('[data-fixcol]');
+    if (cb) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = colorChip(cur);
+      cb.replaceWith(tmp.firstChild);
+    }
+    var sb = this.favBar.querySelector('[data-fixsize]');
+    if (sb) {
+      var tmp2 = document.createElement('div');
+      tmp2.innerHTML = sizeChip(cur);
+      sb.replaceWith(tmp2.firstChild);
     }
     var star = this.favBar.querySelector('[data-fav-star]');
     if (star) star.hidden = isFixed(cur);
@@ -956,7 +1164,7 @@
       if (item.k === 'exit') { this.setOpen(false); this.onExit(); return; }
       if (item.k === 'undo') { if (cv) { if (cv.hist) cv.hist.undo(); else cv.undo(); } this.sync(); return; }
       if (item.k === 'redo') { if (cv) { if (cv.hist) cv.hist.redo(); else cv.redo(); } this.sync(); return; }
-      if (item.tool && cv) cv.setTool(item.tool);
+      if (item.tool && cv) { cv.setTool(item.tool); }
       if (item.ring) this.openSub(item.ring);
       else this.closeSub();
       this.sync();
@@ -964,11 +1172,11 @@
     }
 
     if (!cv) return;
-    if (k.indexOf('nib:') === 0) { cv.setNib(k.slice(4)); noteRecent(cv); }
-    else if (k.indexOf('w:') === 0) { cv.setWidth(parseFloat(k.slice(2))); noteRecent(cv); }
-    else if (k.indexOf('tool:') === 0) cv.setTool(k.slice(5));
+    if (k.indexOf('nib:') === 0) { cv.setNib(k.slice(4)); }
+    else if (k.indexOf('w:') === 0) { cv.setWidth(parseFloat(k.slice(2))); }
+    else if (k.indexOf('tool:') === 0) { cv.setTool(k.slice(5)); }
     else if (k === 'c:custom') this.pickCustom(btn);
-    else if (k.indexOf('c:') === 0) { cv.setColor(k.slice(2)); noteRecent(cv); }
+    else if (k.indexOf('c:') === 0) { cv.setColor(k.slice(2)); }
     else if (k === 'z:in') cv.setUserZoom(cv.userZ * 1.25);
     else if (k === 'z:out') cv.setUserZoom(cv.userZ / 1.25);
     else if (k.indexOf('era:') === 0) cv.setEraseMode(k.slice(4));
@@ -989,7 +1197,6 @@
     if (S && S.board) {
       S.board(btn || null, cur, function (v, done) {
         cv.setColor(v);
-        if (done !== false) { noteRecent(cv); self.paintFavs(); }
         self.sync();
       });
       return;
@@ -1002,11 +1209,12 @@
     var cv = this.getCv();
     var s = st || (cv ? {
       tool: cv.tool, color: cv.color, width: cv.width, nib: cv.nib,
-      zoom: cv.userZ, fit: cv.fitZ,
+      zoom: cv.userZ, fit: cv.fitZ, used: cv.used || null,
       canUndo: cv.hist ? cv.hist.canUndo() : !!(cv.undoS && cv.undoS.length),
       canRedo: cv.hist ? cv.hist.canRedo() : !!(cv.redoS && cv.redoS.length)
     } : null);
     if (!s) return;
+    if (s.used) this.rec(s.used);
 
     var hi = this.el.querySelector('[data-role="hub-i"]');
     if (hi) {

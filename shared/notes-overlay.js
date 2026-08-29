@@ -271,7 +271,7 @@
       onBand: function (r) { self.onBand(r); },
       onTap: function (p) { self.onTap(p); }
     });
-    this.cv.setTool('pen');
+    this.cv.setTool(GardenCanvas.lastTool ? GardenCanvas.lastTool() : 'pen');
     if (this.hist) this.hist.register('ink', {
       undo: function () { return self.cv ? self.cv.undo() : false; },
       redo: function () { return self.cv ? self.cv.redo() : false; }

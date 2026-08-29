@@ -690,18 +690,55 @@
     }
   }
 
+  /*@3.NOPJ2.76*/
+  var VEC_MAX_PX = 4200000;
+
+  function isVector(img) {
+    var s = String(img.currentSrc || img.src || '');
+    return /^data:image\/svg\+xml/i.test(s) || /\.svg(\?|#|$)/i.test(s);
+  }
+
+  function paperOf(img) {
+    var e = img, cs, bg;
+    for (var g = 0; e && g < 6; g++, e = e.parentElement) {
+      try { cs = getComputedStyle(e); } catch (e0) { break; }
+      bg = rgbOf(cs.backgroundColor);
+      if (bg) {
+        return 'rgb(' + Math.round(bg[0] * 255) + ',' + Math.round(bg[1] * 255) +
+               ',' + Math.round(bg[2] * 255) + ')';
+      }
+    }
+    return '#fff';
+  }
+
   /*@3.NOPJ2.45*/
   function jpegOf(img, shownPx) {
     try {
-      var cap = Math.max(320, Math.min(1600, Math.round((shownPx || 400) * 3)));
-      var sc = Math.min(1, cap / Math.max(img.naturalWidth, img.naturalHeight));
+      var vec = isVector(img);
+      var cap = Math.max(320, Math.min(vec ? 2600 : 1600, Math.round((shownPx || 400) * 3)));
+      var big = Math.max(img.naturalWidth, img.naturalHeight);
+      var sc = vec ? (cap / big) : Math.min(1, cap / big);
       var cw = Math.max(1, Math.round(img.naturalWidth * sc));
       var ch = Math.max(1, Math.round(img.naturalHeight * sc));
+      if (vec && cw * ch > VEC_MAX_PX) {
+        var kk = Math.sqrt(VEC_MAX_PX / (cw * ch));
+        cw = Math.max(1, Math.round(cw * kk));
+        ch = Math.max(1, Math.round(ch * kk));
+      }
       var cv = document.createElement('canvas');
       cv.width = cw; cv.height = ch;
       var cx = cv.getContext('2d');
-      cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, ch);
+      cx.fillStyle = vec ? paperOf(img) : '#fff';
+      cx.fillRect(0, 0, cw, ch);
       cx.drawImage(img, 0, 0, cw, ch);
+      if (vec) {
+        var px = cx.getImageData(0, 0, cw, ch).data;
+        var rgb = new Uint8Array(cw * ch * 3);
+        for (var q = 0, w = 0; q < px.length; q += 4) {
+          rgb[w++] = px[q]; rgb[w++] = px[q + 1]; rgb[w++] = px[q + 2];
+        }
+        return { data: rgb, w: cw, h: ch, raw: 1 };
+      }
       var url = cv.toDataURL('image/jpeg', 0.82);
       var b64 = url.slice(url.indexOf(',') + 1);
       var raw = atob(b64);
@@ -1227,7 +1264,15 @@
         return '<link rel="stylesheet" href="' + h.replace(/"/g, '&quot;') + '">';
       }).join('');
       var pw = meta.pageW;
-      var css = 'html,body{margin:0;padding:0;background:#fff}' +
+      /*@3.NOPJ2.77*/
+      var PT = window.GardenPrintTheme;
+      var mode = meta.printMode || (PT ? PT.readMode() : 'paper');
+      var tkey = PT ? PT.resolve(mode) : 'paper';
+      var dark = PT ? PT.isDark(mode) : false;
+      var pset = PT ? PT.set(mode) : null;
+      var page = pset ? pset.bg : '#ffffff';
+      var css = (PT ? PT.vars(mode) : '') +
+        'html,body{margin:0;padding:0;background:' + page + '}' +
         '.pgi{position:relative;inline-size:' + pw + 'px}' +
         '.pgi .na,.pgi .na-zoom,.pgi .na-page{display:block;block-size:auto;' +
         'min-block-size:0;inline-size:' + pw + 'px;max-inline-size:none;' +
@@ -1242,6 +1287,9 @@
         /*@3.NOPJ2.53*/
         'mjx-assistive-mml{display:none !important}' +
       '.pgi [data-ph]::before{content:"" !important}' +
+        /*@3.NOPJ2.78*/
+        '.pgi .ne-dgm{border-color:transparent !important;background:transparent !important}' +
+        '.pgi .ne-dgm-fix{visibility:hidden !important}' +
         '.pgi *{caret-color:transparent}';
       /*@3.NOPJ2.35*/
       var rootAttr = '';
@@ -1252,10 +1300,12 @@
       }
       d.open();
       d.write('<!DOCTYPE html><html dir="' + (meta.dir === 'rtl' ? 'rtl' : 'ltr') +
-        '" lang="' + (meta.dir === 'rtl' ? 'ar' : 'en') + '" data-theme="light"' +
+        '" lang="' + (meta.dir === 'rtl' ? 'ar' : 'en') +
+        '" data-theme="' + (tkey === 'paper' ? 'light' : tkey) +
+        '" data-print-mode="' + mode + '" data-print-dark="' + (dark ? '1' : '0') + '"' +
         rootAttr + '>' +
         '<head><meta charset="UTF-8">' + sheets + '</head>' +
-        '<body><div class="pgi">' + String(meta.html || '').replace('<!--INKSLOT-->', '') +
+        '<body><div class="pgi">' + String(meta.html || '').replace('<!--@3.NOPJ2.75-->', '') +
         '</div></body></html>');
       d.close();
       var incss = (meta.inlineCss || []).concat([css]);
@@ -1466,7 +1516,7 @@
   /*@3.NOPJ2.41*/
   function inkCmds(el, box, k) {
     var K = window.GardenCanvas;
-    if (!K || !K.inkGeom || !K.inkEmit) return null;
+    if (!K || !K.inkGeom || !K.inkPaints) return null;
     var geom = K.inkGeom(el, k, function (x, y) {
       return { x: box.x + x * k, y: box.y + y * k };
     });
@@ -1493,34 +1543,39 @@
         cur = [x - r, y];
       }
     };
-    K.inkEmit(geom, api);
-    if (geom.caps) {
-      for (var c2 = 0; c2 < geom.caps.length; c2++) {
-        api.circle(geom.caps[c2].x, geom.caps[c2].y, geom.caps[c2].r);
-      }
+    /*@3.NOPJ2.79*/
+    var lay = K.inkPaints(geom), out = [], i;
+    for (i = 0; i < lay.length; i++) {
+      cmds = []; cur = null;
+      lay[i].emit(api);
+      if (!cmds.length) continue;
+      out.push({ cmds: cmds, fill: !!lay[i].fill,
+                 w: lay[i].w || 0, op: lay[i].alpha });
     }
-    return { cmds: cmds, fill: geom.kind !== 'line',
-             w: geom.w || 0, op: geom.alpha };
+    return out;
   }
 
   function inkFrom(src, box, scale) {
     return strokesOf(src).then(function (els) {
-      var out = [], i;
+      var out = [], i, g, p;
       var k = scale || 1;
       for (i = 0; i < els.length; i++) {
         var e = els[i];
         if (e.ty !== 'st' || !e.pts || !e.pts.length) continue;
-        var g = inkCmds(e, box, k);
-        if (!g || !g.cmds.length) continue;
-        var xs = [], ys = [], c, j;
-        for (j = 0; j < g.cmds.length; j++) {
-          c = g.cmds[j];
-          for (var q = 1; q + 1 < c.length; q += 2) { xs.push(c[q]); ys.push(c[q + 1]); }
+        var lay = inkCmds(e, box, k);
+        if (!lay || !lay.length) continue;
+        for (p = 0; p < lay.length; p++) {
+          g = lay[p];
+          var xs = [], ys = [], c, j;
+          for (j = 0; j < g.cmds.length; j++) {
+            c = g.cmds[j];
+            for (var q = 1; q + 1 < c.length; q += 2) { xs.push(c[q]); ys.push(c[q + 1]); }
+          }
+          if (!xs.length) continue;
+          out.push({ cmds: g.cmds, fill: g.fill, col: hexRgb(inkHex(e.c)),
+                     w: Math.max(0.4, g.w), op: g.op,
+                     y0: Math.min.apply(null, ys), y1: Math.max.apply(null, ys) });
         }
-        if (!xs.length) continue;
-        out.push({ cmds: g.cmds, fill: g.fill, col: hexRgb(inkHex(e.c)),
-                   w: Math.max(0.4, g.w), op: g.op,
-                   y0: Math.min.apply(null, ys), y1: Math.max.apply(null, ys) });
       }
       return out;
     });
@@ -1533,7 +1588,17 @@
     if (ov && (ov.ink || (ov.shapes && ov.shapes.length))) {
       var host = d.querySelector('.mink');
       var box = null, k = 1;
-      if (host) {
+      /*@3.NOPJ2.80*/
+      var bd = meta.board;
+      if (bd && bd.w > 0 && bd.h > 0) {
+        var shb = d.querySelector('.na-sheet');
+        if (shb) {
+          var srb = shb.getBoundingClientRect();
+          k = srb.width / bd.w;
+          box = { x: (srb.left - org.left) - bd.x * k,
+                  y: (srb.top - org.top) - bd.y * k };
+        }
+      } else if (host) {
         var r = host.getBoundingClientRect();
         box = { x: r.left - org.left, y: r.top - org.top };
         k = (meta.inkBox && meta.inkBox.w) ? (r.width / meta.inkBox.w) : 1;
@@ -1609,11 +1674,16 @@
   }
 
   function zipEmos(imgs) {
-    return Promise.all(imgs.emos.map(function (e) {
+    var jobs = imgs.emos.map(function (e) {
       return Promise.all([deflate(e.b.rgb), deflate(e.b.al)]).then(function (r) {
         e.rgz = r[0]; e.alz = r[1];
       });
-    }));
+    });
+    imgs.jpegs.forEach(function (e) {
+      if (!e.j || !e.j.raw) return;
+      jobs.push(deflate(e.j.data).then(function (z) { if (z) e.j.z = z; }));
+    });
+    return Promise.all(jobs);
   }
 
   var PAD1 = new Uint8Array(1);
@@ -1804,11 +1874,13 @@
     var imgRefs = {};
     for (i = 0; i < imgs.jpegs.length; i++) {
       var e = imgs.jpegs[i];
+      var buf = e.j.raw ? (e.j.z || e.j.data) : e.j.data;
+      var filt = e.j.raw ? (e.j.z ? ' /Filter /FlateDecode' : '') : ' /Filter /DCTDecode';
       imgRefs[e.nm] = doc.add(concat([
         bytes('<< /Type /XObject /Subtype /Image /Width ' + e.j.w + ' /Height ' + e.j.h +
-              ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' +
-              e.j.data.length + ' >>\nstream\n'),
-        e.j.data, bytes('\nendstream')
+              ' /ColorSpace /DeviceRGB /BitsPerComponent 8' + filt + ' /Length ' +
+              buf.length + ' >>\nstream\n'),
+        buf, bytes('\nendstream')
       ]));
     }
 
@@ -1945,6 +2017,16 @@
       var all = paginate(h, meta);
       var ph = h.ph || meta.pageH || 1123;
       return inkLayers(m.doc, meta, docModel, h.org).then(function (inks) {
+      /*@3.NOPJ2.81*/
+      var farInk = 0, gq;
+      for (gq = 0; gq < inks.length; gq++) {
+        if ((inks[gq].y1 || 0) > farInk) farInk = inks[gq].y1;
+      }
+      var wantN = Math.min(400, Math.ceil(farInk / ph - 0.02));
+      while (all.length < wantN) {
+        all.push({ top: all.length * ph, oi: all.length, runs: [], boxes: [], imgs: [],
+                   inks: [], links: [], emo: [] });
+      }
       trimBlank(all, inks, meta);
       h.nAll = all.length;
       var pages = sliceRange(all, meta.range);

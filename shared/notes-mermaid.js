@@ -123,10 +123,12 @@
   };
   var HARD_RE = /#[0-9a-f]{3,6}\b|\b(?:whitesmoke|white|black|grey|gray|lightgrey|lightgray|darkgrey|darkgray|darkseagreen|cornsilk)\b/gi;
 
-  function deHard(text) {
+  /*@3.NOMJ4.21*/
+  function deHard(text, forText) {
     return String(text == null ? '' : text).replace(HARD_RE, function (hit) {
       var k = HARD[hit.toLowerCase()];
-      return k ? ('var(--nd-' + k + ')') : hit;
+      if (!k) return hit;
+      return 'var(--nd-' + (forText ? 'tx' : k) + ')';
     });
   }
 
@@ -141,11 +143,11 @@
     'stop-color': ['26%', 'bg'], 'flood-color': ['26%', 'bg'], 'lighting-color': ['26%', 'bg']
   };
 
-  function freeOf(prop, val) {
+  function freeOf(prop, val, forText) {
     if (!val) return val;
     var v = String(val);
     if (v.indexOf('var(') !== -1) return v;
-    var mix = MIX[prop];
+    var mix = forText ? MIX.color : MIX[prop];
     if (!mix) return v;
     return v.replace(FREE_RE, function (hit) {
       return 'color-mix(in oklab, ' + hit + ' ' + mix[0] + ', var(--nd-' + mix[1] + '))';
@@ -154,13 +156,14 @@
 
   var DECL_RE = /(^|[;{\s])(fill|stroke|color|stop-color|flood-color|lighting-color)(\s*:\s*)([^;}]+)/gi;
 
-  function deFree(text) {
+  function deFree(text, forceText) {
     return String(text == null ? '' : text).replace(DECL_RE, function (hit, lead, prop, sep, val) {
       var p = prop.toLowerCase();
+      var forText = !!forceText || p === 'color';
       var body = val, tail = '';
       var imp = /\s*!important\s*$/i.exec(body);
       if (imp) { tail = body.slice(imp.index); body = body.slice(0, imp.index); }
-      var fixed = freeOf(p, body);
+      var fixed = freeOf(p, deHard(body, forText), forText);
       return fixed === body ? hit : (lead + prop + sep + fixed + tail);
     });
   }
@@ -169,32 +172,43 @@
     if (!svg) return;
     var styles = svg.querySelectorAll('style'), i;
     for (i = 0; i < styles.length; i++) {
-      styles[i].textContent = deFree(deHard(deToken(styles[i].textContent)));
+      styles[i].textContent = deFree(deToken(styles[i].textContent));
     }
     var all = svg.querySelectorAll('*'), j, n, p, val;
     for (i = 0; i < all.length; i++) {
       n = all[i];
+      var inky = /^(?:text|tspan)$/i.test(String(n.tagName || ''));
       for (j = 0; j < PAINT.length; j++) {
         p = PAINT[j];
+        var asText = inky && (p === 'fill' || p === 'color');
         val = n.getAttribute(p);
         if (hasToken(val)) {
           n.removeAttribute(p);
           n.style.setProperty(p, deToken(val));
         } else if (val && HARD[String(val).trim().toLowerCase()]) {
           n.removeAttribute(p);
-          n.style.setProperty(p, 'var(--nd-' + HARD[String(val).trim().toLowerCase()] + ')');
+          n.style.setProperty(p, 'var(--nd-' +
+            (asText ? 'tx' : HARD[String(val).trim().toLowerCase()]) + ')');
         } else if (val && FREE_RE.test(val)) {
           FREE_RE.lastIndex = 0;
           n.removeAttribute(p);
-          n.style.setProperty(p, freeOf(p, val));
+          n.style.setProperty(p, freeOf(p, val, asText));
         }
         FREE_RE.lastIndex = 0;
       }
       val = n.getAttribute('style');
       if (val) {
-        var fixed = deFree(deHard(deToken(val)));
+        var fixed = deFree(deToken(val), inky);
         if (fixed !== val) n.setAttribute('style', fixed);
       }
+    }
+    var inks = svg.querySelectorAll('text, tspan'), q, e2, cur;
+    for (q = 0; q < inks.length; q++) {
+      e2 = inks[q];
+      if (e2.closest && e2.closest('.slice')) continue;
+      cur = e2.style.getPropertyValue('fill');
+      if (cur && cur.indexOf('var(--nd-') === 0) continue;
+      e2.style.setProperty('fill', 'var(--nd-tx)', 'important');
     }
   }
 
@@ -252,12 +266,101 @@
         sequence: { useMaxWidth: true, actorMargin: 46, boxMargin: 12 },
         state: { useMaxWidth: true },
         pie: { useMaxWidth: true, textPosition: 0.62 },
-        gantt: { useMaxWidth: true }
+        gantt: { useMaxWidth: true },
+        /*@3.NOMJ4.18*/
+        maxEdges: 2000,
+        maxTextSize: 300000
       });
       return { ok: true, api: m };
     } catch (e) {
       return { ok: false, why: 'init' };
     }
+  }
+
+  /*@3.NOMJ4.15*/
+  function tailCut(line) {
+    var t = line.replace(/^[\s\t]+/, '');
+    if (t.indexOf('%%') === 0) return -1;
+    var q = 0, tick = 0, i, c;
+    for (i = 0; i + 1 < line.length; i++) {
+      c = line.charAt(i);
+      if (c === '"' && !tick) { q = q ? 0 : 1; continue; }
+      if (c === '`' && !q) { tick = tick ? 0 : 1; continue; }
+      if (q || tick) continue;
+      if (c === '%' && line.charAt(i + 1) === '%') return i;
+    }
+    return -1;
+  }
+
+  var LINKSTYLE_RE = /^\s*linkStyle\b/;
+
+  function repair(src) {
+    var lines = String(src == null ? '' : src).replace(/\r\n?/g, '\n').split('\n');
+    var cmt = 0, semi = 0, i, ln, cut;
+    for (i = 0; i < lines.length; i++) {
+      ln = lines[i];
+      cut = tailCut(ln);
+      if (cut > 0) { ln = ln.slice(0, cut).replace(/\s+$/, ''); cmt++; }
+      if (LINKSTYLE_RE.test(ln) && /;\s*$/.test(ln)) { ln = ln.replace(/;\s*$/, ''); semi++; }
+      lines[i] = ln;
+    }
+    return { src: lines.join('\n'), cmt: cmt, semi: semi };
+  }
+
+  /*@3.NOMJ4.20*/
+  var MD_LABEL_RE = /"`([^`]*)`"/g;
+  var BR_RE = /<br\s*\/?>/gi;
+
+  function dropBr(src) {
+    var n = 0;
+    var out = src.replace(MD_LABEL_RE, function (hit, inner) {
+      if (!BR_RE.test(inner)) { BR_RE.lastIndex = 0; return hit; }
+      BR_RE.lastIndex = 0;
+      n++;
+      return '"' + '`' + inner.replace(BR_RE, ' ') + '`' + '"';
+    });
+    return { src: out, n: n };
+  }
+
+  function dropLinkStyle(src) {
+    var lines = src.split('\n'), out = [], n = 0, i;
+    for (i = 0; i < lines.length; i++) {
+      if (LINKSTYLE_RE.test(lines[i])) { n++; continue; }
+      out.push(lines[i]);
+    }
+    return { src: out.join('\n'), n: n };
+  }
+
+  /*@3.NOMJ4.17*/
+  function detail(err, code) {
+    var msg = String((err && err.message) || err || '');
+    var head = msg.split('\n')[0].slice(0, 220);
+    var m = /line (\d+)/i.exec(msg);
+    if (!m) return head;
+    var ln = code.split('\n')[Number(m[1]) - 1];
+    if (ln == null) return head;
+    return head + '\n' + m[1] + ' │ ' + ln.trim().slice(0, 160);
+  }
+
+  function fixedNote(r) {
+    var bits = [];
+    if (r.cmt) {
+      bits.push(L('‏' + r.cmt + ' تعليقاً في ذيل سطر', r.cmt + ' trailing comments'));
+    }
+    if (r.semi) {
+      bits.push(L('‏' + r.semi + ' فاصلةً منقوطةً بعد linkStyle',
+                  r.semi + ' semicolons after linkStyle'));
+    }
+    if (r.br) {
+      bits.push(L('‏' + r.br + ' لافتةً فيها <br> داخلَ نصٍّ منسّق',
+                  r.br + ' labels with <br> inside formatted text'));
+    }
+    if (r.dropped) {
+      bits.push(L('‏' + r.dropped + ' سطرَ linkStyle تعذّر تطبيقُه',
+                  r.dropped + ' linkStyle lines that could not apply'));
+    }
+    if (!bits.length) return '';
+    return L('صُحّح تلقائيّاً: ', 'Auto-fixed: ') + bits.join(' · ');
   }
 
   function reason(why) {
@@ -276,10 +379,57 @@
               'font-weight', 'font-style', 'text-anchor', 'dominant-baseline',
               'letter-spacing', 'direction', 'display', 'visibility'];
 
-  function bake(live, w, h) {
+  /*@3.NOMJ4.19*/
+  function ndVars(theme) {
+    var probe = document.createElement('div');
+    probe.setAttribute('data-theme', theme);
+    probe.style.cssText = 'position:absolute;inset-block-start:-9999px;visibility:hidden';
+    var inner = document.createElement('div');
+    inner.className = 'ne-dgm';
+    probe.appendChild(inner);
+    document.body.appendChild(probe);
+    var cs = getComputedStyle(inner), out = {}, k, v;
+    for (k in TOK) {
+      if (!Object.prototype.hasOwnProperty.call(TOK, k)) continue;
+      v = cs.getPropertyValue('--nd-' + k).trim();
+      if (v) out['--nd-' + k] = v;
+    }
+    probe.remove();
+    return out;
+  }
+
+  function wearTheme(el, theme) {
+    if (!el || !theme) return null;
+    var now = themeIsDark() ? 'dark' : 'light';
+    if (theme === now) return null;
+    var vars = ndVars(theme), k, had = {};
+    for (k in vars) {
+      if (!Object.prototype.hasOwnProperty.call(vars, k)) continue;
+      had[k] = el.style.getPropertyValue(k);
+      el.style.setProperty(k, vars[k]);
+    }
+    return had;
+  }
+
+  function shedTheme(el, had) {
+    if (!el || !had) return;
+    for (var k in had) {
+      if (!Object.prototype.hasOwnProperty.call(had, k)) continue;
+      if (had[k]) el.style.setProperty(k, had[k]);
+      else el.style.removeProperty(k);
+    }
+  }
+
+  function bake(live, w, h, theme) {
     if (!live || !live.cloneNode) return null;
     var win = live.ownerDocument && live.ownerDocument.defaultView;
     if (!win) return null;
+    var worn = wearTheme(live, theme);
+    try { return bakeNow(live, w, h, win); }
+    finally { shedTheme(live, worn); }
+  }
+
+  function bakeNow(live, w, h, win) {
     var r = live.getBoundingClientRect();
     var bw = Math.round(w || r.width), bh = Math.round(h || r.height);
     if (bw < 2 || bh < 2) return null;
@@ -308,11 +458,33 @@
     catch (e2) { return null; }
   }
 
+  function paint(host, svg, note) {
+    host.setAttribute('data-state', 'ok');
+    host.innerHTML = String(svg);
+    var el = host.querySelector('svg');
+    if (el) {
+      deTokenSvg(el);
+      el.setAttribute('data-nmd', '1');
+      el.removeAttribute('width');
+      el.setAttribute('role', 'img');
+      if (!el.getAttribute('aria-label')) {
+        el.setAttribute('aria-label', L('مخطّط', 'Diagram'));
+      }
+    }
+    if (note) {
+      var tag = document.createElement('div');
+      tag.className = 'ne-dgm-fix';
+      tag.textContent = note;
+      host.appendChild(tag);
+    }
+  }
+
+  /*@3.NOMJ4.16*/
   function render(host, src) {
     if (!host) return Promise.resolve(false);
-    var code = String(src == null ? '' : src).trim();
+    var raw = String(src == null ? '' : src).trim();
     host.textContent = '';
-    if (!code) return Promise.resolve(false);
+    if (!raw) return Promise.resolve(false);
     host.setAttribute('data-state', 'busy');
     return ensure().then(function (lib) {
       if (!lib || !lib.ok) {
@@ -320,32 +492,41 @@
         host.textContent = reason(lib && lib.why);
         return false;
       }
-      var id = 'nmd' + (++_seq);
-      return Promise.resolve(lib.api.render(id, code)).then(function (out) {
-        var svg = (out && out.svg) || out;
-        host.setAttribute('data-state', 'ok');
-        host.innerHTML = String(svg);
-        var el = host.querySelector('svg');
-        if (el) {
-          deTokenSvg(el);
-          el.setAttribute('data-nmd', '1');
-          el.removeAttribute('width');
-          el.setAttribute('role', 'img');
-          if (!el.getAttribute('aria-label')) {
-            el.setAttribute('aria-label', L('مخطّط', 'Diagram'));
-          }
+      var fix = repair(raw);
+      var steps = [{ code: fix.src, cmt: fix.cmt, semi: fix.semi, dropped: 0, br: 0 }];
+      var noBr = dropBr(fix.src);
+      if (noBr.n) {
+        steps.push({ code: noBr.src, cmt: fix.cmt, semi: fix.semi, dropped: 0, br: noBr.n });
+      }
+      var last = steps[steps.length - 1];
+      if (/(^|\n)\s*linkStyle\b/.test(last.code)) {
+        var less = dropLinkStyle(last.code);
+        if (less.n) {
+          steps.push({ code: less.src, cmt: fix.cmt, semi: fix.semi,
+                       dropped: less.n, br: last.br });
         }
-        return true;
-      })['catch'](function (err) {
-        /*@3.NOMJ4.5*/
-        host.setAttribute('data-state', 'bad');
-        host.textContent = L('خطأٌ في وصف المخطّط: ', 'Diagram syntax error: ') +
-          String((err && err.message) || err || '').slice(0, 200);
-        return false;
-      });
+      }
+      var at = 0;
+      function attempt() {
+        var step = steps[at];
+        var id = 'nmd' + (++_seq);
+        return Promise.resolve(lib.api.render(id, step.code)).then(function (out) {
+          paint(host, (out && out.svg) || out, fixedNote(step));
+          return true;
+        })['catch'](function (err) {
+          at++;
+          if (at < steps.length) return attempt();
+          /*@3.NOMJ4.5*/
+          host.setAttribute('data-state', 'bad');
+          host.textContent = L('خطأٌ في وصف المخطّط\n', 'Diagram syntax error\n') +
+            detail(err, steps[0].code);
+          return false;
+        });
+      }
+      return attempt();
     });
   }
 
   window.GardenNotesMermaid = { ensure: ensure, render: render, isDark: themeIsDark,
-                                bake: bake };
+                                bake: bake, repair: repair };
 })();

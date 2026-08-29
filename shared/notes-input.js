@@ -11,6 +11,69 @@
   var PMAX_KEY = 'garden_ink_pmax';
   var BTN_KEY = 'garden_pen_buttons';
 
+  var TILT_KEY = 'garden_ink_tilt';
+  var HALF_PI = Math.PI / 2, TAU = Math.PI * 2, D2R = Math.PI / 180;
+
+  /*@3.NOIJ2.28*/
+  var _tilt = null;
+
+  /*@3.NOIJ2.35*/
+  function tiltMode() {
+    if (_tilt) return _tilt;
+    _tilt = 'auto';
+    try {
+      if (localStorage.getItem(TILT_KEY) === 'off') _tilt = 'off';
+    } catch (e) {}
+    return _tilt;
+  }
+
+  /*@3.NOIJ2.29*/
+  function readTilt(e) {
+    if (e.pointerType !== 'pen') return null;
+
+    /*@3.NOIJ2.33*/
+    var alt = e.altitudeAngle, az = e.azimuthAngle;
+    if (typeof alt === 'number' && typeof az === 'number' &&
+        isFinite(alt) && isFinite(az) && !(alt >= HALF_PI - 1e-6 && az === 0)) {
+      return norm(alt, az);
+    }
+
+    /*@3.NOIJ2.34*/
+    var tx = e.tiltX, ty = e.tiltY;
+    if (typeof tx !== 'number' || typeof ty !== 'number') return null;
+    if (!isFinite(tx) || !isFinite(ty)) return null;
+    if (tx === 0 && ty === 0) return null;
+    return norm2(tx * D2R, ty * D2R);
+  }
+
+  /*@3.NOIJ2.30*/
+  function norm2(tx, ty) {
+    var az, alt;
+    if (Math.abs(tx) >= HALF_PI - 1e-6 || Math.abs(ty) >= HALF_PI - 1e-6) {
+      alt = 0;
+      az = Math.atan2(ty === 0 ? 0 : (ty > 0 ? 1 : -1), tx === 0 ? 0 : (tx > 0 ? 1 : -1));
+    } else if (tx === 0) {
+      az = ty > 0 ? HALF_PI : -HALF_PI;
+      alt = HALF_PI - Math.abs(ty);
+    } else if (ty === 0) {
+      az = tx > 0 ? 0 : Math.PI;
+      alt = HALF_PI - Math.abs(tx);
+    } else {
+      var kx = Math.tan(tx), ky = Math.tan(ty);
+      az = Math.atan2(ky, kx);
+      alt = Math.atan(1 / Math.sqrt(kx * kx + ky * ky));
+    }
+    return norm(alt, az);
+  }
+
+  /*@3.NOIJ2.31*/
+  function norm(alt, az) {
+    var tz = 1 - Math.max(0, Math.min(1, alt / HALF_PI));
+    az = az % TAU;
+    if (az < 0) az += TAU;
+    return { tz: tz, az: az };
+  }
+
   var AIR_CLICK_MS = 900;
   var BTN_DEFAULT = { barrel: 'era', tip: 'era', second: 'sel' };
 
@@ -306,6 +369,20 @@
     return Math.max(0.12, Math.min(1, tr.pSmooth));
   };
 
+  /*@3.NOIJ2.32*/
+  Router.prototype.effTilt = function (tr, pt, e) {
+    if (tiltMode() === 'off') return;
+    var r = readTilt(e);
+    if (!r) {
+      if (tr.tilt) { pt.tz = tr.lastTz; pt.az = tr.lastAz; }
+      return;
+    }
+    tr.tilt = 1;
+    tr.lastTz = r.tz; tr.lastAz = r.az;
+    pt.tz = r.tz; pt.az = r.az;
+    if (!SEEN.tilt) { SEEN.tilt = 1; }
+  };
+
   Router.prototype.points = function (e) {
     var evts = (typeof e.getCoalescedEvents === 'function')
       ? (e.getCoalescedEvents() || [e]) : [e];
@@ -356,6 +433,7 @@
       var tr = { src: e.pointerType, pts: [], start: pt, last: pt,
                  committed: e.pointerType !== 'touch', moved: 0 };
       pt.p = self.effP(tr, pt, e);
+      self.effTilt(tr, pt, e);
       tr.pts.push(pt);
       tr.mod = mod;
       tr.t0 = now();
@@ -391,6 +469,7 @@
         var last = tr.pts[tr.pts.length - 1];
         if (last && Math.abs(p.x - last.x) < 0.35 && Math.abs(p.y - last.y) < 0.35) continue;
         p.p = self.effP(tr, p, raw[i]);
+        self.effTilt(tr, p, raw[i]);
         tr.pts.push(p);
         out.push(p);
         tr.last = p;
@@ -475,8 +554,18 @@
     el.removeEventListener('lostpointercapture', this._up);
   };
 
+  var SEEN = { tilt: 0 };
+
   window.GardenInkInput = {
     create: function (opts) { return new Router(opts); },
+    tiltMode: tiltMode,
+    setTiltMode: function (m) {
+      _tilt = (m === 'off') ? 'off' : 'auto';
+      try { localStorage.setItem(TILT_KEY, _tilt); } catch (e) {}
+    },
+    tiltSeen: function () { return !!SEEN.tilt; },
+    readTilt: readTilt,
+    tiltFromXY: norm2,
     Profile: Profile,
     palmMode: palmMode,
     setPalmMode: function (m) { try { localStorage.setItem(PALM_KEY, m); } catch (e) {} },

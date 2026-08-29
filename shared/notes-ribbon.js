@@ -43,6 +43,12 @@
     { ty: 'math',         ar: 'معادلة',      en: 'Equation' }
   ];
 
+  /*@3.NORJ.28*/
+  var MMD_EG = 'graph TD\n  A[البداية] --> ' +
+    'B{شرط؟}\n  B -->|نعم| ' +
+    'C[نفّذ]\n  B -->|لا| ' +
+    'D[توقّف]';
+
   /*@3.NORJ.5*/
   var INSERTS = [
     { ty: 'tbl',  icon: 'fa-table',                 ar: 'جدول',       en: 'Table' },
@@ -50,6 +56,8 @@
     { ty: 'mlib', icon: 'fa-book-open',            ar: 'مكتبة المعادلات', en: 'Equation library' },
     { ty: 'img',  icon: 'fa-image',                 ar: 'صورة برابط', en: 'Image by URL' },
     { ty: 'code', icon: 'fa-code',                  ar: 'كود',        en: 'Code' },
+    { ty: 'code', icon: 'fa-diagram-project',       ar: 'مخطّط ميرمايد', en: 'Mermaid diagram',
+      extra: { lang: 'mermaid', dgm: 1, src: MMD_EG } },
     { ty: 'hr',   icon: 'fa-minus',                 ar: 'فاصل',       en: 'Divider' }
   ];
 
@@ -117,7 +125,8 @@
       btn('draw', 'fa-pen-nib', 'القلم والرسم', 'Pen and drawing', 'nr-b--pen') +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    /*@3.NORJ.27*/
+    h += '<div class="nr-grp nr-grp--hist">' +
       btn('undo', 'fa-rotate-left', 'تراجع', 'Undo') +
       btn('redo', 'fa-rotate-right', 'إعادة', 'Redo') +
       '</div>';
@@ -403,8 +412,8 @@
              '><span>' + esc(L(all[f].ar, all[f].en)) + '</span></button>';
       }
     } else if (kind === 'ins') {
-      h = INSERTS.map(function (s) {
-        return '<button type="button" class="nr-pi" data-ins="' + s.ty + '">' +
+      h = INSERTS.map(function (s, k) {
+        return '<button type="button" class="nr-pi" data-ins="' + k + '">' +
           '<i class="fa-solid ' + s.icon + '" aria-hidden="true"></i>' +
           '<span>' + esc(L(s.ar, s.en)) + '</span></button>';
       }).join('');
@@ -518,8 +527,9 @@
         var parts = t.getAttribute('data-turn').split(':');
         ed.exec('turn', { ty: parts[0], lv: parts[1] ? Number(parts[1]) : null });
       } else if (t.hasAttribute('data-ins')) {
-        var ity = t.getAttribute('data-ins');
-        if (ity === 'mlib') {
+        var item = INSERTS[Number(t.getAttribute('data-ins'))];
+        if (!item) return;
+        if (item.ty === 'mlib') {
           if (window.GardenNotesMathLib) {
             GardenNotesMathLib.open(function (tex) {
               ed.exec('insert', { ty: 'math', extra: { tex: tex, display: 1 } });
@@ -527,7 +537,9 @@
           }
           return;
         }
-        ed.exec('insert', { ty: ity });
+        ed.exec('insert', item.extra
+          ? { ty: item.ty, extra: JSON.parse(JSON.stringify(item.extra)) }
+          : { ty: item.ty });
       } else {
         ed.exec(kind === 'hl' ? 'hl' : 'fg', t.getAttribute('data-tone'));
       }
@@ -659,11 +671,8 @@
     var cv = this.inkCv();
 
     if (act === 'bsel') {
-      if (ov && ov.on && cv) {
-        cv.setTool(cv.tool === 'sel' ? 'pen' : 'sel');
-        this.setState(ed ? ed.selState() : null);
-        return;
-      }
+      /*@3.NORJ.29*/
+      if (ov && ov.on && this.opts.onDraw) this.opts.onDraw();
       var want = ed ? !ed._selMode : !(ov && ov.pick);
       if (ed) ed.setSelectMode(want);
       if (ov && ov.setPick) ov.setPick(want);

@@ -370,18 +370,10 @@
   /*@3.DASJ.143*/
   function hiddenNote(s) {
     if (!s || !s.hidden) return '';
-    if (s.hiddenWhy === 'term') {
-      return tx('خارج مدى الفصل — لا تُعرض المحاضرات المتكرّرة',
-                'Outside the term range — recurring lectures are not shown');
-    }
-    if (s.hiddenWhy === 'focus') {
-      var R = window.GardenScheduleRules;
-      var f = R ? R.weekFocus(new Date()) : { kind: null };
-      var kind = f.kind === 'midterm' ? tx('الميدتيرم', 'Midterm') : tx('الفاينل', 'Final');
-      return tx('أسبوع تركيز (' + kind + ') — المحاضرات المتكرّرة مخفية',
-                'Focus week (' + kind + ') — recurring lectures hidden');
-    }
-    return '';
+    var R = window.GardenScheduleRules;
+    if (!R || !R.lectureNotice) return '';
+    var n = R.lectureNotice(new Date(), isAr());
+    return n ? n.text : '';
   }
 
   function intensiveToday() {

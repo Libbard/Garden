@@ -60,7 +60,8 @@
     palmAuto:    stack('hand', 'pen'),
     palmAlways:  over('hand', 'slash'),
     palmNever:   ic('hand'),
-    penBtn:      stack('pen', 'gear')
+    penBtn:      stack('pen', 'gear'),
+    tilt:        stack('pen-fancy', 'angle-right')
   };
 
   NI.icon = ic;

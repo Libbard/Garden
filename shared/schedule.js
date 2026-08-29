@@ -10,8 +10,16 @@
   var HOUR_PX_MIN = 44;      /*@3.SCHJ.3*/
   var HOUR_PX_MAX = 56;      /*@3.SCHJ.4*/
   var HOUR_PX_DEF = 56;      /*@3.SCHJ.5*/
+  /*@3.SCHJ.293*/
+  var HOUR_PX_STRETCH = 110;
+  var HOUR_PX_COMFY = 64;
+  var GAP_PX_MAX = 96;
+  var PANEL_MIN_PX = 320;
+  var stripH = 0;
   var GAP_PX = 34;           /*@3.SCHJ.6*/
   var LABEL_TAIL_PX = 8;     /*@3.SCHJ.7*/
+  var GUT_PX = 66;
+  var MIN_EMPTY_RUN = 2;
   var MIN_GAP_HOURS = 2;     /*@3.SCHJ.8*/
   var MIN_EV_PX = 22;        /*@3.SCHJ.9*/
 
@@ -166,6 +174,7 @@
         focus_periods: { midterm: { start:'', end:'' }, final: { start:'', end:'' } },
         onboarded: false,
         span_mode: 'study',          /*@3.SCHJ.31*/
+        collapse_gaps: true,         /*@3.SCHJ.286*/
         agenda: false,
         course_filter: [],           /*@3.SCHJ.32*/
         legacy_notice_seen: false
@@ -211,6 +220,7 @@
     if (typeof st.day_end_hour !== 'number' || st.day_end_hour < 1 || st.day_end_hour > 24 || st.day_end_hour <= st.day_start_hour) st.day_end_hour = d.settings.day_end_hour;
     if (!Array.isArray(st.course_filter)) st.course_filter = [];
     if (st.span_mode !== 'study' && st.span_mode !== 'full') st.span_mode = 'study';
+    if (typeof st.collapse_gaps !== 'boolean') st.collapse_gaps = true;
 
     if (!Array.isArray(s.lectures)) s.lectures = [];
     if (!Array.isArray(s.study_blocks)) s.study_blocks = [];
@@ -257,6 +267,7 @@
     schedule.updated_at = new Date().toISOString();
     try { localStorage.setItem(LS_KEY, JSON.stringify(schedule)); } catch (e) {}
     window.GardenEv('sched_edit', { n: (schedule.entries || []).length });
+    if (window.GardenScheduleRules) GardenScheduleRules.announce('schedule');
   }
 
   /*@3.SCHJ.39*/
@@ -840,8 +851,474 @@
       e.stopPropagation();
       toggleDone(ev);
     });
-    el.addEventListener('click', function (e) { e.stopPropagation(); openSheet(ev); });
+    el.setAttribute('data-uid', ev.uid);
+    el.setAttribute('data-span', String(Math.max(5, (ev.end || 0) - (ev.start || 0))));
+    if (canDragEv(ev)) el.setAttribute('data-drag', '1');
+    EV_BY_UID[ev.uid] = ev;
+    el.addEventListener('click', function (e) {
+      e.stopPropagation();
+      /*@3.SCHJ.259*/
+      if (el._sdrJust && Date.now() - el._sdrJust < 400) return;
+      openSheet(ev);
+    });
     return el;
+  }
+
+  /*@3.SCHJ.260*/
+  var EV_BY_UID = {};
+
+  function canDragEv(ev) {
+    if (!ev || ev.allDay || ev.start == null) return false;
+    if (ev.kind === 'intensive' || ev.src === 'intensive') return false;
+    return ev.src === 'lecture' || ev.src === 'study' ||
+           ev.src === 'exam' || ev.src === 'general';
+  }
+
+  function moveEvent(ev, dateStr, startMin) {
+    var r = ev.raw;
+    if (!r) return false;
+    var span = Math.max(5, (ev.end || 0) - (ev.start || 0));
+    var hm = function (m) {
+      return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    };
+    var d = parseLocalDate(dateStr);
+    if (!d) return false;
+    var dayName = DAYS_ORDER[d.getDay()];
+    var sameDay = (ev.date === dateStr);
+    if (sameDay && startMin === ev.start) return false;   /*@3.SCHJ.261*/
+
+    if (ev.src === 'lecture') {
+      r.day = dayName;
+      r.start_time = hm(startMin);
+      r.end_time = hm(startMin + span);
+    } else if (ev.src === 'study') {
+      if (r.week_id != null && !sameDay) r.week_id = getWeekId(getWeekStartDate(d));
+      r.day = dayName;
+      r.start_time = hm(startMin);
+      r.duration_minutes = span;
+    } else if (ev.src === 'exam') {
+      r.date = dateStr;
+      r.start_time = hm(startMin);
+      r.end_time = hm(startMin + span);
+      r.all_day = false;
+    } else if (ev.src === 'general') {
+      r.date = dateStr;
+      r.start_time = hm(startMin);
+      r.duration_minutes = span;
+    } else return false;
+
+    save();
+    return true;
+  }
+
+  function dragWord(ev, dateStr) {
+    if (!isAr()) {
+      return (ev.recurring && ev.date !== dateStr)
+        ? 'Moved every week to ' + dateStr : 'Moved';
+    }
+    return (ev.recurring && ev.date !== dateStr)
+      ? 'نُقلت في كلِّ أسابيعها' : 'نُقلت';
+  }
+
+  /*@3.SCHJ.262*/
+  var _sayT = null;
+  function schSay(txt) {
+    var el = document.getElementById('sch-say');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'sch-say';
+      el.className = 'sch-say';
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      document.body.appendChild(el);
+    }
+    el.textContent = txt;
+    el.classList.add('is-on');
+    if (_sayT) clearTimeout(_sayT);
+    _sayT = setTimeout(function () { el.classList.remove('is-on'); }, 2600);
+  }
+
+  /*@3.SCHJ.264*/
+  var _menuStop = null;
+  function closeSchMenu() {
+    var m = document.getElementById('sch-ctx');
+    if (m) m.remove();
+    if (_menuStop) { _menuStop(); _menuStop = null; }
+  }
+
+  function openSchMenu(o) {
+    closeSchMenu();
+    var ev = o.el ? EV_BY_UID[o.el.getAttribute('data-uid')] : null;
+    var at = spotAt(o.x, o.y);
+    var items = [];
+
+    /*@3.SCHJ.271*/
+    if (ev) {
+      if (canDragEv(ev)) {
+        items.push({ k: 'move', i: 'fa-up-down-left-right', ar: 'انقلْها بإصبعك', en: 'Move it' });
+        items.push({ k: 'dur', i: 'fa-hourglass-half', ar: 'غيّرْ مدّتَها', en: 'Change duration' });
+        items.push({ k: 'dup', i: 'fa-copy', ar: 'كرّرْها في يومٍ آخر', en: 'Repeat on another day' });
+      }
+      if (ev.recurring) {
+        items.push({ k: 'endrec', i: 'fa-calendar-xmark',
+                     ar: 'أنهِ تكرارَها من هنا', en: 'End repeat from here' });
+      }
+      if (ev.course_code && window.GardenData && GardenData.isRealCourse &&
+          GardenData.isRealCourse(ev.course_code)) {
+        items.push({ k: 'color', i: 'fa-palette', ar: 'لونُ المادّة', en: 'Course colour' });
+        items.push({ k: 'course', i: 'fa-book-open', ar: 'افتحْ صفحةَ المادّة', en: 'Open the course' });
+      }
+    } else if (at) {
+      /*@3.SCHJ.272*/
+      if (CLIP_EV) {
+        items.push({ k: 'paste', i: 'fa-paste',
+                     ar: 'ألصقْ «' + evTitle(CLIP_EV) + '» هنا',
+                     en: 'Paste “' + evTitle(CLIP_EV) + '” here' });
+      }
+      items.push({ k: 'onlyday', i: 'fa-calendar-day', ar: 'اعرضْ هذا اليومَ وحدَه', en: 'Show this day only' });
+    }
+
+    /*@3.SCHJ.287*/
+    if (!ev) {
+      if (items.length) items.push({ sep: true });
+      displayItems().forEach(function (it) { items.push(it); });
+    }
+    if (!items.length) return;
+
+    paintSchMenu(items, ev, at, o);
+  }
+
+  function displayItems() {
+    var st = schedule.settings;
+    var onGrid = (currentView !== 'month' && !agendaOn);
+    var out = [];
+    /*@3.SCHJ.290*/
+    if (currentView === 'month' &&
+        (currentMonthDate.getMonth() !== new Date().getMonth() ||
+         currentMonthDate.getFullYear() !== new Date().getFullYear())) {
+      out.push({ k: 'thismonth', i: 'fa-calendar-day',
+                 ar: 'ارجعْ إلى الشهرِ الحاليّ', en: 'Back to this month' });
+    }
+    if (onGrid) {
+      /*@3.SCHJ.311*/
+      var sp = spanLabel();
+      out.push({ k: 'span', i: sp.icon, ar: sp.ar, en: sp.en });
+      var folded = st.collapse_gaps !== false;
+      out.push({ k: 'gaps', i: folded ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center',
+                 ar: folded ? 'أوقفْ اختصارَ الساعاتِ الفارغة' : 'اختصرِ الساعاتِ الفارغة',
+                 en: folded ? 'Stop collapsing empty hours' : 'Collapse empty hours' });
+    }
+    out.push({ k: 'ics', i: 'fa-calendar-check',
+               ar: 'الربطُ مع البلاك بورد', en: 'Link Blackboard' });
+    out.push({ k: 'clean', i: 'fa-broom',
+               ar: 'تنظيفُ الأحداث', en: 'Clean up events' });
+    return out;
+  }
+
+  var CLIP_EV = null;      /*@3.SCHJ.273*/
+  var DUR_MENU = [30, 50, 60, 90, 110, 120];
+
+  function paintSchMenu(items, ev, at, o, head2) {
+    var m = document.createElement('div');
+    m.id = 'sch-ctx';
+    m.className = 'sch-ctx';
+    m.setAttribute('role', 'menu');
+    var head = head2 || (ev ? evTitle(ev) + ' · ' + fmtMin12(ev.start)
+      : at ? (DAY_NAMES[isAr() ? 'ar' : 'en'][DAYS_ORDER[parseLocalDate(at.date).getDay()]] +
+              ' · ' + fmtMin12(at.min))
+           : (isAr() ? 'عرضُ الجدول' : 'Schedule view'));
+    m.innerHTML = '<div class="sch-ctx-h">' + escapeH(head) + '</div>' +
+      items.map(function (it) {
+        if (it.sep) return '<div class="sch-ctx-sep" role="separator"></div>';
+        /*@3.SCHJ.291*/
+        return '<button type="button" class="sch-ctx-i' + (it.danger ? ' is-danger' : '') +
+          '" data-k="' + it.k + '"' + (it.tone ? ' style="--k:' + it.tone + '"' : '') +
+          '><i class="fa-solid ' + it.i + '" aria-hidden="true"></i>' +
+          '<span>' + escapeH(isAr() ? it.ar : it.en) + '</span></button>';
+      }).join('') +
+      '<button type="button" class="sch-ctx-i is-cancel" data-k="cancel">' +
+        '<i class="fa-solid fa-xmark" aria-hidden="true"></i><span>' +
+        escapeH(isAr() ? 'إلغاء' : 'Cancel') + '</span></button>';
+    document.body.appendChild(m);
+
+    /*@3.SCHJ.312*/
+    var bn = document.querySelector('.bottom-nav');
+    var bnH = (bn && getComputedStyle(bn).display !== 'none') ? bn.offsetHeight : 0;
+    var lo = 8, hi = window.innerHeight - bnH - 8;
+    var w = m.offsetWidth, h = m.offsetHeight;
+    var lx = Math.max(8, Math.min(o.x - w / 2, window.innerWidth - w - 8));
+    var ly = o.y + 12;
+    if (ly + h > hi) ly = o.y - h - 12;
+    if (ly < lo) ly = Math.max(lo, hi - h);
+    m.style.left = lx + 'px';
+    m.style.top = ly + 'px';
+    requestAnimationFrame(function () { m.classList.add('is-on'); });
+
+    function away(e) {
+      if (m.contains(e.target)) return;
+      document.removeEventListener('pointerdown', away, true);
+      closeSchMenu();
+    }
+    document.addEventListener('pointerdown', away, true);
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key !== 'Escape') return;
+      document.removeEventListener('keydown', esc, true);
+      closeSchMenu();
+    }, true);
+
+    m.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-k]');
+      if (!b) return;
+      var k = b.getAttribute('data-k');
+      document.removeEventListener('pointerdown', away, true);
+      closeSchMenu();
+      runSchMenu(k, ev, at, o);
+    });
+  }
+
+  function spotAt(x, y) {
+    var els = document.elementsFromPoint(x, y) || [];
+    for (var i = 0; i < els.length; i++) {
+      var c = els[i].closest ? els[i].closest('.sch-daycol') : null;
+      if (!c) continue;
+      var box = c.getBoundingClientRect();
+      var min = Math.round(axis.minAt(Math.max(0, y - box.top)) / 5) * 5;
+      return { date: c.getAttribute('data-date'), min: min };
+    }
+    return null;
+  }
+
+  function runSchMenu(k, ev, at, o) {
+    if (k === 'cancel') return;
+
+    if (k === 'gaps') {
+      var fold = schedule.settings.collapse_gaps === false;
+      schedule.settings.collapse_gaps = fold;
+      expandedGaps = {};
+      didAutoScroll = false;
+      save(); render();
+      schSay(fold ? (isAr() ? 'الساعاتُ الفارغةُ تُختصر' : 'Empty hours are collapsed')
+                  : (isAr() ? 'اليومُ بمقياسٍ متّصل' : 'One continuous scale'));
+      return;
+    }
+    if (k === 'span') { toggleSpan(); return; }
+    if (k === 'thismonth') {
+      currentMonthDate = new Date();
+      render();
+      schSay(isAr() ? 'الشهرُ الحاليّ' : 'This month');
+      return;
+    }
+    if (k.indexOf('add-') === 0) {
+      ({ 'add-lec': prepLectureModal, 'add-study': prepStudyModal,
+         'add-exam': prepExamModal, 'add-gen': prepGeneralModal,
+         'add-plan': function () {
+           if (window.GardenSchedulePlan) GardenSchedulePlan.openWizard();
+         } })[k]();
+      return;
+    }
+    if (k === 'ics') { openEditor(); goEditorSec('ics'); return; }
+    if (k === 'clean') { openPurge(); return; }
+
+    /*@3.SCHJ.275*/
+    if (k === 'move' && ev && o.el && window.GardenSchedDrag) {
+      schSay(isAr() ? 'اضغطْ على الموضع الجديد — أو Escape للإلغاء'
+                    : 'Tap the new spot — or press Escape to cancel');
+      _menuStop = GardenSchedDrag.moveMode(dragCfg(), o.el, function (res) {
+        _menuStop = null;
+        if (!res) { schSay(isAr() ? 'أُلغي النقل' : 'Move cancelled'); return; }
+        if (!moveEvent(ev, res.date, res.startMin)) { render(); return; }
+        render();
+        schSay(dragWord(ev, res.date));
+      });
+      return;
+    }
+
+    /*@3.SCHJ.276*/
+    if (k === 'dur' && ev) {
+      var cur = Math.max(5, (ev.end || 0) - (ev.start || 0));
+      var list = DUR_MENU.map(function (n) {
+        return { k: 'dur:' + n, i: n === cur ? 'fa-circle-dot' : 'fa-circle',
+                 ar: n + ' دقيقة' + (n === cur ? ' (الآن)' : ''),
+                 en: n + ' minutes' + (n === cur ? ' (now)' : '') };
+      });
+      paintSchMenu(list, ev, at, o, (isAr() ? 'مدّةُ ' : 'Duration · ') + evTitle(ev));
+      return;
+    }
+    if (k.indexOf('dur:') === 0 && ev) {
+      var mins = parseInt(k.slice(4), 10);
+      if (setDuration(ev, mins)) {
+        render();
+        schSay(isAr() ? ('صارت ' + mins + ' دقيقة') : ('Now ' + mins + ' minutes'));
+      }
+      return;
+    }
+
+    /*@3.SCHJ.277*/
+    if (k === 'dup' && ev && o.el && window.GardenSchedDrag) {
+      CLIP_EV = ev;
+      schSay(isAr() ? 'اضغطْ على الموضع الذي تريد نسخَها إليه'
+                    : 'Tap where you want the copy');
+      _menuStop = GardenSchedDrag.moveMode(dragCfg(), o.el, function (res) {
+        _menuStop = null;
+        if (!res) { schSay(isAr() ? 'أُلغي النسخ' : 'Copy cancelled'); return; }
+        if (copyEvent(ev, res.date, res.startMin)) {
+          render();
+          schSay(isAr() ? 'نُسخت' : 'Copied');
+        }
+      });
+      return;
+    }
+    if (k === 'paste' && at && CLIP_EV) {
+      if (copyEvent(CLIP_EV, at.date, at.min)) {
+        render();
+        schSay(isAr() ? 'لُصقت' : 'Pasted');
+      }
+      return;
+    }
+
+    /*@3.SCHJ.278*/
+    if (k === 'endrec' && ev) { endRecurrence(ev); return; }
+
+    if (k === 'color' && ev) {
+      /*@3.SCHJ.279*/
+      if (window.GardenCourseColor) GardenCourseColor.open(ev.course_code);
+      else schSay(isAr() ? 'منتقي الألوان غيرُ متاحٍ هنا' : 'The colour picker is unavailable here');
+      return;
+    }
+    if (k === 'course' && ev && ev.course_code) {
+      location.href = 'course.html?c=' + encodeURIComponent(ev.course_code);
+      return;
+    }
+    if (k === 'onlyday' && at) {
+      var dd = parseLocalDate(at.date);
+      if (dd) { currentDayDate = dd; currentView = 'day'; render(); }
+      return;
+    }
+  }
+
+  /*@3.SCHJ.280*/
+  function setDuration(ev, mins) {
+    var r = ev.raw;
+    if (!r || !(mins > 0)) return false;
+    var hm = function (m) {
+      return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    };
+    if (ev.src === 'lecture' || ev.src === 'exam') r.end_time = hm(ev.start + mins);
+    else if (ev.src === 'study' || ev.src === 'general') r.duration_minutes = mins;
+    else return false;
+    save();
+    return true;
+  }
+
+  /*@3.SCHJ.281*/
+  function copyEvent(ev, dateStr, startMin) {
+    var r = ev.raw;
+    if (!r) return false;
+    var d = parseLocalDate(dateStr);
+    if (!d) return false;
+    var span = Math.max(5, (ev.end || 0) - (ev.start || 0));
+    var hm = function (m) {
+      return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    };
+    var c = JSON.parse(JSON.stringify(r));
+    c.id = ev.src + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    delete c.sx_crn; delete c.sx_slot; delete c.sx_snap;
+    delete c.completed_at; delete c.done;
+    if (ev.src === 'lecture') {
+      c.day = DAYS_ORDER[d.getDay()];
+      c.start_time = hm(startMin); c.end_time = hm(startMin + span);
+      schedule.lectures.push(c);
+    } else if (ev.src === 'study') {
+      c.day = DAYS_ORDER[d.getDay()];
+      c.start_time = hm(startMin); c.duration_minutes = span;
+      if (c.week_id != null) c.week_id = getWeekId(getWeekStartDate(d));
+      schedule.study_blocks.push(c);
+    } else if (ev.src === 'exam') {
+      c.date = dateStr; c.start_time = hm(startMin); c.end_time = hm(startMin + span);
+      schedule.exams.push(c);
+    } else if (ev.src === 'general') {
+      c.date = dateStr; c.start_time = hm(startMin); c.duration_minutes = span;
+      schedule.general_events.push(c);
+    } else return false;
+    save();
+    return true;
+  }
+
+  /*@3.SCHJ.282*/
+  function endRecurrence(ev) {
+    var r = ev.raw;
+    if (!r) return;
+    var d = parseLocalDate(ev.date);
+    if (!d) return;
+    var prev = new Date(d); prev.setDate(prev.getDate() - 1);
+    var to = fmtLocalDate(prev);
+    if (ev.src === 'lecture' || ev.src === 'study') r.end_date = to;
+    else return;
+    save(); render();
+    schSay(isAr() ? ('لن تتكرّر بعد ' + to) : ('Will not repeat after ' + to));
+  }
+
+  /*@3.SCHJ.283*/
+  document.addEventListener('garden:courseColorChanged', function () {
+    try { render(); } catch (e) {}
+  });
+
+  function fmtHM(min) {
+    return String(Math.floor(min / 60)).padStart(2, '0') + ':' +
+           String(min % 60).padStart(2, '0');
+  }
+
+  /*@3.SCHJ.270*/
+  function dragCfg() {
+    var rng = effectiveRange();
+    return {
+      root: document.getElementById('grid-wrap'),
+      colSel: '.sch-daycol',
+      cardSel: '.sch-ev',
+      snap: 5,
+      startH: rng.startH,
+      endH: rng.endH,
+      minAt: function (y) { return axis.minAt(y); },
+      yFor: function (m) { return axis.yFor(m); },
+      spanOf: function (el) {
+        var n = parseInt(el.getAttribute('data-span'), 10);
+        return n > 0 ? n : null;
+      },
+      canDrag: function (el) { return el.getAttribute('data-drag') === '1'; },
+      label: function (a, b) { return fmtMin12(a) + ' – ' + fmtMin12(b); },
+    };
+  }
+
+  function wireDrag() {
+    var wrap = document.getElementById('grid-wrap');
+    if (!wrap || !window.GardenSchedDrag) return;
+    var rng = effectiveRange();
+    GardenSchedDrag.enable({
+      root: wrap,
+      onMenu: openSchMenu,
+      colSel: '.sch-daycol',
+      cardSel: '.sch-ev',
+      snap: 5,
+      startH: rng.startH,
+      endH: rng.endH,
+      /*@3.SCHJ.263*/
+      minAt: function (y) { return axis.minAt(y); },
+      yFor: function (m) { return axis.yFor(m); },
+      spanOf: function (el) {
+        var n = parseInt(el.getAttribute('data-span'), 10);
+        return n > 0 ? n : null;
+      },
+      canDrag: function (el) { return el.getAttribute('data-drag') === '1'; },
+      label: function (a, b) { return fmtMin12(a) + ' – ' + fmtMin12(b); },
+      onDrop: function (o) {
+        var ev = EV_BY_UID[o.el.getAttribute('data-uid')];
+        o.el._sdrJust = Date.now();
+        if (!ev) { render(); return; }
+        if (!moveEvent(ev, o.date, o.startMin)) { render(); return; }
+        render();
+        schSay(dragWord(ev, o.date));
+      },
+    });
   }
 
   /*@3.SCHJ.80*/
@@ -873,23 +1350,35 @@
     if (st.span_mode === 'full') return { startH: 0, endH: 24 };
     return { startH: st.day_start_hour, endH: st.day_end_hour };
   }
-  /*@3.SCHJ.82*/
+  /*@3.SCHJ.310*/
   function spanLabel() {
     var full = schedule.settings.span_mode === 'full';
-    return '<i class="fa-solid ' + (full ? 'fa-clock' : 'fa-book-open') + '"></i><span class="sch-tool-t">' +
-      escapeH(full ? (isAr() ? 'اليوم كامل' : 'Full day')
-                   : (isAr() ? 'ساعات الدراسة' : 'Study hours')) + '</span>';
+    return {
+      full: full,
+      icon: full ? 'fa-down-left-and-up-right-to-center' : 'fa-up-right-and-down-left-from-center',
+      ar: full ? 'صغّرِ الجدولَ إلى ساعاتِ الدراسة' : 'وسّعِ الجدولَ إلى اليومِ كامل',
+      en: full ? 'Shrink to study hours' : 'Expand to the full day'
+    };
+  }
+
+  /*@3.SCHJ.299*/
+  function toggleSpan() {
+    schedule.settings.span_mode = (schedule.settings.span_mode === 'study') ? 'full' : 'study';
+    didAutoScroll = false;
+    save(); render();
+    schSay(schedule.settings.span_mode === 'full'
+      ? (isAr() ? 'اليومُ كاملاً — من منتصفِ الليل إلى منتصفِه' : 'Full day — midnight to midnight')
+      : (isAr() ? 'ساعاتُ الدراسةِ وحدَها' : 'Study hours only'));
   }
 
   /*@3.SCHJ.83*/
   function gapKey(from, to) { return from + '-' + to; }
 
-  function buildAxis(dates, startH, endH, hourPx) {
+  /*@3.SCHJ.296*/
+  function busyMap(dates, startH, endH) {
     var hours = endH - startH;
-    var busy = new Array(hours);
-    var i, k;
+    var busy = new Array(hours), i, k;
     for (i = 0; i < hours; i++) busy[i] = false;
-
     /*@3.SCHJ.84*/
     dates.forEach(function (d) {
       eventsOnDate(d).forEach(function (e) {
@@ -901,7 +1390,6 @@
         }
       });
     });
-
     /*@3.SCHJ.85*/
     if (hours > 0) { busy[0] = true; busy[hours - 1] = true; }
     var now = new Date();
@@ -911,6 +1399,46 @@
       if (k >= 0 && k < hours) busy[k] = true;
       break;
     }
+    return busy;
+  }
+
+  function emptyRuns(busy, startH) {
+    var runs = [], i = 0;
+    while (i < busy.length) {
+      if (busy[i]) { i++; continue; }
+      var j = i;
+      while (j < busy.length && !busy[j]) j++;
+      var f = startH + i, t = startH + j;
+      if (j - i >= MIN_GAP_HOURS && !expandedGaps[gapKey(f, t)]) {
+        runs.push({ key: gapKey(f, t), len: j - i });
+      }
+      i = j;
+    }
+    return runs;
+  }
+
+  function planFold(dates, startH, endH, budgetPx) {
+    var hours = Math.max(1, endH - startH);
+    if (schedule.settings.collapse_gaps === false) {
+      return { set: null, shown: hours, folds: 0 };
+    }
+    var runs = emptyRuns(busyMap(dates, startH, endH), startH)
+                 .sort(function (a, b) { return b.len - a.len; });
+    var set = {}, shown = hours, n = 0;
+    while (n < runs.length && (shown * HOUR_PX_MIN + n * GAP_PX) > budgetPx) {
+      set[runs[n].key] = 1;
+      shown -= runs[n].len;
+      n++;
+    }
+    return { set: n ? set : null, shown: shown, folds: n };
+  }
+
+  function buildAxis(dates, startH, endH, hourPx, gapPx) {
+    /*@3.SCHJ.302*/
+    gapPx = gapPx || GAP_PX;
+    var hours = endH - startH;
+    var busy = busyMap(dates, startH, endH);
+    var i;
 
     var segments = [], total = 0, run = 0;
     function pushHours(from, to) {
@@ -919,8 +1447,8 @@
       total += (to - from) * hourPx;
     }
     function pushGap(from, to) {
-      segments.push({ type: 'gap', from: from, to: to, top: total, px: GAP_PX, key: gapKey(from, to) });
-      total += GAP_PX;
+      segments.push({ type: 'gap', from: from, to: to, top: total, px: gapPx, key: gapKey(from, to) });
+      total += gapPx;
     }
 
     /*@3.SCHJ.86*/
@@ -931,7 +1459,7 @@
       run = i;
       while (run < hours && !busy[run]) run++;
       var f = startH + i, t = startH + run;
-      if (run - i >= MIN_GAP_HOURS && !expandedGaps[gapKey(f, t)]) {
+      if (foldSet && foldSet[gapKey(f, t)] && !expandedGaps[gapKey(f, t)]) {
         pushHours(cursor, f);
         pushGap(f, t);
         cursor = t;
@@ -969,12 +1497,11 @@
              shownHours: shown, yFor: yFor, minAt: minAt };
   }
   /*@3.SCHJ.88*/
+  var foldSet = null;
+
   function computeHourPx(dates, startH, endH) {
     var wrap = document.getElementById('grid-wrap');
     if (!wrap) return HOUR_PX_DEF;
-    var probe = buildAxis(dates, startH, endH, HOUR_PX_DEF);
-    var shown = probe.shownHours || (endH - startH);
-    var gapsPx = probe.segments.reduce(function (a, s) { return a + (s.type === 'gap' ? s.px : 0); }, 0);
 
     var top = wrap.getBoundingClientRect().top;         /*@3.SCHJ.89*/
     var chrome = document.getElementById('head-row').offsetHeight +
@@ -982,15 +1509,40 @@
     var bottomNav = document.querySelector('.bottom-nav');
     var navH = (bottomNav && getComputedStyle(bottomNav).display !== 'none') ? bottomNav.offsetHeight : 0;
     /*@3.SCHJ.90*/
-    var reserve = navH + 26;
+    /*@3.SCHJ.304*/
+    var strip = document.getElementById('day-strip');
+    if (strip && getComputedStyle(strip).display !== 'none') stripH = strip.offsetHeight;
+    var stripGap = (strip && getComputedStyle(strip).display !== 'none') ? 0 : stripH;
+    var pad = parseFloat(getComputedStyle(document.querySelector('.sch-container')).paddingBottom) || 0;
+    var reserve = Math.max(navH, pad) + 14;
     /*@3.SCHJ.91*/
-    var box = window.innerHeight - top - reserve;
-    lastAvail = Math.max(180, box);
+    var box = window.innerHeight - top - reserve - stripGap;
+    lastAvail = Math.max(PANEL_MIN_PX, box);
     /*@3.SCHJ.92*/
-    var forHours = box - chrome - gapsPx - LABEL_TAIL_PX;
-    var px = Math.floor(forHours / Math.max(1, shown));
-    return Math.max(HOUR_PX_MIN, Math.min(HOUR_PX_MAX, px));
+    var forHours = lastAvail - chrome - LABEL_TAIL_PX;
+
+    var plan = planFold(dates, startH, endH, forHours);
+    foldSet = plan.set;
+
+    lastGapPx = GAP_PX;
+    var px = Math.max(HOUR_PX_MIN, Math.min(HOUR_PX_COMFY,
+               Math.floor((forHours - plan.folds * GAP_PX) / Math.max(1, plan.shown))));
+    if (!plan.folds) {
+      return Math.max(HOUR_PX_MIN, Math.min(HOUR_PX_STRETCH,
+             Math.floor(forHours / Math.max(1, plan.shown))));
+    }
+    var slack = forHours - (plan.shown * px + plan.folds * GAP_PX);
+    if (slack > 0) {
+      lastGapPx = Math.min(GAP_PX_MAX, GAP_PX + Math.floor(slack / plan.folds));
+      slack = forHours - (plan.shown * px + plan.folds * lastGapPx);
+    }
+    if (slack > 0) {
+      px = Math.min(HOUR_PX_STRETCH,
+           Math.floor((forHours - plan.folds * lastGapPx) / Math.max(1, plan.shown)));
+    }
+    return px;
   }
+  var lastGapPx = GAP_PX;
   var lastAvail = 0;
 
   function gapLabel(hoursCount, fromH, toH) {
@@ -1191,29 +1743,29 @@
     var after = current ? upcoming[0] : upcoming[1];
 
     /*@3.SCHJ.103*/
-    if (!sessions) {
-      /*@3.SCHJ.104*/
-      pulseLead = pulseAfter = null;
-      box.style.display = 'none';
-      return;
-    }
+    /*@3.SCHJ.292*/
+    /*@3.SCHJ.303*/
+    var today0 = new Date(); today0.setHours(0, 0, 0, 0);
+    var offTerm = !inTermBounds(today0);
     box.style.display = '';
+    box.classList.toggle('is-quiet', !sessions || offTerm);
 
     var kick = document.getElementById('pulse-kick');
     var title = document.getElementById('pulse-title');
     var sub = document.getElementById('pulse-sub');
     var barW = document.getElementById('pulse-bar-wrap');
 
-    if (!lead) {
-      box.style.setProperty('--c', 'var(--st-ok, #10b981)');
-      document.getElementById('pulse-orb').innerHTML = '<i class="fa-solid fa-mug-hot"></i>';
-      kick.textContent = isAr() ? 'وقتٌ حرّ' : 'FREE';
-      title.textContent = isAr() ? 'لا شيء متبقٍّ' : 'Nothing left';
-      sub.innerHTML = '<span>' + escapeH(isAr() ? 'كل ما جُدول قد مضى — أضِف حدثاً أو تصفّح التالي' : 'Everything scheduled has passed — add an event or browse ahead') + '</span>';
+    if (!lead || offTerm) {
+      var st = quietState(dates, sessions);
+      box.style.setProperty('--c', st.color);
+      document.getElementById('pulse-orb').innerHTML = '<i class="fa-solid ' + st.icon + '"></i>';
+      kick.textContent = st.kick;
+      title.textContent = st.title;
+      sub.innerHTML = st.sub;
       barW.hidden = true;
     }
 
-    if (lead) {
+    if (lead && !offTerm) {
       var e = lead.ev;
       box.style.setProperty('--c', e.color || '#a78bfa');
       document.getElementById('pulse-orb').innerHTML = '<i class="fa-solid ' + kindIcon(e) + '"></i>';
@@ -1235,6 +1787,7 @@
     }
 
     var pn = document.getElementById('pulse-next');
+    if (offTerm) after = null;
     if (after) {
       pn.className = 'sch-pulse-next';
       pn.innerHTML = '<div class="sch-pn-kick">' + (isAr() ? 'التالي' : 'NEXT') + '</div>' +
@@ -1252,7 +1805,7 @@
     }
 
     /*@3.SCHJ.105*/
-    pulseLead = lead ? lead.ev : null;
+    pulseLead = (lead && !offTerm) ? lead.ev : null;
     pulseAfter = after ? after.ev : null;
     bindPulse();
     pulseHit(document.querySelector('#sch-pulse .sch-pulse-main'), pulseLead);
@@ -1263,6 +1816,86 @@
       '<div class="sch-stat"><b>' + sessions + '</b><span>' + (isAr() ? 'حصة' : 'sessions') + '</span></div>' +
       (exams ? '<div class="sch-stat is-exam"><b>' + exams + '</b><span>' + (isAr() ? 'اختبار' : 'exams') + '</span></div>' : '');
   }
+
+  function scheduleIsEmpty() {
+    return !schedule.lectures.length && !schedule.study_blocks.length &&
+           !schedule.exams.length && !schedule.general_events.length;
+  }
+
+  function nextAnywhere(fromDate, days) {
+    var d = new Date(fromDate); d.setHours(0, 0, 0, 0);
+    for (var i = 0; i < days; i++) {
+      var list = eventsOnDate(d).filter(function (e) { return !e.done; });
+      if (list.length) return { ev: list[0], date: new Date(d) };
+      d.setDate(d.getDate() + 1);
+    }
+    return null;
+  }
+
+  function quietState(dates, sessions) {
+    var A = isAr();
+    var line = function (x) { return '<span>' + escapeH(x) + '</span>'; };
+    var scope = (currentView === 'day') ? 'day' : (currentView === 'month' ? 'month' : 'week');
+
+    var ref = dates && dates.length ? dates[0] : new Date();
+    var last = dates && dates.length ? dates[dates.length - 1] : ref;
+    var anchor = new Date(); anchor.setHours(0, 0, 0, 0);
+    var nxt = nextAnywhere(new Date(Math.max(anchor.getTime(), last.getTime())), 400);
+    var when = nxt ? (DAY_NAMES[A ? 'ar' : 'en'][DAYS_ORDER[nxt.date.getDay()]] + ' · ' +
+                      nxt.date.getDate() + ' ' + MONTH_NAMES[A ? 'ar' : 'en'][nxt.date.getMonth()]) : '';
+    var nextLine = nxt ? line((A ? 'التالي: ' : 'Next: ') + evTitle(nxt.ev) + ' — ' + when) : null;
+
+    if (!inTermBounds(anchor)) {
+      var st0 = (schedule.settings || {}).term_start_date;
+      var started = !st0 || anchor >= parseLocalDate(st0);
+      if (started) {
+        return { color: 'var(--text-muted)', icon: 'fa-flag-checkered',
+                 kick: A ? 'طُويت الصفحة' : 'CHAPTER CLOSED',
+                 title: A ? 'انتهى الفصل' : 'The term has ended',
+                 sub: nextLine || line(A ? 'استرحْ — لا شيءَ مجدولٌ بعد اليوم'
+                                         : 'Rest — nothing is scheduled from here') };
+      }
+      var s0 = st0 ? parseLocalDate(st0) : null;
+      var startWord = s0 ? (DAY_NAMES[A ? 'ar' : 'en'][DAYS_ORDER[s0.getDay()]] + ' · ' +
+                            s0.getDate() + ' ' + MONTH_NAMES[A ? 'ar' : 'en'][s0.getMonth()]) : '';
+      return { color: 'var(--text-muted)', icon: 'fa-hourglass-start',
+               kick: A ? 'على الأبواب' : 'ALMOST THERE',
+               title: A ? 'لم يبدأِ الفصلُ بعد' : 'The term has not started',
+               sub: s0 ? line((A ? 'يبدأ ' : 'Begins ') + startWord)
+                       : (nextLine || line(A ? 'استعِدَّ على مهل' : 'Get set, no rush')) };
+    }
+
+    /*@3.SCHJ.305*/
+    if (sessions) {
+      var freeT = { day:   [A ? 'انتهى يومُك' : 'Your day is done',
+                            A ? 'خُذْ نفَساً — لا شيءَ متبقٍّ' : 'Take a breath — nothing left'],
+                    week:  [A ? 'أسبوعُك مكتمِل' : 'Your week is complete',
+                            A ? 'كلُّ ما جُدول قد مضى' : 'Everything scheduled has passed'],
+                    month: [A ? 'شهرٌ مضى كما خطّطتَ له' : 'A month went as you planned',
+                            A ? 'لا شيءَ متبقٍّ فيه' : 'Nothing left in it'] }[scope];
+      return { color: 'var(--st-ok, #10b981)', icon: 'fa-mug-hot',
+               kick: A ? 'وقتٌ حرّ' : 'FREE',
+               title: freeT[0], sub: nextLine || line(freeT[1]) };
+    }
+
+    if (scheduleIsEmpty()) {
+      return { color: 'var(--st-accent, #a78bfa)', icon: 'fa-wand-magic-sparkles',
+               kick: A ? 'ابدأْ من هنا' : 'START HERE',
+               title: A ? 'جدولُك فارغ' : 'Your schedule is empty',
+               sub: line(A ? 'اضغطْ على أيِّ فراغٍ في الشبكةِ لتضيفَ أوّلَ حدث'
+                           : 'Tap any empty slot in the grid to add your first event') };
+    }
+
+    var blankT = { day:   A ? 'يومٌ بلا موعد'          : 'A day with nothing due',
+                   week:  A ? 'أسبوعٌ خفيف'            : 'A light week',
+                   month: A ? 'لا شيءَ في هذا الشهر'   : 'Nothing this month' }[scope];
+    return { color: 'var(--text-muted)', icon: 'fa-calendar-day',
+             kick: A ? 'صفحةٌ بيضاء' : 'BLANK PAGE',
+             title: blankT,
+             sub: nextLine || line(A ? 'ولا شيءَ بعده — أضِفْ حدثاً بالضغط على الشبكة'
+                                     : 'And nothing after — add an event by tapping the grid') };
+  }
+
 
   /*@3.SCHJ.106*/
   var introDone = false;
@@ -1282,12 +1915,20 @@
     var range = effectiveRange();
     var startH = range.startH, endH = range.endH;
     var activeDays = schedule.settings.active_days || [];
-    var cols = '66px repeat(' + dates.length + ', minmax(0,1fr))';
+    var cols = GUT_PX + 'px repeat(' + dates.length + ', minmax(0,1fr))';
 
     /*@3.SCHJ.108*/
     var head = document.getElementById('head-row');
     head.style.gridTemplateColumns = cols;
-    var hh = '<div class="sch-head-gutter"></div>';
+    var sp = spanLabel();
+    var spanTip = isAr() ? sp.ar : sp.en;
+    var hh = '<div class="sch-head-gutter">' +
+      '<button type="button" class="sch-span-corner" id="span-corner"' +
+      ' aria-label="' + escapeH(spanTip) + '" title="' + escapeH(spanTip) + '"' +
+      ' data-ar-title="' + escapeH(sp.ar) + '"' +
+      ' data-en-title="' + escapeH(sp.en) + '">' +
+      '<i class="fa-solid ' + sp.icon + '" aria-hidden="true"></i>' +
+      '</button></div>';
     dates.forEach(function (d) {
       var nm = DAYS_ORDER[d.getDay()];
       var today = isSameDay(d, new Date());
@@ -1309,6 +1950,8 @@
     head.querySelectorAll('.sch-day-head').forEach(function (b) {
       b.addEventListener('click', function () { openDayAgenda(parseLocalDate(this.getAttribute('data-date'))); });
     });
+    var sc = document.getElementById('span-corner');
+    if (sc) sc.addEventListener('click', toggleSpan);
 
     /*@3.SCHJ.110*/
     var ad = document.getElementById('allday-row');
@@ -1350,12 +1993,32 @@
     /*@3.SCHJ.112*/
     var body = document.getElementById('grid-body');
     body.style.gridTemplateColumns = cols;
+    /*@3.SCHJ.306*/
+    body.style.setProperty('--sch-gut', GUT_PX + 'px');
     body.innerHTML = '';
 
     /*@3.SCHJ.113*/
-    axis = buildAxis(dates, startH, endH, computeHourPx(dates, startH, endH));
+    axis = buildAxis(dates, startH, endH, computeHourPx(dates, startH, endH), lastGapPx);
+
+    /*@3.SCHJ.295*/
+    var innerAvail = lastAvail - document.getElementById('head-row').offsetHeight -
+                     (anyAllDay ? ad.offsetHeight : 0) - LABEL_TAIL_PX;
+    for (var pass = 0; pass < 3 && axis.totalH < innerAvail - 4; pass++) {
+      var folds = axis.segments.filter(function (s) { return s.type === 'gap'; }).length;
+      var shown = Math.max(1, axis.shownHours);
+      var gp = lastGapPx, hp = axis.hourPx;
+      var gpCap = Math.max(GAP_PX_MAX, Math.round(innerAvail * 0.42 / folds));
+      if (folds && gp < gpCap) {
+        gp = Math.min(gpCap, gp + Math.ceil((innerAvail - axis.totalH) / folds));
+      }
+      var left = innerAvail - folds * gp;
+      hp = Math.max(hp, Math.min(HOUR_PX_STRETCH, Math.floor(left / shown)));
+      if (hp === axis.hourPx && gp === lastGapPx) break;
+      lastGapPx = gp;
+      axis = buildAxis(dates, startH, endH, hp, gp);
+    }
     var bodyH = axis.totalH;
-    wrap.style.maxHeight = lastAvail + 'px';
+    wrap.style.height = lastAvail + 'px';
 
     var gutter = document.createElement('div');
     gutter.className = 'sch-gutter';
@@ -1465,7 +2128,8 @@
         var mins = Math.round(axis.minAt(clickEv.clientY - rect.top) / 15) * 15;
         mins = Math.max(startH * 60, Math.min(endH * 60 - 30, mins));
         openAddModal(DAYS_ORDER[parseLocalDate(this.getAttribute('data-date')).getDay()],
-                     minToHM24(mins), this.getAttribute('data-date'));
+                     minToHM24(mins), this.getAttribute('data-date'),
+                     { x: clickEv.clientX, y: clickEv.clientY });
       });
       body.appendChild(col);
     });
@@ -1629,53 +2293,98 @@
   }
 
   /*@3.SCHJ.142*/
+  var expandedAgRuns = Object.create(null);
+
+  function agRunKey(a, b) { return fmtLocalDate(a) + '|' + fmtLocalDate(b); }
+
+  function agRunLabel(n, from, to) {
+    var mn = MONTH_NAMES[isAr() ? 'ar' : 'en'];
+    var span = from.getMonth() === to.getMonth()
+      ? from.getDate() + ' – ' + to.getDate() + ' ' + mn[to.getMonth()]
+      : from.getDate() + ' ' + mn[from.getMonth()] + ' – ' + to.getDate() + ' ' + mn[to.getMonth()];
+    var word;
+    if (isAr()) {
+      word = n === 2 ? 'يومان خاليان' : (n <= 10 ? n + ' أيّامٍ خالية' : n + ' يوماً خالياً');
+    } else {
+      word = n + ' empty days';
+    }
+    return { word: word, span: span };
+  }
+
+  function agDayHtml(row, scope, today) {
+    var d = row.date, items = row.items;
+    var isToday = row.today;
+    var nm = DAYS_ORDER[d.getDay()];
+    var dateTxt = d.getDate() + ' ' + MONTH_NAMES[isAr() ? 'ar' : 'en'][d.getMonth()];
+
+    if (!items.length) {
+      /*@3.SCHJ.143*/
+      var short = (scope.type !== 'day');
+      return '<div class="sch-ag-day is-empty' + (isToday ? ' is-today' : '') + '">' +
+        '<div class="sch-ag-head">' +
+        '<span class="sch-ag-dname">' +
+          escapeH((short ? DAY_SHORT : DAY_NAMES)[isAr() ? 'ar' : 'en'][nm]) + '</span>' +
+        '<span class="sch-ag-ddate">' + escapeH(dateTxt) + '</span>' +
+        (isToday ? '<span class="sch-ag-today-badge">' + (isAr() ? 'اليوم' : 'Today') + '</span>' : '') +
+        '<span class="sch-ag-count">' +
+          (short ? '—' : (isAr() ? 'لا أحداث' : 'No events')) + '</span></div></div>';
+    }
+
+    var allDay = items.filter(function (e) { return e.allDay; });
+    var timed = items.filter(function (e) { return !e.allDay; });
+    var html = '<div class="sch-ag-day' + (isToday ? ' is-today' : '') + '">' +
+      '<div class="sch-ag-head">' +
+        '<span class="sch-ag-dname">' + escapeH(DAY_NAMES[isAr() ? 'ar' : 'en'][nm]) + '</span>' +
+        '<span class="sch-ag-ddate">' + escapeH(dateTxt) + '</span>' +
+        (isToday ? '<span class="sch-ag-today-badge">' + (isAr() ? 'اليوم' : 'Today') + '</span>' : '') +
+        '<span class="sch-ag-count">' + items.length + '</span>' +
+      '</div><div class="sch-ag-list">';
+    if (allDay.length) {
+      html += '<div class="sch-ag-group-label">' + (isAr() ? 'طوال اليوم' : 'All-day') + '</div>';
+      allDay.forEach(function (e) { html += agendaItem(e); });
+    }
+    timed.forEach(function (e) { html += agendaItem(e); });
+    return html + '</div></div>';
+  }
+
   function buildAgendaHtml(scope) {
     var days = eventsForRange(scope.from, scope.to);
     var today = new Date();
     var html = '';
     var any = false;
 
-    days.forEach(function (d) {
+    /*@3.SCHJ.307*/
+    var rows = days.map(function (d) {
       var items = d.items;
       if (scope.course) items = items.filter(function (e) { return e.course_code === scope.course; });
-      var isToday = isSameDay(d.date, today);
-      var nm = DAYS_ORDER[d.date.getDay()];
-      var dateTxt = d.date.getDate() + ' ' + MONTH_NAMES[isAr() ? 'ar' : 'en'][d.date.getMonth()];
-
-      if (!items.length) {
-        /*@3.SCHJ.143*/
-        if (scope.type === 'day') {
-          html += '<div class="sch-ag-day is-empty"><div class="sch-ag-head">' +
-            '<span class="sch-ag-dname">' + escapeH(DAY_NAMES[isAr() ? 'ar' : 'en'][nm]) + '</span>' +
-            '<span class="sch-ag-ddate">' + escapeH(dateTxt) + '</span>' +
-            '<span class="sch-ag-count">' + (isAr() ? 'لا أحداث' : 'No events') + '</span></div></div>';
-        } else {
-          html += '<div class="sch-ag-day is-empty"><div class="sch-ag-head">' +
-            '<span class="sch-ag-dname">' + escapeH(DAY_SHORT[isAr() ? 'ar' : 'en'][nm]) + '</span>' +
-            '<span class="sch-ag-ddate">' + escapeH(dateTxt) + '</span>' +
-            '<span class="sch-ag-count">—</span></div></div>';
-        }
-        return;
-      }
-      any = true;
-      var allDay = items.filter(function (e) { return e.allDay; });
-      var timed = items.filter(function (e) { return !e.allDay; });
-
-      html += '<div class="sch-ag-day' + (isToday ? ' is-today' : '') + '">' +
-        '<div class="sch-ag-head">' +
-          '<span class="sch-ag-dname">' + escapeH(DAY_NAMES[isAr() ? 'ar' : 'en'][nm]) + '</span>' +
-          '<span class="sch-ag-ddate">' + escapeH(dateTxt) + '</span>' +
-          (isToday ? '<span class="sch-ag-today-badge">' + (isAr() ? 'اليوم' : 'Today') + '</span>' : '') +
-          '<span class="sch-ag-count">' + items.length + '</span>' +
-        '</div><div class="sch-ag-list">';
-
-      if (allDay.length) {
-        html += '<div class="sch-ag-group-label">' + (isAr() ? 'طوال اليوم' : 'All-day') + '</div>';
-        allDay.forEach(function (e) { html += agendaItem(e); });
-      }
-      timed.forEach(function (e) { html += agendaItem(e); });
-      html += '</div></div>';
+      if (items.length) any = true;
+      return { date: d.date, items: items, empty: !items.length, today: isSameDay(d.date, today) };
     });
+
+    var i = 0;
+    while (i < rows.length) {
+      if (!rows[i].empty || scope.type === 'day' || rows[i].today) {
+        html += agDayHtml(rows[i], scope, today);
+        i++;
+        continue;
+      }
+      /*@3.SCHJ.308*/
+      var j = i;
+      while (j < rows.length && rows[j].empty && !rows[j].today) j++;
+      var n = j - i;
+      var key = agRunKey(rows[i].date, rows[j - 1].date);
+      if (n < MIN_EMPTY_RUN || expandedAgRuns[key]) {
+        for (var k = i; k < j; k++) html += agDayHtml(rows[k], scope, today);
+      } else {
+        var lb = agRunLabel(n, rows[i].date, rows[j - 1].date);
+        html += '<button type="button" class="sch-ag-gap" data-agrun="' + escapeH(key) + '" ' +
+          'title="' + escapeH(isAr() ? 'اضغط لعرض هذه الأيّام' : 'Tap to show these days') + '">' +
+          '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i>' +
+          '<span>' + escapeH(lb.word) + '</span>' +
+          '<em>' + escapeH(lb.span) + '</em></button>';
+      }
+      i = j;
+    }
 
     if (!any && scope.type !== 'day') {
       html = '<div class="sch-ag-day"><div class="sch-ag-empty">' +
@@ -1697,6 +2406,12 @@
   }
 
   function bindAgendaClicks(root) {
+    root.querySelectorAll('.sch-ag-gap').forEach(function (b) {
+      b.addEventListener('click', function () {
+        expandedAgRuns[this.getAttribute('data-agrun')] = true;
+        renderAgendaView();
+      });
+    });
     root.querySelectorAll('.sch-ag-item').forEach(function (b) {
       b.addEventListener('click', function () {
         var uid = this.getAttribute('data-uid');
@@ -1755,8 +2470,10 @@
       var showWk = (date.getDay() === 0 && wk);
       html += '<div class="sch-month-cell' + (isSameDay(date, today) ? ' today' : '') +
               (inTermBounds(date) ? '' : ' out-of-term') + '" data-date="' + fmtLocalDate(date) + '">' +
+              '<div class="sch-month-head">' +
               '<span class="sch-month-day-num">' + dd + '</span>' +
-              (showWk ? '<span class="sch-month-wk">' + (isAr() ? 'أ' : 'W') + wk + '</span>' : '');
+              (showWk ? '<span class="sch-month-wk">' + (isAr() ? 'أ' : 'W') + wk + '</span>' : '') +
+              '</div>';
 
       if (items.length) {
         var n = { exam:0, lecture:0, study:0, intensive:0, task:0, late:0 };
@@ -1787,8 +2504,89 @@
     }).join('');
 
     /*@3.SCHJ.145*/
+    /*@3.SCHJ.300*/
     grid.querySelectorAll('.sch-month-cell[data-date]').forEach(function (cell) {
-      cell.addEventListener('click', function () { openDayAgenda(parseLocalDate(this.getAttribute('data-date'))); });
+      cell.addEventListener('click', function () {
+        monthPick = this.getAttribute('data-date');
+        renderMonthView();
+      });
+    });
+    renderMonthRail();
+  }
+
+  /*@3.SCHJ.301*/
+  var monthPick = null;
+  function monthPickDate() {
+    var y = currentMonthDate.getFullYear(), m = currentMonthDate.getMonth();
+    if (monthPick) {
+      var p = parseLocalDate(monthPick);
+      if (p && p.getFullYear() === y && p.getMonth() === m) return p;
+    }
+    var now = new Date();
+    if (now.getFullYear() === y && now.getMonth() === m) return new Date(now);
+    var last = new Date(y, m + 1, 0).getDate();
+    for (var d = 1; d <= last; d++) {
+      var c = new Date(y, m, d);
+      if (eventsOnDate(c).length) return c;
+    }
+    return new Date(y, m, 1);
+  }
+
+  function renderMonthRail() {
+    var rail = document.getElementById('month-rail');
+    if (!rail) return;
+    var lang = isAr() ? 'ar' : 'en';
+    var d = monthPickDate();
+    monthPick = fmtLocalDate(d);
+    document.querySelectorAll('.sch-month-cell[data-date]').forEach(function (c) {
+      c.classList.toggle('is-pick', c.getAttribute('data-date') === monthPick);
+    });
+
+    var items = eventsOnDate(d);
+    var head = '<div class="sch-mr-head">' +
+      '<div class="sch-mr-day">' + escapeH(DAY_NAMES[lang][DAYS_ORDER[d.getDay()]]) +
+      ' · <span class="sch-code">' + d.getDate() + '</span> ' +
+      escapeH(MONTH_NAMES[lang][d.getMonth()]) + '</div>' +
+      '<button type="button" class="sch-mr-open" id="mr-open">' +
+      escapeH(isAr() ? 'افتحْ هذا اليوم' : 'Open this day') +
+      '<i class="fa-solid fa-chevron-' + (isAr() ? 'left' : 'right') + '" aria-hidden="true"></i></button>' +
+      '</div>';
+
+    var body;
+    if (!items.length) {
+      body = '<div class="sch-mr-empty">' +
+        '<i class="fa-solid fa-calendar-day" aria-hidden="true"></i>' +
+        '<b>' + escapeH(isAr() ? 'لا شيءَ في هذا اليوم' : 'Nothing on this day') + '</b>' +
+        '<button type="button" class="sch-mr-add" id="mr-add">' +
+        '<i class="fa-solid fa-plus" aria-hidden="true"></i>' +
+        escapeH(isAr() ? 'أضِفْ حدثاً هنا' : 'Add an event here') + '</button></div>';
+    } else {
+      body = '<div class="sch-mr-list">' + items.map(function (e, i) {
+        var allDay = (e.allDay || e.start === null);
+        var when = allDay ? (isAr() ? 'طوال اليوم' : 'All-day') : fmtMin12(e.start);
+        return '<button type="button" class="sch-mr-row' + (e.done ? ' is-done' : '') +
+          '" data-i="' + i + '" style="--row-c:' + escapeH(e.color) + '">' +
+          '<span class="sch-mr-t' + (allDay ? '' : ' gd-clock') + '">' + escapeH(when) + '</span>' +
+          '<span class="sch-mr-n">' + escapeH(evTitle(e)) + '</span>' +
+          (e.room ? '<span class="sch-mr-r">' + escapeH(e.room) + '</span>' : '') +
+          '</button>';
+      }).join('') + '</div>';
+    }
+
+    rail.innerHTML = head + body;
+    var op = document.getElementById('mr-open');
+    if (op) op.addEventListener('click', function () { openDayAgenda(d); });
+    var ad = document.getElementById('mr-add');
+    if (ad) ad.addEventListener('click', function (ev) {
+      var b = ev.currentTarget.getBoundingClientRect();
+      openAddModal(DAYS_ORDER[d.getDay()], null, fmtLocalDate(d),
+                   { x: b.left + b.width / 2, y: b.bottom });
+    });
+    rail.querySelectorAll('.sch-mr-row').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var it = items[parseInt(this.getAttribute('data-i'), 10)];
+        if (it) openSheet(it);
+      });
     });
   }
   function dots(cls, n, cap) {
@@ -2331,7 +3129,21 @@
     return minToHM24(m);
   }
 
-  function openAddModal(day, time, dateStr) {
+  var ADD_TYPES = [
+    { k: 'add-lec',   i: 'fa-chalkboard-user', tone: 'var(--st-accent, #a78bfa)',
+      ar: 'محاضرة', en: 'Lecture' },
+    { k: 'add-study', i: 'fa-book-open',       tone: 'var(--st-ok, #10b981)',
+      ar: 'مذاكرة', en: 'Study' },
+    { k: 'add-exam',  i: 'fa-file-pen',        tone: 'var(--st-danger, #ef4444)',
+      ar: 'اختبار', en: 'Exam' },
+    { k: 'add-gen',   i: 'fa-bookmark',        tone: 'var(--text-muted)',
+      ar: 'عام · مهمّةٌ أو ملاحظةٌ أو حدث', en: 'General · task, note or event' },
+    { sep: true },
+    { k: 'add-plan',  i: 'fa-bolt',            tone: 'var(--st-warn, #f59e0b)',
+      ar: 'خطّةُ مذاكرةٍ مكثّفة', en: 'Intensive study plan' }
+  ];
+
+  function openAddModal(day, time, dateStr, at) {
     editingEvent = null;
     hideDeleteButtons();
     var base = (currentView === 'day' ? currentDayDate : new Date());
@@ -2341,7 +3153,14 @@
       time: time || nowSlotTime(),
       date: dateStr || fmtLocalDate(base)
     };
-    document.getElementById('modal-choose-type').style.display = '';
+    var d = parseLocalDate(pendingSlot.date);
+    var head = (d ? DAY_NAMES[isAr() ? 'ar' : 'en'][DAYS_ORDER[d.getDay()]] + ' · ' : '') +
+               fmtTime12(pendingSlot.time);
+    closeSchMenu();
+    paintSchMenu(ADD_TYPES, null, null,
+                 { x: (at && at.x) || window.innerWidth / 2,
+                   y: (at && at.y) || Math.round(window.innerHeight * 0.28) },
+                 head);
   }
 
   /*@3.SCHJ.225*/
@@ -2895,6 +3714,38 @@
         schedule.general_events = (schedule.general_events || []).filter(function (g) { return m.general_events.indexOf(g.id) === -1; });
         var p = activePlan();
         if (p && m.intensive.length) p.sessions = p.sessions.filter(function (s) { return m.intensive.indexOf(s.id) === -1; });
+        /*@3.SCHJ.284*/
+        /*@3.SCHJ.285*/
+        (function purgeArchived() {
+          var A = schedule.archived;
+          if (!A) return;
+          var sel = purgeSelection();
+          var typeOn = function (k) { return !sel.types.length || sel.types.indexOf(k) !== -1; };
+          var courseOn = function (c) { return !sel.courses.length || sel.courses.indexOf(c) !== -1; };
+          Object.keys(A).forEach(function (key) {
+            var box = A[key]; if (!box) { delete A[key]; return; }
+            if (Array.isArray(box.lectures) && typeOn('lecture')) {
+              box.lectures = box.lectures.filter(function (r) { return !courseOn(r.course_code); });
+            }
+            if (Array.isArray(box.study_blocks)) {
+              box.study_blocks = box.study_blocks.filter(function (r) {
+                return !(typeOn(r.kind || 'study') && courseOn(r.course_code));
+              });
+            }
+            if (Array.isArray(box.exams) && typeOn('exam')) {
+              box.exams = box.exams.filter(function (r) { return !courseOn(r.course_code); });
+            }
+            if (Array.isArray(box.general_events) && typeOn('event')) {
+              box.general_events = box.general_events.filter(function (r) { return !courseOn(r.course_code); });
+            }
+            var any = ['lectures', 'study_blocks', 'exams', 'general_events']
+              .some(function (k) { return (box[k] || []).length; });
+            if (!any) delete A[key];
+          });
+        })();
+        if (window.GardenSXLink && GardenSXLink.forgetPick) {
+          linkedCrns.forEach(function (c) { GardenSXLink.forgetPick(c); });
+        }
         /*@3.SCHJ.179*/
         if (m.lectures.length) {
           Object.keys(schedule.week_overrides || {}).forEach(function (w) {
@@ -3473,6 +4324,12 @@
     dayFocusFilter = false;
     didAutoScroll = false;
     dayWinStart = null;          /*@3.SCHJ.202*/
+    /*@3.SCHJ.288*/
+    if (agendaOn) {
+      agendaOn = false;
+      schedule.settings.agenda = false;
+      save();
+    }
     syncViewButtons();
     render();
   }
@@ -3489,9 +4346,6 @@
       document.getElementById('week-nav').style.display = showWeekNav ? '' : 'none';
       document.getElementById('month-nav').style.display = showMonthNav ? '' : 'none';
       /*@3.SCHJ.203*/
-      document.getElementById('btn-span').style.display =
-        (currentView === 'week' && !agendaOn) ? '' : 'none';
-      document.getElementById('btn-span').innerHTML = spanLabel();
 
       /*@3.SCHJ.204*/
       var gw = document.getElementById('grid-wrap');
@@ -3505,7 +4359,8 @@
       updateOutOfRangeBanner();
 
       if (agendaOn) {
-        if (currentView === 'month') { mw.style.display = ''; renderMonthNavOnly(); }
+        /*@3.SCHJ.309*/
+        if (currentView === 'month') renderMonthNavOnly();
         renderPulse(scopeDates());
         renderAgendaView();
       } else if (currentView === 'month') {
@@ -3516,6 +4371,7 @@
         document.getElementById('day-strip').style.display = 'none';
         renderPulse([new Date(currentDayDate)]);
         renderGrid([new Date(currentDayDate)]);
+        wireDrag();
         playIntro();
       } else {
         var info = windowDates();
@@ -3523,6 +4379,7 @@
         renderPulse(info.all);
         renderGrid(info.shown);
         bindGridSwipe();
+        wireDrag();
         playIntro();
       }
     } finally { endPass(); }
@@ -3532,6 +4389,7 @@
       MONTH_NAMES[isAr() ? 'ar' : 'en'][currentMonthDate.getMonth()] + ' ' + currentMonthDate.getFullYear();
     document.getElementById('month-grid').innerHTML = '';
     document.getElementById('month-legend').innerHTML = '';
+    document.getElementById('month-rail').innerHTML = '';
   }
 
   function updateNavLabel() {
@@ -3558,21 +4416,19 @@
     var banner = document.getElementById('focus-banner');
     if (currentView === 'month') { banner.style.display = 'none'; return; }
     var ws = (currentView === 'day') ? getWeekStartDate(currentDayDate) : currentWeekStart;
-    var f = weekFocus(ws);
-    if (!f.active) { banner.style.display = 'none'; return; }
-    var wid = getWeekId(ws);
-    var revealed = !!(schedule.week_overrides[wid] && schedule.week_overrides[wid].show_lectures);
-    var kind = f.kind === 'midterm' ? (isAr() ? 'الميدتيرم' : 'Midterm') : (isAr() ? 'الفاينل' : 'Final');
-    document.getElementById('focus-banner-text').textContent = revealed
-      ? (isAr() ? ('أسبوع تركيز (' + kind + ') — المحاضرات ظاهرة') : ('Focus week (' + kind + ') — lectures shown'))
-      : (isAr() ? ('أسبوع تركيز (' + kind + ') — المحاضرات المتكرّرة مخفية') : ('Focus week (' + kind + ') — recurring lectures hidden'));
+    var RL = window.GardenScheduleRules;
+    var n = (RL && RL.lectureNotice) ? RL.lectureNotice(
+      (currentView === 'day') ? currentDayDate : ws, isAr()) : null;
+    if (!n || n.why !== 'focus') { banner.style.display = 'none'; return; }
+    document.getElementById('focus-banner-text').textContent = n.text;
     var btn = document.getElementById('btn-toggle-lectures');
-    btn.textContent = revealed ? (isAr() ? 'إخفاء المحاضرات' : 'Hide lectures')
-                               : (isAr() ? 'إظهار المحاضرات' : 'Show lectures');
+    btn.textContent = n.action;
     btn.onclick = function () {
-      var o = schedule.week_overrides[wid] || (schedule.week_overrides[wid] = {});
-      o.show_lectures = !o.show_lectures;
-      save(); render();
+      RL.setLecturesShown(n.weekId, !n.shown);
+      var raw = null;
+      try { raw = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+      if (raw) schedule = migrateSchedule(raw);
+      render();
     };
     banner.style.display = '';
   }
@@ -3585,8 +4441,11 @@
     var st = schedule.settings;
     var outside = (!inTermBounds(ref) && !inTermBounds(end));
     if (!outside || (!st.term_start_date && !st.semester_end_date)) { bar.style.display = 'none'; return; }
-    bar.textContent = isAr() ? 'خارج مدى الفصل — لا تُعرض المحاضرات المتكرّرة هنا'
-                             : 'Outside the term range — recurring lectures are not shown';
+    var RL2 = window.GardenScheduleRules;
+    var n2 = (RL2 && RL2.lectureNotice) ? RL2.lectureNotice(ref, isAr()) : null;
+    bar.textContent = (n2 && n2.why === 'term') ? n2.text
+      : (isAr() ? 'خارج مدى الفصل — لا تُعرض المحاضرات المتكرّرة'
+                : 'Outside the term range — recurring lectures are not shown');
     bar.style.display = '';
   }
 
@@ -3730,20 +4589,12 @@
     on('btn-next-month', 'click', function () {
       currentMonthDate.setMonth(currentMonthDate.getMonth() + 1); render();
     });
-    on('btn-span', 'click', function () {
-      schedule.settings.span_mode = (schedule.settings.span_mode === 'study') ? 'full' : 'study';
-      didAutoScroll = false; save(); render();
+    on('btn-this-month', 'click', function () {
+      currentMonthDate = new Date();
+      monthPick = null;
+      render();
     });
 
-    on('btn-add-event', 'click', function () { openAddModal(null, null, null); });
-    on('choose-lecture', 'click', function () { closeModal('modal-choose-type'); prepLectureModal(); });
-    on('choose-study', 'click', function () { closeModal('modal-choose-type'); prepStudyModal(); });
-    on('choose-exam', 'click', function () { closeModal('modal-choose-type'); prepExamModal(); });
-    on('choose-general', 'click', function () { closeModal('modal-choose-type'); prepGeneralModal(); });
-    on('choose-plan', 'click', function () {
-      closeModal('modal-choose-type');
-      if (window.GardenSchedulePlan) window.GardenSchedulePlan.openWizard();
-    });
 
     on('btn-save-lecture', 'click', saveLecture);
     on('btn-save-study', 'click', saveStudy);
@@ -3875,7 +4726,7 @@
       ov.addEventListener('click', function (e) {
         if (e.target === ov) {
           ov.style.display = 'none';
-          if (ov.id === 'modal-confirm') confirmFn = null;   /*@3.SCHJ.210*/
+          if (ov.id === 'modal-confirm') confirmFn = null;   /*@3.SCHJ.211*/   /*@3.SCHJ.210*/
           editingEvent = null; hideDeleteButtons();
         }
       });
@@ -3885,8 +4736,7 @@
       document.querySelectorAll('.sch-modal-overlay, .sch-sheet-overlay').forEach(function (ov) {
         if (ov.style.display !== 'none') ov.style.display = 'none';
       });
-      confirmFn = null;   /*@3.SCHJ.211*/
-      editingEvent = null; hideDeleteButtons();
+      confirmFn = null;      editingEvent = null; hideDeleteButtons();
     });
   }
 
@@ -3938,6 +4788,11 @@
     agendaOn = !!schedule.settings.agenda;
 
     bindEvents();
+    if (window.GardenSchedDrag && GardenSchedDrag.holdMenu) {
+      ['month-wrapper', 'agenda-wrap'].forEach(function (id) {
+        GardenSchedDrag.holdMenu(document.getElementById(id), openSchMenu);
+      });
+    }
     /*@3.SCHJ.226*/
     setTimeout(runIntent, 0);
     TP.build(document);

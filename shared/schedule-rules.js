@@ -115,7 +115,66 @@
     return { on: true, why: null };
   }
 
+  function lectureNotice(dateObj, ar) {
+    var d = day0(dateObj || new Date());
+    var ws = getWeekStartDate(d);
+    var wid = getWeekId(ws);
+    var f = weekFocus(ws);
+    var st = settings();
+
+    if (!inTerm(d)) {
+      if (!st.term_start_date && !st.semester_end_date) return null;
+      var a = parseLocalDate(st.term_start_date);
+      var before = !!(a && d < a);
+      return {
+        why: 'term', kind: null, weekId: wid, shown: false, canToggle: false,
+        text: ar ? (before ? 'لم يبدأ الفصلُ بعد — والمحاضراتُ المتكرّرةُ صامتةٌ حتى يبدأ'
+                           : 'انتهى الفصل — والمحاضراتُ المتكرّرةُ صامتة')
+                 : (before ? 'The term has not started — recurring lectures stay silent until it does'
+                           : 'The term has ended — recurring lectures are silent'),
+        action: ''
+      };
+    }
+
+    if (f.active) {
+      var shown = !!overrideFor(wid).show_lectures;
+      var kind = f.kind === 'midterm' ? (ar ? 'الميدتيرم' : 'Midterm') : (ar ? 'الفاينل' : 'Final');
+      return {
+        why: 'focus', kind: f.kind, weekId: wid, shown: shown, canToggle: true,
+        text: ar
+          ? ('أسبوعُ تركيزٍ (' + kind + ') — المحاضراتُ المتكرّرةُ ' + (shown ? 'ظاهرةٌ وتُنبِّه' : 'صامتةٌ ولا تُنبِّه'))
+          : ('Focus week (' + kind + ') — recurring lectures are ' + (shown ? 'shown and will remind' : 'silent and will not remind')),
+        action: ar ? (shown ? 'أسكِتْها' : 'أظهِرْها') : (shown ? 'Silence them' : 'Show them')
+      };
+    }
+    return null;
+  }
+
+  function setLecturesShown(weekId, on) {
+    var s;
+    try { s = JSON.parse(localStorage.getItem(LS_KEY) || 'null') || {}; }
+    catch (e) { return false; }
+    if (!s.week_overrides || typeof s.week_overrides !== 'object') s.week_overrides = {};
+    var o = s.week_overrides[weekId] || (s.week_overrides[weekId] = {});
+    o.show_lectures = !!on;
+    s.updated_at = new Date().toISOString();
+    try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch (e) { return false; }
+    announce('lecture-toggle');
+    return true;
+  }
+
+  function announce(from) {
+    try {
+      window.dispatchEvent(new CustomEvent('garden:scheduleChanged', {
+        detail: { from: from || 'unknown' }
+      }));
+    } catch (e) {}
+  }
+
   window.GardenScheduleRules = {
+    announce: announce,
+    lectureNotice: lectureNotice,
+    setLecturesShown: setLecturesShown,
     DAYS_ORDER: DAYS_ORDER,
     settings: settings,
     fmtLocalDate: fmtLocalDate,

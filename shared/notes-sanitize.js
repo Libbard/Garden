@@ -264,6 +264,20 @@
     return t ? [B().blank('p', { rt: [{ s: t }] })] : [];
   }
 
+  /*@3.NOSJ3.19*/
+  function fromPlain(text) {
+    var t = String(text == null ? '' : text).replace(/\r\n?/g, '\n');
+    var lines = t.split('\n');
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var s = lines[i];
+      if (!s.trim()) continue;
+      out.push(B().blank('p', { rt: [{ s: s }] }));
+    }
+    if (!out.length && t.trim()) out.push(B().blank('p', { rt: [{ s: t }] }));
+    return out;
+  }
+
   function fromClipboard(dt) {
     if (!dt) return [];
     /*@3.NOSJ3.3*/
@@ -310,6 +324,7 @@
   window.GardenNotesSanitize = {
     fromHtml: fromHtml,
     fromText: fromText,
+    fromPlain: fromPlain,
     fromClipboard: fromClipboard,
     stripDangerous: stripDangerous
   };

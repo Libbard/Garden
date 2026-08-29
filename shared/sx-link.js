@@ -169,6 +169,17 @@
     var d = schLoad();
     if (!d) return false;
     var m = matcher(crn, sec), hit = false;
+    /*@3.SXLJ.57*/
+    (d.lectures || []).forEach(function (r) { if (m.lec(r)) hit = true; });
+    (d.exams || []).forEach(function (r) { if (m.ex(r)) hit = true; });
+    return hit;
+  }
+
+  /*@3.SXLJ.58*/
+  function hasAnywhere(crn, sec) {
+    var d = schLoad();
+    if (!d) return false;
+    var m = matcher(crn, sec), hit = false;
     boxes(d).forEach(function (b) {
       (b.lectures || []).forEach(function (r) { if (m.lec(r)) hit = true; });
       (b.exams || []).forEach(function (r) { if (m.ex(r)) hit = true; });
@@ -502,8 +513,83 @@
           !(d.archived[code].study_blocks || []).length) delete d.archived[code];
       dropFromSemester(code);
     }
-    if (n) schSave(d);
+    /*@3.SXLJ.63*/
+    Object.keys(d.archived || {}).forEach(function (k) {
+      var box = d.archived[k];
+      if (!box) { delete d.archived[k]; return; }
+      var any = ['lectures', 'exams', 'study_blocks', 'general_events']
+        .some(function (kk) { return (box[kk] || []).length; });
+      if (!any) delete d.archived[k];
+    });
+    /*@3.SXLJ.60*/
+    forgetPick(crn);
+    /*@3.SXLJ.59*/
+    if (n || (opts && opts.stopAuto) || d.sx_optout) schSave(d);
     return n;
+  }
+
+  function forgetPick(crn) {
+    crn = String(crn);
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); } catch (e) { return false; }
+    if (!p || !p.picks || !Array.isArray(p.picks.crns)) return false;
+    var i = p.picks.crns.indexOf(crn);
+    if (i < 0) return false;
+    p.picks.crns = p.picks.crns.slice();
+    p.picks.crns.splice(i, 1);
+    try { localStorage.setItem(PREF_KEY, JSON.stringify(p)); } catch (e) { return false; }
+    return true;
+  }
+
+  /*@3.SXLJ.61*/
+  function conflicts() {
+    var d = schLoad();
+    if (!d) return [];
+    var byCode = {};
+    function note(code, crn, what) {
+      if (!code || !crn) return;
+      var e = byCode[code] || (byCode[code] = { code: code, crns: {}, what: {} });
+      e.crns[crn] = 1;
+      (e.what[what] || (e.what[what] = {}))[crn] = 1;
+    }
+    (d.lectures || []).forEach(function (l) {
+      if (l && l.sx_crn) note(l.course_code, String(l.sx_crn), 'lecture');
+    });
+    (d.exams || []).forEach(function (x) {
+      if (x && x.sx_crn) note(x.course_code, String(x.sx_crn), x.exam_type || 'exam');
+    });
+    var out = [];
+    Object.keys(byCode).forEach(function (code) {
+      var e = byCode[code];
+      var crns = Object.keys(e.crns);
+      if (crns.length < 2) return;
+      var kinds = [];
+      Object.keys(e.what).forEach(function (w) {
+        if (Object.keys(e.what[w]).length > 1) kinds.push(w);
+      });
+      out.push({ code: code, crns: crns, kinds: kinds });
+    });
+    return out;
+  }
+
+  /*@3.SXLJ.62*/
+  function keepOnly(code, keepCrn) {
+    var d = schLoad();
+    if (!d) return 0;
+    keepCrn = String(keepCrn);
+    var seen = {};
+    boxes(d).forEach(function (b) {
+      (b.lectures || []).concat(b.exams || []).forEach(function (r) {
+        if (r && r.course_code === code && r.sx_crn) seen[String(r.sx_crn)] = 1;
+      });
+    });
+    var gone = 0;
+    Object.keys(seen).forEach(function (c) {
+      if (c === keepCrn) return;
+      unregister(c, null, { stopAuto: 'all' });
+      gone++;
+    });
+    return gone;
   }
 
   function anyEventFor(d, code) {
@@ -679,7 +765,9 @@
     hm24: hm24, iso: iso, examHM: examHM,
     lecSnap: lecSnap, exSnap: exSnap,
     rowsFor: rowsFor, matcher: matcher, boxes: boxes,
-    has: has, linked: linked, registered: registered, crnsOfCourse: crnsOfCourse,
+    has: has,
+    hasAnywhere: hasAnywhere, linked: linked, registered: registered, crnsOfCourse: crnsOfCourse,
+    forgetPick: forgetPick, conflicts: conflicts, keepOnly: keepOnly,
     register: register, unregister: unregister,
     optScope: function (crn) { return optScope(schLoad() || {}, crn); },
     setOptOut: setOptOut, clearOptOut: clearOptOut,

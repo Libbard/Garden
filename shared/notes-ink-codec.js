@@ -2,8 +2,10 @@
 ;(function () {
   'use strict';
 
-  var VER = 3;
-  var NIBS = ['round', 'fine', 'marker', 'flat'];
+  var VER = 4;
+  /*@3.NOICJ.8*/
+  var AZ_Q = 64, TZ_Q = 31;
+  var NIBS = ['round', 'fine', 'marker', 'flat', 'pencil', 'chalk'];
   var Q = 8;
   var P_MAX = 63;
   var RDP_EPS = 0.4;
@@ -81,9 +83,12 @@
   function encodeStrokes(strokes) {
     var w = new Writer();
     /*@3.NOICJ.7*/
-    var need = 2, z;
+    /*@3.NOICJ.9*/
+    var need = 2, z, hasTilt = [];
     for (z = 0; z < strokes.length; z++) {
-      if (colorIndex(strokes[z].color) === HEX_MARK) { need = VER; break; }
+      hasTilt[z] = tiltIn(strokes[z]);
+      if (hasTilt[z]) need = 4;
+      else if (need < 3 && colorIndex(strokes[z].color) === HEX_MARK) need = 3;
     }
     w.raw(need);
     w.u(strokes.length);
@@ -94,6 +99,8 @@
       w.raw(Math.max(0, TOOLS.indexOf(st.tool || 'pen')));
       /*@3.NOICJ.4*/
       w.raw(Math.max(0, NIBS.indexOf(st.nib || 'round')));
+      /*@3.NOICJ.10*/
+      if (need >= 4) w.raw(hasTilt[s] ? 1 : 0);
       w.u(Math.round((st.w || 2) * 4));
       /*@3.NOICJ.6*/
       var ci = colorIndex(st.color);
@@ -104,7 +111,7 @@
       }
       w.u(pts.length);
 
-      var px = 0, py = 0;
+      var px = 0, py = 0, pa = 0, pz = 0;
       for (var i = 0; i < pts.length; i++) {
         var qx = Math.round(pts[i].x * Q);
         var qy = Math.round(pts[i].y * Q);
@@ -114,6 +121,18 @@
         /*@3.NOICJ.2*/
         var pr = pts[i].p == null ? 0.5 : pts[i].p;
         w.raw(Math.max(0, Math.min(P_MAX, Math.round(pr * P_MAX))));
+      }
+      /*@3.NOICJ.12*/
+      if (hasTilt[s]) {
+        for (i = 0; i < pts.length; i++) {
+          var z1 = qz(pts[i].tz), a1 = qa(pts[i].az);
+          var dz = z1 - pz, da = turn(a1 - pa);
+          var ez = zig(dz), ea = zig(da);
+          w.raw(((ez > 14 ? 15 : ez) << 4) | (ea > 14 ? 15 : ea));
+          if (ez > 14) w.s(dz);
+          if (ea > 14) w.s(da);
+          pz = z1; pa = a1;
+        }
       }
     }
     return w.bytes();
@@ -130,6 +149,8 @@
     for (var s = 0; s < n; s++) {
       var tool = TOOLS[r.raw()] || 'pen';
       var nib = (ver >= 2) ? (NIBS[r.raw()] || 'round') : 'round';
+      /*@3.NOICJ.11*/
+      var tilt = (ver >= 4) ? !!r.raw() : false;
       var width = r.u() / 4;
       var cidx = r.u();
       var color;
@@ -141,16 +162,49 @@
       }
       var cnt = r.u();
       var pts = [];
-      var px = 0, py = 0;
+      var px = 0, py = 0, pa = 0, pz = 0;
 
       for (var i = 0; i < cnt; i++) {
         px += r.s(); py += r.s();
         var pr = r.raw() / P_MAX;
         pts.push({ x: px / Q, y: py / Q, p: pr });
       }
+      /*@3.NOICJ.13*/
+      if (tilt) {
+        for (i = 0; i < pts.length; i++) {
+          var byt = r.raw();
+          var hz = byt >> 4, ha = byt & 15;
+          pz += (hz === 15) ? r.s() : unzig(hz);
+          pa = ((pa + ((ha === 15) ? r.s() : unzig(ha))) % AZ_Q + AZ_Q) % AZ_Q;
+          pts[i].tz = Math.max(0, Math.min(1, pz / TZ_Q));
+          pts[i].az = (pa / AZ_Q) * Math.PI * 2;
+        }
+      }
       out.push({ tool: tool, nib: nib, w: width, color: color, pts: pts });
     }
     return out;
+  }
+
+  /*@3.NOICJ.14*/
+  function qz(v) { return Math.max(0, Math.min(TZ_Q, Math.round((v || 0) * TZ_Q))); }
+  function qa(v) {
+    var n = Math.round(((v || 0) / (Math.PI * 2)) * AZ_Q) % AZ_Q;
+    return n < 0 ? n + AZ_Q : n;
+  }
+
+  /*@3.NOICJ.15*/
+  function tiltIn(st) {
+    var a = (st && st.pts) || [];
+    for (var i = 0; i < a.length; i++) if (a[i] && a[i].tz != null) return true;
+    return false;
+  }
+
+  /*@3.NOICJ.16*/
+  function turn(d) {
+    var h = AZ_Q >> 1;
+    while (d > h) d -= AZ_Q;
+    while (d < -h) d += AZ_Q;
+    return d;
   }
 
   var PALETTE = ['ink', 'amber', 'rose', 'violet', 'emerald', 'sky', 'lime', 'orange', 'red', 'pink', 'teal', 'indigo',
@@ -270,6 +324,7 @@
     canCarry: canCarry,
     HEX_MARK: HEX_MARK,
     NIBS: NIBS,
+    VER: VER,
     VER: VER,
     RDP_EPS: RDP_EPS
   };

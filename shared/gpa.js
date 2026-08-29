@@ -20,6 +20,38 @@
   var catalogMap = {}, catalogArr = [];
   var whatIf = {}, pickerQ = '', scenario = '', editingId = null;
   var _chartDrawn = false, programCredits = 132;
+  /*@3.GPAJ.109*/
+  var PL_VER = 4;
+
+  /*@3.GPAJ.105*/
+  function progCredits() {
+    /*@3.GPAJ.106*/
+    if (programCredits !== 132) return programCredits;
+    try {
+      var prof = JSON.parse(localStorage.getItem('student_profile') || 'null');
+      var slug = prof && prof.program;
+      if (!slug) return programCredits;
+      var v = JSON.parse(localStorage.getItem('sx_plans') || 'null');
+      /*@3.GPAJ.108*/
+      if (!v || v.v !== PL_VER) return programCredits;
+      var progs = v.d && (Array.isArray(v.d) ? v.d : v.d.programs);
+      if (!progs) return programCredits;
+      for (var i = 0; i < progs.length; i++) {
+        if (progs[i].slug !== slug) continue;
+        /*@3.GPAJ.107*/
+        if (progs[i].ch > 60) { programCredits = Math.round(progs[i].ch); return programCredits; }
+        var n = 0;
+        (progs[i].courses || []).forEach(function (c) {
+          if (c.k === 'track' || (c.tr && c.tr.length)) return;
+          var h = (c.h != null ? c.h : c.ch);
+          n += (h == null ? 0 : +h) || 0;
+        });
+        if (n > 60) programCredits = Math.round(n);
+        return programCredits;
+      }
+    } catch (e) {}
+    return programCredits;
+  }
 
   /*@3.GPAJ.5*/
   function isAr() { return (document.documentElement.getAttribute('lang') || 'ar') === 'ar'; }
@@ -324,8 +356,9 @@
       if (c.grade && GPA_SCALE[c.grade] !== undefined) pts += GPA_SCALE[c.grade] * c.credits;
     });
     $('#m-credits').textContent = earned;
-    $('#m-credits-of').textContent = ' / ' + programCredits;
-    $('#m-credits-bar').style.width = Math.min(earned / programCredits * 100, 100) + '%';
+    var pc = progCredits();
+    $('#m-credits-of').textContent = ' / ' + pc;
+    $('#m-credits-bar').style.width = Math.min(earned / pc * 100, 100) + '%';
     /*@3.GPAJ.22*/
     $('#m-points').textContent = pts.toFixed(2);
     $('#m-points-of').textContent = ' / ' + (earned * 4).toFixed(0);
@@ -1478,7 +1511,7 @@
           '<div class="gp-xc-band" style="color:' + rampColor(cum) + '">' + esc(L(b.ar, b.en)) + '</div>' +
         '</div>' +
         '<div class="gp-xc-stats">' +
-          [[L('ساعات مجتازة', 'Credits earned'), ratio(earned, programCredits)],
+          [[L('ساعات مجتازة', 'Credits earned'), ratio(earned, progCredits())],
            [L('نقاط', 'Points'), ratio(Math.round(pts), earned * 4)],
            [L('مواد مقدّرة', 'Graded courses'), ratio(graded, total)]].map(function (r) {
             return '<div class="gp-xc-stat"><span>' + esc(r[0]) + '</span><b>' + esc(r[1]) + '</b></div>';

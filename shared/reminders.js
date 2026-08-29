@@ -513,6 +513,27 @@
     }).join('|');
   }
 
+  function rulesSnapshot() {
+    var R = window.GardenScheduleRules;
+    if (!R) return null;
+    var st = R.settings() || {};
+    var fp = st.focus_periods || {};
+    var shown = [];
+    try {
+      var wo = (scheduleRaw() || {}).week_overrides || {};
+      Object.keys(wo).forEach(function (w) { if (wo[w] && wo[w].show_lectures) shown.push(w); });
+    } catch (e) {}
+    return {
+      termStart: st.term_start_date || '',
+      termEnd: st.semester_end_date || '',
+      focus: [fp.midterm || null, fp.final || null].filter(function (p) {
+        return p && p.start && p.end;
+      }).map(function (p) { return { start: p.start, end: p.end }; }),
+      shownWeeks: shown,
+      at: Date.now()
+    };
+  }
+
   /*@3.REMJ.53*/
   function refreshQueue() {
     if (!window.GardenData || !GardenData.allDeadlines) return Promise.resolve(false);
@@ -520,6 +541,7 @@
     var sig = signature(items);
     if (sig === lastSig) return Promise.resolve(false);
     /*@3.REMJ.54*/
+    try { ReminderDB.setMeta('rules', rulesSnapshot()); } catch (e) {}
     return ReminderDB.replaceQueue(items).then(function () {
       lastSig = sig;
       /*@3.REMJ.55*/

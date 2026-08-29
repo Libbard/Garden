@@ -714,8 +714,31 @@
   };
 
   /*@3.NOEJ.35*/
+  /*@3.NOEJ.346*/
   function isDiagram(b) {
-    return b && b.ty === 'code' && /^mermaid$/i.test(String(b.lang || '').trim());
+    if (!b || b.ty !== 'code') return false;
+    var raw = String(b.lang || '').trim();
+    if (!raw) return false;
+    var C = window.GardenNotesCode;
+    if (C && C.isMermaid) return C.isMermaid(raw);
+    return /^(mermaid|mmd)$/i.test(raw);
+  }
+
+  /*@3.NOEJ.348*/
+  function langList() {
+    if (document.getElementById('ne-langs')) return;
+    var C = window.GardenNotesCode;
+    var all = (C && C.languages) ? C.languages() : [];
+    if (!all.length) return;
+    var dl = document.createElement('datalist');
+    dl.id = 'ne-langs';
+    all.sort();
+    for (var i = 0; i < all.length; i++) {
+      var o = document.createElement('option');
+      o.value = all[i];
+      dl.appendChild(o);
+    }
+    document.body.appendChild(dl);
   }
 
   var _mmdMod = null;
@@ -1204,9 +1227,11 @@
 
     } else if (b.ty === 'code') {
       var bar = el('div', 'ne-code-bar');
+      langList();
       var lang = el('input', 'ne-lang', {
         type: 'text', value: b.lang || '', placeholder: L('اللغة', 'Language'),
-        'aria-label': L('لغة الكود', 'Code language'), dir: 'ltr', spellcheck: 'false'
+        'aria-label': L('لغة الكود', 'Code language'), dir: 'ltr', spellcheck: 'false',
+        list: 'ne-langs'
       });
       bar.appendChild(lang);
       body.appendChild(bar);
@@ -1503,7 +1528,7 @@
       var barUI = window.GardenCanvasBar ? GardenCanvasBar.mount(bar, cv) : null;
       self.canvases = self.canvases || {};
       self.canvases[b.id] = cv;
-      cv.setTool('pen');
+      cv.setTool(GardenCanvas.lastTool ? GardenCanvas.lastTool() : 'pen');
       if (b.ink || (b.shapes && b.shapes.length)) cv.load(b.ink, b.h, b.shapes);
       cv.emit();
     }, 0);
@@ -1616,14 +1641,34 @@
       if (nb.wm == null) nb.wm = WIDE[ty] ? 'full' : (src.b.wm || 'fit');
       nb.z = this.topZ() + 1;
     }
+    /*@3.NOEJ.353*/
+    var fresh = isDiagram(nb);
+    if (fresh) nb.dgm = 0;
     this.insertAfter(afterId || this.lastBlockId(), nb);
     this.pushUndo(before);
     var nAt = this.blockAt(nb.id);
     if (nAt && !nb.fp) this.renderInsert(nAt.i, [nb]); else this.render();
-    this.focusBlock(nb.id);
+    if (fresh) { this._mmdFresh = nb.id; this.openCode(nb.id); }
+    else this.focusBlock(nb.id);
     this.touch();
     this.emitState();
     return nb.id;
+  };
+
+  Editor.prototype.openCode = function (id) {
+    var node = this.root.querySelector(':scope > [data-bid="' + id + '"]');
+    var pre = node ? node.querySelector('.ne-code') : null;
+    if (!pre) { this.focusBlock(id); return false; }
+    pre.hidden = false;
+    try {
+      pre.focus({ preventScroll: false });
+      var r = document.createRange();
+      r.selectNodeContents(pre);
+      var s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+    } catch (e) {}
+    return true;
   };
 
   Editor.prototype.lastBlockId = function () {
@@ -1884,12 +1929,46 @@
     return null;
   };
 
-  Editor.prototype.pasteRun = function (cd, node) {
+  /*@3.NOEJ.337*/
+  function snapClip(cd) {
+    if (!cd) return null;
+    var html = '', txt = '';
+    try { html = cd.getData('text/html') || ''; } catch (e) {}
+    try { txt = cd.getData('text/plain') || ''; } catch (e) {}
+    if (!html && !txt) return null;
+    return {
+      html: html, txt: txt,
+      getData: function (t) {
+        if (t === 'text/html') return this.html;
+        if (t === 'text/plain') return this.txt;
+        return '';
+      },
+      files: null, items: null
+    };
+  }
+
+  Editor.prototype.pasteRun = function (cd, node, mode) {
     var self = this;
     if (!node) node = this.pasteHost();
     if (!node) return false;
     needEmoji().then(function () { self.emojiSweep(); });
-    var res = SAN().fromClipboard(cd);
+    var snap = (cd && cd.__snap) ? cd : snapClip(cd);
+    if (!mode && this._plainNext) { mode = 'text'; this._plainNext = false; }
+    /*@3.NOEJ.352*/
+    var flat0 = '';
+    try { flat0 = (snap ? snap.txt : (cd ? cd.getData('text/plain') : '')) || ''; }
+    catch (e0) { flat0 = ''; }
+    var CC0 = window.GardenNotesCode;
+    var asMmd = mode !== 'text' && !!(CC0 && CC0.looksMermaid && CC0.looksMermaid(flat0));
+    var res;
+    if (asMmd) {
+      res = { blocks: [B().blank('code', { lang: 'mermaid', dgm: 1,
+        src: flat0.replace(/\r\n?/g, '\n').replace(/\s+$/, '') })] };
+    } else if (mode === 'text' && snap) {
+      res = { blocks: SAN().fromPlain ? SAN().fromPlain(snap.txt) : [] };
+    } else {
+      res = SAN().fromClipboard(snap || cd);
+    }
     if (res.rejectedImage) {
       if (this.opts.onImagePaste) this.opts.onImagePaste();
       return false;
@@ -1898,7 +1977,7 @@
     /*@3.NOEJ.96*/
     var hasHtml = false;
     try { hasHtml = !!(cd && cd.getData('text/html')); } catch (eh) {}
-    if (!hasHtml) {
+    if (!hasHtml && !asMmd) {
       var flat = cd ? cd.getData('text/plain') : '';
       if (flat && B().looksMarkdown && B().looksMarkdown(flat)) {
         blocks = B().fromMarkdown(flat);
@@ -1952,7 +2031,145 @@
     this.focusBlock(blocks[blocks.length - 1].id);
     this.touch();
     this.emitState();
+    if (snap) {
+      this._pasteOpt = {
+        before: before, at: at, n: blocks.length,
+        nodeId: id, snap: snap, mode: mode || 'full',
+        last: blocks[blocks.length - 1].id
+      };
+      this.showPasteOpts();
+    }
     return true;
+  };
+
+  /*@3.NOEJ.338*/
+  /*@3.NOEJ.343*/
+  var CB_OK = !!(window.navigator && navigator.clipboard &&
+                 (navigator.clipboard.read || navigator.clipboard.readText));
+
+  Editor.prototype.pasteFromClipboard = function (mode, atId) {
+    var self = this;
+    var ar = (document.documentElement.getAttribute('lang') || 'ar') === 'ar';
+    function say(m) { if (self.opts && self.opts.onNote) self.opts.onNote(m); }
+    if (!CB_OK) {
+      say(ar ? 'متصفّحُك لا يتيح قراءةَ الحافظة' : 'This browser cannot read the clipboard');
+      return Promise.resolve(false);
+    }
+    var node = atId ? this.root.querySelector(':scope > [data-bid="' + atId + '"]') : null;
+    if (!node) node = this.pasteHost();
+
+    function run(html, txt) {
+      if (!html && !txt) {
+        say(ar ? 'الحافظةُ فارغة' : 'The clipboard is empty');
+        return false;
+      }
+      var snap = { html: html || '', txt: txt || '', __snap: true,
+                   files: null, items: null,
+                   getData: function (t) {
+                     if (t === 'text/html') return this.html;
+                     if (t === 'text/plain') return this.txt;
+                     return '';
+                   } };
+      var okp = self.pasteRun(snap, node, mode === 'text' ? 'text' : undefined);
+      if (!okp) say(ar ? 'تعذّر اللصق' : 'Could not paste');
+      return okp;
+    }
+
+    if (navigator.clipboard.read) {
+      return navigator.clipboard.read().then(function (items) {
+        var jobs = [], html = '', txt = '';
+        (items || []).forEach(function (it) {
+          (it.types || []).forEach(function (ty) {
+            if (ty === 'text/html') jobs.push(it.getType(ty).then(function (b) { return b.text(); })
+              .then(function (s) { html = html || s; }));
+            else if (ty === 'text/plain') jobs.push(it.getType(ty).then(function (b) { return b.text(); })
+              .then(function (s) { txt = txt || s; }));
+          });
+        });
+        return Promise.all(jobs).then(function () { return run(html, txt); });
+      })['catch'](function () {
+        /*@3.NOEJ.344*/
+        if (!navigator.clipboard.readText) { say(ar ? 'لم يُسمح بقراءة الحافظة' : 'Clipboard access was denied'); return false; }
+        return navigator.clipboard.readText().then(function (s) { return run('', s); })
+          ['catch'](function () { say(ar ? 'لم يُسمح بقراءة الحافظة' : 'Clipboard access was denied'); return false; });
+      });
+    }
+    return navigator.clipboard.readText().then(function (s) { return run('', s); })
+      ['catch'](function () { say(ar ? 'لم يُسمح بقراءة الحافظة' : 'Clipboard access was denied'); return false; });
+  };
+
+  Editor.prototype.hidePasteOpts = function () {
+    if (this._pasteBar && this._pasteBar.parentNode) this._pasteBar.parentNode.removeChild(this._pasteBar);
+    this._pasteBar = null;
+  };
+
+  Editor.prototype.showPasteOpts = function () {
+    var self = this;
+    var st = this._pasteOpt;
+    if (!st || this.readOnly) return;
+    this.hidePasteOpts();
+    var ar = (document.documentElement.getAttribute('lang') || 'ar') === 'ar';
+    function L(a, e) { return ar ? a : e; }
+
+    var bar = document.createElement('div');
+    bar.className = 'ne-pasteopt';
+    bar.setAttribute('role', 'group');
+    bar.setAttribute('aria-label', L('خيارات اللصق', 'Paste options'));
+    var opts = [
+      { m: 'full', i: 'fa-paste', ar: 'لصقٌ كامل', en: 'Keep formatting' },
+      { m: 'text', i: 'fa-font', ar: 'النصُّ فقط', en: 'Text only' }
+    ];
+    if (clipAny()) opts.push({ m: 'blocks', i: 'fa-cubes', ar: 'العناصرُ المنسوخة', en: 'Copied blocks' });
+
+    var h = '';
+    for (var i = 0; i < opts.length; i++) {
+      var o = opts[i];
+      h += '<button type="button" class="ne-po-b' + (o.m === st.mode ? ' on' : '') +
+        '" data-pm="' + o.m + '" aria-pressed="' + (o.m === st.mode ? 'true' : 'false') +
+        '" aria-label="' + L(o.ar, o.en) + '" title="' + L(o.ar, o.en) + '">' +
+        '<i class="fa-solid ' + o.i + '" aria-hidden="true"></i>' +
+        '<span>' + L(o.ar, o.en) + '</span></button>';
+    }
+    bar.innerHTML = h;
+
+    var anchor = this.root.querySelector(':scope > [data-bid="' + st.last + '"]');
+    if (!anchor) return;
+    anchor.appendChild(bar);
+    this._pasteBar = bar;
+
+    bar.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pm]');
+      if (!b) return;
+      e.preventDefault();
+      self.repaste(b.getAttribute('data-pm'));
+    });
+
+    if (this._poTimer) clearTimeout(this._poTimer);
+    this._poTimer = setTimeout(function () { self.hidePasteOpts(); }, 12000);
+  };
+
+  Editor.prototype.repaste = function (mode) {
+    var st = this._pasteOpt;
+    if (!st || mode === st.mode) { this.hidePasteOpts(); return; }
+    this.hidePasteOpts();
+    /*@3.NOEJ.339*/
+    this.swapDoc(JSON.parse(st.before));
+    var popped = this.undo.pop();
+    this._undoB = Math.max(0, (this._undoB || 0) - (popped ? popped.length : 0));
+
+    var node = st.nodeId
+      ? this.root.querySelector(':scope > [data-bid="' + st.nodeId + '"]')
+      : null;
+    if (!node) node = this.pasteHost();
+
+    if (mode === 'blocks') {
+      this.pasteBlocks();
+      this._pasteOpt = null;
+      return;
+    }
+    st.snap.__snap = true;
+    this.pasteRun(st.snap, node, mode);
   };
 
   Editor.prototype.remove = function (id) {
@@ -4485,6 +4702,29 @@
     return this.lastBlockId();
   };
 
+  /*@3.NOEJ.354*/
+  Editor.prototype.selLink = function () {
+    var s;
+    try { s = window.getSelection(); } catch (e) { return null; }
+    if (!s || !s.rangeCount) return null;
+    var pick = function (n) {
+      if (!n) return null;
+      var el = (n.nodeType === 1) ? n : n.parentNode;
+      return (el && el.closest) ? el.closest('a[href], a[data-nl]') : null;
+    };
+    var a = pick(s.anchorNode);
+    if (!a || !this.root.contains(a)) return null;
+    var b = pick(s.focusNode);
+    return (b === a) ? a : null;
+  };
+
+  Editor.prototype.underline = function () {
+    var a = this.selLink();
+    if (!a) return this.applyMark('u', 1);
+    this._ctxLink = a;
+    return this.linkAct(a, 'lkline');
+  };
+
   Editor.prototype.exec = function (cmd, val) {
     var bid = this.activeBid();
     switch (cmd) {
@@ -4492,7 +4732,7 @@
       case 'redo': return this.hist ? this.hist.redo() : this.doRedo();
       case 'bold': return this.applyMark('b', 1);
       case 'italic': return this.applyMark('i', 1);
-      case 'underline': return this.applyMark('u', 1);
+      case 'underline': return this.underline();
       case 'strike': return this.applyMark('st', 1);
       case 'code': return this.applyMark('c', 1);
       case 'fg': return this.applyMark('fg', val);
@@ -4750,12 +4990,131 @@
     m.style.right = 'auto';
   };
 
+  /*@3.NOEJ.349*/
+  Editor.prototype.grabSel = function () {
+    this._ctxSel = null;
+    this._ctxSelTxt = '';
+    try {
+      var s = window.getSelection();
+      if (!s || !s.rangeCount || s.isCollapsed) return;
+      if (!this.root.contains(s.anchorNode) || !this.root.contains(s.focusNode)) return;
+      var r = s.getRangeAt(0);
+      var txt = String(s).replace(/\u200b/g, '');
+      if (!txt) return;
+      this._ctxSel = r.cloneRange();
+      this._ctxSelTxt = txt;
+    } catch (e) {}
+  };
+
+  Editor.prototype.putSel = function () {
+    var r = this._ctxSel;
+    if (!r) return null;
+    var host = r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentNode;
+    var edn = (host && host.closest) ? host.closest('[contenteditable="true"]') : null;
+    if (edn) { try { edn.focus({ preventScroll: true }); } catch (e) {} }
+    try {
+      var s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+    } catch (e2) { return null; }
+    return edn;
+  };
+
+  Editor.prototype.copySel = function (cut) {
+    var edn = this.putSel();
+    if (!this._ctxSel) return false;
+    var before = cut ? this.snapshot() : null;
+    var done = false;
+    try { done = document.execCommand(cut ? 'cut' : 'copy'); } catch (e) { done = false; }
+    if (!done) {
+      var box = document.createElement('div');
+      try { box.appendChild(this._ctxSel.cloneContents()); } catch (e1) {}
+      var txt = box.textContent || this._ctxSelTxt || '';
+      if (txt && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt)['catch'](function () {});
+        done = true;
+      }
+    }
+    if (cut && done) {
+      var node = edn ? edn.closest('[data-bid]') : null;
+      while (node && node.parentNode !== this.root) {
+        node = (node.parentNode && node.parentNode.closest)
+          ? node.parentNode.closest('[data-bid]') : null;
+      }
+      if (node) this.readBlock(node);
+      this.pushUndo(before);
+      this.touch();
+      this.emitState();
+    }
+    return done;
+  };
+
+  /*@3.NOEJ.350*/
+  Editor.prototype.linkHost = function (a) {
+    var node = a && a.closest ? a.closest('[data-bid]') : null;
+    while (node && node.parentNode !== this.root) {
+      node = (node.parentNode && node.parentNode.closest)
+        ? node.parentNode.closest('[data-bid]') : null;
+    }
+    return node;
+  };
+
+  Editor.prototype.linkAct = function (a, act) {
+    if (!a) return false;
+    var href = a.getAttribute('data-nl') || a.getAttribute('href') || '';
+    if (act === 'lkopen') {
+      if (/^https:/i.test(href)) window.open(href, '_blank', 'noopener,noreferrer');
+      else if (this.opts.onNoteLink) this.opts.onNoteLink(href);
+      return true;
+    }
+    if (act === 'lkcopy') {
+      if (href && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(href)['catch'](function () {});
+      }
+      if (this.opts.onNote) {
+        this.opts.onNote(L('نُسخ عنوانُ الرابط', 'Link address copied'));
+      }
+      return true;
+    }
+    if (act === 'lksel' || act === 'lkedit') {
+      try {
+        var r = document.createRange();
+        r.selectNodeContents(a);
+        var host0 = a.closest('[contenteditable="true"]');
+        if (host0) { try { host0.focus({ preventScroll: true }); } catch (eF) {} }
+        var s = window.getSelection();
+        s.removeAllRanges(); s.addRange(r);
+      } catch (e) {}
+      if (act === 'lkedit' && this.opts.onAskLink) this.opts.onAskLink();
+      return true;
+    }
+    var node = this.linkHost(a);
+    if (!node) return false;
+    var before = this.snapshot();
+    if (act === 'lkoff') {
+      var pa = a.parentNode;
+      while (a.firstChild) pa.insertBefore(a.firstChild, a);
+      pa.removeChild(a);
+    } else if (act === 'lkline') {
+      if (a.getAttribute('data-lu') === '0') a.removeAttribute('data-lu');
+      else a.setAttribute('data-lu', '0');
+    } else { return false; }
+    this.readBlock(node);
+    this.pushUndo(before);
+    this.renderOne(node.getAttribute('data-bid'));
+    this.touch();
+    this.emitState();
+    return true;
+  };
+
   /*@3.NOEJ.316*/
   Editor.prototype.openCtx = function (target, cx, cy) {
     if (this.readOnly) return false;
     if (!target || !this.root.contains(target)) return false;
     if (target.closest('.ne-menu') || target.closest('.ne-rail') ||
         target.closest('.ne-dgm-ed')) return false;
+    this.grabSel();
+    this._ctxLink = target.closest ? target.closest('a[href], a[data-nl]') : null;
     var node = target.closest ? target.closest('[data-bid]') : null;
     while (node && node.parentNode !== this.root) {
       node = (node.parentNode && node.parentNode.closest)
@@ -4785,6 +5144,52 @@
           'Right-click to add a field here or change an element.'));
   };
 
+  Editor.prototype.selHtml = function () {
+    var n = (this._ctxSelTxt || '').replace(/\s+/g, ' ').trim();
+    if (!n) return '';
+    var cut = n.length > 26 ? (n.slice(0, 26) + '…') : n;
+    return '<div class="ne-menu-h">' + B().esc(L('النصُّ المحدَّد', 'Selected text')) +
+      ' — <span class="ne-menu-q">' + B().esc(cut) + '</span></div>' +
+      mItem('selcopy', 'fa-copy', L('نسخُ النصّ', 'Copy text')) +
+      mItem('selcut', 'fa-scissors', L('قصُّ النصّ', 'Cut text'));
+  };
+
+  Editor.prototype.lkHtml = function () {
+    var a = this._ctxLink;
+    if (!a) return '';
+    var href = a.getAttribute('data-nl') || a.getAttribute('href') || '';
+    var off = a.getAttribute('data-lu') === '0';
+    var show = href.replace(/^https:\/\//i, '');
+    if (show.length > 30) show = show.slice(0, 30) + '…';
+    return '<div class="ne-menu-h">' + B().esc(L('الرابط', 'Link')) +
+      ' — <span class="ne-menu-q" dir="ltr">' + B().esc(show) + '</span></div>' +
+      mItem('lkopen', 'fa-arrow-up-right-from-square',
+            L('فتحٌ في نافذةٍ جديدة', 'Open in a new tab')) +
+      mItem('lkcopy', 'fa-link', L('نسخُ العنوان', 'Copy address')) +
+      mItem('lkedit', 'fa-pen', L('تعديلُ الرابط', 'Edit the link')) +
+      mItem('lksel', 'fa-highlighter', L('حدِّدْ نصَّه لتلوينه', 'Select its text to colour it')) +
+      mItem('lkline', 'fa-underline',
+            off ? L('أعِدِ الخطَّ السفليّ', 'Bring the underline back')
+                : L('أخفِ الخطَّ السفليّ', 'Hide the underline'),
+            false, off ? '' : 'is-on') +
+      mItem('lkoff', 'fa-link-slash', L('انزعِ الرابطَ وأبقِ النصّ', 'Remove the link, keep the text'));
+  };
+
+  /*@3.NOEJ.351*/
+  Editor.prototype.pasteHtml = function () {
+    var n = (Editor.clip && Editor.clip.length) ? Editor.clip.length
+          : (clipAny() ? (clipLoad().length || 0) : 0);
+    return '<div class="ne-menu-h">' + B().esc(L('اللصق', 'Paste')) + '</div>' +
+      mItem('cbfull', 'fa-paste', L('من الحافظة — بتنسيقه', 'From the clipboard — keep formatting'),
+            !CB_OK) +
+      mItem('cbtext', 'fa-font', L('من الحافظة — النصُّ فقط', 'From the clipboard — text only'),
+            !CB_OK) +
+      mItem('paste', 'fa-cubes',
+            n ? L('العناصرُ المنسوخة (' + n + ')', 'Copied blocks (' + n + ')')
+              : L('العناصرُ المنسوخة', 'Copied blocks'),
+            !clipAny());
+  };
+
   Editor.prototype.openMenu = function (id, anchor, kind, pt) {
     var self = this;
     this.closeMenu();
@@ -4799,6 +5204,8 @@
       var bb0 = hit ? hit.b : null;
       var i = hit ? hit.i : 0;
       var last = this.doc.blocks.length - 1;
+      html += this.selHtml();
+      html += this.lkHtml();
       html += '<div class="ne-menu-h">' + B().esc(L('هذه الكتلة', 'This block')) + '</div>';
       html += mItem('up', 'fa-arrow-up', L('تحريك لأعلى', 'Move up'), i <= 0);
       html += mItem('down', 'fa-arrow-down', L('تحريك لأسفل', 'Move down'), i >= last);
@@ -4821,10 +5228,9 @@
       /*@3.NOEJ.166*/
       html += mItem('sel', 'fa-square-check', L('تحديدُ الكتل', 'Select blocks'));
       html += mItem('dup', 'fa-clone', L('تكرار', 'Duplicate'));
-      html += mItem('copy', 'fa-copy', L('نسخ', 'Copy'));
-      html += mItem('paste', 'fa-paste', L('لصقٌ بعدها', 'Paste after'),
-                    !clipAny());
+      html += mItem('copy', 'fa-copy', L('نسخُ الكتلة', 'Copy the block'));
       html += mItem('del', 'fa-trash', L('حذف', 'Delete'), false, 'ne-menu-i--danger');
+      html += this.pasteHtml();
       /*@3.NOEJ.79*/
       var bb = hit ? hit.b : null;
       var wm = bb ? bb.wm : null;
@@ -4872,8 +5278,11 @@
         return mItem('here:' + k, it.icon, L(it.ar, it.en), false, '',
                      it.eg ? L(it.eg.ar, it.eg.en) : '');
       }).join('');
+      /*@3.NOEJ.345*/
+      html = this.selHtml() + this.lkHtml() + html + this.pasteHtml();
       html += '<div class="ne-menu-h">' + B().esc(L('الورقة', 'The page')) + '</div>';
-      html += mItem('phere', 'fa-paste', L('لصقٌ في آخرِ الوثيقة', 'Paste at the end'), !clipAny());
+      html += mItem('phere', 'fa-cubes', L('العناصرُ المنسوخةُ في آخرِ الوثيقة',
+                                           'Copied blocks at the end'), !clipAny());
       html += mItem('pend', 'fa-arrow-down', L('أضِفْ فقرةً في آخرِ الوثيقة',
                                                     'Add a paragraph at the end'));
       html += mItem('sel', 'fa-square-check', L('تحديدُ الكتل', 'Select blocks'));
@@ -4942,8 +5351,21 @@
         if (id) { self.toggleBlockSel(id, true); self._bselLast = id; }
       }
       else if (act === 'dup') self.duplicate(id);
+      else if (act === 'selcopy' || act === 'selcut') {
+        if (!self.copySel(act === 'selcut') && self.opts.onNote) {
+          self.opts.onNote(L('تعذّر النسخُ من هنا — جرّبْ Ctrl+C.',
+                             'Could not copy from here — try Ctrl+C.'));
+        }
+      }
+      else if (act.indexOf('lk') === 0) self.linkAct(self._ctxLink, act);
       else if (act === 'copy') { self.toggleBlockSel(id, true); self.copyBlocks(); }
-      else if (act === 'paste') { self.toggleBlockSel(id, true); self.pasteBlocks(); }
+      else if (act === 'paste') {
+        if (id) self.toggleBlockSel(id, true); else self.clearBlockSel();
+        self.pasteBlocks();
+      }
+      else if (act === 'cbfull' || act === 'cbtext') {
+        self.pasteFromClipboard(act === 'cbtext' ? 'text' : 'full', id);
+      }
       else if (act === 'del') self.remove(id);
     });
     /*@3.NOEJ.110*/
@@ -5291,6 +5713,13 @@
       if (e.target.classList.contains('ne-code')) {
         self.readBlock(node);
         var hit = self.blockAt(node.getAttribute('data-bid'));
+        if (hit && self._mmdFresh === hit.b.id && isDiagram(hit.b)) {
+          self._mmdFresh = null;
+          hit.b.dgm = 1;
+          self.renderOne(hit.b.id);
+          self.touch();
+          return;
+        }
         if (hit) paintCode(e.target, hit.b);
         return;
       }
@@ -5396,9 +5825,27 @@
         }
       }
       if (e.target.classList.contains('ne-lang')) {
+        /*@3.NOEJ.347*/
         var hitL = self.blockAt(node.getAttribute('data-bid'));
         var preL = node.querySelector('.ne-code');
-        if (hitL && preL && document.activeElement !== preL) paintCode(preL, hitL.b);
+        if (hitL) {
+          var wasD = !!node.querySelector('.ne-dgm');
+          hitL.b.lang = e.target.value || '';
+          if (isDiagram(hitL.b) !== wasD) {
+            var caret = e.target.selectionStart;
+            if (preL) hitL.b.src = preL.textContent || '';
+            self.renderOne(hitL.b.id);
+            var back = self.root.querySelector(
+              ':scope > [data-bid="' + hitL.b.id + '"] .ne-lang');
+            if (back) {
+              back.focus();
+              try { back.setSelectionRange(caret, caret); } catch (eR) {}
+            }
+            self.softTouch();
+            return;
+          }
+          if (preL && document.activeElement !== preL) paintCode(preL, hitL.b);
+        }
       }
       self.softTouch();
     });
@@ -5672,6 +6119,10 @@
         if (mod && k === 'v') { e.preventDefault(); self.pasteBlocks(); return; }
         if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); self.deleteBlocks(); return; }
         if (e.key === 'Escape') { e.preventDefault(); self.clearBlockSel(); return; }
+      } else if (mod && e.shiftKey && keyOf(e) === 'v') {
+        /*@3.NOEJ.340*/
+        self._plainNext = true;
+        setTimeout(function () { self._plainNext = false; }, 1200);
       } else if (mod && keyOf(e) === 'v' && Editor.clip && Editor.clip.length) {
         var here = e.target.closest('[data-bid]');
         if (here && !e.target.isContentEditable) { e.preventDefault(); self.pasteBlocks(); return; }
@@ -5903,27 +6354,64 @@
       self.openMenu(id2, t, 'insert');
     });
 
+    /*@3.NOEJ.341*/
+    function elOf(t) {
+      if (t && t.nodeType !== 1) t = t.parentElement;
+      return (t && t.nodeType === 1) ? t : null;
+    }
+
     root.addEventListener('paste', function (e) {
-      var node = e.target.closest('[data-bid]');
+      var tgt = elOf(e.target);
+      if (!tgt) return;
+      var node = tgt.closest('[data-bid]');
       if (!node) return;
       /*@3.NOEJ.4*/
-      if (e.target.classList.contains('ne-code') ||
-          e.target.classList.contains('ne-tex')) {
+      if (tgt.classList.contains('ne-code') ||
+          tgt.classList.contains('ne-tex')) {
         /*@3.NOEJ.137*/
         e.preventDefault();
         var flatTxt = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
         if (flatTxt) {
           try { document.execCommand('insertText', false, flatTxt); }
           catch (ep) {
-            e.target.textContent += flatTxt;
+            tgt.textContent += flatTxt;
           }
         }
         return;
       }
-      if (e.target.tagName === 'INPUT') return;
+      if (tgt.tagName === 'INPUT') return;
 
       e.preventDefault();
       self.pasteRun(e.clipboardData, node);
+    });
+
+    /*@3.NOEJ.342*/
+    root.addEventListener('input', function () { self.hidePasteOpts(); });
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && self._pasteBar) { e.stopPropagation(); self.hidePasteOpts(); }
+    }, true);
+    document.addEventListener('pointerdown', function (e) {
+      if (!self._pasteBar) return;
+      if (e.target && e.target.closest && e.target.closest('.ne-pasteopt')) return;
+      self.hidePasteOpts();
+    }, true);
+
+    root.addEventListener('beforeinput', function (e) {
+      if (e.inputType !== 'insertFromPaste' && e.inputType !== 'insertFromPasteAsQuotation') return;
+      var dt = e.dataTransfer;
+      if (!dt || typeof dt.getData !== 'function') return;
+      var tgt = elOf(e.target);
+      if (!tgt) return;
+      if (tgt.classList.contains('ne-code') || tgt.classList.contains('ne-tex')) return;
+      if (tgt.tagName === 'INPUT') return;
+      var node = tgt.closest('[data-bid]');
+      if (!node) return;
+      var html = '', txt = '';
+      try { html = dt.getData('text/html') || ''; } catch (eh) {}
+      try { txt = dt.getData('text/plain') || ''; } catch (et) {}
+      if (!html && !txt) return;
+      e.preventDefault();
+      self.pasteRun(dt, node);
     });
 
     this._onDocPaste = function (e) {

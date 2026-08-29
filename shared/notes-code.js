@@ -108,6 +108,19 @@
       line: '#', q: '"\'', sig: '$', ty: 0
     },
     latex: { kw: '', line: '%', q: '', sig: '\\', ty: 0 },
+    /*@3.NOCJ2.6*/
+    mermaid: {
+      kw: 'flowchart graph subgraph end direction classDef class style linkStyle click href call callback ' +
+          'sequenceDiagram participant actor activate deactivate note over left right loop alt else opt ' +
+          'par and critical option break rect autonumber box ' +
+          'classDiagram stateDiagram stateDiagram-v2 state erDiagram journey gantt pie mindmap timeline ' +
+          'gitGraph commit branch checkout merge cherry-pick tag ' +
+          'quadrantChart xychart bar line sankey block columns requirementDiagram requirement element ' +
+          'C4Context C4Container Person System Boundary Rel ' +
+          'title section dateFormat axisFormat excludes todayMarker accTitle accDescr ' +
+          'TB TD BT RL LR of as',
+      line: '%%', q: '"`', ty: 0
+    },
     html: { html: 1 }
   };
 
@@ -140,7 +153,12 @@
     'dockerfile': 'docker', 'containerfile': 'docker',
     'makefile': 'make', 'mk': 'make',
     'tex': 'latex', 'bibtex': 'latex',
-    'php3': 'php', 'php7': 'php', 'php8': 'php'
+    'php3': 'php', 'php7': 'php', 'php8': 'php',
+    'mmd': 'mermaid', 'mermaidjs': 'mermaid', 'mermaid-js': 'mermaid',
+    'flowchart': 'mermaid', 'graph': 'mermaid', 'sequencediagram': 'mermaid',
+    'classdiagram': 'mermaid', 'statediagram': 'mermaid', 'erdiagram': 'mermaid',
+    'gantt': 'mermaid', 'mindmap': 'mermaid', 'gitgraph': 'mermaid',
+    'diagram': 'mermaid', 'mermade': 'mermaid'
   };
 
   function norm(lang) {
@@ -358,10 +376,37 @@
     return Object.keys(LANG).filter(function (k) { return k !== 'html'; });
   }
 
+  function isMermaid(lang) { return norm(lang) === 'mermaid'; }
+
+  /*@3.NOCJ2.7*/
+  var MMD_HEAD = new RegExp('^(?:graph|flowchart|sequenceDiagram|classDiagram|' +
+    'stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|mindmap|timeline|gitGraph|' +
+    'quadrantChart|xychart-beta|sankey-beta|block-beta|kanban|packet-beta|' +
+    'C4(?:Context|Container|Component|Dynamic|Deployment)|requirementDiagram|' +
+    'architecture-beta|radar-beta|treemap-beta|zenuml)\\b', 'i');
+
+  function looksMermaid(text) {
+    var raw = String(text == null ? '' : text).replace(/\r\n?/g, '\n').trim();
+    if (!raw || raw.length > 400000) return false;
+    var lines = raw.split('\n');
+    var head = '', i, ln;
+    for (i = 0; i < lines.length; i++) {
+      ln = lines[i].trim();
+      if (!ln || ln.indexOf('%%') === 0) continue;
+      head = ln;
+      break;
+    }
+    if (!head || !MMD_HEAD.test(head)) return false;
+    for (i = i + 1; i < lines.length; i++) if (lines[i].trim()) return true;
+    return false;
+  }
+
   window.GardenNotesCode = {
     paint: paint,
     tokenize: tokenize,
     norm: norm,
+    isMermaid: isMermaid,
+    looksMermaid: looksMermaid,
     languages: languages,
     ALIAS: ALIAS
   };

@@ -1946,10 +1946,11 @@
       dimg.style.cssText = 'display:block;margin:0 auto;inline-size:' + dw +
         'px;block-size:' + dh + 'px';
       /*@3.NOAJ.198*/
+      /*@3.NOAJ.201*/
       var baked = null;
       try {
         var Mm = window.GardenNotesMermaid;
-        baked = (Mm && Mm.bake) ? Mm.bake(sv, dw, dh) : null;
+        baked = (Mm && Mm.bake) ? Mm.bake(sv, dw, dh, printDark() ? 'dark' : 'light') : null;
       } catch (eD) { baked = null; }
       if (!baked) {
         var preB = host.parentNode ? host.parentNode.querySelector('.ne-code') : null;
@@ -1973,16 +1974,18 @@
       list[i].classList.remove('ne-sizing');
     }
     /*@3.NOAJ.83*/
+    /*@3.NOAJ.200*/
     n = clone.querySelector('.na-page');
     if (n) {
       var bg = (ed && ed.doc && ed.doc.bg) || {};
       var lit = (typeof bg.c === 'string' && bg.c.charAt(0) === '#')
         ? paperHex(bg.c)
-        : (PAPER[bg.c] ? PAPER[bg.c].light : '');
+        : (PAPER[bg.c] ? (printDark() ? PAPER[bg.c].dark : PAPER[bg.c].light) : '');
       if (lit) {
         n.style.setProperty('--na-paper', lit);
         n.setAttribute('data-tinted', '1');
-        n.setAttribute('data-paper', 'light');
+        var plum = (window.GardenCanvas && GardenCanvas.lumOf) ? GardenCanvas.lumOf(lit) : null;
+        n.setAttribute('data-paper', (plum != null && plum > 0.34) ? 'light' : 'dark');
       } else {
         n.style.removeProperty('--na-paper');
         n.setAttribute('data-tinted', '0');
@@ -2002,6 +2005,16 @@
       sh.appendChild(slot);
     }
     return '<div class="na" data-width="a4">' + clone.outerHTML + '</div>';
+  }
+
+  function printMode() {
+    var PT = window.GardenPrintTheme;
+    return PT ? PT.readMode() : 'paper';
+  }
+
+  function printDark() {
+    var PT = window.GardenPrintTheme;
+    return !!(PT && PT.isDark(PT.readMode()));
   }
 
   /*@3.NOAJ.84*/
@@ -2053,12 +2066,36 @@
     pm.rootAttrs = printRootAttrs();
     pm.dir = isAr() ? 'rtl' : 'ltr';
     pm.range = pageRange();
+    pm.printMode = printMode();
+    pm.board = boardBox();
     return pm;
+  }
+
+  /*@3.NOAJ.204*/
+  function boardBox() {
+    if (!ed || !ed.doc || ed.doc.kind !== 'board') return null;
+    var cv = inkCv();
+    var bb = cv && cv.contentBox ? cv.contentBox() : null;
+    if (!bb || !(bb.w > 0) || !(bb.h > 0)) return null;
+    var pad = 28;
+    return { x: Math.round(bb.x - pad), y: Math.round(bb.y - pad),
+             w: Math.round(bb.w + pad * 2), h: Math.round(bb.h + pad * 2) };
   }
 
   function expMsg(txt) {
     var p = document.querySelector('#na-exp .na-pg-hint');
     if (p) p.textContent = txt;
+  }
+
+  function wirePrintTheme() {
+    var sel = document.getElementById('na-prt-theme');
+    var PT = window.GardenPrintTheme;
+    if (!sel || !PT) return;
+    sel.value = PT.readMode();
+    if (window.GardenSelect && GardenSelect.sync) GardenSelect.sync(sel);
+    if (sel._ptWired) return;
+    sel._ptWired = true;
+    sel.addEventListener('change', function () { PT.writeMode(this.value); });
   }
 
   /*@3.NOAJ.162*/
@@ -2192,7 +2229,7 @@
     EXP_RNG = { on: false, a: 1, b: expTotalPages() };
     setExpTab('out');
     impMsg('', '');
-    var fmts = dlg.querySelector('#na-exp-fmts');
+    wirePrintTheme();    var fmts = dlg.querySelector('#na-exp-fmts');
     var Sz = window.GardenNotesSerialize;
     if (fmts && Sz) {
       /*@3.NOAJ.156*/
@@ -2308,11 +2345,19 @@
           : L('استُوردت ' + made.length + ' ملاحظات.', made.length + ' notes imported.'));
         reload({ keepOpen: true });
         if (made.length === 1) openNote(made[0].id);
+        closeExport(1500);
       }, function () {
         impMsg('error', L('تعذّر حفظُ الملاحظات المستورَدة.', 'The imported notes could not be saved.'));
       });
     };
     fr.readAsText(file);
+  }
+
+  function closeExport(wait) {
+    var dlg = document.getElementById('na-exp');
+    if (!dlg) return;
+    setTimeout(function () { try { if (dlg.open) dlg.close(); } catch (e) {} },
+               Math.max(0, wait || 0));
   }
 
   function runExport(fmt) {
@@ -2344,9 +2389,10 @@
         if (ok) saveState('saved', L('صُدِّرت ' + items.length, items.length + ' exported'));
         else saveState('error', L('لا محتوى للتصدير', 'Nothing to export'));
         setTimeout(function () { saveState('', ''); }, 2200);
+        /*@3.NOAJ.203*/
+        if (ok) closeExport(900);
       });
     })['catch'](function () { saveState('error', L('تعذّر التصدير', 'Export failed')); });
-    try { dlg.close(); } catch (e3) {}
   }
 
   /*@3.NOAJ.136*/
@@ -2481,6 +2527,7 @@
             .sort(function (x, y) { return (y.updated_at || 0) - (x.updated_at || 0); })
             .slice(0, 80);
         },
+        onAskLink: function () { if (ribbon && ribbon.askLink) ribbon.askLink(); },
         onLinkMiss: function () {
           saveState('error', L('لا يوجد عنوانٌ بهذا الاسم في الملاحظة.',
                                'No heading with that name in this note.'));
@@ -5303,6 +5350,8 @@
         adoptQuick(adopt);
       } else if (wanted && idxFind(wanted)) openNote(wanted);
       else if (qs.get('new') === '1') createNote();
+      /*@3.NOAJ.202*/
+      else if (!idxRead().length) createNote();
     } catch (e) {}
 
     runReconcile(false);

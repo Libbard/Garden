@@ -153,14 +153,105 @@
     return _styleMap;
   }
 
+  /*@3.GADJ.160*/
+  var HUE_MIN = 26;
+
+  function hueOf(hex) {
+    var h = normHex(hex); if (!h) return -1;
+    var r = parseInt(h.substr(1, 2), 16) / 255,
+        g = parseInt(h.substr(3, 2), 16) / 255,
+        b = parseInt(h.substr(5, 2), 16) / 255;
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    if (d < 0.04) return -1;                       /*@3.GADJ.161*/
+    var q;
+    if (mx === r) q = ((g - b) / d) % 6;
+    else if (mx === g) q = (b - r) / d + 2;
+    else q = (r - g) / d + 4;
+    q *= 60; if (q < 0) q += 360;
+    return q;
+  }
+
+  function hueFar(hex, taken) {
+    var h = hueOf(hex);
+    for (var i = 0; i < taken.length; i++) {
+      var t = taken[i];
+      if (h < 0 || t < 0) { if (h === t) return false; continue; }
+      var d = Math.abs(h - t); if (d > 180) d = 360 - d;
+      if (d < HUE_MIN) return false;
+    }
+    return true;
+  }
+
+  var _autoRaw = null, _autoMap = {};
+  function autoColorMap() {
+    var codes = [], stamp = '';
+    styleMap();                     /*@3.GADJ.162*/
+    try {
+      var sem = readJSON(LS.semester, null);
+      (((sem && sem.courses) || [])).forEach(function (c) {
+        if (c && c.code && isRealCourse(c.code)) codes.push(String(c.code));
+      });
+    } catch (e) {}
+    try {
+      var s = readJSON(LS.schedule, null);
+      (((s && s.lectures) || [])).forEach(function (l) {
+        if (l && l.course_code && codes.indexOf(String(l.course_code)) === -1
+            && isRealCourse(l.course_code)) codes.push(String(l.course_code));
+      });
+    } catch (e) {}
+    codes.sort();
+    stamp = codes.join(',') + '|' + (_styleRaw || '');
+    if (stamp === _autoRaw) return _autoMap;
+
+    /*@3.GADJ.163*/
+    var taken = [], need = [];
+    codes.forEach(function (c) {
+      var mine = normHex((styleMap()[c] || {}).color);
+      var info = courseInfo(c);
+      var cat = normHex(info && info.brand_color);
+      if (mine) { taken.push(hueOf(mine)); return; }
+      if (cat) { taken.push(hueOf(cat)); return; }
+      need.push(c);
+    });
+
+    var kept = taken.slice();      /*@3.GADJ.164*/
+    var map = {}, step = 5, at = 0, n = PALETTE.length;
+    need.forEach(function (c) {
+      var pick = '';
+      for (var k = 0; k < n; k++) {
+        var cand = PALETTE[(at + k * step) % n].hex;
+        if (taken.indexOf(hueOf(cand)) !== -1) continue;
+        if (!hueFar(cand, taken)) continue;
+        pick = cand; break;
+      }
+      /*@3.GADJ.165*/
+      if (!pick) {
+        taken = kept.slice();
+        for (var k2 = 0; k2 < n; k2++) {
+          var c2 = PALETTE[(at + k2 * step) % n].hex;
+          if (hueFar(c2, taken)) { pick = c2; break; }
+        }
+        if (!pick) pick = PALETTE[at % n].hex;
+      }
+      map[c] = pick;
+      taken.push(hueOf(pick));
+      at = (at + step) % n;
+    });
+
+    _autoRaw = stamp; _autoMap = map;
+    return map;
+  }
+
+  function dropAutoColors() { _autoRaw = null; _autoMap = {}; }
+
   /*@3.GADJ.14*/
   function courseColor(code, entry) {
     var mine = normHex((styleMap()[code] || {}).color);
     if (mine) return mine;
     var info = courseInfo(code);
-    return (info && info.brand_color) ||
-           (entry && entry.brand_color) ||
-           COLOR_DEF;
+    var cat = (info && info.brand_color) || (entry && entry.brand_color);
+    if (cat) return cat;
+    return autoColorMap()[code] || COLOR_DEF;
   }
 
   /*@3.GADJ.15*/
@@ -191,7 +282,7 @@
     if (!cur.color && !cur.icon) delete p.courseStyle[code];
     try { localStorage.setItem(LS.prefs, JSON.stringify(p)); } catch (e) {}
     _styleRaw = null;                       /*@3.GADJ.19*/
-    var now = courseColor(code);
+    dropAutoColors();    var now = courseColor(code);
     try {
       document.dispatchEvent(new CustomEvent('garden:courseColorChanged', {
         detail: { code: code, color: now, custom: !!v }
@@ -933,10 +1024,21 @@
 
   /*@3.GADJ.67*/
 
+  function announceSchedule(from) {
+    if (window.GardenScheduleRules && GardenScheduleRules.announce) {
+      GardenScheduleRules.announce(from); return;
+    }
+    try {
+      window.dispatchEvent(new CustomEvent('garden:scheduleChanged', { detail: { from: from } }));
+    } catch (e) {}
+  }
+
   function writeSchedule(s) {
     s.updated_at = new Date().toISOString();
-    try { localStorage.setItem(LS.schedule, JSON.stringify(s)); return true; }
+    try { localStorage.setItem(LS.schedule, JSON.stringify(s)); }
     catch (e) { return false; }
+    announceSchedule('garden-data');
+    return true;
   }
 
   /*@3.GADJ.142*/
@@ -1839,6 +1941,7 @@
     COLOR_DEFAULT: COLOR_DEF,
     normHex: normHex,
     courseColor: courseColor,
+    dropAutoColors: dropAutoColors,
     courseColorBase: courseColorBase,
     courseColorSource: courseColorSource,
     setCourseColor: setCourseColor,

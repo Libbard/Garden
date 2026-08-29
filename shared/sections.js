@@ -280,7 +280,10 @@
       t('أبقِها', 'Keep it'),
       function () {
         var n = schUnregister(crn);
+        /*@3.SECJ.480*/
+        dropFromBasket(crn);
         paintBasket();
+        paintConflicts();
         emitScheduleChanged();
         toast(n ? t('حُذفت من جدولك', 'Removed from your schedule')
                 : t('لم يبقَ منها شيء', 'Nothing left to remove'));
@@ -545,6 +548,7 @@
     render();
     paintCount();
     paintBasket();
+    paintConflicts();
     $('#sx-clear').hidden = !(state.cities.length || state.subjects.length ||
       state.gender !== 'all' || state.status !== 'all' || state.mode !== 'all' ||
       state.prep === 'on' || state.mine === 'on' || state.q ||
@@ -1023,6 +1027,17 @@
   }
   function inBasket(crn) { return basket().indexOf(String(crn)) >= 0; }
 
+  /*@3.SECJ.481*/
+  function dropFromBasket(crn) {
+    crn = String(crn);
+    var list = basket();
+    var i = list.indexOf(crn);
+    if (i < 0) return false;
+    list = list.slice(); list.splice(i, 1);
+    saveProf({ picks: { term: state.term, crns: list } });
+    return true;
+  }
+
   /*@3.SECJ.67*/
   function seedBasketFromSchedule() {
     var reg = schRegistered();
@@ -1100,6 +1115,7 @@
     if (i >= 0) list.splice(i, 1); else list.push(crn);
     saveProf({ picks: { term: state.term, crns: list } });
     paintBasket();
+    paintConflicts();
     /*@3.SECJ.72*/
     $$('.sx-pick[data-pick="' + crn + '"]').forEach(function (b) {
       var on = list.indexOf(crn) >= 0;
@@ -1107,6 +1123,69 @@
       b.innerHTML = '<i class="fa-solid fa-' + (on ? 'check' : 'plus') + '"></i>';
     });
   }
+  /*@3.SECJ.484*/
+  function paintConflicts() {
+    var host = $('#sx-conflict');
+    if (!host || !SXL() || !SXL().conflicts) return;
+    var list = [];
+    try { list = SXL().conflicts() || []; } catch (e) { list = []; }
+    if (!list.length) { host.hidden = true; host.innerHTML = ''; return; }
+
+    var byCrn = {};
+    (state.all || []).forEach(function (s) { byCrn[String(s.crn)] = s; });
+
+    host.innerHTML = list.map(function (c) {
+      /*@3.SECJ.485*/
+      var name = c.code;
+      try {
+        if (window.GardenData && GardenData.courseInfo) {
+          var ci = GardenData.courseInfo(c.code);
+          if (ci && (ci.name_ar || ci.name_en)) name = (isAr() ? ci.name_ar : ci.name_en) || c.code;
+        }
+      } catch (e) {}
+      var opts = c.crns.map(function (crn) {
+        var s = byCrn[crn];
+        var when = s ? slotWords(s) : '';
+        return '<button type="button" class="sx-cf-pick" data-keep="' + esc(crn) +
+          '" data-code="' + esc(c.code) + '">' +
+          '<b dir="ltr">' + esc(crn) + '</b>' +
+          (when ? '<span>' + esc(when) + '</span>' : '') +
+          '<i class="fa-solid fa-check"></i></button>';
+      }).join('');
+      return '<div class="sx-cf">' +
+        '<div class="sx-cf-h"><i class="fa-solid fa-triangle-exclamation"></i>' +
+        '<b>' + esc(t('شعبتان لمادّةٍ واحدة', 'Two sections for one course')) + '</b></div>' +
+        '<p class="sx-cf-p">' + esc(
+          t('في جدولك شعبتان لـ' + name + '. اختر الصحيحة — وتُلغى الأخرى تماماً ولن تعود.',
+            'Your schedule has two sections for ' + name + '. Pick the right one — the other is removed for good.')) +
+        '</p><div class="sx-cf-opts">' + opts + '</div></div>';
+    }).join('');
+    host.hidden = false;
+
+    host.querySelectorAll('[data-keep]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var keep = b.getAttribute('data-keep'), code = b.getAttribute('data-code');
+        var gone = SXL().keepOnly(code, keep);
+        emitScheduleChanged();
+        paintConflicts(); paintBasket(); apply();
+        toast(t('أُبقيت ' + keep + ' وأُلغيت ' + gone + ' شعبة',
+                'Kept ' + keep + ' and removed ' + gone + ' section' + (gone > 1 ? 's' : '')));
+      });
+    });
+  }
+
+  /*@3.SECJ.486*/
+  function slotWords(sec) {
+    var rows = [];
+    (sec.mg || []).forEach(function (m) {
+      if (m.type !== 'CLAS' && m.type !== 'VRTL') return;
+      (m.days || []).forEach(function (d) {
+        rows.push((isAr() ? DAY_AR : DAY_EN)[d] + ' ' + hhmm(SXL().hm24(m.begin)));
+      });
+    });
+    return rows.slice(0, 3).join(' · ');
+  }
+
   function paintBasket() {
     var host = $('#sx-basket');
     if (!host) return;
@@ -1232,6 +1311,9 @@
     crns = crns.filter(function (c) { return known[c]; });
     if (!crns.length) return null;
     /*@3.SECJ.477*/
+    /*@3.SECJ.482*/
+    crns = crns.filter(function (c) { return schLinked(c); });
+    if (!crns.length) return null;
     schRegister(crns, { pending: false, noAdopt: true });
     return schRegister.lastReport || null;
   }
@@ -1253,14 +1335,9 @@
     toast(parts.join(' · '));
   }
 
+  /*@3.SECJ.483*/
   function schRegistered() {
-    var out = SXL().registered();
-    /*@3.SECJ.99*/
-    basket().forEach(function (c) {
-      if (out[String(c)]) return;
-      if (schHas(c)) out[String(c)] = 1;
-    });
-    return out;
+    return SXL().registered();
   }
 
   /*@3.SECJ.371*/
@@ -1464,7 +1541,7 @@
     var tip = kind.tt + (room ? ' · ' + (bld ? bld + ' — ' : '') + room : '');
     return '<div class="sx-slot sx-slot--' + kind.c + '" title="' + esc(tip) + '">' +
       '<i class="fa-solid ' + kind.i + '"></i><b>' + esc(dayList(m.days)) + '</b>' +
-      '<span>' + esc(hhmm(m.begin)) + '–' + esc(hhmm(m.end)) + '</span>' +
+      '<span class="gd-clock">' + esc(hhmm(m.begin)) + '–' + esc(hhmm(m.end)) + '</span>' +
       (room ? '<u class="sx-room">' + esc(room) + '</u>' : '') + '</div>';
   }
   /*@3.SECJ.377*/
@@ -1476,7 +1553,7 @@
   function slotExam(m, label) {
     if (!m) return '<div class="sx-slot sx-slot--ex sx-slot--none">' + esc(label) + ' —</div>';
     return '<div class="sx-slot sx-slot--ex"><i class="fa-solid fa-file-pen"></i>' +
-      '<b>' + esc(label) + '</b><span>' + esc(dt(m.start_date)) +
+      '<b>' + esc(label) + '</b><span class="gd-clock">' + esc(dt(m.start_date)) +
       (m.begin ? ' · ' + esc(examWord(m.begin)) : '') + '</span></div>';
   }
   var EMPTY_SLOT = '<div class="sx-slot sx-slot--none">···</div>';
@@ -2033,7 +2110,9 @@
         return '<li class="sx-wl-i">' +
           '<span class="sx-wl-k">' + esc((ar ? WK_AR : WK_EN)[w.kind] || w.kind) + '</span>' +
           /*@3.SECJ.148*/
-          '<span class="sx-wl-t">' + esc(w.kind === 'term'
+          /*@3.SECJ.489*/
+          '<span class="sx-wl-t' + (w.kind === 'term' ? '' : ' is-code') + '">' +
+            esc(w.kind === 'term'
               ? t('أيُّ فصلٍ ينزل', 'Any new term') : w.target) + '</span>' +
           (w.kind !== 'term' && w.term !== state.term
             ? '<span class="sx-wl-o">' + t('فصلٌ آخر', 'other term') + '</span>' : '') +
@@ -2364,7 +2443,7 @@
   var PLANS = null;
   var PL_KEY = 'sx_plans';
   /*@3.SECJ.178*/
-  var PL_VER = 3;
+  var PL_VER = 4;
   var PL_TTL = 30 * 24 * 3600 * 1000;
   /*@3.SECJ.179*/
   var PL_ALT = null;                 /*@3.SECJ.180*/
@@ -3727,6 +3806,7 @@
         }
         schRegister(todo, { force: true });
         paintBasket();
+        paintConflicts();
         /*@3.SECJ.478*/
         var rp = schRegister.lastReport || {};
         var say = [];
@@ -3774,6 +3854,7 @@
                 var n = 0;
                 inSch.forEach(function (c) { n += schUnregister(c); });
                 paintBasket();
+                paintConflicts();
                 toast(n ? t('حُذفت من جدولك', 'Removed from your schedule')
                         : t('لم يبقَ منها شيء', 'Nothing left to remove'));
               }, 9000);
@@ -4218,7 +4299,8 @@
         '<i class="fa-solid fa-users" aria-hidden="true"></i>' + (r.n || 0) + '</button>';
     }
     var col = r.idx >= 80 ? '#10b981' : r.idx >= 60 ? '#f59e0b' : r.idx >= 40 ? '#f97316' : '#ef4444';
-    return '<button class="sx-rate" style="color:' + col +
+    /*@3.SECJ.488*/
+    return '<button class="sx-rate" style="--rate-c:' + col +
       '" data-prof="' + esc((p && p.e) || '') + '" data-profn="' + esc((p && p.n) || p || '') +
       '" title="' +
       esc(t('مؤشّر التقييم ' + r.idx + '٪ من ' + r.n + ' تقييماً — اضغط للتفاصيل',
@@ -4453,6 +4535,9 @@
   }
 
   function boot() {
+    /*@3.SECJ.487*/
+    try { paintConflicts(); }
+    catch (e) { try { console.error('[sx] paintConflicts:', e && e.message); } catch (_) {} }
     if (!API) {
       $('#sx-grid').innerHTML = '<div class="sx-state">' +
         t('خدمة الكتالوج غير مهيّأة', 'Catalog service not configured') + '</div>';

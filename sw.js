@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.3.13'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.3.47'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -131,6 +131,8 @@ var PRECACHE_URLS = [
   'shared/sections.css',
   'shared/sections.js',
   'shared/sx-link.js',
+  'shared/schedule-drag.js',
+  'shared/print-theme.js',
   /*@0.SWJ.64*/
   'shared/faculty.css',
   'shared/faculty.js',
@@ -511,6 +513,37 @@ function swB64ToU8(b64) {
   return out;
 }
 
+function swDayKey(ms) {
+  var d = new Date(ms);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+         '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function swWeekId(ms) {
+  var d = new Date(ms);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  var w1 = new Date(d.getFullYear(), 0, 4);
+  var n = 1 + Math.round(((d - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7);
+  return d.getFullYear() + '-W' + String(n).padStart(2, '0');
+}
+
+function lectureStillOn(item, rules) {
+  if (!item || item.kind !== 'lectures') return true;
+  if (!rules) return true;
+  var key = swDayKey(item.eventAt || item.fireAt);
+  if (rules.termStart && key < rules.termStart) return false;
+  if (rules.termEnd && key > rules.termEnd) return false;
+  var focus = rules.focus || [];
+  for (var i = 0; i < focus.length; i++) {
+    if (key >= focus[i].start && key <= focus[i].end) {
+      var wid = swWeekId(item.eventAt || item.fireAt);
+      if ((rules.shownWeeks || []).indexOf(wid) === -1) return false;
+    }
+  }
+  return true;
+}
+
 function handleWake() {
   var now = Date.now();
   var GRACE = 10 * 60 * 1000;   /*@0.SWJ.89*/
@@ -521,19 +554,22 @@ function handleWake() {
     self.ReminderDB.getMeta('snooze'),
     self.ReminderDB.getMeta('root'),
     self.ReminderDB.getQueue(),
-    self.ReminderDB.firedMap()
+    self.ReminderDB.firedMap(),
+    self.ReminderDB.getMeta('rules')
   ]).then(function (r) {
     lang = r[0] || 'ar';
     snoozeOpts = r[1];
     root = r[2] || '/';
     var queue = r[3] || [];
     var fired = r[4] || {};
+    var rules = r[5] || null;
 
     /*@0.SWJ.90*/
     var due = queue.filter(function (i) {
       return i && typeof i.fireAt === 'number'
         && i.fireAt <= now && i.fireAt > now - GRACE
-        && !fired[i.id];
+        && !fired[i.id]
+        && lectureStillOn(i, rules);
     }).sort(function (a, b) { return a.fireAt - b.fireAt; });
 
     if (!due.length) return fallbackNotice(lang, root, queue, now);

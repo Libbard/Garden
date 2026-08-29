@@ -40,18 +40,26 @@
   };
 
   /*@3.NOCJ.11*/
+  /*@3.NOCJ.100*/
   var NIBS = {
-    round:  { scale: 1.00, min: 0.30, resp: 0.95, chisel: 0, round: 1 },
-    fine:   { scale: 0.45, min: 0.78, resp: 0.30, chisel: 0, round: 1 },
-    marker: { scale: 1.55, min: 1.00, resp: 0.00, chisel: 0, round: 0 },
-    flat:   { scale: 1.30, min: 0.45, resp: 0.35, chisel: 1, round: 0 },
+    round:  { scale: 1.00, min: 0.30, resp: 0.95, chisel: 0, round: 1,
+              tw: 0.16, ov: 0.30 },
+    fine:   { scale: 0.45, min: 0.78, resp: 0.30, chisel: 0, round: 1,
+              tw: 0.10, ov: 0.22 },
+    marker: { scale: 1.55, min: 1.00, resp: 0.00, chisel: 0, round: 1,
+              tw: 0.34, ov: 0.55 },
+    flat:   { scale: 1.30, min: 0.45, resp: 0.35, chisel: 1, round: 0,
+              tw: 0.24, ov: 0 },
     /*@3.NOCJ.79*/
     pencil: { scale: 0.88, min: 0.46, resp: 0.58, chisel: 0, round: 1,
-              grain: 1, speck: 3.0, spread: 1.15, dust: 0.46 },
+              grain: 1, speck: 3.0, spread: 1.15, dust: 0.46,
+              tw: 0.95, ov: 0.85, tg: 1 },
     chalk:  { scale: 1.85, min: 0.74, resp: 0.24, chisel: 0, round: 0,
-              grain: 1, speck: 4.2, spread: 1.35, dust: 0.30 }
+              grain: 1, speck: 4.2, spread: 1.35, dust: 0.30,
+              tw: 0.70, ov: 0.75, tg: 1 }
   };
   var CHISEL_ANGLE = -Math.PI / 4;
+  var TILT_MIN = 0.12;
 
   var SEL = '#10b981';
 
@@ -217,6 +225,23 @@
     return out;
   }
 
+  /*@3.NOCJ.90*/
+  var RESUME = { pen: 1, pencil: 1, hi: 1 };
+
+  function lastTool() {
+    var t = inkStore()._t;
+    return (typeof t === 'string' && RESUME[t]) ? t : 'pen';
+  }
+
+  function keepTool(tool) {
+    var k = toolKey(tool);
+    if (!RESUME[k]) return;
+    var all = inkStore();
+    if (all._t === k) return;
+    all._t = k;
+    try { localStorage.setItem(INK_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+
   function keepInk(tool, patch) {
     var k = toolKey(tool);
     var all = inkStore();
@@ -327,14 +352,15 @@
     this.undoS = [];
     this.redoS = [];
 
-    this.tool = 'pen';
+    this.tool = lastTool();
     /*@3.NOCJ.40*/
-    var seed = lastInk('pen');
+    var seed = lastInk(this.tool);
     this.color = seed.color;
     /*@3.NOCJ.18*/
     this.width = seed.width;
     this.nib = seed.nib;
     this.opacity = 1;
+    this.used = null;
     /*@3.NOCJ.23*/
     this.eraseMode = 'whole';
     this.hiStraight = 1;
@@ -657,11 +683,18 @@
         out.push(pts[i]);
         continue;
       }
-      out.push({
+      /*@3.NOCJ.103*/
+      var o = {
         x: (pts[i - 1].x + pts[i].x * 2 + pts[i + 1].x) / 4,
         y: (pts[i - 1].y + pts[i].y * 2 + pts[i + 1].y) / 4,
         p: (pts[i - 1].p + pts[i].p * 2 + pts[i + 1].p) / 4
-      });
+      };
+      if (pts[i].tz != null) {
+        o.tz = (pts[i - 1].tz + pts[i].tz * 2 + pts[i + 1].tz) / 4;
+        o.ax = (pts[i - 1].ax + pts[i].ax * 2 + pts[i + 1].ax) / 4;
+        o.ay = (pts[i - 1].ay + pts[i].ay * 2 + pts[i + 1].ay) / 4;
+      }
+      out.push(o);
     }
     out.push(pts[pts.length - 1]);
     return out;
@@ -686,13 +719,94 @@
   }
 
   /*@3.NOCJ.27*/
-  function widthAt(base, nib, pr, ang) {
+  /*@3.NOCJ.92*/
+  var ONSET_N = 6, ONSET_W = 3.5, ONSET_TH = 0.62;
+
+  function medPress(pts) {
+    var a = [], i;
+    for (i = 0; i < pts.length; i++) a.push(pts[i].p);
+    a.sort(function (x, y) { return x - y; });
+    return a[a.length >> 1];
+  }
+
+  function holdEnds(pts, base) {
+    var n = pts.length;
+    if (n < 3) return pts;
+    var pr = medPress(pts);
+    if (!(pr > 0)) return pts;
+    var lim = pr * ONSET_TH;
+    var span = Math.max(2, base * ONSET_W);
+    var i, k, d, steps;
+
+    /*@3.NOCJ.93*/
+    pts[0].p = pts[1].p;
+    pts[n - 1].p = pts[n - 2].p;
+
+    d = 0; k = 0; steps = 0;
+    while (k < n - 1 && pts[k].p < lim && steps < ONSET_N && d < span) {
+      d += Math.hypot(pts[k + 1].x - pts[k].x, pts[k + 1].y - pts[k].y);
+      k++; steps++;
+    }
+    for (i = 0; i < k; i++) pts[i].p = pts[k].p;
+
+    d = 0; k = n - 1; steps = 0;
+    while (k > 0 && pts[k].p < lim && steps < ONSET_N && d < span) {
+      d += Math.hypot(pts[k].x - pts[k - 1].x, pts[k].y - pts[k - 1].y);
+      k--; steps++;
+    }
+    for (i = n - 1; i > k; i--) pts[i].p = pts[k].p;
+    return pts;
+  }
+
+  /*@3.NOCJ.101*/
+  function widthAt(base, nib, pr, ang, pt) {
     var w = base * nib.scale * (nib.min + nib.resp * pr);
+    var lean = (pt && pt.ln) || 0;
+    if (lean > 0 && nib.tw) w *= (1 + nib.tw * lean);
     if (nib.chisel) {
-      var d = Math.abs(Math.sin(ang - CHISEL_ANGLE));
-      w *= (0.18 + 0.82 * d);
+      /*@3.NOCJ.109*/
+      var d = Math.abs(Math.sin(ang - (lean > 0 ? pt.eg : CHISEL_ANGLE)));
+      /*@3.NOCJ.110*/
+      var lo = 0.18 * (1 - 0.72 * lean);
+      w *= (lo + (1 - lo) * d);
+    } else if (lean > 0 && nib.ov) {
+      /*@3.NOCJ.111*/
+      var k = nib.ov * lean;
+      /*@3.NOCJ.112*/
+      w *= (1 - k * 0.5) + k * Math.abs(Math.cos(ang - pt.eg));
     }
     return Math.max(0.35, w);
+  }
+
+  /*@3.NOCJ.102*/
+  function leanOf(pts) {
+    for (var i = 0; i < pts.length; i++) {
+      var q = pts[i];
+      if (q.tz == null) continue;
+      q.ln = Math.max(0, (q.tz - TILT_MIN) / (1 - TILT_MIN));
+      if (q.ln > 0) q.eg = Math.atan2(q.ay, q.ax) + Math.PI / 2;
+    }
+  }
+
+  /*@3.NOCJ.106*/
+  function tiltPt(x, y, src) {
+    var o = { x: x, y: y, p: src.p };
+    if (src.tz != null) { o.tz = src.tz; o.az = src.az || 0; }
+    return o;
+  }
+
+  /*@3.NOCJ.105*/
+  function fillTilt(pts) {
+    var n = pts.length, i, last = null;
+    for (i = 0; i < n; i++) {
+      if (pts[i].tz != null) { last = pts[i]; continue; }
+      if (last) { pts[i].tz = last.tz; pts[i].ax = last.ax; pts[i].ay = last.ay; }
+    }
+    last = null;
+    for (i = n - 1; i >= 0; i--) {
+      if (pts[i].tz != null) { last = pts[i]; continue; }
+      if (last) { pts[i].tz = last.tz; pts[i].ax = last.ax; pts[i].ay = last.ay; }
+    }
   }
 
   /*@3.NOCJ.46*/
@@ -706,34 +820,44 @@
     var nib = NIBS[el.nib] || NIBS.round;
     var sc = k || 1;
     var base = (el.w || 2) * sc;
-    var raw = [], i, list = el.pts || [];
+    var raw = [], i, list = el.pts || [], tilted = 0;
     for (i = 0; i < list.length; i++) {
       var p = list[i];
       var px = (p && p.x != null) ? p.x : (p && p[0]);
       var py = (p && p.y != null) ? p.y : (p && p[1]);
       if (px == null || py == null) continue;
       var q = map ? map(px, py) : { x: px * sc, y: py * sc };
-      raw.push({ x: q.x, y: q.y, p: (p && p.p != null) ? p.p : 0.55 });
+      var r = { x: q.x, y: q.y, p: (p && p.p != null) ? p.p : 0.55 };
+      /*@3.NOCJ.104*/
+      if (p && p.tz != null) {
+        var a0 = p.az || 0;
+        r.tz = p.tz; r.ax = Math.cos(a0); r.ay = Math.sin(a0);
+        tilted = 1;
+      }
+      raw.push(r);
     }
     if (!raw.length) return null;
-    var pts = smoothPts(raw);
+    if (tilted) fillTilt(raw);
+    var pts = smoothPts(holdEnds(raw, base));
+    if (tilted) leanOf(pts);
     var alpha = (el.o == null ? 1 : el.o) *
                 (nib.speck ? (1 - (nib.dust || 0.4)) : (nib.grain ? 0.72 : 1));
     if (el.hi) alpha *= isLight() ? HI_FLAT : (HI_DARK * HI_FLAT * 2);
     if (pts.length === 1) {
       return { kind: 'dot', alpha: alpha, grain: !!nib.grain,
                x: pts[0].x, y: pts[0].y,
-               r: Math.max(0.4, widthAt(base, nib, pts[0].p, 0) / 2) };
+               r: Math.max(0.4, widthAt(base, nib, pts[0].p, 0, pts[0]) / 2) };
     }
     /*@3.NOCJ.28*/
-    if (!nib.resp && !nib.chisel) {
+    /*@3.NOCJ.107*/
+    if (!nib.resp && !nib.chisel && !tilted) {
       return { kind: 'line', alpha: alpha, grain: false, pts: pts,
                w: Math.max(0.5, widthAt(base, nib, 1, 0)) };
     }
     var angs = dirsOf(pts), left = [], right = [];
     for (i = 0; i < pts.length; i++) {
       var ang = angs[i];
-      var hw = widthAt(base, nib, pts[i].p, ang) / 2;
+      var hw = widthAt(base, nib, pts[i].p, ang, pts[i]) / 2;
       if (nib.grain) hw *= grainAt(i);
       var nx = -Math.sin(ang) * hw, ny = Math.cos(ang) * hw;
       left.push({ x: pts[i].x + nx, y: pts[i].y + ny });
@@ -741,10 +865,12 @@
     }
     var caps = null;
     if (nib.round) {
+      var lastI = pts.length - 1;
       caps = [{ x: pts[0].x, y: pts[0].y,
-                r: Math.max(0.3, widthAt(base, nib, pts[0].p, 0) / 2) },
-              { x: pts[pts.length - 1].x, y: pts[pts.length - 1].y,
-                r: Math.max(0.3, widthAt(base, nib, pts[pts.length - 1].p, 0) / 2) }];
+                r: Math.max(0.3, widthAt(base, nib, pts[0].p, angs[0], pts[0]) / 2) },
+              { x: pts[lastI].x, y: pts[lastI].y,
+                r: Math.max(0.3, widthAt(base, nib, pts[lastI].p, angs[lastI],
+                                         pts[lastI]) / 2) }];
     }
     var spk = null;
     if (nib.speck) spk = speckle(pts, angs, base, nib);
@@ -755,21 +881,24 @@
 
   var SPECK_MAX = 2600;
 
+  /*@3.NOCJ.108*/
   function speckle(pts, angs, base, nib) {
     var out = [], i, j;
     var per = nib.speck || 3;
     var cap = SPECK_MAX;
     for (i = 0; i < pts.length && out.length < cap; i++) {
-      var hw = widthAt(base, nib, pts[i].p, angs[i]) / 2;
+      var lean = pts[i].ln || 0;
+      var hw = widthAt(base, nib, pts[i].p, angs[i], pts[i]) / 2;
       if (hw < 0.25) continue;
       var ang = angs[i] || 0;
       var nx = -Math.sin(ang), ny = Math.cos(ang);
-      var n = Math.max(1, Math.round(per * (0.45 + 0.55 * pts[i].p)));
+      var n = Math.max(1, Math.round(per * (0.45 + 0.55 * pts[i].p) *
+                                     (1 + (nib.tg ? 0.5 : 0) * lean)));
       for (j = 0; j < n; j++) {
         var h1 = rnd(i * 7.13 + j * 3.71);
         var h2 = rnd(i * 2.37 + j * 9.19 + 5.5);
         var h3 = rnd(i * 5.51 + j * 1.93 + 11.2);
-        var t = (h1 * 2 - 1) * (nib.spread || 1);
+        var t = (h1 * 2 - 1) * ((nib.spread || 1) * (1 + 0.45 * lean));
         var d = t * hw;
         out.push({
           x: pts[i].x + nx * d + (h2 - 0.5) * hw * 0.5,
@@ -816,59 +945,95 @@
     api.close();
   }
 
+  var SPECK_STEPS = 10;
+
+  function shifted(api, dx, dy) {
+    return {
+      move: function (x, y) { api.move(x + dx, y + dy); },
+      line: function (x, y) { api.line(x + dx, y + dy); },
+      quad: function (cx, cy, x, y) { api.quad(cx + dx, cy + dy, x + dx, y + dy); },
+      close: function () { api.close(); },
+      circle: function (x, y, r) { api.circle(x + dx, y + dy, r); }
+    };
+  }
+
+  /*@3.NOCJ.95*/
+  function inkPaints(geom) {
+    if (!geom) return [];
+    if (geom.kind === 'dot') {
+      return [{ fill: 1, alpha: geom.alpha, emit: function (api) {
+        api.circle(geom.x, geom.y, geom.r);
+      } }];
+    }
+    if (geom.kind === 'line') {
+      return [{ fill: 0, alpha: geom.alpha, w: geom.w, emit: function (api) {
+        smoothInto(geom.pts, api);
+      } }];
+    }
+    var out = [{ fill: 1, alpha: geom.alpha, emit: function (api) {
+      inkEmit(geom, api);
+    } }];
+    /*@3.NOCJ.96*/
+    if (geom.speck && geom.speck.length) {
+      var dust = geom.dust ? (1 - geom.dust * 0.4) : 1;
+      var bins = {}, i, sp, lv;
+      for (i = 0; i < geom.speck.length; i++) {
+        sp = geom.speck[i];
+        lv = Math.max(1, Math.min(SPECK_STEPS, Math.round(sp.a * SPECK_STEPS)));
+        (bins[lv] || (bins[lv] = [])).push(sp);
+      }
+      for (lv = 1; lv <= SPECK_STEPS; lv++) {
+        if (!bins[lv]) continue;
+        out.push({ fill: 1, alpha: geom.alpha * (lv / SPECK_STEPS) * dust,
+          list: bins[lv], emit: (function (list) {
+            return function (api) {
+              for (var q = 0; q < list.length; q++) api.circle(list[q].x, list[q].y, list[q].r);
+            };
+          }(bins[lv])) });
+      }
+    } else if (geom.grain) {
+      out.push({ fill: 1, alpha: geom.alpha * 0.34, emit: function (api) {
+        inkEmit(geom, shifted(api, 0.45, 0.45));
+      } });
+    }
+    /*@3.NOCJ.97*/
+    if (geom.caps) {
+      out.push({ fill: 1, alpha: geom.alpha, emit: function (api) {
+        for (var c = 0; c < geom.caps.length; c++) {
+          api.circle(geom.caps[c].x, geom.caps[c].y, geom.caps[c].r);
+        }
+      } });
+    }
+    return out;
+  }
+
   /*@3.NOCJ.2*/
   Canvas.prototype.paintStroke = function (g, el) {
     var self = this;
     var geom = inkGeom(el, this.cam.z, function (x, y) { return self.toScreen({ x: x, y: y }); });
     if (!geom) return;
+    var lay = inkPaints(geom);
+    if (!lay.length) return;
     g.save();
-    g.globalAlpha = geom.alpha;
     g.fillStyle = inkHex(el);
     g.strokeStyle = inkHex(el);
+    g.lineJoin = 'round';
+    g.lineCap = 'round';
     var api = {
       move: function (x, y) { g.moveTo(x, y); },
       line: function (x, y) { g.lineTo(x, y); },
       quad: function (cx, cy, x, y) { g.quadraticCurveTo(cx, cy, x, y); },
       close: function () { g.closePath(); },
-      circle: function (x, y, r) { g.arc(x, y, r, 0, Math.PI * 2); }
+      circle: function (x, y, r) { g.moveTo(x + r, y); g.arc(x, y, r, 0, Math.PI * 2); }
     };
-    if (geom.kind === 'line') {
-      g.lineWidth = geom.w;
-      g.lineJoin = 'round';
-      g.lineCap = 'round';
-      g.beginPath();
-      inkEmit(geom, api);
-      g.stroke();
-      g.restore();
-      return;
-    }
-    g.beginPath();
-    inkEmit(geom, api);
-    g.fill();
     /*@3.NOCJ.76*/
-    if (geom.speck) {
-      g.save();
-      var sp = geom.speck, sa = geom.alpha;
-      for (var q = 0; q < sp.length; q++) {
-        g.globalAlpha = sa * sp[q].a * (geom.dust ? (1 - geom.dust * 0.4) : 1);
-        g.beginPath();
-        g.arc(sp[q].x, sp[q].y, sp[q].r, 0, Math.PI * 2);
-        g.fill();
-      }
-      g.restore();
-    } else if (geom.grain) {
-      g.save();
-      g.globalAlpha = 0.34;
-      g.translate(0.45, 0.45);
-      g.fill();
-      g.restore();
-    }
-    if (geom.caps) {
-      for (var c = 0; c < geom.caps.length; c++) {
-        g.beginPath();
-        g.arc(geom.caps[c].x, geom.caps[c].y, geom.caps[c].r, 0, Math.PI * 2);
-        g.fill();
-      }
+    for (var q = 0; q < lay.length; q++) {
+      var pa = lay[q];
+      g.globalAlpha = Math.max(0, Math.min(1, pa.alpha));
+      g.beginPath();
+      pa.emit(api);
+      if (pa.fill) g.fill();
+      else { g.lineWidth = pa.w; g.stroke(); }
     }
     g.restore();
   };
@@ -1616,6 +1781,7 @@
       this.nib = want.nib;
     }
     this.tool = t;
+    keepTool(t);
     if (t !== 'sel' && t !== 'lasso') { this.sel = {}; this.paintWet(); }
     this.wrap.setAttribute('data-tool', t);
     this.emit();
@@ -1647,7 +1813,7 @@
       canUndo: this.hist ? this.hist.canUndo() : !!this.undoS.length,
       canRedo: this.hist ? this.hist.canRedo() : !!this.redoS.length,
       canPaste: !!((this.clip && this.clip.length) || inkClipAny()),
-      expanded: this.expanded, count: this.els.length
+      expanded: this.expanded, count: this.els.length, used: this.used || null
     });
   };
 
@@ -1730,7 +1896,7 @@
           id: uid(), ty: 'st', c: self.color, w: hi ? self.width / NIBS.marker.scale : self.width,
           /*@3.NOCJ.82*/
           nib: hi ? 'marker' : self.nib, o: hi ? 0.8 : self.opacity, hi: hi ? 1 : 0,
-          pts: [{ x: wp.x, y: wp.y, p: pt.p }]
+          pts: [tiltPt(wp.x, wp.y, pt)]
         };
         self.paintWet();
       },
@@ -1830,7 +1996,7 @@
           var tdx = w3.x - lp.x, tdy = w3.y - lp.y;
           if (tdx * tdx + tdy * tdy < minD * minD &&
               Math.abs((pts[i].p || 0) - (lp.p || 0)) < 0.05) continue;
-          st.pts.push({ x: w3.x, y: w3.y, p: pts[i].p });
+          st.pts.push(tiltPt(w3.x, w3.y, pts[i]));
         }
         self.wetTick();
       },
@@ -1892,6 +2058,12 @@
         }
         self.push(self.snapshot());
         self.els.push(st);
+        /*@3.NOCJ.99*/
+        if (st.ty === 'st') {
+          self.used = { tool: st.hi ? 'hi' : 'pen', color: self.color,
+                        width: self.width, nib: st.nib || self.nib,
+                        straight: st.hi ? (self.hiStraight ? 1 : 0) : 0 };
+        }
         self.onAdd(st);
         self.growIfNeeded();
         /*@3.NOCJ.7*/
@@ -2020,22 +2192,22 @@
           circle: function (X, Y, R) {
             d.push('M' + n1(X - R) + ' ' + n1(Y) + 'a' + n1(R) + ' ' + n1(R) +
                    ' 0 1 0 ' + n1(R * 2) + ' 0a' + n1(R) + ' ' + n1(R) +
-                   ' 0 1 0 ' + n1(-R * 2) + ' 0');
+                   ' 0 1 0 ' + n1(-R * 2) + ' 0Z');
           }
         };
-        inkEmit(geom, api);
-        if (geom.caps) {
-          for (var cc = 0; cc < geom.caps.length; cc++) {
-            api.circle(geom.caps[cc].x, geom.caps[cc].y, geom.caps[cc].r);
+        /*@3.NOCJ.98*/
+        return inkPaints(geom).map(function (pa) {
+          d = [];
+          pa.emit(api);
+          if (!d.length) return '';
+          if (!pa.fill) {
+            return '<path d="' + d.join(' ') + '" fill="none" stroke="' + col +
+              '" stroke-width="' + n1(pa.w) + '" stroke-linecap="round" ' +
+              'stroke-linejoin="round" opacity="' + n1(pa.alpha) + '"/>';
           }
-        }
-        if (geom.kind === 'line') {
-          return '<path d="' + d.join(' ') + '" fill="none" stroke="' + col +
-            '" stroke-width="' + n1(geom.w) + '" stroke-linecap="round" ' +
-            'stroke-linejoin="round" opacity="' + n1(geom.alpha) + '"/>';
-        }
-        return '<path d="' + d.join(' ') + '" fill="' + col +
-          '" fill-rule="nonzero" stroke="none" opacity="' + n1(geom.alpha) + '"/>';
+          return '<path d="' + d.join(' ') + '" fill="' + col +
+            '" fill-rule="nonzero" stroke="none" opacity="' + n1(pa.alpha) + '"/>';
+        }).join('');
       }
       var x = Math.min(el.x1, el.x2), y = Math.min(el.y1, el.y2);
       var ww = Math.abs(el.x2 - el.x1), hh = Math.abs(el.y2 - el.y1);
@@ -2058,16 +2230,21 @@
   window.GardenCanvas = {
     mount: function (host, opts) { return new Canvas(host, opts); },
     hexOf: hexOf,
+    lastTool: lastTool,
     hiHexOf: hiHexOf,
     TONES: TONES,
     HI_TONES: HI_TONES,
     NIBS: NIBS,
+    inkPaints: inkPaints,
     toSvg: toSvg,
     inkGeom: inkGeom,
     inkEmit: inkEmit,
     isLight: isLight,
     setPaper: setPaper,
     themeIsLight: themeIsLight,
+    /*@3.NOCJ.91*/
+    mixHex: mixHex,
+    adaptHex: adaptHex,
     lumOf: function (hex) {
       try { return relLum(hex); } catch (e) { return null; }
     },

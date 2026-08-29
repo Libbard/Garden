@@ -25,11 +25,12 @@
   <script src="../shared/schedule-motivation.js" defer></script>
   <!--@1.SCHH.1-->
   <link rel="stylesheet" href="../shared/select.css">
-  <link rel="stylesheet" href="../shared/schedule.css?v=1.0.3.13">
+  <link rel="stylesheet" href="../shared/course-color.css">
+  <link rel="stylesheet" href="../shared/schedule.css?v=1.0.3.47">
   <!--@1.SCHH.2-->
   <link rel="stylesheet" href="../shared/settings.css">
-  <link rel="stylesheet" href="../shared/schedule-editor.css?v=1.0.3.13">
-  <link rel="stylesheet" href="../shared/schedule-plan.css?v=1.0.3.13">
+  <link rel="stylesheet" href="../shared/schedule-editor.css?v=1.0.3.47">
+  <link rel="stylesheet" href="../shared/schedule-plan.css?v=1.0.3.47">
   <link rel="stylesheet" href="../shared/bottom-nav.css">
   <link rel="stylesheet" href="../shared/vendor/fontawesome/css/garden-icons.css">
 
@@ -81,17 +82,17 @@
           <button class="sch-view-btn" data-view="day"><span data-ar="يومي" data-en="Daily"></span></button>
           <button class="sch-view-btn" data-view="month"><span data-ar="شهري" data-en="Monthly"></span></button>
         </div>
+        <span class="sch-tb-div" aria-hidden="true"></span>
         <!--@1.SCHH.6-->
         <div class="sch-tb-group">
           <!--@1.SCHH.7-->
           <button class="sch-tool" id="btn-agenda" type="button"
                   data-title-ar="عرض الأحداث قائمةً بأوقاتها" data-title-en="Show events as a timed list"
-            ><i class="fa-solid fa-list-ul"></i><span class="sch-tool-t" data-ar="أجندة" data-en="Agenda"></span></button>
+            ><span class="sch-tool-t" data-ar="أجندة" data-en="Agenda"></span></button>
           <!--@1.SCHH.9-->
           <div class="sch-cf" id="sch-cf">
             <button class="sch-tool" id="cf-btn" type="button" aria-expanded="false"
                     data-title-ar="فلتر المواد" data-title-en="Course filter">
-              <i class="fa-solid fa-filter" aria-hidden="true"></i>
               <span class="sch-tool-t" data-ar="المواد" data-en="Courses"></span>
               <i class="fa-solid fa-chevron-down sch-tool-car" aria-hidden="true"></i>
               <span class="sch-cf-n" id="cf-n" hidden></span>
@@ -104,9 +105,6 @@
               <div class="sch-cf-list" id="course-chips"></div>
             </div>
           </div>
-          <!--@1.SCHH.8-->
-          <button class="sch-tool" id="btn-span" type="button"
-                  data-title-ar="مدى ساعات اليوم" data-title-en="Day hour range"></button>
         </div>
       </div>
 
@@ -126,6 +124,7 @@
         <button class="sch-nav-btn" id="btn-prev-month" data-title-ar="الشهر السابق" data-title-en="Previous month"><i class="fa-solid fa-chevron-right"></i></button>
         <span class="sch-month-label" id="month-label"></span>
         <button class="sch-nav-btn" id="btn-next-month" data-title-ar="الشهر التالي" data-title-en="Next month"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="sch-today-btn" id="btn-this-month" data-ar="اليوم" data-en="Today"></button>
       </div>
     </div>
 
@@ -153,25 +152,16 @@
 
     <!--@1.SCHH.15-->
     <div class="sch-month-wrapper" id="month-wrapper" style="display:none">
-      <div class="sch-month-grid" id="month-grid"></div>
-      <div class="sch-legend" id="month-legend"></div>
+      <div class="sch-month-pane">
+        <div class="sch-month-grid" id="month-grid"></div>
+        <div class="sch-legend" id="month-legend"></div>
+      </div>
+      <div class="sch-month-rail" id="month-rail"></div>
     </div>
 
-    <button class="sch-fab" id="btn-add-event" data-title-ar="إضافة حدث" data-title-en="Add event">
-      <i class="fa-solid fa-plus"></i>
-    </button>
   </div>
 
   <!--@1.SCHH.16-->
-  <div class="sch-modal-overlay" id="modal-choose-type" style="display:none">
-    <div class="sch-modal sch-modal-compact">
-      <button class="sch-choose-btn" id="choose-lecture"><i class="fa-solid fa-chalkboard-user"></i> <span data-ar="محاضرة" data-en="Lecture"></span></button>
-      <button class="sch-choose-btn" id="choose-study"><i class="fa-solid fa-book-open"></i> <span data-ar="مذاكرة" data-en="Study"></span></button>
-      <button class="sch-choose-btn" id="choose-exam"><i class="fa-solid fa-file-pen"></i> <span data-ar="اختبار" data-en="Exam"></span></button>
-      <button class="sch-choose-btn" id="choose-general"><i class="fa-solid fa-bookmark"></i> <span data-ar="عام (مهمة · ملاحظة · حدث)" data-en="General (task · note · event)"></span></button>
-      <button class="sch-choose-btn is-plan" id="choose-plan"><i class="fa-solid fa-bolt"></i> <span data-ar="خطة مذاكرة مكثّفة" data-en="Intensive study plan"></span></button>
-    </div>
-  </div>
 
   <!--@1.SCHH.17-->
   <div class="sch-modal-overlay" id="modal-add-lecture" style="display:none">
@@ -677,6 +667,16 @@
         <option value="agenda" data-ar="أجندة (قائمة بالأوقات)" data-en="Agenda (timed list)"></option>
         <option value="plan" data-ar="خطة مكثّفة" data-en="Intensive plan"></option>
       </select>
+      <label class="sch-label" data-ar="ثيم الورقة" data-en="Sheet theme"></label>
+      <select class="sch-select" id="print-theme" data-gs-name-ar="ثيم الورقة" data-gs-name-en="Sheet theme" data-gs-icon="fa-palette">
+        <option value="paper" data-ar="ورقيّ — يوفّر الحبر" data-en="Paper — saves ink"
+                data-gs-name-ar="ورقيّ" data-gs-name-en="Paper"></option>
+        <option value="theme" data-ar="مثل ثيم الصفحة" data-en="Match the page theme"
+                data-gs-name-ar="مثل الصفحة" data-gs-name-en="Match page"></option>
+        <option value="light" data-ar="فاتح" data-en="Light"></option>
+        <option value="dim" data-ar="خافت" data-en="Dim"></option>
+        <option value="dark" data-ar="داكن" data-en="Dark"></option>
+      </select>
       <div id="print-weeks-wrap">
         <label class="sch-label" data-ar="نطاق الأسابيع" data-en="Week range"></label>
         <select class="sch-select" id="print-week-scope" data-gs-name-ar="مدى الأسبوع" data-gs-name-en="Week scope">
@@ -731,13 +731,17 @@
   <script src="../shared/legacy-data.js"></script>
   <!--@1.SCHH.45-->
   <script src="../shared/endpoints.js"></script>
-  <script src="../shared/ics-sync.js?v=1.0.3.13"></script>
-  <script src="../shared/ics-panel.js?v=1.0.3.13"></script>
+  <script src="../shared/ics-sync.js?v=1.0.3.47"></script>
+  <script src="../shared/ics-panel.js?v=1.0.3.47"></script>
   <script src="../shared/select.js"></script>
   <script src="../shared/schedule-rules.js"></script>
-  <script src="../shared/schedule.js?v=1.0.3.13"></script>
-  <script src="../shared/schedule-print.js?v=1.0.3.13"></script>
-  <script src="../shared/schedule-plan.js?v=1.0.3.13"></script>
+  <script src="../shared/schedule.js?v=1.0.3.47"></script>
+  <script src="../shared/sx-link.js"></script>
+  <script src="../shared/course-color.js"></script>
+  <script src="../shared/schedule-drag.js"></script>
+  <script src="../shared/print-theme.js"></script>
+  <script src="../shared/schedule-print.js?v=1.0.3.47"></script>
+  <script src="../shared/schedule-plan.js?v=1.0.3.47"></script>
   <script src="../shared/bottom-nav.js"></script>
   <script src="../shared/sw-register.js"></script>
   <script src="../shared/reminders-db.js"></script>

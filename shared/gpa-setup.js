@@ -5,7 +5,7 @@
   var PROF = 'student_profile', ARCH = 'semester_archive',
       SEM = 'my_semester', PLANK = 'gpa_plan', DRAFT = 'gpa_setup_draft';
   /*@3.GPSJ.2*/
-  var PL_KEY = 'sx_plans', PL_VER = 3, PL_TTL = 30 * 24 * 3600 * 1000;
+  var PL_KEY = 'sx_plans', PL_VER = 4, PL_TTL = 30 * 24 * 3600 * 1000;
   var GPA_SCALE = { 'A+': 4, 'A': 3.75, 'B+': 3.5, 'B': 3, 'C+': 2.5, 'C': 2, 'D+': 1.5, 'D': 1, 'F': 0 };
   var GRADES = ['', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'TR'];
   var PREP_RE = /^[A-Za-z]+0/;
@@ -178,7 +178,7 @@
   function blank() {
     return { step: 0, name_ar: '', name_en: '', start_year: '',
              college_key: '', program: '', plan_version: '', track: '',
-             levels: {}, curLevel: '', term: guessTerm(), cur: [] };
+             levels: {}, curLevel: '', term: guessTerm(), cur: [], planAsk: {} };
   }
   function saveDraft() { writeJSON(DRAFT, W); }
 
@@ -589,6 +589,47 @@
     return W.levels[lv].filter(function (x) { return x.code === code; })[0];
   }
 
+  /*@3.GPSJ.112*/
+  function normCode(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^ISLAM/, 'ISLM'); }
+  function planSig() {
+    var cs = courses();
+    if (!cs.length) return '';
+    return (W.program || '') + '|' + cs.map(function (c) { return normCode(fCode(c)); }).sort().join(',');
+  }
+  function hasRecord() {
+    return Object.keys(W.levels).some(function (k) { return (W.levels[k] || []).length; });
+  }
+  /*@3.GPSJ.113*/
+  function recordCodes() {
+    var m = {};
+    Object.keys(W.levels).forEach(function (k) {
+      (W.levels[k] || []).forEach(function (x) { m[normCode(x.code)] = 1; });
+    });
+    return m;
+  }
+  /*@3.GPSJ.115*/
+  function newlyAdded() {
+    var lv = parseInt(W.curLevel, 10);
+    if (!lv || !courses().length || !hasRecord()) return [];
+    var prof = readJSON(PROF, {}) || {};
+    if (prof.plan_seen && prof.plan_seen === planSig()) return [];
+    var have = recordCodes(), said = W.planAsk || {};
+    return courses().filter(function (c) {
+      var pl = planLevel(c);
+      if (pl === null || pl >= lv) return false;
+      var k = normCode(fCode(c));
+      return !have[k] && !said[k];
+    });
+  }
+  /*@3.GPSJ.114*/
+  function sealPlanSeen() {
+    var sig = planSig();
+    if (!sig) return;
+    var prof = readJSON(PROF, {}) || {};
+    prof.plan_seen = sig;
+    writeJSON(PROF, prof);
+  }
+
   /*@3.GPSJ.53*/
   var _autoAt = null, _autoOwned = false;
   function autoTickBelow() {
@@ -687,6 +728,38 @@
           '<i class="fa-solid fa-rotate" aria-hidden="true"></i> ' + esc(L('أعد المحاولة', 'Retry')) + '</button>' +
         '</div></div></div>';
       return h;
+    }
+    var fresh = newlyAdded();
+    if (fresh.length) {
+      h += '<div class="gs-warn gs-new" role="group" aria-label="' +
+        esc(L('مواد أضيفت إلى خطتك', 'Courses added to your plan')) + '">' +
+        '<i class="fa-solid fa-circle-plus" aria-hidden="true"></i><div class="gs-warn-t"><b>' +
+        esc(L(fresh.length === 1
+                ? 'أُضيفت مادّةٌ إلى خطتك — هل اجتزتها؟'
+                : 'أُضيفت ' + fresh.length + ' مواد إلى خطتك — هل اجتزتها؟',
+              fresh.length === 1
+                ? 'One course was added to your plan — did you pass it?'
+                : fresh.length + ' courses were added to your plan — did you pass them?')) + '</b>' +
+        esc(L('صحّحنا خطةَ برنامجك، فظهرت موادُّ لم تكن معروضةً حين سجّلتَ مستوياتك. ' +
+              'قل لنا حالَ كلٍّ منها — ولن يتغيّر معدّلُك حتى تجيب.',
+              'We corrected your programme’s plan, so courses appeared that were not shown when you recorded your levels. ' +
+              'Tell us about each — your GPA will not change until you answer.')) +
+        '<div class="gs-new-list">';
+      fresh.forEach(function (c) {
+        var code = fCode(c), pl = planLevel(c);
+        h += '<div class="gs-new-row">' +
+          '<span class="gs-new-c"><b>' + esc(code) + '</b> ' +
+            esc(cTitle(c)) + '</span>' +
+          '<span class="gs-new-m">' + esc(levelName(pl)) + ' · ' + fCh(c) + esc(L(' ساعات', ' ch')) + '</span>' +
+          '<span class="gs-new-b">' +
+            '<button class="gp-btn gp-btn--primary" data-gs="new-yes" data-v="' + esc(code) + '" data-lv="' + pl + '">' +
+              esc(L('اجتزتها', 'Passed')) + '</button>' +
+            '<button class="gp-btn" data-gs="new-no" data-v="' + esc(code) + '">' +
+              esc(L('لا', 'Not yet')) + '</button>' +
+          '</span>' +
+        '</div>';
+      });
+      h += '</div></div></div>';
     }
     if (noGrade) {
       h += '<div class="gs-warn is-soft"><i class="fa-solid fa-circle-info"></i><div>' +
@@ -1211,6 +1284,19 @@
     if (a === 'drop-here') {
       if (MOVING) { moveTo(MOVING, v); claimRecord(); saveDraft(); MOVING = null; paint(); }
       return;
+    }
+    if (a === 'new-yes' || a === 'new-no') {
+      claimRecord();
+      if (a === 'new-yes') {
+        var nlv = b.getAttribute('data-lv');
+        (W.levels[nlv] = W.levels[nlv] || []).push({ code: v, grade: '' });
+      } else {
+        W.planAsk = W.planAsk || {};
+        W.planAsk[normCode(v)] = 1;
+      }
+      saveDraft();
+      if (!newlyAdded().length) sealPlanSeen();
+      paint(); return;
     }
     if (a === 'tick') {
       claimRecord();

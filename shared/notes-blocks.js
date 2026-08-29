@@ -55,12 +55,17 @@
     return d === 0;
   }
 
+  /*@3.NOBJ.25*/
+  var TAIL_PUNCT = ':;,.!?،؛؟…';
+
   function pairSpan(txt, a, b) {
     var ch;
     while (b > a + 1) {
       ch = txt.charAt(b - 1);
-      if (!SHUT[ch] || evenPair(txt.slice(a, b), SHUT[ch], ch)) break;
-      b--;
+      if (TAIL_PUNCT.indexOf(ch) >= 0) { b--; continue; }
+      if (SHUT[ch] && !evenPair(txt.slice(a, b), SHUT[ch], ch)) { b--; continue; }
+      if (PAIR[ch] && !evenPair(txt.slice(a, b), ch, PAIR[ch])) { b--; continue; }
+      break;
     }
     return [a, b];
   }
@@ -138,23 +143,26 @@
         close = '</span>' + close;
       }
       /*@3.NOBJ.20*/
+      /*@3.NOBJ.26*/
+      var body = open + txt + close;
       if (r.lk) {
         var lkv = String(r.lk);
+        var lu = (r.lu === 0 || r.lu === '0') ? ' data-lu="0"' : '';
         if (lkv.charAt(0) === '#') {
-          open += '<a class="ne-xl" href="' + esc(lkv) + '" data-nl="' + esc(lkv) + '">';
-          close = '</a>' + close;
-        } else if (/^note:/i.test(lkv) && !/["'<>\s]/.test(lkv)) {
-          open += '<a class="ne-xl ne-xl--note" href="#" data-nl="' + esc(lkv) + '">';
-          close = '</a>' + close;
-        } else {
-          var href = httpsOnly(lkv);
-          if (href) {
-            open += '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer nofollow">';
-            close = '</a>' + close;
-          }
+          return '<a class="ne-xl" href="' + esc(lkv) + '" data-nl="' + esc(lkv) + '"' +
+                 lu + '>' + body + '</a>';
+        }
+        if (/^note:/i.test(lkv) && !/["'<>\s]/.test(lkv)) {
+          return '<a class="ne-xl ne-xl--note" href="#" data-nl="' + esc(lkv) + '"' +
+                 lu + '>' + body + '</a>';
+        }
+        var href = httpsOnly(lkv);
+        if (href) {
+          return '<a href="' + esc(href) + '" target="_blank"' + lu +
+                 ' rel="noopener noreferrer nofollow">' + body + '</a>';
         }
       }
-      return open + txt + close;
+      return body;
     }).join('');
   }
 
@@ -188,6 +196,7 @@
         var nl = n.getAttribute('data-nl');
         if (nl) next.lk = nl;
         else { var h = httpsOnly(n.getAttribute('href')); if (h) next.lk = h; }
+        if (next.lk && n.getAttribute('data-lu') === '0') next.lu = 0;
       }
       else if (tag === 'br') { out.push(Object.assign({}, st, { s: '\n' })); continue; }
       nodeRuns(n, next, out);
@@ -213,6 +222,7 @@
            !!a.st === !!b.st && !!a.c === !!b.c &&
            !!a.sb === !!b.sb && !!a.sp === !!b.sp &&
            (a.hl || '') === (b.hl || '') && (a.lk || '') === (b.lk || '') &&
+           (a.lu == null ? 1 : a.lu) === (b.lu == null ? 1 : b.lu) &&
            (a.fg || '') === (b.fg || '') && (a.ff || '') === (b.ff || '') &&
            (a.fz || 0) === (b.fz || 0);
   }
