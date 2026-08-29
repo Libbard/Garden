@@ -5,7 +5,7 @@
   var PROF = 'student_profile', ARCH = 'semester_archive',
       SEM = 'my_semester', PLANK = 'gpa_plan', DRAFT = 'gpa_setup_draft';
   /*@3.GPSJ.2*/
-  var PL_KEY = 'sx_plans', PL_VER = 4, PL_TTL = 30 * 24 * 3600 * 1000;
+  var PL_KEY = 'sx_plans', PL_VER = 5, PL_TTL = 30 * 24 * 3600 * 1000;
   var GPA_SCALE = { 'A+': 4, 'A': 3.75, 'B+': 3.5, 'B': 3, 'C+': 2.5, 'C': 2, 'D+': 1.5, 'D': 1, 'F': 0 };
   var GRADES = ['', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'TR'];
   var PREP_RE = /^[A-Za-z]+0/;

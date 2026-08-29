@@ -5,7 +5,7 @@
 
   var PROF = 'student_profile';
   var PREFS = 'dashboard_prefs';
-  var PL_KEY = 'sx_plans', PL_VER = 4, PL_TTL = 30 * 24 * 3600 * 1000;
+  var PL_KEY = 'sx_plans', PL_VER = 5, PL_TTL = 30 * 24 * 3600 * 1000;
   var SYNC_TS_PREFIX = '__syncT_';
   var MAX_LEVEL = 12;                 /*@3.SETJ.2*/
   var STORE_BUDGET = 5 * 1024 * 1024; /*@3.SETJ.3*/

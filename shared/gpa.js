@@ -21,7 +21,7 @@
   var whatIf = {}, pickerQ = '', scenario = '', editingId = null;
   var _chartDrawn = false, programCredits = 132;
   /*@3.GPAJ.109*/
-  var PL_VER = 4;
+  var PL_VER = 5;
 
   /*@3.GPAJ.105*/
   function progCredits() {

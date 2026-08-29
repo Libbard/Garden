@@ -2443,7 +2443,7 @@
   var PLANS = null;
   var PL_KEY = 'sx_plans';
   /*@3.SECJ.178*/
-  var PL_VER = 4;
+  var PL_VER = 5;
   var PL_TTL = 30 * 24 * 3600 * 1000;
   /*@3.SECJ.179*/
   var PL_ALT = null;                 /*@3.SECJ.180*/
