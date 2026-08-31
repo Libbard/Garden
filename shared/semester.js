@@ -140,8 +140,16 @@
 
   /*@3.SEMJ.20*/
 
+  function termSpan() {
+    var st = (S.sched && S.sched.settings) || {};
+    try { return GardenData.termWindow(st); } catch (e) { return null; }
+  }
+
+  /*@3.SEMJ.209*/
   function termArc() {
     var st = (S.sched && S.sched.settings) || {};
+    var w = termSpan();
+    if (!w || !w.ok) return null;
     var a = parseD(st.term_start_date), b = parseD(st.semester_end_date);
     if (!a || !b || b <= a) return null;
     var now = new Date(); now.setHours(0, 0, 0, 0);
@@ -166,6 +174,33 @@
       before: gone < 0, after: gone > total,
       flags: flags
     };
+  }
+
+  /*@3.SEMJ.210*/
+  function renderTermBad() {
+    var host = el('sem-term-bad');
+    if (!host) return;
+    var w = termSpan();
+    if (!w || w.ok || w.why === 'missing') { host.hidden = true; host.innerHTML = ''; return; }
+    var msg;
+    if (w.why === 'reversed') {
+      msg = L('نهايةُ فصلك قبل بدايته.', 'Your term ends before it starts.');
+    } else if (w.why === 'short') {
+      msg = L('تاريخا فصلك يصنعان ' + w.days + ' يوماً — أقصرُ من أيِّ فصل.',
+              'Your term dates span ' + w.days + ' days — shorter than any term.');
+    } else {
+      msg = L('تاريخا فصلك يصنعان ' + w.weeks + ' أسبوعاً — والفصلُ لا يتجاوز ' +
+                Math.floor(w.max / 7) + '، فأحدُهما من فصلٍ قديم.',
+              'Your term dates span ' + w.weeks + ' weeks — no term exceeds ' +
+                Math.floor(w.max / 7) + ', so one of them belongs to an older term.');
+    }
+    host.hidden = false;
+    host.style.setProperty('--tint', 'var(--st-warn, #f59e0b)');
+    host.innerHTML = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>' +
+      '<span>' + esc(msg) + ' ' +
+      esc(L('المحفوظ: ', 'Saved: ')) +
+      '<span class="gsf-code">' + esc(w.start) + ' → ' + esc(w.end) + '</span>' +
+      '</span>';
   }
 
   function renderTermClash() {
@@ -203,6 +238,7 @@
     var arc = termArc();
     var box = el('sem-arc'), empty = el('sem-arc-empty');
     renderTermClash();
+    renderTermBad();
     if (!arc) { box.hidden = true; empty.hidden = false; return; }
     box.hidden = false; empty.hidden = true;
 
@@ -1026,6 +1062,14 @@
       created_at: sem.created_at,
       archived_at: new Date().toISOString()
     };
+  }
+
+  /*@3.SEMJ.211*/
+  function endTermWindow() {
+    var cleared = false;
+    try { cleared = GardenData.clearTermWindow(); } catch (e) { cleared = false; }
+    if (cleared) { try { S.sched = GardenData.scheduleRaw(); } catch (e) {} }
+    return cleared;
   }
 
   function saveArchive(list) {
@@ -2159,9 +2203,13 @@
     var arch = GardenData.archive() || [];
     arch.push(archiveRecord(S.sem));
     saveArchive(arch);
+    var wiped = endTermWindow();
     newSemester(r.pair, r.key);
-    toast(L('أُرشف فصلُك السابق، وبدأ «' + r.pair.ar + '»',
-            'Your past term is archived — “' + r.pair.en + '” has begun'));
+    toast(wiped
+      ? L('أُرشف فصلُك السابق وبدأ «' + r.pair.ar + '» — وتاريخا الفصل صُفِّرا',
+          'Your past term is archived — “' + r.pair.en + '” has begun, and its dates were cleared')
+      : L('أُرشف فصلُك السابق، وبدأ «' + r.pair.ar + '»',
+          'Your past term is archived — “' + r.pair.en + '” has begun'));
   }
 
   /*@3.SEMJ.98*/
@@ -2364,6 +2412,7 @@
       try { localStorage.removeItem('garden_semester_meta'); } catch (e) {}
       S.sem = null;
       saveArchive(arch);
+      endTermWindow();
       /*@3.SEMJ.193*/
       var moved = 0;
       try {
@@ -2748,6 +2797,7 @@
       try { localStorage.removeItem('garden_semester_meta'); } catch (e) {}
       S.sem = null;
       saveArchive(arch);
+      endTermWindow();
       refresh();
       toast(L('أُرشف «' + nm + '» — تجده في الفصول السابقة',
               '“' + nm + '” is archived — find it under past semesters'));

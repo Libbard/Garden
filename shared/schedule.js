@@ -353,9 +353,17 @@
     if (!startStr) return '';
     return addMonthsStr(startStr, type === 'summer' ? 3 : 4);
   }
+  /*@3.SCHJ.313*/
+  function termSpanBad() {
+    var w = null;
+    try { w = GardenData.termWindow(schedule.settings || {}); } catch (e) { return null; }
+    return (w && !w.ok && w.why !== 'missing') ? w : null;
+  }
+
   function studyWeekNumber(date) {
     var st = schedule.settings || {};
     if (!st.term_start_date) return null;
+    if (termSpanBad()) return null;
     var termStart = getWeekStartDate(parseLocalDate(st.term_start_date));
     var n = Math.round((getWeekStartDate(date) - termStart) / (7 * 86400000)) + 1;
     if (n < 1) return null;
@@ -4405,7 +4413,9 @@
     } else {
       var wn = studyWeekNumber(currentWeekStart);
       numEl.textContent = wn ? (isAr() ? 'الأسبوع ' + wn : 'Week ' + wn)
-                             : (isAr() ? 'خارج الفصل' : 'Outside term');
+                             : (termSpanBad()
+                                ? (isAr() ? 'تاريخا فصلك غير صحيحين' : 'Term dates look wrong')
+                                : (isAr() ? 'خارج الفصل' : 'Outside term'));
       var e = new Date(currentWeekStart); e.setDate(e.getDate() + 6);
       dateEl.textContent = currentWeekStart.getDate() + ' – ' + e.getDate() + ' ' +
         MONTH_NAMES[lang][e.getMonth()] + ' ' + e.getFullYear();

@@ -1048,11 +1048,38 @@
       if (!l || !l.sx_crn || !l.start_date) return;
       if (!start || l.start_date < start) start = l.start_date;
     });
+    var st = sched.settings || {};
+    /*@3.GADJ.166*/
+    if (!start && st.sx_term_start) start = String(st.sx_term_start);
     (sched.exams || []).forEach(function (x) {
       if (!x || !x.sx_crn || x.exam_type !== 'final' || !x.date) return;
       if (!end || x.date > end) end = x.date;
     });
     return { start: start, end: end };
+  }
+
+  /*@3.GADJ.167*/
+  var TERM_MIN_DAYS = 21, TERM_MAX_DAYS = 217;
+  function termDay(v) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v || ''));
+    if (!m) return null;
+    var d = new Date(+m[1], +m[2] - 1, +m[3]);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  function termWindow(st) {
+    st = st || (scheduleRaw().settings || {});
+    var a = st.term_start_date || '', b = st.semester_end_date || '';
+    var out = { start: a, end: b, days: 0, weeks: 0, ok: false, why: 'missing',
+                min: TERM_MIN_DAYS, max: TERM_MAX_DAYS };
+    var da = termDay(a), db = termDay(b);
+    if (!da || !db) return out;
+    out.days = Math.round((db - da) / 86400000);
+    out.weeks = Math.max(1, Math.ceil(out.days / 7));
+    if (out.days <= 0) { out.why = 'reversed'; return out; }
+    if (out.days > TERM_MAX_DAYS) { out.why = 'long'; return out; }
+    if (out.days < TERM_MIN_DAYS) { out.why = 'short'; return out; }
+    out.ok = true; out.why = '';
+    return out;
   }
 
   /*@3.GADJ.143*/
@@ -1083,6 +1110,17 @@
       return { changed: false, conflict: null };
     }
 
+    /*@3.GADJ.168*/
+    if (!r.start || !r.end) {
+      var probe = termWindow({
+        term_start_date: r.start || st.term_start_date,
+        semester_end_date: r.end || st.semester_end_date
+      });
+      if (!probe.ok && probe.why !== 'missing') {
+        return { changed: false, conflict: r, span: probe };
+      }
+    }
+
     var changed = false;
     if (r.start && st.term_start_date !== r.start) { st.term_start_date = r.start; changed = true; }
     if (r.end && st.semester_end_date !== r.end) { st.semester_end_date = r.end; changed = true; }
@@ -1092,6 +1130,22 @@
     }
     if (changed && own && o.save !== false) writeSchedule(s);
     return { changed: changed, conflict: null };
+  }
+
+  /*@3.GADJ.169*/
+  function clearTermWindow(sched, opts) {
+    var o = opts || {};
+    var own = !sched;
+    var s = sched || scheduleRaw();
+    var st = s.settings || (s.settings = {});
+    var had = !!(st.term_start_date || st.semester_end_date);
+    st.term_start_date = '';
+    st.semester_end_date = '';
+    st.focus_periods = { midterm: { start: '', end: '' }, final: { start: '', end: '' } };
+    ['term_auto', 'term_rejected', 'sx_term_start',
+     'focus_auto', 'focus_rejected'].forEach(function (k) { delete st[k]; });
+    if (own && o.save !== false) writeSchedule(s);
+    return had;
   }
 
   function scheduleRaw() {
@@ -1976,6 +2030,8 @@
     progressMode: progressMode,
     setProgressMode: setProgressMode,
     syncTermRange: syncTermRange,
+    termWindow: termWindow,
+    clearTermWindow: clearTermWindow,
     semesterProgress: semesterProgress,
 
     gpaSummary: gpaSummary,
