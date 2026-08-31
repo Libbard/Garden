@@ -69,6 +69,11 @@
     this.open = false;
   }
 
+  /*@3.NOFJ.8*/
+  Find.prototype.pdf = function () {
+    return (this.getPdf && this.getPdf()) || null;
+  };
+
   /*@3.NOFJ.5*/
   Find.prototype.index = function () {
     var ed = this.ed;
@@ -94,6 +99,14 @@
     this.q = String(q == null ? '' : q);
     this.hits = [];
     this.at = -1;
+    /*@3.NOFJ.9*/
+    var P = this.pdf();
+    if (P) {
+      var n = P.search(this.q);
+      if (n) P.next();
+      this.say();
+      return n;
+    }
     var nq = norm(this.q).s;
     if (nq.length < 1) { this.paint(); this.say(); return 0; }
     var rows = this.index(), r, k, from, cap = 5000;
@@ -131,7 +144,15 @@
     return true;
   };
 
-  Find.prototype.next = function (back) { return this.go(this.at + (back ? -1 : 1)); };
+  Find.prototype.next = function (back) {
+    var P = this.pdf();
+    if (P) {
+      if (back) P.prev(); else P.next();
+      this.say();
+      return true;
+    }
+    return this.go(this.at + (back ? -1 : 1));
+  };
 
   /*@3.NOFJ.3*/
   Find.prototype.host = function () {
@@ -164,6 +185,7 @@
   }
 
   Find.prototype.paint = function () {
+    if (this.pdf()) return;
     var host = this.host();
     if (!host) return;
     host.textContent = '';
@@ -201,6 +223,24 @@
     if (!this.bar) return;
     var out = this.bar.querySelector('[data-nf="count"]');
     if (!out) return;
+    /*@3.NOFJ.10*/
+    var P = this.pdf();
+    if (P) {
+      var st = P.state();
+      if (!st.q) { out.textContent = ''; out.removeAttribute('data-none'); return; }
+      var scan = st.scanning
+        ? ' \u00b7 ' + Math.round(st.scanned * 100 / Math.max(1, st.pages)) + '%'
+        : '';
+      if (!st.total) {
+        out.textContent = (st.scanning ? L('\u064a\u064f\u0642\u0631\u0623 \u0627\u0644\u0645\u0644\u0641\u0651', 'Reading the file') + scan
+                                       : L('\u0644\u0627 \u0646\u062a\u064a\u062c\u0629', 'No results'));
+        out.setAttribute('data-none', st.scanning ? '0' : '1');
+        return;
+      }
+      out.removeAttribute('data-none');
+      out.textContent = (st.cur + 1) + ' / ' + st.total + scan;
+      return;
+    }
     if (!this.q) { out.textContent = ''; out.removeAttribute('data-none'); return; }
     if (!this.hits.length) {
       out.textContent = L('لا نتيجة', 'No results');
@@ -242,6 +282,18 @@
     this.bar.hidden = !want;
     var btn = document.getElementById('na-find-btn');
     if (btn) btn.setAttribute('aria-expanded', want ? 'true' : 'false');
+    /*@3.NOFJ.11*/
+    var P = this.pdf();
+    if (P) {
+      if (want) {
+        this.place();
+        var pin = this.bar.querySelector('[data-nf="q"]');
+        if (pin) { try { pin.focus(); pin.select(); } catch (e3) {} }
+        if (this.q) this.search(this.q);
+        else this.say();
+      } else { P.clear(); this.say(); }
+      return;
+    }
     if (want) {
       this.place();
       var inp = this.bar.querySelector('[data-nf="q"]');
@@ -266,6 +318,7 @@
   Find.prototype.bind = function (opts) {
     var self = this;
     this.getEd = opts.editor;
+    this.getPdf = opts.pdf || null;
     this.bar = opts.bar || document.getElementById('na-find-bar');
     if (!this.bar) return;
     var inp = this.bar.querySelector('[data-nf="q"]');
@@ -294,7 +347,7 @@
       var mod = e.ctrlKey || e.metaKey;
       if (mod && e.code === 'KeyF') {
         sync();
-        if (!self.ed || !self.ed.root || !self.ed.root.isConnected) return;
+        if (!self.pdf() && (!self.ed || !self.ed.root || !self.ed.root.isConnected)) return;
         e.preventDefault();
         self.show(true);
         return;
@@ -343,6 +396,7 @@
     soil: function () { inst.onDocChange(); },
     relayout: function () { inst.onLayout(); },
     search: function (q) { inst.ed = inst.getEd ? inst.getEd() : inst.ed; return inst.search(q); },
+    tell: function () { inst.say(); },
     next: function (b) { return inst.next(b); },
     hits: function () { return inst.hits.length; },
     at: function () { return inst.at; },

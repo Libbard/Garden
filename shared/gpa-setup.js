@@ -5,7 +5,7 @@
   var PROF = 'student_profile', ARCH = 'semester_archive',
       SEM = 'my_semester', PLANK = 'gpa_plan', DRAFT = 'gpa_setup_draft';
   /*@3.GPSJ.2*/
-  var PL_KEY = 'sx_plans', PL_VER = 5, PL_TTL = 30 * 24 * 3600 * 1000;
+  var PL_KEY = 'sx_plans', PL_VER = 6, PL_TTL = 30 * 24 * 3600 * 1000;
   var GPA_SCALE = { 'A+': 4, 'A': 3.75, 'B+': 3.5, 'B': 3, 'C+': 2.5, 'C': 2, 'D+': 1.5, 'D': 1, 'F': 0 };
   var GRADES = ['', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'TR'];
   var PREP_RE = /^[A-Za-z]+0/;
@@ -13,7 +13,7 @@
   var CAP_REG = 18, CAP_SUM = 9;
   var FULL_SUPPORT = 'bachelor-of-computer-science';
 
-  var PLANS = null, W = null, MOVING = null;
+  var PLANS = null, W = null, MOVING = null, MODE = 'setup';
 
   function isAr() { return (document.documentElement.getAttribute('lang') || 'ar') === 'ar'; }
   function L(a, e) { return isAr() ? a : e; }
@@ -144,24 +144,79 @@
   /*@3.GPSJ.17*/
   var LV_AR = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس',
                'السابع', 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر'];
+  /*@3.GPSJ.121*/
+  function summerAfter(k) {
+    var m = /^s(\d+)$/.exec(String(k == null ? '' : k));
+    return m ? parseInt(m[1], 10) : null;
+  }
+  function lvRank(k) {
+    var sa = summerAfter(k);
+    if (sa !== null) return sa + 0.5;
+    if (k === 'u') return 90;
+    if (k === 'x') return 91;
+    var n = parseInt(k, 10);
+    return isNaN(n) ? 92 : n;
+  }
   function levelNameIn(n, lang) {
+    var sa = summerAfter(n);
+    if (sa !== null) {
+      return lang === 'ar' ? ('فصل صيفيّ بعد ' + levelNameIn(sa, 'ar'))
+                           : ('Summer term after level ' + sa);
+    }
+    if (n === 'u') return lang === 'ar' ? 'بلا مستوىً معلن' : 'Level not stated';
     if (n === 'x' || n === null || isNaN(n)) return lang === 'ar' ? 'مواد خارج الخطة' : 'Outside the plan';
+    n = +n;
     if (n === 0) return lang === 'ar' ? 'السنة التحضيرية' : 'Preparatory year';
     return lang === 'ar' ? ('المستوى ' + (LV_AR[n] || n)) : ('Level ' + n);
   }
   function levelName(n) { return levelNameIn(n, isAr() ? 'ar' : 'en'); }
 
   /*@3.GPSJ.18*/
-  var PRE = null;                       /*@3.GPSJ.19*/
-  function prereqOf(code) {
-    if (PRE && PRE[code]) return (PRE[code] || []).map(function (r) { return r.c; }).filter(Boolean);
+  var RULES_AT = '';
+  /*@3.GPSJ.123*/
+  function rulesReady(after) {
+    var R = window.GardenPlanRules;
+    if (!R) return;
+    if (RULES_AT === 'ok' || RULES_AT === 'busy') return;
+    RULES_AT = 'busy';
+    R.loadRules(function (ru) {
+      RULES_AT = (ru && ru.kn) ? 'ok' : 'fail';
+      if (typeof after === 'function') setTimeout(after, 0);
+    });
+  }
+  /*@3.GPSJ.19*/
+  function preGroups(code) {
+    var R = window.GardenPlanRules;
+    if (R) return R.prereq(W && W.program, code).groups;
     var c = courseBy(code);
-    return c ? fPre(c) : [];
+    return fPre(c).map(function (x) { return [x]; });
+  }
+  function prereqOf(code) {
+    var flat = [];
+    preGroups(code).forEach(function (g) { flat.push(g.join(isAr() ? ' أو ' : ' or ')); });
+    return flat;
   }
   function prereqMet(code, passed) {
-    var pre = prereqOf(code);
-    if (!pre.length) return true;       /*@3.GPSJ.20*/
-    return pre.every(function (x) { return !!passed[x]; });
+    var g = preGroups(code);
+    if (!g.length) return true;         /*@3.GPSJ.20*/
+    return g.every(function (grp) {
+      return grp.some(function (x) { return !!passed[x]; });
+    });
+  }
+  /*@3.GPSJ.124*/
+  function levelBlocks(code) {
+    var R = window.GardenPlanRules;
+    if (!R || !W || !W.curLevel) return null;
+    if (R.levelAllows(code, W.curLevel) !== false) return null;
+    var n = R.levelNote(code, spanOf());
+    if (!n) return '';
+    if (n.tail) {
+      return L('بانر لا يفتحها قبل ' + levelName(n.min) + ' وأنت في المستوى ' + W.curLevel + ' — لك أن تختارها، ولك أن تعرف.',
+               'Banner does not open it before level ' + n.min + ' and you are in level ' + W.curLevel +
+                 ' — you may still pick it, but now you know.');
+    }
+    return L('بانر يقصرها على ' + n.list.map(levelName).join('، ') + ' وأنت في المستوى ' + W.curLevel + '.',
+             'Banner limits it to levels ' + n.list.join(', ') + ' and you are in level ' + W.curLevel + '.');
   }
   function passedMap() {
     var m = {};
@@ -180,7 +235,19 @@
              college_key: '', program: '', plan_version: '', track: '',
              levels: {}, curLevel: '', term: guessTerm(), cur: [], planAsk: {} };
   }
-  function saveDraft() { writeJSON(DRAFT, W); }
+  /*@3.GPSJ.120*/
+  function recSig() {
+    var a = (readJSON(ARCH, []) || []).map(function (x) {
+      return String((x && x.id) || '') + ':' +
+        ((x && x.courses) || []).map(function (c) {
+          return String((c && c.code) || '') + '=' + String((c && c.grade) || '');
+        }).sort().join(',');
+    }).sort().join('|');
+    var sem = readJSON(SEM, null);
+    var c = ((sem && sem.courses) || []).map(function (x) { return String((x && x.code) || ''); }).sort().join(',');
+    return a + '#' + c;
+  }
+  function saveDraft() { W.sig = recSig(); writeJSON(DRAFT, W); }
 
   /*@3.GPSJ.23*/
   function importExisting() {
@@ -239,9 +306,24 @@
   var YEAR_FLOOR = 2018;              /*@3.GPSJ.29*/
   var oldYears = false, planErr = false;
 
+  var CARRY = ['name_ar', 'name_en', 'start_year', 'college_key', 'program',
+               'plan_version', 'track', 'curLevel', 'term'];
+  var refreshed = false;
   function open(step) {
     loadPlans(function () {
       var draft = readJSON(DRAFT, null);
+      _autoAt = null; _autoOwned = false;
+      refreshed = false;
+      if (draft && draft.sig !== recSig()) {
+        var keep = draft;
+        importExisting();
+        W.step = keep.step || 0;
+        CARRY.forEach(function (k) { if (keep[k]) W[k] = keep[k]; });
+        W.planAsk = keep.planAsk || {};
+        refreshed = true;
+        saveDraft();
+        draft = W;
+      }
       W = draft || importExisting();
       if (!draft) W.step = 0;   /*@3.GPSJ.30*/
       if (typeof step === 'string') { var k = STEPS.indexOf(step); if (k >= 0) W.step = k; }
@@ -253,7 +335,7 @@
     if (!keepDraft) localStorage.removeItem(DRAFT);
     closeGrade();
     var ov = $('#gs-overlay'); if (ov) ov.remove();
-    W = null;
+    W = null; MODE = 'setup';
   }
 
   function mount() {
@@ -291,7 +373,10 @@
     /*@3.GPSJ.33*/
     $('#gs-body').addEventListener('scroll', closeGrade, { passive: true });
     /*@3.GPSJ.34*/
+    /*@3.GPSJ.153*/
+    ov.addEventListener('pointerdown', plPointerDown);
     ov.addEventListener('dragstart', function (e) {
+      if (MODE === 'planner') { e.preventDefault(); return; }
       var card = e.target.closest && e.target.closest('.gs-card[draggable]');
       if (!card) return;
       MOVING = card.getAttribute('data-code');
@@ -299,6 +384,7 @@
       card.classList.add('is-moving');
     });
     ov.addEventListener('dragover', function (e) {
+      if (MODE === 'planner') return;
       var z = e.target.closest && e.target.closest('[data-drop]');
       if (!z || !MOVING) return;
       e.preventDefault();
@@ -306,17 +392,22 @@
       z.classList.add('is-drop');
     });
     ov.addEventListener('dragleave', function (e) {
+      if (MODE === 'planner') return;
       var z = e.target.closest && e.target.closest('[data-drop]');
       if (z) z.classList.remove('is-drop');
     });
     ov.addEventListener('drop', function (e) {
+      if (MODE === 'planner') return;
       var z = e.target.closest && e.target.closest('[data-drop]');
       if (!z || !MOVING) return;
       e.preventDefault();
       moveTo(MOVING, z.getAttribute('data-drop'));
       MOVING = null; saveDraft(); paint();
     });
-    ov.addEventListener('dragend', function () { MOVING = null; paint(); });
+    ov.addEventListener('dragend', function () {
+      if (MODE === 'planner') return;
+      MOVING = null; paint();
+    });
   }
 
   /*@3.GPSJ.35*/
@@ -482,6 +573,16 @@
     return h + '</div>';
   }
 
+  function spanOf() {
+    var R = window.GardenPlanRules;
+    if (R && W && W.program) return R.levelSpan(W.program);
+    return { lo: 1, hi: 8, prep: false, known: false };
+  }
+  function topLevel() {
+    var sp = spanOf();
+    return sp.known ? Math.max(sp.hi, 1) : MAX_LEVEL;
+  }
+
   /*@3.GPSJ.45*/
   function levelFromYear(y) {
     y = parseInt(y, 10); if (!y) return null;
@@ -489,10 +590,16 @@
     var acad = (m >= 7) ? now.getFullYear() : now.getFullYear() - 1;   /*@3.GPSJ.46*/
     var elapsed = acad - y;
     if (elapsed < 0) return null;
-    if (elapsed === 0) return 0;                                        /*@3.GPSJ.47*/
-    var lv = 3 + (elapsed - 1) * 2;
-    if (m >= 0 && m <= 4) lv += 1;                                      /*@3.GPSJ.48*/
-    return Math.max(0, Math.min(lv, MAX_LEVEL));
+    var sp = spanOf(), spring = (m >= 0 && m <= 4) ? 1 : 0;
+    var lv;
+    if (sp.known && !sp.prep) {
+      lv = sp.lo + elapsed * 2 + spring;
+    } else {
+      if (elapsed === 0) return 0;                                      /*@3.GPSJ.47*/
+      lv = 3 + (elapsed - 1) * 2 + spring;                              /*@3.GPSJ.48*/
+    }
+    var hi = sp.known ? sp.hi : MAX_LEVEL;
+    return Math.max(sp.known ? sp.lo : 0, Math.min(lv, hi));
   }
 
   /*@3.GPSJ.49*/
@@ -553,30 +660,70 @@
 
   /*@3.GPSJ.51*/
   function resolveUnknownLevels() {
-    var x = W.levels.x;
-    if (!x || !x.length || !courses().length) return;
-    var rest = [];
-    x.forEach(function (e) {
-      var c = courseBy(e.code), lv = c ? planLevel(c) : null;
-      if (lv === null) { rest.push(e); return; }
-      (W.levels[lv] = W.levels[lv] || []).push(e);
+    if (!courses().length) return;
+    var moved = false;
+    ['x', 'u'].forEach(function (bag) {
+      var src = W.levels[bag];
+      if (!src || !src.length) return;
+      var rest = [];
+      src.forEach(function (e) {
+        var c = courseBy(e.code), lv = c ? planLevel(c) : null;
+        /*@3.GPSJ.119*/
+        var home = c ? (lv === null ? 'u' : lv) : 'x';
+        if (String(home) === bag) { rest.push(e); return; }
+        (W.levels[home] = W.levels[home] || []).push(e);
+        moved = true;
+      });
+      if (rest.length) W.levels[bag] = rest; else delete W.levels[bag];
     });
-    if (rest.length) W.levels.x = rest; else delete W.levels.x;
-    saveDraft();
+    if (moved) saveDraft();
   }
 
+  /*@3.GPSJ.118*/
+  var KINDS = {
+    elective:   ['اختياري', 'Elective'],
+    internship: ['تدريب ميداني', 'Internship'],
+    research:   ['مشروع بحث', 'Research project']
+  };
+  function kindName(c) {
+    var k = KINDS[c.k || c.category];
+    return k ? L(k[0], k[1]) : '';
+  }
+  /*@3.GPSJ.117*/
+  function planHasUnlevelled() {
+    return courses().some(function (c) { return planLevel(c) === null; });
+  }
+  /*@3.GPSJ.116*/
   function levelsInUse() {
-    var s = {};
-    courses().forEach(function (c) { var lv = planLevel(c); if (lv !== null) s[lv] = true; });
-    Object.keys(W.levels).forEach(function (k) { if (k !== 'x') s[k] = true; });
+    var s = {}, cs = courses();
+    cs.forEach(function (c) { var lv = planLevel(c); if (lv !== null) s[lv] = true; });
+    Object.keys(W.levels).forEach(function (k) {
+      if (k === 'x' || k === 'u' || summerAfter(k) !== null) return;
+      if (!isNaN(parseInt(k, 10))) s[k] = true;
+    });
     var arr = Object.keys(s).map(Number).filter(function (n) { return !isNaN(n); });
     var maxPlan = Math.max.apply(null, arr.concat([0]));
-    for (var i = 0; i <= Math.min(MAX_LEVEL, Math.max(maxPlan, 8)); i++) if (i !== 1 && i !== 2) s[i] = true;
-    s[0] = true;
-    var out = Object.keys(s).map(Number).sort(function (a, b) { return a - b; });
+    var span = cs.length ? maxPlan : 8;
+    for (var i = 0; i <= Math.min(MAX_LEVEL, span); i++) if (i !== 1 && i !== 2) s[i] = true;
+    if (!cs.length || cs.some(fPrep) || (W.levels[0] || []).length) s[0] = true;
+    else delete s[0];
+    var nums = Object.keys(s).map(Number).filter(function (n) { return !isNaN(n); })
+                     .sort(function (a, b) { return a - b; });
+    var out = [];
+    nums.forEach(function (n) {
+      out.push(n);
+      if (hasBag('s' + n)) out.push('s' + n);
+    });
+    Object.keys(W.levels).forEach(function (k) {
+      var sa = summerAfter(k);
+      if (sa === null || out.indexOf(k) > -1) return;
+      out.push(k);
+    });
+    if (planHasUnlevelled() || (W.levels.u || []).length) out.push('u');
     if ((W.levels.x || []).length) out.push('x');   /*@3.GPSJ.52*/
     return out;
   }
+  function hasBag(k) { return Object.prototype.hasOwnProperty.call(W.levels, k); }
   function takenAt(code) {
     var found = null;
     Object.keys(W.levels).forEach(function (lv) {
@@ -658,16 +805,19 @@
     if (g === 'F') return 'danger';
     return 'warn';
   }
-  function gradeBtn(code, val) {
+  function gradeBtn(code, val, label) {
+    var nm = label || code;
     return '<button type="button" class="gs-gr-btn' + (val ? ' is-set' : '') +
       '" data-gs="grade" data-v="' + esc(code) + '" data-tone="' + gTone(val) + '"' +
-      ' aria-haspopup="listbox" aria-label="' + esc(L('تقدير ' + code, 'Grade for ' + code)) + '">' +
+      ' aria-haspopup="listbox" aria-label="' + esc(L('تقدير ' + nm, 'Grade for ' + nm)) + '">' +
       '<span>' + esc(val || '—') + '</span><i class="fa-solid fa-chevron-down"></i></button>';
   }
   function closeGrade() { var p = $('#gs-gpop'); if (p) p.remove(); }
   function openGrade(btn, code) {
     closeGrade();
-    var en = entryOf(code), cur = (en && en.grade) || '';
+    var planned = String(code).indexOf('pl:') === 0;
+    var en = planned ? null : entryOf(code);
+    var cur = planned ? plGradeOf(code) : ((en && en.grade) || '');
     var pop = document.createElement('div');
     pop.id = 'gs-gpop'; pop.className = 'gs-gpop'; pop.setAttribute('role', 'listbox');
     pop.innerHTML = GRADES.map(function (g) {
@@ -684,6 +834,7 @@
     pop.style.top = top + 'px'; pop.style.left = left + 'px';
     pop.addEventListener('click', function (ev) {
       var o = ev.target.closest('[data-g]'); if (!o) return;
+      if (planned) { closeGrade(); plGradeSet(code, o.getAttribute('data-g')); return; }
       var e2 = entryOf(code);
       if (e2) { e2.grade = o.getAttribute('data-g'); claimRecord(); saveDraft(); }
       closeGrade(); paint();
@@ -705,7 +856,7 @@
     var lvls = levelsInUse();
     var byLevel = {};
     courses().forEach(function (c) {
-      var lv = planLevel(c); if (lv === null) lv = 'x';
+      var lv = planLevel(c); if (lv === null) lv = 'u';
       (byLevel[lv] = byLevel[lv] || []).push(c);
     });
     var noGrade = 0, ticked = 0;
@@ -728,6 +879,12 @@
           '<i class="fa-solid fa-rotate" aria-hidden="true"></i> ' + esc(L('أعد المحاولة', 'Retry')) + '</button>' +
         '</div></div></div>';
       return h;
+    }
+    if (refreshed) {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-rotate"></i><div>' +
+        esc(L('تغيّر سجلُّك في صفحة المعدّل بعد آخر مرّةٍ فتحتَ المعالج، فأعدنا قراءتَه من مكانه — والمعروضُ هنا هو المحفوظ الآن.',
+              'Your record changed on the GPA page since you last opened the wizard, so we re-read it — what you see here is what is stored now.')) +
+        '</div></div>';
     }
     var fresh = newlyAdded();
     if (fresh.length) {
@@ -785,14 +942,32 @@
       }, 0);
       var list = planned.concat(extra.map(function (x) { return courseBy(x.code) || { c: x.code, h: 0, l: lv }; }));
 
-      h += '<div class="gs-lv' + (MOVING ? ' is-target' : '') + '" data-lv="' + lv + '" data-drop="' + lv + '">' +
+      var numeric = /^\d+$/.test(String(lv)) && +lv > 0;
+      var hasSum = hasBag('s' + lv);
+      h += '<div class="gs-lv' + (MOVING ? ' is-target' : '') +
+             (summerAfter(lv) !== null ? ' is-summer' : '') + '" data-lv="' + lv + '" data-drop="' + lv + '">' +
+        '<div class="gs-lv-top">' +
         '<button type="button" class="gs-lv-h" data-gs="drop-here" data-v="' + lv + '">' +
           '<span class="gs-lv-n">' + esc(levelName(lv)) + '</span>' +
           (cr ? '<span class="gs-lv-cr">' + cr + esc(L(' ساعة', ' cr')) + '</span>' : '<span class="gs-lv-cr"></span>') +
           (lv === 0 ? '<span class="gs-lv-fix">' + esc(L('موادها ثابتة', 'fixed')) + '</span>' : '') +
           (MOVING ? '<span class="gs-drop-hint">' + esc(L('انقله هنا', 'drop here')) + '</span>' : '') +
-        '</button><div class="gs-cards">';
+        '</button>' +
+        (numeric && !hasSum ? '<button type="button" class="gp-ico gs-lv-add" data-gs="add-summer" data-v="' + lv + '"' +
+          ' title="' + esc(L('فصل صيفيّ بعده', 'Summer term after it')) + '"' +
+          ' aria-label="' + esc(L('أضف فصلاً صيفيّاً بعد ' + levelName(lv), 'Add a summer term after level ' + lv)) +
+          '"><i class="fa-solid fa-sun"></i></button>' : '') +
+        (summerAfter(lv) !== null && !(W.levels[lv] || []).length
+          ? '<button type="button" class="gp-ico gp-ico--danger gs-lv-add" data-gs="del-summer" data-v="' + lv + '"' +
+            ' aria-label="' + esc(L('احذف ' + levelName(lv), 'Delete ' + levelName(lv))) +
+            '"><i class="fa-solid fa-trash-can"></i></button>' : '') +
+        '</div><div class="gs-cards">';
 
+      if (!list.length && summerAfter(lv) !== null) {
+        h += '<p class="gs-hint gs-lv-hint">' + esc(L(
+          'فصلٌ صيفيٌّ فارغ — انقل إليه مادّةً بزرِّ النقل أو بالسحب، أو احذفه.',
+          'An empty summer term — move a course into it with the move button or by dragging, or delete it.')) + '</p>';
+      }
       list.forEach(function (c) {
         var code = fCode(c), at = takenAt(code), on = at !== null;
         var here = String(at) === String(lv);
@@ -811,7 +986,9 @@
             '<span class="gs-card-name"' + dirAttr + '>' + esc(cTitle(c)) + '</span>' +
           '</div>' +
           '<div class="gs-card-foot">' +
-            '<span class="gs-card-ch">' + (fCh(c) ? fCh(c) + esc(L(' ساعة', ' cr')) : '') + '</span>' +
+            '<span class="gs-card-ch">' + (fCh(c) ? fCh(c) + esc(L(' ساعة', ' cr')) : '') +
+              (lv === 'u' && kindName(c) ? '<em class="gs-card-kind">' + esc(kindName(c)) + '</em>' : '') +
+            '</span>' +
             (fromElsewhere ? '<em class="gs-card-from">' + esc(L('من ', 'from ') + levelName(planLevel(c))) + '</em>' : '') +
             (on ? gradeBtn(code, (e && e.grade) || '') : '') +
             (on && lv !== 0 ? '<button type="button" class="gp-ico gs-card-move' + (moving ? ' is-on' : '') +
@@ -844,6 +1021,7 @@
   /*@3.GPSJ.63*/
   function bodyCurrent() {
     syncLevelWithRecord();
+    rulesReady(function () { if (W && STEPS[W.step] === 'current') paint(); });
     var passed = passedMap();
     var elig = courses().filter(function (c) {
       return !passed[fCode(c)] && prereqMet(fCode(c), passed) && !fPrep(c);
@@ -856,7 +1034,7 @@
 
     var h = '<div class="gs-two">' +
       '<div class="gs-field"><label class="gs-lbl" for="gs-lv">' + esc(L('رقم مستواك الحالي', 'Your current level')) + '</label>' +
-        '<input class="gs-inp" id="gs-lv" type="number" min="1" max="' + MAX_LEVEL + '" value="' + esc(W.curLevel) + '" placeholder="6">' +
+        '<input class="gs-inp" id="gs-lv" type="number" min="1" max="' + topLevel() + '" value="' + esc(W.curLevel) + '" placeholder="' + topLevel() + '">' +
         '</div>' +
       '<div class="gs-field"><label class="gs-lbl">' + esc(L('نوع الفصل', 'Term type')) + '</label>' +
         '<div class="gs-chips">' +
@@ -869,12 +1047,30 @@
     h += '<p class="gs-lead">' + esc(L(
       'ما يصحّ تسجيلُه الآن: غيرُ مجتاز ومتطلبُه متحقّق — بلا سقفٍ بالمستوى، فقد تسجّل مادةً من مستوًى لاحقٍ حقّقت متطلبها.',
       'What you may register now: not yet passed and prerequisites met — with no level cap, so a later-level course whose prerequisite you met is allowed.')) + '</p>';
+    if (RULES_AT === 'busy') {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-cloud-arrow-down"></i><div>' +
+        esc(L('نجلب قيودَ بانر… المتطلباتُ المعروضة الآن من خطّتك، وقيودُ المستوى تظهر حين تصل.',
+              'Fetching Banner rules… prerequisites shown now come from your plan; level limits appear once they land.')) +
+        '</div></div>';
+    }
+    var broke = W.cur.filter(function (code) {
+      return !prereqMet(code, passed) || levelBlocks(code);
+    });
+    if (broke.length) {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-triangle-exclamation"></i><div>' +
+        esc(L('اخترتَ ' + broke.length + ' مادةً تخالف قيداً: ' + broke.join('، ') +
+                '. نُبقيها لك — والقرارُ قرارك، ولكن البانرَ قد يرفض التسجيل.',
+              'You picked ' + broke.length + ' course(s) against a rule: ' + broke.join(', ') +
+                '. We keep them — the call is yours, but Banner may refuse the registration.')) +
+        '</div></div>';
+    }
 
     var lang = progLang(), dirAttr = ' dir="' + (lang === 'ar' ? 'rtl' : 'ltr') + '"';
     h += '<div class="gs-elig">' + elig.map(function (c) {
       var cc = fCode(c), on = W.cur.indexOf(cc) > -1;
+      var win = levelBlocks(cc);
       /*@3.GPSJ.64*/
-      return '<div class="gs-card gs-card--tap' + (on ? ' is-on' : '') + '"' +
+      return '<div class="gs-card gs-card--tap' + (on ? ' is-on' : '') + (win ? ' is-flag' : '') + '"' +
           ' role="button" tabindex="0" aria-pressed="' + on + '" data-gs="cur" data-v="' + esc(cc) + '">' +
         '<div class="gs-card-main">' +
           '<span class="gs-tick-box"><i class="fa-solid fa-check"></i></span>' +
@@ -884,7 +1080,9 @@
         '<div class="gs-card-foot">' +
           '<span class="gs-card-ch">' + (fCh(c) ? fCh(c) + esc(L(' ساعة', ' cr')) : '') + '</span>' +
           '<em class="gs-card-from gs-card-lv">' + esc(levelName(planLevel(c))) + '</em>' +
-        '</div></div>';
+        '</div>' +
+        (win ? '<div class="gs-flag"><i class="fa-solid fa-stairs"></i>' + esc(win) + '</div>' : '') +
+        '</div>';
     }).join('') + '</div>';
 
     /*@3.GPSJ.65*/
@@ -908,7 +1106,7 @@
             '</div>' +
             '<div class="gs-card-foot">' +
               '<span class="gs-card-ch">' + (fCh(c) ? fCh(c) + esc(L(' ساعة', ' cr')) : '') + '</span>' +
-              '<em class="gs-card-from gs-card-lv">' + esc(L('يلزم ', 'needs ') + prereqOf(bc).join('، ')) + '</em>' +
+              '<em class="gs-card-from gs-card-lv">' + esc(L('يلزم ', 'needs ') + prereqOf(bc).join(isAr() ? ' و' : ', ')) + '</em>' +
             '</div></div>';
         }).join('') + '</div></details>';
     }
@@ -1217,15 +1415,21 @@
     var from = takenAt(code); if (from === null) return;
     var e = entryOf(code);
     W.levels[from] = W.levels[from].filter(function (x) { return x.code !== code; });
-    if (!W.levels[from].length) delete W.levels[from];
+    /*@3.GPSJ.122*/
+    if (!W.levels[from].length && summerAfter(from) === null) delete W.levels[from];
     (W.levels[lv] = W.levels[lv] || []).push(e);
   }
 
   /*@3.GPSJ.84*/
   function onClick(e) {
     /*@3.GPSJ.85*/
-    if (e.target === e.currentTarget) { e.stopPropagation(); close(true); return; }
+    if (e.target === e.currentTarget) {
+      e.stopPropagation();
+      if (MODE === 'planner') plClose(); else close(true);
+      return;
+    }
     if (!e.target.closest('[data-gs="grade"]')) closeGrade();
+    if (MODE === 'planner') { plClick(e); return; }
     var b = e.target.closest('[data-gs]'); if (!b) return;
     var a = b.getAttribute('data-gs'), v = b.getAttribute('data-v');
     if (a === 'close') { close(true); return; }
@@ -1281,6 +1485,18 @@
     }
     if (a === 'pick') { MOVING = (MOVING === v) ? null : v; paint(); return; }
     if (a === 'grade') { openGrade(b, v); return; }
+    if (a === 'del-summer') {
+      if (!(W.levels[v] || []).length) delete W.levels[v];
+      saveDraft(); paint(); return;
+    }
+    if (a === 'add-summer') {
+      var sk = 's' + v;
+      if (!(W.levels[sk] || []).length) {
+        W.levels[sk] = W.levels[sk] || [];
+        if (MOVING) { moveTo(MOVING, sk); MOVING = null; }
+      }
+      claimRecord(); saveDraft(); paint(); return;
+    }
     if (a === 'drop-here') {
       if (MOVING) { moveTo(MOVING, v); claimRecord(); saveDraft(); MOVING = null; paint(); }
       return;
@@ -1303,7 +1519,7 @@
       var lv = b.getAttribute('data-lv'), at = takenAt(v);
       if (at !== null) {
         W.levels[at] = W.levels[at].filter(function (x) { return x.code !== v; });
-        if (!W.levels[at].length) delete W.levels[at];
+        if (!W.levels[at].length && summerAfter(at) === null) delete W.levels[at];
       } else {
         (W.levels[lv] = W.levels[lv] || []).push({ code: v, grade: '' });
       }
@@ -1325,6 +1541,7 @@
   }
   function onInput(e) {
     var s = e.target;
+    if (MODE === 'planner') { plInput(e); return; }
     if (s.id === 'gs-name-ar') W.name_ar = s.value;
     else if (s.id === 'gs-name-en') W.name_en = s.value;
     else if (s.id === 'gs-lv') W.curLevel = s.value;
@@ -1355,6 +1572,7 @@
     if (W.start_year) p.start_year = W.start_year;
     if (W.program) p.program = W.program;
     if (W.plan_version) p.plan_version = W.plan_version;
+    if (W.track) p.track = W.track;
     if (W.curLevel) { p.level = String(W.curLevel); p.levels = [String(W.curLevel)]; }
     /*@3.GPSJ.94*/
     var passed = passedMap();
@@ -1365,13 +1583,19 @@
     var arch = (readJSON(ARCH, []) || []).filter(function (a) {
       return a && a.id && String(a.id).indexOf('gpa_L') !== 0 && a.id !== 'onb_prior';
     });
-    Object.keys(W.levels).sort(function (a, b) { return (+a) - (+b); }).forEach(function (lv) {
+    var ord = 0;
+    Object.keys(W.levels).sort(function (a, b) { return lvRank(a) - lvRank(b); }).forEach(function (lv) {
       /*@3.GPSJ.111*/
       var mine = W.levels[lv].filter(function (x) { return !x.from; });
       if (!mine.length) return;
+      var sa = summerAfter(lv);
       arch.push({
-        id: 'gpa_L' + lv, level: (lv === 'x' ? null : +lv), name: levelName(+lv),
-        name_ar: levelNameIn(+lv, 'ar'), name_en: levelNameIn(+lv, 'en'),
+        id: 'gpa_L' + lv,
+        level: (sa !== null || !/^\d+$/.test(String(lv))) ? null : +lv,
+        summer: sa !== null, after: sa,
+        ord: ord++,
+        name: levelNameIn(lv, isAr() ? 'ar' : 'en'),
+        name_ar: levelNameIn(lv, 'ar'), name_en: levelNameIn(lv, 'en'),
         courses: mine.map(function (x) {
           var c = courseBy(x.code), o = { code: x.code, grade: x.grade || null };
           if (c) o.credits = fCh(c);
@@ -1476,8 +1700,1050 @@
     });
   }
 
+  /*@3.GPSJ.125*/
+  var PC = null, PQ = '', PMOVE = null, RULES_STATE = 'idle';
+
+  function R() { return window.GardenPlanRules || null; }
+
+  function plUid() {
+    return 'c' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
+  }
+  function plRead() {
+    var p = readJSON(PLANK, null);
+    var fresh = !p || !Array.isArray(p.semesters);
+    if (fresh) p = { semesters: [] };
+    var seen = {}, n = 0, uids = {};
+    p.semesters.forEach(function (s) {
+      s.courses = Array.isArray(s.courses) ? s.courses : [];
+      if (!s.id || seen[s.id]) { s.id = 'pt' + (Date.now() % 1e7) + '_' + (n++); fresh = true; }
+      seen[s.id] = 1;
+      s.courses.forEach(function (c) {
+        if (!c.uid || uids[c.uid]) { c.uid = plUid() + (n++); fresh = true; }
+        uids[c.uid] = 1;
+      });
+    });
+    /*@3.GPSJ.144*/
+    if (fresh) writeJSON(PLANK, p);
+    return p;
+  }
+  function plWrite(p) {
+    writeJSON(PLANK, p);
+    try { document.dispatchEvent(new CustomEvent('garden:planChanged')); } catch (e) {}
+  }
+
+  /*@3.GPSJ.145*/
+  var PSNAP = null, PUNDO = [];
+  function plMark(p) {
+    try { PUNDO.push(JSON.stringify(p)); } catch (e) { return; }
+    if (PUNDO.length > 40) PUNDO.shift();
+  }
+  function plRestore(raw) {
+    if (raw == null) return false;
+    try { localStorage.setItem(PLANK, raw); } catch (e) { return false; }
+    try { document.dispatchEvent(new CustomEvent('garden:planChanged')); } catch (e) {}
+    return true;
+  }
+  function plDirty() {
+    if (PSNAP == null) return false;
+    var now = null;
+    try { now = localStorage.getItem(PLANK); } catch (e) { return false; }
+    return String(now || '') !== String(PSNAP);
+  }
+
+  function plCtx() {
+    var prof = readJSON(PROF, {}) || {};
+    var passed = {}, curCodes = [];
+    (readJSON(ARCH, []) || []).forEach(function (a) {
+      (a && a.courses || []).forEach(function (c) { if (c && c.code) passed[c.code] = c.grade || true; });
+    });
+    (prof.passed_extra || []).forEach(function (c) { if (c) passed[c] = passed[c] || true; });
+    var sem = readJSON(SEM, null);
+    if (sem && sem.courses) curCodes = sem.courses.map(function (c) { return c && c.code; }).filter(Boolean);
+    var lv = parseInt(prof.level, 10) || 0;
+    return {
+      slug: prof.program || '',
+      level: lv,
+      summer: !!(sem && sem.summer),
+      passed: passed,
+      cur: curCodes,
+      span: R() ? R().levelSpan(prof.program || '') : { lo: 1, hi: 8, prep: false, known: false }
+    };
+  }
+
+  function plTitle(c) {
+    if (!c) return '';
+    var ar = (c.ta != null ? c.ta : c.title_ar), en = (c.t != null ? c.t : c.title);
+    return (isAr() ? (ar || en) : (en || ar)) || '';
+  }
+  function plCourse(code) { return R() ? R().courseBy(PC.slug, code) : null; }
+  function plName(code, fallback) {
+    var c = plCourse(code);
+    return plTitle(c) || fallback || code || '';
+  }
+
+  /*@3.GPSJ.128*/
+  function plTermName(s, i) {
+    if (s.renamed && s.name) return s.name;
+    if (s.summer) return L('فصل صيفيّ', 'Summer term');
+    if (s.level != null) return levelName(s.level);
+    return s.name || L('فصل مخطّط ' + (i + 1), 'Planned term ' + (i + 1));
+  }
+  function plCap(s) { return s && s.summer ? CAP_SUM : CAP_REG; }
+  function plCr(s) {
+    return (s.courses || []).reduce(function (a, c) { return a + (+c.credits || 0); }, 0);
+  }
+
+  /*@3.GPSJ.126*/
+  function plPassedBefore(p, upto) {
+    var m = {};
+    Object.keys(PC.passed).forEach(function (k) { m[k] = 1; });
+    PC.cur.forEach(function (k) { m[k] = 1; });
+    for (var i = 0; i < upto && i < p.semesters.length; i++) {
+      (p.semesters[i].courses || []).forEach(function (c) { if (c && c.code) m[c.code] = 1; });
+    }
+    return m;
+  }
+
+  function plIssues(p, si, course) {
+    if (!R() || !course || !course.code) return [];
+    var s = p.semesters[si];
+    return R().check({
+      slug: PC.slug, code: course.code,
+      passed: plPassedBefore(p, si),
+      level: (s && s.level != null) ? s.level : null
+    });
+  }
+
+  function plIssueText(v) {
+    if (v.k === 'pre') return L('يلزمها قبلها: ' + plGroupWord(v.groups), 'Needs first: ' + plGroupWord(v.groups));
+    if (v.k === 'level') return levelWord(v.code, v.at);
+    return '';
+  }
+  function plGroupWord(groups) {
+    return groups.map(function (g) { return g.join(isAr() ? ' أو ' : ' or '); })
+                 .join(isAr() ? ' و' : ', ');
+  }
+
+  function levelWord(code, at) {
+    var Rr = window.GardenPlanRules;
+    var n = Rr && Rr.levelNote(code, PC ? PC.span : null);
+    if (!n) return '';
+    if (n.tail) {
+      return L('بانر لا يفتحها قبل ' + levelName(n.min) + ' — وهذا الفصل عند المستوى ' + at + '.',
+               'Banner does not open it before level ' + n.min + ' — this term sits at level ' + at + '.');
+    }
+    return L('بانر يقصرها على ' + n.list.map(levelName).join('، ') + ' — وهذا الفصل عند المستوى ' + at + '.',
+             'Banner limits it to levels ' + n.list.join(', ') + ' — this term sits at level ' + at + '.');
+  }
+
+  /*@3.GPSJ.129*/
+  function plGeneral(c) {
+    if (!c) return false;
+    var k = c.k || c.category;
+    return k === 'university' || R().planLevel(c) === null;
+  }
+
+  function plRemaining(p) {
+    if (!R()) return [];
+    var inPlan = {};
+    p.semesters.forEach(function (s) {
+      (s.courses || []).forEach(function (c) { if (c && c.code) inPlan[c.code] = 1; });
+    });
+    var cur = {}; PC.cur.forEach(function (c) { cur[c] = 1; });
+    return R().courses(PC.slug).filter(function (c) {
+      var code = R().fCode(c);
+      if (!code) return false;
+      if (R().fPrep(c)) return false;
+      return !PC.passed[code] && !cur[code] && !inPlan[code];
+    }).sort(function (a, b) {
+      var la = R().planLevel(a), lb = R().planLevel(b);
+      return (la === null ? 99 : la) - (lb === null ? 99 : lb) ||
+             String(R().fCode(a)).localeCompare(String(R().fCode(b)));
+    });
+  }
+
+  function plNextLevel(p) {
+    var mx = null;
+    p.semesters.forEach(function (s) {
+      if (s.summer || s.level == null) return;
+      var n = parseInt(s.level, 10);
+      if (!isNaN(n) && (mx === null || n > mx)) mx = n;
+    });
+    if (mx === null) mx = Math.max(PC.level || 0, (PC.span && PC.span.lo ? PC.span.lo - 1 : 0));
+    return Math.min(mx + 1, MAX_LEVEL);
+  }
+
+  function plLastLevel(p) {
+    var lv = null;
+    p.semesters.forEach(function (s) { if (!s.summer && s.level != null) lv = parseInt(s.level, 10); });
+    return lv === null ? (PC.level || plNextLevel(p) - 1) : lv;
+  }
+
+  function plHeadBar(p) {
+    var rest = plRemaining(p);
+    var restCr = rest.reduce(function (a, c) { return a + (R().fCh(c) || 3); }, 0);
+    var planCr = p.semesters.reduce(function (a, s) { return a + plCr(s); }, 0);
+    var nT = p.semesters.length;
+    var h = '<div class="gpp-sum">' +
+      '<span><b>' + nT + '</b>' + esc(L(' ' + arCount(nT, 'فصلٌ مخطّط', 'فصلان مخطّطان', 'فصولٍ مخطّطة', 'فصلاً مخطّطاً').replace(/^\d+\s/, ''),
+                                        nT === 1 ? ' planned term' : ' planned terms')) + '</span>' +
+      '<span><b>' + planCr + '</b>' + esc(L(' ساعة مجدولة', planCr === 1 ? ' credit scheduled' : ' credits scheduled')) + '</span>' +
+      (rest.length
+        ? '<span class="is-warn"><b>' + rest.length + '</b>' +
+          esc(L(' مادة لم تُجدوَل (' + restCr + ' ساعة)',
+                rest.length === 1 ? ' course unscheduled (' + restCr + ' cr)'
+                                  : ' unscheduled (' + restCr + ' cr)')) + '</span>'
+        : '<span class="is-done"><i class="fa-solid fa-circle-check"></i>' +
+          esc(L(' لا مادةَ خارج الجدول', ' nothing left unscheduled')) + '</span>') +
+    '</div>';
+    if (PC.span && PC.span.known) {
+      h += '<p class="gs-hint">' + esc(L(
+        'خطّتك تمتدّ من ' + levelName(PC.span.lo) + ' إلى ' + levelName(PC.span.hi) +
+          (PC.span.prep ? ' وقبلها السنة التحضيرية' : '') +
+          '. والفصلُ الصيفيُّ ليس مستوًى — يجلس بين مستويين ولا يرفع رقمَك.',
+        'Your plan runs from level ' + PC.span.lo + ' to ' + PC.span.hi +
+          (PC.span.prep ? ', preceded by the preparatory year' : '') +
+          '. A summer term is not a level — it sits between two and never raises your number.')) + '</p>';
+    }
+    if (RULES_STATE === 'loading') {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-cloud-arrow-down"></i><div>' +
+        esc(L('نجلب قيودَ بانر (المتطلبات السابقة وقيود المستوى)… التنبيهات تظهر حين تصل.',
+              'Fetching Banner rules (prerequisites and level limits)… warnings appear once they land.')) +
+        '</div></div>';
+    } else if (RULES_STATE === 'fail') {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-circle-info"></i><div>' +
+        esc(L('لم تصل قيودُ بانر، فنحكم بالمتطلبات المكتوبة في خطتك وحدَها — وقيودُ المستوى لا تُفحص.',
+              'Banner rules did not arrive, so we judge by your plan’s prerequisites alone — level limits are unchecked.')) +
+        '</div></div>';
+    }
+    return h;
+  }
+
+  /*@3.GPSJ.142*/
+  function plGeneralPending(p) {
+    if (!R()) return 0;
+    var n = plRemaining(p).filter(plGeneral).length;
+    p.semesters.forEach(function (s) {
+      if (s.summer) return;
+      (s.courses || []).forEach(function (c) {
+        if (c.code && plGeneral(plCourse(c.code))) n++;
+      });
+    });
+    return n;
+  }
+
+  /*@3.GPSJ.130*/
+  function plTools(p) {
+    var rest = plRemaining(p).length;
+    var gen = plGeneralPending(p);
+    var placed = p.semesters.reduce(function (a, s) { return a + (s.courses || []).length; }, 0);
+    function b(act, ico, ar, en, off, tip_ar, tip_en) {
+      return '<button class="gp-btn gp-btn--sm" data-gs="' + act + '"' + (off ? ' disabled' : '') +
+        ' title="' + esc(L(tip_ar, tip_en)) + '">' +
+        '<i class="fa-solid ' + ico + '"></i><span>' + esc(L(ar, en)) + '</span></button>';
+    }
+    return '<div class="gpp-tools">' +
+      b('pl-undo', 'fa-rotate-left', 'تراجع', 'Undo', !PUNDO.length,
+        'يُلغي آخرَ خطوةٍ فعلتَها هنا — خطوةً خطوة.',
+        'Undoes the last step you took here — one at a time.') +
+      b('pl-auto', 'fa-wand-magic-sparkles', 'رتّبْ ما تبقّى', 'Plan what remains', !rest,
+        'يوزّع كلَّ ما تبقّى على فصولك بالترتيب، وينشئ ما ينقص منها، ويحترم السقفَ والمتطلّبَ السابق.',
+        'Spreads everything that remains across your terms in order, creates the missing ones, and respects caps and prerequisites.') +
+      b('pl-byplan', 'fa-list-check', 'وزّعْ حسب الخطة', 'Follow the plan', !rest,
+        'كلُّ مادةٍ إلى فصلِ مستواها في الخطة تماماً — ولو تجاوز السقف.',
+        'Every course into the term of its own plan level — even if that goes over the cap.') +
+      b('pl-summer', 'fa-sun', 'العامّة في الصيفيّ', 'General into summer', !gen,
+        'موادُّ متطلّبِ الجامعة وما لا مستوى له تُجمع من فصولك ومن المتبقّي إلى فصولٍ صيفيّة، وتُنشأ إن لم توجد.',
+        'University-requirement and unlevelled courses are gathered from your terms and the pool into summer terms, created if needed.') +
+      b('pl-clearall', 'fa-broom', 'فرّغِ الفصول', 'Empty all terms', !placed,
+        'تعود كلُّ المواد إلى المتبقّي، وتبقى الفصولُ فارغةً كما هي.',
+        'Every course returns to the pool; the terms stay, empty.') +
+    '</div>';
+  }
+
+  /*@3.GPSJ.131*/
+  function plCard(p, s, si, c, ci) {
+    var iss = plIssues(p, si, c);
+    var free = !c.code;
+    var moving = PMOVE && PMOVE.uid === c.uid;
+    var last = p.semesters.length - 1;
+    var h = '<div class="gs-card gpp-c' + (iss.length ? ' is-bad' : '') + (moving ? ' is-moving' : '') + '"' +
+      ' data-uid="' + esc(c.uid) + '">' +
+      '<div class="gs-card-main">' +
+        '<i class="fa-solid fa-grip-vertical gpp-grip" aria-hidden="true"></i>' +
+        (free ? '' : '<span class="gs-card-code">' + esc(c.code) + '</span>') +
+        (free
+          ? '<input class="gs-inp gpp-row-in" data-gs="pl-cname" data-v="' + esc(s.id) + ':' + ci + '"' +
+            ' value="' + esc(c.name || '') + '" placeholder="' + esc(L('اسم المادة', 'Course name')) +
+            '" aria-label="' + esc(L('اسم المادة', 'Course name')) + '">'
+          : '<span class="gs-card-name">' + esc(c.name || plName(c.code, '')) + '</span>') +
+      '</div>' +
+      '<div class="gs-card-foot">' +
+        (free
+          ? '<input class="gs-inp gpp-row-cr" type="number" min="1" max="12" data-gs="pl-ccr" data-v="' +
+            esc(s.id) + ':' + ci + '" value="' + (+c.credits || 3) + '" aria-label="' +
+            esc(L('ساعات المادة', 'Course credits')) + '">'
+          : '<span class="gs-card-ch">' + (+c.credits || 0) + esc(L(' ساعة', ' cr')) + '</span>') +
+        gradeBtn('pl:' + s.id + ':' + ci, c.grade || '', c.code || c.name) +
+        '<span class="gpp-cacts">' +
+          '<button class="gp-ico gpp-pickb' + (moving ? ' is-on' : '') + '" data-gs="pl-pick" data-v="' + esc(c.uid) + '"' +
+            ' title="' + esc(L('نقلٌ إلى فصل', 'Move to a term')) + '" aria-label="' +
+            esc(L('نقل ' + (c.code || c.name || ''), 'Move ' + (c.code || c.name || ''))) +
+            '"><i class="fa-solid fa-arrows-up-down-left-right"></i></button>' +
+          '<button class="gp-ico" data-gs="pl-mv" data-v="' + esc(s.id) + ':' + ci + ':-1"' + (si === 0 ? ' disabled' : '') +
+            ' aria-label="' + esc(L('قدّمها فصلاً', 'Pull one term earlier')) + '"><i class="fa-solid fa-angles-up"></i></button>' +
+          '<button class="gp-ico" data-gs="pl-mv" data-v="' + esc(s.id) + ':' + ci + ':1"' + (si === last ? ' disabled' : '') +
+            ' aria-label="' + esc(L('أجّلها فصلاً', 'Defer one term')) + '"><i class="fa-solid fa-angles-down"></i></button>' +
+          '<button class="gp-ico gp-ico--danger" data-gs="pl-rm" data-v="' + esc(s.id) + ':' + ci + '"' +
+            ' aria-label="' + esc(L('أعِدها إلى المتبقّي', 'Return it to the pool')) + '"><i class="fa-solid fa-xmark"></i></button>' +
+        '</span>' +
+      '</div>';
+    if (iss.length) {
+      h += '<div class="gpp-flags">' + iss.map(function (v) {
+        return '<span class="gpp-flag" data-k="' + v.k + '"><i class="fa-solid ' +
+          (v.k === 'level' ? 'fa-stairs' : 'fa-diagram-project') + '"></i>' + esc(plIssueText(v)) + '</span>';
+      }).join('') + '</div>';
+    }
+    return h + '</div>';
+  }
+
+  function plTermCard(p, s, si) {
+    var last = p.semesters.length - 1;
+    var cr = plCr(s), cap = plCap(s), over = cr > cap;
+    var thin = !s.summer && cr > 0 && cr < 11;
+    var bad = 0;
+    (s.courses || []).forEach(function (c) { if (plIssues(p, si, c).length) bad++; });
+    var name = plTermName(s, si);
+
+    var h = '<div class="gs-lv gpp-term' + (s.summer ? ' is-summer' : '') + (PMOVE ? ' is-target' : '') +
+        '" data-pt="' + esc(s.id) + '" data-pdrop="' + esc(s.id) + '">' +
+      '<div class="gs-lv-top gpp-term-h">' +
+        '<span class="gs-lv-h gpp-drop-h">' +
+          '<i class="fa-solid ' + (s.summer ? 'fa-sun' : 'fa-layer-group') + ' gpp-sun" aria-hidden="true"></i>' +
+          '<input class="gs-inp gpp-name gpp-tname" data-gs="pl-name" data-v="' + esc(s.id) + '"' +
+            ' value="' + esc(name) + '" placeholder="' + esc(L('اسم الفصل', 'Term name')) +
+            '" aria-label="' + esc(L('اسم الفصل', 'Term name')) + '">' +
+          '<span class="gpp-cr' + (over ? ' is-over' : '') + '">' +
+            '<span class="gp-num">' + cr + '/' + cap + '</span>' + esc(L(' ساعة', ' cr')) + '</span>' +
+          (bad ? '<span class="gpp-badge" title="' + esc(L('تنبيهات', 'warnings')) + '">' +
+              '<i class="fa-solid fa-triangle-exclamation"></i><span class="gp-num">' + bad + '</span></span>' : '') +
+        '</span>' +
+        '<span class="gpp-acts">' +
+          '<button class="gp-ico" data-gs="pl-up" data-v="' + esc(s.id) + '"' + (si === 0 ? ' disabled' : '') +
+            ' aria-label="' + esc(L('قدّم ' + name, 'Move ' + name + ' earlier')) +
+            '"><i class="fa-solid fa-arrow-up"></i></button>' +
+          '<button class="gp-ico" data-gs="pl-down" data-v="' + esc(s.id) + '"' + (si === last ? ' disabled' : '') +
+            ' aria-label="' + esc(L('أخّر ' + name, 'Move ' + name + ' later')) +
+            '"><i class="fa-solid fa-arrow-down"></i></button>' +
+          '<button class="gp-ico gp-ico--danger" data-gs="pl-del" data-v="' + esc(s.id) + '"' +
+            ' aria-label="' + esc(L('حذف ' + name, 'Delete ' + name)) +
+            '"><i class="fa-solid fa-trash-can"></i></button>' +
+        '</span>' +
+      '</div>' +
+      '<div class="gpp-term-m">' +
+        '<span class="gs-chips">' +
+          '<button class="gp-chip' + (!s.summer ? ' is-on' : '') + '" data-gs="pl-kind" data-v="' + esc(s.id) + ':r">' +
+            esc(L('عاديّ', 'Regular')) + '</button>' +
+          '<button class="gp-chip' + (s.summer ? ' is-on' : '') + '" data-gs="pl-kind" data-v="' + esc(s.id) + ':s">' +
+            esc(L('صيفيّ', 'Summer')) + '</button>' +
+        '</span>' +
+        '<label class="gpp-lv">' + esc(L('المستوى', 'Level')) +
+          '<input class="gs-inp" type="number" min="1" max="' + MAX_LEVEL + '" data-gs="pl-lv" data-v="' + esc(s.id) + '"' +
+            ' value="' + (s.level == null ? '' : esc(s.level)) + '" placeholder="—"></label>' +
+      '</div>' +
+      /*@3.GPSJ.140*/
+      (PMOVE ? '<button type="button" class="gpp-dropbar" data-gs="pl-drophere" data-v="' + esc(s.id) + '">' +
+        '<i class="fa-solid fa-down-long"></i>' +
+        esc(L('انقل ' + (PMOVE.label || '') + ' إلى ' + name, 'Move ' + (PMOVE.label || '') + ' into ' + name)) +
+        '</button>' : '');
+
+    if (over) {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-triangle-exclamation"></i><div>' +
+        esc(L('تجاوزتَ سقفَ الفصل: ' + cr + ' ساعةً والسقفُ ' + cap + '. لك أن تُبقيه إن كنتَ تعرف حالتك.',
+              'Over the term cap: ' + cr + ' credits against ' + cap + '. Keep it if you know your case.')) + '</div></div>';
+    }
+    if (thin) {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-circle-info"></i><div>' +
+        esc(L('دون الحدِّ الأدنى للفصل النظاميّ: ' + cr + ' ساعةً والحدُّ ١١.',
+              'Below the regular-term minimum: ' + cr + ' credits against 11.')) + '</div></div>';
+    }
+
+    h += '<div class="gs-cards gpp-cards">' +
+      (s.courses || []).map(function (c, ci) { return plCard(p, s, si, c, ci); }).join('') +
+    '</div>';
+    if (!(s.courses || []).length) {
+      h += '<p class="gs-hint gpp-empty">' + esc(L(
+        'فصلٌ فارغ — اسحب إليه بطاقةً من المتبقّي، أو املأه بزرِّ العصا.',
+        'Empty term — drag a card here from the pool, or fill it with the wand.')) + '</p>';
+    }
+
+    h += '<div class="gpp-term-a">' +
+      '<button class="gp-btn gp-btn--sm" data-gs="pl-fill" data-v="' + esc(s.id) + '">' +
+        '<i class="fa-solid fa-wand-magic-sparkles"></i><span>' + esc(L('املأه من المتبقّي', 'Fill from remaining')) + '</span></button>' +
+      '<button class="gp-btn gp-btn--sm" data-gs="pl-clear" data-v="' + esc(s.id) + '"' +
+        ((s.courses || []).length ? '' : ' disabled') + '>' +
+        '<i class="fa-solid fa-broom"></i><span>' + esc(L('فرّغه', 'Empty it')) + '</span></button>' +
+      '<button class="gp-btn gp-btn--sm" data-gs="pl-free" data-v="' + esc(s.id) + '">' +
+        '<i class="fa-solid fa-plus"></i><span>' + esc(L('مادة خارج الخطة', 'Course outside the plan')) + '</span></button>' +
+    '</div>';
+
+    return h + '</div>';
+  }
+
+  /*@3.GPSJ.132*/
+  function plReady(code) {
+    if (!R()) return null;
+    var m = {};
+    Object.keys(PC.passed).forEach(function (k) { m[k] = 1; });
+    PC.cur.forEach(function (k) { m[k] = 1; });
+    var miss = R().prereqMissing(PC.slug, code, m);
+    return miss.length ? miss : null;
+  }
+
+  function plPickList(p) {
+    var rest = plRemaining(p);
+    var q = normPl(PQ);
+    var hit = !q ? rest : rest.filter(function (c) {
+      return normPl(R().fCode(c) + ' ' + plTitle(c)).indexOf(q) > -1;
+    });
+
+    var h = '<div class="gpp-sec' + (PMOVE ? ' is-target' : '') + '" data-pdrop="pool">' +
+      '<h4 class="gpp-sec-h">' +
+      '<i class="fa-solid fa-inbox" aria-hidden="true"></i>' +
+      esc(L('المواد المتبقّية حسب الخطة', 'What your plan still owes you')) +
+      ' <span class="gpp-sec-n">' + rest.length + '</span>' +
+      '</h4>' +
+      (PMOVE && PMOVE.from === 'term'
+        ? '<button type="button" class="gpp-dropbar" data-gs="pl-drophere" data-v="pool">' +
+          '<i class="fa-solid fa-rotate-left"></i>' +
+          esc(L('أعِدْ ' + (PMOVE.label || '') + ' إلى المتبقّي', 'Return ' + (PMOVE.label || '') + ' to the pool')) +
+          '</button>' : '');
+    if (!R() || !R().courses(PC.slug).length) {
+      h += '<div class="gs-warn is-err"><i class="fa-solid fa-cloud-arrow-down"></i><div class="gs-warn-t"><b>' +
+        esc(L('لم تصل مقرّراتُ خطتك', 'Your plan’s courses did not load')) + '</b>' +
+        esc(L('اختر برنامجك من المعالج، أو أعد المحاولة حين تعود الشبكة — ويبقى بناءُ الفصول يدويّاً متاحاً.',
+              'Pick your programme in the wizard, or retry when the network returns — building terms by hand still works.')) +
+        '</div></div></div>';
+      return h;
+    }
+    if (!rest.length) {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-circle-check"></i><div>' +
+        esc(L('كلُّ ما تبقّى من خطتك مجدولٌ في فصولك أعلاه.',
+              'Everything your plan still owes you is scheduled above.')) + '</div></div></div>';
+      return h;
+    }
+    if (!p.semesters.length) {
+      h += '<div class="gs-warn is-soft"><i class="fa-solid fa-circle-info"></i><div>' +
+        esc(L('أنشئ فصلاً أوّلاً لتضيف إليه.', 'Create a term first so there is somewhere to add.')) + '</div></div>';
+    }
+    h += '<div class="gpp-pick-h">' +
+      '<input class="gs-inp" id="gpp-q" value="' + esc(PQ) + '" placeholder="' +
+        esc(L('ابحث برمزٍ أو اسم', 'Search by code or name')) + '" aria-label="' +
+        esc(L('بحث في المتبقّي', 'Search what remains')) + '">' +
+      (p.semesters.length ? '<label class="gpp-to">' + esc(L('إلى', 'into')) +
+        '<select class="gs-inp" id="gpp-to" aria-label="' + esc(L('الفصل الهدف', 'Target term')) + '">' +
+        p.semesters.map(function (s, i) {
+          return '<option value="' + esc(s.id) + '">' + esc(plTermName(s, i)) + '</option>';
+        }).join('') + '</select></label>' : '') +
+    '</div>';
+
+    h += '<div class="gs-cards gpp-cards">' + hit.map(function (c) {
+      var code = R().fCode(c), lv = R().planLevel(c);
+      var miss = plReady(code);
+      var moving = PMOVE && PMOVE.code === code && PMOVE.from === 'pool';
+      return '<div class="gs-card gpp-avail' + (miss ? ' is-wait' : ' is-ready') + (moving ? ' is-moving' : '') + '"' +
+          ' data-code="' + esc(code) + '">' +
+        '<div class="gs-card-main">' +
+          '<i class="fa-solid fa-grip-vertical gpp-grip" aria-hidden="true"></i>' +
+          '<span class="gs-card-code">' + esc(code) + '</span>' +
+          '<span class="gs-card-name">' + esc(plTitle(c)) + '</span>' +
+        '</div>' +
+        '<div class="gs-card-foot">' +
+          '<span class="gs-card-ch">' + (R().fCh(c) || 3) + esc(L(' ساعة', ' cr')) + '</span>' +
+          '<em class="gs-card-from">' + esc(levelName(lv)) + '</em>' +
+          '<span class="gpp-cacts">' +
+            '<button class="gp-ico gpp-pickb' + (moving ? ' is-on' : '') + '" data-gs="pl-pick" data-v="pool:' + esc(code) + '"' +
+              ' title="' + esc(L('نقلٌ إلى فصل', 'Move to a term')) + '" aria-label="' +
+              esc(L('نقل ' + code, 'Move ' + code)) + '"><i class="fa-solid fa-arrows-up-down-left-right"></i></button>' +
+            '<button class="gp-btn gp-btn--sm gpp-add" data-gs="pl-add" data-v="' + esc(code) + '">' +
+              '<i class="fa-solid fa-plus"></i><span>' + esc(L('أضِف', 'Add')) + '</span></button>' +
+          '</span>' +
+        '</div>' +
+        (miss ? '<div class="gpp-flags"><span class="gpp-flag" data-k="wait">' +
+          '<i class="fa-solid fa-hourglass-half"></i>' +
+          esc(L('بعد ' + plGroupWord(miss), 'After ' + plGroupWord(miss))) + '</span></div>'
+              : '<div class="gpp-flags"><span class="gpp-flag" data-k="ready">' +
+          '<i class="fa-solid fa-circle-check"></i>' +
+          esc(L('متطلّبها متحقّقٌ الآن', 'Prerequisites already met')) + '</span></div>') +
+      '</div>';
+    }).join('') + '</div>';
+    if (!hit.length) {
+      h += '<p class="gs-hint">' + esc(L('لا نتيجة لبحثك.', 'Nothing matches your search.')) + '</p>';
+    }
+    return h + '</div>';
+  }
+
+  function normPl(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/[ً-ْـ]/g, '')
+      .replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+      .replace(/\s+/g, ' ').trim();
+  }
+
+  function plPaint() {
+    var p = plRead();
+    var body = $('#gs-body');
+    if (!body) return;
+    var ttl = $('#gs-title');
+    if (ttl) ttl.textContent = L('معالج الفصول المخطّطة', 'Planned terms');
+    var done = $('[data-gs="close"] span');
+    if (done) done.textContent = L('تمّ', 'Done');
+    /*@3.GPSJ.146*/
+    var rev = $('#gs-overlay [data-gs="pl-revert"]');
+    if (rev) {
+      var dirty = plDirty();
+      rev.style.display = dirty ? '' : 'none';
+      var rs = rev.querySelector('span');
+      if (rs) rs.textContent = L('ألغِ تغييراتي', 'Discard my changes');
+    }
+    var q = $('#gpp-q'), keepFocus = q && document.activeElement === q;
+    var selTo = $('#gpp-to') ? $('#gpp-to').value : '';
+    body.innerHTML =
+      '<p class="gs-lead">' + esc(L(
+        'هذه فصولُك القادمة. اسحبِ البطاقاتِ بينها وبين المتبقّي، أو انقلها بزرِّ النقل — ونقول لك متى خالفتَ متطلّباً أو قيدَ مستوًى، ولا نمنعك.',
+        'These are your terms to come. Drag the cards between them and the pool, or use the move button — we flag a broken prerequisite or level limit, and never block you.')) + '</p>' +
+      plHeadBar(p) +
+      plTools(p) +
+      (PMOVE ? '<div class="gs-warn"><i class="fa-solid fa-arrows-up-down-left-right"></i><div>' +
+        esc(L('اخترتَ ' + (PMOVE.label || '') + ' للنقل — اضغط شريطَ «انقل إلى…» في الفصل الذي تريده، أو اسحبِ البطاقةَ إليه.',
+              'You picked ' + (PMOVE.label || '') + ' to move — tap the “Move into…” bar on the term you want, or drag the card there.')) +
+        '</div></div>' : '') +
+      '<div class="gpp-terms">' + p.semesters.map(function (s, i) { return plTermCard(p, s, i); }).join('') + '</div>' +
+      '<div class="gpp-add-row">' +
+        '<button class="gp-btn" data-gs="pl-new" data-v="r"><i class="fa-solid fa-plus"></i><span>' +
+          esc(L('فصل عاديّ', 'Regular term')) + '</span></button>' +
+        '<button class="gp-btn" data-gs="pl-new" data-v="s"><i class="fa-solid fa-sun"></i><span>' +
+          esc(L('فصل صيفيّ', 'Summer term')) + '</span></button>' +
+      '</div>' +
+      plPickList(p);
+    var t2 = $('#gpp-to');
+    if (t2 && selTo) t2.value = selTo;
+    if (keepFocus) { var q2 = $('#gpp-q'); if (q2) { q2.focus(); q2.selectionStart = q2.value.length; } }
+  }
+
+  function plTargetId(p) {
+    var sel = $('#gpp-to');
+    if (sel && sel.value) return sel.value;
+    return p.semesters.length ? p.semesters[p.semesters.length - 1].id : null;
+  }
+  /*@3.GPSJ.127*/
+  function plIndex(p, id) {
+    for (var i = 0; i < p.semesters.length; i++) if (p.semesters[i].id === id) return i;
+    return -1;
+  }
+  function plFind(p, uid) {
+    for (var i = 0; i < p.semesters.length; i++) {
+      var cs = p.semesters[i].courses || [];
+      for (var j = 0; j < cs.length; j++) if (cs[j].uid === uid) return { si: i, ci: j, c: cs[j] };
+    }
+    return null;
+  }
+
+  function plAdd(p, code, termId) {
+    var i = plIndex(p, termId);
+    if (i < 0) return false;
+    var c = plCourse(code);
+    p.semesters[i].courses.push({
+      uid: plUid(), code: code, name: plTitle(c) || code,
+      credits: (c ? R().fCh(c) : 0) || 3, grade: 'B+'
+    });
+    return true;
+  }
+
+  /*@3.GPSJ.133*/
+  function plDrop(p, token, dest) {
+    if (!token) return false;
+    if (token.from === 'pool') {
+      if (dest === 'pool') return false;
+      return plAdd(p, token.code, dest);
+    }
+    var at = plFind(p, token.uid);
+    if (!at) return false;
+    var moved = p.semesters[at.si].courses.splice(at.ci, 1)[0];
+    /*@3.GPSJ.143*/
+    if (dest === 'pool') return true;
+    var i = plIndex(p, dest);
+    if (i < 0) { p.semesters[at.si].courses.splice(at.ci, 0, moved); return false; }
+    p.semesters[i].courses.push(moved);
+    return true;
+  }
+
+  function plNewTerm(p, summer, level) {
+    var lv = (level != null) ? level : (summer ? plLastLevel(p) : plNextLevel(p));
+    var t = {
+      id: 'pt' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36),
+      level: lv, summer: !!summer, courses: []
+    };
+    p.semesters.push(t);
+    return t;
+  }
+
+  /*@3.GPSJ.134*/
+  function plTermFor(p, level, summer) {
+    for (var i = 0; i < p.semesters.length; i++) {
+      var s = p.semesters[i];
+      if (!!s.summer === !!summer && String(s.level) === String(level)) return s;
+    }
+    return plNewTerm(p, summer, level);
+  }
+  function plOrder(p) {
+    p.semesters.sort(function (a, b) {
+      var la = (a.level == null) ? 99 : +a.level, lb = (b.level == null) ? 99 : +b.level;
+      if (la !== lb) return la - lb;
+      return (a.summer ? 1 : 0) - (b.summer ? 1 : 0);
+    });
+  }
+  function plClearAll(p) {
+    var n = 0;
+    p.semesters.forEach(function (s) { n += (s.courses || []).length; s.courses = []; });
+    return n;
+  }
+
+  function plClick(e) {
+    var b = e.target.closest && e.target.closest('[data-gs]');
+    if (!b) return false;
+    var a = b.getAttribute('data-gs'), v = b.getAttribute('data-v') || '';
+    if (a.indexOf('pl-') !== 0 && a !== 'close' && a !== 'grade') return false;
+
+    if (a === 'close') { plClose(); return true; }
+    if (a === 'grade') { openGrade(b, v); return true; }
+
+    var p = plRead(), ix, si, n;
+    /*@3.GPSJ.147*/
+    if (PL_MUT[a]) plMark(p);
+    if (a === 'pl-undo') {
+      if (!PUNDO.length) return true;
+      plRestore(PUNDO.pop());
+      plPaint();
+      plToast(L('رجعت خطوةً.', 'Stepped back.'));
+      return true;
+    }
+    if (a === 'pl-revert') {
+      if (!plDirty()) { plToast(L('لا تغييرَ لإلغائه.', 'Nothing to discard.')); return true; }
+      plRestore(PSNAP); PUNDO = [];
+      plPaint();
+      plToast(L('رجعت خطّتُك كما كانت حين فتحتَ المعالج.',
+                'Your plan is back to how it was when you opened this.'));
+      return true;
+    }
+    if (a === 'pl-new') { plNewTerm(p, v === 's'); plWrite(p); plPaint(); return true; }
+    if (a === 'pl-del') {
+      ix = plIndex(p, v); if (ix < 0) return true;
+      var lost = (p.semesters[ix].courses || []).length;
+      p.semesters.splice(ix, 1); plWrite(p); plPaint();
+      if (lost) plToast(L('حُذف الفصل ورجعت ' + plCW(lost) + ' إلى المتبقّي.',
+                          'Term deleted — ' + plCW(lost) + ' returned to the pool.'));
+      return true;
+    }
+    if (a === 'pl-up' || a === 'pl-down') {
+      ix = plIndex(p, v); if (ix < 0) return true;
+      var to = ix + (a === 'pl-up' ? -1 : 1);
+      if (to < 0 || to >= p.semesters.length) return true;
+      p.semesters.splice(to, 0, p.semesters.splice(ix, 1)[0]);
+      plWrite(p); plPaint(); return true;
+    }
+    if (a === 'pl-kind') {
+      var pr = v.split(':'); ix = plIndex(p, pr[0]); if (ix < 0) return true;
+      p.semesters[ix].summer = (pr[1] === 's');
+      plWrite(p); plPaint(); return true;
+    }
+    if (a === 'pl-mv') {
+      var m = v.split(':'); si = plIndex(p, m[0]);
+      if (si < 0) return true;
+      var ci = +m[1], step = +m[2], dst = si + step;
+      if (dst < 0 || dst >= p.semesters.length) return true;
+      p.semesters[dst].courses.push(p.semesters[si].courses.splice(ci, 1)[0]);
+      plWrite(p); plPaint();
+      plToast(L('نُقلت إلى ' + plTermName(p.semesters[dst], dst),
+                'Moved to ' + plTermName(p.semesters[dst], dst)));
+      return true;
+    }
+    if (a === 'pl-rm') {
+      var r = v.split(':'); si = plIndex(p, r[0]); if (si < 0) return true;
+      p.semesters[si].courses.splice(+r[1], 1);
+      plWrite(p); plPaint(); return true;
+    }
+    /*@3.GPSJ.135*/
+    if (a === 'pl-pick') {
+      var tok = plToken(p, v);
+      PMOVE = (PMOVE && tok && PMOVE.key === tok.key) ? null : tok;
+      plPaint(); return true;
+    }
+    if (a === 'pl-drophere') {
+      if (!PMOVE) return true;
+      var snap = JSON.stringify(p);
+      if (plDrop(p, PMOVE, v)) { PMOVE = null; plMark(JSON.parse(snap)); plWrite(p); plPaint(); }
+      else { PMOVE = null; plPaint(); }
+      return true;
+    }
+    if (a === 'pl-add') {
+      var tid = plTargetId(p);
+      if (!tid) { plToast(L('أنشئ فصلاً أوّلاً.', 'Create a term first.')); return true; }
+      if (plAdd(p, v, tid)) {
+        plWrite(p); plPaint();
+        var t = p.semesters[plIndex(p, tid)];
+        plToast(L('أُضيفت إلى ' + plTermName(t, plIndex(p, tid)),
+                  'Added to ' + plTermName(t, plIndex(p, tid))));
+      }
+      return true;
+    }
+    if (a === 'pl-fill') {
+      ix = plIndex(p, v); if (ix < 0) return true;
+      n = plFillTerm(p, p.semesters[ix]);
+      plWrite(p); plPaint();
+      plToast(n ? L('أُضيفت ' + plCW(n) + ' حتى سقف الفصل.', plCW(n) + ' added up to the cap.')
+                : L('لا مادةَ تناسب هذا الفصل ضمن سقفه.', 'Nothing from the remainder fits this term.'));
+      return true;
+    }
+    if (a === 'pl-clear') {
+      ix = plIndex(p, v); if (ix < 0) return true;
+      n = (p.semesters[ix].courses || []).length;
+      p.semesters[ix].courses = [];
+      plWrite(p); plPaint();
+      plToast(L('رجعت ' + plCW(n) + ' إلى المتبقّي.', plCW(n) + ' returned to the pool.'));
+      return true;
+    }
+    if (a === 'pl-clearall') {
+      n = plClearAll(p);
+      plWrite(p); plPaint();
+      plToast(L('فُرّغت الفصول ورجعت ' + plCW(n) + ' إلى المتبقّي.',
+                'Terms emptied — ' + plCW(n) + ' back in the pool.'));
+      return true;
+    }
+    /*@3.GPSJ.136*/
+    if (a === 'pl-auto') {
+      n = plAutoPlan(p);
+      plWrite(p); plPaint();
+      plToast(n ? L('وُزّعت ' + plCW(n) + ' على فصولك.', plCW(n) + ' spread across your terms.')
+                : L('لا شيءَ متبقٍّ ليُوزَّع.', 'Nothing left to spread.'));
+      return true;
+    }
+    if (a === 'pl-byplan') {
+      n = plByPlan(p);
+      plWrite(p); plPaint();
+      plToast(n ? L('وُضعت ' + plCW(n) + ' في فصلِ مستواها من الخطة.',
+                    plCW(n) + ' placed in their own plan level.')
+                : L('لا شيءَ متبقٍّ ليُوزَّع.', 'Nothing left to place.'));
+      return true;
+    }
+    if (a === 'pl-summer') {
+      n = plGeneralToSummer(p);
+      plWrite(p); plPaint();
+      plToast(n ? L('إلى الفصول الصيفيّة: ' + plCW(n) + '.',
+                    plCW(n) + ' moved into summer terms.')
+                : L('لا مادّةَ عامّةً تنتظر.', 'No general course is pending.'));
+      return true;
+    }
+    if (a === 'pl-free') {
+      ix = plIndex(p, v); if (ix < 0) return true;
+      p.semesters[ix].courses.push({ uid: plUid(), code: '',
+        name: L('مادة خارج الخطة', 'Course outside the plan'), credits: 3, grade: 'B+' });
+      plWrite(p); plPaint(); return true;
+    }
+    return false;
+  }
+
+  function plCW(n) {
+    return L(arCount(n, 'مادّةٌ واحدة', 'مادّتان', 'مواد', 'مادّةً'),
+             n === 1 ? '1 course' : n + ' courses');
+  }
+
+  /*@3.GPSJ.148*/
+  var PL_MUT = { 'pl-new': 1, 'pl-del': 1, 'pl-up': 1, 'pl-down': 1, 'pl-kind': 1,
+                 'pl-mv': 1, 'pl-rm': 1, 'pl-add': 1, 'pl-fill': 1, 'pl-clear': 1,
+                 'pl-clearall': 1, 'pl-auto': 1, 'pl-byplan': 1, 'pl-summer': 1, 'pl-free': 1 };
+
+  function plToken(p, v) {
+    if (String(v).indexOf('pool:') === 0) {
+      var code = String(v).slice(5);
+      return { key: 'p:' + code, from: 'pool', code: code, label: code };
+    }
+    var at = plFind(p, v);
+    if (!at) return null;
+    return { key: 'c:' + v, from: 'term', uid: v, label: at.c.code || at.c.name || '' };
+  }
+
+  /*@3.GPSJ.137*/
+  function plFillTerm(p, s) {
+    var cap = plCap(s), have = plCr(s), n = 0;
+    plRemaining(p).forEach(function (c) {
+      var h = R().fCh(c) || 3;
+      if (have + h > cap) return;
+      var lv = R().planLevel(c);
+      if (lv !== null && s.level != null && lv > s.level) return;
+      plAdd(p, R().fCode(c), s.id); have += h; n++;
+    });
+    return n;
+  }
+
+  function plAutoPlan(p) {
+    var rest = plRemaining(p);
+    if (!rest.length) return 0;
+    var placed = 0, guard = 0;
+    while (plRemaining(p).length && guard++ < 24) {
+      var moved = 0;
+      for (var i = 0; i < p.semesters.length; i++) moved += plFillTerm(p, p.semesters[i]);
+      placed += moved;
+      if (!plRemaining(p).length) break;
+      if (!moved) {
+        var lvl = plNextLevel(p);
+        plNewTerm(p, false, lvl);
+        if (plNextLevel(p) - 1 >= MAX_LEVEL && !moved && guard > 12) break;
+      }
+    }
+    return placed;
+  }
+
+  /*@3.GPSJ.138*/
+  function plByPlan(p) {
+    var rest = plRemaining(p), n = 0;
+    if (!rest.length) return 0;
+    rest.forEach(function (c) {
+      var lv = R().planLevel(c);
+      if (lv === null) lv = plNextLevel(p);
+      var t = plTermFor(p, lv, false);
+      plAdd(p, R().fCode(c), t.id); n++;
+    });
+    plOrder(p);
+    return n;
+  }
+
+  function plGeneralToSummer(p) {
+    /*@3.GPSJ.141*/
+    var pool = plRemaining(p).filter(plGeneral).map(function (c) {
+      return { uid: plUid(), code: R().fCode(c), name: plTitle(c) || R().fCode(c),
+               credits: R().fCh(c) || 3, grade: 'B+' };
+    });
+    var pull = [];
+    p.semesters.forEach(function (s) {
+      if (s.summer) return;
+      s.courses = (s.courses || []).filter(function (c) {
+        if (!c.code || !plGeneral(plCourse(c.code))) return true;
+        pull.push(c); return false;
+      });
+    });
+    var all = pull.concat(pool);
+    if (!all.length) return 0;
+    var n = 0, t = null;
+    all.forEach(function (c) {
+      var h = +c.credits || 3;
+      if (!t || plCr(t) + h > CAP_SUM) {
+        t = null;
+        for (var i = 0; i < p.semesters.length; i++) {
+          if (p.semesters[i].summer && plCr(p.semesters[i]) + h <= CAP_SUM) { t = p.semesters[i]; break; }
+        }
+        if (!t) t = plNewTerm(p, true, plLastLevel(p));
+      }
+      t.courses.push(c); n++;
+    });
+    return n;
+  }
+
+  function plInput(e) {
+    var s = e.target, a = s.getAttribute && s.getAttribute('data-gs');
+    if (s.id === 'gpp-q') { PQ = s.value || ''; plPaint(); return true; }
+    if (a === 'pl-cname' || a === 'pl-ccr') {
+      var pr = String(s.getAttribute('data-v')).split(':');
+      var pc = plRead(), pi = plIndex(pc, pr[0]);
+      if (pi < 0) return true;
+      var cc = pc.semesters[pi].courses[+pr[1]];
+      if (!cc) return true;
+      if (a === 'pl-cname') cc.name = s.value;
+      else cc.credits = Math.max(1, Math.min(12, parseInt(s.value, 10) || 3));
+      plWrite(pc);
+      clearTimeout(plInput._t);
+      plInput._t = setTimeout(plPaint, 500);
+      return true;
+    }
+    if (a !== 'pl-name' && a !== 'pl-lv') return false;
+    var p = plRead(), ix = plIndex(p, s.getAttribute('data-v'));
+    if (ix < 0) return true;
+    if (a === 'pl-name') {
+      p.semesters[ix].name = s.value;
+      p.semesters[ix].renamed = !!s.value;
+      plWrite(p);
+      return true;
+    }
+    var nn = parseInt(s.value, 10);
+    p.semesters[ix].level = (isNaN(nn) || nn < 1) ? null : Math.min(nn, MAX_LEVEL);
+    plWrite(p);
+    clearTimeout(plInput._t);
+    plInput._t = setTimeout(plPaint, 400);
+    return true;
+  }
+
+  function plGradeOf(key) {
+    var pr = String(key).split(':');
+    var p = plRead(), ix = plIndex(p, pr[1]);
+    if (ix < 0) return '';
+    var c = p.semesters[ix].courses[+pr[2]];
+    return (c && c.grade) || '';
+  }
+  function plGradeSet(key, g) {
+    var pr = String(key).split(':');
+    var p = plRead(), ix = plIndex(p, pr[1]);
+    if (ix < 0) return;
+    var c = p.semesters[ix].courses[+pr[2]];
+    if (!c) return;
+    c.grade = g;
+    plWrite(p); plPaint();
+  }
+
+  function plPointerCancelQuiet() {
+    if (!PDRAG) return;
+    if (PDRAG.ghost && PDRAG.ghost.parentNode) PDRAG.ghost.parentNode.removeChild(PDRAG.ghost);
+    PDRAG = null; PMOVE = null;
+  }
+
+  function plToast(msg) {
+    var t = $('#gs-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'gs-toast'; t.className = 'gpp-toast';
+      t.setAttribute('role', 'status');
+      document.body.appendChild(t);
+    }
+    t.textContent = msg; t.classList.add('is-on');
+    clearTimeout(t._h);
+    t._h = setTimeout(function () { t.classList.remove('is-on'); }, 2400);
+  }
+
+  /*@3.GPSJ.139*/
+  var PDRAG = null;
+
+  function plCardAt(t) {
+    return t && t.closest ? t.closest('.gs-card[data-uid], .gs-card[data-code]') : null;
+  }
+  function plZoneAt(x, y) {
+    var el = document.elementFromPoint(x, y);
+    return (el && el.closest) ? el.closest('[data-pdrop]') : null;
+  }
+  function plLit(z) {
+    $$('#gs-overlay [data-pdrop].is-drop').forEach(function (n) {
+      if (n !== z) n.classList.remove('is-drop');
+    });
+    if (z) z.classList.add('is-drop');
+  }
+
+  /*@3.GPSJ.150*/
+  function plPointerDown(e) {
+    if (MODE !== 'planner' || PDRAG) return;
+    if (e.button != null && e.button > 0) return;
+    var card = plCardAt(e.target);
+    if (!card || !card.closest('#gs-overlay')) return;
+    if (e.target.closest('button, input, select, textarea, a, .gs-gr-btn')) return;
+    var grip = !!e.target.closest('.gpp-grip');
+    /*@3.GPSJ.151*/
+    if (e.pointerType && e.pointerType !== 'mouse' && !grip) return;
+    var p = plRead();
+    var v = card.hasAttribute('data-uid') ? card.getAttribute('data-uid')
+                                          : 'pool:' + card.getAttribute('data-code');
+    var tok = plToken(p, v);
+    if (!tok) return;
+    PDRAG = { tok: tok, card: card, x0: e.clientX, y0: e.clientY, on: false, id: e.pointerId, ghost: null };
+    try { card.setPointerCapture(e.pointerId); } catch (_) {}
+  }
+
+  function plPointerMove(e) {
+    if (!PDRAG || (PDRAG.id != null && e.pointerId !== PDRAG.id)) return;
+    var dx = e.clientX - PDRAG.x0, dy = e.clientY - PDRAG.y0;
+    if (!PDRAG.on) {
+      if (dx * dx + dy * dy < 64) return;      /*@3.GPSJ.152*/
+      PDRAG.on = true;
+      PMOVE = PDRAG.tok;
+      var r = PDRAG.card.getBoundingClientRect();
+      var g = PDRAG.card.cloneNode(true);
+      g.className += ' gpp-ghost';
+      g.style.inlineSize = r.width + 'px';
+      g.style.insetBlockStart = r.top + 'px';
+      g.style.insetInlineStart = '0';
+      g.style.left = r.left + 'px';
+      document.body.appendChild(g);
+      PDRAG.ghost = g;
+      PDRAG.gx = e.clientX - r.left; PDRAG.gy = e.clientY - r.top;
+      PDRAG.card.classList.add('is-moving');
+      $$('#gs-overlay [data-pdrop]').forEach(function (n) { n.classList.add('is-target'); });
+    }
+    e.preventDefault();
+    if (PDRAG.ghost) {
+      PDRAG.ghost.style.left = (e.clientX - PDRAG.gx) + 'px';
+      PDRAG.ghost.style.top = (e.clientY - PDRAG.gy) + 'px';
+    }
+    plLit(plZoneAt(e.clientX, e.clientY));
+  }
+
+  function plPointerUp(e) {
+    if (!PDRAG || (PDRAG.id != null && e.pointerId !== PDRAG.id)) return;
+    var d = PDRAG; PDRAG = null;
+    if (d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+    if (!d.on) { PMOVE = null; return; }
+    var z = plZoneAt(e.clientX, e.clientY);
+    PMOVE = null;
+    if (!z) { plPaint(); return; }
+    var p = plRead(), was = JSON.stringify(p);
+    if (plDrop(p, d.tok, z.getAttribute('data-pdrop'))) { plMark(JSON.parse(was)); plWrite(p); }
+    plPaint();
+  }
+
+  function plPointerCancel() {
+    if (!PDRAG) return;
+    if (PDRAG.ghost && PDRAG.ghost.parentNode) PDRAG.ghost.parentNode.removeChild(PDRAG.ghost);
+    PDRAG = null; PMOVE = null;
+    plPaint();
+  }
+
+  function plClose() {
+    plPointerCancelQuiet();
+    closeGrade();
+    var ov = $('#gs-overlay'); if (ov) ov.remove();
+    var t = $('#gs-toast'); if (t) t.remove();
+    PMOVE = null; PUNDO = []; PSNAP = null;
+    MODE = 'setup';
+  }
+
+  function openPlanner() {
+    if ($('#gs-overlay')) return;
+    MODE = 'planner';
+    PC = plCtx(); PQ = ''; PMOVE = null; PUNDO = [];
+    /*@3.GPSJ.149*/
+    plRead();
+    try { PSNAP = localStorage.getItem(PLANK); } catch (e) { PSNAP = null; }
+    mount();
+    var box = $('#gs-overlay .gs-box'); if (box) box.classList.add('gpp-box');
+    var st = $('#gs-steps'); if (st) st.hidden = true;
+    var back = $('[data-gs="back"]');
+    if (back) {
+      back.setAttribute('data-gs', 'pl-revert');
+      back.style.display = 'none';
+      var bi = back.querySelector('i');
+      if (bi) bi.className = 'fa-solid fa-rotate-left';
+    }
+    var nx = $('[data-gs="next"]');
+    if (nx) { nx.setAttribute('data-gs', 'close'); nx.querySelector('span').textContent = L('تمّ', 'Done'); }
+    if (!R()) { plPaint(); return; }
+    R().loadPlans(function () {
+      R().dropIndex(); PC = plCtx();
+      plPaint();
+      RULES_STATE = 'loading'; plPaint();
+      R().loadRules(function (ru) {
+        RULES_STATE = (ru && ru.kn) ? 'ok' : 'fail';
+        if (MODE === 'planner' && $('#gs-overlay')) plPaint();
+      });
+    });
+  }
+
   /*@3.GPSJ.106*/
-  window.GardenSetup = { open: open, close: close };
+  window.GardenSetup = { open: open, close: close, openPlanner: openPlanner };
   /*@3.GPSJ.107*/
   window.Onboarding = window.Onboarding || {};
   window.Onboarding.open = function () {
@@ -1485,10 +2751,22 @@
     else location.href = (/\/hub\//.test(location.pathname) ? 'gpa.html' : 'hub/gpa.html') + '#setup';
   };
 
+  /*@3.GPSJ.154*/
+  document.addEventListener('pointermove', plPointerMove, { passive: false });
+  document.addEventListener('pointerup', plPointerUp);
+  document.addEventListener('pointercancel', plPointerCancel);
+
+  document.addEventListener('garden:languageChanged', function () {
+    if (!$('#gs-overlay')) return;
+    if (MODE === 'planner') { PC = plCtx(); plPaint(); }
+    else if (W) paint();
+  });
+
   /*@3.GPSJ.108*/
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
     if ($('#gs-gpop')) { closeGrade(); return; }
+    if (MODE === 'planner') { if ($('#gs-overlay')) plClose(); return; }
     if ($('#gs-move')) { closeMove(); if (W) paint(); return; }
     if ($('#gs-overlay')) close(true);
   });

@@ -36,16 +36,27 @@
     amber: 'Amber', rose: 'Rose'
   };
 
+  /*@3.NODJ.54*/
+  var MAIN_TONES = ['ink', 'red', 'sky', 'emerald'];
+  var EDGE_TONES = [
+    { k: '#ffffff', ar: 'أبيض', en: 'White' },
+    { k: '#000000', ar: 'أسود', en: 'Black' }
+  ];
+
   var PEN_W = [1.2, 2.4, 4, 7, 12];
-  var HI_W = [18, 26, 36];
+  /*@3.NODJ.55*/
+  var HI_W = [6, 10, 14, 20, 28, 38];
   var NIBS = [
     { k: 'round',  ar: 'مدوّرة',  en: 'Round' },
     { k: 'fine',   ar: 'رفيعة',   en: 'Fine' },
     { k: 'marker', ar: 'ثابتة',   en: 'Marker' },
     { k: 'flat',   ar: 'مشطوفة',  en: 'Chisel' },
     { k: 'pencil', ar: 'رصاص',    en: 'Pencil' },
-    { k: 'chalk',  ar: 'طباشير',  en: 'Chalk' }
+    { k: 'chalk',  ar: 'طباشير',  en: 'Chalk', hide: 1 }
   ];
+  function pickNibs() {
+    return NIBS.filter(function (n) { return !n.hide; });
+  }
   var SHAPES = [
     { k: 'rect', icon: 'fa-square',           ar: 'مستطيل', en: 'Rectangle' },
     { k: 'ell',  icon: 'fa-circle',           ar: 'دائرة',  en: 'Ellipse' },
@@ -74,6 +85,9 @@
     { k: 'hi',    icon: 'fa-highlighter',   ar: 'فسفوري',     en: 'Highlighter', tool: 'hi',    ring: 'hiw' },
     { k: 'era',   html: ICONS.eraser,       ar: 'ممحاة',      en: 'Eraser',      tool: 'era', ring: 'era' },
     { k: 'shape', icon: 'fa-shapes',        ar: 'أشكال',      en: 'Shapes',      ring: 'shape' },
+    /*@3.NODJ.63*/
+    { k: 'text',  icon: 'fa-i-cursor',      ar: 'حقلُ نصّ',    en: 'Text field',  tool: 'text',
+      cap: 'canText' },
     /*@3.NODJ.9*/
     { k: 'lasso', html: LASSO_SVG,          ar: 'لاسو حرّ',   en: 'Free lasso',  tool: 'lasso' },
     { k: 'sel',   icon: 'fa-arrow-pointer', ar: 'تحديد',      en: 'Select',      tool: 'sel' },
@@ -84,11 +98,13 @@
   ];
 
   var R1 = 78, R2 = 128, POS_KEY = 'garden_ink_dial', FAV_KEY = 'garden_ink_favs2';
+  /*@3.NODJ.59*/
+  var FAV_KEY3 = 'garden_ink_favs3', FAV_MAX = 14;
 
+  /*@3.NODJ.56*/
   var FAV_FIXED = [
     { tool: 'hand',  color: 'ink', width: 4, nib: 'round' },
     { tool: 'sel',   color: 'ink', width: 4, nib: 'round' },
-    { tool: 'lasso', color: 'ink', width: 4, nib: 'round' },
     { tool: 'era',   color: 'ink', width: 4, nib: 'round', mode: 'part' },
     { tool: 'era',   color: 'ink', width: 4, nib: 'round', mode: 'whole' }
   ];
@@ -130,9 +146,10 @@
             'Pen tilt: ready — your pen has not reported tilt yet'];
   }
 
-  function palmNow() {
+  function palmNow(cv) {
     var I = window.GardenInkInput;
-    var m = I && I.palmMode ? I.palmMode() : 'auto';
+    var d = (cv && cv.palmDefault) || 'auto';
+    var m = I && I.palmMode ? I.palmMode(d) : d;
     return PALM_ORDER.indexOf(m) >= 0 ? m : 'auto';
   }
 
@@ -195,7 +212,7 @@
   }
 
   /*@3.NODJ.36*/
-  function favs() {
+  function legacyFavs() {
     var out = FAV_DEFAULTS.slice(), i;
     var seen = {};
     for (i = 0; i < out.length; i++) seen[favKey(out[i])] = 1;
@@ -212,11 +229,36 @@
     return out;
   }
 
+  function favs() {
+    try {
+      var a = JSON.parse(localStorage.getItem(FAV_KEY3) || 'null');
+      if (Array.isArray(a)) {
+        var out = [], i;
+        for (i = 0; i < a.length && out.length < FAV_MAX; i++) {
+          if (a[i] && a[i].tool) out.push(a[i]);
+        }
+        return out;
+      }
+    } catch (e) {}
+    return legacyFavs();
+  }
+
   function setFavs(a) {
-    var mine = [], i, k = {};
-    for (i = 0; i < FAV_DEFAULTS.length; i++) k[favKey(FAV_DEFAULTS[i])] = 1;
-    for (i = 0; i < a.length; i++) if (a[i] && !k[favKey(a[i])]) mine.push(a[i]);
-    try { localStorage.setItem(FAV_KEY, JSON.stringify(mine.slice(0, 8))); } catch (e) {}
+    var out = [], seen = {}, i;
+    for (i = 0; i < a.length && out.length < FAV_MAX; i++) {
+      if (!a[i] || !a[i].tool) continue;
+      var k = favKey(a[i]);
+      if (seen[k]) continue;
+      seen[k] = 1;
+      out.push(a[i]);
+    }
+    try { localStorage.setItem(FAV_KEY3, JSON.stringify(out)); } catch (e) {}
+    return out;
+  }
+
+  function resetFavs() {
+    try { localStorage.removeItem(FAV_KEY3); } catch (e) {}
+    try { localStorage.removeItem(FAV_KEY); } catch (e) {}
   }
   /*@3.NODJ.14*/
   function favKey(f) {
@@ -290,6 +332,17 @@
     bar.addEventListener('click', function (e) {
       var star = e.target.closest('[data-fav-star]');
       if (star) { self.toggleFav(); return; }
+      var hb = e.target.closest('[data-hist]');
+      if (hb) {
+        var hcv = self.getCv();
+        if (hcv) {
+          if (hb.getAttribute('data-hist') === 'undo') {
+            if (hcv.hist) hcv.hist.undo(); else if (hcv.undo) hcv.undo();
+          } else if (hcv.hist) { hcv.hist.redo(); } else if (hcv.redo) { hcv.redo(); }
+        }
+        self.sync();
+        return;
+      }
       if (e.target.closest('[data-palm]')) { self.cyclePalm(); return; }
       if (e.target.closest('[data-tilt]')) { self.toggleTilt(); return; }
       if (e.target.closest('[data-penbtn]')) { self.penBtnDialog(); return; }
@@ -317,6 +370,129 @@
       cv.setNib(f.nib);
       self.sync();
     });
+
+    /*@3.NODJ.60*/
+    bar.addEventListener('contextmenu', function (e) {
+      if (e.target.closest('[data-hist],[data-palm],[data-tilt],[data-penbtn]')) return;
+      e.preventDefault();
+      self.favPop(e.target.closest('[data-fav],[data-recent]'), e.clientX, e.clientY);
+    });
+    var hold = null, hx = 0, hy = 0;
+    bar.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      if (e.target.closest('[data-hist],[data-palm],[data-tilt],[data-penbtn]')) return;
+      hx = e.clientX; hy = e.clientY;
+      var chip = e.target.closest('[data-fav],[data-recent]');
+      if (hold) clearTimeout(hold);
+      hold = setTimeout(function () {
+        hold = null;
+        self.favPop(chip, hx, hy);
+      }, 520);
+    }, { passive: true });
+    var drop = function (e) {
+      if (!hold) return;
+      if (e && e.clientX != null &&
+          (Math.abs(e.clientX - hx) > 10 || Math.abs(e.clientY - hy) > 10)) {
+        clearTimeout(hold); hold = null; return;
+      }
+      if (e && e.type !== 'pointermove') { clearTimeout(hold); hold = null; }
+    };
+    bar.addEventListener('pointermove', drop, { passive: true });
+    bar.addEventListener('pointerup', drop, { passive: true });
+    bar.addEventListener('pointercancel', drop, { passive: true });
+  };
+
+  /*@3.NODJ.61*/
+  function favRow(act, icon, ar, en, off) {
+    return '<button type="button" class="ndl-favp-i" data-fx="' + act + '"' +
+      (off ? ' disabled' : '') + '>' +
+      '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
+      '<span>' + esc(L(ar, en)) + '</span></button>';
+  }
+
+  Dial.prototype.closeFavPop = function () {
+    if (!this._fvPop) return;
+    if (this._fvPop.parentNode) this._fvPop.parentNode.removeChild(this._fvPop);
+    this._fvPop = null;
+    if (this._fvOut) { document.removeEventListener('pointerdown', this._fvOut, true); this._fvOut = null; }
+  };
+
+  Dial.prototype.favPop = function (chip, x, y) {
+    var self = this;
+    this.closeFavPop();
+    this.closeSizePop();
+    this.closeColorPop();
+    var list = favs();
+    var isRec = !!(chip && chip.hasAttribute('data-recent'));
+    var ix = chip ? Number(chip.getAttribute(isRec ? 'data-recent' : 'data-fav')) : -1;
+    var cur = this.current();
+    var h = '';
+    if (isRec) {
+      h += favRow('add', 'fa-star', 'أضِفْ إلى المفضّلة', 'Add to favourites');
+    } else if (ix >= 0 && list[ix]) {
+      h += '<div class="ndl-favp-h">' + esc(favName(list[ix])) + '</div>';
+      h += favRow('put', 'fa-arrow-down-to-line',
+                  'ضَعِ الأداةَ الحاليّةَ مكانَها', 'Replace with current tool', !cur);
+      h += favRow('back', 'fa-arrow-right-long', 'حرّكْ قبلَها', 'Move earlier', ix <= 0);
+      h += favRow('fwd', 'fa-arrow-left-long', 'حرّكْ بعدَها', 'Move later',
+                  ix >= list.length - 1);
+      h += favRow('del', 'fa-trash', 'أزِلْها', 'Remove');
+      h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
+    }
+    if (!isRec) {
+      h += favRow('add', 'fa-plus', 'أضِفِ الأداةَ الحاليّة', 'Add current tool', !cur);
+      h += favRow('reset', 'fa-rotate-left', 'أعِدِ المفضّلةَ الافتراضيّة', 'Reset favourites');
+    }
+    var pop = document.createElement('div');
+    pop.className = 'ndl-favpop';
+    pop.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    pop.innerHTML = h;
+    document.body.appendChild(pop);
+    var w = pop.offsetWidth || 210, hh = pop.offsetHeight || 120;
+    pop.style.insetBlockStart = Math.round(Math.max(8, Math.min(innerHeight - hh - 8, y + 6))) + 'px';
+    pop.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, x - w / 2))) + 'px';
+    pop.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fx]');
+      if (!b || b.disabled) return;
+      self.favAct(b.getAttribute('data-fx'), ix, isRec);
+      self.closeFavPop();
+    });
+    this._fvPop = pop;
+    this._fvOut = function (e) { if (pop && !pop.contains(e.target)) self.closeFavPop(); };
+    setTimeout(function () { document.addEventListener('pointerdown', self._fvOut, true); }, 0);
+    return pop;
+  };
+
+  /*@3.NODJ.62*/
+  Dial.prototype.favAct = function (act, ix, isRec) {
+    var list = favs();
+    if (act === 'reset') {
+      resetFavs();
+    } else if (act === 'add') {
+      var f = isRec ? recents()[ix] : this.current();
+      if (!f) return false;
+      var key = favKey(f), i;
+      for (i = 0; i < list.length; i++) if (favKey(list[i]) === key) return false;
+      list.splice(ix >= 0 && !isRec ? ix : list.length, 0, f);
+      setFavs(list);
+    } else if (act === 'del') {
+      if (!(ix >= 0) || !list[ix]) return false;
+      list.splice(ix, 1);
+      setFavs(list);
+    } else if (act === 'put') {
+      var c = this.current();
+      if (!c || !(ix >= 0)) return false;
+      list[ix] = c;
+      setFavs(list);
+    } else if (act === 'back' || act === 'fwd') {
+      var to = act === 'back' ? ix - 1 : ix + 1;
+      if (!(ix >= 0) || to < 0 || to >= list.length) return false;
+      var t = list[ix]; list[ix] = list[to]; list[to] = t;
+      setFavs(list);
+    } else return false;
+    this.paintFavs();
+    this.sync();
+    return true;
   };
 
   /*@3.NODJ.15*/
@@ -398,9 +574,20 @@
   }
 
   /*@3.NODJ.17*/
+  function histChip(k, icon, ar, en) {
+    return '<button type="button" class="ndl-fav ndl-fav-opt" data-hist="' + k + '" disabled' +
+      ' aria-label="' + esc(L(ar, en)) + '" title="' + esc(L(ar, en)) + '"' +
+      ' data-ar-title="' + esc(ar) + '" data-en-title="' + esc(en) + '">' +
+      '<i class="fa-solid ' + icon + '" aria-hidden="true"></i></button>';
+  }
+
   Dial.prototype.paintFavs = function () {
     if (!this.favBar) return;
-    var h = FAV_FIXED.map(function (f, i) { return favChip(f, 'data-fix', i); }).join('');
+    var h = '<span class="ndl-fav-hist">' +
+      histChip('undo', 'fa-rotate-left', 'تراجع', 'Undo') +
+      histChip('redo', 'fa-rotate-right', 'إعادة', 'Redo') +
+      '</span><span class="ndl-fav-sep" aria-hidden="true"></span>';
+    h += FAV_FIXED.map(function (f, i) { return favChip(f, 'data-fix', i); }).join('');
     h += colorChip(this.getCv());
     h += sizeChip(this.getCv());
     h += '<span class="ndl-fav-sep" aria-hidden="true"></span>';
@@ -410,7 +597,7 @@
       h += '<span class="ndl-fav-sep" aria-hidden="true"></span>';
       h += rec.map(function (f, i) { return favChip(f, 'data-recent', i); }).join('');
     }
-    var pm = palmNow(), pu = PALM_UI[pm];
+    var pm = palmNow(this.getCv()), pu = PALM_UI[pm];
     h += '<span class="ndl-fav-tail">';
     var tl = tiltLabel();
     h += '<button type="button" class="ndl-fav ndl-fav-opt" data-tilt="1"' +
@@ -458,7 +645,7 @@
           '<span class="ndl-fav-dot" style="inline-size:' + d + 'px;block-size:' + d + 'px"></span>' +
           '</button>';
       }).join('') + '</div>' +
-      '<div class="ndl-szrow">' + NIBS.map(function (n) {
+      '<div class="ndl-szrow">' + pickNibs().map(function (n) {
         return '<button type="button" class="ndl-szb" data-nib="' + n.k + '"' +
           ' aria-pressed="' + (cv.nib === n.k ? 'true' : 'false') + '"' +
           ' aria-label="' + esc(L(n.ar, n.en)) + '" title="' + esc(L(n.ar, n.en)) + '">' +
@@ -489,7 +676,7 @@
     pop.className = 'ndl-clpop';
     pop.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     pop.innerHTML =
-      '<div class="ndl-clrow" data-role="base">' + TONES.map(function (t) {
+      '<div class="ndl-clrow" data-role="base">' + MAIN_TONES.map(function (t) {
         return '<button type="button" class="ndl-clb" data-tone="' + t + '"' +
           ' style="--t:' + (cv.tool === 'hi' && window.GardenCanvas && GardenCanvas.hiHexOf
                             ? GardenCanvas.hiHexOf(t) : hexOf(t)) + '"' +
@@ -497,10 +684,30 @@
           ' aria-label="' + esc(L(TONE_AR[t], TONE_EN[t])) + '"' +
           ' title="' + esc(L(TONE_AR[t], TONE_EN[t])) + '"></button>';
       }).join('') +
+      EDGE_TONES.map(function (t) {
+        return '<button type="button" class="ndl-clb" data-tone="' + t.k + '"' +
+          ' style="--t:' + t.k + '"' +
+          ' aria-pressed="' + (cv.color === t.k ? 'true' : 'false') + '"' +
+          ' aria-label="' + esc(L(t.ar, t.en)) + '"' +
+          ' title="' + esc(L(t.ar, t.en)) + '"></button>';
+      }).join('') +
+      '<button type="button" class="ndl-clb ndl-clb--more" data-more="1"' +
+      ' aria-label="' + esc(L('بقيّةُ الألوان', 'More colours')) + '"' +
+      ' title="' + esc(L('بقيّةُ الألوان', 'More colours')) + '">' +
+      '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>' +
       '<button type="button" class="ndl-clb ndl-clb--pick" data-custom="1"' +
       ' aria-label="' + esc(L('لون مخصّص', 'Custom colour')) + '"' +
       ' title="' + esc(L('لون مخصّص', 'Custom colour')) + '">' +
       '<i class="fa-solid fa-eye-dropper" aria-hidden="true"></i></button></div>' +
+      '<div class="ndl-clrow ndl-clrow--more" data-role="rest" hidden>' +
+      TONES.filter(function (t) { return MAIN_TONES.indexOf(t) < 0; }).map(function (t) {
+        return '<button type="button" class="ndl-clb" data-tone="' + t + '"' +
+          ' style="--t:' + (cv.tool === 'hi' && window.GardenCanvas && GardenCanvas.hiHexOf
+                            ? GardenCanvas.hiHexOf(t) : hexOf(t)) + '"' +
+          ' aria-pressed="' + (cv.color === t ? 'true' : 'false') + '"' +
+          ' aria-label="' + esc(L(TONE_AR[t], TONE_EN[t])) + '"' +
+          ' title="' + esc(L(TONE_AR[t], TONE_EN[t])) + '"></button>';
+      }).join('') + '</div>' +
       '<div class="ndl-clramp" data-role="ramp" hidden></div>';
     document.body.appendChild(pop);
     var r = btn.getBoundingClientRect();
@@ -549,6 +756,12 @@
         self.closeColorPop();
         return;
       }
+      /*@3.NODJ.57*/
+      if (e.target.closest('[data-more]')) {
+        var rest = pop.querySelector('[data-role="rest"]');
+        if (rest) rest.hidden = !rest.hidden;
+        return;
+      }
       if (e.target.closest('[data-custom]')) {
         self.closeColorPop();
         self.pickCustom(btn);
@@ -593,7 +806,7 @@
   Dial.prototype.cyclePalm = function () {
     var I = window.GardenInkInput;
     if (!I || !I.setPalmMode) return;
-    var i = PALM_ORDER.indexOf(palmNow());
+    var i = PALM_ORDER.indexOf(palmNow(this.getCv()));
     var next = PALM_ORDER[(i + 1) % PALM_ORDER.length];
     I.setPalmMode(next);
     this.paintFavs();
@@ -832,8 +1045,15 @@
     this.sync();
   };
 
-  Dial.prototype.syncFavs = function () {
+  Dial.prototype.syncFavs = function (st) {
     if (!this.favBar) return;
+    /*@3.NODJ.52*/
+    if (st) {
+      var hu = this.favBar.querySelector('[data-hist="undo"]');
+      var hr = this.favBar.querySelector('[data-hist="redo"]');
+      if (hu) hu.disabled = !st.canUndo;
+      if (hr) hr.disabled = !st.canRedo;
+    }
     var cur = this.current();
     if (!cur) return;
     var key = favKey(cur), list = favs(), on = false, i;
@@ -931,8 +1151,12 @@
     if (cls) host.setAttribute('data-kind', cls);
   };
 
+  /*@3.NODJ.64*/
   Dial.prototype.paintRing1 = function () {
-    this.arc(this.r1, RING1.map(function (t) {
+    var cv = this.getCv();
+    this.arc(this.r1, RING1.filter(function (t) {
+      return !t.cap || !!(cv && cv[t.cap]);
+    }).map(function (t) {
       return { k: t.k, icon: t.icon, html: t.html, ar: t.ar, en: t.en,
                cls: t.k === 'exit' ? 'ndl-i--danger' : '' };
     }), R1);
@@ -942,7 +1166,7 @@
   Dial.prototype.subItems = function (kind) {
     var cv = this.getCv();
     if (kind === 'nib') {
-      return NIBS.map(function (n) {
+      return pickNibs().map(function (n) {
         return { k: 'nib:' + n.k, ar: n.ar, en: n.en,
                  pressed: cv && cv.nib === n.k,
                  html: NIB_ICON[n.k] || ICONS.nibRound };
@@ -1164,7 +1388,17 @@
       if (item.k === 'exit') { this.setOpen(false); this.onExit(); return; }
       if (item.k === 'undo') { if (cv) { if (cv.hist) cv.hist.undo(); else cv.undo(); } this.sync(); return; }
       if (item.k === 'redo') { if (cv) { if (cv.hist) cv.hist.redo(); else cv.redo(); } this.sync(); return; }
-      if (item.tool && cv) { cv.setTool(item.tool); }
+      /*@3.NODJ.58*/
+      if (item.tool && cv) {
+        cv.setTool(item.tool);
+        if (item.tool === 'hi' && typeof cv.color === 'string' &&
+            cv.color.charAt(0) !== '#') {
+          var C1 = window.GardenCanvas;
+          var hx = (C1 && C1.hiHexOf) ? C1.hiHexOf(cv.color) : '';
+          var pn = (C1 && C1.hexOf) ? C1.hexOf(cv.color) : '';
+          if (!hx || hx === pn) cv.setColor('yellow');
+        }
+      }
       if (item.ring) this.openSub(item.ring);
       else this.closeSub();
       this.sync();
@@ -1232,7 +1466,12 @@
       if (svg) hi.outerHTML = '<span class="ni-host" data-role="hub-i">' + svg + '</span>';
       else hi.outerHTML = '<i class="fa-solid ' + ic + '" aria-hidden="true" data-role="hub-i"></i>';
     }
+    /*@3.NODJ.53*/
     this.hub.style.color = hexOf(s.color);
+    var C0 = window.GardenCanvas;
+    var paper = (C0 && C0.paperHex) ? C0.paperHex() : null;
+    this.hub.style.setProperty('--ndl-paper', paper || '');
+    this.el.style.setProperty('--ndl-paper', paper || '');
 
     var z = this.zoomBtn;
     if (z) {
@@ -1261,7 +1500,7 @@
       q[m].setAttribute('aria-pressed', on ? 'true' : 'false');
     }
 
-    this.syncFavs();
+    this.syncFavs(s);
 
     if (this.sub) {
       var items = this.subItems(this.sub);
@@ -1278,7 +1517,7 @@
     this.el.hidden = !on;
     this.el.setAttribute('data-drawing', drawing ? '1' : '0');
     if (this.favBar) this.favBar.hidden = !on;
-    if (on) { this.clamp(); this.sync(); }
+    if (on) { this.paintRing1(); this.clamp(); this.sync(); }
     else { this.setOpen(false); }
   };
 

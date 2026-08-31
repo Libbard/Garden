@@ -197,9 +197,10 @@
     return false;
   }
 
-  function palmMode() {
-    try { return localStorage.getItem(PALM_KEY) || 'auto'; }
-    catch (e) { return 'auto'; }
+  function palmMode(def) {
+    var d = def || 'auto';
+    try { return localStorage.getItem(PALM_KEY) || d; }
+    catch (e) { return d; }
   }
 
   function now() { return Date.now(); }
@@ -250,6 +251,114 @@
     return this.penSeen && (now() - this.lastPenAt) < MOUSE_TWIN_MS;
   };
 
+  function splitAct(act) {
+    var want = act, mode = null;
+    if (act.indexOf('era') === 0) {
+      want = 'era';
+      if (act === 'era:part') mode = 'part';
+      else if (act === 'era:whole') mode = 'whole';
+    }
+    return { tool: want, mode: mode };
+  }
+
+  function Mods(a) {
+    this.a = a || {};
+    this.held = null;
+    this.latch = null;
+  }
+
+  Mods.prototype.begin = function (act) {
+    if (!act || act === 'none') return false;
+    var a = this.a, s = splitAct(act);
+    this.held = { tool: a.getTool(), mode: a.getEraseMode() };
+    if (s.mode) a.setEraseMode(s.mode);
+    if (s.tool !== a.getTool()) a.setTool(s.tool);
+    else if (a.onChange) a.onChange();
+    return true;
+  };
+
+  Mods.prototype.end = function (info) {
+    var a = this.a;
+    if (info && info.tap && info.act) {
+      this.held = null;
+      this.toggle(info.act);
+      if (a.onChange) a.onChange();
+      return 'tap';
+    }
+    var m = this.held;
+    this.held = null;
+    if (m && !(a.hasSelection && a.hasSelection())) {
+      a.setEraseMode(m.mode);
+      if (a.getTool() !== m.tool) a.setTool(m.tool);
+    }
+    if (a.onChange) a.onChange();
+    return 'hold';
+  };
+
+  Mods.prototype.toggle = function (act) {
+    if (!act || act === 'none') return false;
+    var a = this.a, s = splitAct(act), L = this.latch;
+    if (L && L.act === act) {
+      this.latch = null;
+      a.setEraseMode(L.mode);
+      a.setTool(L.tool);
+      return true;
+    }
+    if (L) {
+      this.latch = { act: act, tool: L.tool, mode: L.mode };
+    } else {
+      if (s.tool === a.getTool() && (!s.mode || s.mode === a.getEraseMode())) return false;
+      this.latch = { act: act, tool: a.getTool(), mode: a.getEraseMode() };
+    }
+    if (s.mode) a.setEraseMode(s.mode);
+    a.setTool(s.tool);
+    return true;
+  };
+
+  function typing(t) {
+    return !!(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)));
+  }
+
+  function keys(spec, guard) {
+    return function (e) {
+      if (e.defaultPrevented) return;
+      if (typing(e.target)) return;
+      if (guard && guard(e) === false) return;
+      var name = ((e.ctrlKey || e.metaKey) ? 'mod+' : '') +
+                 (e.shiftKey ? 'shift+' : '') + keyOf(e);
+      var fn = spec[name];
+      if (!fn) return;
+      if (fn(e) === false) return;
+      e.preventDefault();
+    };
+  }
+
+  function ring(host) {
+    var el = null;
+    return {
+      at: function (x, y, r, dashed) {
+        if (!host) return;
+        if (!el) {
+          el = document.createElement('div');
+          el.className = 'gink-ring';
+          el.setAttribute('aria-hidden', 'true');
+          host.appendChild(el);
+        }
+        el.setAttribute('data-dash', dashed ? '1' : '0');
+        el.style.inlineSize = el.style.blockSize = Math.max(4, r * 2) + 'px';
+        el.style.insetInlineStart = '0';
+        el.style.insetBlockStart = '0';
+        el.style.transform = 'translate(' + (x - r) + 'px,' + (y - r) + 'px)';
+        el.hidden = false;
+      },
+      off: function () { if (el) el.hidden = true; },
+      drop: function () {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+        el = null;
+      }
+    };
+  }
+
   function Router(opts) {
     var o = opts || {};
     this.el = o.el;
@@ -259,6 +368,7 @@
     this.onEndMod = o.onEndMod || null;
     this.onGesture = o.onGesture || function () {};
     this.mode = o.mode || function () { return 'draw'; };
+    this.palmDef = o.palmDefault || '';
     this.profile = o.profile || new Profile();
     this.live = {};
     this.gest = {};
@@ -310,7 +420,7 @@
   Router.prototype.classify = function (e) {
     var t = e.pointerType || 'mouse';
     var P = this.profile;
-    var pm = palmMode();
+    var pm = palmMode(this.palmDef);
 
     if (t === 'pen') { P.notePen(); return 'draw'; }
 
@@ -579,6 +689,10 @@
       return cur;
     },
     penMods: penMods,
+    mods: function (adapter) { return new Mods(adapter); },
+    splitAct: splitAct,
+    keys: keys,
+    ring: ring,
     keyOf: keyOf,
     penKeys: penKeys,
     setPenKey: setPenKey,

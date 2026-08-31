@@ -7,6 +7,7 @@
   var LS_SEMESTER = 'my_semester';
   var LS_ARCHIVE  = 'semester_archive';
   var LS_GRADES   = 'gpa_grades';
+  var LS_REC_ORD  = 'gpa_record_order';
 
   var GPA_SCALE = {
     'A+': 4.00, 'A': 3.75, 'B+': 3.50, 'B': 3.00,
@@ -21,7 +22,7 @@
   var whatIf = {}, pickerQ = '', scenario = '', editingId = null;
   var _chartDrawn = false, programCredits = 132;
   /*@3.GPAJ.109*/
-  var PL_VER = 5;
+  var PL_VER = 6;
 
   /*@3.GPAJ.105*/
   function progCredits() {
@@ -46,7 +47,8 @@
           var h = (c.h != null ? c.h : c.ch);
           n += (h == null ? 0 : +h) || 0;
         });
-        if (n > 60) programCredits = Math.round(n);
+        /*@3.GPAJ.110*/
+        if (n >= 24) programCredits = Math.round(n);
         return programCredits;
       }
     } catch (e) {}
@@ -228,9 +230,11 @@
       var own = !!a.summer || !!s.summer || a.level != null;
       if (own) {
         var key = 'sem:' + s.id;
+        var lvA = (a.level != null) ? +a.level : null;
         buckets[key] = {
-          lv: (a.level != null) ? a.level : null,
+          lv: lvA,
           summer: !!(a.summer || s.summer),
+          sort: (a.after != null) ? (+a.after + 0.5) : (lvA != null ? lvA : null),
           name: archName(a.id ? a : s) || semName(s),
           at: a.archived_at || '',
           courses: (s.courses || []).slice()
@@ -247,13 +251,36 @@
   }
 
   /*@3.GPAJ.101*/
-  function bucketOrder(buckets) {
+  function readRecOrder() {
+    try { var v = JSON.parse(localStorage.getItem(LS_REC_ORD) || 'null'); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
+  function saveRecOrder(a) {
+    try { localStorage.setItem(LS_REC_ORD, JSON.stringify(a)); } catch (e) {}
+  }
+  /*@3.GPAJ.113*/
+  function bucketRank(b) {
+    if (b.sort != null) return b.sort;
+    return b.lv == null ? 99 : b.lv;
+  }
+  function naturalOrder(buckets) {
     return Object.keys(buckets).sort(function (a, b) {
-      var A = buckets[a], B = buckets[b];
-      var la = A.lv == null ? 99 : A.lv, lb = B.lv == null ? 99 : B.lv;
+      var la = bucketRank(buckets[a]), lb = bucketRank(buckets[b]);
       if (la !== lb) return la - lb;
-      return String(A.at || '').localeCompare(String(B.at || ''));
+      return String(buckets[a].at || '').localeCompare(String(buckets[b].at || ''));
     });
+  }
+  /*@3.GPAJ.111*/
+  function bucketOrder(buckets) {
+    var base = naturalOrder(buckets);
+    var rank = {}; readRecOrder().forEach(function (k, i) { rank[k] = i; });
+    var slots = [], picked = [];
+    base.forEach(function (k, i) { if (rank[k] !== undefined) { slots.push(i); picked.push(k); } });
+    if (picked.length < 2) return base;
+    picked.sort(function (a, b) { return rank[a] - rank[b]; });
+    var out = base.slice();
+    slots.forEach(function (pos, i) { out[pos] = picked[i]; });
+    return out;
   }
 
   function bucketName(b) {
@@ -593,7 +620,13 @@
     }
 
     /*@3.GPAJ.104*/
-    bucketOrder(buckets).forEach(function (key) {
+    var order = bucketOrder(buckets), lastB = order.length - 1;
+    if (order.length > 1) {
+      html += '<p class="gp-rec-lead">' + esc(L(
+        'رتّبْ سجلَّك كما وقع فعلاً — بالسهمين. والمعدّلُ لا يتغيّر بالترتيب، لكنّ المنحنى والتسلسلَ يتبعانه.',
+        'Order your record the way it actually happened — with the arrows. The GPA does not change; the curve and the sequence follow it.')) + '</p>';
+    }
+    order.forEach(function (key, bi) {
       var b = buckets[key]; if (!b) return;
       var g = gpaOf(b.courses, false);
       var cr = b.courses.reduce(function (a, c) { return a + c.credits; }, 0);
@@ -602,14 +635,23 @@
                           .reduce(function (a, c) { return a + c.credits; }, 0);
 
       /*@3.GPAJ.36*/
-      html += '<div class="gp-acc">' +
+      html += '<div class="gp-acc"><div class="gp-acc-top">' +
         '<button class="gp-acc-head" type="button" aria-expanded="false">' +
           '<span>' + esc(bucketName(b)) + '</span>' +
           '<span class="gp-acc-sum">' + b.courses.length + esc(L(' مواد · ', ' courses · ')) +
             '<span class="gp-num">' + cr + '</span>' + esc(L(' ساعة', ' cr')) + '</span>' +
           '<span class="gp-acc-gpa" data-tone="' + gpaTone(g) + '">' + g.toFixed(2) + '</span>' +
           '<i class="fa-solid fa-chevron-down gp-acc-caret"></i>' +
-        '</button><div class="gp-acc-body">' +
+        '</button>' +
+        (order.length > 1 ? '<span class="gp-acc-ord">' +
+          '<button class="gp-ico" data-rec-mv="' + esc(key) + ',-1"' + (bi === 0 ? ' disabled' : '') +
+            ' aria-label="' + esc(L('قدّم ' + bucketName(b), 'Move ' + bucketName(b) + ' earlier')) +
+            '"><i class="fa-solid fa-arrow-up"></i></button>' +
+          '<button class="gp-ico" data-rec-mv="' + esc(key) + ',1"' + (bi === lastB ? ' disabled' : '') +
+            ' aria-label="' + esc(L('أخّر ' + bucketName(b), 'Move ' + bucketName(b) + ' later')) +
+            '"><i class="fa-solid fa-arrow-down"></i></button>' +
+        '</span>' : '') +
+        '</div><div class="gp-acc-body">' +
         b.courses.map(function (c) {
           var isTR = c.grade === 'TR';
           return '<div class="gp-rec-row' + (isTR ? ' is-tr' : '') + '">' +
@@ -707,23 +749,26 @@
   function savePlan(p) {
     if (window.GardenData && GardenData.saveGpaPlan) GardenData.saveGpaPlan(p);
   }
+  /*@3.GPAJ.112*/
   function seriesData() {
     var out = [], pts = 0, cr = 0;
     /*@3.GPAJ.41*/
-    var arch = gradesData.semesters.filter(function (s) { return !s.is_current; });
-    arch.sort(function (a, b) {
-      var la = minLevel(a), lb = minLevel(b);
-      return (la === null ? 98 : la) - (lb === null ? 98 : lb);
+    var buckets = archivedByLevel();
+    var steps = bucketOrder(buckets).map(function (k) {
+      return { label: bucketName(buckets[k]), courses: buckets[k].courses || [], live: false };
     });
-    arch.concat(gradesData.semesters.filter(function (s) { return s.is_current; })).forEach(function (s) {
+    gradesData.semesters.filter(function (s) { return s.is_current; }).forEach(function (s) {
+      steps.push({ label: semName(s), courses: s.courses || [], live: true });
+    });
+    steps.forEach(function (st) {
       var sp = 0, sc = 0;
-      (s.courses || []).forEach(function (c) {
-        var g = c.grade || (s.is_current ? whatIf[c.code] : null);
+      st.courses.forEach(function (c) {
+        var g = c.grade || (st.live ? whatIf[c.code] : null);
         if (g && GPA_SCALE[g] !== undefined) { sp += GPA_SCALE[g] * c.credits; sc += c.credits; }
       });
       if (!sc) return;
       pts += sp; cr += sc;
-      out.push({ label: semName(s), gpa: pts / cr, plan: false });
+      out.push({ label: st.label, gpa: pts / cr, plan: false });
     });
     plan().semesters.forEach(function (s, si) {
       (s.courses || []).forEach(function (c) {
@@ -733,14 +778,6 @@
       out.push({ label: termName(s, si), gpa: cr ? pts / cr : 0, plan: true, summer: !!s.summer });
     });
     return out;
-  }
-  function minLevel(s) {
-    var min = null;
-    (s.courses || []).forEach(function (c) {
-      var lv = levelOf(c.code);
-      if (lv !== null && (min === null || lv < min)) min = lv;
-    });
-    return min;
   }
   function recordedCount() {
     return seriesData().filter(function (p) { return !p.plan; }).length;
@@ -801,12 +838,14 @@
             esc(L(' ساعة · ', ' cr · ')) + '<span class="gp-num">' + n + '</span>' + esc(L(' مواد', '')) +
           '</span>' +
           /*@3.GPAJ.50*/
-          (s.summer ? '<button class="gp-ico gp-sem-mv" data-sem-mv="' + si + ',-1"' +
-              (si === 0 ? ' disabled' : '') + ' title="' + esc(L('قدّمه', 'Move earlier')) +
-              '" aria-label="' + esc(L('قدّم الفصل الصيفيّ', 'Move summer term earlier')) + '"><i class="fa-solid fa-arrow-up"></i></button>' +
-            '<button class="gp-ico gp-sem-mv" data-sem-mv="' + si + ',1"' +
-              (si === last ? ' disabled' : '') + ' title="' + esc(L('أخّره', 'Move later')) +
-              '" aria-label="' + esc(L('أخّر الفصل الصيفيّ', 'Move summer term later')) + '"><i class="fa-solid fa-arrow-down"></i></button>' : '') +
+          '<button class="gp-ico gp-sem-mv" data-sem-mv="' + si + ',-1"' +
+            (si === 0 ? ' disabled' : '') + ' title="' + esc(L('قدّمه', 'Move earlier')) +
+            '" aria-label="' + esc(L('قدّم ' + termName(s, si), 'Move ' + termName(s, si) + ' earlier')) +
+            '"><i class="fa-solid fa-arrow-up"></i></button>' +
+          '<button class="gp-ico gp-sem-mv" data-sem-mv="' + si + ',1"' +
+            (si === last ? ' disabled' : '') + ' title="' + esc(L('أخّره', 'Move later')) +
+            '" aria-label="' + esc(L('أخّر ' + termName(s, si), 'Move ' + termName(s, si) + ' later')) +
+            '"><i class="fa-solid fa-arrow-down"></i></button>' +
           '<button class="gp-ico gp-ico--danger" data-del-sem="' + si + '" aria-label="' + esc(L('حذف الفصل', 'Delete term')) + '"><i class="fa-solid fa-trash-can"></i></button>' +
         '</div>' +
         '<div class="gp-sem-body" dir="' + tdir + '">' +
@@ -1221,7 +1260,7 @@
       return '<button class="gp-pick-item" data-add="' + esc(c.code) + '">' +
         '<span class="gp-code">' + esc(c.code) + '</span>' +
         '<span class="gp-pick-info"><span class="gp-pick-name">' + esc(name) + '</span>' +
-        '<span class="gp-pick-meta">' + esc(lvl || '') + ' · ' + esc(crWord(c.credits != null ? c.credits : 3)) + '</span></span>' +
+        '<span class="gp-pick-meta">' + (lvl ? esc(lvl) + ' · ' : '') + esc(crWord(c.credits != null ? c.credits : 3)) + '</span></span>' +
         (isActive ? '<span class="gp-badge" data-kind="on">' + esc(L('في فصلي', 'In my term')) + '</span>' : '') +
       '</button>';
     }
@@ -1650,8 +1689,17 @@
         if (!folded) renderChart();
         return;
       }
+      if ((el = e.target.closest('[data-rec-mv]'))) {
+        var rm = el.getAttribute('data-rec-mv').split(',');
+        var ord = bucketOrder(archivedByLevel());
+        var at = ord.indexOf(rm[0]), dst = at + (+rm[1]);
+        if (at < 0 || dst < 0 || dst >= ord.length) return;
+        ord.splice(dst, 0, ord.splice(at, 1)[0]);
+        saveRecOrder(ord);
+        renderRecord(); renderChart(); return;
+      }
       if ((el = e.target.closest('.gp-acc-head')) && !el.hasAttribute('data-act')) {
-        var acc = el.parentElement, open = acc.classList.toggle('is-open');
+        var acc = el.closest('.gp-acc'), open = acc.classList.toggle('is-open');
         el.setAttribute('aria-expanded', open); return;
       }
       if ((el = e.target.closest('[data-sem-fold]'))) {
@@ -1708,6 +1756,11 @@
       /*@3.GPAJ.96*/
       if ((el = e.target.closest('[data-act="close"]')) || e.target.classList.contains('gp-overlay')) {
         $$('.gp-overlay:not(.gs-overlay)').forEach(function (o) { o.hidden = true; }); return;
+      }
+      if ((el = e.target.closest('[data-act="planner"]'))) {
+        if (window.GardenSetup && GardenSetup.openPlanner) GardenSetup.openPlanner();
+        else toast(L('المعالج غير متاح', 'Wizard unavailable'));
+        return;
       }
       if ((el = e.target.closest('[data-act="wizard"]'))) {
         if (window.Onboarding && window.Onboarding.open) window.Onboarding.open();
@@ -1791,6 +1844,9 @@
       }
 
       document.addEventListener('garden:languageChanged', render);
+      document.addEventListener('garden:planChanged', function () {
+        renderPlan(false); renderChart(); renderTarget(); renderHonour();
+      });
       document.addEventListener('garden:gradesChanged', function () {
         archive = JSON.parse(localStorage.getItem(LS_ARCHIVE) || '[]');
         gradesData = JSON.parse(localStorage.getItem(LS_GRADES) || 'null') || gradesData;

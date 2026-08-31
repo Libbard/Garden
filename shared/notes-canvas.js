@@ -303,6 +303,9 @@
   }
   function dropBox(el) { if (el._bb) el._bb = null; }
 
+  var ERASE = { TOL_PX: 8, RING_PX: 9,
+                partR: function (w) { return Math.max(6, (w || 2) * 2.2); } };
+
   function unionBox(list) {
     var mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity;
     for (var i = 0; i < list.length; i++) {
@@ -318,6 +321,19 @@
 
   function eachPoint(el, fn) {
     dropBox(el);
+    if (el.ty === 'tx') {
+      var m2 = fn(el.x + el.w / 2, el.y + el.h / 2);
+      el.x = m2[0] - el.w / 2; el.y = m2[1] - el.h / 2;
+      return;
+    }
+    if (el.ty === 'hl') {
+      for (var q = 0; q < (el.r || []).length; q++) {
+        var b = el.r[q];
+        var m = fn(b.x + b.w / 2, b.y + b.h / 2);
+        b.x = m[0] - b.w / 2; b.y = m[1] - b.h / 2;
+      }
+      return;
+    }
     if (el.ty === 'st') {
       for (var i = 0; i < el.pts.length; i++) {
         var p = el.pts[i], r = fn(p.x, p.y);
@@ -1177,8 +1193,8 @@
 /*@3.NOCJ.29*/
     if (this.tool === 'era' && this.hover) {
       var rr = (this.eraseMode === 'part')
-        ? Math.max(6, this.width * 2.2) * this.cam.z
-        : 9;
+        ? ERASE.partR(this.width) * this.cam.z
+        : ERASE.RING_PX;
       g.save();
       g.beginPath();
       g.arc(this.hover.x, this.hover.y, rr, 0, Math.PI * 2);
@@ -1364,7 +1380,7 @@
 
   /*@3.NOCJ.4*/
   Canvas.prototype.hit = function (wp) {
-    var tol = 8 / this.cam.z;
+    var tol = ERASE.TOL_PX / this.cam.z;
     for (var i = this.els.length - 1; i >= 0; i--) {
       var el = this.els[i];
       if (el.ty === 'st') {
@@ -1407,7 +1423,7 @@
 
   /*@3.NOCJ.24*/
   Canvas.prototype.erasePart = function (wp, r) {
-    var rad = r || Math.max(6, this.width * 2.2);
+    var rad = r || ERASE.partR(this.width);
     var out = [], hitAny = false;
     for (var i = 0; i < this.els.length; i++) {
       var el = this.els[i];
@@ -1706,68 +1722,31 @@
 
   /*@3.NOCJ.32*/
   /*@3.NOCJ.44*/
-  Canvas.prototype.toggleAct = function (act) {
-    if (!act || act === 'none') return false;
-    var want = act, mode = null;
-    if (act.indexOf('era') === 0) {
-      want = 'era';
-      if (act === 'era:part') mode = 'part';
-      else if (act === 'era:whole') mode = 'whole';
-    }
-    var latch = this._latch;
-    if (latch && latch.act === act) {
-      this._latch = null;
-      this.eraseMode = latch.mode;
-      this.setTool(latch.tool);
-      return true;
-    }
-    if (latch) {
-      this._latch = { act: act, tool: latch.tool, mode: latch.mode };
-    } else {
-      if (want === this.tool && (!mode || mode === this.eraseMode)) return false;
-      this._latch = { act: act, tool: this.tool, mode: this.eraseMode };
-    }
-    if (mode) this.eraseMode = mode;
-    this.setTool(want);
-    return true;
-  };
+  Canvas.prototype.toggleAct = function (act) { return this.mods().toggle(act); };
 
   /*@3.NOCJ.48*/
-  Canvas.prototype.useMod = function (act) {
-    if (!act || act === 'none') return false;
-    var want = act, mode = null;
-    if (act.indexOf('era') === 0) {
-      want = 'era';
-      if (act === 'era:part') mode = 'part';
-      else if (act === 'era:whole') mode = 'whole';
-    }
-    this._mod = { tool: this.tool, mode: this.eraseMode };
-    if (mode) this.eraseMode = mode;
-    if (want !== this.tool) this.setTool(want); else this.emit();
-    return true;
+  Canvas.prototype.mods = function () {
+    if (this._mods) return this._mods;
+    var self = this;
+    this._mods = window.GardenInkInput.mods({
+      getTool: function () { return self.tool; },
+      setTool: function (t) { self.setTool(t); },
+      getEraseMode: function () { return self.eraseMode; },
+      setEraseMode: function (m) { self.eraseMode = m; },
+      hasSelection: function () { return !!self.selected().length; },
+      onChange: function () { self.emit(); }
+    });
+    return this._mods;
   };
 
-  Canvas.prototype.beginMod = function (act) {
-    return this.useMod(act);
-  };
+  Canvas.prototype.useMod = function (act) { return this.mods().begin(act); };
+
+  Canvas.prototype.beginMod = function (act) { return this.mods().begin(act); };
 
   /*@3.NOCJ.36*/
   Canvas.prototype.endMod = function (info) {
-    if (info && info.tap && info.act) {
-      this._mod = null;
-      this.toggleAct(info.act);
-      this._modDid = false;
-      this.emit();
-      return;
-    }
-    var m = this._mod;
-    this._mod = null;
-    if (m && !this.selected().length) {
-      this.eraseMode = m.mode;
-      if (this.tool !== m.tool) this.setTool(m.tool);
-    }
+    this.mods().end(info);
     this._modDid = false;
-    this.emit();
   };
 
   Canvas.prototype.setTool = function (t) {
@@ -2236,11 +2215,15 @@
     HI_TONES: HI_TONES,
     NIBS: NIBS,
     inkPaints: inkPaints,
+    snapHi: snapHi,
+    straighten: straighten,
     toSvg: toSvg,
     inkGeom: inkGeom,
     inkEmit: inkEmit,
     isLight: isLight,
     setPaper: setPaper,
+    /*@3.NOCJ.113*/
+    paperHex: function () { return _paperOverride; },
     themeIsLight: themeIsLight,
     /*@3.NOCJ.91*/
     mixHex: mixHex,
@@ -2250,6 +2233,10 @@
     },
     bboxOf: bboxOf,
     segDist: segDist,
-    pointInPoly: pointInPoly
+    pointInPoly: pointInPoly,
+    eachPoint: eachPoint,
+    unionBox: unionBox,
+    ERASE: ERASE,
+    clip: { store: inkClipStore, load: inkClipLoad, any: inkClipAny }
   };
 })();

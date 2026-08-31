@@ -374,7 +374,7 @@
   }
 
   /*@3.GARJ.18*/
-  const THEME_META_COLOR = { light: '#a78bfa', dark: '#111827', dim: '#0f111a' };
+  const THEME_META_COLOR = { light: '#ffffff', dark: '#1f2937', dim: '#171923' };
   function updateThemeColorMeta(theme) {
     const color = THEME_META_COLOR[theme] || THEME_META_COLOR.dark;
     let meta = document.querySelector('meta[name="theme-color"]');
@@ -6721,7 +6721,8 @@ ${baseRules}`) + regenSuffix;
     /*@3.GARJ.618*/
     aiCadence: AI_CADENCE,
     moduleVisits: moduleVisits,
-    noteModuleVisit: noteModuleVisit
+    noteModuleVisit: noteModuleVisit,
+    toast: notesToast
   };
 
   /*@3.GARJ.448*/

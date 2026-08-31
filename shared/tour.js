@@ -126,7 +126,7 @@
     document.querySelectorAll("[data-tour-theme]").forEach(button => {
       button.setAttribute("aria-pressed", String(button.dataset.tourTheme === state.theme));
     });
-    const themeColours = { dark: "#111827", dim: "#0f111a" };
+    const themeColours = { light: "#ffffff", dark: "#1f2937", dim: "#171923" };
     document.querySelector("meta[name='theme-color']").content = themeColours[state.theme];
     updateThemeSwitch();
     if (persist) localStorage.setItem("garden_theme", state.theme);
