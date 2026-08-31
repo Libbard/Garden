@@ -375,8 +375,22 @@
 
   /*@3.GARJ.18*/
   const THEME_META_COLOR = { light: '#ffffff', dark: '#1f2937', dim: '#171923' };
+  /*@3.GARJ.646*/
+  const APP_SHELL_COLOR = '#1f2937';
+  const INSTALLED_MODES = ['standalone', 'fullscreen', 'minimal-ui', 'window-controls-overlay'];
+  function isInstalledShell() {
+    try {
+      if (window.navigator && window.navigator.standalone === true) return true;
+      if (!window.matchMedia) return false;
+      return INSTALLED_MODES.some(function (m) {
+        return window.matchMedia('(display-mode: ' + m + ')').matches;
+      });
+    } catch (e) { return false; }
+  }
   function updateThemeColorMeta(theme) {
-    const color = THEME_META_COLOR[theme] || THEME_META_COLOR.dark;
+    const color = isInstalledShell()
+      ? APP_SHELL_COLOR
+      : (THEME_META_COLOR[theme] || THEME_META_COLOR.dark);
     let meta = document.querySelector('meta[name="theme-color"]');
     if (!meta) {
       meta = document.createElement('meta');
