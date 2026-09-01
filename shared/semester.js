@@ -1048,8 +1048,67 @@
   }
   /*@3.SEMJ.60*/
   /*@3.SEMJ.190*/
+  /*@3.SEMJ.215*/
+  var ARCH_ASSETS = ['../shared/gpa.css', '../shared/gpa-setup.css',
+                     '../shared/plan-rules.js', '../shared/gpa-setup.js'];
+  var archLoading = false;
+  function loadOne(src) {
+    return new Promise(function (done, fail) {
+      var css = /\.css$/.test(src);
+      var sel = css ? 'link[href^="' + src + '"]' : 'script[src^="' + src + '"]';
+      if (document.querySelector(sel)) { done(); return; }
+      var el2 = document.createElement(css ? 'link' : 'script');
+      if (css) { el2.rel = 'stylesheet'; el2.href = src; }
+      else { el2.src = src; el2.async = false; }
+      el2.onload = function () { done(); };
+      el2.onerror = function () { fail(new Error(src)); };
+      document.head.appendChild(el2);
+    });
+  }
+  /*@3.SEMJ.216*/
+  function openArchWizard() {
+    if (window.GardenSetup && GardenSetup.openArchive) { GardenSetup.openArchive(); return; }
+    if (archLoading) return;
+    archLoading = true;
+    var btn = el('sem-arch-wiz');
+    if (btn) btn.disabled = true;
+    ARCH_ASSETS.reduce(function (chain, src) {
+      return chain.then(function () { return loadOne(src); });
+    }, Promise.resolve()).then(function () {
+      archLoading = false;
+      if (btn) btn.disabled = false;
+      if (window.GardenSetup && GardenSetup.openArchive) GardenSetup.openArchive();
+      else toast(L('تعذّر فتحُ المعالج', 'The wizard could not open'));
+    }, function () {
+      archLoading = false;
+      if (btn) btn.disabled = false;
+      toast(L('تعذّر جلبُ المعالج — تحقّقْ من شبكتك.', 'Could not fetch the wizard — check your connection.'));
+    });
+  }
+
+  /*@3.SEMJ.212*/
+  function afterLevel(sem) {
+    if (sem.after != null && sem.after !== '' && !isNaN(+sem.after)) return +sem.after;
+    var mx = null;
+    (GardenData.archive() || []).forEach(function (a) {
+      if (!a || a.summer) return;
+      var n = parseInt(a.level, 10);
+      if (!isNaN(n) && (mx === null || n > mx)) mx = n;
+    });
+    if (mx !== null) return mx;
+    var n2 = parseInt(sem.level, 10);
+    if (!isNaN(n2)) return n2;
+    try {
+      var p = JSON.parse(localStorage.getItem('student_profile') || '{}') || {};
+      var n3 = parseInt(p.level, 10);
+      if (!isNaN(n3)) return n3;
+    } catch (e) {}
+    return null;
+  }
+
   function archiveRecord(sem) {
     var st = archiveStats({ courses: sem.courses });
+    var after = sem.summer ? afterLevel(sem) : null;
     return {
       id: sem.id,
       name: sem.name || sem.name_ar || sem.name_en,
@@ -1057,6 +1116,8 @@
       name_ar: sem.name_ar || sem.name,
       name_en: sem.name_en || sem.name,
       level: sem.level, term: sem.term, summer: !!sem.summer,
+      /*@3.SEMJ.213*/
+      after: after,
       courses: sem.courses,
       gpa: st.gpa, total_credits: st.credits,
       created_at: sem.created_at,
@@ -2450,7 +2511,8 @@
         name: a.name || a.name_ar || a.name_en,
         name_ar: a.name_ar || a.name,
         name_en: a.name_en || a.name,
-        level: a.level, term: a.term,
+        /*@3.SEMJ.214*/
+        level: a.level, term: a.term, summer: !!a.summer, after: a.after,
         courses: a.courses || [],
         is_active: true, is_pinned: false, was_activated: false,
         created_at: a.created_at || new Date().toISOString(),
@@ -2730,6 +2792,7 @@
       crnLookup(String(el('crn-n').value || '').trim());
     });
     on('crn-ok', 'click', doCrnLink);
+    on('sem-arch-wiz', 'click', openArchWizard);
     on('crn-unlink', 'click', doCrnUnlink);
     /*@3.SEMJ.131*/
     ['nm-ar', 'nm-en'].forEach(function (id) {

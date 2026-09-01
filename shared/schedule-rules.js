@@ -115,6 +115,84 @@
     return { on: true, why: null };
   }
 
+  /*@3.SCRJ.5*/
+  function weekIdOf(ev) {
+    if (ev && ev.weekId) return ev.weekId;
+    var d = parseLocalDate(ev && ev.date);
+    return d ? getWeekId(getWeekStartDate(d)) : '';
+  }
+  function byId(list, id) {
+    var a = list || [];
+    for (var i = 0; i < a.length; i++) if (a[i] && a[i].id === id) return a[i];
+    return null;
+  }
+  function planSessions(s) {
+    var it = s && s.intensive;
+    var p = (it && it.active && it.plans) ? it.plans[it.active] : null;
+    return (p && p.sessions) || [];
+  }
+  function isDone(ev, model) {
+    if (!ev) return false;
+    var src = ev.src || ev.source || '';
+    var s = model || raw();
+    if (src === 'lecture' || src === 'study') {
+      var ov = (s.week_overrides && s.week_overrides[weekIdOf(ev)]) || {};
+      return (ov.completed_events || []).indexOf(ev.id) !== -1;
+    }
+    if (src === 'exam') { var x = byId(s.exams, ev.id); return !!(x && x.completed_at); }
+    if (src === 'general') { var g = byId(s.general_events, ev.id); return !!(g && g.done); }
+    if (src === 'intensive') { var ss = byId(planSessions(s), ev.id); return !!(ss && ss.done); }
+    return !!ev.done;
+  }
+
+  /*@3.SCRJ.6*/
+  function setDone(ev, on, model) {
+    if (!ev) return false;
+    var src = ev.src || ev.source || '';
+    var s = model, own = false;
+    if (!s) {
+      try { s = JSON.parse(localStorage.getItem(LS_KEY) || 'null') || {}; } catch (e) { return false; }
+      own = true;
+    }
+    var hit = false;
+    if (src === 'lecture' || src === 'study') {
+      var wid = weekIdOf(ev);
+      if (!wid) return false;
+      if (!s.week_overrides || typeof s.week_overrides !== 'object') s.week_overrides = {};
+      var o = s.week_overrides[wid] || (s.week_overrides[wid] = {});
+      if (!Array.isArray(o.completed_events)) o.completed_events = [];
+      var i = o.completed_events.indexOf(ev.id);
+      if (on && i === -1) o.completed_events.push(ev.id);
+      else if (!on && i !== -1) o.completed_events.splice(i, 1);
+      hit = true;
+    } else if (src === 'exam') {
+      var x = byId(s.exams, ev.id);
+      if (x) { x.completed_at = on ? new Date().toISOString() : null; hit = true; }
+    } else if (src === 'general') {
+      var g = byId(s.general_events, ev.id);
+      if (g) { g.done = !!on; hit = true; }
+    } else if (src === 'intensive') {
+      var ss = byId(planSessions(s), ev.id);
+      if (ss) { ss.done = !!on; hit = true; }
+    }
+    if (!hit) return false;
+    if (own) {
+      s.updated_at = new Date().toISOString();
+      try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch (e) { return false; }
+      announce('done-toggle');
+    }
+    return true;
+  }
+
+  /*@3.SCRJ.7*/
+  function isPast(ev, now) {
+    if (!ev || ev.allDay || ev.start === null || ev.start === undefined) return false;
+    var d = parseLocalDate(ev.date);
+    if (!d) return false;
+    d.setMinutes(d.getMinutes() + (ev.end !== null && ev.end !== undefined ? ev.end : ev.start + 60));
+    return d.getTime() < (now || Date.now());
+  }
+
   function lectureNotice(dateObj, ar) {
     var d = day0(dateObj || new Date());
     var ws = getWeekStartDate(d);
@@ -185,6 +263,9 @@
     inTerm: inTerm,
     weekFocus: weekFocus,
     lectureOn: lectureOn,
-    blockOn: blockOn
+    blockOn: blockOn,
+    isDone: isDone,
+    setDone: setDone,
+    isPast: isPast
   };
 })();

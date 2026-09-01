@@ -458,6 +458,11 @@
              !!(s.channels && s.channels.exams), off, leadSel('exams', s.lead.exams)) +
       optRow('ch.tasks', L('المهامُّ والمواعيد', 'Tasks and due dates'), '',
              !!(s.channels && s.channels.tasks), off, leadSel('tasks', s.lead.tasks)) +
+      /*@3.NOTJ.51*/
+      optRow('ch.study', L('قبل المذاكرة وجلسات الخطّة', 'Before study and plan sessions'), '',
+             !!(s.channels && s.channels.study), off, leadSel('study', s.lead.study)) +
+      optRow('ch.events', L('قبل الأحداث العامّة', 'Before events'), '',
+             !!(s.channels && s.channels.events), off, leadSel('events', s.lead.events)) +
       optRow('ch.review', L('نداءُ المراجعة اليوميّ', 'Daily review call'),
              L('نداءٌ واحدٌ كلَّ يومٍ لمراجعة بطاقاتك المستحقّة.',
                'One call a day to review your due cards.'),

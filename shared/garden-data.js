@@ -896,8 +896,31 @@
                /*@3.GADJ.58*/
                credits: (c.credits != null) ? c.credits : ((info.credits != null) ? info.credits : 3) };
     }
-    return { name_ar: c.name_ar || c.name_en || c.name || c.code,
-             name_en: c.name_en || c.name_ar || c.name || c.code, credits: c.credits || 3 };
+    if (c.name_ar || c.name_en || c.name) {
+      return { name_ar: c.name_ar || c.name_en || c.name,
+               name_en: c.name_en || c.name_ar || c.name, credits: c.credits || 3 };
+    }
+    var pl = planCourseInfo(c.code);
+    if (pl) {
+      return { name_ar: pl.name_ar, name_en: pl.name_en,
+               credits: (c.credits != null) ? c.credits : pl.credits };
+    }
+    return { name_ar: c.code, name_en: c.code, credits: c.credits || 3 };
+  }
+
+  var _planSlug;
+  /*@3.GADJ.171*/
+  function planCourseInfo(code) {
+    var R = window.GardenPlanRules;
+    if (!R) return null;
+    if (_planSlug === undefined) {
+      var p = readJSON(LS.profile, null);
+      _planSlug = (p && p.program) || '';
+    }
+    if (!_planSlug || !R.courseBy(_planSlug, code)) return null;
+    return { name_ar: R.courseTitle(_planSlug, code, 'ar') || code,
+             name_en: R.courseTitle(_planSlug, code, 'en') || code,
+             credits: R.courseCh(_planSlug, code) || 3 };
   }
 
   /*@3.GADJ.59*/
@@ -924,9 +947,16 @@
                  credits: info.credits, grade: c.grade || null,
                  points: c.grade ? (GPA_SCALE[c.grade] || 0) : null };
       });
+      /*@3.GADJ.170*/
+      var meta = { name: a.name, name_ar: a.name_ar, name_en: a.name_en,
+                   level: a.level, summer: !!a.summer, after: a.after };
       var ex = g.semesters.filter(function (s) { return s.id === a.id; })[0];
-      if (ex) { ex.name = a.name; ex.courses = courses; ex.is_current = false; }
-      else { g.semesters.push({ id: a.id, name: a.name, courses: courses, is_current: false }); }
+      if (ex) {
+        Object.keys(meta).forEach(function (k) { ex[k] = meta[k]; });
+        ex.courses = courses; ex.is_current = false;
+      } else {
+        g.semesters.push(Object.assign({ id: a.id, courses: courses, is_current: false }, meta));
+      }
     });
 
     if (JSON.stringify(g.semesters) === before) return false;
@@ -1020,6 +1050,128 @@
     out.hiddenWhy = why;
     out.count = out.lectures.length + out.exams.length + out.blocks.length;
     return out;
+  }
+
+
+  /*@3.GADJ.173*/
+  function dayEvents(d, noSpill) {
+    var d0 = new Date(d); d0.setHours(0, 0, 0, 0);
+    var ds = todayStr(d);
+    var day = todayDayName(d);
+    var s = readJSON(LS.schedule, null);
+    var out = [];
+    if (!s) return out;
+    var R = window.GardenScheduleRules;
+    var now = Date.now();
+
+    function hm(t) {
+      var p = String(t || '').split(':');
+      if (p.length < 2) return null;
+      var h = parseInt(p[0], 10), m = parseInt(p[1], 10);
+      if (isNaN(h) || isNaN(m)) return null;
+      return h * 60 + m;
+    }
+    function push(o) {
+      o.date = ds;
+      o.src_date = ds;
+      o.done = (R && R.isDone) ? R.isDone(o, s) : !!o.done;
+      o.past = (R && R.isPast) ? R.isPast(o, now) : false;
+      out.push(o);
+    }
+
+    (s.lectures || []).forEach(function (l) {
+      if (!l || l.day !== day) return;
+      if (R && R.lectureOn && !R.lectureOn(l, d0).on) return;
+      var a = hm(l.start_time);
+      if (a === null) return;
+      var b = hm(l.end_time);
+      if (b === null || b <= a) b = a + (l.duration || 50);
+      push({ src: 'lecture', id: l.id, kind: 'lecture', code: l.course_code || '',
+             label: l.room || '', time: l.start_time || '', start: a, end: b, allDay: false });
+    });
+
+    (s.study_blocks || []).forEach(function (b) {
+      if (!b || b.day !== day) return;
+      if (R && R.blockOn && !R.blockOn(b, d0).on) return;
+      var a = hm(b.start_time);
+      if (a === null) return;
+      push({ src: 'study', id: b.id, kind: 'study', code: b.course_code || '',
+             label: b.custom_label || '', time: b.start_time || '', start: a,
+             end: a + (b.duration_minutes || 60), allDay: false });
+    });
+
+    (s.exams || []).forEach(function (x) {
+      if (!x || x.date !== ds) return;
+      var allDay = !!x.all_day && !x.start_time;
+      var a = hm(x.start_time);
+      if (a === null && !allDay) a = 15 * 60;
+      var b = hm(x.end_time);
+      if (!allDay && (b === null || b <= a)) b = a + 90;
+      push({ src: 'exam', id: x.id, kind: 'exam', code: x.course_code || '', label: '',
+             time: allDay ? '' : (x.start_time || '15:00'),
+             start: allDay ? null : a, end: allDay ? null : b, allDay: allDay });
+    });
+
+    (s.general_events || []).forEach(function (g) {
+      if (!g || g.date !== ds) return;
+      var a = hm(g.start_time);
+      push({ src: 'general', id: g.id, kind: 'general', code: g.course_code || '',
+             label: g.title || '', time: g.start_time || '', start: a,
+             end: (a === null ? null : a + (g.duration_minutes || 60)), allDay: (a === null) });
+    });
+
+    var it = s.intensive;
+    var plan = (it && it.active && it.plans) ? it.plans[it.active] : null;
+    ((plan && plan.sessions) || []).forEach(function (ss) {
+      if (!ss || ss.date !== ds) return;
+      var a = hm(ss.start_time);
+      if (a === null) return;
+      push({ src: 'intensive', id: ss.id, kind: 'intensive', code: ss.course || '',
+             label: '', module: ss.module || '', part: ss.part || 1,
+             total_parts: ss.total_parts || 1, sub: ss.kind || 'study',
+             time: ss.start_time || '', start: a, end: a + (ss.minutes || 60), allDay: false });
+    });
+
+    (allDeadlines() || []).forEach(function (t) {
+      if (!t || t.source === 'exam' || !t.due) return;
+      var due = String(t.due);
+      if (due.slice(0, 10) !== ds) return;
+      var timed = due.length > 10;
+      var a = timed ? hm(due.slice(11, 16)) : null;
+      push({ src: t.source, id: t.id, kind: 'task', code: t.course || '',
+             label: t.title || '', type: t.type || '', time: timed ? due.slice(11, 16) : '',
+             start: a, end: (a === null ? null : a + 60), allDay: (a === null),
+             done: !!t.done });
+    });
+
+    /*@3.GADJ.174*/
+    if (!noSpill) {
+      var prev = new Date(d0);
+      prev.setDate(prev.getDate() - 1);
+      dayEvents(prev, true).forEach(function (e) {
+        if (e.allDay || e.start === null || e.end === null || e.end <= 1440) return;
+        var t = {};
+        Object.keys(e).forEach(function (k) { t[k] = e[k]; });
+        t.spill = true;
+        t.spill_start = e.start;
+        t.start = 0;
+        t.end = Math.min(e.end - 1440, 1440);
+        t.date = ds;
+        t.past = (R && R.isPast) ? R.isPast(t, now) : false;
+        out.push(t);
+      });
+    }
+
+    /*@3.GADJ.175*/
+    out.sort(function (a, b) {
+      if (a.allDay !== b.allDay) return a.allDay ? -1 : 1;
+      return (a.start || 0) - (b.start || 0);
+    });
+    return out;
+  }
+
+  function todayEvents(date) {
+    return dayEvents(date ? new Date(date) : new Date(), false);
   }
 
   /*@3.GADJ.67*/
@@ -1909,7 +2061,8 @@
       out.push({
         id: e.id, source: 'exam', editable: false,
         course: e.course_code || null, title: '', type: e.exam_type || 'exam',
-        due: due, done: (d !== null && d < 0),
+        /*@3.GADJ.172*/
+        due: due, done: !!e.completed_at || (d !== null && d < 0),
         note: e.room || ''
       });
     });
@@ -2039,6 +2192,8 @@
     completedCourses: completedCourses,
     dispName: dispName,
     todaySchedule: todaySchedule,
+    todayEvents: todayEvents,
+    dayEvents: dayEvents,
     todaySessions: todaySessions,
 
     scheduleRaw: scheduleRaw,

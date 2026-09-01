@@ -28,13 +28,17 @@
         lectures: true,     /*@3.REMJ.8*/
         exams: true,        /*@3.REMJ.9*/
         tasks: true,        /*@3.REMJ.10*/
+        study: true,
+        events: true,
         review: false       /*@3.REMJ.11*/
       },
       /*@3.REMJ.12*/
       lead: {
         lectures: 15,
         exams: 1440,        /*@3.REMJ.13*/
-        tasks: 720          /*@3.REMJ.14*/
+        tasks: 720,         /*@3.REMJ.14*/
+        study: 10,
+        events: 30
       },
       reviewTime: '20:00',
       quiet: { on: false, from: '00:00', to: '07:00' },
@@ -265,6 +269,9 @@
         /*@3.REMJ.89*/
         var day0 = new Date(d); day0.setHours(0, 0, 0, 0);
         if (R && !R.lectureOn(l, day0).on) continue;
+        /*@3.REMJ.92*/
+        if (R && R.isDone && R.fmtLocalDate &&
+            R.isDone({ src: 'lecture', id: l.id, date: R.fmtLocalDate(day0) })) continue;
         d.setHours(hm.h, hm.m, 0, 0);
         var startMs = d.getTime();
         if (!R && startMs > endMs) continue;
@@ -342,6 +349,95 @@
     return out;
   }
 
+  /*@3.REMJ.93*/
+  function studyOccurrences(now, horizon) {
+    var s = load();
+    var sch = scheduleRaw();
+    var R = window.GardenScheduleRules;
+    var out = [];
+
+    (sch.study_blocks || []).forEach(function (b) {
+      if (!b || !b.day || !b.start_time) return;
+      var dayIdx = DAYS_ORDER.indexOf(b.day);
+      if (dayIdx < 0) return;
+      var hm = parseHM(b.start_time);
+
+      for (var i = 0; i <= HORIZON_DAYS; i++) {
+        var d = new Date(now);
+        d.setDate(d.getDate() + i);
+        if (d.getDay() !== dayIdx) continue;
+        var day0 = new Date(d); day0.setHours(0, 0, 0, 0);
+        if (R && R.blockOn && !R.blockOn(b, day0).on) continue;
+        if (R && R.isDone && R.fmtLocalDate &&
+            R.isDone({ src: 'study', id: b.id, date: R.fmtLocalDate(day0) })) continue;
+        d.setHours(hm.h, hm.m, 0, 0);
+        var startMs = d.getTime();
+        var fireAt = startMs - (s.lead.study || 0) * 60000;
+        if (fireAt > horizon) continue;
+        var nm = b.custom_label || courseName(b.course_code) || tx('مذاكرة', 'Study');
+        out.push({
+          id: 'stu:' + (b.id || b.day + b.start_time) + ':' + stamp(startMs),
+          kind: 'study',
+          title: tx('مذاكرة · ', 'Study · ') + nm,
+          body: tx('تبدأ ', 'Starts ') + fmtWhen(startMs),
+          fireAt: applyQuiet(fireAt),
+          eventAt: startMs,
+          url: 'hub/schedule.html',
+          course: b.course_code || null
+        });
+      }
+    });
+
+    var it = sch.intensive;
+    var plan = (it && it.active && it.plans) ? it.plans[it.active] : null;
+    ((plan && plan.sessions) || []).forEach(function (ss) {
+      if (!ss || !ss.date || !ss.start_time) return;
+      if (R && R.isDone && R.isDone({ src: 'intensive', id: ss.id, date: ss.date })) return;
+      var when = toLocalTime(ss.date + 'T' + ss.start_time);
+      if (!when) return;
+      var fireAt = when.ms - (s.lead.study || 0) * 60000;
+      if (fireAt > horizon) return;
+      out.push({
+        id: 'stu:plan:' + ss.id + ':' + stamp(when.ms),
+        kind: 'study',
+        title: tx('جلسة خطّة · ', 'Plan session · ') + (courseName(ss.course) || ''),
+        body: tx('تبدأ ', 'Starts ') + fmtWhen(when.ms),
+        fireAt: applyQuiet(fireAt),
+        eventAt: when.ms,
+        url: 'hub/schedule.html',
+        course: ss.course || null
+      });
+    });
+    return out;
+  }
+
+  /*@3.REMJ.94*/
+  function eventReminders(now, horizon) {
+    var s = load();
+    var sch = scheduleRaw();
+    var R = window.GardenScheduleRules;
+    var out = [];
+    (sch.general_events || []).forEach(function (g) {
+      if (!g || !g.date || !g.start_time) return;
+      if (R && R.isDone && R.isDone({ src: 'general', id: g.id, date: g.date })) return;
+      var when = toLocalTime(g.date + 'T' + g.start_time);
+      if (!when) return;
+      var fireAt = when.ms - (s.lead.events || 0) * 60000;
+      if (fireAt > horizon) return;
+      out.push({
+        id: 'gen:' + g.id + ':' + stamp(when.ms),
+        kind: 'events',
+        title: g.title || tx('حدث', 'Event'),
+        body: tx('يبدأ ', 'Starts ') + fmtWhen(when.ms),
+        fireAt: applyQuiet(fireAt),
+        eventAt: when.ms,
+        url: 'hub/schedule.html',
+        course: g.course_code || null
+      });
+    });
+    return out;
+  }
+
   /*@3.REMJ.37*/
   function reviewReminders(now, horizon) {
     var s = load();
@@ -387,6 +483,8 @@
     var out = [];
 
     if (s.channels.lectures) out = out.concat(lectureOccurrences(now, horizon));
+    if (s.channels.study) out = out.concat(studyOccurrences(now, horizon));
+    if (s.channels.events) out = out.concat(eventReminders(now, horizon));
     out = out.concat(deadlineReminders(now, horizon));
     out = out.concat(reviewReminders(now, horizon));
 

@@ -196,46 +196,36 @@
     today: {
       ar: 'اليوم', en: 'Today',
       render: function () {
-        var s = D.todaySchedule();
-        var items = [];
-
-        s.exams.forEach(function (e) {
-          items.push({ t: e.start_time || '', n: (e.course_code || '') + ' · ' + tx('اختبار', 'Exam'), c: 'var(--st-danger)' });
-        });
-        s.lectures.forEach(function (l) {
-          items.push({ t: l.start_time || '', n: (l.course_code || '') + (l.room ? ' · ' + l.room : ''), c: 'var(--st-accent)' });
-        });
-        s.blocks.forEach(function (b) {
-          items.push({ t: b.start_time || '', n: (b.course_code || '') + ' · ' + tx('مذاكرة', 'Study'), c: 'var(--st-ok)' });
-        });
-        /*@3.DASJ.18*/
-        intensiveToday().forEach(function (x) {
-          items.push({ t: x.start_time || '', n: x.label, c: 'var(--st-accent)', done: x.done });
-        });
+        /*@3.DASJ.144*/
         /*@3.DASJ.19*/
-        items.sort(function (a, b) { return String(a.t).localeCompare(String(b.t)); });
+        var all = (D.todayEvents ? D.todayEvents() : []);
+        var live = [], doneN = 0, pastN = 0;
+        all.forEach(function (e) {
+          if (e.done) { doneN++; return; }
+          if (e.past) { pastN++; return; }
+          live.push(e);
+        });
+        var ICO = '<i class="fa-solid fa-calendar-day"></i>';
+        var HD = head(ICO, tx('اليوم', 'Today'), 'hub/schedule.html');
 
         /*@3.DASJ.20*/
-
-        if (!items.length) {
-          var note = hiddenNote(s);
-          return head('<i class="fa-solid fa-calendar-day"></i>', tx('اليوم', 'Today'), 'hub/schedule.html') +
-            emptyState('<i class="fa-solid fa-calendar-day"></i>',
-                       note || tx('لا شيء مجدول اليوم', 'Nothing scheduled today'),
-                       tx('افتح الجدول', 'Open schedule'), 'go-schedule');
+        if (!live.length) {
+          var note = hiddenNote(D.todaySchedule());
+          var msg = note ? note
+            : (doneN && !pastN) ? tx('أنهيتَ كلَّ المهام 🎉', 'You finished every task 🎉')
+            : (doneN || pastN) ? tx('انقضى اليوم', 'The day is over')
+            : tx('لا شيء مجدول اليوم', 'Nothing scheduled today');
+          return HD + emptyState(ICO, msg, tx('افتح الجدول', 'Open schedule'), 'go-schedule');
         }
-        var list = items.slice(0, 4).map(function (i) {
-          return '<a class="widget-item" href="hub/schedule.html"' + (i.done ? ' style="opacity:.5"' : '') + '>' +
-            '<span class="widget-item-dot" style="background:' + i.c + '"></span>' +
-            '<span class="widget-item-time">' + esc(i.t) + '</span>' +
-            '<span class="widget-item-name">' + esc(i.n) + '</span>' +
-            (i.done ? '<span class="widget-item-done" style="color:var(--st-ok);font-weight:800"><i class="fa-solid fa-check" aria-hidden="true"></i></span>' : '') +
-            '</a>';
-        }).join('');
-        var more = items.length > 4
-          ? '<div class="widget-sub" style="margin-top:.3rem">+' + (items.length - 4) + ' ' + esc(tx('أخرى', 'more')) + '</div>' : '';
-        return head('<i class="fa-solid fa-calendar-day"></i>', tx('اليوم', 'Today'), 'hub/schedule.html') +
-          '<div class="widget-body"><div class="widget-list">' + list + '</div>' + more + '</div>';
+
+        var list = live.slice(0, 4).map(todayRow).join('');
+        var bits = [];
+        if (live.length > 4) bits.push('+' + (live.length - 4) + ' ' + tx('أخرى', 'more'));
+        if (pastN) bits.push(pastN + ' ' + tx('مضت', 'passed'));
+        if (doneN) bits.push(doneN + ' ' + tx('أُتمّت', 'done'));
+        var foot = bits.length
+          ? '<div class="widget-sub" style="margin-top:.3rem">' + esc(bits.join(' · ')) + '</div>' : '';
+        return HD + '<div class="widget-body"><div class="widget-list">' + list + '</div>' + foot + '</div>';
       }
     },
 
@@ -376,23 +366,56 @@
     return n ? n.text : '';
   }
 
-  function intensiveToday() {
-    var sch = null;
-    try { sch = JSON.parse(localStorage.getItem('weekly_schedule') || 'null'); } catch (e) { return []; }
-    var it = sch && sch.intensive;
-    var plan = (it && it.active && it.plans) ? it.plans[it.active] : null;
-    if (!plan || !plan.sessions || !plan.sessions.length) return [];
-
-    var now = new Date();
-    var today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-    return plan.sessions.filter(function (s) { return s.date === today; }).map(function (s) {
-      var num = parseInt(String(s.module || '').replace('M', ''), 10);
-      var what = s.kind === 'buffer' ? tx('مراجعة ما قبل الاختبار', 'Pre-exam review')
-               : s.kind === 'spaced' ? tx('مراجعة متباعدة', 'Spaced review')
-               : (tx('الوحدة ', 'Module ') + (num || '—') + (s.total_parts > 1 ? ' (' + s.part + '/' + s.total_parts + ')' : ''));
-      return { start_time: s.start_time || '', done: !!s.done, label: (s.course || '') + ' · ' + what };
-    });
+  var TODAY_COLOUR = {
+    exam: 'var(--st-danger)', lecture: 'var(--st-accent)', study: 'var(--st-ok)',
+    intensive: 'var(--st-accent)', general: 'var(--st-warn)', task: 'var(--st-warn)'
+  };
+  function todayName(e) {
+    var code = e.code || '';
+    if (e.kind === 'lecture') return code + (e.label ? ' · ' + e.label : '');
+    if (e.kind === 'exam') return code + ' · ' + tx('اختبار', 'Exam');
+    if (e.kind === 'study') return code + ' · ' + (e.label || tx('مذاكرة', 'Study'));
+    /*@3.DASJ.18*/
+    if (e.kind === 'intensive') {
+      var num = parseInt(String(e.module || '').replace('M', ''), 10);
+      var what = e.sub === 'buffer' ? tx('مراجعة ما قبل الاختبار', 'Pre-exam review')
+               : e.sub === 'spaced' ? tx('مراجعة متباعدة', 'Spaced review')
+               : (tx('الوحدة ', 'Module ') + (num || '—') +
+                  (e.total_parts > 1 ? ' (' + e.part + '/' + e.total_parts + ')' : ''));
+      return code + ' · ' + what;
+    }
+    var t = e.label || tx('حدث', 'Event');
+    return code ? (code + ' · ' + t) : t;
   }
+  /*@3.DASJ.146*/
+  function todayRow(e) {
+    var name = todayName(e);
+    var lbl = tx('إتمام', 'Mark done') + ' — ' + name;
+    var cont = e.spill
+      ? '<i class="fa-solid fa-arrow-turn-down widget-item-cont" aria-hidden="true"></i>' : '';
+    var when = e.spill ? minToHM(e.spill_start) : (e.time || tx('طوال اليوم', 'All day'));
+    var from = e.spill
+      ? (tx('بدأ أمسِ ', 'Started yesterday ') + minToHM(e.spill_start) + ' — ') : '';
+    return '<div class="widget-item widget-item--act' + (e.spill ? ' is-spill' : '') + '">' +
+      '<a class="widget-item-go" href="hub/schedule.html"' +
+        (e.spill ? ' title="' + esc(from + name) + '"' : '') + '>' +
+        '<span class="widget-item-dot" style="background:' + (TODAY_COLOUR[e.kind] || 'var(--st-accent)') + '"></span>' +
+        '<span class="widget-item-time">' + esc(when) + '</span>' +
+        cont +
+        '<span class="widget-item-name">' + esc(name) + '</span>' +
+      '</a>' +
+      '<button type="button" class="widget-item-check" data-act="today-done"' +
+        ' data-src="' + esc(e.src) + '" data-id="' + esc(e.id) + '" data-code="' + esc(e.code || '') + '"' +
+        ' data-date="' + esc(e.src_date || e.date || '') + '"' +
+        ' title="' + esc(from + lbl) + '" aria-label="' + esc(from + lbl) + '">' +
+        '<i class="fa-solid fa-check" aria-hidden="true"></i></button>' +
+      '</div>';
+  }
+  function minToHM(m) {
+    var h = Math.floor((m || 0) / 60), n = (m || 0) % 60;
+    return String(h).padStart(2, '0') + ':' + String(n).padStart(2, '0');
+  }
+
   /*@3.DASJ.34*/
   function clearIntensiveSlot() {
     var slot = el('ip-home-slot');
@@ -1533,6 +1556,22 @@
     if (!t) return;
     var act = t.getAttribute('data-act');
     var id = t.getAttribute('data-id');
+
+    /*@3.DASJ.145*/
+    if (act === 'today-done') {
+      e.preventDefault();
+      var tsrc = t.getAttribute('data-src') || '';
+      var tid = t.getAttribute('data-id') || '';
+      var tcode = t.getAttribute('data-code') || '';
+      var tdate = t.getAttribute('data-date') || D.todayStr();
+      if (tsrc === 'task') { if (D.toggleTask) D.toggleTask(tid); }
+      else if (tsrc === 'course') { if (D.toggleCourseDate) D.toggleCourseDate(tcode, tid); }
+      else if (window.GardenScheduleRules && GardenScheduleRules.setDone) {
+        GardenScheduleRules.setDone({ src: tsrc, id: tid, date: tdate }, true);
+      }
+      renderWidgets();
+      return;
+    }
 
     /*@3.DASJ.108*/
     if (act === 'wizard') {
