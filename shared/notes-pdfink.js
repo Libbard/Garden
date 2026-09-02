@@ -144,8 +144,112 @@
     this.armed = false;
     this.dead = false;
     this.saveT = {};
+    /*@3.NOPJ8.119*/
+    this.ready = this.o.seed ? this.seed(this.o.seed) : Promise.resolve(0);
     paper(true);
   }
+
+  /*@3.NOPJ8.120*/
+  function toCodec(els) {
+    var st = [], ts = [], keep = [], i;
+    for (i = 0; i < els.length; i++) {
+      var e = els[i];
+      if (!e) continue;
+      if (e.ty === 'st' && e.pts && e.pts.length) {
+        st.push({ tool: e.hi ? 'hi' : 'pen', color: e.c, w: e.w, nib: e.nib, pts: e.pts });
+        ts.push(e.ts == null ? -1 : e.ts);
+      } else keep.push(e);
+    }
+    return { st: st, ts: ts, keep: keep };
+  }
+
+  function fromCodec(strokes, ts, keep) {
+    var out = [], i;
+    for (i = 0; i < (strokes || []).length; i++) {
+      var s = strokes[i];
+      var e = { ty: 'st', pts: s.pts, c: s.color || 'ink', w: s.w || 2, nib: s.nib || 'round',
+                o: 1, hi: s.tool === 'hi' ? 1 : 0 };
+      if (ts && ts[i] != null && ts[i] >= 0) e.ts = ts[i];
+      out.push(e);
+    }
+    return out.concat(keep || []);
+  }
+
+  /*@3.NOPJ8.121*/
+  Ink.prototype.absorb = function (n, els) {
+    var self = this;
+    if (!this.id || !els || !els.length) return Promise.resolve(false);
+    return this.ready.then(function () {
+      return read(self.id, n);
+    }).then(function (row) {
+      if (row && row.els && row.els.length) return false;
+      var p = self.pages[n];
+      if (p) {
+        p.els = deep(els);
+        p.loaded = true;
+        self.paint(n);
+        self.touch(n);
+        return true;
+      }
+      return write(self.id, n, { els: deep(els), t: Date.now() }).then(function () {
+        if (self.o.onDirty) self.o.onDirty(n);
+        return true;
+      });
+    });
+  };
+
+  Ink.prototype.bundle = function () {
+    var self = this;
+    var C = window.GardenInkCodec;
+    if (!this.id) return Promise.resolve(null);
+    return this.flushAll().then(function () {
+      return pagesOf(self.id);
+    }).then(function (list) {
+      var out = { v: 1, pages: {} };
+      return list.reduce(function (chain, n) {
+        return chain.then(function () {
+          return read(self.id, n).then(function (row) {
+            if (!row || !row.els || !row.els.length) return null;
+            var parts = toCodec(row.els);
+            var page = { els: parts.keep };
+            if (parts.ts.some(function (t) { return t >= 0; })) page.ts = parts.ts;
+            if (!parts.st.length || !C || !C.pack) {
+              if (parts.st.length) page.raw = parts.st;
+              out.pages[String(n)] = page;
+              return null;
+            }
+            return C.pack(parts.st).then(function (packed) {
+              page.st = packed;
+              out.pages[String(n)] = page;
+            });
+          });
+        });
+      }, Promise.resolve()).then(function () { return out; });
+    });
+  };
+
+  Ink.prototype.seed = function (data) {
+    var self = this;
+    var C = window.GardenInkCodec;
+    if (!data || !data.pages || !this.id) return Promise.resolve(0);
+    var keys = Object.keys(data.pages);
+    var got = 0;
+    return wipe(this.id).then(function () {
+      return keys.reduce(function (chain, k) {
+        var n = +k, page = data.pages[k];
+        if (!(n > 0) || !page) return chain;
+        return chain.then(function () {
+          var un = page.st && C && C.unpack ? C.unpack(page.st) : Promise.resolve(page.raw || []);
+          return un.then(function (strokes) {
+            var els = fromCodec(strokes, page.ts, page.els);
+            if (!els.length) return null;
+            got += els.length;
+            return write(self.id, n, { els: els, t: Date.now() });
+          });
+        });
+      }, Promise.resolve());
+    }).then(function () { return got; })['catch'](function () { return got; });
+  };
 
   /*@3.NOPJ8.13*/
   function paper(on) {
@@ -161,7 +265,7 @@
     return {
       act: (t && t.act) || 'pen',
       c: (t && t.c) || 'ink',
-      w: (t && t.w > 0) ? t.w : 2,
+      w: (t && t.w > 0) ? t.w : ((t && t.hi) ? 0 : 2),
       nib: (t && t.nib) || 'round',
       hi: !!(t && t.hi),
       o: (t && t.o > 0) ? t.o : 1,
@@ -239,13 +343,14 @@
     if (p.hi) { p.hi.width = 0; p.hi.height = 0; }
     if (p.wet) { p.wet.width = 0; p.wet.height = 0; }
     if (p.hwet) { p.hwet.width = 0; p.hwet.height = 0; }
+    this.dropRich(p);
     delete this.pages[n];
   };
 
   Ink.prototype.load = function (n) {
     var self = this;
     if (!this.id) return Promise.resolve(null);
-    return read(this.id, n).then(function (row) {
+    return this.ready.then(function () { return read(self.id, n); }).then(function (row) {
       var p = self.pages[n];
       if (!p || self.dead) return null;
       p.loaded = true;
@@ -403,9 +508,10 @@
     }
     var pt = { x: s.x, y: s.y, p: pressure == null ? 0.55 : pressure };
     if (tilt) { pt.tz = tilt.tz; pt.az = tilt.az; }
+    var w0 = t.hi ? this.hiWidth(s.n, t.w) : t.w;
     this.live = {
       n: s.n,
-      el: { ty: 'st', pts: [pt], c: t.c, w: t.w, nib: t.nib, o: t.o, hi: t.hi ? 1 : 0,
+      el: { ty: 'st', pts: [pt], c: t.c, w: w0, nib: t.nib, o: t.o, hi: t.hi ? 1 : 0,
             ts: Date.now() - (this.o.t0 || 0) }
     };
     this.drawWet(s.p, this.live.el);
@@ -960,13 +1066,14 @@
     if (!v || !v.scroller || !g) return;
     /*@3.NOPJ8.51*/
     if (phase === 'end' || !g.n) { this._pan = null; return; }
+    var gx = g.cx != null ? g.cx : g.x, gy = g.cy != null ? g.cy : g.y;
     if (phase === 'start' || !this._pan || this._pan.n !== g.n) {
-      this._pan = { x: g.x, y: g.y, n: g.n, d0: g.d || 0, pinch: 0 };
+      this._pan = { x: gx, y: gy, n: g.n, d0: g.d || 0, pinch: 0 };
       return;
     }
-    v.scroller.scrollLeft -= (g.x - this._pan.x);
-    v.scroller.scrollTop -= (g.y - this._pan.y);
-    this._pan.x = g.x; this._pan.y = g.y;
+    v.scroller.scrollLeft -= (gx - this._pan.x);
+    v.scroller.scrollTop -= (gy - this._pan.y);
+    this._pan.x = gx; this._pan.y = gy;
   };
 
   function eraseLim(t, view) {
@@ -1349,31 +1456,63 @@
   }
 
   var TOOL_KEY = 'garden_pdfink';
+  /*@3.NOPJ8.117*/
+  var KIT_DEF = {
+    pen: { color: 'ink', width: 2, nib: 'round' },
+    hi:  { color: 'yellow', width: 0, nib: 'marker' }
+  };
+  var KIT_OF = { pen: 'pen', pencil: 'pen', hi: 'hi' };
+
+  function kitKey(t) { return KIT_OF[t] || 'pen'; }
+
+  function rawKit() {
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(TOOL_KEY) || 'null'); } catch (e) {}
+    if (!raw || typeof raw !== 'object') raw = {};
+    if (!raw.kits || typeof raw.kits !== 'object') {
+      raw.kits = {};
+      if (raw.color || raw.width > 0 || raw.nib) {
+        raw.kits.pen = { color: raw.color, width: raw.width, nib: raw.nib };
+      }
+    }
+    return raw;
+  }
+
+  function kitFor(raw, t) {
+    var k = kitKey(t), def = KIT_DEF[k];
+    var o = raw.kits[k] || {};
+    return {
+      color: typeof o.color === 'string' ? o.color : def.color,
+      width: (o.width > 0) ? o.width : def.width,
+      nib: typeof o.nib === 'string' ? o.nib : def.nib
+    };
+  }
 
   function lastKit() {
-    var d = { tool: 'pen', color: 'ink', width: 2, nib: 'round',
-              hiMode: 'text', eraseMode: 'whole' };
-    try {
-      var raw = JSON.parse(localStorage.getItem(TOOL_KEY) || 'null');
-      if (raw && typeof raw === 'object') {
-        if (raw.tool) d.tool = raw.tool;
-        if (raw.color) d.color = raw.color;
-        if (raw.width > 0) d.width = raw.width;
-        if (raw.nib) d.nib = raw.nib;
-        if (raw.hiMode) d.hiMode = raw.hiMode;
-        if (raw.eraseMode) d.eraseMode = raw.eraseMode;
-      }
-    } catch (e) {}
+    var raw = rawKit();
+    var d = { tool: 'pen', hiMode: 'text', eraseMode: 'whole' };
+    if (raw.tool) d.tool = raw.tool;
+    if (raw.hiMode) d.hiMode = raw.hiMode;
+    if (raw.eraseMode) d.eraseMode = raw.eraseMode;
+    var k = kitFor(raw, d.tool);
+    d.color = k.color; d.width = k.width; d.nib = k.nib;
     return d;
   }
 
-  function keepKit(k) {
-    try { localStorage.setItem(TOOL_KEY, JSON.stringify(k)); } catch (e) {}
+  function keepKit2(f) {
+    var raw = rawKit();
+    raw.tool = f.tool; raw.hiMode = f.hiMode; raw.eraseMode = f.eraseMode;
+    raw.kits[kitKey(f.tool)] = { color: f.color, width: f.width, nib: f.nib };
+    delete raw.color; delete raw.width; delete raw.nib;
+    try { localStorage.setItem(TOOL_KEY, JSON.stringify(raw)); } catch (e) {}
   }
 
-  function keepKit2(f) {
-    keepKit({ tool: f.tool, color: f.color, width: f.width, nib: f.nib,
-              hiMode: f.hiMode, eraseMode: f.eraseMode });
+  function swapKit(f, t) {
+    if (kitKey(t) === kitKey(f.tool)) return;
+    var raw = rawKit();
+    raw.kits[kitKey(f.tool)] = { color: f.color, width: f.width, nib: f.nib };
+    var k = kitFor(raw, t);
+    f.color = k.color; f.width = k.width; f.nib = k.nib;
   }
 
   /*@3.NOPJ8.11*/
@@ -1399,6 +1538,7 @@
       redo: function () { return self.redo(); },
       paint: function () { self.repaint(); },
       setTool: function (t) {
+        swapKit(f, t || 'pen');
         f.tool = t || 'pen';
         /*@3.NOPJ8.47*/
         if (f.tool !== 'sel' && f.tool !== 'lasso') self.setPick(null);
@@ -1485,6 +1625,21 @@
              nib: f.nib, hi: act === 'hi', o: 1,
              hiMode: f.hiMode, straight: f.hiStraight,
              eraseMode: f.eraseMode };
+  };
+
+  /*@3.NOPJ8.118*/
+  Ink.prototype.hiWidth = function (n, w) {
+    if (w > 0) return w;
+    var runs = this.runsOf(n);
+    var p = this.pages[n];
+    if (!runs || !runs.length || !p) return 14;
+    var hs = [];
+    for (var i = 0; i < runs.length; i++) if (runs[i].h > 2) hs.push(runs[i].h);
+    if (!hs.length) return 14;
+    hs.sort(function (a, b) { return a - b; });
+    var med = hs[hs.length >> 1];
+    var pt = med / (this.ppp(p) || 1);
+    return Math.max(6, Math.min(38, Math.round(pt * 0.9 * 10) / 10));
   };
 
   Ink.prototype.repaint = function () {
@@ -1861,46 +2016,40 @@
     var ax = pa.x * kx, ay = pa.y * ky, bx = pb.x * kx, by = pb.y * ky;
     var x0 = Math.min(ax, bx), x1 = Math.max(ax, bx);
     var y0 = Math.min(ay, by), y1 = Math.max(ay, by);
-    var hit = [], i;
+    /*@3.NOPJ8.116*/
+    var hs = [], i;
+    for (i = 0; i < runs.length; i++) if (runs[i].h > 2) hs.push(runs[i].h);
+    hs.sort(function (u, v) { return u - v; });
+    var lh = hs.length ? hs[hs.length >> 1] : 12;
+    if (y1 - y0 > lh * 1.4) return this.markRects(n, a, b, 'text');
+    var cy = (y0 + y1) / 2;
+    var best = null, bd = Infinity;
     for (i = 0; i < runs.length; i++) {
       var r = runs[i];
-      if (Math.min(r.y + r.h, y1) - Math.max(r.y, y0) < 0.5) continue;
       if (Math.min(r.x + r.w, x1) - Math.max(r.x, x0) < 0.5) continue;
-      hit.push(r);
+      var d = (cy < r.y) ? r.y - cy : (cy > r.y + r.h ? cy - r.y - r.h : 0);
+      if (d < bd) { bd = d; best = r; }
     }
-    /*@3.NOPJ8.105*/
-    if (!hit.length) {
-      var ix = pickRun(runs, (x0 + x1) / 2, (y0 + y1) / 2, -1);
-      if (ix == null) return null;
-      var near = runs[ix];
-      var gap = (y0 > near.y + near.h) ? y0 - near.y - near.h
-        : (y1 < near.y ? near.y - y1 : 0);
-      if (gap > near.h) return null;
-      if (Math.min(near.x + near.w, x1) - Math.max(near.x, x0) < 0.5) return null;
-      hit.push(near);
-    }
+    if (!best || bd > lh) return null;
     var lift = this.grab, was = lift ? lift.style.pointerEvents : null;
     if (lift) lift.style.pointerEvents = 'none';
-    var boxes = [], j;
-    for (i = 0; i < hit.length; i++) {
-      var run = hit[i];
-      var cy = run.y + run.h / 2;
-      var c1 = caretInRun(td, base, run, Math.max(x0, run.x), cy);
-      var c2 = caretInRun(td, base, run, Math.min(x1, run.x + run.w), cy);
-      if (!c1 || !c2) continue;
-      var rg = document.createRange();
-      try {
-        rg.setStart(c1.node, c1.offset);
-        rg.setEnd(c2.node, c2.offset);
-        if (rg.collapsed) { rg.setStart(c2.node, c2.offset); rg.setEnd(c1.node, c1.offset); }
-      } catch (e) { continue; }
-      if (rg.collapsed) continue;
-      var list = rg.getClientRects();
-      if (!list || !list.length) continue;
-      var got = V.merge(list, base.left, base.top);
-      for (j = 0; j < got.length; j++) if (hitRun(run, got[j])) boxes.push(got[j]);
-    }
+    var boxes = [];
+    var my = best.y + best.h / 2;
+    var c1 = caretInRun(td, base, best, Math.max(x0, best.x), my);
+    var c2 = caretInRun(td, base, best, Math.min(x1, best.x + best.w), my);
     if (lift) lift.style.pointerEvents = was || '';
+    if (!c1 || !c2) return null;
+    var rg = document.createRange();
+    try {
+      rg.setStart(c1.node, c1.offset);
+      rg.setEnd(c2.node, c2.offset);
+      if (rg.collapsed) { rg.setStart(c2.node, c2.offset); rg.setEnd(c1.node, c1.offset); }
+    } catch (e) { return null; }
+    if (rg.collapsed) return null;
+    var list = rg.getClientRects();
+    if (!list || !list.length) return null;
+    var got = V.merge(list, base.left, base.top);
+    for (i = 0; i < got.length; i++) if (hitRun(best, got[i])) boxes.push(got[i]);
     boxes = foldRects(boxes);
     if (!boxes.length) return null;
     return boxesToPts(boxes, f, kx, ky);
@@ -2032,16 +2181,66 @@
     for (var i = 0; i < p.els.length; i++) {
       var e = p.els[i];
       if (e.ty !== 'tx') continue;
-      if (live && this.edit.ix === i) { this.placeText(live, e, f, k); continue; }
+      if (live && this.edit.ix === i) {
+        if (this.edit.rich) this.placeRich(live, e, f, k); else this.placeText(live, e, f, k);
+        continue;
+      }
       var el = document.createElement('div');
       el.className = 'gpi-tx';
       el.setAttribute('data-i', String(i));
       if (e.bg) el.setAttribute('data-bg', e.bg);
-      el.textContent = e.t || '';
       el.style.color = (K && K.hexOf) ? K.hexOf(e.c) : '#111827';
-      this.placeText(el, e, f, k);
+      /*@3.NOPJ8.122*/
+      if (e.doc && window.GardenNotesEditor) {
+        el.classList.add('gpi-tx--rich');
+        el.appendChild(this.richView(p, i, e));
+        this.placeRich(el, e, f, k);
+      } else {
+        el.textContent = e.t || '';
+        this.placeText(el, e, f, k);
+      }
       host.appendChild(el);
     }
+  };
+
+  /*@3.NOPJ8.123*/
+  Ink.prototype.richView = function (p, ix, e) {
+    var key = JSON.stringify(e.doc);
+    var box = p.txDom || (p.txDom = {});
+    var had = box[ix];
+    if (had && had.key === key && had.node) return had.node;
+    if (had && had.ed) { try { had.ed.destroy(); } catch (e2) {} }
+    var host = document.createElement('div');
+    host.className = 'gpi-txed';
+    var ed = null;
+    try {
+      ed = GardenNotesEditor.mount(host, deep(e.doc), { readOnly: true });
+      if (ed.setReadOnly) ed.setReadOnly(true);
+    } catch (e3) { host.textContent = e.t || ''; }
+    box[ix] = { key: key, node: host, ed: ed };
+    return host;
+  };
+
+  Ink.prototype.dropRich = function (p) {
+    if (!p || !p.txDom) return;
+    for (var k in p.txDom) {
+      var it = p.txDom[k];
+      if (it && it.ed) { try { it.ed.destroy(); } catch (e) {} }
+    }
+    p.txDom = null;
+  };
+
+  Ink.prototype.placeRich = function (el, e, f, k) {
+    var a = f.toPx(e.x, e.y), b = f.toPx(e.x + e.w, e.y + e.h);
+    el.style.insetInlineStart = Math.min(a.x, b.x).toFixed(2) + 'px';
+    el.style.insetBlockStart = Math.min(a.y, b.y).toFixed(2) + 'px';
+    el.style.inlineSize = Math.max(40, e.w).toFixed(2) + 'px';
+    if (e.bg) {
+      el.style.blockSize = Math.max(8, e.h).toFixed(2) + 'px';
+      el.style.overflow = 'hidden';
+    } else el.style.minBlockSize = Math.max(8, e.h).toFixed(2) + 'px';
+    el.style.transform = 'scale(' + k.toFixed(4) + ')';
+    el.style.fontSize = Math.max(6, (e.fs || 14)).toFixed(2) + 'px';
   };
 
   /*@3.NOPJ8.93*/
@@ -2121,7 +2320,126 @@
   };
 
   /*@3.NOPJ8.96*/
+  /*@3.NOPJ8.124*/
   Ink.prototype.editText = function (n, ix) {
+    var self = this;
+    var E = window.GardenNotesEditor, B = window.GardenNotesBlocks;
+    var p = this.pages[n];
+    var v = this.view;
+    if (!p || !v || !v.fields) return false;
+    var e = p.els[ix];
+    if (!e || e.ty !== 'tx') return false;
+    if (!E || !E.mount || !B) return this.editPlain(n, ix);
+    this.commitText();
+    var host = v.fields(n);
+    if (!host) return false;
+    var f = this.frameOf(p, p.scale);
+    if (!f) return false;
+    var K = window.GardenCanvas;
+    var old = host.querySelector('.gpi-tx[data-i="' + ix + '"]');
+    if (old) old.remove();
+    if (p.txDom && p.txDom[ix]) {
+      if (p.txDom[ix].ed) { try { p.txDom[ix].ed.destroy(); } catch (e0) {} }
+      delete p.txDom[ix];
+    }
+    var box = document.createElement('div');
+    box.className = 'gpi-tx gpi-tx--rich';
+    box.setAttribute('data-i', String(ix));
+    if (e.bg) box.setAttribute('data-bg', e.bg);
+    box.style.color = (K && K.hexOf) ? K.hexOf(e.c) : '#111827';
+    host.appendChild(box);
+    var doc = e.doc ? deep(e.doc)
+      : { v: 1, blocks: [{ ty: 'p', rt: (e.t ? [{ s: String(e.t) }] : []) }] };
+    var edHost = document.createElement('div');
+    edHost.className = 'gpi-txed';
+    box.appendChild(edHost);
+    var ed = E.mount(edHost, doc, {
+      onDirty: function () { self.beat(); }
+    });
+    this.placeRich(box, e, f, this.ppp(p));
+    box.setAttribute('data-edit', '1');
+    this.edit = { n: n, ix: ix, el: box, rich: 1, ed: ed, was: JSON.stringify(e.doc || null),
+                  fresh: !!this._txPre, snap: this._txPre || deep(p.els) };
+    this._txPre = null;
+    if (this.grab) this.grab.style.pointerEvents = 'none';
+    this.fieldBar(box, ed);
+    this._txKey = function (ev) {
+      if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); self.commitText(); }
+    };
+    this._txOut = function (ev) {
+      var to = ev.relatedTarget;
+      if (to && (box.contains(to) || (self._fbar && self._fbar.contains(to)))) return;
+      setTimeout(function () {
+        var ae = document.activeElement;
+        if (self.edit && self.edit.el === box &&
+            !(ae && (box.contains(ae) || (self._fbar && self._fbar.contains(ae))))) self.commitText();
+      }, 0);
+    };
+    box.addEventListener('keydown', this._txKey);
+    box.addEventListener('focusout', this._txOut);
+    if (this.o.onField) this.o.onField(true);
+    setTimeout(function () {
+      try {
+        var first = edHost.querySelector('[contenteditable="true"]');
+        if (first) {
+          first.focus();
+          var rg = document.createRange();
+          rg.selectNodeContents(first);
+          rg.collapse(false);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(rg);
+        }
+      } catch (err) {}
+    }, 0);
+    this.beat();
+    return true;
+  };
+
+  /*@3.NOPJ8.125*/
+  Ink.prototype.fieldBar = function (box, ed) {
+    var R = window.GardenNotesRibbon;
+    this.dropFieldBar();
+    if (!R || !R.mount) return;
+    var bar = document.createElement('div');
+    bar.className = 'nr gpi-fbar';
+    bar.setAttribute('dir', document.documentElement.getAttribute('dir') || 'rtl');
+    document.body.appendChild(bar);
+    var rib = null;
+    try { rib = R.mount(bar, {}); rib.attach(ed); } catch (e) {}
+    this._fbar = bar;
+    this._frib = rib;
+    var self = this;
+    var place = function () {
+      if (!self._fbar || !box.isConnected) return;
+      var r = box.getBoundingClientRect();
+      var w = bar.offsetWidth || 320, h = bar.offsetHeight || 40;
+      var top = r.top - h - 8;
+      if (top < 8) top = Math.min(window.innerHeight - h - 8, r.bottom + 8);
+      var left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left));
+      bar.style.top = Math.round(top) + 'px';
+      bar.style.left = Math.round(left) + 'px';
+    };
+    place();
+    this._fbarPlace = place;
+    var sc = this.view && this.view.scroller;
+    if (sc && sc.addEventListener) sc.addEventListener('scroll', place, { passive: true });
+    window.addEventListener('resize', place);
+    this._fbarSc = sc;
+  };
+
+  Ink.prototype.dropFieldBar = function () {
+    if (this._fbarPlace) {
+      if (this._fbarSc && this._fbarSc.removeEventListener) this._fbarSc.removeEventListener('scroll', this._fbarPlace);
+      window.removeEventListener('resize', this._fbarPlace);
+      this._fbarPlace = null;
+    }
+    if (this._fbar && this._fbar.parentNode) this._fbar.parentNode.removeChild(this._fbar);
+    this._fbar = null;
+    this._frib = null;
+  };
+
+  Ink.prototype.editPlain = function (n, ix) {
     var self = this;
     var p = this.pages[n];
     var v = this.view;
@@ -2181,12 +2499,14 @@
     this.edit = null;
     var box = E.el;
     if (this._txKey) box.removeEventListener('keydown', this._txKey);
-    if (this._txOut) box.removeEventListener('blur', this._txOut);
+    if (this._txOut) { box.removeEventListener('blur', this._txOut); box.removeEventListener('focusout', this._txOut); }
     this._txKey = null; this._txOut = null;
     box.removeAttribute('contenteditable');
     box.removeAttribute('data-edit');
     if (this.grab) this.grab.style.pointerEvents = '';
     var p = this.pages[E.n];
+    /*@3.NOPJ8.126*/
+    if (E.rich) return this.commitRich(E, p, box);
     if (!p) return false;
     var e = p.els[E.ix];
     var txt = (box.textContent || '').replace(/\u00a0/g, ' ');
@@ -2209,6 +2529,60 @@
     var r = box.getBoundingClientRect();
     var k = this.ppp(p);
     if (k > 0 && r.height > 0) e.h = r.height / k;
+    this.push({ act: 'set', n: E.n, before: E.snap, after: deep(p.els) });
+    this.paint(E.n);
+    this.touch(E.n);
+    this.beat();
+    return true;
+  };
+
+  Ink.prototype.commitRich = function (E, p, box) {
+    var B = window.GardenNotesBlocks;
+    var ed = E.ed;
+    var doc = null;
+    try { doc = ed.save(); } catch (e0) { doc = ed.doc; }
+    var r = box.getBoundingClientRect();
+    var k = p ? this.ppp(p) : 1;
+    try { ed.destroy(); } catch (e1) {}
+    this.dropFieldBar();
+    if (this.o.onField) this.o.onField(false);
+    if (!p) return false;
+    var e = p.els[E.ix];
+    if (!e || e.ty !== 'tx') { this.paint(E.n); return false; }
+    var clean = doc ? deep(doc) : { v: 1, blocks: [] };
+    delete clean.eng;
+    /*@3.NOPJ8.127*/
+    var rootEl = box.querySelector('.ne-root');
+    if (rootEl) {
+      var kids = rootEl.querySelectorAll(':scope > [data-bid]');
+      if (kids.length) {
+        var top = rootEl.getBoundingClientRect().top;
+        var last = kids[kids.length - 1].getBoundingClientRect();
+        r = { height: (last.bottom - top) + 6 };
+      }
+    }
+    var txt = '';
+    try { txt = B && B.toText ? String(B.toText(clean) || '') : ''; } catch (e2) { txt = ''; }
+    var empty = !txt.trim() && !(clean.blocks || []).some(function (b) {
+      return b && (b.ty === 'img' || b.ty === 'ink' || b.ty === 'tbl' || b.ty === 'math' || b.ty === 'code');
+    });
+    if (empty) {
+      p.els.splice(E.ix, 1);
+      if (!E.fresh) {
+        this.push({ act: 'set', n: E.n, before: E.snap, after: deep(p.els) });
+        this.touch(E.n);
+      }
+      this.setPick(null);
+      this.paint(E.n);
+      this.beat();
+      return true;
+    }
+    var same = !E.fresh && JSON.stringify(clean) === E.was;
+    if (same) { this.paint(E.n); this.beat(); return false; }
+    e.doc = clean;
+    e.t = txt;
+    /*@3.NOPJ8.128*/
+    if (k > 0 && r.height > 0 && !e.bg) e.h = r.height / k;
     this.push({ act: 'set', n: E.n, before: E.snap, after: deep(p.els) });
     this.paint(E.n);
     this.touch(E.n);
@@ -2336,6 +2710,9 @@
   Ink.prototype.destroy = function () {
     this.dead = true;
     paper(false);
+    this.commitText();
+    this.dropFieldBar();
+    for (var q in this.pages) this.dropRich(this.pages[q]);
     this.arm(false);
     for (var k in this.saveT) if (this.saveT[k]) clearTimeout(this.saveT[k]);
     this.saveT = {};

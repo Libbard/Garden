@@ -976,6 +976,26 @@
     return obj.name_en || obj.name || obj.name_ar || '';
   }
 
+  /*@3.GADJ.177*/
+  function courseTitle(code) {
+    if (!code) return '';
+    var ar = (localStorage.getItem('garden_lang') || 'ar') === 'ar';
+    function pick(o) {
+      if (!o) return '';
+      return ar ? (o.name_ar || o.name || o.name_en || '')
+                : (o.name_en || o.name || o.name_ar || '');
+    }
+    var sem = semester();
+    var mine = ((sem && sem.courses) || []).filter(function (c) {
+      return c && c.code === code;
+    })[0];
+    var custom = String(code).indexOf('__CUSTOM_') === 0;
+    if (custom) return pick(mine);
+    var n = pick(courseInfo(code));
+    if (n) return n;
+    return pick(mine) || String(code);
+  }
+
   function completedCourses() {
     var out = {};
     (archive() || []).forEach(function (sem) {
@@ -2041,6 +2061,14 @@
     var codes = (sem && sem.courses ? sem.courses : [])
       .filter(Boolean).map(function (c) { return c.code; });
 
+    /*@3.GADJ.176*/
+    var srx = scheduleRaw();
+    [].concat(srx.lectures || [], srx.exams || [], srx.study_blocks || [])
+      .forEach(function (x) {
+        var c = x && x.course_code;
+        if (c && codes.indexOf(c) === -1) codes.push(c);
+      });
+
     codes.forEach(function (code) {
       courseMeta(code).dates.forEach(function (d) {
         if (!d || !d.date) return;
@@ -2055,12 +2083,14 @@
     /*@3.GADJ.115*/
     (scheduleRaw().exams || []).forEach(function (e) {
       if (!e || !e.date) return;
-      if (codes.length && codes.indexOf(e.course_code) === -1) return;
+      if (e.course_code && codes.length && codes.indexOf(e.course_code) === -1) return;
       var due = e.date + (e.start_time ? 'T' + e.start_time : '');
       var d = daysUntil(due);
       out.push({
         id: e.id, source: 'exam', editable: false,
         course: e.course_code || null, title: '', type: e.exam_type || 'exam',
+        /*@3.GADJ.178*/
+        label: e.notes || '',
         /*@3.GADJ.172*/
         due: due, done: !!e.completed_at || (d !== null && d < 0),
         note: e.room || ''
@@ -2191,6 +2221,7 @@
     rebuildGrades: rebuildGrades,
     completedCourses: completedCourses,
     dispName: dispName,
+    courseTitle: courseTitle,
     todaySchedule: todaySchedule,
     todayEvents: todayEvents,
     dayEvents: dayEvents,

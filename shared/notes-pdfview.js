@@ -348,13 +348,9 @@
     this.host.addEventListener('copy', this.onCopy);
     /*@3.NOPJ3.36*/
     this.onDbl = function (e) {
-      /*@3.NOPJ3.40*/
+      /*@3.NOPJ3.64*/
+      if (self.touchZoomAt && (e.timeStamp || Date.now()) - self.touchZoomAt < 700) return;
       var pg = e.target && e.target.closest ? e.target.closest('.gpv-page') : null;
-      if (pg && (self.mode !== 1 || self.focus)) {
-        e.preventDefault();
-        self.zoomPage(+pg.getAttribute('data-p'), e.clientX, e.clientY);
-        return;
-      }
       var sp = e.target;
       var inText = sp && sp.tagName === 'SPAN' && sp.parentNode &&
         sp.parentNode.classList && sp.parentNode.classList.contains('gpv-text');
@@ -364,28 +360,43 @@
       /*@3.NOPJ3.57*/
       if (pg && !inText && self.o.onTapZoom) {
         e.preventDefault();
-        self.o.onTapZoom(e.clientX, e.clientY);
+        self.o.onTapZoom(e.clientX, e.clientY, +pg.getAttribute('data-p'));
       }
     };
     this.host.addEventListener('dblclick', this.onDbl);
     /*@3.NOPJ3.41*/
-    this.tapAt = 0; this.tapOn = 0;
+    this.tapAt = 0; this.tapOn = 0; this.tapDown = null; this.multiAt = 0;
+    this.onTapDown = function (e) {
+      if (e.pointerType !== 'touch') return;
+      self.tapDown = (self.tapDown && self.tapDown.id !== e.pointerId)
+        ? null
+        : { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp || Date.now() };
+      if (self.tapDown === null) self.multiAt = e.timeStamp || Date.now();
+    };
     this.onTap = function (e) {
       if (e.pointerType !== 'touch') return;
-      var pg = e.target && e.target.closest ? e.target.closest('.gpv-page') : null;
-      if (!pg) return;
-      var n = +pg.getAttribute('data-p');
       var now = e.timeStamp || Date.now();
+      var d = self.tapDown;
+      self.tapDown = null;
+      if (!d || d.id !== e.pointerId) { self.multiAt = now; self.tapAt = 0; return; }
+      if (now - self.multiAt < 450) { self.tapAt = 0; return; }
+      if (Math.abs(e.clientX - d.x) > 12 || Math.abs(e.clientY - d.y) > 12 || now - d.t > 320) {
+        self.tapAt = 0; return;
+      }
+      var pg = e.target && e.target.closest ? e.target.closest('.gpv-page') : null;
+      if (!pg) { self.tapAt = 0; return; }
+      var n = +pg.getAttribute('data-p');
       if (self.tapOn === n && now - self.tapAt < 340) {
         self.tapAt = 0; self.tapOn = 0;
-        if (self.mode !== 1 || self.focus) self.zoomPage(n, e.clientX, e.clientY);
-        /*@3.NOPJ3.58*/
-        else if (self.o.onTapZoom) self.o.onTapZoom(e.clientX, e.clientY);
+        self.touchZoomAt = now;
+        if (self.o.onTapZoom) self.o.onTapZoom(e.clientX, e.clientY, n);
         return;
       }
       self.tapAt = now; self.tapOn = n;
     };
+    this.host.addEventListener('pointerdown', this.onTapDown, { passive: true });
     this.host.addEventListener('pointerup', this.onTap, { passive: true });
+    this.host.addEventListener('pointercancel', function () { self.tapDown = null; self.tapAt = 0; }, { passive: true });
     /*@3.NOPJ3.43*/
     this.onTagClick = function (e) {
       var b = e.target && e.target.closest ? e.target.closest('.gpv-tag') : null;
@@ -646,6 +657,16 @@
     var gen = this.gen;
     this.h.doc.getPage(n).then(function (page) {
       if (self.dead || gen !== self.gen || !self.slots[n]) { try { page.cleanup(); } catch (e) {} return; }
+      /*@3.NOPJ3.65*/
+      if (s.ahide == null && self.o.annots) {
+        return page.getAnnotations().then(function (list) {
+          s.ahide = !!self.o.annots(n, list);
+        }, function () { s.ahide = false; }).then(function () { return page; });
+      }
+      return page;
+    }).then(function (page) {
+      if (!page) return;
+      if (self.dead || gen !== self.gen || !self.slots[n]) { try { page.cleanup(); } catch (e) {} return; }
       s.page = page;
       var vp = page.getViewport({ scale: self.scale });
       self.fix(n, page);
@@ -661,7 +682,8 @@
         canvasContext: ctx,
         viewport: vp,
         transform: r !== 1 ? [r, 0, 0, r, 0, 0] : null,
-        background: '#ffffff'
+        background: '#ffffff',
+        annotationMode: s.ahide ? 0 : 1
       });
       s.task = task;
       return task.promise.then(function () {
@@ -719,10 +741,33 @@
     b.type = 'button';
     b.className = 'gpv-tag';
     b.setAttribute('data-p', String(n));
-    b.textContent = this.o.stamp ? this.o.stamp(n, this.n) : (n + ' / ' + this.n);
-    b.setAttribute('aria-label', b.textContent);
+    this.stampOne(b, n);
     s.el.appendChild(b);
     s.tag = b;
+  };
+
+  View.prototype.stampOne = function (b, n) {
+    var txt = this.o.stamp ? this.o.stamp(n, this.n) : (n + ' / ' + this.n);
+    var rtl = /[\u0600-\u06FF]/.test(txt);
+    b.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    b.textContent = '';
+    var parts = String(txt).split(/(\d+)/);
+    for (var i = 0; i < parts.length; i++) {
+      if (!parts[i]) continue;
+      if (/^\d+$/.test(parts[i])) {
+        var bd = document.createElement('bdi');
+        bd.textContent = parts[i];
+        b.appendChild(bd);
+      } else b.appendChild(document.createTextNode(parts[i]));
+    }
+    b.setAttribute('aria-label', txt);
+  };
+
+  View.prototype.restamp = function () {
+    for (var k in this.slots) {
+      var s = this.slots[k];
+      if (s && s.tag) this.stampOne(s.tag, +k);
+    }
   };
 
   /*@3.NOPJ3.24*/
@@ -1064,25 +1109,6 @@
     return true;
   };
 
-  /*@3.NOPJ3.59*/
-  View.prototype.zoomPage = function (n, cx, cy) {
-    if (this.focus) { this.unfocus(); return true; }
-    if (!(n > 0)) return false;
-    this.focus = { mode: this.mode, order: this.order, scale: this.scale, page: n,
-                   flow: this.flow, where: this.where(),
-                   grip: this.grip(cx, cy) };
-    if (this.o.onFocus) this.o.onFocus(true, n, this.focus);
-    return true;
-  };
-
-  View.prototype.unfocus = function () {
-    var f = this.focus;
-    if (!f) return false;
-    this.focus = null;
-    if (this.o.onFocus) this.o.onFocus(false, f.page, f);
-    return true;
-  };
-
   View.prototype.copy = function (e) {
     var t = this.selText();
     if (!t || !e.clipboardData) return;
@@ -1116,6 +1142,7 @@
     if (this.onCopy) { this.host.removeEventListener('copy', this.onCopy); this.onCopy = null; }
     if (this.onDbl) { this.host.removeEventListener('dblclick', this.onDbl); this.onDbl = null; }
     if (this.onTap) { this.host.removeEventListener('pointerup', this.onTap); this.onTap = null; }
+    if (this.onTapDown) { this.host.removeEventListener('pointerdown', this.onTapDown); this.onTapDown = null; }
     if (this.onTagClick) { this.host.removeEventListener('click', this.onTagClick); this.onTagClick = null; }
     if (this.ro) { try { this.ro.disconnect(); } catch (e) {} this.ro = null; }
     for (var k in this.slots) this.free(+k);

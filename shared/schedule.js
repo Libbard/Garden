@@ -556,13 +556,14 @@
   }
 
   /*@3.SCHJ.317*/
-  var DAY_MIN = 24 * 60;
+  /*@3.SCHJ.324*/
+  var MINS_PER_DAY = 24 * 60;
   function spillFrom(dateObj, dstr, weekId) {
     var prev = new Date(dateObj);
     prev.setDate(prev.getDate() - 1);
     var out = [];
     eventsOnDate(prev, { noSpill: true }).forEach(function (e) {
-      if (e.allDay || e.start === null || e.end === null || e.end <= DAY_MIN) return;
+      if (e.allDay || e.start === null || e.end === null || e.end <= MINS_PER_DAY) return;
       /*@3.SCHJ.318*/
       if (e.synthetic_span) return;
       var o = {};
@@ -572,7 +573,7 @@
       o.spill_start = e.start;
       o.spill_end = e.end;
       o.start = 0;
-      o.end = Math.min(e.end - DAY_MIN, DAY_MIN);
+      o.end = Math.min(e.end - MINS_PER_DAY, MINS_PER_DAY);
       o.date = dstr;
       o.weekId = weekId;
       o.recurring = false;
@@ -875,7 +876,7 @@
     /*@3.SCHJ.79*/
     if (tier !== 'xs') {
       var shownA = ev.spill ? ev.spill_start : ev.start;
-      var shownB = ev.spill ? (ev.spill_end - DAY_MIN) : ev.end;
+      var shownB = ev.spill ? (ev.spill_end - MINS_PER_DAY) : ev.end;
       html += '<div class="sch-ev-time"><span class="sch-ev-start">' + escapeH(fmtMin12(shownA)) +
               '</span><span class="sch-ev-end"> – ' + escapeH(fmtMin12(shownB)) + '</span></div>';
     }

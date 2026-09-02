@@ -1,7 +1,7 @@
 ;(function () {
   'use strict';
 
-  var MAX_PAGES = 900;
+  var MAX_PAGES = 9000;
   var SOFT_BYTES = 150 * 1024 * 1024;
   var HARD_BYTES = 500 * 1024 * 1024;
 
@@ -400,7 +400,6 @@
             side: st.side || guessSide(),
             stamp: o.stamp || null,
             onAsk: o.onAsk || null,
-            onFocus: onFocus,
             /*@3.NOPJ5.20*/
             onLayer: function (n, el, geo) {
               if (st.ink) st.ink.layer(n, el, geo);
@@ -411,10 +410,20 @@
               if (o.offLayer) o.offLayer(n, el);
             },
             onText: function (n, td) { if (st.find) st.find.paint(n, td); },
+            /*@3.NOPJ5.29*/
+            annots: function (n, list) {
+              var A = window.GardenPdfAnnot;
+              if (!A || !list || !list.length) return false;
+              var got = A.harvest(list);
+              if (!got.mine) return false;
+              if (st.ink && got.els.length && !o.marks) st.ink.absorb(n, got.els);
+              return true;
+            },
             onPinch: function (n) {
               /*@3.NOPJ5.18*/
               /*@3.NOPJ5.27*/
               if (st.fitT) { clearTimeout(st.fitT); st.fitT = 0; }
+              st.tapBack = null;
               st.zm = ''; st.scale = n;
               save();
               if (o.onZoom) o.onZoom(n, '');
@@ -567,7 +576,9 @@
         if (seen > 80 && seen < h) h = seen;
       }
       var cs = getComputedStyle(s);
-      return Math.max(0, h - (parseFloat(cs.paddingTop) || 0) -
+      /*@3.NOPJ5.30*/
+      var extra = (o.dockH ? o.dockH() : 0) || 0;
+      return Math.max(0, h + extra - (parseFloat(cs.paddingTop) || 0) -
         (parseFloat(cs.paddingBottom) || 0) - 14);
     }
 
@@ -594,12 +605,14 @@
       st.ink = K.create({
         id: sp.h || '',
         view: st.view,
+        seed: o.marks || null,
         t0: Date.now(),
         onState: function (s2) { if (o.onInk) o.onInk(s2); },
         onZoom: function (z) { setScale(z); },
         onFit: function () { refit('page'); },
         onExpand: function (on) { if (o.onExpand) o.onExpand(on); },
         onDirty: function () { if (o.onInkDirty) o.onInkDirty(); },
+        onField: function (on) { if (o.onInkField) o.onInkField(on); },
         /*@3.NOPJ5.23*/
         onGesture: function (phase, g) { if (o.onInkGesture) o.onInkGesture(phase, g); }
       });
@@ -632,43 +645,6 @@
       return st.mode;
     }
 
-    /*@3.NOPJ5.17*/
-    /*@3.NOPJ5.26*/
-    function onFocus(on, page, was) {
-      if (!st.view) return;
-      if (on) {
-        st.back = { mode: st.mode, order: st.order, zm: st.zm, scale: st.scale,
-                    flow: st.flow, where: (was && was.where) || st.view.where() };
-        st.mode = 1;
-        st.view.setView(1, st.order);
-        return window.GardenPdfView
-          .fitScale(st.h, room(), 1, tall(), false)
-          .then(function (n2) {
-            if (st.dead || !st.view) return;
-            st.zm = '';
-            apply(n2, (was && was.grip) ? { grip: was.grip } : { keep: 1 });
-            if (!(was && was.grip)) st.view.goTo(page, 0);
-            tell();
-            if (o.onView) o.onView(st.mode, st.order, st.flow, st.side);
-          });
-      }
-      var b = st.back || { mode: 2, order: st.order, zm: 'page',
-                           scale: st.scale, flow: st.flow, where: null };
-      st.back = null;
-      st.mode = b.mode;
-      st.view.setView(b.mode, b.order);
-      st.zm = b.zm;
-      apply(b.scale, { keep: 1 });
-      if (b.where) st.view.goTo(b.where.p, b.where.f);
-      else st.view.goTo(page, 0);
-      tell();
-      if (o.onView) o.onView(st.mode, st.order, st.flow, st.side);
-    }
-
-    function focused() { return !!(st.view && st.view.focus); }
-
-    function unfocus() { return st.view ? st.view.unfocus() : false; }
-
     /*@3.NOPJ5.16*/
     function setFlow(f) {
       var was = st.flow;
@@ -687,19 +663,34 @@
 
     function setScale(n, at) {
       st.zm = '';
+      st.tapBack = null;
       return apply(n, at || null);
     }
 
     /*@3.NOPJ5.24*/
     function tapZoom(cx, cy) {
       if (st.dead || !st.view) return st.scale;
-      if (st.zm) {
-        var want = Math.min(4, Math.max((st.scale || 1) * 2.4, 1));
-        if (want <= (st.scale || 1) * 1.05) want = Math.min(4, (st.scale || 1) * 2);
-        return setScale(want, { cx: cx, cy: cy });
+      var back = st.tapBack;
+      var sc = scroller();
+      if (back && Math.abs((st.scale || 1) - back.to) < 0.02) {
+        st.tapBack = null;
+        st.zm = back.zm;
+        var land = function () {
+          if (st.dead || !st.view) return;
+          st.view.goTo(back.where.p, back.where.f);
+          if (sc) sc.scrollLeft = back.x;
+        };
+        if (back.zm) { refit(back.zm).then(land); return st.scale; }
+        apply(back.scale, { keep: 1 });
+        land();
+        return st.scale;
       }
-      refit('page');
-      return st.scale;
+      var cur = st.scale || 1;
+      var want = cur < 0.97 ? 1 : Math.min(4, cur * 2);
+      st.tapBack = { zm: st.zm, scale: cur, to: want, where: st.view.where(),
+                     x: sc ? sc.scrollLeft : 0 };
+      st.zm = '';
+      return apply(want, { cx: cx, cy: cy });
     }
 
     return {
@@ -712,8 +703,6 @@
       zoomMode: function () { return st.zm; },
       isFit: function () { return !!st.zm; },
       side: function () { return st.side || guessSide(); },
-      focused: focused,
-      unfocus: unfocus,
       selectPage: function (n) { return st.view ? st.view.selectPage(n) : false; },
       setSide: setSide,
       find: function () { return st.find; },

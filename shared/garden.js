@@ -7509,6 +7509,17 @@ ${baseRules}`) + regenSuffix;
     (document.head || document.documentElement).appendChild(tint);
   }
 
+  /*@3.GARJ.652*/
+  var remSet = null;
+  try { remSet = JSON.parse(localStorage.getItem('garden_reminders') || 'null'); } catch (e) {}
+  if (remSet && remSet.enabled && !window.GardenNotifyGuard &&
+      !(('Notification' in window) && Notification.permission === 'granted')) {
+    var ng = document.createElement('script');
+    ng.src = root + 'shared/notify-guard.js';
+    ng.async = true;
+    (document.head || document.documentElement).appendChild(ng);
+  }
+
   if (window.Reminders) return;                   /*@3.GARJ.535*/
   var el = document.createElement('script');
   el.src = root + 'shared/reminders-boot.js';
