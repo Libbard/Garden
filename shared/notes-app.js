@@ -3078,6 +3078,8 @@
     var f = ik && ik.face;
     if (!f) return true;
     if (f.tool === 'sel' || f.tool === 'lasso') return false;
+    /*@3.NOAJ.269*/
+    if (f.tool === 'text') return false;
     return true;
   }
 

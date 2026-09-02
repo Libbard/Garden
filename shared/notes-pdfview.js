@@ -46,6 +46,20 @@
     return d > top ? top : (d < 1 ? 1 : d);
   }
 
+  /*@3.NOPJ3.66*/
+  var BUDGET_TOUCH = 4e6, BUDGET_DESK = 16e6;
+  function budget() {
+    var coarse = false;
+    try { coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches; } catch (e) {}
+    return coarse ? BUDGET_TOUCH : BUDGET_DESK;
+  }
+  function ratioFor(w, h, cap) {
+    var r = ratio(cap);
+    var px = (w > 0 && h > 0) ? w * h : 0;
+    if (px > 0 && px * r * r > budget()) r = Math.max(1, Math.sqrt(budget() / px));
+    return r;
+  }
+
   var GAP = 12;
   var CELL = 8;
 
@@ -532,10 +546,22 @@
       if (n < a - this.keep || n > b + this.keep) this.free(n);
       else if (n < a || n > b) this.blank(n);
     }
-    for (n = a; n <= b; n++) this.paint(n);
+    /*@3.NOPJ3.67*/
+    for (n = sa; n <= sb; n++) this.paint(n);
+    this.ahead(a, b, sa, sb);
     for (n = a; n <= b; n++) if ((n < sa || n > sb) && !keep[n]) this.untext(n);
     this.later(sa, sb);
     if (this.o.onView) this.o.onView(this.mid(), this.n);
+  };
+
+  View.prototype.ahead = function (a, b, sa, sb) {
+    var self = this;
+    if (this.aheadT) clearTimeout(this.aheadT);
+    this.aheadT = setTimeout(function () {
+      self.aheadT = 0;
+      if (self.dead) return;
+      for (var n = a; n <= b; n++) if ((n < sa || n > sb) && self.slots[n]) self.paint(n);
+    }, 160);
   };
 
   /*@3.NOPJ3.9*/
@@ -670,7 +696,7 @@
       s.page = page;
       var vp = page.getViewport({ scale: self.scale });
       self.fix(n, page);
-      var r = ratio(self.o.maxRatio);
+      var r = ratioFor(vp.width, vp.height, self.o.maxRatio);
       var cv = document.createElement('canvas');
       cv.className = 'gpv-cv';
       cv.width = Math.round(vp.width * r);
@@ -1177,6 +1203,7 @@
   }
 
   window.GardenPdfView = {
+    ratioFor: ratioFor,
     load: load,
     mount: mount,
     fitScale: fitScale,
