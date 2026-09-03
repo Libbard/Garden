@@ -14,6 +14,10 @@
   var host = null;
   var busy = false;
 
+  function termUrl() {
+    return String(location.pathname).replace(/[^/]*$/, 'gpa.html') + '#setup';
+  }
+
   /*@3.ICPJ.21*/
   var picks = {};
 
@@ -147,9 +151,63 @@
              '<i class="fa-solid ' + st.i + '"></i><span>' + (isAr() ? st.ar : st.en) + '</span></li>';
     }).join('') + '</ol>';
 
+    out += teachView(s);
     out += inboxView(s);
     out += alertsView(s);
     return out;
+  }
+
+  /*@3.ICPJ.36*/
+  function pageUrl() { return location.origin + location.pathname; }
+
+  function teachView(s) {
+    var ICS = window.GardenICS;
+    var sum = ICS.bbSummary ? ICS.bbSummary() : { at: 0, items: 0, stale: 0, courses: [] };
+    var status = sum.at
+      ? L('آخر تعليم ' + ago(sum.at) + ' · ' + sum.items + ' عنصراً في ' + sum.courses.length + ' موادّ' +
+            (sum.stale ? ' · و' + sum.stale + ' من فصلٍ سابقٍ أُهملت' : ''),
+          'Last taught ' + ago(sum.at) + ' · ' + sum.items + ' items in ' + sum.courses.length + ' courses' +
+            (sum.stale ? ' · ' + sum.stale + ' from a past term ignored' : ''))
+      : L('لم تعلّمنا بعد — فما لا يحمل رمزاً يُسأل عنه أدناه.', 'Not taught yet — items without a code are asked about below.');
+    return '' +
+    '<div class="ics-teach">' +
+      '<div class="ics-inbox-h"><i class="fa-solid fa-graduation-cap"></i><span>' +
+        esc(L('اربطها بيقين — مرّةً في الفصل', 'Link with certainty — once a term')) + '</span></div>' +
+      '<p class="set-row-h">' + esc(L(
+        'رابطُ المشاركة لا يذكر المادة، لكنّ حسابَك في البلاك بورد يعرفها. افتح صفحةَ الجلب وأنت مسجَّلُ الدخول، انسخ كلَّ ما فيها والصقه هنا — فيُربط كلُّ عنصرٍ بمادّته بلا تخمين، ويُهمَل ما كان من فصلٍ سابق. وما تعلّمه يصل زملاءَك في الشعبة نفسِها تلقائيّاً.',
+        'The share link does not name the course, but your Blackboard account does. Open the fetch page while signed in, copy everything on it and paste it here — every item is then linked to its course with no guessing, past-term items are ignored, and classmates in the same section benefit automatically.')) + '</p>' +
+      '<div class="ics-teach-s" id="ics-teach-s">' + esc(status) + '</div>' +
+      '<div class="set-btns">' +
+        '<a class="set-btn" id="ics-teach-open" href="' + esc(ICS.teachUrl()) + '" target="_blank" rel="noopener">' +
+          '<i class="fa-solid fa-up-right-from-square"></i><span>' + esc(L('افتح صفحة الجلب', 'Open the fetch page')) + '</span></a>' +
+        '<a class="set-btn ics-bm" id="ics-bm" href="' + esc(ICS.bookmarklet(pageUrl())) + '"' +
+          ' title="' + esc(L('اسحبني إلى شريط المفضّلة', 'Drag me to your bookmarks bar')) + '">' +
+          '<i class="fa-solid fa-bookmark"></i><span>' + esc(L('علّم الحديقة', 'Teach Garden')) + '</span></a>' +
+      '</div>' +
+      '<textarea class="set-in ics-paste" id="ics-paste" rows="3" spellcheck="false" placeholder="' +
+        esc(L('الصق هنا ما نسخته من صفحة الجلب…', 'Paste what you copied from the fetch page…')) + '"></textarea>' +
+      '<div class="set-btns">' +
+        '<button class="set-btn" id="ics-teach-go"><i class="fa-solid fa-check"></i><span>' +
+          esc(L('علّمني', 'Teach')) + '</span></button>' +
+      '</div>' +
+      '<p class="set-row-h">' + esc(L(
+        'وعلى الحاسوب أسرع: اسحب زرَّ «علّم الحديقة» إلى شريط المفضّلة، ثمّ اضغطه وأنت داخل البلاك بورد — يجلب ويعود بك إلى هنا في ضغطةٍ واحدة.',
+        'Faster on a computer: drag “Teach Garden” to your bookmarks bar, then click it while inside Blackboard — it fetches and brings you back here in one click.')) + '</p>' +
+    '</div>';
+  }
+
+  /*@3.ICPJ.37*/
+  function teachMsg(r) {
+    if (!r) return '';
+    if (!r.ok) {
+      var m = { bad_json: L('هذا ليس نصَّ صفحة الجلب — انسخ الصفحةَ كلَّها.', 'That is not the fetch page text — copy the whole page.'),
+                bad_shape: L('الشكلُ غيرُ متوقَّع — انسخ الصفحةَ كلَّها كما هي.', 'Unexpected shape — copy the page exactly as it is.'),
+                no_items: L('لا عنصرَ مادّةٍ في ما لصقته.', 'No course items in what you pasted.'),
+                bad_hash: L('تعذّرت قراءةُ ما أرسله زرُّ المفضّلة.', 'Could not read what the bookmark sent.') };
+      return m[r.error] || L('تعذّر التعليم.', 'Teaching failed.');
+    }
+    return L('رُبط ' + r.items + ' عنصراً بـ' + r.courses + ' موادَّ بيقين' + (r.stale ? '، وأُهمل ' + r.stale + ' من فصلٍ سابق' : '') + '.',
+             'Linked ' + r.items + ' items to ' + r.courses + ' courses with certainty' + (r.stale ? ', ignored ' + r.stale + ' from a past term' : '') + '.');
   }
 
   /*@3.ICPJ.7*/
@@ -162,13 +220,16 @@
 
     /*@3.ICPJ.23*/
     var groups = window.GardenICS.groupInbox(s.inbox);
-    var codes = window.GardenICS.myCourses();
+    var full = window.GardenICS.myCoursesFull ? window.GardenICS.myCoursesFull() : [];
+    var codes = full.map(function (c) { return c.code; });
 
     var body = groups.map(function (g) {
       var head = g.items.length > 1
         ? L(g.items.length + ' عناصرَ متجاورة', g.items.length + ' adjacent items')
         : L('عنصرٌ واحد', 'One item');
-      var sug = g.guess && codes.indexOf(g.guess) > -1 ? g.guess : '';
+      /*@3.ICPJ.32*/
+      var alien = g.foreign && codes.indexOf(g.foreign) < 0 ? g.foreign : '';
+      var sug = !alien && g.guess && codes.indexOf(g.guess) > -1 ? g.guess : '';
       var key = g.items[0].uid;
       /*@3.ICPJ.24*/
       var chosen = picks[key] !== undefined ? picks[key] : sug;
@@ -177,15 +238,39 @@
       var rows = g.items.map(function (it) {
         return '<li class="ics-item">' +
           '<span class="ics-badge" data-k="' + esc(it.kind) + '">' + esc(kindName(it.kind)) + '</span>' +
+          (it.code ? '<span class="ics-item-c ltr">' + esc(it.code) + '</span>' : '') +
           '<span class="ics-item-t">' + esc(it.raw) + '</span>' +
           '<span class="ics-item-d ltr">' + esc(it.date) + '</span>' +
         '</li>';
       }).join('');
 
+      /*@3.ICPJ.33*/
       var opts = ['<option value="">' + esc(L('اختر المادة…', 'Pick a course…')) + '</option>']
-        .concat(codes.map(function (c) {
-          return '<option value="' + esc(c) + '"' + (c === chosen ? ' selected' : '') + '>' + esc(c) + '</option>';
+        .concat(full.map(function (c) {
+          return '<option value="' + esc(c.code) + '"' + (c.code === chosen ? ' selected' : '') + '>' +
+            esc(c.name ? c.code + ' — ' + c.name : c.code) + '</option>';
         })).join('');
+
+      if (alien) {
+        return '<div class="ics-group is-alien" data-uid="' + esc(key) + '">' +
+          '<div class="ics-group-h">' +
+            '<span class="ics-group-n">' + esc(head) + '</span>' +
+            '<span class="ics-alien-t"><i class="fa-solid fa-circle-question"></i>' +
+              esc(L('رمزُها ', 'Course code ')) + '<b class="ltr">' + esc(alien) + '</b>' +
+              esc(L(' — وليست في فصلك', ' — not in your term')) + '</span>' +
+          '</div>' +
+          '<ul class="ics-items">' + rows + '</ul>' +
+          '<p class="set-row-h">' + esc(L(
+            'هذه غالباً مادّةٌ حذفتَها من فصلك أو لم تُضِفْها بعد، وما زالت في البلاك بورد. أضِفها إلى فصلك لتصل مواعيدُها، أو تجاهلها فلا تُسألَ عنها ثانية.',
+            'This is most likely a course you removed from your term, or have not added yet, while Blackboard still lists it. Add it to your term to receive its dates, or dismiss it and we will stop asking.')) + '</p>' +
+          '<div class="ics-group-a">' +
+            '<a class="set-btn set-btn--primary ics-add" href="' + esc(termUrl()) + '">' +
+              '<i class="fa-solid fa-plus"></i><span>' + esc(L('أضِف المادة إلى فصلي', 'Add it to my term')) + '</span></a>' +
+            '<button class="set-btn ics-no"><i class="fa-solid fa-eye-slash"></i><span>' +
+              esc(L('تجاهل هذه المادة', 'Dismiss this course')) + '</span></button>' +
+          '</div>' +
+        '</div>';
+      }
 
       return '<div class="ics-group" data-uid="' + esc(key) + '"' +
           (picks[key] ? ' data-picked="1"' : '') + '>' +
@@ -248,8 +333,8 @@
     '<div class="set-row">' +
       '<div class="set-row-t">' +
         '<div class="set-row-n">' + esc(L('حدّث تلقائياً عند فتح الموقع', 'Refresh when I open the site')) + '</div>' +
-        '<div class="set-row-h">' + esc(L('مزامنةٌ صامتةٌ كلَّ ست ساعات على هذا الجهاز.',
-                                          'A silent sync every six hours on this device.')) + '</div>' +
+        '<div class="set-row-h">' + esc(L('مزامنةٌ صامتةٌ كلَّ ساعتين على هذا الجهاز — وتُحدَّث عند كلِّ فتحةٍ بعدها.',
+                                          'A silent sync every two hours on this device.')) + '</div>' +
       '</div>' +
       '<div class="set-row-c"><div class="set-seg" id="ics-auto">' +
         '<button data-v="1"' + (s.auto ? ' class="is-on"' : '') + '>' + esc(L('نعم', 'Yes')) + '</button>' +
@@ -327,7 +412,8 @@
       /*@3.ICPJ.28*/
       if (r.blocked) bits.push(L(r.blocked + ' تعذّر إدراجُها — أعد المحاولة',
                                  r.blocked + ' could not be filed — try again'));
-      msg(bits.join(' · '), r.blocked ? 'bad' : 'ok');
+      msg((teachPrefix ? teachPrefix + ' ' : '') + bits.join(' · '), r.blocked ? 'bad' : 'ok');
+      teachPrefix = '';
       render();
       if (window.GardenSchedule && GardenSchedule.reload) GardenSchedule.reload();
     });
@@ -420,6 +506,16 @@
     host.querySelectorAll('.ics-group').forEach(function (g) {
       var key = g.getAttribute('data-uid');
       var pick = g.querySelector('.ics-pick');
+      if (!pick) {
+        var noAlien = g.querySelector('.ics-no');
+        if (noAlien) {
+          noAlien.addEventListener('click', function () {
+            if (ICS.ignoreBand) ICS.ignoreBand(key); else ICS.skip(key);
+            doSync();
+          });
+        }
+        return;
+      }
       /*@3.ICPJ.29*/
       pick.addEventListener('change', function () {
         if (pick.value) picks[key] = pick.value; else delete picks[key];
@@ -436,13 +532,25 @@
       g.querySelector('.ics-no').addEventListener('click', function () {
         /*@3.ICPJ.30*/
         delete picks[key];
-        var mine = null;
-        ICS.groupInbox(ICS.state().inbox).forEach(function (x) {
-          if (x.items[0] && x.items[0].uid === key) mine = x;
-        });
-        (mine ? mine.items : [{ uid: key }]).forEach(function (it) { ICS.skip(it.uid); });
+        if (ICS.ignoreBand) { ICS.ignoreBand(key); }
+        else {
+          var mine = null;
+          ICS.groupInbox(ICS.state().inbox).forEach(function (x) {
+            if (x.items[0] && x.items[0].uid === key) mine = x;
+          });
+          (mine ? mine.items : [{ uid: key }]).forEach(function (it) { ICS.skip(it.uid); });
+        }
         doSync();
       });
+    });
+
+    /*@3.ICPJ.38*/
+    var tgo = $('ics-teach-go');
+    if (tgo) tgo.addEventListener('click', function () {
+      var ta = $('ics-paste');
+      var r = ICS.teach(ta ? ta.value : '');
+      msg(teachMsg(r), r && r.ok ? 'ok' : 'bad');
+      if (r && r.ok) { if (ta) ta.value = ''; teachPrefix = teachMsg(r); doSync(); }
     });
 
     /*@3.ICPJ.31*/
@@ -469,14 +577,102 @@
 
   /*@3.ICPJ.16*/
 
+  function countAr(n) {
+    if (n === 1) return 'عنصرٌ واحد';
+    if (n === 2) return 'عنصران';
+    if (n <= 10) return n + ' عناصرَ';
+    return n + ' عنصراً';
+  }
+
+  /*@3.ICPJ.34*/
+  var bar = null;
+
+  function renderBar() {
+    if (!bar) return;
+    var ICS = window.GardenICS;
+    var s = ICS && ICS.state ? ICS.state() : null;
+    var list = (s && s.url && s.inbox) ? s.inbox : [];
+    if (!list.length) {
+      if (taught) {
+        bar.hidden = false;
+        bar.innerHTML = '<i class="fa-solid fa-graduation-cap"></i><div class="sch-icsbar-t"><b>' +
+          esc(teachMsg(taught)) + '</b></div>';
+        return;
+      }
+      bar.hidden = true; bar.innerHTML = ''; return;
+    }
+    var alien = list.filter(function (it) { return it.foreign; }).length;
+    bar.hidden = false;
+    bar.innerHTML =
+      '<i class="fa-solid fa-inbox"></i>' +
+      '<div class="sch-icsbar-t"><b>' +
+        esc(L(countAr(list.length) + ' من البلاك بورد ' +
+                (list.length === 1 ? 'ينتظر مادّته' : list.length === 2 ? 'ينتظران مادّتهما' : 'تنتظر مادّتها'),
+              list.length + (list.length === 1 ? ' Blackboard item is' : ' Blackboard items are') +
+                ' waiting for a course')) +
+      '</b><span>' + esc(alien
+        ? L('وفيها ' + countAr(alien) + ' ' + (alien === 1 ? 'يحمل' : alien === 2 ? 'يحملان' : 'تحمل') +
+              ' رمزَ مادّةٍ ليست في فصلك.',
+            alien + ' of them carry a course code that is not in your term.')
+        : L('البلاك بورد لا يذكر المادةَ في هذه العناصر — اربطها مرّةً وما يأتي بعدها يُربط وحدَه.',
+            'Blackboard does not name the course on these — assign once and later items follow.')) +
+      '</span></div>' +
+      '<button type="button" class="sch-icsbar-go" id="ics-bar-go">' +
+        esc(L('افتحها', 'Open')) + '</button>';
+    var go = $('ics-bar-go');
+    if (go) {
+      go.addEventListener('click', function () {
+        var b = $('btn-settings');
+        if (b) b.click();
+        setTimeout(function () {
+          var card = $('ics-card');
+          if (card && card.scrollIntoView) card.scrollIntoView({ block: 'start' });
+        }, 380);
+      });
+    }
+  }
+
+  function paint() { render(); renderBar(); }
+
   window.GardenICSPanel = {
     mount: function (el) { host = el; render(); },
-    refresh: render
+    mountBar: function (el) { bar = el; renderBar(); },
+    refresh: paint
   };
 
   /*@3.ICPJ.17*/
-  document.addEventListener('garden:languageChanged', render);
-  window.addEventListener('ics:sync', function () { /*@3.ICPJ.18*/ });
+  document.addEventListener('garden:languageChanged', paint);
+  /*@3.ICPJ.18*/
+  window.addEventListener('ics:sync', renderBar);
   /*@3.ICPJ.20*/
-  window.addEventListener('garden:syncCompleted', function () { render(); });
+  window.addEventListener('garden:syncCompleted', function () { paint(); });
+
+  /*@3.ICPJ.39*/
+  var taught = null;
+  var teachPrefix = '';
+  function fromHash() {
+    var ICS = window.GardenICS;
+    if (!ICS || !ICS.teachFromHash) return false;
+    var r = ICS.teachFromHash(location.hash);
+    if (!r) return false;
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    taught = r;
+    if (r.ok) ICS.sync().then(function () { renderBar(); if (host) render(); });
+    return true;
+  }
+
+  /*@3.ICPJ.35*/
+  (function () {
+    function selfMount() {
+      var el = $('ics-bar');
+      if (el) { bar = el; }
+      if (!fromHash() && /bbteach=/.test(location.hash)) {
+        var tries = 0, tm = setInterval(function () { if (fromHash() || ++tries > 40) clearInterval(tm); }, 250);
+      }
+      renderBar();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', selfMount);
+    } else { selfMount(); }
+  })();
 })();

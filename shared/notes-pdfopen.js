@@ -384,9 +384,19 @@
         /*@3.NOPJ5.3*/
         /*@3.NOPJ5.7*/
         var want = (o.pos && o.pos.z) || 'page';
+        var kz = (o.pos && o.pos.k > 0) ? o.pos.k : 0;
+        var pw = (o.pos && o.pos.w > 0) ? o.pos.w : 0, rw = room();
         st.zm = (want === 'page' || want === 'fit') ? want : '';
+        if (!st.zm && kz && pw && rw && Math.abs(rw - pw) / pw > 0.15) { st.zm = kz > 1 ? 'fit' : 'page'; kz = 0; }
         var seed = st.zm ? V.fitScale(st.h, room(), st.mode, tall(), st.zm === 'page')
-                         : Promise.resolve(want > 0 ? want : 1);
+                         : V.fitScale(st.h, room(), st.mode, tall(), false).then(function (fw) {
+                             if (!(fw > 0)) return want > 0 ? want : 1;
+                             st.uzRoom = room();
+                             if (kz) { st.uz = kz; return fw * kz; }
+                             if (want > 0 && want <= fw * 1.02) { st.uz = want / fw; return want; }
+                             st.zm = 'fit'; st.uz = 1;
+                             return fw;
+                           });
         seed.then(function (n) {
           if (st.dead) return null;
           st.scale = clamp(n);
@@ -426,6 +436,7 @@
               st.tapBack = null;
               st.zm = ''; st.scale = n;
               save();
+              noteUz(n, true);
               if (o.onZoom) o.onZoom(n, '');
             },
             onView: function (p) { st.page = p; tell(); },
@@ -489,9 +500,9 @@
         .addEventListener('scroll', st.onScroll, { passive: true });
       if (window.ResizeObserver) {
         st.ro = new ResizeObserver(function () {
-          if (!st.zm || !st.view) return;
+          if (!st.view) return;
           if (st.fitT) clearTimeout(st.fitT);
-          st.fitT = setTimeout(refit, 180);
+          st.fitT = setTimeout(st.zm ? refit : rescale, 180);
         });
         try { st.ro.observe(host); } catch (e) {}
       }
@@ -502,7 +513,9 @@
       if (st.dead || !st.view || !o.onPos) return;
       var w = st.view.where();
       o.onPos({ p: w.p, f: Math.round(w.f * 1000) / 1000,
-                z: st.zm || st.scale, m: st.mode, r: st.order, fl: st.flow,
+                z: st.zm || st.scale, k: st.zm ? 0 : (st.uz > 0 ? Math.round(st.uz * 1000) / 1000 : 0),
+                w: st.zm ? 0 : Math.round(st.uzRoom || room()),
+                m: st.mode, r: st.order, fl: st.flow,
                 sd: st.side || '' });
     }
 
@@ -549,8 +562,49 @@
       st.scale = clamp(n);
       st.view.setScale(st.scale, at || null);
       save();
+      if (!st.zm && !(at && at.uz)) noteUz(st.scale, false);
       if (o.onZoom) o.onZoom(st.scale, st.zm);
       return st.scale;
+    }
+
+    /*@3.NOPJ5.31*/
+    function fitW() {
+      if (st.dead || !st.h) return Promise.resolve(0);
+      return window.GardenPdfView
+        .fitScale(st.h, room(), st.mode, tall(), false, st.view ? st.view.grid() : null);
+    }
+
+    function noteUz(n, snap) {
+      var gen = (st.uzGen = (st.uzGen || 0) + 1);
+      st.uzRoom = room();
+      return fitW().then(function (fw) {
+        if (st.dead || gen !== st.uzGen || !(fw > 0) || st.zm) return;
+        st.uz = n / fw;
+        if (snap && Math.abs(st.uz - 1) < 0.06) {
+          st.zm = 'fit'; st.uz = 1;
+          apply(fw, { keep: 1 });
+          return;
+        }
+        save();
+      });
+    }
+
+    function rescale() {
+      if (st.dead || !st.view || st.zm || !(st.uz > 0)) return;
+      var w = room();
+      if (!(w > 0) || w === st.uzRoom) return;
+      var was = st.uzRoom;
+      st.uzRoom = w;
+      if (was > 0 && Math.abs(w - was) / was > 0.15) {
+        st.zm = st.uz > 1 ? 'fit' : 'page';
+        refit();
+        return;
+      }
+      var uz = st.uz;
+      fitW().then(function (fw) {
+        if (st.dead || st.zm || !(fw > 0) || uz !== st.uz) return;
+        apply(fw * uz, { fit: 1, uz: 1 });
+      });
     }
 
     /*@3.NOPJ5.11*/

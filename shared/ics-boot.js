@@ -3,7 +3,8 @@
   'use strict';
 
   var STAMP_LS = 'garden_ics_boot';
-  var MIN_GAP = 6 * 60 * 60 * 1000;
+  /*@3.ICBJ.10*/
+  var MIN_GAP = 2 * 60 * 60 * 1000;
 
   /*@3.ICBJ.2*/
   var s = null;

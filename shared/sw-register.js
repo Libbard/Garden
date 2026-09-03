@@ -21,7 +21,7 @@
     st.textContent = [
       '.sw-update-toast {',
       '  position: fixed;',
-      '  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));',
+      '  bottom: calc(1.5rem + var(--sa-b));',
       /*@3.SWRJ.2*/
       '  left: 50%;',
       '  transform: translateX(-50%) translateY(12px);',
@@ -71,7 +71,7 @@
       '.sw-update-toast-close:hover { color: var(--text-primary); }',
       /*@3.SWRJ.3*/
       '@media (max-width: 768px) {',
-      '  .sw-update-toast { bottom: calc(56px + 1rem + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 2rem); }',
+      '  .sw-update-toast { bottom: calc(56px + 1rem + var(--sa-b)); max-width: calc(100vw - 2rem); }',
       '  .sw-update-toast-text { white-space: normal; }',
       '}',
       '@media (prefers-reduced-motion: reduce) {',

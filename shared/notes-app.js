@@ -3146,7 +3146,7 @@
       /*@3.NOAJ.267*/
       onInkField: function (on) {
         if (!pdfDial) return;
-        try { pdfDial.show(!on, !on); } catch (eF) {}
+        try { pdfDial.show(!on, !on, !!on); } catch (eF) {}
       },
       /*@3.NOAJ.229*/
       stamp: function (n, of) { return isAr() ? (n + ' من ' + of) : (n + ' of ' + of); },

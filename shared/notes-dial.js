@@ -1745,11 +1745,12 @@
     }
   };
 
-  Dial.prototype.show = function (on, drawing) {
+  /*@3.NODJ.71*/
+  Dial.prototype.show = function (on, drawing, keepDock) {
     this.el.hidden = !on;
     this.el.setAttribute('data-drawing', drawing ? '1' : '0');
-    if (this.dock) this.dock.hidden = !on;
-    if (this.favBar) this.favBar.hidden = !on;
+    if (this.dock) this.dock.hidden = !on && !keepDock;
+    if (this.favBar) this.favBar.hidden = !on && !keepDock;
     if (on) { this.paintRing1(); this.paintColors(); this.clamp(); this.sync(); }
     else { this.setOpen(false); }
   };
