@@ -44,32 +44,71 @@
     { k: 'black', ar: 'أسود', en: 'Black' }
   ];
   var ALL_TONES = TONES.concat(['white', 'black']);
-  var ORDER_KEY = 'garden_ink_tone_order', PIN_KEY = 'garden_ink_pin_colors';
-
-  function toneOrder() {
-    var out = [], seen = {};
-    try {
-      var a = JSON.parse(localStorage.getItem(ORDER_KEY) || 'null');
-      if (Array.isArray(a)) {
-        a.forEach(function (t) {
-          if (ALL_TONES.indexOf(t) >= 0 && !seen[t]) { seen[t] = 1; out.push(t); }
-        });
-      }
-    } catch (e) {}
-    ALL_TONES.forEach(function (t) { if (!seen[t]) { seen[t] = 1; out.push(t); } });
-    return out;
-  }
-
-  function setToneOrder(a) {
-    try { localStorage.setItem(ORDER_KEY, JSON.stringify(a)); } catch (e) {}
-  }
+  var PIN_KEY = 'garden_ink_pin_colors';
 
   function colorsPinned() {
-    try { return localStorage.getItem(PIN_KEY) === '1'; } catch (e) { return false; }
+    try { var v = localStorage.getItem(PIN_KEY); return v == null ? true : v === '1'; }
+    catch (e) { return true; }
   }
 
   function setColorsPinned(on) {
     try { localStorage.setItem(PIN_KEY, on ? '1' : '0'); } catch (e) {}
+  }
+
+  var PL_KEY = 'garden_ink_palettes', PL_REC_KEY = 'garden_ink_recent_colors';
+  var PL_MAX = 12, PL_LISTS_MAX = 8, PL_REC_MAX = 8;
+  var PL_DEFAULTS = {
+    pen: [['ink', 'red', 'sky', 'emerald', 'orange', 'violet'],
+          ['black', 'brown', 'teal', 'indigo', 'pink', 'yellow'],
+          ['lime', 'amber', 'rose', 'white', 'indigo', 'brown']],
+    hi:  [['yellow', 'lime', 'emerald', 'sky', 'pink', 'orange'],
+          ['teal', 'indigo', 'violet', 'red', 'amber', 'rose'],
+          ['brown', 'ink', 'amber', 'teal', 'violet', 'rose']]
+  };
+  function plKind(cv) { return (cv && cv.tool === 'hi') ? 'hi' : 'pen'; }
+  function plOk(c) {
+    return typeof c === 'string' && (ALL_TONES.indexOf(c) >= 0 || TONES.indexOf(c) >= 0 ||
+      /^#[0-9a-f]{6}$/i.test(c) || c === 'amber' || c === 'rose');
+  }
+  function plRead() {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem(PL_KEY) || 'null'); } catch (e) {}
+    var out = { v: 1 };
+    ['pen', 'hi'].forEach(function (k) {
+      var src = d && d[k], lists = [], cur = 0;
+      if (src && Array.isArray(src.lists)) {
+        src.lists.forEach(function (l) {
+          if (lists.length >= PL_LISTS_MAX) return;
+          lists.push({ c: (l && Array.isArray(l.c)) ? l.c.filter(plOk).slice(0, PL_MAX) : [] });
+        });
+        cur = Math.max(0, Math.min(lists.length - 1, Number(src.cur) || 0));
+      }
+      if (!lists.length) lists = PL_DEFAULTS[k].map(function (c) { return { c: c.slice() }; });
+      out[k] = { cur: cur, lists: lists };
+    });
+    return out;
+  }
+  function plWrite(d) { try { localStorage.setItem(PL_KEY, JSON.stringify(d)); } catch (e) {} }
+  function plRecents(kind) {
+    try {
+      var a = JSON.parse(localStorage.getItem(PL_REC_KEY) || 'null');
+      if (a && Array.isArray(a[kind])) return a[kind].filter(plOk).slice(0, PL_REC_MAX);
+    } catch (e) {}
+    return [];
+  }
+  function noteRecentColor(kind, c) {
+    if (!plOk(c)) return false;
+    var a = null;
+    try { a = JSON.parse(localStorage.getItem(PL_REC_KEY) || 'null'); } catch (e) {}
+    if (!a || typeof a !== 'object') a = {};
+    var list = (Array.isArray(a[kind]) ? a[kind] : []).filter(function (x) { return x !== c; });
+    list.unshift(c);
+    a[kind] = list.slice(0, PL_REC_MAX);
+    try { localStorage.setItem(PL_REC_KEY, JSON.stringify(a)); } catch (e2) {}
+    return true;
+  }
+  function arDigits(n) {
+    return isAr() ? String(n).replace(/\d/g, function (ch) { return '٠١٢٣٤٥٦٧٨٩'.charAt(+ch); }) : String(n);
   }
 
   var PEN_W = [1.2, 2.4, 4, 7, 12];
@@ -375,11 +414,45 @@
     cbar.addEventListener('click', function (e) {
       if (self._justSorted) return;
       var cv = self.getCv();
+      var tab = e.target.closest('[data-pl]');
+      if (tab) { self.plShow(tab.getAttribute('data-pl')); return; }
+      if (e.target.closest('[data-pl-add]')) { self.plAct('newlist'); return; }
+      if (e.target.closest('[data-pl-put]')) { self.plAct('add'); return; }
       var sw = e.target.closest('[data-tone]');
       if (sw && cv) { cv.setColor(sw.getAttribute('data-tone')); self.sync(); return; }
       if (e.target.closest('[data-pal]')) { self.cyclePalette(); return; }
       if (e.target.closest('[data-custom]')) { self.pickCustom(e.target.closest('[data-custom]')); }
     });
+    cbar.addEventListener('contextmenu', function (e) {
+      var it = e.target.closest('[data-ix],[data-rec],[data-pl]');
+      if (!it) return;
+      e.preventDefault();
+      self.plPop(it, e.clientX, e.clientY);
+    });
+    var chold = null, chx = 0, chy = 0;
+    cbar.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      var it = e.target.closest('[data-ix],[data-rec],[data-pl]');
+      if (!it) return;
+      chx = e.clientX; chy = e.clientY;
+      if (chold) clearTimeout(chold);
+      chold = setTimeout(function () {
+        chold = null;
+        if (self._sorting) return;
+        self.plPop(it, chx, chy);
+      }, 520);
+    }, { passive: true });
+    var cdrop = function (e) {
+      if (!chold) return;
+      if (e && e.clientX != null &&
+          (Math.abs(e.clientX - chx) > 10 || Math.abs(e.clientY - chy) > 10)) {
+        clearTimeout(chold); chold = null; return;
+      }
+      if (e && e.type !== 'pointermove') { clearTimeout(chold); chold = null; }
+    };
+    cbar.addEventListener('pointermove', cdrop, { passive: true });
+    cbar.addEventListener('pointerup', cdrop, { passive: true });
+    cbar.addEventListener('pointercancel', cdrop, { passive: true });
     this.bindSort();
 
     bar.addEventListener('click', function (e) {
@@ -686,15 +759,47 @@
     var cv = this.getCv();
     var K = window.GardenCanvas;
     var pm = (K && K.paletteMode) ? K.paletteMode() : '';
-    var h = toneOrder().map(function (t) {
-      var hx = (cv && cv.tool === 'hi' && K && K.hiHexOf) ? K.hiHexOf(t) : hexOf(t);
-      var nm = L(TONE_AR[t] || t, TONE_EN[t] || t);
-      return '<button type="button" class="ndl-fav ndl-fav-sw" data-tone="' + t + '"' +
-        ' style="--t:' + hx + '"' +
+    var kind = plKind(cv), P = plRead()[kind];
+    var rec = this._plView === 'recent';
+    var hexK = function (t) { return (kind === 'hi' && K && K.hiHexOf) ? K.hiHexOf(t) : hexOf(t); };
+    var nameOf = function (t) { return TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t; };
+    var h = '<span class="ndl-pl-tabs" role="tablist">';
+    P.lists.forEach(function (l, i) {
+      var nm = L('قائمة ', 'List ') + (i + 1);
+      h += '<button type="button" class="ndl-fav ndl-pl-tab" data-pl="' + i + '" role="tab"' +
+        ' aria-selected="' + (!rec && i === P.cur ? 'true' : 'false') + '"' +
+        ' aria-label="' + esc(nm) + '" title="' + esc(nm) + '">' + arDigits(i + 1) + '</button>';
+    });
+    if (P.lists.length < PL_LISTS_MAX) {
+      h += '<button type="button" class="ndl-fav ndl-pl-tab ndl-pl-tab--add" data-pl-add="1"' +
+        ' aria-label="' + esc(L('قائمةٌ جديدة', 'New list')) + '" title="' + esc(L('قائمةٌ جديدة', 'New list')) + '">' +
+        '<i class="fa-solid fa-plus" aria-hidden="true"></i></button>';
+    }
+    h += '<button type="button" class="ndl-fav ndl-pl-tab" data-pl="recent" role="tab"' +
+      ' aria-selected="' + (rec ? 'true' : 'false') + '"' +
+      ' aria-label="' + esc(L('آخرُ الألوانِ المستعملة', 'Recently used colours')) + '"' +
+      ' title="' + esc(L('آخرُ الألوانِ المستعملة', 'Recently used colours')) + '">' +
+      '<i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></button>';
+    h += '</span><span class="ndl-fav-sep" aria-hidden="true"></span>';
+    var cols = rec ? plRecents(kind) : P.lists[P.cur].c;
+    if (!cols.length) {
+      h += '<span class="ndl-pl-empty">' + esc(rec
+        ? L('لم يُستعمل لونٌ بعد', 'No colours used yet')
+        : L('القائمةُ فارغة — أضِفِ اللونَ الحاليّ', 'Empty list — add the current colour')) + '</span>';
+    }
+    cols.forEach(function (t, i) {
+      h += '<button type="button" class="ndl-fav ndl-fav-sw" data-tone="' + esc(t) + '" ' +
+        (rec ? 'data-rec' : 'data-ix') + '="' + i + '" style="--t:' + hexK(t) + '"' +
         ' aria-pressed="' + (cv && cv.color === t ? 'true' : 'false') + '"' +
-        ' aria-label="' + esc(nm) + '" title="' + esc(nm) + '"></button>';
-    }).join('');
-    h += '<span class="ndl-fav-sep" aria-hidden="true"></span>';
+        ' aria-label="' + esc(nameOf(t)) + '" title="' + esc(nameOf(t)) + '"></button>';
+    });
+    if (!rec && cols.length < PL_MAX) {
+      h += '<button type="button" class="ndl-fav ndl-fav-opt ndl-pl-put" data-pl-put="1"' +
+        ' aria-label="' + esc(L('أضِفِ اللونَ الحاليَّ إلى القائمة', 'Add the current colour to this list')) + '"' +
+        ' title="' + esc(L('أضِفِ اللونَ الحاليَّ إلى القائمة', 'Add the current colour to this list')) + '">' +
+        '<i class="fa-solid fa-plus" aria-hidden="true"></i></button>';
+    }
+    h += '<span class="ndl-fav-tail">';
     var pal = pm === 'night'
       ? ['ألوانُ الليل — اضغط لألوانِ النهار', 'Night colours — tap for day colours', 'fa-moon']
       : (pm === 'day'
@@ -708,8 +813,126 @@
     h += '<button type="button" class="ndl-fav ndl-fav-opt" data-custom="1"' +
       ' aria-label="' + esc(L('لون مخصّص', 'Custom colour')) + '"' +
       ' title="' + esc(L('لون مخصّص', 'Custom colour')) + '">' +
-      '<i class="fa-solid fa-eye-dropper" aria-hidden="true"></i></button>';
+      '<i class="fa-solid fa-eye-dropper" aria-hidden="true"></i></button></span>';
     this.colorBar.innerHTML = h;
+    this.colorBar.setAttribute('data-kind', kind);
+    i18n(this.colorBar);
+  };
+
+  Dial.prototype.plShow = function (k) {
+    if (k === 'recent') { this._plView = 'recent'; this.paintColors(); return; }
+    var d = plRead(), P = d[plKind(this.getCv())];
+    var i = Number(k);
+    if (!(i >= 0) || i >= P.lists.length) return;
+    P.cur = i;
+    plWrite(d);
+    this._plView = 'list';
+    this.paintColors();
+  };
+
+  Dial.prototype.plAct = function (act, ix, to) {
+    var cv = this.getCv();
+    var kind = plKind(cv), d = plRead(), P = d[kind];
+    var list = P.lists[P.cur].c;
+    var c = cv && typeof cv.color === 'string' ? cv.color : '';
+    if (act === 'add') {
+      if (!plOk(c) || list.indexOf(c) >= 0 || list.length >= PL_MAX) return false;
+      list.push(c);
+    } else if (act === 'put') {
+      if (!plOk(c) || !(ix >= 0) || ix >= list.length) return false;
+      list[ix] = c;
+    } else if (act === 'del') {
+      if (!(ix >= 0) || ix >= list.length) return false;
+      list.splice(ix, 1);
+    } else if (act === 'move') {
+      if (!(ix >= 0) || ix >= list.length || !(to >= 0) || to >= list.length) return false;
+      var it = list.splice(ix, 1)[0];
+      list.splice(to, 0, it);
+    } else if (act === 'rec-add') {
+      var r = plRecents(kind)[ix];
+      if (!r || list.indexOf(r) >= 0 || list.length >= PL_MAX) return false;
+      list.push(r);
+      this._plView = 'list';
+    } else if (act === 'newlist') {
+      if (P.lists.length >= PL_LISTS_MAX) return false;
+      P.lists.push({ c: plOk(c) ? [c] : [] });
+      P.cur = P.lists.length - 1;
+      this._plView = 'list';
+    } else if (act === 'dellist') {
+      if (P.lists.length <= 1) return false;
+      P.lists.splice(ix >= 0 ? ix : P.cur, 1);
+      P.cur = Math.min(P.cur, P.lists.length - 1);
+      this._plView = 'list';
+    } else if (act === 'reset') {
+      P.lists = PL_DEFAULTS[kind].map(function (x) { return { c: x.slice() }; });
+      P.cur = 0;
+      this._plView = 'list';
+    } else if (act === 'clear-rec') {
+      try {
+        var a = JSON.parse(localStorage.getItem(PL_REC_KEY) || 'null') || {};
+        a[kind] = [];
+        localStorage.setItem(PL_REC_KEY, JSON.stringify(a));
+      } catch (e) {}
+      this.paintColors();
+      return true;
+    } else return false;
+    plWrite(d);
+    this.paintColors();
+    this.sync();
+    return true;
+  };
+
+  Dial.prototype.plPop = function (it, x, y) {
+    var self = this;
+    this.closeFavPop();
+    this.closeSizePop();
+    this.closeColorPop();
+    var cv = this.getCv();
+    var kind = plKind(cv), P = plRead()[kind];
+    var isIx = it.hasAttribute('data-ix'), isRec = it.hasAttribute('data-rec'), isTab = it.hasAttribute('data-pl');
+    var ix = isIx ? Number(it.getAttribute('data-ix')) : isRec ? Number(it.getAttribute('data-rec')) : -1;
+    var tab = isTab ? it.getAttribute('data-pl') : '';
+    var cur = cv && plOk(cv.color);
+    var h = '';
+    if (isIx) {
+      var t = P.lists[P.cur].c[ix];
+      h += '<div class="ndl-favp-h">' + esc(TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t) + '</div>';
+      h += favRow('put', 'fa-arrow-down-to-line', 'ضَعِ اللونَ الحاليَّ مكانَه', 'Replace with current colour', !cur);
+      h += favRow('del', 'fa-trash', 'أزِلْه من القائمة', 'Remove from list');
+      h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
+      h += favRow('add', 'fa-plus', 'أضِفِ اللونَ الحاليّ', 'Add current colour', !cur);
+    } else if (isRec) {
+      h += favRow('rec-add', 'fa-plus', 'أضِفْه إلى القائمةِ الحاليّة', 'Add to current list');
+      h += favRow('clear-rec', 'fa-trash', 'امسحْ آخرَ الألوان', 'Clear recent colours');
+    } else if (isTab && tab === 'recent') {
+      h += favRow('clear-rec', 'fa-trash', 'امسحْ آخرَ الألوان', 'Clear recent colours');
+    } else if (isTab) {
+      h += '<div class="ndl-favp-h">' + esc(L('قائمة ', 'List ') + (Number(tab) + 1)) + '</div>';
+      h += favRow('newlist', 'fa-plus', 'قائمةٌ جديدة', 'New list', P.lists.length >= PL_LISTS_MAX);
+      h += favRow('dellist', 'fa-trash', 'احذفْ هذه القائمة', 'Delete this list', P.lists.length <= 1);
+      h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
+      h += favRow('reset', 'fa-rotate-left', 'أعِدِ القوائمَ الافتراضيّة', 'Reset lists');
+    }
+    if (!h) return null;
+    var pop = document.createElement('div');
+    pop.className = 'ndl-favpop';
+    pop.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    pop.innerHTML = h;
+    document.body.appendChild(pop);
+    var w = pop.offsetWidth || 210, hh = pop.offsetHeight || 120;
+    pop.style.insetBlockStart = Math.round(Math.max(8, Math.min(innerHeight - hh - 8, y + 6))) + 'px';
+    pop.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, x - w / 2))) + 'px';
+    pop.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fx]');
+      if (!b || b.disabled) return;
+      var act = b.getAttribute('data-fx');
+      self.plAct(act, act === 'dellist' ? Number(tab) : ix);
+      self.closeFavPop();
+    });
+    this._fvPop = pop;
+    this._fvOut = function (e) { if (pop && !pop.contains(e.target)) self.closeFavPop(); };
+    setTimeout(function () { document.addEventListener('pointerdown', self._fvOut, true); }, 0);
+    return pop;
   };
 
   Dial.prototype.cyclePalette = function () {
@@ -834,12 +1057,8 @@
       });
     }
     if (this.colorBar) {
-      wire(this.colorBar, '[data-tone]', function (from, to) {
-        var list = toneOrder();
-        var it = list.splice(from, 1)[0];
-        list.splice(to, 0, it);
-        setToneOrder(list);
-        self.paintColors();
+      wire(this.colorBar, '[data-tone][data-ix]', function (from, to) {
+        self.plAct('move', from, to);
       });
     }
   };
@@ -851,6 +1070,8 @@
     if (k === this._lastUsed) return;
     this._lastUsed = k;
     if (noteRecent(used)) this.paintFavs();
+    if (INKY[used.tool] && noteRecentColor(used.tool === 'hi' ? 'hi' : 'pen', used.color) &&
+        this._plView === 'recent') this.paintColors();
   };
 
   /*@3.NODJ.30*/
@@ -1307,6 +1528,7 @@
       sb.replaceWith(tmp2.firstChild);
     }
     if (this.colorBar) {
+      if (this.colorBar.getAttribute('data-kind') !== plKind(cur)) this.paintColors();
       var sws = this.colorBar.querySelectorAll('[data-tone]');
       for (i = 0; i < sws.length; i++) {
         sws[i].setAttribute('aria-pressed', sws[i].getAttribute('data-tone') === cur.color ? 'true' : 'false');
@@ -1604,10 +1826,13 @@
       i18n(self.el);
       self.paintRing1();
       self.paintFavs();
+      self.paintColors();
       if (self.sub) self.openSub(self.sub);
       self.sync();
     };
     document.addEventListener('garden:languageChanged', this._onLang);
+    this._onSync = function () { self.paintColors(); };
+    window.addEventListener('garden:syncCompleted', this._onSync);
   };
 
   /*@3.NODJ.6*/
@@ -1777,6 +2002,7 @@
     if (this._onRestore) this.el.removeEventListener('pointerenter', this._onRestore);
     window.removeEventListener('resize', this._onRz);
     document.removeEventListener('garden:languageChanged', this._onLang);
+    if (this._onSync) window.removeEventListener('garden:syncCompleted', this._onSync);
     if (this.el && this.el.parentNode) this.el.remove();
     if (this.dock && this.dock.parentNode) this.dock.remove();
     else if (this.favBar && this.favBar.parentNode) this.favBar.remove();

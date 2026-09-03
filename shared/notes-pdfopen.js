@@ -666,7 +666,8 @@
         onFit: function () { refit('page'); },
         onExpand: function (on) { if (o.onExpand) o.onExpand(on); },
         onDirty: function () { if (o.onInkDirty) o.onInkDirty(); },
-        onField: function (on) { if (o.onInkField) o.onInkField(on); },
+        onField: function (on, bar) { return o.onInkField ? o.onInkField(on, bar) : false; },
+        onClosePen: function () { if (o.onInkClose) o.onInkClose(); },
         /*@3.NOPJ5.23*/
         onGesture: function (phase, g) { if (o.onInkGesture) o.onInkGesture(phase, g); }
       });

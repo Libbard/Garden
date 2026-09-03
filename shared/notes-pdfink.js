@@ -1427,7 +1427,8 @@
     var v = this.view;
     if (!v || !v.wrap) return false;
     if (!on) {
-      this.fieldExitAll();
+      this._disarming = 1;
+      try { this.fieldExitAll(); } finally { this._disarming = 0; }
       if (this.router) { try { this.router.destroy(); } catch (e) {} this.router = null; }
       if (this.grab && this.grab.parentNode) this.grab.parentNode.removeChild(this.grab);
       this.grab = null;
@@ -2257,6 +2258,15 @@
     if (!p.fdoc || !p.fdoc.blocks) p.fdoc = { v: 1, blocks: [] };
     return p.fdoc;
   }
+  function appDir() {
+    try { return (localStorage.getItem('garden_lang') || 'ar') === 'ar' ? 'rtl' : 'ltr'; }
+    catch (e) { return 'rtl'; }
+  }
+  function fdocDir(d) {
+    if (!d) return 'ltr';
+    if (d.bd === 'rtl' || d.bd === 'ltr') return d.bd;
+    return (d.blocks && d.blocks.length) ? 'ltr' : appDir();
+  }
   var HOLDS = { img: 1, ink: 1, tbl: 1, math: 1, code: 1, hr: 1, gap: 1 };
   function holds(b) {
     if (!b) return false;
@@ -2266,6 +2276,7 @@
   }
   function freeOnly(d) {
     var out = { v: 1, blocks: [] };
+    if (d && d.bd === 'rtl') out.bd = 'rtl';
     var bs = (d && d.blocks) || [];
     for (var i = 0; i < bs.length; i++) if (bs[i] && bs[i].fp && holds(bs[i])) out.blocks.push(bs[i]);
     return out;
@@ -2296,6 +2307,7 @@
     var self = this;
     var h = document.createElement('div');
     h.className = 'gpi-fed';
+    h.setAttribute('dir', fdocDir(fdocOf(p)));
     fld.appendChild(h);
     p.fhost = h;
     this.placeFields(p);
@@ -2332,11 +2344,6 @@
     p.fhost.style.setProperty('--gpi-ik', (1 / k).toFixed(4));
   };
 
-  Ink.prototype.browse = function () {
-    var f = this.face || this.bar();
-    if (f.tool !== 'hand') f.setTool('hand', true);
-  };
-
   Ink.prototype.fieldExit = function (p) {
     p = p || this._fpage;
     if (!p) return false;
@@ -2355,7 +2362,9 @@
       } catch (e2) {}
     }
     this.fieldFocus(p, false);
-    this.browse();
+    if (this.armed && !this._disarming && this.o.onClosePen) {
+      try { this.o.onClosePen(); } catch (e3) {}
+    }
     return true;
   };
 
@@ -2394,13 +2403,16 @@
     if (!E || !E.mount) return null;
     var d = fdocOf(p);
     if (!make && !d.blocks.length) return null;
+    if (!d.bd) d.bd = fdocDir(d);
     var host = this.fieldHost(p);
     if (!host) return null;
+    host.setAttribute('dir', fdocDir(d));
     var self = this;
     var ed = null;
     try {
       ed = E.mount(host, deep(d), { noDocPaste: true, onDirty: function () { self.fieldDirty(p); } });
     } catch (e) { return null; }
+    if (ed.root) ed.root.setAttribute('data-rail', 'out');
     p.fed = ed;
     p.fkey = fkeyOf(d);
     return ed;
@@ -2431,6 +2443,7 @@
     if (!ed || this.dead) return false;
     var d;
     try { ed.readAll(); d = freeOnly(deep(ed.doc)); } catch (e) { return false; }
+    if (fdocOf(p).bd) d.bd = fdocOf(p).bd;
     this.fieldMeasure(p, d);
     var key = fkeyOf(d);
     if (key === p.fkey) return false;
@@ -2479,8 +2492,10 @@
       if (this.grab) this.grab.style.pointerEvents = 'none';
       if (wrap) wrap.setAttribute('data-fedit', '1');
       this.fieldWatch(true);
-      if (p.fed) this.fieldBar(p);
-      if (this.o.onField) this.o.onField(true);
+      var bar = p.fed ? this.fieldBar(p) : null;
+      var held = false;
+      if (this.o.onField) { try { held = !!this.o.onField(true, bar); } catch (eB) {} }
+      if (bar && !held) this.floatBar(p, bar);
       return;
     }
     if (this._fpage !== p) return;
@@ -2488,9 +2503,9 @@
     if (this.grab) this.grab.style.pointerEvents = '';
     if (wrap) wrap.removeAttribute('data-fedit');
     this.fieldWatch(false);
+    if (this.o.onField) { try { this.o.onField(false, this._fbar); } catch (eO) {} }
     this.dropFieldBar();
     this.fieldCommit(p);
-    if (this.o.onField) this.o.onField(false);
   };
 
   /*@3.NOPJ8.138*/
@@ -2501,10 +2516,13 @@
     if (!ed || !ed.addFree) return null;
     var ex = extra || {};
     if (ex.fs == null) ex.fs = Math.max(14, Math.min(48, Math.round(16 / (p.scale || 1))));
+    if (fdocDir(fdocOf(p)) === 'rtl') {
+      var W = p.w || (ed.sheetW ? ed.sheetW() : 0) || 1;
+      x = Math.max(0, W - x - ((typeof ex.wm === 'number' && ex.wm > 0) ? ex.wm * W : 0));
+    }
     try { ed.addFree('p', x + 6, y + 12, ex); } catch (e) { return null; }
     var ae = document.activeElement;
     if (ae && p.fhost && p.fhost.contains(ae)) this.fieldFocus(p, true);
-    this.browse();
     this.beat();
     return ed;
   };
@@ -2553,6 +2571,7 @@
     if (!d || !d.blocks || !page) return out;
     var f = frame(page, 1);
     var bs = d.blocks;
+    var rtl = fdocDir(d) === 'rtl';
     for (var i = 0; i < bs.length; i++) {
       var b = bs[i];
       if (!b || !b.fp) continue;
@@ -2561,6 +2580,7 @@
       var x = (b.fp.x || 0) * W, y = b.fp.y || 0;
       var w = b.pw > 0 ? b.pw : (wmOf(b, W) || Math.min(W - x, Math.max(60, t.length * 7.5)));
       var h = b.ph > 0 ? b.ph : Math.max(20, Math.ceil((t.length * 7.5) / Math.max(40, w)) * 20);
+      if (rtl) x = Math.max(0, W - x - w);
       var a = f.toPt(x, y), c = f.toPt(x + w, y + h);
       out.push({ ty: 'tx', x: Math.min(a.x, c.x), y: Math.min(a.y, c.y),
                  w: Math.abs(c.x - a.x), h: Math.abs(c.y - a.y), t: t, c: 'ink', fs: 14 });
@@ -2669,15 +2689,21 @@
   Ink.prototype.fieldBar = function (p) {
     var R = window.GardenNotesRibbon;
     this.dropFieldBar();
-    if (!R || !R.mount || !p.fed) return;
+    if (!R || !R.mount || !p.fed) return null;
     var bar = document.createElement('div');
     bar.className = 'nr gpi-fbar';
     bar.setAttribute('dir', document.documentElement.getAttribute('dir') || 'rtl');
-    document.body.appendChild(bar);
     var rib = null;
     try { rib = R.mount(bar, {}); rib.attach(p.fed); } catch (e) {}
     this._fbar = bar;
     this._frib = rib;
+    return bar;
+  };
+
+  Ink.prototype.floatBar = function (p, bar) {
+    if (!bar || this._fbar !== bar) return;
+    bar.className += ' gpi-fbar--float';
+    document.body.appendChild(bar);
     var self = this;
     /*@3.NOPJ8.139*/
     var place = function () {

@@ -7805,3 +7805,14 @@ window.GardenEv = window.GardenEv || function (n, p) {
   if (document.readyState !== 'loading') schedule();
   else document.addEventListener('DOMContentLoaded', schedule, { once: true });
 })();
+/*@3.GARJ.653*/
+;(function () {
+  'use strict';
+  var S = window.CSS && CSS.supports ? function (a, b) { try { return b == null ? CSS.supports(a) : CSS.supports(a, b); } catch (e) { return false; } } : function () { return false; };
+  if (!window.__gardenCompatForce && S('color', 'color-mix(in oklab, red 50%, blue)') && S('selector(:has(a))') && S('height', '1dvh')) return;
+  var me = document.currentScript && document.currentScript.src;
+  var base = me ? me.replace(/[^\/]*$/, '') : 'shared/';
+  var el = document.createElement('script');
+  el.src = base + 'compat-css.js';
+  (document.head || document.documentElement).appendChild(el);
+})();

@@ -99,6 +99,7 @@
     /*@3.FISJ.204*/
     /^garden_ics$/,
     /^garden_module_visits$/,
+    /^garden_ink_palettes$/,
   ];
   /*@3.FISJ.22*/
   const NEVER_SYNC = new Set([

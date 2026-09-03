@@ -3139,15 +3139,13 @@
       marks: doc.marks || null,
       /*@3.NOAJ.268*/
       dockH: function () {
-        var d = document.querySelector('#na-favs .ndl-dock');
-        return (d && !d.hidden) ? d.getBoundingClientRect().height : 0;
+        var d = document.getElementById('na-favs');
+        return d ? d.getBoundingClientRect().height : 0;
       },
       onInkDirty: function () { if (edId === id) marksDirty(id, doc); },
       /*@3.NOAJ.267*/
-      onInkField: function (on) {
-        if (!pdfDial) return;
-        try { pdfDial.show(!on, !on, !!on); } catch (eF) {}
-      },
+      onInkField: function (on, bar) { return favsSwap(on, bar); },
+      onInkClose: function () { pdfDraw(false); },
       /*@3.NOAJ.229*/
       stamp: function (n, of) { return isAr() ? (n + ' من ' + of) : (n + ' of ' + of); },
       onAsk: function () {
@@ -4756,6 +4754,31 @@
     });
   }
 
+  function keepFavs(fn) {
+    var favs = document.getElementById('na-favs');
+    var sc = els.docBody;
+    var h0 = favs ? favs.getBoundingClientRect().height : 0;
+    fn();
+    var h1 = favs ? favs.getBoundingClientRect().height : 0;
+    if (sc && h1 !== h0) sc.scrollTop += (h1 - h0);
+  }
+
+  function favsSwap(on, bar) {
+    var favs = document.getElementById('na-favs');
+    if (!favs) return false;
+    keepFavs(function () {
+      if (on) {
+        if (pdfDial) { try { pdfDial.show(false, false, false); } catch (e1) {} }
+        if (bar) favs.appendChild(bar);
+        return;
+      }
+      if (bar && bar.parentNode === favs) favs.removeChild(bar);
+      var arm = !!(pdfUi && pdfUi.drawing && pdfUi.drawing());
+      if (pdfDial) { try { pdfDial.show(arm, arm); } catch (e2) {} }
+    });
+    return true;
+  }
+
   /*@3.NOAJ.234*/
   function pdfDraw(on) {
     if (!pdfOn() || !pdfUi.ink()) return false;
@@ -4769,7 +4792,7 @@
         favHost: document.getElementById('na-favs')
       });
     }
-    if (pdfDial) pdfDial.show(arm, arm);
+    if (pdfDial) keepFavs(function () { pdfDial.show(arm, arm); });
     paintDrawBtn();
     return arm;
   }
