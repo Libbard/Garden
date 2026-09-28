@@ -25,7 +25,6 @@
       document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
     })();
   </script>
-  <!-- لونُ الطالب لهذه المادة — قبل CSS فلا وميض -->
   <script src="../../shared/subject-tint.js"></script>
   <!-- garden-fontpath -->
   <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
@@ -36,7 +35,6 @@
   <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
 
   <style>
-    /* ── شريط تقدم الاختبار ── */
     .quiz-progress-container {
       width: 100%; height: 8px; background: var(--bg-surface);
       border-radius: var(--radius-pill); overflow: hidden; margin-bottom: 2rem;
@@ -48,7 +46,6 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ── رأس بطاقة السؤال ── */
     .quiz-card-header {
       display: flex; justify-content: space-between; align-items: flex-start;
       margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
@@ -56,7 +53,6 @@
     }
     .quiz-meta-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-    /* ── لوحة النتيجة الحية ── */
     .live-score-board {
       display: inline-flex; align-items: center; gap: 0.5rem;
       background: var(--bg-body); padding: 0.4rem 1rem;
@@ -67,7 +63,6 @@
     }
     .live-score-board i { color: var(--brand-400); }
 
-    /* ── خيارات الإجابة ── */
     .quiz-options-grid { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
     .quiz-option-btn {
       position: relative; text-align: right; padding: 1.2rem 1.5rem;
@@ -138,7 +133,6 @@
     }
     .timer-toggle:hover { color: var(--brand-500); }
 
-    /* ── ملخص الأخطاء ── */
     .summary-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
       gap: 0.5rem; margin: 1.5rem 0;
@@ -180,7 +174,6 @@
     .summary-row .row-q    { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .summary-row .row-mod  { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
 
-    /* ── كارت اختصارات الكيبورد ── */
     .quiz-nav-row {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -193,20 +186,17 @@
     .quiz-nav-row .nav-left  { justify-self: start; }
     .quiz-nav-row .nav-mid   { justify-self: center; text-align: center; min-width: 0; }
     .quiz-nav-row .nav-right { justify-self: end; }
-    /* على الجوال: أزرار أصغر ونص مختصر */
     @media (max-width: 480px) {
       .quiz-nav-row { gap: 0.25rem; padding-top: 1rem; margin-top: 1.25rem; }
       #q-counter { font-size: 0.8rem; letter-spacing: 0; }
     }
 
-    /* زر التالي/الإنهاء — معطل حتى الإجابة */
     .nav-btn.pending {
       opacity: 0.38;
       cursor: not-allowed;
       pointer-events: none;
       filter: grayscale(0.4);
     }
-    /* تلميح مرئي: نبضة خفيفة عند الانتظار */
     @keyframes pendingPulse {
       0%, 100% { box-shadow: none; }
       50%       { box-shadow: 0 0 0 3px var(--brand-glow); }
@@ -216,7 +206,6 @@
       background: linear-gradient(135deg, var(--brand-400), var(--brand-600));
       color: #fff !important; border: none; box-shadow: 0 4px 15px var(--brand-glow);
     }
-    /* إصلاح: نمنع nav-btn:hover من الكتابة فوق btn-primary */
     .nav-btn.btn-primary:hover {
       background: linear-gradient(135deg, var(--brand-400), var(--brand-600)) !important;
       color: #fff !important;
@@ -228,7 +217,6 @@
       box-shadow: 0 6px 20px var(--brand-glow);
     }
 
-    /* ── أيقونة الاختصارات (tooltip) ── */
     .kbd-tooltip-wrap {
       position: relative;
       display: inline-flex;
@@ -255,7 +243,6 @@
     .kbd-tooltip-panel {
       position: absolute;
       bottom: calc(100% + 10px);
-      /* RTL: توجيه من اليمين لتجنب خروجه من الشاشة */
       right: 0; left: auto;
       transform: translateY(4px);
       background: var(--bg-surface);
@@ -274,7 +261,6 @@
       opacity: 1; pointer-events: auto;
       transform: translateY(0);
     }
-    /* مثلث صغير */
     .kbd-tooltip-panel::after {
       content: '';
       position: absolute;
@@ -282,7 +268,6 @@
       border: 6px solid transparent;
       border-top-color: var(--border-color);
     }
-    /* على الجوال: يفتح للأسفل بدلاً من الأعلى لتجنب الاقتصاص */
     @media (max-width: 640px) {
       .kbd-tooltip-panel {
         bottom: auto;
@@ -315,7 +300,6 @@
       font-weight: 700; color: var(--text-secondary); min-width: 1.4rem; text-align: center;
     }
 
-    /* ── شريط أدوات الاختبار ── */
     .quiz-toolbar {
       display: flex;
       flex-direction: column;
@@ -335,14 +319,12 @@
         padding: 1rem 1.5rem;
       }
     }
-    /* مجموعة الوحدات: تظهر كأسطر متعددة على الجوال بدلاً من التمرير */
     .filter-group {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
       justify-content: flex-start;
     }
-    /* مجموعة الأزرار (shuffle + new): تبقى مضغوطة على اليمين */
     .filter-group--actions {
       display: flex;
       gap: 0.5rem;
@@ -355,7 +337,6 @@
       .filter-group--actions { align-self: center; }
     }
 
-    /* ── تلوين درجة الصعوبة (مستخدمة ألوان مكتبة الخوارزميات) ── */
     .difficulty-easy   { background: rgba(52,211,153,0.12); color: var(--algo-sorted); border: 1px solid rgba(52,211,153,0.3); }
     .difficulty-medium { background: rgba(253,224,71,0.12);  color: var(--algo-compare); border: 1px solid rgba(253,224,71,0.3); }
     .difficulty-hard   { background: rgba(244,114,182,0.12); color: var(--algo-swap);   border: 1px solid rgba(244,114,182,0.3); }
@@ -363,7 +344,6 @@
     [data-theme="light"] .difficulty-medium { color: var(--algo-compare); }
     [data-theme="light"] .difficulty-hard   { color: var(--algo-swap); }
 
-    /* ── تعليق الإجابة — خارج البطاقة، يظهر بحركة سلسة ── */
     .mcq-feedback-panel {
       overflow: hidden;
       max-height: 0;
@@ -395,7 +375,6 @@
       color: var(--text-primary);
     }
 
-    /* ── نقاط المقالي — شريط عائم ثابت ── */
     .essay-score-float {
       position: sticky;
       top: 5rem;
@@ -429,7 +408,6 @@
     }
     .essay-score-float i { color: var(--brand-400); font-size: 1rem; }
 
-    /* ── تنسيق المقالي ── */
     @media (min-width: 1024px) {
       .sidebar {
         position: sticky !important;
@@ -589,7 +567,6 @@
     <div class="quiz-progress-bar" id="q-progress-fill" style="width:0%"></div>
   </div>
 
-  <!-- شريط التايمر — يظهر تلقائياً -->
   <div class="quiz-timer-bar" id="timer-bar">
     <button class="timer-toggle" id="timer-toggle-btn" onclick="toggleTimer()" title="تشغيل/إيقاف التايمر">
       <i class="fa-solid fa-pause" id="timer-toggle-icon"></i>
@@ -633,7 +610,6 @@
           <span class="content-target">إظهار تلميح</span>
         </span>
       </button>
-      <!-- أيقونة i بجانب التلميح مباشرةً -->
       <div class="kbd-tooltip-wrap" style="flex-shrink:0">
         <button class="kbd-info-btn" tabindex="0" aria-label="keyboard shortcuts">i</button>
         <div class="kbd-tooltip-panel" data-bilingual>
@@ -665,7 +641,6 @@
     </div>
 
     <div class="quiz-nav-row">
-      <!-- يسار: السابق -->
       <div class="nav-left">
         <button class="nav-btn" onclick="prevMcq()">
           <i class="fa-solid fa-arrow-right"></i>
@@ -677,7 +652,6 @@
         </button>
       </div>
 
-      <!-- وسط: عداد السؤال — ثابت دائماً -->
       <div class="nav-mid">
         <div id="q-counter"
              style="font-weight:700;color:var(--text-muted);font-family:var(--display-font);font-size:0.9rem;letter-spacing:1px;white-space:nowrap">
@@ -689,7 +663,6 @@
         </div>
       </div>
 
-      <!-- يمين: التالي أو الإنهاء — ظاهر دائماً، معطل حتى الإجابة -->
       <div class="nav-right">
         <button class="nav-btn btn-primary pending pending-hint" id="mcq-next-btn"
                 onclick="nextMcq()" disabled>
@@ -714,7 +687,6 @@
     </div>
   </article>
 
-  <!-- لوحة التعليق — خارج البطاقة، ثابتة لا تحرك التصميم -->
   <div class="mcq-feedback-panel" id="mcq-feedback" role="status" aria-live="polite">
     <div class="feedback-inner"></div>
   </div>
@@ -730,10 +702,8 @@
     <div id="motivational-msg"
          style="margin:1rem 0;font-size:1.1rem;font-weight:600;color:var(--text-secondary);line-height:1.6"></div>
 
-    <!-- ملخص لكل وحدة -->
     <div class="summary-grid" id="summary-mod-grid"></div>
 
-    <!-- قائمة الأسئلة بالتفصيل -->
     <details style="text-align:right;margin-top:1rem">
       <summary style="cursor:pointer;font-weight:700;color:var(--brand-500);font-size:0.95rem;padding:0.5rem;list-style:none;display:flex;align-items:center;gap:0.5rem">
         <i class="fa-solid fa-chart-bar"></i>
@@ -979,13 +949,11 @@ function renderMcq(idx) {
   }
   document.getElementById('mcq-feedback').className = 'mcq-feedback-panel';
   document.getElementById('mcq-feedback').querySelector('.feedback-inner').innerHTML = '';
-  // زر التالي — ظاهر دائماً، معطل حتى الإجابة
   const nextBtn   = document.getElementById('mcq-next-btn');
   const finishBtn = document.getElementById('mcq-finish-btn');
   const isLast    = (idx >= TOTAL - 1);
   nextBtn.classList.toggle('hidden', isLast);
   finishBtn.classList.toggle('hidden', !isLast);
-  // تعطيل الزر المرئي
   const activeBtn = isLast ? finishBtn : nextBtn;
   const otherBtn  = isLast ? nextBtn   : finishBtn;
   activeBtn.disabled = true;
@@ -1021,7 +989,6 @@ function showFeedback(q, lang) {
     `<template class="content-en">${q.explanation.en}</template>` +
     `<span class="content-target">${q.explanation[lang]}</span></div>`;
   fb.className = `mcq-feedback-panel ${ok ? 'correct-panel' : 'wrong-panel'} visible`;
-  // إعادة تطبيق data-bilingual على العناصر الجديدة
   if (typeof Garden !== 'undefined' && Garden.refreshBilingual) Garden.refreshBilingual(fb);
 }
 function showNextOrFinish() {
@@ -1208,7 +1175,6 @@ function updateTimerUI() {
 }
 function autoTimeOut() {
   if (answered[cur] !== undefined) return;
-  // اختر إجابة خاطئة تلقائياً (تُحسب كإجابة)
   const q = sessionMCQ[cur];
   const wrongIdx = (q.correctIndex + 1) % (q.options.ar||[]).length;
   pickMcq(wrongIdx);
