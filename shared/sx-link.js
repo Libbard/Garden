@@ -40,6 +40,11 @@
     catch (e) { return false; }
     /*@3.SXLJ.4*/
     try { localStorage.setItem('__syncT_' + SCH_KEY, String(Date.now())); } catch (e) {}
+    /*@3.SXLJ.66*/
+    try {
+      if (window.GardenScheduleRules && GardenScheduleRules.announce) GardenScheduleRules.announce('sx-link');
+      else window.dispatchEvent(new CustomEvent('garden:scheduleChanged', { detail: { from: 'sx-link' } }));
+    } catch (e) {}
     return true;
   }
 

@@ -719,7 +719,8 @@
         /*@3.SCHJ.322*/
         start: s, end: (s === null ? null : s + 60), synthetic_span: (s !== null),
         allDay: (s === null),
-        room: '', notes: d.note || '', youtube: '', date: dstr, weekId: weekId,
+        /*@3.SCHJ.327*/
+        room: '', notes: d.note || (d.pending_course ? L(PENDING_COURSE) : ''), youtube: '', date: dstr, weekId: weekId,
         done: !!d.done, editable: !!d.editable, recurring: false, raw: d
       }));
     });
@@ -796,6 +797,8 @@
     }
     return L(GEN_KIND[ev.sub] || GEN_KIND.event);
   }
+  var PENDING_COURSE = { ar: 'من بلاك بورد — المادّةُ غيرُ معروفةٍ بعد', en: 'From Blackboard — course not known yet' };
+
   function evMeta(ev) {
     var parts = [subLabel(ev)];
     if (ev.room) parts.push(ev.room);
@@ -4165,7 +4168,8 @@
     var lang = isAr() ? 'ar' : 'en';
     box.innerHTML = courses.map(function (c) {
       var code = c.code, color = getCourseColor(code);
-      var existing = schedule.lectures.filter(function (l) { return l.course_code === code; });
+      var existing = schedule.lectures.filter(function (l) { return l.course_code === code; })
+        .sort(function (a, b) { return DAYS_ORDER.indexOf(a.day) - DAYS_ORDER.indexOf(b.day); });
       var days = existing.map(function (l) { return l.day; });
       var first = existing[0];
       var start = first ? first.start_time : '15:00';
@@ -4173,6 +4177,11 @@
       var attend = (first && first.attendance) ? first.attendance : 'in_person';
       var form = (first && first.kind) ? first.kind : 'lecture';
       var room = first ? (first.room || '') : '';
+      /*@3.SCHJ.325*/
+      var mixAtt = existing.some(function (l) {
+        return (l.attendance || 'in_person') !== attend;
+      });
+      if (mixAtt) { attend = ''; room = ''; }
       var chips = DAYS_ORDER.map(function (d) {
         return '<button type="button" class="sch-daychip' + (days.indexOf(d) !== -1 ? ' on' : '') +
           '" data-ecdaych="' + d + '">' + escapeH(DAY_SHORT[lang][d]) + '</button>';
@@ -4206,6 +4215,8 @@
             '</select></div>' +
           '<div><label class="sch-label">' + (isAr() ? 'الحضور' : 'Attendance') + '</label>' +
             '<select class="sch-select ec-attend">' +
+            (mixAtt ? '<option value="" selected>' +
+              escapeH(isAr() ? 'مختلفٌ بالأيام' : 'Varies by day') + '</option>' : '') +
             '<option value="in_person"' + (attend === 'in_person' ? ' selected' : '') + '>' + L(ATTEND.in_person) + '</option>' +
             '<option value="remote"' + (attend === 'remote' ? ' selected' : '') + '>' + L(ATTEND.remote) + '</option>' +
             '</select></div>' +
@@ -4325,10 +4336,12 @@
           delete byDay[d];
           return;
         }
+        var newAtt = attend || (srcRow && srcRow.attendance) || 'in_person';
         var row = {
           id: 'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
           course_code: code, day: d, start_time: start, end_time: end,
-          room: room, kind: form, attendance: attend, recurring: true,
+          room: newAtt === 'in_person' ? room : '', kind: form,
+          attendance: newAtt, recurring: true,
           color: getCourseColor(code), duration: dur
         };
         if (tagAny) row.sx_crn = tagAny;
@@ -4827,6 +4840,24 @@
       });
   }
 
+  /*@3.SCHJ.326*/
+  function rereadStore() {
+    if (!schedule) return false;
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+    if (!raw) return false;
+    schedule = migrateSchedule(raw);
+    delete schedule.__needsSave;
+    try { semester = JSON.parse(localStorage.getItem(LS_SEMESTER) || 'null'); } catch (e) {}
+    return true;
+  }
+  window.addEventListener('garden:scheduleChanged', function (e) {
+    var from = e && e.detail && e.detail.from;
+    if (from === 'schedule') return;
+    if (rereadStore()) render();
+  });
+  window.addEventListener('garden:syncCompleted', function () { if (rereadStore()) render(); });
+
   function boot() {
     try { semester = JSON.parse(localStorage.getItem(LS_SEMESTER) || 'null'); } catch (e) { semester = null; }
     var raw = null;
@@ -4922,13 +4953,7 @@
     save: save,
     render: render,
     /*@3.SCHJ.220*/
-    reload: function () {
-      var raw = null;
-      try { raw = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
-      if (raw) schedule = migrateSchedule(raw);
-      try { semester = JSON.parse(localStorage.getItem(LS_SEMESTER) || 'null'); } catch (e) {}
-      render();
-    },
+    reload: function () { if (rereadStore()) render(); },
     eventsOnDate: eventsOnDate,
     eventsForRange: eventsForRange,
     buildAgendaHtml: buildAgendaHtml,

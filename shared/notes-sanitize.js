@@ -21,6 +21,8 @@
 
   /*@3.NOSJ3.9*/
   function keepBeforeStrip(root) {
+    var ims = root.querySelectorAll('span.ne-im[data-tex]');
+    for (var q = 0; q < ims.length; q++) ims[q].textContent = '';
     var codes = root.querySelectorAll('pre,code');
     for (var c = 0; c < codes.length; c++) {
       var cls = codes[c].getAttribute('class') || '';
@@ -63,6 +65,8 @@
         else if (name === 'data-hl' || name === 'data-nl') keep = true;
         /*@3.NOSJ3.13*/
         else if (name === 'data-lang' || name === 'data-done' || name === 'data-al') keep = true;
+        else if (el.tagName.toLowerCase() === 'span' && el.hasAttribute('data-tex') &&
+                 (name === 'data-tex' || (name === 'class' && attrs[k].value === 'ne-im'))) keep = true;
         /*@3.NOSJ3.6*/
         else if (el.tagName.toLowerCase() === 'span' &&
                  (name === 'data-fg' || name === 'data-ff' || name === 'data-fz')) keep = true;
@@ -130,19 +134,35 @@
     return out;
   }
 
+  function isLoose(n) {
+    if (n.nodeType === 3) return true;
+    return n.nodeType === 1 && !!INLINE_OK[n.tagName.toLowerCase()] && !n.querySelector(BLOCK_SEL);
+  }
+
   function walk(node, out) {
     for (var i = 0; i < node.childNodes.length; i++) {
       var n = node.childNodes[i];
 
-      if (n.nodeType === 3) {
-        var txt = n.nodeValue;
-        if (txt && txt.trim()) out.push(B().blank('p', { rt: [{ s: txt.replace(/\s+/g, ' ') }] }));
+      /*@3.NOSJ3.20*/
+      if (isLoose(n)) {
+        var grp = n.ownerDocument.createElement('p');
+        var j = i;
+        for (; j < node.childNodes.length; j++) {
+          var m = node.childNodes[j];
+          if (m.nodeType === 8) continue;
+          if (!isLoose(m)) break;
+          grp.appendChild(m.nodeType === 3 ? n.ownerDocument.createTextNode(m.nodeValue.replace(/\s+/g, ' ')) : m.cloneNode(true));
+        }
+        i = j - 1;
+        var gr = B().readRuns(grp);
+        if (B().runsToText(gr).trim()) out.push(B().blank('p', { rt: gr }));
         continue;
       }
       if (n.nodeType !== 1) continue;
 
       var tag = n.tagName.toLowerCase();
 
+      if (INLINE_OK[tag] && n.querySelector(BLOCK_SEL)) { walk(n, out); continue; }
       if (INLINE_OK[tag]) {
         var runs = B().readRuns(n);
         if (runs.length) out.push(B().blank('p', { rt: runs }));
@@ -231,23 +251,7 @@
     catch (e) { return []; }
     if (!doc || !doc.body) return [];
     stripDangerous(doc.body);
-    var blocks = walk(doc.body, []);
-    return merge(blocks);
-  }
-
-  function merge(blocks) {
-    var out = [];
-    for (var i = 0; i < blocks.length; i++) {
-      var b = blocks[i], last = out[out.length - 1];
-      if (b.ty === 'p' && last && last.ty === 'p') {
-        var lastTxt = B().runsToText(last.rt);
-        if (lastTxt && !/\s$/.test(lastTxt)) last.rt.push({ s: ' ' });
-        last.rt = last.rt.concat(b.rt);
-        continue;
-      }
-      out.push(b);
-    }
-    return out;
+    return walk(doc.body, []);
   }
 
   /*@3.NOSJ3.8*/

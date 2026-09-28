@@ -356,6 +356,8 @@
             (hasAr(GF.dirAltOf(p)) ? '' : ' ltr') + '">' + esc(GF.dirAltOf(p)) + '</div>' : '') +
           '<div class="fc-n"><i class="fa-solid fa-layer-group"></i>' +
             t(p.c + ' شعبة', p.c + ' sections') + '</div>' +
+          (GF.dirAgeNote(p)
+            ? '<div class="fc-dir-age">' + esc(GF.dirAgeNote(p)) + '</div>' : '') +
         '</div>' +
       '</div>' +
       '<div class="fc-dir-cta"><i class="fa-solid fa-pen-to-square"></i>' +

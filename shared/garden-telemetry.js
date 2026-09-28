@@ -12,6 +12,7 @@
   var MAX_SESSION = 200;
   var MAX_QUEUE_CHARS = 24000;
   var VAL_CHARS = 64;
+  var WIDE_CHARS = { m: 200 };
   var MAX_KEYS = 8;
 
   var K_DID = 'gt_did';
@@ -170,7 +171,8 @@
         for (var i = 0; i < lim; i++) a.push(typeof v[i] === 'number' ? v[i] : 0);
         o[k] = a; n++;
       }
-      else { o[k] = String(v).slice(0, VAL_CHARS); n++; }
+      /*@3.GATJ.41*/
+      else { o[k] = String(v).slice(0, WIDE_CHARS[k] || VAL_CHARS); n++; }
     }
     return o;
   }
@@ -414,13 +416,15 @@
   }
 
   function watchErrors() {
+    /*@3.GATJ.39*/
     window.addEventListener('error', function (e) {
       var m = e && e.message;
       if (!m || /^script error/i.test(m)) return;
+      var at = frameOf(e && e.error && e.error.stack);
       ev('js_error', {
         m: shortErr(m),
-        f: shortErr((e.filename || '').split('/').pop()),
-        l: e.lineno || 0
+        f: at ? at.f : shortErr((e.filename || '').split('/').pop()),
+        l: at ? at.l : (e.lineno || 0)
       });
     });
     /*@3.GATJ.30*/
@@ -447,6 +451,16 @@
 
   /*@3.GATJ.17*/
   var clicks = [];
+  var TYPE_IN = { text: 1, search: 1, email: 1, url: 1, tel: 1, password: 1,
+                  number: 1, date: 1, time: 1, month: 1, week: 1, 'datetime-local': 1 };
+  function isTyping(node) {
+    var el = node && node.closest
+      ? node.closest('input,textarea,[contenteditable=""],[contenteditable="true"]') : null;
+    if (!el) return false;
+    if (el.tagName !== 'INPUT') return true;
+    return !!TYPE_IN[String(el.type || 'text').toLowerCase()];
+  }
+
   function watchRage(e) {
     var t = Date.now();
     clicks.push({ t: t, x: e.clientX, y: e.clientY });
@@ -457,6 +471,8 @@
       if (Math.abs(clicks[i].x - a.x) > 45 || Math.abs(clicks[i].y - a.y) > 45) { far = true; break; }
     }
     if (far) return;
+    /*@3.GATJ.40*/
+    if (isTyping(e.target)) { clicks = []; return; }
     clicks = [];
     var el = e.target && e.target.closest ? e.target.closest('button,a,[role=button],input') : null;
     ev('rage_click', { c: 4, el: el ? (el.id || el.tagName.toLowerCase()) : 'page' });

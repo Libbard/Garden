@@ -71,35 +71,6 @@
     } catch (e) {}
   }
 
-  /*@3.MOTJ.15*/
-  var _siteSw = null, _siteKey = '';
-  function siteSwatch() {
-    var root = document.documentElement;
-    /*@3.MOTJ.6*/
-    if (!root.getAttribute('data-mod-theme')) return null;
-    var site = 'dark';
-    try { site = localStorage.getItem('garden_theme') || 'dark'; } catch (e) {}
-    var key = site + '|' + (root.getAttribute('data-tinted') || '');
-    if (_siteSw && _siteKey === key) return _siteSw;
-
-    /*@3.MOTJ.7*/
-    var hadSkin = root.getAttribute('data-mod-theme');
-    var hadBase = root.getAttribute('data-theme');
-    root.removeAttribute('data-mod-theme');
-    root.setAttribute('data-theme', site);
-    var cs = getComputedStyle(root);
-    _siteSw = {
-      bg: cs.getPropertyValue('--bg-card').trim() || '#1f2937',
-      bars: ['--syn-keyword', '--syn-string', '--syn-function', '--syn-type'].map(function (k) {
-        return cs.getPropertyValue(k).trim() || 'currentColor';
-      })
-    };
-    _siteKey = key;
-    root.setAttribute('data-mod-theme', hadSkin);
-    if (hadBase) root.setAttribute('data-theme', hadBase); else root.removeAttribute('data-theme');
-    return _siteSw;
-  }
-
   /*@3.MOTJ.11*/
   var FONTS = [
     { id: 'garden',   css: null,                   star: 1, ar: 'خطُّ الموقع (القاهرة)', en: 'Site font (Cairo)' },
@@ -138,21 +109,21 @@
     { id: 'geist',       css: 'Geist',                          ar: 'غايست',       en: 'Geist' }
   ];
 
-  function fontList() { return isAr() ? FONTS : FONTS_LAT; }
-  function fontKey() { return isAr() ? 'moduleFont' : 'moduleFontLat'; }
+  function fontKey(kind) { return (kind ? kind === 'ar' : isAr()) ? 'moduleFont' : 'moduleFontLat'; }
 
-  function currentFont() {
-    var v = prefs()[fontKey()];
+  function currentFont(kind) {
+    var v = prefs()[fontKey(kind)];
     return (typeof v === 'string' && v) ? v : 'garden';
   }
 
-  function chooseFont(id) {
+  function chooseFont(id, kind) {
+    kind = kind || (isAr() ? 'ar' : 'lat');
     if (!id || id === 'garden') {
-      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont(isAr() ? 'ar' : 'lat');
+      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont(kind);
       return;
     }
     var p = prefs();
-    p[fontKey()] = id;
+    p[fontKey(kind)] = id;
     try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch (e) {}
     if (window.GardenTint && GardenTint.applyFont) GardenTint.applyFont();
   }
@@ -189,157 +160,242 @@
     return n;
   }
 
-  /*@3.MOTJ.19*/
-  function paintGarden(tile) {
-    var site = siteSwatch();
-    var prev = tile.querySelector('.mt-prev');
-    var bars = tile.querySelectorAll('.mt-prev > i');
-    prev.style.background = site ? site.bg : '';
-    for (var i = 0; i < bars.length; i++) {
-      bars[i].style.background = site ? site.bars[i % site.bars.length] : '';
+  /*@3.MOTJ.29*/
+  var DESIGNS = [
+    { id: 'garden',   ar: 'Garden',    en: 'Garden',        note: ['التنسيقُ الأساسيّ', 'The core layout'] },
+    { id: 'lamp',     ar: 'المصباح',   en: 'Lamp',          note: ['ركّزْ على مفهومٍ واحدٍ فقط', 'Focus on one concept only'] },
+    { id: 'herbal',   ar: 'عشبي',      en: 'Herbal',        note: ['حديقتُك تنمو مع كلِّ مفهومٍ تقرؤه', 'Your garden grows with every concept you read'] },
+    { id: 'cornell',  ar: 'كورنيل',    en: 'Cornell',       note: ['عمودُ إشاراتٍ وملاحظات', 'Cue column + notes'] },
+    { id: 'journey',  ar: 'الرحلة',    en: 'Journey',       note: ['تقدّمٌ ووقتٌ تراه', 'Progress and time you can see'] },
+    { id: 'recall',   ar: 'الاستذكار', en: 'Recall',        note: ['سؤالٌ قبل القراءة وتذكّرٌ بعدها', 'Question first, recall after'] },
+    { id: 'words',    ar: 'بكلماتك',   en: 'In your words', note: ['اشرحه كما فهمته، ثمّ قارِنْ', 'Explain it as you understood it, then compare'] },
+    { id: 'summary',  ar: 'الخلاصة',   en: 'Summary',       note: ['كلُّ المفاهيم في ورقة', 'Every concept on one sheet'] },
+    { id: 'practice', ar: 'تمرين',     en: 'Practice',      note: ['أسئلةٌ بعد كلِّ مفهوم', 'Questions after each concept'] }
+  ];
+
+  var MINI = {
+    garden: '<i class="mm-card mm-r12 mm-sh"><b class="mm-sq"></b><u class="mm-l mm-w60"></u><u class="mm-l mm-w80"></u><u class="mm-l mm-w70"></u></i>',
+    lamp: '<i class="mm-room"><i class="mm-card mm-lit"><u class="mm-l mm-w60 mm-ink"></u><u class="mm-l mm-w80 mm-ink"></u><u class="mm-l mm-w70 mm-ink"></u></i><i class="mm-card mm-dim"><u class="mm-l mm-w70"></u></i></i>',
+    herbal: '<i class="mm-card mm-r3"><b class="mm-stamp"></b><u class="mm-l mm-w60"></u><u class="mm-l mm-w80"></u></i><i class="mm-vine"><b></b><b></b><b class="mm-bud"></b><b class="mm-ghost"></b></i>',
+    cornell: '<i class="mm-card mm-r6 mm-cornell"><i class="mm-cue"><b class="mm-num"></b><u class="mm-l mm-w80"></u></i><i class="mm-notes"><u class="mm-l mm-w80"></u><u class="mm-l mm-w90"></u><u class="mm-l mm-w70"></u></i></i>',
+    journey: '<i class="mm-card mm-r12 mm-jr"><i class="mm-jbar"><b class="mm-d"></b><b class="mm-d"></b><b class="mm-cur"></b><b></b><b></b></i><u class="mm-l mm-w60"></u><u class="mm-l mm-w80"></u><i class="mm-jnext"></i></i>',
+    recall: '<i class="mm-card mm-r12 mm-rc"><i class="mm-q"><u class="mm-l mm-w70 mm-ink"></u></i><u class="mm-l mm-w80 mm-blur"></u><u class="mm-l mm-w60 mm-blur"></u><i class="mm-rate"><b class="mm-t1"></b><b class="mm-t3"></b><b class="mm-t5"></b></i></i>',
+    words: '<i class="mm-card mm-r12 mm-ow"><u class="mm-l mm-w80"></u><u class="mm-l mm-w60"></u><i class="mm-wbox"><u class="mm-l mm-w70 mm-ink"></u><b class="mm-caret"></b></i></i>',
+    summary: '<i class="mm-shg"><i class="mm-card mm-r6"><u class="mm-l mm-w60 mm-ink"></u><u class="mm-l mm-w90"></u></i><i class="mm-card mm-r6"><u class="mm-l mm-w60 mm-ink"></u><u class="mm-l mm-w80"></u></i><i class="mm-card mm-r6"><u class="mm-l mm-w60 mm-ink"></u><u class="mm-l mm-w70"></u></i><i class="mm-card mm-r6"><u class="mm-l mm-w60 mm-ink"></u><u class="mm-l mm-w90"></u></i></i>',
+    practice: '<i class="mm-card mm-r12 mm-prm"><u class="mm-l mm-w70"></u><i class="mm-q"><u class="mm-l mm-w70 mm-ink"></u><i class="mm-g"><b class="mm-t1"></b><b class="mm-t5"></b></i></i><i class="mm-q mm-back"><u class="mm-l mm-w60"></u></i></i>'
+  };
+
+  var SITE = [
+    { id: 'dark', ar: 'داكن', en: 'Dark' },
+    { id: 'dim', ar: 'خافت', en: 'Dim' },
+    { id: 'light', ar: 'فاتح', en: 'Light' }
+  ];
+
+  function curDesign() { return (window.GardenTint && GardenTint.design) ? GardenTint.design() : 'garden'; }
+  function chooseDesign(id) {
+    if (window.GardenTint && GardenTint.setDesign) GardenTint.setDesign(id === 'garden' ? '' : id);
+  }
+  function siteTheme() {
+    try { return localStorage.getItem('garden_theme') || 'dark'; } catch (e) { return 'dark'; }
+  }
+  function chooseSite(t) {
+    if (window.GardenTint && GardenTint.clearTheme) GardenTint.clearTheme();
+    if (window.Garden && Garden.applyTheme) Garden.applyTheme(t);
+    else {
+      try { localStorage.setItem('garden_theme', t); } catch (e) {}
+      document.documentElement.setAttribute('data-theme', t);
     }
+    try {
+      document.dispatchEvent(new CustomEvent('garden:moduleThemeChanged', { detail: { theme: 'garden' } }));
+    } catch (e) {}
   }
 
-  /*@3.MOTJ.20*/
-  function moreBtn(host, hidden) {
-    if (!hidden.length) return null;
-    var n = hidden.filter(function (x) { return x.tagName === 'BUTTON'; }).length || hidden.length;
-    var b = el('button', 'mt-more');
-    b.type = 'button';
-    b.setAttribute('aria-expanded', 'false');
-    var lab = el('span', null, L('المزيد (' + n + ')', 'More (' + n + ')'));
-    b.appendChild(lab);
-    b.appendChild(el('i', 'fa-solid fa-chevron-down'));
-    b.addEventListener('click', function () {
-      var on = b.getAttribute('aria-expanded') === 'true';
-      b.setAttribute('aria-expanded', on ? 'false' : 'true');
-      hidden.forEach(function (x) { x.hidden = on; });
-      lab.textContent = on ? L('المزيد (' + n + ')', 'More (' + n + ')') : L('أقلّ', 'Less');
+  /*@3.MOTJ.15*/
+  var _siteCols = {};
+  function siteCols(t) {
+    var root = document.documentElement;
+    /*@3.MOTJ.6*/
+    var key = t + '|' + (root.getAttribute('data-tinted') || '');
+    if (_siteCols[key]) return _siteCols[key];
+    /*@3.MOTJ.7*/
+    var hadSkin = root.getAttribute('data-mod-theme'), hadBase = root.getAttribute('data-theme');
+    root.removeAttribute('data-mod-theme');
+    root.setAttribute('data-theme', t);
+    var cs = getComputedStyle(root), g = function (k) { return cs.getPropertyValue(k).trim(); };
+    var c = {
+      bg: g('--bg-body'), panel: g('--bg-card'), fg: g('--text-primary'),
+      bars: ['--syn-keyword', '--syn-string', '--syn-function', '--syn-type'].map(g)
+    };
+    if (hadSkin) root.setAttribute('data-mod-theme', hadSkin);
+    if (hadBase) root.setAttribute('data-theme', hadBase); else root.removeAttribute('data-theme');
+    return (_siteCols[key] = c);
+  }
+
+  function designSection() {
+    var sec = el('section', 'mt-sec mt-sec--design');
+    var h = el('h3', 'gsf-card-h');
+    h.appendChild(el('i', 'fa-solid fa-table-columns'));
+    h.appendChild(el('span', null, L('التصميم', 'Design')));
+    var sub = el('small', 'mt-hnote');
+    h.appendChild(sub);
+    sec.appendChild(h);
+    var grid = el('div', 'mt-dgrid');
+    sec.appendChild(grid);
+    var tiles = [];
+    DESIGNS.forEach(function (d) {
+      var b = el('button', 'mt-dtile');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitemradio');
+      var pv = el('span', 'mt-pv');
+      pv.setAttribute('aria-hidden', 'true');
+      pv.innerHTML = MINI[d.id];
+      b.appendChild(pv);
+      b.appendChild(el('b', 'mt-dname', L(d.ar, d.en)));
+      b.appendChild(el('span', 'mt-dnote', L(d.note[0], d.note[1])));
+      b.addEventListener('click', function () { chooseDesign(d.id); mark(); });
+      b.__id = d.id;
+      tiles.push(b);
+      grid.appendChild(b);
     });
-    host.appendChild(b);
-    return b;
+    function mark() {
+      var cur = curDesign(), on = null;
+      tiles.forEach(function (b) {
+        var is = b.__id === cur;
+        b.classList.toggle('is-on', is);
+        b.setAttribute('aria-checked', is ? 'true' : 'false');
+        if (is) on = b;
+      });
+      var d = DESIGNS.filter(function (x) { return x.id === cur; })[0] || DESIGNS[0];
+      sub.textContent = '· ' + L(d.note[0], d.note[1]);
+    }
+    mark();
+    sec.__mark = mark;
+    return sec;
   }
 
-  /*@3.MOTJ.21*/
   function themeSection() {
     var sec = el('section', 'mt-sec');
     var h = el('h3', 'gsf-card-h');
     h.appendChild(el('i', 'fa-solid fa-swatchbook'));
-    h.appendChild(el('span', null, L('الثيم', 'Theme')));
+    h.appendChild(el('span', null, L('الألوان', 'Colours')));
     sec.appendChild(h);
 
     var grid = el('div', 'mt-grid');
     sec.appendChild(grid);
+    var tiles = [];
 
-    var tiles = [], hidden = [], group = null, gardenTile = null;
-
-    function tile(th) {
-      var b = el('button', 'mt-tile' + (th.id === 'garden' ? '' : ' mt-pal-' + th.id));
+    function prev() {
+      var p = el('span', 'mt-prev');
+      p.setAttribute('aria-hidden', 'true');
+      for (var i = 0; i < 4; i++) p.appendChild(document.createElement('i'));
+      return p;
+    }
+    function tile(cls, name, onPick, id) {
+      var b = el('button', 'mt-tile' + (cls ? ' ' + cls : ''));
       b.type = 'button';
       b.setAttribute('role', 'menuitemradio');
-      var prev = el('span', 'mt-prev');
-      prev.setAttribute('aria-hidden', 'true');
-      for (var i = 0; i < 4; i++) prev.appendChild(document.createElement('i'));
-      b.appendChild(prev);
+      b.appendChild(prev());
       var nm = el('span', 'mt-tname');
-      nm.appendChild(el('span', null, isAr() ? th.ar : th.en));
+      nm.appendChild(el('span', null, name));
       b.appendChild(nm);
-      b.addEventListener('click', function () {
-        choose(th.id);
-        mark();
-        if (gardenTile) paintGarden(gardenTile);
-      });
-      b.__id = th.id;
+      b.addEventListener('click', function () { onPick(); mark(); });
+      b.__id = id;
       tiles.push(b);
+      grid.appendChild(b);
       return b;
     }
 
-    THEMES.forEach(function (th) {
-      if (!th.star) return;
-      var b = tile(th);
-      grid.appendChild(b);
-      if (th.id === 'garden') gardenTile = b;
+    grid.appendChild(el('div', 'mt-fam', L('ألوانُ الموقع', 'Site colours')));
+    SITE.forEach(function (s) {
+      var b = tile('', L(s.ar, s.en), function () { chooseSite(s.id); }, 'site:' + s.id);
+      var c = siteCols(s.id), p = b.querySelector('.mt-prev'), bars = p.children;
+      p.style.background = c.panel;
+      for (var i = 0; i < bars.length; i++) bars[i].style.background = c.bars[i] || 'currentColor';
     });
 
+    var group = null;
     THEMES.forEach(function (th) {
-      if (th.star) return;
+      if (!th.base) return;
       /*@3.MOTJ.8*/
       if (th.base !== group) {
         group = th.base;
-        var lab = el('div', 'mt-fam mt-hid', L(FAMILY[group].ar, FAMILY[group].en));
-        lab.hidden = true;
-        grid.appendChild(lab);
-        hidden.push(lab);
+        grid.appendChild(el('div', 'mt-fam', L(FAMILY[group].ar, FAMILY[group].en)));
       }
-      var b = tile(th);
-      b.classList.add('mt-hid');
-      b.hidden = true;
-      grid.appendChild(b);
-      hidden.push(b);
+      tile('mt-pal-' + th.id, isAr() ? th.ar : th.en, function () { choose(th.id); }, th.id);
     });
 
-    moreBtn(sec, hidden);
-
     function mark() {
-      var cur = current();
+      var cur = current(), st = siteTheme();
       tiles.forEach(function (b) {
-        var on = b.__id === cur;
+        var on = cur === 'garden' ? b.__id === 'site:' + st : b.__id === cur;
         b.classList.toggle('is-on', on);
         b.setAttribute('aria-checked', on ? 'true' : 'false');
       });
     }
     mark();
-    if (gardenTile) paintGarden(gardenTile);
-    sec.__mark = function () { mark(); if (gardenTile) paintGarden(gardenTile); };
+    sec.__mark = mark;
     return sec;
   }
 
-  /*@3.MOTJ.22*/
+  /*@3.MOTJ.30*/
+  var _fontKind = null;
   function fontSection() {
     /*@3.MOTJ.13*/
     if (window.GardenTint && GardenTint.fontSheet) GardenTint.fontSheet();
+    if (!_fontKind) _fontKind = isAr() ? 'ar' : 'lat';
     var sec = el('section', 'mt-sec');
     var h = el('h3', 'gsf-card-h');
     h.appendChild(el('i', 'fa-solid fa-font'));
     h.appendChild(el('span', null, L('خطُّ القراءة', 'Reading font')));
+    var seg = el('span', 'mt-seg');
+    seg.setAttribute('role', 'group');
+    [['ar', 'عربي', 'Arabic'], ['lat', 'لاتيني', 'Latin']].forEach(function (k) {
+      var b = el('button', null, L(k[1], k[2]));
+      b.type = 'button';
+      b.__k = k[0];
+      b.addEventListener('click', function () { _fontKind = k[0]; paint(); });
+      seg.appendChild(b);
+    });
+    h.appendChild(seg);
     sec.appendChild(h);
 
-    var list = el('div', 'mt-flist');
-    sec.appendChild(list);
+    var grid = el('div', 'mt-fgrid');
+    sec.appendChild(grid);
+    var rows = [];
 
-    var rows = [], hidden = [];
-
-    fontList().forEach(function (fo) {
-      var b = el('button', 'mt-fopt');
-      b.type = 'button';
-      b.setAttribute('role', 'menuitemradio');
-      var name = el('span', 'mt-name', isAr() ? fo.ar : fo.en);
-      /*@3.MOTJ.14*/
-      if (fo.css) name.style.fontFamily = '"' + fo.css + '", sans-serif';
-      b.appendChild(name);
-      var samp = el('span', 'mt-fsamp');
-      /*@3.MOTJ.17*/
-      samp.textContent = isAr() ? 'خوارزميّة' : 'Algorithm';
-      if (fo.css) samp.style.fontFamily = '"' + fo.css + '", sans-serif';
-      b.appendChild(samp);
-      b.addEventListener('click', function () { chooseFont(fo.id); mark(); });
-      b.__id = fo.id;
-      rows.push(b);
-      if (!fo.star) { b.classList.add('mt-hid'); b.hidden = true; hidden.push(b); }
-      list.appendChild(b);
-    });
-
-    moreBtn(sec, hidden);
-
+    function paint() {
+      Array.prototype.forEach.call(seg.children, function (b) {
+        b.setAttribute('aria-pressed', b.__k === _fontKind ? 'true' : 'false');
+      });
+      grid.textContent = '';
+      rows = [];
+      var ar = _fontKind === 'ar';
+      (ar ? FONTS : FONTS_LAT).forEach(function (fo) {
+        var b = el('button', 'mt-ftile');
+        b.type = 'button';
+        b.setAttribute('role', 'menuitemradio');
+        /*@3.MOTJ.14*/
+        /*@3.MOTJ.17*/
+        var gl = el('span', 'mt-glyph', ar ? 'أبجد' : 'Aa');
+        gl.style.fontFamily = fo.css ? '"' + fo.css + '", sans-serif' : (ar ? '"Cairo", sans-serif' : '"Inter", sans-serif');
+        b.appendChild(gl);
+        b.appendChild(el('small', 'mt-fname', fo.id === 'garden' ? L('خطُّ الموقع', 'Site font') : (isAr() ? fo.ar : fo.en)));
+        b.addEventListener('click', function () { chooseFont(fo.id, _fontKind); mark(); });
+        b.__id = fo.id;
+        rows.push(b);
+        grid.appendChild(b);
+      });
+      mark();
+    }
     function mark() {
-      var cur = currentFont();
+      var cur = currentFont(_fontKind);
       rows.forEach(function (b) {
         var on = b.__id === cur;
         b.classList.toggle('is-on', on);
         b.setAttribute('aria-checked', on ? 'true' : 'false');
       });
     }
-    mark();
+    paint();
     sec.__mark = mark;
     return sec;
   }
@@ -351,8 +407,8 @@
     surfaceSheet();
 
     var d = document.createElement('dialog');
-    d.className = 'gsf mt-dlg';
-    d.setAttribute('aria-label', L('مظهرٌ مخصّص', 'Custom appearance'));
+    d.className = 'gsf gsf--flat mt-dlg';
+    d.setAttribute('aria-label', L('المظهر', 'Appearance'));
 
     d.appendChild(el('div', 'gsf-grip'));
     var x = el('form', 'gsf-x');
@@ -365,15 +421,16 @@
     d.appendChild(x);
 
     var head = el('div', 'gsf-head');
-    head.appendChild(el('h2', 'gsf-title', L('مظهرٌ مخصّص', 'Custom appearance')));
+    head.appendChild(el('h2', 'gsf-title', L('المظهر', 'Appearance')));
     head.appendChild(el('p', 'gsf-sub',
-      L('اختر ثيماً وخطَّ قراءةٍ لصفحات المادة — يُطبَّق فوراً ويبقى محفوظاً على هذا الجهاز.',
-        'Pick a theme and a reading font for course pages — applied at once, kept on this device.')));
+      L('يُطبَّق فوراً — الصفحةُ خلفك هي المعاينة، ويُحفظ لكلِّ المواد.',
+        'Applies at once — the page behind is the preview, kept for every course.')));
     d.appendChild(head);
 
     /*@3.MOTJ.12*/
     var body = el('div', 'gsf-body mt-body');
-    var st = themeSection(), sf = fontSection();
+    var sd = designSection(), st = themeSection(), sf = fontSection();
+    body.appendChild(sd);
     body.appendChild(st);
     body.appendChild(sf);
     d.appendChild(body);
@@ -386,8 +443,11 @@
     reset.appendChild(el('i', 'fa-solid fa-rotate-left'));
     reset.appendChild(el('span', null, L('أعِدْ مظهرَ الموقع', 'Back to site look')));
     reset.addEventListener('click', function () {
+      chooseDesign('garden');
       choose('garden');
-      chooseFont('garden');
+      chooseFont('garden', 'ar');
+      chooseFont('garden', 'lat');
+      sd.__mark();
       st.__mark();
       sf.__mark();
     });
@@ -399,10 +459,13 @@
     _dlg = d;
     d.addEventListener('close', close);
     try { d.showModal(); } catch (e) { d.setAttribute('open', ''); }
+    var on = body.querySelector('.mt-dtile.is-on');
+    if (on && on.focus) try { on.focus({ preventScroll: true }); } catch (e) {}
   }
 
   window.GardenModuleTheme = {
     open: open, close: close, current: current, choose: choose, THEMES: THEMES,
-    currentFont: currentFont, chooseFont: chooseFont, FONTS: FONTS, FONTS_LAT: FONTS_LAT
+    currentFont: currentFont, chooseFont: chooseFont, FONTS: FONTS, FONTS_LAT: FONTS_LAT,
+    DESIGNS: DESIGNS, design: curDesign, chooseDesign: chooseDesign
   };
 })();

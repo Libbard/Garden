@@ -5,7 +5,7 @@
   var PROF = 'student_profile', ARCH = 'semester_archive',
       SEM = 'my_semester', PLANK = 'gpa_plan', DRAFT = 'gpa_setup_draft';
   /*@3.GPSJ.2*/
-  var PL_KEY = 'sx_plans', PL_VER = 6, PL_TTL = 30 * 24 * 3600 * 1000;
+  var PL_KEY = 'sx_plans', PL_VER = 7, PL_TTL = 30 * 24 * 3600 * 1000;
   var GPA_SCALE = { 'A+': 4, 'A': 3.75, 'B+': 3.5, 'B': 3, 'C+': 2.5, 'C': 2, 'D+': 1.5, 'D': 1, 'F': 0 };
   var GRADES = ['', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'TR'];
   var PREP_RE = /^[A-Za-z]+0/;
@@ -500,8 +500,8 @@
   ];
   function bodyWelcome() {
     return '<p class="gs-lead">' + esc(L(
-      'الحديقةُ الرقمية منصّةٌ يبنيها طالبٌ لطلاب الجامعة السعودية الإلكترونية. هذه جولةٌ في دقيقة، ثم نُعِدّ ملفَّك.',
-      'The Digital Garden is a platform built by a student for SEU students. A one-minute tour, then we set up your profile.')) + '</p>' +
+      'الحديقةُ الرقمية منصّةٌ يبنيها طالبٌ لطلاب جامعة الأمير مساعد بن عبدالرحمن. هذه جولةٌ في دقيقة، ثم نُعِدّ ملفَّك.',
+      'The Digital Garden is a platform built by a student for PMAU students. A one-minute tour, then we set up your profile.')) + '</p>' +
       '<div class="gs-feats">' + FEATURES.map(function (f) {
         /*@3.GPSJ.41*/
         var tag = f.soon ? '<em class="gs-soon">' + esc(L('قريباً', 'soon')) + '</em>'

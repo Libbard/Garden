@@ -24,11 +24,18 @@
     this.stage = o.stage || o.scroller;
     this.sheet = o.sheet;
     this.onChange = o.onChange || function () {};
+    this.onLoad = o.onLoad || null;
+    this.onAdd = o.onAdd || null;
     this.data = o.data || null;
     this.favHost = o.favHost || null;
+    this.surface = o.surface || '';
     this.onBand = o.onBand || function () {};
     this.onTap = o.onTap || function () {};
+    /*@3.NOOJ.31*/
+    this.onTextAt = o.onTextAt || null;
     this.onPinch = o.onPinch || null;
+    this.onShapeBox = o.onShapeBox || null;
+    this.unview = o.unview || null;
     /*@3.NOOJ.14*/
     this.bound = o.bound !== false;
     this.hist = o.hist || null;
@@ -50,7 +57,8 @@
       this.dial = GardenNotesDial.mount({
         canvas: function () { return self.cv; },
         onExit: function () { self.toggle(false); },
-        favHost: this.favHost || null
+        favHost: this.favHost || null,
+        surface: this.surface || ''
       });
     }
   };
@@ -132,6 +140,24 @@
     }
   }
 
+  /*@3.NOOJ.36*/
+  function textRects(rg) {
+    var out = [], root = rg.commonAncestorContainer, n, sub = document.createRange(), rs, k, a, b;
+    if (root.nodeType === 3) root = root.parentNode;
+    if (!root) return out;
+    var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while ((n = tw.nextNode())) {
+      if (!n.nodeValue || !rg.intersectsNode(n)) continue;
+      if (n.parentNode && n.parentNode.closest && n.parentNode.closest('[data-brk],[data-pgc]')) continue;
+      a = (n === rg.startContainer) ? rg.startOffset : 0;
+      b = (n === rg.endContainer) ? rg.endOffset : n.nodeValue.length;
+      if (b <= a) continue;
+      try { sub.setStart(n, a); sub.setEnd(n, b); rs = sub.getClientRects(); } catch (e) { continue; }
+      for (k = 0; k < rs.length; k++) out.push(rs[k]);
+    }
+    return out;
+  }
+
   /*@3.NOOJ.29*/
   function caretAt(x, y) {
     if (document.caretRangeFromPoint) return document.caretRangeFromPoint(x, y);
@@ -180,9 +206,9 @@
       try {
         var rg = document.createRange();
         rg.selectNodeContents(hosts[i]);
-        rects = rg.getClientRects();
+        rects = textRects(rg);
       } catch (e) { rects = null; }
-      if (!rects || !rects.length) rects = [hr];
+      if (!rects || !rects.length) continue;
       mergeLines(rects, lines);
     }
     if (!lines.length) return null;
@@ -218,6 +244,65 @@
              sx0: Math.min(q0.x, q1.x), sx1: Math.max(q0.x, q1.x) };
   };
 
+  /*@3.NOOJ.34*/
+  Overlay.prototype.linesUnder = function (pa, pb) {
+    if (!this.cv || !this.sheet || !pa || !pb) return null;
+    var a = this.worldToClient(pa), b = this.worldToClient(pb);
+    var was = this.host.style.pointerEvents, wasS = this.sheet.style.pointerEvents;
+    this.host.style.pointerEvents = 'none';
+    this.sheet.style.pointerEvents = 'auto';
+    var ra = null, rb = null;
+    var inSheet = function (rg) { var n = rg && rg.startContainer; return !!(n && this.sheet.contains(n.nodeType === 3 ? n.parentNode : n) && (n.nodeType === 3 ? n.parentNode : n).closest && (n.nodeType === 3 ? n.parentNode : n).closest(LINE_SEL)); }.bind(this);
+    try {
+      ra = caretAt(a.x, a.y); rb = caretAt(b.x, b.y);
+      if (!inSheet(ra)) ra = this.caretNear(a.x, a.y);
+      if (!inSheet(rb)) rb = this.caretNear(b.x, b.y);
+    } catch (e) { ra = rb = null; }
+    this.host.style.pointerEvents = was || '';
+    this.sheet.style.pointerEvents = wasS || '';
+    if (!ra || !rb) return null;
+    if (!inSheet(ra) || !inSheet(rb)) return null;
+    var rg = document.createRange();
+    try {
+      rg.setStart(ra.startContainer, ra.startOffset);
+      rg.setEnd(rb.startContainer, rb.startOffset);
+      if (rg.collapsed) { rg.setStart(rb.startContainer, rb.startOffset); rg.setEnd(ra.startContainer, ra.startOffset); }
+    } catch (e2) { return null; }
+    if (rg.collapsed) return null;
+    var rects = textRects(rg), lines = [], i;
+    if (!rects || !rects.length) return null;
+    mergeLines(rects, lines);
+    lines.sort(function (x, y) { return x.top - y.top; });
+    var out = [];
+    for (i = 0; i < lines.length; i++) {
+      var L0 = lines[i];
+      if (!(L0.h > 3) || !(L0.right - L0.left > 2)) continue;
+      var p0 = this.clientToWorld(L0.left, L0.top), p1 = this.clientToWorld(L0.right, L0.bot);
+      out.push({ x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x), y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y) });
+    }
+    return out.length ? out : null;
+  };
+
+  /*@3.NOOJ.35*/
+  Overlay.prototype.caretNear = function (x, y) {
+    var sr = this.sheet.getBoundingClientRect();
+    if (y < sr.top - 40 || y > sr.bottom + 40) return null;
+    var cx = Math.min(Math.max(x, sr.left + 8), sr.right - 8);
+    var els = document.elementsFromPoint ? document.elementsFromPoint(cx, y) : [], blk = null, i;
+    for (i = 0; i < els.length; i++) { if (els[i].matches && els[i].matches('[data-bid]') && this.sheet.contains(els[i])) { blk = els[i]; break; } }
+    var cands = (blk || this.sheet).querySelectorAll(LINE_SEL), best = null, bd = Infinity;
+    for (i = 0; i < cands.length; i++) {
+      var r = cands[i].getBoundingClientRect();
+      if (!(r.height > 0) || !(r.width > 0)) continue;
+      var dy = y < r.top ? r.top - y : (y > r.bottom ? y - r.bottom : 0);
+      if (dy < bd) { bd = dy; best = r; }
+    }
+    if (!best || bd > 240) return null;
+    var yy = Math.min(Math.max(y, best.top + 1), best.bottom - 1);
+    var xx = Math.min(Math.max(x, best.left + 1), best.right - 1);
+    return caretAt(xx, yy);
+  };
+
   Overlay.prototype.worldToClient = function (p) {
     var r = this.cv.wet.getBoundingClientRect();
     var z = zoomOf(this.stage);
@@ -249,8 +334,11 @@
     this.cv = GardenCanvas.mount(this.host, {
       height: 400,
       onWin: function () { self.syncWindow(); },
+      onAdd: function (el) { if (self.onAdd) self.onAdd(el); },
+      unview: function (el) { return self.unview ? self.unview(el) : 0; },
       hist: this.hist,
       snapText: function (bx) { return self.lineUnder(bx); },
+      snapLines: function (st) { var pts = st && st.pts; return (pts && pts.length > 1) ? self.linesUnder(pts[0], pts[pts.length - 1]) : null; },
       /*@3.NOOJ.8*/
       bound: this.bound,
       onScroll: function (dx, dy) {
@@ -260,6 +348,7 @@
       onPinch: function (phase, f, cx, cy) {
         if (self.onPinch) self.onPinch(phase, f, cx, cy);
       },
+      onShapeBox: function (x, y, w, h, stage) { return self.onShapeBox ? self.onShapeBox(x, y, w, h, stage) : false; },
       onChange: function (d, quiet) {
         var out = {};
         for (var k in d) if (Object.prototype.hasOwnProperty.call(d, k)) out[k] = d[k];
@@ -269,7 +358,9 @@
       },
       onState: function () { self.sync(); },
       onBand: function (r) { self.onBand(r); },
-      onTap: function (p) { self.onTap(p); }
+      onTap: function (p) { self.onTap(p); },
+      /*@3.NOOJ.32*/
+      onTextAt: self.onTextAt ? function (p) { self.onTextAt(p); } : null
     });
     this.cv.setTool(GardenCanvas.lastTool ? GardenCanvas.lastTool() : 'pen');
     if (this.hist) this.hist.register('ink', {
@@ -325,19 +416,16 @@
       this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
       var self2 = this;
       var done = this.cv.load(this.data.ink, null, this.data.shapes);
-      if (done && done.then) done.then(function () { self2.migrateRef(was); });
-      else this.migrateRef(was);
+      if (done && done.then) done.then(function () { self2.migrateRef(was); if (self2.onLoad) self2.onLoad(); });
+      else { this.migrateRef(was); if (this.onLoad) this.onLoad(); }
     }
     return this.cv;
   };
 
   /*@3.NOOJ.25*/
-  Overlay.prototype.shiftY = function (regs) {
-    if (!this.cv || !this.cv.shiftY) return 0;
-    return this.cv.shiftY(regs);
-  };
+/*@3.NOOJ.33*/
+/*@3.NOOJ.19*/
 
-  /*@3.NOOJ.19*/
   Overlay.prototype.migrateRef = function (was) {
     if (!this.bound || !this.cv) return 0;
     var now = A4W;
@@ -408,8 +496,8 @@
     if (this.cv && this.data) {
       var self3 = this;
       var p = this.cv.load(this.data.ink, null, this.data.shapes);
-      if (p && p.then) p.then(function () { self3.migrateRef(was); });
-      else this.migrateRef(was);
+      if (p && p.then) p.then(function () { self3.migrateRef(was); if (self3.onLoad) self3.onLoad(); });
+      else { this.migrateRef(was); if (this.onLoad) this.onLoad(); }
     }
   };
 

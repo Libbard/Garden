@@ -149,7 +149,10 @@
 
   /*@3.SWRJ.5*/
   var reloading = false;
+  /*@3.SWRJ.12*/
+  var hadCtl = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (!hadCtl) { hadCtl = true; return; }
     if (reloading) return;
     reloading = true;
     window.location.reload();

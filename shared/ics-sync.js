@@ -465,7 +465,9 @@
 
   /*@3.ICSJ.45*/
   function snapOf(rec) {
-    return [rec.date || '', rec.time || rec.start_time || '', rec.title || ''].join('|');
+    /*@3.ICSJ.110*/
+    var due = String(rec.due || '');
+    return [rec.date || due.slice(0, 10), rec.time || rec.start_time || due.slice(11, 16), rec.title || ''].join('|');
   }
 
   function myCourses() {
@@ -743,8 +745,57 @@
     try {
       localStorage.setItem('weekly_schedule', JSON.stringify(s));
       localStorage.setItem('__syncT_weekly_schedule', String(Date.now()));
+      wrote = true;
       return true;
     } catch (e) { return false; }
+  }
+
+  /*@3.ICSJ.111*/
+  var wrote = false;
+  function announceWrites() {
+    if (!wrote) return false;
+    wrote = false;
+    try {
+      if (window.GardenScheduleRules && GardenScheduleRules.announce) GardenScheduleRules.announce('ics');
+      else window.dispatchEvent(new CustomEvent('garden:scheduleChanged', { detail: { from: 'ics' } }));
+    } catch (e) {}
+    return true;
+  }
+
+  /*@3.ICSJ.112*/
+  var TASK_TYPE = { quiz: 'quiz', exam: 'exam', midterm: 'midterm', final: 'final',
+                    assignment: 'assignment', project: 'project', discussion: 'discussion' };
+
+  function findTask(id) {
+    var list = (window.GardenData && GardenData.tasks) ? (GardenData.tasks() || []) : [];
+    for (var i = 0; i < list.length; i++) if (list[i] && list[i].id === id) return list[i];
+    return null;
+  }
+
+  function applyPending(ev) {
+    var s = load();
+    if (!window.GardenData || !GardenData.upsertTask) return 'blocked';
+    var link = s.links[ev.uid] || null;
+    if (link && link.store !== 'task') return false;
+    var id = link ? link.id : ('ics_p_' + hash(ev.uid));
+    var cur = findTask(id);
+    if (cur && link && link.snap && link.snap !== snapOf(cur)) return 'touched';
+    var when = ev.dtstart;
+    var rec = GardenData.upsertTask({
+      id: id, title: ev.raw, course: null, type: TASK_TYPE[ev.kind] || 'other',
+      due: when.date + (when.time ? 'T' + when.time : ''),
+      done: !!(cur && cur.done), note: (cur && cur.note) || '',
+      origin: { type: 'ics', uid: ev.uid, pending: true }
+    });
+    wrote = true;
+    s.links[ev.uid] = { store: 'task', id: id, code: '', snap: snapOf(rec) };
+    return true;
+  }
+
+  function dropPending(uid) {
+    var s = load();
+    var link = s.links[uid];
+    if (link && link.store === 'task') removeLink(uid);
   }
 
   var EXAMISH = { quiz: 1, exam: 1, midterm: 1, final: 1 };
@@ -756,6 +807,16 @@
     var isExam = !!EXAMISH[ev.kind];
     var title = ev.raw;
     var when = ev.dtstart;
+
+    /*@3.ICSJ.113*/
+    var carryDone = false;
+    if (link && link.store === 'task') {
+      var pt = findTask(link.id);
+      carryDone = !!(pt && pt.done);
+      if (window.GardenData && GardenData.deleteTask) GardenData.deleteTask(link.id);
+      delete s.links[ev.uid];
+      link = null;
+    }
 
     /*@3.ICSJ.47*/
     if (link && link.store === 'exam' && !isExam) {
@@ -788,9 +849,10 @@
         start_time: deadline ? '' : (when.time || ''),
         end_time: deadline ? '' : ((ev.dtend && ev.dtend.time) || ''),
         exam_type: (ev.kind === 'quiz' || ev.kind === 'midterm' || ev.kind === 'final') ? ev.kind : 'exam',
-        room: '',
+        room: (i > -1 && sch.exams[i].room) || '',
         notes: title,
         all_day: deadline,        /*@3.ICSJ.49*/
+        completed_at: (i > -1 && sch.exams[i].completed_at) || (carryDone ? new Date().toISOString() : null),
         ics_uid: ev.uid
       };
       if (i > -1) sch.exams[i] = rec; else sch.exams.push(rec);
@@ -815,7 +877,7 @@
       date: when.date,
       time: when.time || '',
       type: (ev.kind === 'assignment' || ev.kind === 'project' || ev.kind === 'discussion') ? ev.kind : 'assignment',
-      done: (j > -1 && meta.dates[j].done) || false,   /*@3.ICSJ.51*/
+      done: (j > -1 && meta.dates[j].done) || carryDone,   /*@3.ICSJ.51*/
       note: ''
     };
     if (j > -1) meta.dates[j] = d; else meta.dates.push(d);
@@ -847,6 +909,8 @@
       var n = meta.dates.length;
       meta.dates = meta.dates.filter(function (d) { return !d || d.id !== link.id; });
       if (meta.dates.length !== n) GardenData.saveCourseMeta(link.code, meta);
+    } else if (link.store === 'task') {
+      if (window.GardenData && GardenData.deleteTask) { GardenData.deleteTask(link.id); wrote = true; }
     }
     delete s.links[uid];
     return true;
@@ -901,20 +965,24 @@
       events.forEach(function (ev) {
         seen[ev.uid] = 1;
         /*@3.ICSJ.92*/
-        if (s.skip[ev.uid] || bandSkipped(s, ev)) { rep.ignored++; return; }
+        /*@3.ICSJ.114*/
+        if (s.skip[ev.uid] || bandSkipped(s, ev)) { rep.ignored++; dropPending(ev.uid); return; }
 
         var r2 = resolve(ev, codes);
-        if (r2.why === 'stale') { rep.ignored++; rep.stale++; return; }
+        if (r2.why === 'stale') { rep.ignored++; rep.stale++; dropPending(ev.uid); return; }
         if (!r2.sure || !r2.code) {
           rep.pending++;
-          if (r2.why === 'foreign') rep.foreign++;
+          var shown = false;
+          if (r2.why === 'foreign') { rep.foreign++; dropPending(ev.uid); }
+          else { shown = applyPending(ev); if (shown === 'touched') rep.touched++; }
           inbox.push({
             uid: ev.uid, raw: ev.raw, kind: ev.kind, no: ev.no,
             date: ev.dtstart.date, time: ev.dtstart.time,
             /*@3.ICSJ.84*/
             code: ev.code || '',
             foreign: r2.why === 'foreign' ? r2.foreign : '',
-            guess: r2.code || '', score: Math.round((r2.score || 0) * 100), why: r2.why
+            guess: r2.code || '', score: Math.round((r2.score || 0) * 100), why: r2.why,
+            shown: shown === true || shown === 'touched'
           });
           return;
         }
@@ -931,7 +999,8 @@
       var pend = inbox.filter(function (it) { return !it.foreign && it.why !== 'stale'; });
       if (pend.length && codes.length) {
         var linked = {};
-        Object.keys(s.links).forEach(function (u) { var L = s.links[u]; if (L && L.code) linked[L.code] = 1; });
+        /*@3.ICSJ.115*/
+        Object.keys(s.links).forEach(function (u) { var L = s.links[u]; if (L && L.code && seen[u]) linked[L.code] = 1; });
         var missing = codes.filter(function (c) { return !linked[c]; });
         var sigs = {}, allCl = true;
         pend.forEach(function (it) {
@@ -961,6 +1030,7 @@
       s.last_ok = Date.now();
       s.last_err = '';
       save();
+      announceWrites();
       emit('ics:sync', rep);
       return rep;
     }
@@ -1003,6 +1073,7 @@
     if (alsoWipe) Object.keys(s.links).forEach(removeLink);
     s.url = ''; s.on_server = false; s.stamp = ''; s.inbox = []; s.last_ok = 0; s.last_err = '';
     save();
+    announceWrites();
     var base = api();
     if (!base || !url) return Promise.resolve(true);
     return unregister().then(function () { return true; }, function () { return true; });
@@ -1129,6 +1200,7 @@
     _resolve: resolve,
     /*@3.ICSJ.66*/
     _applyOne: applyOne,
+    _applyPending: applyPending,
     _load: load,
     _snap: snapOf
   };

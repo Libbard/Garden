@@ -84,7 +84,12 @@
       rq.onupgradeneeded = function () {
         try { rq.result.createObjectStore(BIN); } catch (e2) {}
       };
-      rq.onsuccess = function () { ok(rq.result); };
+      rq.onsuccess = function () {
+        var db = rq.result;
+        /*@3.NOPJ4.8*/
+        db.onversionchange = function () { try { db.close(); } catch (eC) {} _db = null; };
+        ok(db);
+      };
       rq.onerror = function () { no(rq.error || new Error('idb-open')); };
       rq.onblocked = function () { no(new Error('idb-blocked')); };
     });

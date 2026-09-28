@@ -22,7 +22,7 @@
   var whatIf = {}, pickerQ = '', scenario = '', editingId = null;
   var _chartDrawn = false, programCredits = 132;
   /*@3.GPAJ.109*/
-  var PL_VER = 6;
+  var PL_VER = 7;
 
   /*@3.GPAJ.105*/
   function progCredits() {
@@ -827,8 +827,8 @@
         extra: disq ? L(' — رسوبٌ في ' + codes, ' — failed: ' + codes) : '' },
       { ok: '?', ar: 'أن تنهي متطلبات التخرّج خلال متوسط المدّة بين الحدّ الأدنى والأقصى للبقاء في الكلية',
         en: 'Finish within the average of the minimum and maximum residence period', extra: '' },
-      { ok: '?', ar: 'أن تدرس في الجامعة السعودية الإلكترونية ما لا يقلّ عن ٦٠٪ من متطلبات التخرّج',
-        en: 'Study at least 60% of graduation requirements at SEU', extra: '' }
+      { ok: '?', ar: 'أن تدرس في جامعة الأمير مساعد بن عبدالرحمن ما لا يقلّ عن ٦٠٪ من متطلبات التخرّج',
+        en: 'Study at least 60% of graduation requirements at PMAU', extra: '' }
     ].map(function (c) {
       var ic = c.ok === '1' ? 'fa-circle-check' : c.ok === '0' ? 'fa-circle-xmark' : 'fa-circle-question';
       return '<li data-ok="' + c.ok + '"><i class="fa-solid ' + ic + '"></i><span>' +
@@ -1644,7 +1644,7 @@
     box.innerHTML =
       '<div class="gp-xc-top">' +
         '<div><div class="gp-xc-title">' + esc(L('المعدل الدراسي', 'Grade Point Average')) + '</div>' +
-        '<div class="gp-xc-sub">' + esc(L('الجامعة السعودية الإلكترونية', 'Saudi Electronic University')) + '</div></div>' +
+        '<div class="gp-xc-sub">' + esc(L('جامعة الأمير مساعد بن عبدالرحمن', 'Prince Musaid bin Abdulrahman University')) + '</div></div>' +
       '</div>' +
       '<div class="gp-xc-hero">' +
         '<div class="gp-xc-now">' + ringSVG(126, cum) +

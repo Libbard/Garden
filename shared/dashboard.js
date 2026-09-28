@@ -395,6 +395,7 @@
       return code + ' · ' + what;
     }
     var t = e.label || tx('حدث', 'Event');
+    if (!code && e.pending_course) return tx(PENDING_COURSE[0], PENDING_COURSE[1]) + ' · ' + t;
     return code ? (code + ' · ' + t) : t;
   }
   /*@3.DASJ.146*/
@@ -931,8 +932,11 @@
   var SRC_LABEL = {
     task:   ['مهامي', 'My tasks'],
     course: ['بطاقة المادة', 'Course card'],
-    exam:   ['الجدول', 'Schedule']
+    exam:   ['الجدول', 'Schedule'],
+    bb:     ['بلاك بورد', 'Blackboard']
   };
+  /*@3.DASJ.150*/
+  var PENDING_COURSE = ['المادّةُ غيرُ معروفةٍ بعد', 'Course not known yet'];
 
   /*@3.DASJ.63*/
   function urgency(days, done) {
@@ -964,7 +968,7 @@
     var days = D.daysUntil(t.due);
     var u = urgency(days, t.done);
     var title = t.title || (t.course ? t.course + ' · ' + typeLabel(t.type) : typeLabel(t.type));
-    var src = SRC_LABEL[t.source] || SRC_LABEL.task;
+    var src = t.pending_course ? SRC_LABEL.bb : (SRC_LABEL[t.source] || SRC_LABEL.task);
 
     var check = t.editable
       ? '<button class="tk-check" data-act="tk-toggle" data-id="' + esc(t.id) + '" ' +
@@ -986,7 +990,8 @@
         ' aria-label="' + esc(tx('تفاصيل: ', 'Details: ') + title) + '">' +
         '<div class="tk-title">' + esc(title) + '</div>' +
         '<div class="tk-meta">' +
-          (t.course ? '<span class="tk-chip">' + esc(t.course) + '</span>' : '') +
+          (t.course ? '<span class="tk-chip">' + esc(t.course) + '</span>'
+                    : (t.pending_course ? '<span class="tk-chip tk-chip-pend">' + esc(tx(PENDING_COURSE[0], PENDING_COURSE[1])) + '</span>' : '')) +
           '<span class="tk-chip">' + esc(typeLabel(t.type)) + '</span>' +
           '<span class="tk-chip tk-chip-src">' + esc(tx(src[0], src[1])) + '</span>' +
           (t.note ? '<span class="tk-note">' + esc(t.note) + '</span>' : '') +
@@ -1965,6 +1970,12 @@
     document.addEventListener('garden:cardsReviewed', function () {
       renderWidgets(); renderCourses(); updateSidebarBadges();
     });
+    /*@3.DASJ.151*/
+    window.addEventListener('garden:scheduleChanged', function (e) {
+      var from = e && e.detail && e.detail.from;
+      if (from === 'ics' || from === 'sx-link') { renderWidgets(); renderTasks(); }
+    });
+    window.addEventListener('garden:syncCompleted', function () { renderWidgets(); renderTasks(); });
     applyTitles();
   }
 

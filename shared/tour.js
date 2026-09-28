@@ -177,8 +177,8 @@
     document.body.dataset.lang = state.lang;
     document.title = state.lang === "ar" ? "اكتشف الحديقة الرقمية · الأطلس الحي" : "Explore the Digital Garden · The Living Atlas";
     document.querySelector("meta[name='description']").content = state.lang === "ar"
-      ? "جولة تفاعلية في الحديقة الرقمية: الشرح، المراجعة، التخطيط، المعدل، الشُعب، المختبرات والمزامنة لطلاب الجامعة السعودية الإلكترونية."
-      : "An interactive tour of the Digital Garden: learning, review, planning, GPA, sections, labs, and private sync for SEU students.";
+      ? "جولة تفاعلية في الحديقة الرقمية: الشرح، المراجعة، التخطيط، المعدل، الشُعب، المختبرات والمزامنة لطلاب جامعة الأمير مساعد بن عبدالرحمن."
+      : "An interactive tour of the Digital Garden: learning, review, planning, GPA, sections, labs, and private sync for PMAU students.";
     document.querySelectorAll("[data-ar][data-en]").forEach(element => {
       element.textContent = element.dataset[state.lang];
     });

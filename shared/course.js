@@ -320,9 +320,11 @@
         var raw = localStorage.getItem('garden_' + CODE + '_m' + m + '_quiz');
         if (raw != null && raw !== '') q = Math.max(0, Math.min(1, parseFloat(raw) / 10));
       } catch (err) {}
-      var href = S.info.path ? '../' + S.info.path + 'M' + String(m).padStart(2, '0') + '.html' : '#';
-      mods += '<a class="crs-mod" href="' + esc(href) + '"' + (d ? ' data-due="1"' : '') +
+      var href = modHref(m), mk = GardenData.moduleMark ? GardenData.moduleMark(CODE, m) : '';
+      mods += '<a class="crs-mod" href="' + esc(href) + '" data-mod="' + m + '"' + (d ? ' data-due="1"' : '') +
+          (mk ? ' data-mark="' + mk + '"' : '') +
           ' title="' + esc(L('الوحدة ' + m, 'Module ' + m)) + '">' +
+        (mk ? '<i class="crs-mod-k fa-solid ' + (mk === 'mastered' ? 'fa-circle-check' : 'fa-circle-xmark') + '" aria-hidden="true"></i>' : '') +
         '<span class="crs-mod-n">M' + String(m).padStart(2, '0') + '</span>' +
         '<span class="crs-mod-d">' + (d ? esc(L(d + ' مستحقّة', d + ' due'))
                                         : (q == null ? '—' : pctTxt(q))) + '</span>' +
@@ -332,8 +334,8 @@
       '</a>';
     }
     h += '<div class="crs-sec-d" style="margin:.9rem 0 .5rem">' +
-      esc(L('وحداتُ المادة — الرقمُ درجةُ كويزها، والمصبوغُ فيه بطاقاتٌ تنتظرك.',
-            'Course modules — the number is the quiz score; tinted ones have cards waiting.')) + '</div>';
+      esc(L('وحداتُ المادة — الرقمُ درجةُ كويزها، والمصبوغُ فيه بطاقاتٌ تنتظرك. اضغطْ وحدةً لتفتحها أو لتحدّد إتقانَها.',
+            'Course modules — the number is the quiz score; tinted ones have cards waiting. Tap one to open it or set how well you know it.')) + '</div>';
     h += '<div class="crs-mods">' + mods + '</div>';
 
     host.innerHTML = h;
@@ -1006,6 +1008,91 @@
     toast(L('حُفظ ✓', 'Saved ✓'));
   }
 
+  function modHref(m) {
+    return S.info && S.info.path ? '../' + S.info.path + 'M' + String(m).padStart(2, '0') + '.html' : '#';
+  }
+
+  /*@3.COUJ.62*/
+  var modOpen = 0;
+  function openMod(m) {
+    modOpen = m;
+    var p = GardenData.courseProgress(CODE);
+    var sig = p.perModule[m - 1] || {};
+    var mk = GardenData.moduleMark(CODE, m);
+    var now = Date.now(), due = 0;
+    GardenData.moduleCards(CODE, m).forEach(function (c) { if (c.nextReview && c.nextReview <= now) due++; });
+    var q = null;
+    try {
+      var raw = localStorage.getItem('garden_' + CODE + '_m' + m + '_quiz');
+      if (raw != null && raw !== '') q = Math.max(0, Math.min(10, parseFloat(raw)));
+    } catch (e) {}
+    var deck = sig.deckSize || sig.cardsTotal || 0;
+    var num = function (a, b) { return '<bdi>' + a + '/' + b + '</bdi>'; };
+    var line = function (on, html) {
+      return '<li' + (on ? ' class="is-on"' : '') + '><i class="fa-' + (on ? 'solid fa-circle-check' : 'regular fa-circle') +
+        '" aria-hidden="true"></i><span>' + html + '</span></li>';
+    };
+    var why = line(sig.quiz, !sig.quiz ? esc(L('لم تحلَّ اختبارَها بعد', 'Quiz not taken yet'))
+      : q != null && isFinite(q) ? esc(L('اختبارُها: ', 'Quiz: ')) + num(Math.round(q), 10)
+      : esc(L('حللتَ اختبارَها', 'Quiz taken')));
+    if (deck) why += line(sig.cardsStrong > 0, esc(L('بطاقاتٌ متقنة: ', 'Cards mastered: ')) + num(sig.cardsStrong || 0, deck) +
+      (due ? ' · ' + esc(nOf(due, ['تنتظرك', 'تنتظرانك', 'تنتظرك'], ['due', 'due'])) : ''));
+    if (sig.studyTotal) why += line(sig.studyKnown > 0, esc(L('مفاهيمُ فهمتَها: ', 'Concepts understood: ')) + num(sig.studyKnown, sig.studyTotal));
+    if (sig.visits) why += line(true, esc(L(
+      sig.visits === 1 ? 'فتحتَها يوماً واحداً' : (sig.visits === 2 ? 'فتحتَها يومين' : 'فتحتَها ' + sig.visits + ' أيّام'),
+      sig.visits + (sig.visits === 1 ? ' day opened' : ' days opened'))));
+    var score = Math.round((sig.score || 0) * 100);
+    var how = mk === 'mastered' ? L('بتقديرك: أتقنتَها', 'Your call: mastered')
+            : mk === 'unmastered' ? L('بتقديرك: لم تتقنها بعد', 'Your call: not yet')
+            : L('محسوبةٌ من عملك', 'Measured from your work');
+    var chip = function (v, icon, ar, en) {
+      var on = mk === v;
+      return '<button class="crs-chip' + (on ? ' is-on' : '') + '" type="button" role="radio" aria-checked="' + on + '"' +
+        ' data-act="mod-mark" data-mark="' + v + '"><i class="fa-solid ' + icon + '" aria-hidden="true"></i>' + esc(L(ar, en)) + '</button>';
+    };
+    var b = '<a class="crs-btn crs-btn--primary crs-mod-go" href="' + esc(modHref(m)) + '">' +
+        '<i class="fa-solid fa-book-open" aria-hidden="true"></i>' + esc(L('افتح الوحدة', 'Open the module')) + '</a>' +
+      '<div class="crs-mod-sum">' +
+        '<div class="crs-mod-pct" style="--fill:' + esc(GardenData.qualityColor01(score / 100)) + '"><b><bdi>' + score + '%</bdi></b><span>' + esc(how) + '</span></div>' +
+        '<ul class="crs-mod-why">' + why + '</ul>' +
+      '</div>' +
+      '<p class="crs-sec-d crs-mod-q">' + esc(L('إتقانُها', 'How well you know it')) + '</p>' +
+      '<div class="crs-mod-marks" role="radiogroup" aria-label="' + esc(L('إتقانُ الوحدة', 'Module mastery')) + '">' +
+        chip('', 'fa-wand-magic-sparkles', 'من عملي', 'From my work') +
+        chip('mastered', 'fa-circle-check', 'أتقنتُها', 'Mastered') +
+        chip('unmastered', 'fa-circle-xmark', 'لم أتقنها', 'Not yet') +
+      '</div>' +
+      '<p class="crs-mod-note">' + esc(
+        mk === 'mastered' ? L('تُحسب كاملةً في تقدّم المادة و«فصلي»، مهما كان عملُك فيها.', 'Counts in full in the course progress and My Semester, whatever your work in it.')
+        : mk === 'unmastered' ? L('تُحسب صفراً — وبياناتُها باقية: درجةُ اختبارها ومواعيدُ بطاقاتها كما هي.', 'Counts as zero — its data stays: the quiz score and the card schedule are untouched.')
+        : L('من اختبارها وبطاقاتها ومفاهيمها وأيّام فتحها — وتتغيّر كلّما عملتَ فيها.', 'From its quiz, cards, concepts and days opened — it moves as you work on it.')) + '</p>' +
+      (mk === 'unmastered' ? '<button class="crs-btn crs-btn--danger crs-mod-wipe" type="button" data-act="mod-wipe">' +
+        '<i class="fa-solid fa-eraser" aria-hidden="true"></i>' + esc(L('امسح بياناتها وابدأها من جديد', 'Erase its data and start over')) + '</button>' : '');
+    el('dlg-mod-t').textContent = L('الوحدة ' + m, 'Module ' + m);
+    el('dlg-mod-b').innerHTML = b;
+    var d = el('dlg-mod');
+    if (!d.open) d.showModal();
+  }
+
+  function wipeMod(m) {
+    var n = GardenData.moduleLearning(CODE, m);
+    var bits = [];
+    if (n.quiz || n.attempts) bits.push(L('درجةُ اختبارها', 'its quiz score'));
+    if (n.cards) bits.push(L('تقديراتُ ' + nOf(n.cards, ['بطاقة', 'بطاقتين', 'بطاقات'], ['card', 'cards']), 'the grades of ' + n.cards + ' cards'));
+    if (n.concepts) bits.push(L('سجلُّ ' + nOf(n.concepts, ['مفهوم', 'مفهومين', 'مفاهيم'], ['concept', 'concepts']), 'the record of ' + n.concepts + ' concepts'));
+    el('dlg-mod').close();
+    ask(L('امسح بياناتِ الوحدة ' + m + '؟', 'Erase module ' + m + '’s data?'),
+      (bits.length ? L('سيُمسح ' + bits.join('، و') + '، وأيّامُ فتحها — على كلِّ أجهزتك. ', 'This erases ' + bits.join(', ') + ' and its days opened — on all your devices. ')
+                   : L('لا بياناتَ لها بعدُ غيرُ أيّام فتحها. ', 'It has no data yet beyond the days opened. ')) +
+      L('وتعود بطاقاتُها جديدة، وملاحظاتُك تبقى. ولا يُسترجَع.', 'Its cards start fresh and your notes stay. This cannot be undone.'),
+      L('امسح', 'Erase'),
+      function () {
+        GardenData.moduleLearning(CODE, m, true);
+        refresh();
+        toast(L('بدأتَ الوحدة ' + m + ' من جديد', 'Module ' + m + ' starts fresh'));
+      });
+  }
+
   /*@3.COUJ.45*/
   var askFn = null;
   function ask(title, body, okLabel, fn) {
@@ -1102,6 +1189,14 @@
         return;
       }
 
+      var mt = t.closest('.crs-mod[data-mod]');
+      if (mt) {
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button) return;
+        ev.preventDefault();
+        openMod(parseInt(mt.getAttribute('data-mod'), 10));
+        return;
+      }
+
       /*@3.COUJ.59*/
       var rt = t.closest('[data-rate]');
       if (rt && t.closest('#dlg-fac-b')) { openFacRate(rt.getAttribute('data-rate')); return; }
@@ -1112,6 +1207,13 @@
       var id = a.getAttribute('data-id');
       var src = a.getAttribute('data-src');
 
+      if (act === 'mod-mark') {
+        GardenData.setModuleMark(CODE, modOpen, a.getAttribute('data-mark'));
+        refresh();
+        openMod(modOpen);
+        return;
+      }
+      if (act === 'mod-wipe') { wipeMod(modOpen); return; }
       if (act === 'due') {
         if (window.GardenDue) GardenDue.open({ code: CODE });
         return;
@@ -1229,7 +1331,7 @@
 
     /*@3.COUJ.56*/
     document.addEventListener('garden:languageChanged', function () { refresh(); });
-    document.addEventListener('garden:syncCompleted', function () { refresh(); });
+    window.addEventListener('garden:syncCompleted', function () { refresh(); });
     document.addEventListener('garden:cardsReviewed', function () { refresh(); });
     document.addEventListener('garden:gradesChanged', function () { renderStats(); renderHead(); });
   }

@@ -1,0 +1,225 @@
+/*@6.LAMC.1*/
+
+html:root{
+  --l6-display: var(--mt-font, 'Geist', 'Alexandria', sans-serif);
+  --l6-body: var(--mt-font, 'Source Sans 3', 'Vazirmatn', sans-serif);
+  --l6-mono: 'JetBrains Mono', 'Vazirmatn', monospace;
+  --l6-warm: 255, 200, 120;
+  --l6-bulb: color-mix(in oklab, var(--st-warn) 78%, #fff);
+  --l6-ease: .5s cubic-bezier(.2, .7, .2, 1);
+  --l6-r: 16px;
+}
+
+/*@6.LAMC.2*/
+html .sidebar{ opacity: .38; transition: opacity var(--l6-ease); }
+html .sidebar:is(:hover, :focus-within){ opacity: 1; }
+
+html .main-content{ font-family: var(--l6-body); max-width: 800px; padding-block-start: 2rem; }
+
+/*@6.LAMC.3*/
+html:root{ --l6-veil: rgba(3, 5, 9, .74); --l6-veil-edge: rgba(0, 0, 0, .86); }
+html:root[data-theme="dim"]{ --l6-veil: rgba(8, 10, 16, .6); --l6-veil-edge: rgba(0, 0, 0, .78); }
+/*@6.LAMC.4*/
+html:root[data-theme="light"]{ --l6-veil: rgba(146, 140, 132, .82); --l6-veil-edge: rgba(112, 106, 98, .9); }
+html .content-wrapper{ position: relative; z-index: 5; }
+html:root.lamp-on .content-wrapper{ z-index: auto; }             /*@6.LAMC.5*/
+html:root.lamp-on body::after{
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1000;
+  background: radial-gradient(ellipse 72% 82% at 50% 46%, var(--l6-veil) 55%, var(--l6-veil-edge) 100%);
+  animation: l6-dusk var(--l6-ease) both;
+}
+html:root.lamp-on .lamp-unit{ position: relative; }
+html:root.lamp-on .lamp-unit.is-lit{ z-index: 1001; box-shadow: 0 30px 90px -30px rgba(0, 0, 0, .55) !important; opacity: 1 !important; animation: l6-wake .55s ease-out; }
+/*@6.LAMC.6*/
+html:root.lamp-on :is(.lamp-unit:not(.is-lit), .sidebar, .g-header):is(:hover, :focus-within){ z-index: 1001; }
+/*@6.LAMC.7*/
+html:root.lamp-on .lamp-unit.is-lit:not(.lamp-host){ background: var(--pp-page); border-radius: 18px; box-shadow: 0 0 0 1.1rem var(--pp-page), 0 30px 90px -20px rgba(0, 0, 0, .55) !important; }
+@keyframes l6-dusk { from { opacity: 0; } }
+@keyframes l6-wake { from { filter: brightness(.6); } }
+
+/*@6.LAMC.8*/
+html .lamp-host{ position: relative; padding-block-start: 2.9rem !important; }
+html .lamp-btn{
+  all: unset; position: absolute; inset-block-start: -1px; inset-inline-start: 50%; transform: translateX(50%);
+  inline-size: 46px; block-size: 34px; display: grid; justify-items: center; cursor: pointer; z-index: 3;
+}
+html:root[dir="ltr"] .lamp-btn{ transform: translateX(-50%); }
+html .lamp-btn::before{                                             /*@6.LAMC.9*/
+  content: ''; inline-size: 1.5px; block-size: 9px; background: color-mix(in oklab, var(--pp-ink) 30%, transparent);
+}
+html .lamp-btn i{                                                   /*@6.LAMC.10*/
+  display: block; inline-size: 30px; block-size: 13px; border-radius: 15px 15px 3px 3px;
+  background: color-mix(in oklab, var(--pp-line-2) 70%, var(--pp-card)); position: relative; transition: background var(--l6-ease), box-shadow var(--l6-ease);
+}
+html .lamp-btn i::after{                                            /*@6.LAMC.11*/
+  content: ''; position: absolute; inset-block-end: -5px; inset-inline-start: calc(50% - 4px); inline-size: 8px; block-size: 6px; border-radius: 0 0 6px 6px;
+  background: color-mix(in oklab, var(--pp-mute) 50%, transparent); transition: all var(--l6-ease);
+}
+html .lamp-btn:hover i{ background: color-mix(in oklab, var(--st-warn) 30%, var(--pp-card)); }
+html .lamp-btn:focus-visible i{ outline: 2px solid var(--l6-bulb); outline-offset: 3px; }
+/*@6.LAMC.12*/
+html .is-lit > .lamp-btn i, html .lamp-host.is-lit > .lamp-btn i{ background: color-mix(in oklab, var(--st-warn) 55%, var(--pp-card)); }
+html:root.lamp-on .is-lit > .lamp-btn i::after{ background: var(--l6-bulb); box-shadow: 0 0 10px 3px rgba(var(--l6-warm), .75); }
+html:root.lamp-on .lamp-host.is-lit::before{
+  content: ''; position: absolute; inset-block-start: 0; inset-inline: 18%; block-size: 2.6rem; pointer-events: none; z-index: 1;
+  background: radial-gradient(60% 100% at 50% 0, rgba(var(--l6-warm), .24), transparent 80%);
+  border-radius: 0 0 50% 50%;
+}
+html:root[data-theme="light"].lamp-on .lamp-host.is-lit::before{ background: radial-gradient(60% 100% at 50% 0, rgba(var(--l6-warm), .45), transparent 80%); }
+html .lamp-host.is-lit{ box-shadow: 0 0 0 1px rgba(var(--l6-warm), .22), 0 30px 70px -40px rgba(var(--l6-warm), .35) !important; }
+html:root:not(.lamp-on) .lamp-host.is-lit{ box-shadow: none !important; }
+
+/*@6.LAMC.13*/
+html .hero{ padding: 2.25rem 0 2.5rem; }
+html .hero-eyebrow{ background: none; border: 0; box-shadow: none; padding: 0; font-family: var(--l6-mono); font-size: .74rem; font-weight: 500; color: var(--pp-mute); margin-bottom: 1.2rem; }
+html .hero-eyebrow span{ color: var(--pp-acc); }
+html .hero h1{ font-family: var(--l6-display); font-size: clamp(2.2rem, 4.6vw, 3.2rem); font-weight: 600; line-height: 1.3; margin-bottom: 1rem; }
+html .hero-description{ font-size: 1.08rem; line-height: 2; color: var(--pp-ink-2); max-width: 60ch; font-weight: 400; }
+html .hero .tag{ background: none; border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent); border-radius: 999px; font-size: .78rem; font-weight: 500; color: var(--pp-mute); padding: .28rem .75rem; }
+html .hero .tag--accent{ color: var(--pp-acc); border-color: color-mix(in oklab, var(--brand-500) 35%, transparent); }
+
+/*@6.LAMC.14*/
+html .glass-card, html .concept-card, html .objectives-card, html .professor-card, html .vault-section{
+  background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 60%, transparent) !important;
+  border-radius: var(--l6-r) !important; box-shadow: 0 24px 50px -40px rgba(0, 0, 0, .6) !important; overflow: visible !important;
+}
+html .objectives-card, html .professor-card{ border-inline-start-width: 1px !important; }
+html .objectives-card h2, html #quiz > h2, html #ask-professor > h2, html .vault-section h2, html .flashcard-section > h2, html .professor-header h2{
+  font-family: var(--l6-display); font-size: 1.1rem; font-weight: 600; color: var(--pp-ink);
+}
+html .sec-icon{ color: var(--pp-mute) !important; }
+html .objectives-card{ padding: 1.6rem 2rem 1.6rem !important; }
+html .objectives-list, html .objectives-list > .content-target{ display: flex; flex-direction: column; gap: .6rem; }
+html .objectives-list li{ font-size: 1rem; font-weight: 400; color: var(--pp-ink-2); gap: .8rem; line-height: 1.85; }
+html .objectives-list .obj-icon{ font-size: 0; flex: none; inline-size: 6px; block-size: 6px; border-radius: 50%; background: var(--pp-acc); margin-top: .75em; opacity: .8; }
+
+/*@6.LAMC.15*/
+html .concept-card{ padding: 2rem 2.25rem 2.1rem !important; margin-bottom: 2.25rem !important; }
+html .concept-header{ margin-bottom: 1.1rem; padding-inline-end: 2.75rem; }
+html .concept-header h2{ font-family: var(--l6-display); font-size: 1.45rem; font-weight: 600; gap: .9rem; line-height: 1.45; }
+html .concept-number{
+  inline-size: auto !important; block-size: auto !important; background: none !important; box-shadow: none !important; border-radius: 0 !important;
+  font-family: var(--l6-mono) !important; font-size: .8rem !important; font-weight: 500 !important; color: var(--pp-mute) !important;
+  padding-inline-end: .9rem; border-inline-end: 1px solid var(--pp-line); align-self: stretch; align-items: center !important;
+}
+html .concept-card > .ai-explain-btn, html .objectives-card > .ai-explain-btn, html .professor-card > .ai-explain-btn, html .vault-section > .ai-explain-btn{
+  inset-block-start: 2.7rem !important; inset-inline-end: 1.8rem !important; inset-inline-start: auto !important;
+  inline-size: 32px !important; block-size: 32px !important; border-radius: 50% !important; background: none !important;
+  border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent) !important; color: var(--pp-mute) !important; box-shadow: none !important; opacity: 1 !important;
+}
+
+/*@6.LAMC.16*/
+html .depth-tabs{ background: color-mix(in oklab, var(--pp-page) 70%, transparent); border: 1px solid color-mix(in oklab, var(--pp-line) 70%, transparent); border-radius: 999px; padding: 3px; gap: 2px; margin-bottom: 1.3rem; }
+html .depth-tab{ border-radius: 999px !important; padding: .32rem .95rem .32rem .8rem !important; font-family: var(--l6-body); font-size: .84rem; font-weight: 600; color: var(--pp-mute); background: none !important; box-shadow: none !important; display: inline-flex; align-items: center; gap: .45rem; }
+html .depth-tab i{ display: none; }
+html .depth-tab::before{ content: ''; inline-size: 7px; block-size: 7px; border-radius: 50%; background: color-mix(in oklab, var(--pp-mute) 45%, transparent); }
+html .depth-tab.active{ color: var(--pp-ink) !important; background: var(--pp-card) !important; box-shadow: 0 1px 0 color-mix(in oklab, var(--pp-line) 80%, transparent) !important; }
+html .depth-tab.active::before{ background: var(--pp-acc); }
+html .depth-layer{ font-size: 1.07rem; line-height: 2; color: color-mix(in oklab, var(--pp-ink) 88%, var(--pp-mute)); max-width: 66ch; }
+html .depth-layer[data-layer="full"], html .depth-layer[data-layer="deep"]{ border-inline-start: 0 !important; padding-inline-start: 0; margin-top: 0; }
+html .depth-layer strong, html .depth-layer b, html .depth-layer li b, html .depth-layer li strong{ color: var(--pp-ink) !important; }
+
+/*@6.LAMC.17*/
+html .formula-block, html .code-block, html .svg-placeholder, html .svg-diagram, html .comparison-wrapper{
+  background: color-mix(in oklab, var(--pp-page) 50%, var(--pp-card)) !important; border: 0 !important; border-radius: 12px !important; box-shadow: none !important; margin: 1.5rem 0 !important;
+}
+html .formula-block{ padding: 1.1rem 1.3rem !important; }
+html .formula-block strong{ font-size: .8rem; color: var(--pp-mute); font-weight: 600; }
+html .formula-block .math-block{ text-align: center; font-size: 1.05rem; }
+html .code-block-header{ background: none !important; border: 0 !important; padding: .8rem 1.2rem 0 !important; font-family: var(--l6-mono); font-size: .7rem; }
+html .copy-btn{ border: 0 !important; background: none !important; }
+html .code-block pre{ background: none !important; padding: .6rem 1.2rem 1.15rem !important; font-size: .87rem; line-height: 1.75; }
+html .svg-placeholder{ padding: 1.25rem !important; }
+html .algo-widget{ background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+html .algo-title{ font-family: var(--l6-display) !important; font-weight: 600 !important; color: var(--pp-ink) !important; }
+html .algo-toolbar button{ background: none !important; border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent) !important; border-radius: 999px !important; color: var(--pp-ink-2) !important; box-shadow: none !important; font-family: var(--l6-body) !important; }
+html .algo-toolbar button[data-algo-btn="play"]{ color: var(--pp-acc) !important; border-color: color-mix(in oklab, var(--brand-500) 45%, transparent) !important; }
+html .algo-explanation, html .algo-canvas{ background: var(--pp-card) !important; border: 0 !important; border-radius: 10px !important; }
+/*@6.LAMC.18*/
+html .comparison-wrapper{ padding: 0 !important; background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 70%, transparent) !important; }
+html .comparison-table{ border: 0 !important; background: none !important; }
+html .comparison-table th{ background: color-mix(in oklab, var(--pp-raise) 70%, var(--pp-card)) !important; color: var(--pp-ink) !important; font-size: .86rem; font-weight: 700; white-space: normal !important; border-bottom: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent) !important; }
+html .comparison-table td, html .comparison-table td:first-child{ background: transparent !important; border-bottom: 1px solid color-mix(in oklab, var(--pp-line) 55%, transparent) !important; }
+html .comparison-table td:first-child{ color: var(--pp-ink) !important; font-weight: 700 !important; }
+html .comparison-table tr:hover td{ background: color-mix(in oklab, var(--pp-raise) 25%, transparent) !important; }
+
+/*@6.LAMC.19*/
+html .thinking-question{ background: none !important; border: 0 !important; border-top: 1px solid color-mix(in oklab, var(--pp-line) 60%, transparent) !important; border-radius: 0 !important; padding: 1.1rem 0 0 !important; margin: 1.7rem 0 0 !important; }
+html .thinking-question summary{ color: var(--pp-ink-2) !important; font-size: 1rem; font-weight: 600; cursor: pointer; gap: .7rem !important; }
+html .thinking-question summary::before{ font-weight: 400 !important; color: var(--pp-mute); inline-size: 30px; block-size: 30px; display: grid; place-items: center; flex: none; border-radius: 50%; border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent); }
+html .thinking-question[open] summary{ color: var(--pp-ink) !important; }
+html .thinking-question[open] summary::before{ font-weight: 900 !important; color: var(--l6-bulb); border-color: transparent; }
+html .thinking-question > div{ padding-inline-start: 2.6rem; color: var(--pp-ink-2); }
+
+/*@6.LAMC.20*/
+html .professor-card{ padding: 1.7rem 2rem !important; }
+html .professor-text{ font-size: 1.05rem !important; line-height: 2 !important; color: var(--pp-ink-2) !important; }
+html .accordion-item{ background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 60%, transparent) !important; border-radius: 12px !important; margin-bottom: .5rem !important; box-shadow: none !important; }
+html .vault-entry{ background: color-mix(in oklab, var(--pp-page) 50%, var(--pp-card)) !important; border: 0 !important; border-radius: 12px !important; }
+html .mcq-option, html .quiz-option-btn{ background: color-mix(in oklab, var(--pp-page) 40%, var(--pp-card)) !important; border: 1px solid transparent !important; border-radius: 12px !important; box-shadow: none !important; }
+html .mcq-option:hover, html .quiz-option-btn:hover{ border-color: color-mix(in oklab, var(--st-ok) 55%, transparent) !important; }
+html .mcq-label{ background: none !important; border: 1px solid var(--pp-line-2) !important; border-radius: 50% !important; color: var(--pp-mute) !important; font-family: var(--l6-mono); }
+html .quiz-progress, html .quiz-progress-container{ block-size: 3px !important; background: color-mix(in oklab, var(--pp-line) 70%, transparent) !important; }
+html .quiz-progress-fill, html .quiz-progress-bar{ background: var(--brand-500) !important; }
+
+/*@6.LAMC.21*/
+html .toc-link{ border: 0 !important; background: none !important; font-size: .84rem; font-weight: 500; color: var(--pp-mute); border-radius: 8px; }
+html .toc-link:hover{ color: var(--pp-ink); }
+html .toc-link.active{ color: var(--pp-ink) !important; font-weight: 700; }
+html .toc-link.active::before{ content: '●'; color: var(--pp-acc); font-size: .5rem; margin-inline-end: .45rem; vertical-align: middle; }
+html .toc-link--action, html .toc-link[href="#quiz"].toc-link--action{ border: 0 !important; background: none !important; color: var(--pp-ink-2) !important; animation: none !important; }
+html .toc-link--action .toc-action-icon{ background: none !important; color: var(--pp-mute) !important; }
+html .sidebar-widget, html .sidebar-notes-btn{ background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 60%, transparent) !important; border-radius: 12px !important; box-shadow: none !important; }
+html .widget-number{ color: var(--pp-ink) !important; font-family: var(--l6-mono); }
+
+/*@6.LAMC.22*/
+html .hub-hero{ background: none !important; border: 0 !important; box-shadow: none !important; padding: 2.5rem 0 1.5rem !important; }
+html .hub-hero::before, html .hub-hero::after{ display: none !important; }
+html .hub-hero-badge{ background: none !important; border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent) !important; border-radius: 999px !important; box-shadow: none !important; color: var(--pp-acc) !important; font-family: var(--l6-mono); }
+html .hub-hero h1{ font-family: var(--l6-display); font-size: clamp(2.4rem, 5.5vw, 3.6rem) !important; font-weight: 600 !important; margin: 1rem 0 .5rem !important; }
+html .hub-hero-metaphor{ font-style: normal !important; color: var(--pp-ink-2) !important; font-size: 1.1rem !important; }
+html .hub-stat strong{ color: var(--pp-ink) !important; font-family: var(--l6-mono); }
+html .hub-stat span{ color: var(--pp-mute) !important; }
+html .hub-progress{ background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 60%, transparent) !important; box-shadow: none !important; border-radius: var(--l6-r) !important; }
+html .progress-ring-container{ transform: scale(.6); margin: -16px; }
+html .hub-divider{ background: color-mix(in oklab, var(--pp-line) 60%, transparent) !important; block-size: 1px !important; }
+html .hub-divider::before, html .hub-divider::after{ display: none !important; }
+html .hub-section-header h2{ font-family: var(--l6-display); font-weight: 600 !important; }
+html .hub-section-header h2 i{ color: var(--pp-acc); }
+html .section-count{ background: none !important; border: 0 !important; color: var(--pp-mute) !important; font-family: var(--l6-mono); }
+html .subject-hub{ font-family: var(--l6-body); }
+html .module-card{
+  background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 55%, transparent) !important; border-radius: var(--l6-r) !important;
+  box-shadow: 0 24px 50px -36px rgba(0, 0, 0, .7) !important; transition: opacity var(--l6-ease), box-shadow var(--l6-ease) !important; transform: none !important;
+}
+html .module-card::before, html .module-card::after{ display: none !important; }
+html .module-grid:has(.module-card:is(:hover, :focus-visible)) .module-card:not(:hover, :focus-visible){ opacity: .45; }
+html .module-card:is(:hover, :focus-visible){ box-shadow: 0 0 0 1px rgba(var(--l6-warm), .35), 0 30px 80px -30px rgba(var(--l6-warm), .3) !important; }
+html .module-card-number{ background: none !important; box-shadow: none !important; color: var(--pp-acc) !important; font-family: var(--l6-mono) !important; font-weight: 500 !important; font-size: .8rem !important; inline-size: auto !important; block-size: auto !important; }
+html .module-card-flavor{ background: none !important; border: 0 !important; color: var(--pp-mute) !important; padding: 0 !important; font-size: .74rem !important; }
+html .module-card h3{ font-family: var(--l6-display); font-weight: 600 !important; font-size: 1.1rem !important; }
+html .module-card-desc{ color: var(--pp-mute) !important; font-size: .88rem !important; line-height: 1.85 !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+html .module-card-meta{ color: var(--pp-mute) !important; font-family: var(--l6-mono); font-size: .75rem !important; }
+html .exam-card{ background: var(--pp-card) !important; border: 1px solid color-mix(in oklab, var(--pp-line) 60%, transparent) !important; border-radius: var(--l6-r) !important; box-shadow: none !important; }
+html .exam-card-icon{ background: none !important; color: var(--pp-acc) !important; box-shadow: none !important; }
+html .exam-link{ box-shadow: none !important; border-radius: 999px !important; font-weight: 600 !important; }
+html .exam-link--review{ background: none !important; border: 1px solid color-mix(in oklab, var(--pp-line) 90%, transparent) !important; color: var(--pp-ink) !important; }
+html .exam-link--quiz{ background: var(--pp-tint) !important; border: 1px solid color-mix(in oklab, var(--brand-500) 45%, transparent) !important; color: var(--pp-acc) !important; }
+
+/*@6.LAMC.23*/
+html .quiz-toolbar{ background: none !important; border: 0 !important; box-shadow: none !important; }
+html .module-filter-btn{ background: none !important; border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent) !important; color: var(--pp-mute) !important; border-radius: 999px !important; }
+html .module-filter-btn.tag--accent{ border-color: color-mix(in oklab, var(--st-ok) 55%, transparent) !important; color: var(--st-ok) !important; background: color-mix(in oklab, var(--st-ok) 10%, transparent) !important; }
+html .btn-primary{ background: var(--pp-tint) !important; background-image: none !important; border: 1px solid color-mix(in oklab, var(--brand-500) 45%, transparent) !important; color: var(--pp-acc) !important; box-shadow: none !important; border-radius: 999px !important; }
+html .quiz-timer-bar{ background: none !important; border: 0 !important; box-shadow: none !important; }
+html .quiz-meta-tags .tag{ background: none !important; border: 1px solid color-mix(in oklab, var(--pp-line) 80%, transparent) !important; color: var(--pp-mute) !important; border-radius: 999px !important; }
+html .module-intro .concept-number{ border: 0; }
+
+@media (max-width: 640px) {
+  html .main-content{ padding-inline: .7rem !important; }
+  html .concept-card{ padding: 1.4rem 1.2rem 1.5rem !important; }
+  html .lamp-host{ padding-block-start: 2.6rem !important; }
+  html .depth-tab{ flex: none !important; min-width: 0 !important; }
+  html .depth-tabs{ flex-wrap: nowrap !important; inline-size: auto !important; }
+}
+@media (prefers-reduced-motion: reduce) { html .lamp-unit, html .sidebar, html .g-header > *, html .module-card, html .lamp-btn i, html .lamp-btn i::after{ transition: none !important; } html:root.lamp-on body::after, html:root.lamp-on .lamp-unit.is-lit{ animation: none !important; } }

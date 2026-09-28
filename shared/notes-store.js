@@ -3,23 +3,43 @@
   'use strict';
 
   var DB_NAME = 'byte-notes';
-  var DB_VER = 1;
+  var DB_VER = 2;
   var S_DOCS = 'docs';
   var S_META = 'meta';
+  /*@3.NOSJ.6*/
+  var S_IMGS = 'imgs';
+  var MAX_IMG_BYTES = 8 * 1024 * 1024;
 
-  var MAX_DOC_BYTES = 1024 * 1024;
-  var WARN_DOC_BYTES = 700 * 1024;
-  var MAX_TOTAL_BYTES = 25 * 1024 * 1024;
-  var WARN_TOTAL_BYTES = 20 * 1024 * 1024;
+  /*@3.NOSJ.10*/
+  var MAX_DOC_BYTES = 32 * 1024 * 1024;
+  var WARN_DOC_BYTES = 24 * 1024 * 1024;
+  var MAX_TOTAL_BYTES = 512 * 1024 * 1024;
+  var WARN_TOTAL_BYTES = 400 * 1024 * 1024;
 
   var dbPromise = null;
   /*@3.NOSJ.2*/
   var idbBroken = false;
+  /*@3.NOSJ.13*/
+  var pending = null, BLOCK_MS = 15000;
 
   function open() {
     if (idbBroken) return Promise.reject(new Error('no-idb'));
     if (dbPromise) return dbPromise;
-    dbPromise = new Promise(function (resolve, reject) {
+    if (!pending) pending = openReq();
+    var tm = 0;
+    dbPromise = Promise.race([pending, new Promise(function (res, rej) {
+      tm = setTimeout(function () { rej(new Error('idb-blocked')); }, BLOCK_MS);
+    })]);
+    dbPromise.then(function () { clearTimeout(tm); }, function (e) {
+      clearTimeout(tm);
+      dbPromise = null;
+      if (!(e && e.message === 'idb-blocked')) { idbBroken = true; pending = null; }
+    });
+    return dbPromise;
+  }
+
+  function openReq() {
+    return new Promise(function (resolve, reject) {
       if (!self.indexedDB) { reject(new Error('no-idb')); return; }
       var req;
       try { req = self.indexedDB.open(DB_NAME, DB_VER); }
@@ -34,13 +54,22 @@
         if (!db.objectStoreNames.contains(S_META)) {
           db.createObjectStore(S_META, { keyPath: 'k' });
         }
+        if (!db.objectStoreNames.contains(S_IMGS)) {
+          db.createObjectStore(S_IMGS, { keyPath: 'id' });
+        }
       };
-      req.onsuccess = function () { resolve(req.result); };
+      req.onsuccess = function () {
+        var db = req.result;
+        /*@3.NOSJ.14*/
+        db.onversionchange = function () {
+          try { db.close(); } catch (eC) {}
+          dbPromise = null; pending = null;
+        };
+        resolve(db);
+      };
       req.onerror = function () { reject(req.error); };
-      req.onblocked = function () { reject(new Error('idb-blocked')); };
+      req.onblocked = function () {};
     });
-    dbPromise.catch(function () { dbPromise = null; idbBroken = true; });
-    return dbPromise;
   }
 
   function tx(store, mode, fn) {
@@ -82,6 +111,14 @@
     return getRow(id).then(function (row) {
       if (!row) return null;
       return { id: row.id, doc: parse(row.raw), t: row.t || 0, bytes: row.bytes || 0 };
+    });
+  }
+
+  /*@3.NOSJ.12*/
+  function getRaw(id) {
+    return getRow(id).then(function (row) {
+      if (!row) return null;
+      return { id: row.id, raw: (typeof row.raw === 'string') ? row.raw : JSON.stringify(row.raw), t: row.t || 0, bytes: row.bytes || 0, dirty: row.dirty ? 1 : 0 };
     });
   }
 
@@ -194,9 +231,68 @@
     return open().then(function () { return true; }).catch(function () { return false; });
   }
 
+  /*@3.NOSJ.7*/
+  var URLS = {};
+
+  function imgId() {
+    var s2 = '';
+    var a = new Uint8Array(12);
+    if (self.crypto && self.crypto.getRandomValues) self.crypto.getRandomValues(a);
+    else for (var i = 0; i < 12; i++) a[i] = (Math.random() * 256) | 0;
+    for (var j = 0; j < a.length; j++) s2 += (a[j] + 256).toString(16).slice(1);
+    return s2;
+  }
+
+  /*@3.NOSJ.8*/
+  function putImage(blob, meta) {
+    if (!blob || !blob.size) return Promise.reject(mkErr('img_empty'));
+    if (blob.size > MAX_IMG_BYTES) {
+      return Promise.reject(mkErr('img_too_large', { bytes: blob.size, max: MAX_IMG_BYTES }));
+    }
+    var row = { id: imgId(), blob: blob, type: blob.type || 'image/png',
+                bytes: blob.size, at: Date.now(), name: (meta && meta.name) || '' };
+    return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); })
+      .then(function () { return row.id; });
+  }
+
+  function getImage(id) {
+    return tx(S_IMGS, 'readonly', function (os) { return os.get(String(id)); })
+      .catch(function () { return null; });
+  }
+
+  function delImage(id) {
+    var u = URLS[id];
+    if (u) { try { URL.revokeObjectURL(u); } catch (e) {} delete URLS[id]; }
+    return tx(S_IMGS, 'readwrite', function (os) { return os.delete(String(id)); })
+      .then(function () { return true; }).catch(function () { return false; });
+  }
+
+  /*@3.NOSJ.9*/
+  /*@3.NOSJ.11*/
+  function imageUrlNow(id) { return URLS[id] || ''; }
+  function imageUrl(id) {
+    if (URLS[id]) return Promise.resolve(URLS[id]);
+    return getImage(id).then(function (row) {
+      if (!row || !row.blob) return '';
+      var u = URL.createObjectURL(row.blob);
+      URLS[id] = u;
+      return u;
+    }).catch(function () { return ''; });
+  }
+
+  function imageBytes() {
+    return tx(S_IMGS, 'readonly', function (os) { return os.getAll(); })
+      .then(function (rows) {
+        var n = 0;
+        for (var i = 0; i < (rows || []).length; i++) n += rows[i].bytes || 0;
+        return n;
+      }).catch(function () { return 0; });
+  }
+
   window.GardenNotesStore = {
     available: available,
     getDoc: getDoc,
+    getRaw: getRaw,
     putDoc: putDoc,
     delDoc: delDoc,
     manifest: manifest,
@@ -208,11 +304,18 @@
     meta: getMeta,
     setMeta: setMeta,
     byteLen: byteLen,
+    putImage: putImage,
+    getImage: getImage,
+    delImage: delImage,
+    imageUrl: imageUrl,
+    imageUrlNow: imageUrlNow,
+    imageBytes: imageBytes,
     LIMITS: {
       doc: MAX_DOC_BYTES,
       docWarn: WARN_DOC_BYTES,
       total: MAX_TOTAL_BYTES,
-      totalWarn: WARN_TOTAL_BYTES
+      totalWarn: WARN_TOTAL_BYTES,
+      img: MAX_IMG_BYTES
     }
   };
 })();

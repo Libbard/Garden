@@ -5,6 +5,8 @@
   /*@3.NOSJ2.9*/
   var PUSH_IDLE_MS = 8000;
   var PUSH_MAX_WAIT_MS = 30000;
+  var PUSH_LAZY_MS = 60000;
+  var QUOTA_LS = '__notesQuotaMax';
   /*@3.NOSJ2.2*/
   var PENDING_LS = '__notesPending';
 
@@ -73,6 +75,16 @@
   function isQuota(status, body) {
     return status === 413 && body && body.error;
   }
+  /*@3.NOSJ2.10*/
+  function knownMax() {
+    var m = (lastQuota && lastQuota.max > 0) ? Number(lastQuota.max) : 0;
+    if (!m) { try { m = Number(localStorage.getItem(QUOTA_LS)) || 0; } catch (e) { m = 0; } }
+    return m;
+  }
+  function rememberMax(m) {
+    if (!(m > 0)) return;
+    try { localStorage.setItem(QUOTA_LS, String(m)); } catch (e) {}
+  }
 
   function req(method, url, body) {
     return fetch(url, {
@@ -96,21 +108,31 @@
     });
   }
 
+  /*@3.NOSJ2.11*/
+  var again = {};
   function push(noteId) {
     if (!S() || !endpoint()) {
       emit('garden:notesPushFailed', { id: noteId, reason: 'no-endpoint', local: true });
       return Promise.resolve({ ok: false, reason: 'no-endpoint' });
     }
-    if (inflight[noteId]) return inflight[noteId];
+    if (inflight[noteId]) { again[noteId] = 1; return inflight[noteId]; }
 
     var p = vaultId().then(function (vid) {
       if (!vid) {
         emit('garden:notesPushFailed', { id: noteId, reason: 'no-vault', local: true });
         return { ok: false, reason: 'no-vault' };
       }
-      return S().getDoc(noteId).then(function (row) {
+      var read = S().getRaw ? S().getRaw(noteId) : S().getDoc(noteId);
+      return read.then(function (row) {
         if (!row) return { ok: false, reason: 'no-doc' };
-        var raw = (typeof row.doc === 'string') ? row.doc : JSON.stringify(row.doc);
+        var raw = (typeof row.raw === 'string') ? row.raw : ((typeof row.doc === 'string') ? row.doc : JSON.stringify(row.doc));
+        var cap = knownMax(), bytes = row.bytes || 0;
+        if (cap > 0 && bytes > cap) {
+          markPending(noteId, 'note_too_large');
+          quotaEvent('note_too_large', { id: noteId, bytes: bytes, max: cap });
+          emit('garden:notesPushFailed', { id: noteId, reason: 'note_too_large', quota: true, skipped: true });
+          return { ok: false, reason: 'note_too_large', quota: true, skipped: true };
+        }
         return authed('POST', base(vid) + '/' + encodeURIComponent(noteId), vid,
                       { doc: raw, t: row.t })
           .then(function (r) {
@@ -118,6 +140,7 @@
             if (isQuota(r.status, r.body)) {
               markPending(noteId, r.body.error);
               lastQuota = r.body;
+              rememberMax(r.body.max);
               quotaEvent(r.body.error, { id: noteId, bytes: r.body.bytes, max: r.body.max });
               emit('garden:notesPushFailed', { id: noteId, reason: r.body.error, quota: true });
               return { ok: false, reason: r.body.error, quota: true };
@@ -129,6 +152,10 @@
             }
             clearPending(noteId);
             if (r.body && r.body.note_bytes != null) lastQuota = r.body;
+            /*@3.NOSJ2.12*/
+            if (r.body && r.body.applied === 0) {
+              return pull(noteId).then(function (pr) { return { ok: false, reason: 'stale', pulled: !!(pr && pr.ok) }; });
+            }
             return S().markClean(noteId, row.t).then(function () {
               emit('garden:notesPushed', { id: noteId, t: row.t });
               return { ok: true, applied: r.body && r.body.applied, t: row.t };
@@ -139,7 +166,11 @@
       markPending(noteId, 'error');
       emit('garden:notesPushFailed', { id: noteId, reason: 'error' });
       return { ok: false, reason: String((e && e.message) || e) };
-    }).then(function (out) { delete inflight[noteId]; return out; });
+    }).then(function (out) {
+      delete inflight[noteId];
+      if (again[noteId]) { delete again[noteId]; push(noteId); }
+      return out;
+    });
 
     inflight[noteId] = p;
     return p;
@@ -153,11 +184,18 @@
         .then(function (r) {
           if (r.status === 404) return { ok: false, reason: 'not-found' };
           if (!r.ok || !r.body) return { ok: false, reason: 'http-' + r.status };
-          return S().putDoc(noteId, r.body.doc, r.body.t, { clean: true })
-            .then(function () {
-              emit('garden:notesPulled', { id: noteId, t: r.body.t });
-              return { ok: true, t: r.body.t };
-            });
+          var read = S().getRaw ? S().getRaw(noteId) : Promise.resolve(null);
+          return read.catch(function () { return null; }).then(function (row) {
+            /*@3.NOSJ2.13*/
+            var rem = (typeof r.body.doc === 'string') ? r.body.doc : JSON.stringify(r.body.doc);
+            if (row && row.dirty && row.raw && row.raw !== rem) {
+              emit('garden:notesConflict', { id: noteId, raw: row.raw, t: row.t, remoteT: r.body.t });
+            }
+            return S().putDoc(noteId, r.body.doc, r.body.t, { clean: true });
+          }).then(function () {
+            emit('garden:notesPulled', { id: noteId, t: r.body.t });
+            return { ok: true, t: r.body.t };
+          });
         });
     }).catch(function (e) { return { ok: false, reason: String((e && e.message) || e) }; });
   }
@@ -179,10 +217,10 @@
     });
   }
 
-  function schedule(noteId) {
+  function schedule(noteId, lazy) {
     var now = Date.now();
     if (firstAt[noteId] == null) firstAt[noteId] = now;
-    var wait = Math.min(PUSH_IDLE_MS, Math.max(0, firstAt[noteId] + PUSH_MAX_WAIT_MS - now));
+    var wait = lazy ? PUSH_LAZY_MS : Math.min(PUSH_IDLE_MS, Math.max(0, firstAt[noteId] + PUSH_MAX_WAIT_MS - now));
     if (timers[noteId]) clearTimeout(timers[noteId]);
     timers[noteId] = setTimeout(function () {
       delete timers[noteId];

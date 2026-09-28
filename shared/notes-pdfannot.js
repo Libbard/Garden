@@ -19,6 +19,8 @@
   function colourOf(el) {
     var K = window.GardenCanvas;
     if (!K) return '#111827';
+    /*@3.NOPAJ.8*/
+    if (el.ty === 'hl' && el.u) return K.hexOf(el.c);
     return el.hi || el.ty === 'hl' ? K.hiHexOf(el.c) : K.hexOf(el.c);
   }
 
@@ -56,9 +58,11 @@
   function markEntries(el, pageIx) {
     var out = [], i;
     var col = rgb(colourOf(el));
+    /*@3.NOPAJ.9*/
+    var U = window.GardenPdfInk;
     for (i = 0; i < (el.r || []).length; i++) {
-      var r = el.r[i];
-      if (!(r.w > 0.5) || !(r.h > 0.5)) continue;
+      var r = (el.u && U && U.underRect) ? U.underRect(el.r[i]) : el.r[i];
+      if (!(r.w > 0.5) || !(r.h > 0.4)) continue;
       var x0 = r.x, y0 = r.y, x1 = r.x + r.w, y1 = r.y + r.h;
       out.push({
         annotationType: 9,

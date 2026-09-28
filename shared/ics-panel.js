@@ -602,6 +602,8 @@
       bar.hidden = true; bar.innerHTML = ''; return;
     }
     var alien = list.filter(function (it) { return it.foreign; }).length;
+    /*@3.ICPJ.40*/
+    var shown = list.filter(function (it) { return it.shown; }).length;
     bar.hidden = false;
     bar.innerHTML =
       '<i class="fa-solid fa-inbox"></i>' +
@@ -614,6 +616,9 @@
         ? L('وفيها ' + countAr(alien) + ' ' + (alien === 1 ? 'يحمل' : alien === 2 ? 'يحملان' : 'تحمل') +
               ' رمزَ مادّةٍ ليست في فصلك.',
             alien + ' of them carry a course code that is not in your term.')
+        : shown
+        ? L('البلاك بورد لا يذكر المادةَ في هذه العناصر — أظهرناها في جدولك بلا مادّةٍ وستُنبِّهك في وقتها، واربطها مرّةً وما يأتي بعدها يُربط وحدَه.',
+            'Blackboard does not name the course on these — they show in your schedule without a course and will remind you; assign once and later items follow.')
         : L('البلاك بورد لا يذكر المادةَ في هذه العناصر — اربطها مرّةً وما يأتي بعدها يُربط وحدَه.',
             'Blackboard does not name the course on these — assign once and later items follow.')) +
       '</span></div>' +

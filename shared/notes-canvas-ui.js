@@ -20,7 +20,7 @@
 
   var TOOLS = [
     { k: 'pen',   icon: 'fa-pen',          ar: 'قلم',        en: 'Pen' },
-    { k: 'hi',    icon: 'fa-highlighter',  ar: 'فسفوري',     en: 'Highlighter' },
+    { k: 'hi',    icon: 'fa-highlighter',  ar: 'تظليل',     en: 'Highlighter' },
     { k: 'era',   icon: 'fa-eraser',       ar: 'ممحاة',      en: 'Eraser' },
     { k: 'sel',   icon: 'fa-arrow-pointer', ar: 'تحديد',     en: 'Select' },
     { k: 'lasso', icon: 'fa-draw-polygon', ar: 'لاسو',       en: 'Lasso',

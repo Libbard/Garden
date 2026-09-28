@@ -6,6 +6,7 @@
     catch (e) { return true; }
   }
   function L(ar, en) { return isAr() ? ar : en; }
+  var FS_STEPS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72, 96];
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -121,9 +122,8 @@
 
   Ribbon.prototype.build = function () {
     var h = '';
-    h += '<div class="nr-grp nr-grp--pen">' +
-      btn('draw', 'fa-pen-nib', 'القلم والرسم', 'Pen and drawing', 'nr-b--pen') +
-      '</div>';
+    /*@3.NORJ.30*/
+    h += '<div class="nr-grp nr-grp--pen" hidden></div>';
 
     /*@3.NORJ.27*/
     h += '<div class="nr-grp nr-grp--hist">' +
@@ -138,10 +138,16 @@
       '<span class="nr-sel-t" data-role="style-name">' + esc(L('نصّ عادي', 'Normal text')) + '</span>' +
       '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>' +
       /*@3.NORJ.21*/
+      '<button type="button" class="nr-b nr-fstep" data-act="fsz:-"' +
+      ' aria-label="' + esc(L('تصغير الخطّ', 'Smaller text')) + '"' +
+      ' data-ar-title="تصغير الخطّ" data-en-title="Smaller text"><span aria-hidden="true">A<small>−</small></span></button>' +
       '<input type="number" class="nr-fsize" data-role="fsize" min="8" max="96" step="1"' +
       ' inputmode="numeric"' +
       ' aria-label="' + esc(L('مقاس خطّ الكتلة', 'Block font size')) + '"' +
       ' data-ar-title="مقاس خطّ الكتلة" data-en-title="Block font size">' +
+      '<button type="button" class="nr-b nr-fstep" data-act="fsz:+"' +
+      ' aria-label="' + esc(L('تكبير الخطّ', 'Larger text')) + '"' +
+      ' data-ar-title="تكبير الخطّ" data-en-title="Larger text"><span aria-hidden="true">A<small>+</small></span></button>' +
       '<button type="button" class="nr-sel nr-font" data-pop="font" aria-haspopup="true" aria-expanded="false"' +
       ' aria-label="' + esc(L('خطُّ الكتلة', 'Block font')) + '"' +
       ' data-ar-title="خطُّ الكتلة" data-en-title="Block font">' +
@@ -604,6 +610,15 @@
         return;
       }
       if (act === 'link') { self.askLink(); return; }
+      /*@3.NORJ.31*/
+      if (act === 'fsz:-' || act === 'fsz:+') {
+        var fsC = self.host.querySelector('[data-role="fsize"]');
+        var curZ = parseFloat(fsC && fsC.value) || 16, up = act === 'fsz:+', nz = curZ, zi;
+        if (up) { for (zi = 0; zi < FS_STEPS.length; zi++) if (FS_STEPS[zi] > curZ + 0.01) { nz = FS_STEPS[zi]; break; } }
+        else { for (zi = FS_STEPS.length - 1; zi >= 0; zi--) if (FS_STEPS[zi] < curZ - 0.01) { nz = FS_STEPS[zi]; break; } }
+        if (nz !== curZ) { ed.exec('fsize', String(nz)); if (fsC) fsC.value = String(nz); }
+        return;
+      }
       if (act === 'painter') {
         if (self._fmt) self.disarmPainter();
         else self.armPainter(false);
@@ -629,6 +644,20 @@
       var f = e.target.closest('[data-role="fsize"]');
       if (!f || !self.ed) return;
       self.ed.exec('fsize', f.value);
+    });
+    /*@3.NORJ.32*/
+    this.host.addEventListener('focusin', function (e) {
+      var f = e.target.closest && e.target.closest('[data-role="fsize"]');
+      if (!f) return;
+      f.__selNext = 1;
+      try { f.select(); } catch (eS) {}
+    });
+    this.host.addEventListener('mouseup', function (e) {
+      var f = e.target.closest && e.target.closest('[data-role="fsize"]');
+      if (!f || !f.__selNext) return;
+      f.__selNext = 0;
+      e.preventDefault();
+      try { f.select(); } catch (eS) {}
     });
     this.host.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter') return;

@@ -109,8 +109,19 @@
     ];
   }
 
+  /*@3.PRTJ.8*/
+  function brand(px) {
+    var s = px || 15;
+    return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;flex-shrink:0">' +
+      '<g fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M50 88 V64" stroke="#10b981" stroke-width="8"/>' +
+      '<path d="M50 64 L22 42 M50 64 L78 42 M50 64 V34" stroke="#a78bfa" stroke-width="7"/></g>' +
+      '<circle cx="50" cy="64" r="12" fill="#a78bfa"/><circle cx="22" cy="42" r="9" fill="#a78bfa"/>' +
+      '<circle cx="78" cy="42" r="9" fill="#a78bfa"/><circle cx="50" cy="26" r="14" fill="#10b981"/></svg>';
+  }
+
   window.GardenPrintTheme = {
-    SETS: SETS, MODE_KEY: MODE_KEY, pageRule: pageRule,
+    SETS: SETS, MODE_KEY: MODE_KEY, pageRule: pageRule, brand: brand,
     siteTheme: siteTheme, resolve: resolve, isDark: isDark,
     readMode: readMode, writeMode: writeMode,
     vars: vars, set: set, labels: labels

@@ -366,6 +366,8 @@
       if (self.touchZoomAt && (e.timeStamp || Date.now()) - self.touchZoomAt < 700) return;
       var pg = e.target && e.target.closest ? e.target.closest('.gpv-page') : null;
       var sp = e.target;
+      /*@3.NOPJ3.73*/
+      if (sp && sp.closest && sp.closest('[data-bid], [contenteditable="true"]')) return;
       var inText = sp && sp.tagName === 'SPAN' && sp.parentNode &&
         sp.parentNode.classList && sp.parentNode.classList.contains('gpv-text');
       if (inText && (sp.textContent || '').trim().length <= 1) {
@@ -399,6 +401,7 @@
       }
       var pg = e.target && e.target.closest ? e.target.closest('.gpv-page') : null;
       if (!pg) { self.tapAt = 0; return; }
+      if (e.target.closest('.gpv-text, [data-bid], [contenteditable="true"]')) { self.tapAt = 0; return; }
       var n = +pg.getAttribute('data-p');
       if (self.tapOn === n && now - self.tapAt < 340) {
         self.tapAt = 0; self.tapOn = 0;
@@ -438,10 +441,18 @@
       return { d: Math.hypot(a.x - b.x, a.y - b.y),
                cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 };
     };
+    /*@3.NOPJ3.72*/
+    /*@3.NOPJ3.74*/
+    var sweep = function (now) {
+      for (var k in pts) if (now - (pts[k].t || 0) > 1500) delete pts[k];
+    };
     this.onPd = function (e) {
       if (e.pointerType !== 'touch') return;
-      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      sweep(e.timeStamp || Date.now());
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY, t: e.timeStamp || Date.now() };
       if (Object.keys(pts).length === 2) {
+        var ae = document.activeElement;
+        if (ae && ae.blur && self.wrap && self.wrap.contains(ae)) { try { ae.blur(); } catch (eB) {} }
         var d = dist();
         var r = self.wrap.getBoundingClientRect();
         live = { d0: d.d, s0: self.scale, ox: d.cx - r.left, oy: d.cy - r.top,
@@ -451,7 +462,7 @@
     };
     this.onPm = function (e) {
       if (!pts[e.pointerId]) return;
-      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY, t: e.timeStamp || Date.now() };
       if (!live) return;
       var d = dist();
       if (!d) return;
@@ -486,6 +497,9 @@
     s.addEventListener('pointermove', this.onPm, { passive: false });
     s.addEventListener('pointerup', this.onPu, { passive: true });
     s.addEventListener('pointercancel', this.onPu, { passive: true });
+    this.onPuWin = function (e) { if (e.pointerType === 'touch' && pts[e.pointerId]) self.onPu(e); };
+    window.addEventListener('pointerup', this.onPuWin, true);
+    window.addEventListener('pointercancel', this.onPuWin, true);
   };
 
   /*@3.NOPJ3.14*/
@@ -951,7 +965,10 @@
   View.prototype.relay = function (change, opts) {
     var o = opts || {};
     var g = o.grip || null;
-    var w = (o.keep || g) ? null : this.where();
+    var pend = this._pend; this._pend = null;
+    var w = (o.keep || g) ? null : (pend ? { p: pend.n, f: pend.f } : this.where());
+    /*@3.NOPJ3.68*/
+    if (w && o.snap) o.eye = this.eyeSheet();
     this.gen++;
     for (var k in this.slots) this.stale(+k);
     change(this);
@@ -964,7 +981,8 @@
       var s2 = this.sheetOf(w.p);
       var fits = this.slotH(s2) <= this.vh() + 2;
       /*@3.NOPJ3.62*/
-      if (o.snap && fits) this.goTo(this.firstOf(s2), 0);
+      /*@3.NOPJ3.69*/
+      if (o.snap && fits) this.goTo(this.firstOf(o.eye != null ? o.eye : s2), 0);
       else this.goTo(w.p, (this.flow === 'page' && fits) ? 0 : w.f);
     } else this.sync();
   };
@@ -1001,16 +1019,49 @@
     n = Math.max(1, Math.min(this.n, n | 0));
     var s = this.sheetOf(n);
     var f = frac > 0 ? (frac < 1 ? frac : 0.999) : 0;
-    this.scroller.scrollTop = this.off() + this.stop[s] + f * this.slotH(s);
+    var wantY = this.off() + this.stop[s] + f * this.slotH(s);
+    this.scroller.scrollTop = wantY;
+    /*@3.NOPJ3.76*/
+    this._pend = (this.scroller.scrollTop < wantY - 2) ? { n: n, f: f } : null;
+    if (this._pend) {
+      var selfG = this, tries = 0;
+      var again = function () {
+        if (selfG.dead || !selfG._pend || selfG._pend.n !== n) return;
+        if (++tries > 12) { selfG._pend = null; return; }
+        var y2 = selfG.off() + selfG.stop[selfG.sheetOf(n)] + f * selfG.slotH(selfG.sheetOf(n));
+        selfG.scroller.scrollTop = y2;
+        if (selfG.scroller.scrollTop >= y2 - 2) { selfG._pend = null; selfG.sync(); return; }
+        (window.requestAnimationFrame || setTimeout)(again, 40);
+      };
+      (window.requestAnimationFrame || setTimeout)(again, 40);
+    }
     this.sync();
     return this.firstOf(s);
   };
 
   /*@3.NOPJ3.8*/
+  /*@3.NOPJ3.70*/
+  View.prototype.eyeSheet = function () {
+    var y = this.y(), room = this.vh() || 0;
+    if (!(room > 0)) return this.atSheet(y);
+    var top = this.atSheet(y), best = top, seen = -1, many = 0;
+    for (var s = top; s < this.stop.length; s++) {
+      var t = this.stop[s], h = this.slotH(s);
+      if (t >= y + room) break;
+      var v = Math.min(t + h, y + room) - Math.max(t, y);
+      if (v > 8) many++;
+      if (v > seen) { seen = v; best = s; }
+    }
+    /*@3.NOPJ3.71*/
+    return many > 1 ? best : top;
+  };
+
   View.prototype.where = function () {
     var y = this.y();
-    var s = this.atSheet(y);
-    var f = (y - this.stop[s]) / Math.max(1, this.slotH(s));
+    /*@3.NOPJ3.75*/
+    var s = this.atSheet(y + 1);
+    var top = this.stop[s];
+    var f = Math.max(0, y - top) / Math.max(1, this.slotH(s));
     return { p: this.firstOf(s), f: f > 0 ? (f < 1 ? f : 0.999) : 0 };
   };
 
@@ -1159,6 +1210,7 @@
     }
     if (this.onPd) {
       s.removeEventListener('pointerdown', this.onPd);
+      if (this.onPuWin) { window.removeEventListener('pointerup', this.onPuWin, true); window.removeEventListener('pointercancel', this.onPuWin, true); this.onPuWin = null; }
       s.removeEventListener('pointermove', this.onPm);
       s.removeEventListener('pointerup', this.onPu);
       s.removeEventListener('pointercancel', this.onPu);

@@ -83,6 +83,11 @@
     return { lines: keep, refs: refs, foot: foot };
   }
 
+  /*@3.NOMJ3.51*/
+  var MATHY = /^[\d.,]+$|[=+\-*\/^_<>\\(){}|.]/;
+  var TEX_BARE = /(^|[^\\A-Za-z])(leq|geq|neq|times|cdots|cdot|ldots|dfrac|frac|sqrt|approx|infty|sum|prod|cap|cup|mid|overline|emptyset|subseteq|subset|notin|alpha|beta|gamma|delta|lambda|sigma|theta|mu|pi|pm|div|rightarrow|Rightarrow|binom)(?![A-Za-z])/g;
+  function texFix(t) { return t.indexOf('\\') >= 0 ? t : t.replace(TEX_BARE, '$1\\$2'); }
+
   var BARE = /^(?:https?:\/\/|www\.)[^\s<>"'`)\]]+[^\s<>"'`)\].,;:!?؟]/i;
 
   var HTML_MARK = {
@@ -276,9 +281,11 @@
       /*@3.NOMJ3.9*/
       if (ch === '$' && s.charAt(i + 1) !== '$' && i + 1 < s.length) {
         var mEnd = s.indexOf('$', i + 1);
-        if (mEnd > i + 1 && !/[\s\d]/.test(s.charAt(i + 1)) && s.charAt(mEnd - 1) !== ' ') {
+        var mIn = mEnd > i + 1 ? s.slice(i + 1, mEnd) : '';
+        if (mIn && !/\s/.test(mIn.charAt(0)) && !/\s/.test(mIn.charAt(mIn.length - 1)) &&
+            !/\d/.test(s.charAt(mEnd + 1)) && (!/\d/.test(mIn.charAt(0)) || MATHY.test(mIn))) {
           flush();
-          push(out, s.slice(i + 1, mEnd), Object.assign({}, st, { c: 1, mth: 1 }));
+          push(out, texFix(mIn), Object.assign({}, st, { c: 1, mth: 1 }));
           i = mEnd + 1; continue;
         }
       }
@@ -420,11 +427,22 @@
 
   function cells(line) {
     var t = line.trim().replace(/^\|/, '').replace(/\|\s*$/, '');
-    var out = [], cur = '', i;
+    var out = [], cur = '', i, math = '', code = false;
     for (i = 0; i < t.length; i++) {
       var c = t.charAt(i);
-      if (c === '\\' && t.charAt(i + 1) === '|') { cur += '|'; i++; continue; }
-      if (c === '|') { out.push(cur); cur = ''; continue; }
+      /*@3.NOMJ3.50*/
+      if (math) {
+        if (c === '\\') { cur += c + t.charAt(i + 1); i++; continue; }
+        if (t.substr(i, math.length) === math) { cur += math; i += math.length - 1; math = ''; continue; }
+        cur += c; continue;
+      }
+      if (c === '`') code = !code;
+      else if (!code && c === '$') {
+        var dm = t.charAt(i + 1) === '$' ? '$$' : '$';
+        if (t.indexOf(dm, i + dm.length) > i + dm.length) { math = dm; cur += dm; i += dm.length - 1; continue; }
+      }
+      if (!code && c === '\\' && t.charAt(i + 1) === '|') { cur += '|'; i++; continue; }
+      if (!code && c === '|') { out.push(cur); cur = ''; continue; }
       cur += c;
     }
     out.push(cur);
@@ -991,16 +1009,18 @@
           var at = [];
           if (b.anc) at.push('#' + b.anc);
           if (b.al && b.al !== 'start') at.push('.' + b.al);
-          return new Array(Math.min(6, b.lv || 2) + 1).join('#') + ' ' + runsToMd(b.rt) +
+          return new Array(Math.min(6, b.lv || 2) + 1).join('#') + ' ' + (B().pgLead ? B().pgLead(b) : '') + runsToMd(b.rt) +
                  (at.length ? ' {' + at.join(' ') + '}' : '');
         }
         case 'p':     return runsToMd(b.rt);
+        /*@3.NOMJ3.49*/
+        case 'sticky': return '> ' + runsToMd(b.rt).replace(/\n/g, '\n> ');
         case 'quote': return '> ' + runsToMd(b.rt).replace(/\n/g, '\n> ');
         case 'callout': {
           /*@3.NOMJ3.24*/
           var crt = (b.rt || []).slice();
           if (b.cal && crt.length && crt[0].cl) crt.shift();
-          return '> [!' + String(b.cal || 'note').toUpperCase() + ']\n> ' +
+          return '> [!' + String(b.cal || 'note').toUpperCase() + ']\n> ' + (b.ct ? '**' + String(b.ct).replace(/\*/g, '') + ':** ' : '') +
                  runsToMd(crt).replace(/\n/g, '\n> ');
         }
         case 'todo':  return '- [' + (b.done ? 'x' : ' ') + '] ' + runsToMd(b.rt);
@@ -1018,6 +1038,7 @@
           : '';
         case 'ink':   return '_[drawing]_';
         case 'hr':    return '---';
+        case 'pb':    return '<!-- pagebreak -->';
         default:      return '';
       }
     }).filter(function (x) { return x !== ''; }).join('\n\n');

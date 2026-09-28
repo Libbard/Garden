@@ -65,6 +65,8 @@
       fillType4: TOK.s5, fillType5: TOK.s6, fillType6: TOK.s7, fillType7: TOK.s8,
       pieTitleTextColor: TOK.tx, pieSectionTextColor: TOK.stx,
       pieLegendTextColor: TOK.tx, pieStrokeColor: TOK.lb, pieOuterStrokeColor: TOK.lb,
+      /*@3.NOMJ4.22*/
+      pieOpacity: '1',
       quadrant1Fill: TOK.cl, quadrant2Fill: TOK.alt, quadrant3Fill: TOK.cl,
       quadrant4Fill: TOK.alt, quadrantTitleFill: TOK.tx,
       quadrantPointFill: TOK.s1, quadrantPointTextFill: TOK.tx,
@@ -269,7 +271,9 @@
         gantt: { useMaxWidth: true },
         /*@3.NOMJ4.18*/
         maxEdges: 2000,
-        maxTextSize: 300000
+        maxTextSize: 300000,
+        /*@3.NOMJ4.23*/
+        suppressErrorRendering: true
       });
       return { ok: true, api: m };
     } catch (e) {
@@ -294,17 +298,32 @@
 
   var LINKSTYLE_RE = /^\s*linkStyle\b/;
 
+  /*@3.NOMJ4.25*/
+  var LIST_MARK_RE = /([\[\(\{>|"]\s*`?)(\d{1,9}[.)]|[-*+]|#{1,6})(\s)/g;
+  /*@3.NOMJ4.27*/
+  var FLOW_HEAD_RE = /^\s*(?:graph|flowchart)\s+(LR|RL|TB|TD|BT)\b/i;
+  var SUBGRAPH_RE = /^\s*subgraph\b/i;
+  var DIRECTION_RE = /^\s*direction\s+(LR|RL|TB|TD|BT)\b/i;
   function repair(src) {
     var lines = String(src == null ? '' : src).replace(/\r\n?/g, '\n').split('\n');
-    var cmt = 0, semi = 0, i, ln, cut;
+    var cmt = 0, semi = 0, md = 0, dir = 0, i, ln, cut, head = null, out = [];
     for (i = 0; i < lines.length; i++) {
       ln = lines[i];
       cut = tailCut(ln);
       if (cut > 0) { ln = ln.slice(0, cut).replace(/\s+$/, ''); cmt++; }
       if (LINKSTYLE_RE.test(ln) && /;\s*$/.test(ln)) { ln = ln.replace(/;\s*$/, ''); semi++; }
-      lines[i] = ln;
+      if (ln.indexOf('\u200B') < 0) {
+        ln = ln.replace(LIST_MARK_RE, function (m, a, b, c) { md++; return a + b + '\u200B' + c; });
+      }
+      if (head === null && !/^\s*(%%|$)/.test(ln)) { var hm = FLOW_HEAD_RE.exec(ln); head = hm ? hm[1].toUpperCase() : ''; }
+      out.push(ln);
+      if (head && SUBGRAPH_RE.test(ln)) {
+        var q = i + 1;
+        while (q < lines.length && /^\s*$/.test(lines[q])) q++;
+        if (!(q < lines.length && DIRECTION_RE.test(lines[q]))) { out.push('    direction ' + (head === 'TD' ? 'TB' : head)); dir++; }
+      }
     }
-    return { src: lines.join('\n'), cmt: cmt, semi: semi };
+    return { src: out.join('\n'), cmt: cmt, semi: semi, md: md, dir: dir };
   }
 
   /*@3.NOMJ4.20*/
@@ -458,12 +477,53 @@
     catch (e2) { return null; }
   }
 
+  /*@3.NOMJ4.26*/
+  var ENT_RE = /&(amp|lt|gt|quot|#39|#x27|#\d{2,5});/g;
+  var ENT = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", '#x27': "'" };
+  function unescapeText(svg) {
+    var w = svg.ownerDocument.createTreeWalker(svg, 4), n, v;
+    while ((n = w.nextNode())) {
+      v = n.nodeValue;
+      if (!v || v.indexOf('&') < 0) continue;
+      ENT_RE.lastIndex = 0;
+      if (!ENT_RE.test(v)) continue;
+      n.nodeValue = v.replace(ENT_RE, function (m, k) {
+        if (ENT[k] != null) return ENT[k];
+        var cp = parseInt(k.slice(1), 10);
+        return (cp > 31 && cp < 0x10FFFF) ? String.fromCodePoint(cp) : m;
+      });
+    }
+  }
+
+  /*@3.NOMJ4.28*/
+  function fitViewBox(el) {
+    var g = el.firstElementChild, bb = null, i;
+    while (g && String(g.tagName).toLowerCase() !== 'g') g = g.nextElementSibling;
+    if (!g || !g.getBBox) return false;
+    try { bb = g.getBBox(); } catch (e) { bb = null; }
+    if (!bb || !(bb.width > 1) || !(bb.height > 1)) return false;
+    var vb = String(el.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number), pad = 8;
+    var x0 = bb.x - pad, y0 = bb.y - pad, w = bb.width + pad * 2, h = bb.height + pad * 2;
+    if (vb.length === 4 && vb.every(isFinite)) {
+      var inside = bb.x >= vb[0] - 1 && bb.y >= vb[1] - 1 && bb.x + bb.width <= vb[0] + vb[2] + 1 && bb.y + bb.height <= vb[1] + vb[3] + 1;
+      if (inside) return false;
+      x0 = Math.min(x0, vb[0]); y0 = Math.min(y0, vb[1]);
+      w = Math.max(bb.x + bb.width + pad, vb[0] + vb[2]) - x0; h = Math.max(bb.y + bb.height + pad, vb[1] + vb[3]) - y0;
+    }
+    el.setAttribute('viewBox', [x0, y0, w, h].map(function (v) { return Math.round(v * 100) / 100; }).join(' '));
+    var mw = parseFloat((el.style.maxWidth || '').replace('px', ''));
+    if (isFinite(mw) && mw > 0 && vb.length === 4 && vb[2] > 0) el.style.maxWidth = Math.round(mw * w / vb[2]) + 'px';
+    return true;
+  }
+
   function paint(host, svg, note) {
     host.setAttribute('data-state', 'ok');
     host.innerHTML = String(svg);
     var el = host.querySelector('svg');
     if (el) {
+      unescapeText(el);
       deTokenSvg(el);
+      fitViewBox(el);
       el.setAttribute('data-nmd', '1');
       el.removeAttribute('width');
       el.setAttribute('role', 'img');
@@ -514,6 +574,8 @@
           paint(host, (out && out.svg) || out, fixedNote(step));
           return true;
         })['catch'](function (err) {
+          /*@3.NOMJ4.24*/
+          try { var junk = document.getElementById('d' + id); if (junk && junk.parentNode) junk.parentNode.removeChild(junk); } catch (eJ) {}
           at++;
           if (at < steps.length) return attempt();
           /*@3.NOMJ4.5*/

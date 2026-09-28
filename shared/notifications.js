@@ -1050,8 +1050,8 @@
   }
 
   /*@3.NOTJ.48*/
-  ['garden:languageChanged', 'garden:syncCompleted'].forEach(function (ev) {
-    document.addEventListener(ev, function () { CACHE.log = null; refresh(); });
+  [[document, 'garden:languageChanged'], [window, 'garden:syncCompleted']].forEach(function (p) {
+    p[0].addEventListener(p[1], function () { CACHE.log = null; refresh(); });
   });
   if (window.GardenWatch && GardenWatch.on) {
     GardenWatch.on(function () { CACHE.log = null; refresh(); });

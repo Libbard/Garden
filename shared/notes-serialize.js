@@ -26,6 +26,11 @@
     if (!K || !K.toSvg) return Promise.resolve('');
     var shapes = (b.shapes || []).slice();
     var w = b.w || 720, h = b.h || 300;
+    /*@3.NOSJ4.12*/
+    if (Array.isArray(b.els)) {
+      var pre = shapes.concat(b.els);
+      return Promise.resolve(pre.length ? K.toSvg(pre, w, h, { hex: lightHex }) : '');
+    }
     if (!b.ink) {
       if (!shapes.length) return Promise.resolve('');
       return Promise.resolve(K.toSvg(shapes, w, h, { hex: lightHex }));
@@ -72,8 +77,47 @@
     return '<table data-tst="' + esc(st) + '"' + s + '>' + rows + '</table>';
   }
 
+  /*@3.NOSJ4.9*/
+  function localData(ref) {
+    var S = window.GardenNotesStore;
+    if (!S || !S.getImage) return Promise.resolve('');
+    return S.getImage(String(ref).slice(11)).then(function (row) {
+      if (!row || !row.blob) return '';
+      return new Promise(function (res) {
+        var fr = new FileReader();
+        fr.onload = function () { res(String(fr.result || '')); };
+        fr.onerror = function () { res(''); };
+        fr.readAsDataURL(row.blob);
+      });
+    }).catch(function () { return ''; });
+  }
+
+  /*@3.NOSJ4.10*/
+  function imgJob(b) {
+    var Bx = B();
+    if (!Bx || !Bx.localImg || !Bx.localImg(b.url)) return null;
+    return localData(b.url).then(function (u) {
+      if (!u) return '';
+      var copy = {}, k;
+      for (k in b) if (Object.prototype.hasOwnProperty.call(b, k)) copy[k] = b[k];
+      copy.url = u;
+      copy.__raw = 1;
+      return imgHtml(copy);
+    });
+  }
+
+  /*@3.NOSJ4.11*/
+  var STK_HEX = { amber: '#f59e0b', lime: '#84cc16', sky: '#38bdf8',
+                  pink: '#ec4899', violet: '#a78bfa', slate: '#94a3b8' };
+  function stkHtml(b, s) {
+    var hex = STK_HEX[b.tone] || STK_HEX.amber;
+    var rot = Math.max(-12, Math.min(12, Number(b.rot) || 0));
+    return '<div class="stk" style="--stk:' + hex + ';transform:rotate(' + rot + 'deg)"' +
+      (s || '') + '>' + runs(b.rt) + '</div>';
+  }
+
   function imgHtml(b) {
-    var u = B() ? B().httpsOnly(b.url) : '';
+    var u = b.__raw ? String(b.url) : (B() ? B().httpsOnly(b.url) : '');
     if (!u) return '';
     var f = ['width:' + (b.iw == null ? 100 : b.iw) + '%'];
     var br = b.br == null ? 100 : b.br;
@@ -110,7 +154,7 @@
     var isar = true;
     try { isar = (localStorage.getItem('garden_lang') || 'ar') === 'ar'; } catch (e) {}
     return '<div class="cal cal-' + k + '"' + s + '>' +
-      '<div class="cal-h">' + esc(isar ? c.ar : c.en) + '</div>' +
+      '<div class="cal-h">' + esc(b.ct || (isar ? c.ar : c.en)) + '</div>' +
       '<div class="cal-b">' + runs(rt) + '</div></div>';
   }
 
@@ -119,10 +163,11 @@
     var lv = b.lv || 2;
     switch (b.ty) {
       /*@3.NOSJ4.6*/
-      case 'h':       return '<h' + lv + s + hid(b) + '>' + runs(b.rt) + '</h' + lv + '>';
+      case 'h':       return '<h' + lv + s + hid(b) + '>' + (b.pg > 0 ? '<span class="pg">' + esc(B().pgLead(b)) + '</span>' : '') + runs(b.rt) + '</h' + lv + '>';
       case 'p':       return '<p' + s + '>' + runs(b.rt) + '</p>';
       case 'quote':   return '<blockquote' + s + '>' + runs(b.rt) + '</blockquote>';
       case 'callout': return calHtml(b, s);
+      case 'sticky':  return stkHtml(b, s);
       case 'todo':    return '<p class="td"' + s + '><span class="bx">' +
                         (b.done ? '&#10003;' : '&#160;') + '</span>' + runs(b.rt) + '</p>';
       case 'ul':
@@ -135,6 +180,7 @@
       case 'img':     return imgHtml(b);
       case 'gap':     return '<div style="height:' + (b.h || 40) + 'px"></div>';
       case 'hr':      return '<hr>';
+      case 'pb':      return '<div class="pb" style="break-before:page"></div>';
       default:        return '';
     }
   }
@@ -168,6 +214,7 @@
     'table[data-tst="lines"] td,table[data-tst="lines"] th{border-inline:0}' +
     'table[data-tst="plain"] td,table[data-tst="plain"] th{border:0}' +
     'figure{margin:0 auto .8rem}figure img{max-width:100%;display:block;border-radius:.4rem}' +
+    '.stk{width:min(100%,15rem);min-height:8.5rem;padding:.7rem .8rem;margin:0 0 .8rem;border:1px solid var(--stk);border-radius:2px 2px 10px 2px;background:color-mix(in srgb,var(--stk) 18%,#fff)}' +
     'figcaption{font-size:.82rem;color:#6b7280;text-align:center;margin-top:.25rem}' +
     '.ink{margin:0 0 .8rem}.ink svg{max-width:100%;height:auto;display:block}' +
     '.ovl{border-top:1px dashed #e5e7eb;padding-top:.6rem;margin-top:1rem}' +
@@ -181,6 +228,8 @@
   function bodyHtml(doc) {
     var blocks = (doc && doc.blocks) || [];
     var jobs = blocks.map(function (b) {
+      /*@3.NOSJ4.8*/
+      if (b.ty === 'img') { var ij = imgJob(b); if (ij) return ij; }
       if (b.ty === 'ink') {
         return inkSvg(b).then(function (svg) {
           return svg ? '<div class="ink">' + svg + '</div>' : '';
@@ -234,22 +283,45 @@
     });
   }
 
-  function toJson(doc, meta) {
+  function toJson(doc, meta, raw) {
     var m = meta || {};
     return JSON.stringify({
       format: 'garden-notes', v: 1,
       title: m.title || '', course: m.course || '', exported: m.date || '',
-      doc: B() ? B().normalize(doc) : doc
+      doc: (B() && !raw) ? B().normalize(doc) : doc
     }, null, 2);
   }
 
-  function toJsonMany(items) {
+  /*@3.NOSJ4.13*/
+  function inlineLocal(doc) {
+    var Bx = B(), bs = (doc && doc.blocks) || [], jobs = [], i;
+    if (!Bx || !Bx.localImg) return Promise.resolve(doc);
+    for (i = 0; i < bs.length; i++) {
+      (function (b) {
+        if (!b || b.ty !== 'img' || !Bx.localImg(b.url)) return;
+        jobs.push(localData(b.url).then(function (u) { if (u) b.url = u; }));
+      }(bs[i]));
+    }
+    return Promise.all(jobs).then(function () { return doc; });
+  }
+  /*@3.NOSJ4.15*/
+  function toJsonAsync(doc, meta) {
+    var copy = doc ? JSON.parse(JSON.stringify(doc)) : doc;
+    if (copy && B()) copy = B().normalize(copy);
+    return inlineLocal(copy).then(function (d) { return toJson(d, meta, true); });
+  }
+  function toJsonManyAsync(items) {
+    var list = (items || []).map(function (it) { var dc = it.doc ? JSON.parse(JSON.stringify(it.doc)) : it.doc; if (dc && B()) dc = B().normalize(dc); return { meta: it.meta, doc: dc }; });
+    return Promise.all(list.map(function (it) { return inlineLocal(it.doc); })).then(function () { return toJsonMany(list, true); });
+  }
+
+  function toJsonMany(items, raw) {
     return JSON.stringify({
       format: 'garden-notes-bundle', v: 1,
       notes: (items || []).map(function (it) {
         var m = it.meta || {};
         return { title: m.title || '', course: m.course || '',
-                 doc: B() ? B().normalize(it.doc) : it.doc };
+                 doc: (B() && !raw) ? B().normalize(it.doc) : it.doc };
       })
     }, null, 2);
   }
@@ -257,6 +329,10 @@
   function fromJson(text) {
     var o;
     try { o = JSON.parse(text); } catch (e) { return null; }
+    return fromJsonObj(o);
+  }
+  /*@3.NOSJ4.14*/
+  function fromJsonObj(o) {
     if (!o || typeof o !== 'object') return null;
     if (o.format === 'garden-notes' && o.doc) {
       return [{ title: o.title || '', doc: B() ? B().normalize(o.doc) : o.doc }];
@@ -305,7 +381,7 @@
     var M = B();
     if (fmt === 'txt') return Promise.resolve(M ? M.toText(doc) : '');
     if (fmt === 'md') return Promise.resolve(M ? M.toMarkdown(doc) : '');
-    if (fmt === 'json') return Promise.resolve(toJson(doc, meta));
+    if (fmt === 'json') return toJsonAsync(doc, meta);
     return toHtml(doc, meta);
   }
 
@@ -322,7 +398,7 @@
       return '# ' + ((it.meta && it.meta.title) || L('بلا عنوان', 'Untitled')) + '\n\n' +
         (M ? M.toMarkdown(it.doc) : '');
     }).join('\n\n---\n\n'));
-    if (fmt === 'json') return Promise.resolve(toJsonMany(items));
+    if (fmt === 'json') return toJsonManyAsync(items);
     return toHtmlMany(items, title);
   }
 
@@ -367,7 +443,10 @@
     toHtmlMany: toHtmlMany,
     toJson: toJson,
     toJsonMany: toJsonMany,
+    toJsonAsync: toJsonAsync,
+    toJsonManyAsync: toJsonManyAsync,
     fromJson: fromJson,
+    fromJsonObj: fromJsonObj,
     render: render,
     renderMany: renderMany,
     exportNote: exportNote,

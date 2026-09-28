@@ -186,10 +186,8 @@
   }
 
   function tokHtml(s) {
-    var out = '', i = 0, n = s.length;
-    function push(cls, txt) {
-      out += cls ? ('<span class="cd-' + cls + '">' + esc(txt) + '</span>') : esc(txt);
-    }
+    var out = [], i = 0, n = s.length;
+    function push(cls, txt) { if (txt) out.push([cls, txt]); }
     while (i < n) {
       if (s.substr(i, 4) === '<!--') {
         var ce = s.indexOf('-->', i + 4);
@@ -201,8 +199,10 @@
         te = te < 0 ? n : te + 1;
         var tag = s.slice(i, te);
         var mt = tag.match(/^<\/?\s*([A-Za-z0-9_:.-]+)/);
+        /*@3.NOCJ2.8*/
+        if (!mt) { push('pn', '<'); i++; continue; }
         var j = 0;
-        push('pn', mt ? tag.slice(0, mt[0].length - mt[1].length) : '<');
+        push('pn', tag.slice(0, mt[0].length - mt[1].length));
         if (mt) {
           push('ty', mt[1]);
           j = mt[0].length;
@@ -245,14 +245,24 @@
     return s.charAt(j) === mark;
   }
 
+  /*@3.NOCJ2.10*/
+  function htmlOf(toks) {
+    var out = '', i, t;
+    for (i = 0; i < toks.length; i++) {
+      t = toks[i];
+      out += t[0] ? ('<span class="cd-' + t[0] + '">' + esc(t[1]) + '</span>') : esc(t[1]);
+    }
+    return out;
+  }
   /*@3.NOCJ2.1*/
-  function tokenize(src, lang) {
+  function tokenize(src, lang) { return htmlOf(tokensOf(src, lang)); }
+  function tokensOf(src, lang) {
     var s = String(src == null ? '' : src);
     var cfg = LANG[lang];
-    if (!cfg) return esc(s);
+    if (!cfg) return s ? [['', s]] : [];
     if (cfg.html) return tokHtml(s);
     var kw = keywords(lang);
-    var out = '';
+    var out = [];
     var i = 0, n = s.length;
     var lineA = cfg.line || '', lineB = cfg.alt || '';
     var bo = cfg.block ? cfg.block[0] : '', bc = cfg.block ? cfg.block[1] : '';
@@ -261,9 +271,7 @@
     var sig = cfg.sig || '';
     var wordRe = cfg.dash ? /[A-Za-z0-9_$#-]/ : /[A-Za-z0-9_$#]/;
 
-    function push(cls, txt) {
-      out += cls ? ('<span class="cd-' + cls + '">' + esc(txt) + '</span>') : esc(txt);
-    }
+    function push(cls, txt) { if (txt) out.push([cls, txt]); }
 
     /*@3.NOCJ2.4*/
     var last = -1;
@@ -363,12 +371,145 @@
     return out;
   }
 
+  /*@3.NOCJ2.11*/
+  var CHUNK = 24, CHUNK_MIN = 40;
+  function chunkHtml(toks, lh) {
+    var lines = [''], i, j, t, parts, cls;
+    for (i = 0; i < toks.length; i++) {
+      t = toks[i]; cls = t[0];
+      parts = t[1].split('\n');
+      for (j = 0; j < parts.length; j++) {
+        if (j) lines.push('');
+        if (!parts[j]) continue;
+        lines[lines.length - 1] += cls ? ('<span class="cd-' + cls + '">' + esc(parts[j]) + '</span>') : esc(parts[j]);
+      }
+    }
+    var out = '', k, n, nv, sz;
+    var phantom = (lines.length > 1 && lines[lines.length - 1] === '') ? 1 : 0;
+    for (k = 0; k < lines.length; k += CHUNK) {
+      n = Math.min(CHUNK, lines.length - k);
+      nv = (k + n >= lines.length) ? Math.max(0, n - phantom) : n;
+      /*@3.NOCJ2.15*/
+      sz = (lh > 0) ? ((Math.round(nv * lh * 1000) / 1000) + 'px') : (nv + 'lh');
+      out += '<div class="cd-ck" data-n="' + nv + '" style="contain-intrinsic-block-size:auto ' + sz + '">' + lines.slice(k, k + n).join('\n') + (k + n < lines.length ? '\n' : '') + '</div>';
+    }
+    return out;
+  }
+  /*@3.NOCJ2.12*/
+  /*@3.NOCJ2.14*/
+  var SIZEQ = [], SIZET = 0;
+  var LHC = {};
+  var CKST = { flushes: 0, hosts: 0, ms: 0, probes: 0 };
+  function fontKey(host) {
+    var cs;
+    try { cs = getComputedStyle(host); return cs.fontSize + '|' + cs.lineHeight + '|' + cs.fontFamily; } catch (e) { return ''; }
+  }
+  var PROBE_N = 16;
+  function lineHFor(root, key, fs, card) {
+    var k = String(key || ''), h = 0;
+    if (LHC[k] > 0) return LHC[k];
+    if (!root || !root.isConnected) return 0;
+    var wrap = document.createElement('div'), pre = document.createElement('pre'), p = document.createElement('div');
+    wrap.className = 'ne-b ne-b-code';
+    wrap.setAttribute('data-ty', 'code');
+    wrap.setAttribute('aria-hidden', 'true');
+    if (fs) { wrap.setAttribute('data-fs', String(fs)); wrap.style.setProperty('--ne-fs', fs + 'px'); }
+    if (card) wrap.setAttribute('data-card', String(card));
+    wrap.style.cssText += ';position:absolute;inset-inline-start:0;inset-block-start:0;inline-size:400px;visibility:hidden;pointer-events:none;margin:0';
+    pre.className = 'ne-code';
+    p.className = 'cd-ck';
+    p.style.cssText = 'content-visibility:visible;contain-intrinsic-block-size:auto';
+    p.textContent = new Array(PROBE_N).join('x\n') + 'x';
+    pre.appendChild(p); wrap.appendChild(pre);
+    try { root.appendChild(wrap); h = p.getBoundingClientRect().height / PROBE_N; } catch (e) { h = 0; }
+    if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    CKST.probes++;
+    if (h > 2) LHC[k] = h;
+    return h > 2 ? h : 0;
+  }
+  function probeLh(host, fk) {
+    if (LHC[fk] > 0) return LHC[fk];
+    var p = document.createElement('div'), h = 0;
+    p.className = 'cd-ck';
+    p.setAttribute('data-probe', '1');
+    p.style.cssText = 'position:absolute;inset-inline-start:0;inset-block-start:0;visibility:hidden;pointer-events:none;content-visibility:visible;contain-intrinsic-block-size:auto';
+    p.textContent = new Array(PROBE_N).join('x\n') + 'x';
+    try {
+      host.appendChild(p);
+      h = p.getBoundingClientRect().height / PROBE_N;
+    } catch (e) { h = 0; }
+    if (p.parentNode) p.parentNode.removeChild(p);
+    if (h > 2 && fk) LHC[fk] = h;
+    return h > 2 ? h : 0;
+  }
+  function writeChunks(host, lh) {
+    var cks = host.querySelectorAll ? host.querySelectorAll(':scope > .cd-ck') : [], i, n;
+    if (!(lh > 0)) return false;
+    for (i = 0; i < cks.length; i++) {
+      n = parseInt(cks[i].getAttribute('data-n'), 10) || 0;
+      cks[i].style.containIntrinsicBlockSize = 'auto ' + (Math.round(n * lh * 1000) / 1000) + 'px';
+    }
+    host.setAttribute('data-cv', '1');
+    return true;
+  }
+  function sizeChunks(host) {
+    if (!host || !host.isConnected) return false;
+    var fk = fontKey(host);
+    return writeChunks(host, probeLh(host, fk));
+  }
+  function sizeFlush() {
+    SIZET = 0;
+    var q = SIZEQ; SIZEQ = [];
+    var i, live = [], t0 = Date.now(), fk, lh, p0 = 0;
+    for (i = 0; i < q.length; i++) {
+      if (!q[i].isConnected || q[i].hasAttribute('data-cv') || live.indexOf(q[i]) >= 0) continue;
+      if (q[i].hidden || (q[i].closest && q[i].closest('[hidden]'))) continue;
+      live.push(q[i]);
+    }
+    var fks = [];
+    for (i = 0; i < live.length; i++) fks.push(fontKey(live[i]));
+    for (i = 0; i < live.length; i++) {
+      fk = fks[i];
+      if (!(LHC[fk] > 0)) p0++;
+      lh = probeLh(live[i], fk);
+      writeChunks(live[i], lh);
+    }
+    CKST.flushes++; CKST.hosts += live.length; CKST.ms += Date.now() - t0; CKST.probes += p0;
+    return live.length;
+  }
+  function sizeSoon(host) {
+    SIZEQ.push(host);
+    if (SIZET) return;
+    SIZET = 1;
+    Promise.resolve().then(sizeFlush);
+  }
+  function resizeAll(root) {
+    var hosts = (root || document).querySelectorAll('.ne-code[data-cv]'), i;
+    LHC = {};
+    for (i = 0; i < hosts.length; i++) { hosts[i].removeAttribute('data-cv'); sizeSoon(hosts[i]); }
+  }
   /*@3.NOCJ2.2*/
-  function paint(host, src, lang) {
+  function paint(host, src, lang, mode, lh) {
     if (!host) return false;
     var l = norm(lang);
+    if (host.removeAttribute) host.removeAttribute('data-painted');
     if (!l) { host.textContent = String(src == null ? '' : src); return false; }
-    host.innerHTML = tokenize(src, l);
+    /*@3.NOCJ2.9*/
+    var s0 = String(src == null ? '' : src), lead = (s0.charAt(0) === '\n' ? '\n' : '');
+    var toks = tokensOf(s0, l);
+    var lines = 0, q = -1;
+    while ((q = s0.indexOf('\n', q + 1)) >= 0) lines++;
+    if (mode === 'spans' || lines < CHUNK_MIN) {
+      host.innerHTML = lead + htmlOf(toks);
+      if (host.removeAttribute) host.removeAttribute('data-cv');
+      return true;
+    }
+    host.innerHTML = chunkHtml(toks, lh);
+    if (host.setAttribute) {
+      host.setAttribute('data-painted', '1');
+      if (lh > 0) host.setAttribute('data-cv', '1');
+      else { host.removeAttribute('data-cv'); sizeSoon(host); }
+    }
     return true;
   }
 
@@ -403,6 +544,13 @@
 
   window.GardenNotesCode = {
     paint: paint,
+    sizeChunks: sizeChunks,
+    resizeAll: resizeAll,
+    sizeFlush: sizeFlush,
+    lineHFor: lineHFor,
+    lineH: function (fk) { return LHC[fk] || 0; },
+    _ck: function () { return { flushes: CKST.flushes, hosts: CKST.hosts, ms: CKST.ms, probes: CKST.probes, keys: Object.keys(LHC).length }; },
+    tokens: tokensOf,
     tokenize: tokenize,
     norm: norm,
     isMermaid: isMermaid,

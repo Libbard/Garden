@@ -177,7 +177,7 @@
     GardenFetch('/v1/faculty/directory.json')
       .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); })
       .then(function (d) {
-        DIR = d; DIR_LOADING = false;
+        DIR = d; DIR_LOADING = false; LATEST = '';
         /*@3.FAPJ.22*/
         /*@3.FAPJ.83*/
         DIR_MAIL = {}; DIR_NAME = {};
@@ -373,6 +373,32 @@
     return otherName({ ar: p.a, machine: p.s === 'ai', latin: p.n });
   }
 
+  /*@3.FAPJ.94*/
+  var LATEST = '';
+  function latestTerm() {
+    if (LATEST) return LATEST;
+    var d = DIR && DIR.people ? DIR.people : [];
+    for (var i = 0; i < d.length; i++) {
+      var v = String(d[i].t1 || '');
+      if (v > LATEST) LATEST = v;
+    }
+    return LATEST;
+  }
+  function termYear(t) {
+    t = String(t || '');
+    return /^\d{6}$/.test(t) ? t.slice(0, 4) : '';
+  }
+  function dirAgeNote(p) {
+    if (!p) return '';
+    var bits = [];
+    var y = termYear(p.t1);
+    if (y && String(p.t1) < latestTerm()) {
+      bits.push(t('آخرُ شعبةٍ مسجّلةٍ له في ' + y, 'last section in ' + y));
+    }
+    if (p.nx) bits.push(t('لا بريدَ له في البانر', 'no email in Banner'));
+    return bits.join(t(' · ', ' · '));
+  }
+
   /*@3.FAPJ.78*/
   function detStrip(f) {
     return f._detFail
@@ -530,6 +556,8 @@
           '<div class="fc-d-name' + (hasAr(dirNameOf(p)) ? '' : ' ltr') + '">' +
             esc(dirNameOf(p)) + '</div>' +
           arLine(p) +
+          (dirAgeNote(p)
+            ? '<div class="fc-dir-age">' + esc(dirAgeNote(p)) + '</div>' : '') +
           '<div class="fc-d-sub">' +
             t('لا تقييماتِ له بعد — رأيُك سيكون الأوّل.',
               'No ratings yet — yours would be the first.') + '</div>' +
@@ -1107,6 +1135,7 @@
     resetVals: resetVals, nameOf: nameOf, tone: tone, ring: ring,
     pickName: pickName, otherName: otherName, altNameOf: altNameOf,
     dirNameOf: dirNameOf, dirAltOf: dirAltOf, latinOf: latinOf,
+    dirAgeNote: dirAgeNote, termYear: termYear,
     data: function () { return DATA; },
     loadDir: loadDir, searchDir: searchDir, dirByName: dirByName,
     dirByEmail: dirByEmail, dirDetailHtml: dirDetailHtml, arLine: arLine,

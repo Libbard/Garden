@@ -469,9 +469,11 @@
       tick();
     }
 
-    function clamp(n) {
+    /*@3.NOPJ5.34*/
+    function clamp(n, fit) {
       if (!(n > 0)) return 1;
-      return n < 0.25 ? 0.25 : (n > 4 ? 4 : n);
+      var lo = fit ? 0.1 : 0.25;
+      return n < lo ? lo : (n > 4 ? 4 : n);
     }
 
     function room() {
@@ -501,10 +503,19 @@
       if (window.ResizeObserver) {
         st.ro = new ResizeObserver(function () {
           if (!st.view) return;
+          /*@3.NOPJ5.32*/
+          var t = tall(), w = room();
+          if (t === st.lastTall && w === st.lastRoom) return;
+          /*@3.NOPJ5.37*/
+          if (w === st.lastRoom && o.holdFit && o.holdFit()) { st.lastTall = t; return; }
+          st.lastTall = t; st.lastRoom = w;
           if (st.fitT) clearTimeout(st.fitT);
           st.fitT = setTimeout(st.zm ? refit : rescale, 180);
         });
         try { st.ro.observe(host); } catch (e) {}
+        try { st.ro.observe(s); } catch (e2) {}
+        var dk = o.dockEl && o.dockEl();
+        if (dk) { try { st.ro.observe(dk); } catch (e3) {} }
       }
     }
 
@@ -559,7 +570,7 @@
     /*@3.NOPJ5.6*/
     function apply(n, at) {
       if (st.dead || !st.view || !(n > 0)) return st.scale;
-      st.scale = clamp(n);
+      st.scale = clamp(n, at && at.fit);
       st.view.setScale(st.scale, at || null);
       save();
       if (!st.zm && !(at && at.uz)) noteUz(st.scale, false);
@@ -631,8 +642,7 @@
       }
       var cs = getComputedStyle(s);
       /*@3.NOPJ5.30*/
-      var extra = (o.dockH ? o.dockH() : 0) || 0;
-      return Math.max(0, h + extra - (parseFloat(cs.paddingTop) || 0) -
+      return Math.max(0, h - (parseFloat(cs.paddingTop) || 0) -
         (parseFloat(cs.paddingBottom) || 0) - 14);
     }
 
@@ -668,6 +678,8 @@
         onDirty: function () { if (o.onInkDirty) o.onInkDirty(); },
         onField: function (on, bar) { return o.onInkField ? o.onInkField(on, bar) : false; },
         onClosePen: function () { if (o.onInkClose) o.onInkClose(); },
+        onShapeBox: function (n, x, y, w, h, W, stage) { return o.onShapeBox ? o.onShapeBox(n, x, y, w, h, W, stage) : false; },
+        onFileMenu: function (x, y) { if (o.onFileMenu) o.onFileMenu(x, y); },
         /*@3.NOPJ5.23*/
         onGesture: function (phase, g) { if (o.onInkGesture) o.onInkGesture(phase, g); }
       });
@@ -689,12 +701,25 @@
     /*@3.NOPJ5.8*/
     function setView(mode, order) {
       var was = st.mode + st.order;
+      var wasMode = st.mode;
       st.mode = (mode === 2 || mode === 4) ? mode : 1;
       st.order = order === 'col' ? 'col' : 'row';
       if (!st.view) return st.mode;
+      /*@3.NOPJ5.36*/
+      if (wasMode === 1 || !(st.anchorP > 0)) st.anchorP = st.page || 1;
+      var anchorP = st.anchorP;
       st.view.setView(st.mode, st.order);
       /*@3.NOPJ5.19*/
-      if (was !== st.mode + st.order) refit('page', 1);
+      if (was !== st.mode + st.order) {
+        /*@3.NOPJ5.38*/
+        var seqV = (st.navSeq = (st.navSeq || 0) + 1);
+        if (anchorP > 0) st.view.goTo(anchorP, 0);
+        if (st.mode === 1) st.anchorP = 0;
+        refit('page', 0).then(function () {
+          if (st.dead || !st.view || st.navSeq !== seqV || !(anchorP > 0)) return;
+          st.view.goTo(anchorP, 0);
+        });
+      }
       else if (st.zm) refit(); else save();
       if (o.onView) o.onView(st.mode, st.order, st.flow, st.side);
       return st.mode;
@@ -713,6 +738,7 @@
 
     function step(dir) {
       if (!st.view) return st.page;
+      st.navSeq = (st.navSeq || 0) + 1;
       return st.view.step(dir > 0 ? 1 : -1);
     }
 
@@ -723,27 +749,26 @@
     }
 
     /*@3.NOPJ5.24*/
+    /*@3.NOPJ5.33*/
     function tapZoom(cx, cy) {
       if (st.dead || !st.view) return st.scale;
+      st.navSeq = (st.navSeq || 0) + 1;
       var back = st.tapBack;
-      var sc = scroller();
-      if (back && Math.abs((st.scale || 1) - back.to) < 0.02) {
-        st.tapBack = null;
-        st.zm = back.zm;
-        var land = function () {
-          if (st.dead || !st.view) return;
-          st.view.goTo(back.where.p, back.where.f);
-          if (sc) sc.scrollLeft = back.x;
-        };
-        if (back.zm) { refit(back.zm).then(land); return st.scale; }
-        apply(back.scale, { keep: 1 });
-        land();
-        return st.scale;
-      }
       var cur = st.scale || 1;
-      var want = cur < 0.97 ? 1 : Math.min(4, cur * 2);
-      st.tapBack = { zm: st.zm, scale: cur, to: want, where: st.view.where(),
-                     x: sc ? sc.scrollLeft : 0 };
+      var here = st.view.where();
+      if (back && Math.abs(cur - back.to) < 0.02) {
+        st.tapBack = null;
+        /*@3.NOPJ5.35*/
+        var g0 = (cx != null && st.view.grip) ? st.view.grip(cx, cy) : null;
+        return refit('page', 1).then(function (n) {
+          if (st.dead || !st.view) return n;
+          if (g0 && st.view.regrip) { st.view.regrip(g0); st.view.sync(); }
+          else st.view.goTo(here.p, here.f);
+          return n;
+        });
+      }
+      var want = Math.min(4, Math.max(cur * 2, 1.15));
+      st.tapBack = { to: want };
       st.zm = '';
       return apply(want, { cx: cx, cy: cy });
     }
@@ -767,7 +792,7 @@
         return st.ink.arm(on === undefined ? !st.ink.armed : !!on);
       },
       drawing: function () { return !!(st.ink && st.ink.armed); },
-      goTo: function (n, f) { if (st.view) st.view.goTo(n, f || 0); return st.page; },
+      goTo: function (n, f) { st.navSeq = (st.navSeq || 0) + 1; if (st.view) st.view.goTo(n, f || 0); return st.page; },
       step: step,
       mode: function () { return st.mode; },
       order: function () { return st.order; },

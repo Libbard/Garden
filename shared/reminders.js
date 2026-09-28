@@ -332,6 +332,8 @@
 
       var cname = t.course ? courseName(t.course) : '';
       var head = typeLabel(t.type) + (cname ? tx(' · ', ' · ') + cname : '');
+      /*@3.REMJ.100*/
+      if (!cname && t.pending_course) head += tx(' · المادّةُ غيرُ معروفةٍ بعد', ' · course not known yet');
       var titleTxt = (t.title || t.label || '').trim();
 
       out.push({

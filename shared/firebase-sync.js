@@ -100,6 +100,10 @@
     /^garden_ics$/,
     /^garden_module_visits$/,
     /^garden_ink_palettes$/,
+    /*@3.FISJ.246*/
+    /^garden_ink_bar$/,
+    /*@3.FISJ.247*/
+    /^garden_[A-Z0-9]+_m(\d+|review)_study$/,
   ];
   /*@3.FISJ.22*/
   const NEVER_SYNC = new Set([
@@ -363,6 +367,7 @@
     /*@3.FISJ.48*/
     /^garden_[A-Z0-9]+_quizlog$/,
     /^garden_module_visits$/,
+    /^garden_[A-Z0-9]+_m(\d+|review)_study$/,
   ];
   function isDeepKey(k) {
     return MERGE_DEEP.has(k) || MERGE_DEEP_PATTERNS.some(p => p.test(k));

@@ -1,3 +1,94 @@
+/*@3.GARJ.654*/
+;(function () {
+  'use strict';
+  if (window.GardenUnitSlots) return;
+  var PLANS = [
+    { code: 'CS476', map: { 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13 }, retire: [2] },
+    /*@3.GARJ.658*/
+    { code: 'CS230', map: { 11: 8, 8: 9, 12: 10, 9: 11, 10: 12 }, retire: [] }
+  ];
+  var TS = '__syncT_', T0_KEY = 'garden_unit_slots_t0', VISITS = 'garden_module_visits';
+  var EMPTY = { fc: '{}', notes: '[]', quiz: '' };
+  var ls;
+  try { ls = window.localStorage; ls.getItem(T0_KEY); } catch (e) { return; }
+
+  function get(k) { try { return ls.getItem(k); } catch (e) { return null; } }
+  function raw(k, v) { try { ls.setItem(k, v); } catch (e) {} }
+  function put(k, v) { raw(k, v); raw(TS + k, String(Date.now())); }
+  function stampOf(k) { var v = Number(get(TS + k)); return isFinite(v) ? v : 0; }
+  function has(o, n) { return Object.prototype.hasOwnProperty.call(o, n); }
+
+  function t0Of(code) {
+    var key = T0_KEY + '_' + code, t = Number(get(key));
+    if (!(t > 0)) { t = Date.now(); raw(key, String(t)); }
+    return t;
+  }
+
+  function vacate(k, suffix) {
+    if (has(EMPTY, suffix)) put(k, EMPTY[suffix]);
+    else { try { ls.removeItem(k); } catch (e) {} }
+  }
+
+  function runPlan(p) {
+    var mark = 'garden_' + p.code + '_m0_quiz';
+    if (get(mark) !== null) return 0;
+    var t0 = t0Of(p.code);
+    function isOld(k) { return stampOf(k) < t0; }
+    var re = new RegExp('^garden_' + p.code + '_m(\\d+)_(.+)$');
+    var old = [];
+    for (var i = 0; i < ls.length; i++) {
+      var k = ls.key(i), m = re.exec(k || '');
+      if (!m || /_legacy$/.test(k)) continue;
+      var n = +m[1];
+      if ((has(p.map, n) || p.retire.indexOf(n) >= 0) && isOld(k)) old.push({ k: k, n: n, s: m[2], v: get(k) });
+    }
+    if (!old.length) return 0;
+    var written = {}, moved = 0;
+    old.filter(function (x) { return p.retire.indexOf(x.n) >= 0 && x.s !== 'notes'; })
+      .forEach(function (x) { raw(x.k + '_legacy', x.v); vacate(x.k, x.s); written[x.k] = 1; });
+    var movers = old.filter(function (x) { return has(p.map, x.n); });
+    movers.forEach(function (x) {
+      var dest = 'garden_' + p.code + '_m' + p.map[x.n] + '_' + x.s;
+      if (get(dest) !== null && !isOld(dest) && !written[dest]) raw(x.k + '_legacy', x.v);
+      else { put(dest, x.v); written[dest] = 1; moved++; }
+    });
+    movers.forEach(function (x) { if (!written[x.k]) { vacate(x.k, x.s); written[x.k] = 1; } });
+    var qk = 'garden_' + p.code + '_quizlog';
+    try {
+      var log = JSON.parse(get(qk) || 'null');
+      if (Array.isArray(log)) {
+        var ch = false;
+        log.forEach(function (e) {
+          var kn = parseInt(e && e.k, 10);
+          if (String(kn) === String(e.k) && has(p.map, kn) && (e.at || 0) < t0) {
+            e.k = String(p.map[kn]); e.id = e.k + '@' + e.at; ch = true;
+          }
+        });
+        if (ch) put(qk, JSON.stringify(log));
+      }
+    } catch (e) {}
+    try {
+      var vis = JSON.parse(get(VISITS) || 'null');
+      if (vis && typeof vis === 'object') {
+        var nv = {};
+        Object.keys(vis).forEach(function (key) {
+          var mm = /^(.+)_(\d+)$/.exec(key);
+          var nn = mm && mm[1] === p.code ? +mm[2] : 0;
+          nv[nn && has(p.map, nn) ? p.code + '_' + p.map[nn] : key] = vis[key];
+        });
+        raw(VISITS, JSON.stringify(nv));
+      }
+    } catch (e) {}
+    put(mark, 'slots-v1');
+    return moved;
+  }
+
+  function run() { var t = 0; PLANS.forEach(function (p) { t += runPlan(p); }); return t; }
+  run();
+  window.addEventListener('garden:syncCompleted', function () { setTimeout(run, 0); });
+  window.GardenUnitSlots = { run: run, plans: PLANS };
+})();
+
 /*@3.GARJ.1*/
 ;(function () {
   'use strict';
@@ -809,12 +900,50 @@
     });
   }
 
+  /*@3.GARJ.660*/
+  const AR_TXT = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  function mathArabic() {
+    const doc = window.MathJax && MathJax.startup && MathJax.startup.document;
+    if (!doc || doc.__gArText) return;
+    doc.__gArText = 1;
+    (doc.inputJax || []).forEach((jax) => {
+      if (!jax.postFilters) return;
+      jax.postFilters.add((arg) => {
+        const d = arg.data;
+        const root = d && d.root && d.root.walkTree ? d.root : (d && d.walkTree ? d : null);
+        if (!root) return;
+        let fam = '';
+        root.walkTree((node) => {
+          if (!node.isKind || !node.isKind('mtext') || node.attributes.getExplicit('fontfamily')) return;
+          if (!AR_TXT.test(node.getText ? node.getText() : '')) return;
+          if (!fam) {
+            const st = arg.math.start && arg.math.start.node;
+            let host = st && (st.nodeType === 1 ? st : st.parentNode);
+            for (let k = 0; host && host.nodeType === 1 && k < 8; k++, host = host.parentElement) {
+              fam = getComputedStyle(host).fontFamily || '';
+              if (fam && !/mono|consolas|courier/i.test(fam)) break;
+              fam = '';
+            }
+            fam = fam || 'sans-serif';
+          }
+          node.attributes.set('fontfamily', fam);
+        });
+      });
+    });
+  }
+
+  if (window.MathJax && typeof MathJax.typesetPromise !== 'function' && typeof MathJax === 'object') {
+    const st = MathJax.startup = MathJax.startup || {};
+    if (!st.ready) st.ready = () => { MathJax.startup.defaultReady(); mathArabic(); };
+  } else mathArabic();
+
   let _mathLoading = null;
   function typesetMath(el) {
     if (!el) return;
     enhanceMath(el);
     if (!MATH_RE.test(el.textContent || '')) return;
     if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+      mathArabic();
       MathJax.typesetPromise([el]).catch(() => { });
       return;
     }
@@ -822,7 +951,8 @@
       window.MathJax = window.MathJax || {
         tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
         chtml: { displayAlign: 'left' },
-        options: { enableMenu: false }
+        options: { enableMenu: false },
+        startup: { ready: () => { MathJax.startup.defaultReady(); mathArabic(); } }
       };
       _mathLoading = new Promise((res) => {
         /*@3.GARJ.573*/
@@ -856,6 +986,7 @@
     }
     _mathLoading.then((ok) => {
       if (ok && window.MathJax && MathJax.typesetPromise) {
+        mathArabic();
         MathJax.typesetPromise([el]).catch(() => { });
       }
     });
@@ -1243,20 +1374,7 @@
 
     if (grade >= 3) {
       /*@3.GARJ.75*/
-      const updated = sm2Calc(item.state, grade);
-
-      /*@3.GARJ.76*/
-      const prevFail = item.state.failCount || 0;
-      if (updated.interval >= 21) {
-        /*@3.GARJ.77*/
-        updated.failCount = 0;
-      } else if (prevFail > 0 && updated.n > 2) {
-        /*@3.GARJ.78*/
-        updated.failCount = prevFail - 1;
-      } else {
-        updated.failCount = prevFail;
-      }
-      updated.buriedUntil = 0;
+      const updated = nextCardState(item.state, grade);
 
       if (!fc._isReview) {
         fc.sm2[item.i] = updated;
@@ -1274,10 +1392,7 @@
       fc.completed++;
     } else {
       /*@3.GARJ.80*/
-      const updated = sm2Calc(item.state, grade);
-      updated.nextReview = Date.now();
-      updated.failCount = (item.state.failCount || 0) + 1;
-      updated.buriedUntil = 0;
+      const updated = nextCardState(item.state, grade);
       if (!fc._isReview) {
         fc.sm2[item.i] = updated;
         item.state = updated;
@@ -1304,6 +1419,53 @@
 
     renderFlashcard();
     updateDueCount();
+    try { document.dispatchEvent(new CustomEvent('garden:cardsReviewed', { detail: { source: 'deck' } })); } catch (e) { }
+  }
+
+  /*@3.GARJ.655*/
+  function nextCardState(prev, grade) {
+    const updated = sm2Calc(prev, grade);
+    if (grade >= 3) {
+      /*@3.GARJ.76*/
+      const prevFail = prev.failCount || 0;
+      if (updated.interval >= 21) {
+        /*@3.GARJ.77*/
+        updated.failCount = 0;
+      } else if (prevFail > 0 && updated.n > 2) {
+        /*@3.GARJ.78*/
+        updated.failCount = prevFail - 1;
+      } else {
+        updated.failCount = prevFail;
+      }
+    } else {
+      updated.nextReview = Date.now();
+      updated.failCount = (prev.failCount || 0) + 1;
+    }
+    updated.buriedUntil = 0;
+    return updated;
+  }
+
+  /*@3.GARJ.656*/
+  function fcGradeAt(i, grade) {
+    const fc = window._gardenFC;
+    if (!fc.cards || isReviewPage() || !(i >= 0 && i < fc.cards.length)) return false;
+    fc.sm2 = loadSM2();
+    const wasNew = !fc.sm2[i] || fc.sm2[i].n === 0;
+    fc.sm2[i] = nextCardState(fc.sm2[i] || newCard(), grade);
+    saveSM2(fc.sm2);
+    recordRetention(grade >= 3);
+    if (grade >= 3) {
+      recordDailyActivity();
+      if (wasNew && fc._dailyKey) {
+        fc._dailyNewCount = (fc._dailyNewCount || 0) + 1;
+        try { localStorage.setItem(fc._dailyKey, String(fc._dailyNewCount)); } catch (e) { }
+      }
+    }
+    buildQueue(fc.filterMode);
+    renderFlashcard();
+    updateDueCount();
+    try { document.dispatchEvent(new CustomEvent('garden:cardsReviewed', { detail: { source: 'practice', i: i } })); } catch (e) { }
+    return true;
   }
 
   /*@3.GARJ.82*/
@@ -4195,18 +4357,19 @@
   /*@3.GARJ.231*/
   function initScrollAnimations() {
     const all = document.querySelectorAll('.fade-up');
-    const reveal = el => el.classList.add('visible');
+    const reveal = el => { el.classList.remove('fu-wait'); el.classList.add('visible'); };
     const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (calm) { all.forEach(reveal); return; }
 
     const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) reveal(e.target); });
+      entries.forEach(e => { if (e.isIntersecting) { reveal(e.target); obs.unobserve(e.target); } });
     }, { threshold: 0.08 });
 
+    /*@3.GARJ.661*/
     all.forEach(el => {
       const r = el.getBoundingClientRect();
       if (r.top < innerHeight && r.bottom > 0) reveal(el);   /*@3.GARJ.232*/
-      else obs.observe(el);
+      else { el.classList.add('fu-wait'); obs.observe(el); }
     });
 
     /*@3.GARJ.233*/
@@ -6746,21 +6909,46 @@ ${baseRules}`) + regenSuffix;
   }
 
   /*@3.GARJ.620*/
-  function noteModuleVisit(code, mod) {
+  function noteModuleVisit(code, mod, deck) {
     var n = parseInt(mod, 10);
     if (!code || !(n > 0)) return false;
     var all = moduleVisitStore();
     var k = String(code) + '_' + n;
     var d0 = new Date(); d0.setHours(0, 0, 0, 0);
     var day = d0.getTime();
-    var cur = all[k];
-    if (cur && typeof cur === 'object' && cur.d === day) return false;
-    all[k] = { n: ((cur && typeof cur === 'object' ? parseInt(cur.n, 10) : parseInt(cur, 10)) || 0) + 1, d: day };
+    var cur = all[k], c = parseInt(deck, 10) || 0;
+    if (cur && typeof cur === 'object' && cur.d === day) {
+      if (!c || cur.c === c) return false;
+      cur.c = c;   /*@3.GARJ.657*/
+    } else {
+      all[k] = { n: ((cur && typeof cur === 'object' ? parseInt(cur.n, 10) : parseInt(cur, 10)) || 0) + 1, d: day };
+      if (c) all[k].c = c;
+    }
     try { localStorage.setItem(MODULE_VISITS_LS, JSON.stringify(all)); return true; }
     catch (e) { return false; }
   }
+  /*@3.GARJ.659*/
+  function resetModuleVisit(code, mod) {
+    var n = parseInt(mod, 10);
+    if (!code || !(n > 0)) return false;
+    var all = moduleVisitStore(), k = String(code) + '_' + n, cur = all[k];
+    if (cur == null) return false;
+    all[k] = (cur && typeof cur === 'object') ? { n: 0, d: 0, c: parseInt(cur.c, 10) || 0 } : 0;
+    try { localStorage.setItem(MODULE_VISITS_LS, JSON.stringify(all)); return true; }
+    catch (e) { return false; }
+  }
+  function moduleDecks(code) {
+    var all = moduleVisitStore(), out = {}, pre = String(code || '') + '_';
+    Object.keys(all).forEach(function (k) {
+      var v = all[k];
+      if (k.indexOf(pre) === 0 && v && typeof v === 'object' && v.c > 0) out[k.slice(pre.length)] = parseInt(v.c, 10);
+    });
+    return out;
+  }
 
   window.Garden = {
+    fcGradeAt: fcGradeAt,
+    fcState: function () { return { sm2: loadSM2(), review: isReviewPage() }; },
 
     cycleTheme, toggleLanguage, setLanguage, applyTheme,
     /*@3.GARJ.447*/
@@ -6785,7 +6973,9 @@ ${baseRules}`) + regenSuffix;
     /*@3.GARJ.618*/
     aiCadence: AI_CADENCE,
     moduleVisits: moduleVisits,
+    moduleDecks: moduleDecks,
     noteModuleVisit: noteModuleVisit,
+    resetModuleVisit: resetModuleVisit,
     toast: notesToast
   };
 
@@ -7464,7 +7654,9 @@ ${baseRules}`) + regenSuffix;
     var code = root.getAttribute('data-subject') || '';
     var mod = root.getAttribute('data-module') || '';
     if (!code || !/^[0-9]+$/.test(mod) || +mod < 1) return;
-    if (window.Garden && Garden.noteModuleVisit) Garden.noteModuleVisit(code, +mod);
+    var deck = 0;
+    try { var fd = document.getElementById('flashcard-data'); deck = fd ? (JSON.parse(fd.textContent) || []).length : 0; } catch (e) { deck = 0; }
+    if (window.Garden && Garden.noteModuleVisit) Garden.noteModuleVisit(code, +mod, deck);
   }
   trackModuleVisit();
 

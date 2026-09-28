@@ -46,6 +46,20 @@
     this.emit();
   };
 
+  /*@3.NOHJ.5*/
+  History.prototype.merge = function (n) {
+    if (this.tx || !(n > 1) || this.u.length < n) return false;
+    var g = [], i, e;
+    for (i = this.u.length - n; i < this.u.length; i++) {
+      e = this.u[i];
+      if (Array.isArray(e)) g = g.concat(e); else g.push(e);
+    }
+    this.u.length -= n;
+    this.u.push(g);
+    this.emit();
+    return true;
+  };
+
   History.prototype.register = function (key, api) {
     if (!key || !api) return;
     this.s[key] = api;

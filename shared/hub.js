@@ -284,7 +284,7 @@ async function init() {
     updateHeaderButtons();
     if (catalog) renderAll();
   });
-  document.addEventListener('garden:syncCompleted', () => {
+  window.addEventListener('garden:syncCompleted', () => {
     try { semester = JSON.parse(localStorage.getItem('my_semester')) || null; } catch (e) { semester = null; }
     try { archive = JSON.parse(localStorage.getItem('semester_archive')) || []; } catch (e) { archive = []; }
     if (catalog) renderAll();
@@ -687,7 +687,7 @@ function getCourseProgress(entry) {
       } catch (e) {}
     }
     const quizRaw = localStorage.getItem(quizKey);
-    if (quizRaw !== null) result.quizzesDone++;
+    if (quizRaw !== null && quizRaw !== '') result.quizzesDone++;
   }
   return result;
 }

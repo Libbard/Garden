@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var PL_KEY = 'sx_plans', PL_VER = 6, PL_TTL = 30 * 24 * 3600 * 1000;
+  var PL_KEY = 'sx_plans', PL_VER = 7, PL_TTL = 30 * 24 * 3600 * 1000;
   var RU_KEY = 'sx_rules', RU_VER = 1, RU_TTL = 14 * 24 * 3600 * 1000;
   var MAX_LEVEL = 12, FULL_MASK = (1 << MAX_LEVEL) - 1;
   var PREP_RE = /^[A-Za-z]+0/;

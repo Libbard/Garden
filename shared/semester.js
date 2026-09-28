@@ -519,6 +519,22 @@
     return null;
   }
 
+  /*@3.SEMJ.217*/
+  function dayWord(d) { return isAr() ? (DAY_SHORT_AR[d] || d) : (DAY_EN[d] || d); }
+  function attWord(a) { return a === 'remote' ? L('عن بُعد', 'Remote') : L('حضوري', 'In person'); }
+  function isMixed(list) {
+    for (var i = 1; i < list.length; i++) {
+      if (list[i].attendance !== list[0].attendance) return true;
+    }
+    return false;
+  }
+  function dayModeLabel(list) {
+    var mixed = isMixed(list);
+    return list.map(function (x) {
+      return dayWord(x.day) + (mixed ? ' ' + attWord(x.attendance) : '');
+    }).join(isAr() ? '، ' : ', ');
+  }
+
   /*@3.SEMJ.37*/
   function sectionOf(code) {
     var rows = (S.sched.lectures || []).filter(function (x) {
@@ -530,23 +546,27 @@
       return kept ? { crn: kept, room: '', remote: false, days: [], time: '', label: '', empty: true }
                   : null;
     }
-    var days = [], crn = null, room = '', remote = false;
+    var byDay = [], seen = {}, crn = null, room = '', remote = false, onsite = false;
     /*@3.SEMJ.206*/
     rows.forEach(function (r) {
-      if (days.indexOf(r.day) === -1) days.push(r.day);
+      var att = r.attendance === 'remote' ? 'remote' : 'in_person';
+      if (r.day && !seen[r.day]) {
+        seen[r.day] = 1;
+        byDay.push({ day: r.day, attendance: att, start_time: r.start_time || '', room: r.room || '' });
+      }
       if (!crn && r.sx_crn) crn = r.sx_crn;
       if (!room && r.room) room = r.room;
-      if (r.attendance === 'remote') remote = true;
+      if (att === 'remote') remote = true; else onsite = true;
     });
     if (!crn) crn = semesterCrn(code);
     var order = GardenData.DAYS_ORDER;
-    days.sort(function (a, b) { return order.indexOf(a) - order.indexOf(b); });
+    byDay.sort(function (a, b) { return order.indexOf(a.day) - order.indexOf(b.day); });
     return {
-      crn: crn, room: room, remote: remote,
-      days: days, time: hhmm(rows[0].start_time),
+      crn: crn, room: room, remote: remote, mixed: remote && onsite,
+      days: byDay.map(function (x) { return x.day; }), byDay: byDay,
+      time: hhmm((byDay[0] && byDay[0].start_time) || rows[0].start_time),
       /*@3.SEMJ.38*/
-      label: days.map(function (d) { return isAr() ? (DAY_SHORT_AR[d] || d) : (DAY_EN[d] || d); })
-                 .join(isAr() ? '، ' : ', ')
+      label: dayModeLabel(byDay)
     };
   }
 
@@ -690,7 +710,7 @@
     if (sec) {
       var extra = [];
       if (sec.room) extra.push(sec.room);
-      if (sec.remote) extra.push(L('عن بُعد', 'Remote'));
+      if (sec.remote && !sec.mixed) extra.push(L('عن بُعد', 'Remote'));
       /*@3.SEMJ.208*/
       h += row('fa-clock',
         (sec.empty
@@ -1555,20 +1575,29 @@
 
   /*@3.SEMJ.149*/
   function crnFacts(s) {
-    var f = { days: [], time: '', room: '', remote: false, mid: null, fin: null };
+    var f = { days: [], byDay: [], time: '', room: '', remote: false, mixed: false,
+              mid: null, fin: null };
+    var seen = {}, onsite = false;
     (s.mg || []).forEach(function (m) {
       if (m.type === 'CLAS' || m.type === 'VRTL') {
-        (m.days || []).forEach(function (x) { if (f.days.indexOf(x) < 0) f.days.push(x); });
-        if (!f.time) f.time = hhmm(SXL().hm24(m.begin)) + ' – ' + hhmm(SXL().hm24(m.end));
-        if (m.type === 'VRTL') f.remote = true;
-        else if (!f.room && m.room) f.room = m.room;
+        var att = m.type === 'VRTL' ? 'remote' : 'in_person';
+        (m.days || []).forEach(function (x) {
+          if (seen[x]) return;
+          seen[x] = 1;
+          f.byDay.push({ day: x, attendance: att,
+                         time: hhmm(SXL().hm24(m.begin)) + ' – ' + hhmm(SXL().hm24(m.end)) });
+        });
+        if (att === 'remote') f.remote = true;
+        else { onsite = true; if (!f.room && m.room) f.room = m.room; }
       } else if (m.type === 'MEXM') { if (!f.mid) f.mid = m; }
       else if (m.type === 'FEXM') { if (!f.fin) f.fin = m; }
     });
     var order = GardenData.DAYS_ORDER;
-    f.days.sort(function (a, b) { return order.indexOf(a) - order.indexOf(b); });
-    f.label = f.days.map(function (d) { return isAr() ? (DAY_SHORT_AR[d] || d) : (DAY_EN[d] || d); })
-                    .join(isAr() ? '، ' : ', ');
+    f.byDay.sort(function (a, b) { return order.indexOf(a.day) - order.indexOf(b.day); });
+    f.days = f.byDay.map(function (x) { return x.day; });
+    f.mixed = f.remote && onsite;
+    f.time = (f.byDay[0] && f.byDay[0].time) || '';
+    f.label = dayModeLabel(f.byDay);
     return f;
   }
 
@@ -1652,7 +1681,8 @@
     h += f.days.length
       ? row('fa-clock', esc(f.label + (f.time ? ' · ' + f.time : '')), '',
           (f.room ? '<span class="sem-code">' + esc(f.room) + '</span>'
-                  : (f.remote ? '<span class="sem-badge">' + esc(L('عن بُعد', 'Remote')) + '</span>' : '')))
+                  : (f.remote && !f.mixed
+                      ? '<span class="sem-badge">' + esc(L('عن بُعد', 'Remote')) + '</span>' : '')))
       : row('fa-clock', esc(L('بلا مواعيدَ معلنة', 'No published meeting times')), '', '', true);
 
     /*@3.SEMJ.154*/
@@ -1952,6 +1982,7 @@
     var rows = p.perModule.map(function (m) {
       var why = [];
       if (m.mastered) why.push(L('أتقنتَها', 'mastered'));
+      if (m.unmastered) why.push(L('لم تتقنها بعد — بتقديرك', 'not yet — your call'));
       if (m.quiz) why.push(L('اختبارُها', 'quiz'));
       if (m.cardsTotal) why.push(L(m.cardsStrong + '/' + m.cardsTotal + ' بطاقة',
                                    m.cardsStrong + '/' + m.cardsTotal + ' cards'));
@@ -2831,7 +2862,7 @@
     /*@3.SEMJ.136*/
     document.addEventListener('garden:courseColorChanged', function () { renderCourses(); });
     document.addEventListener('garden:gradesChanged', refresh);
-    document.addEventListener('garden:syncCompleted', refresh);
+    window.addEventListener('garden:syncCompleted', refresh);
     document.addEventListener('garden:semesterActivated', refresh);
     document.addEventListener('garden:cardsReviewed', refresh);
   }

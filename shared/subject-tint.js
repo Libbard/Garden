@@ -207,10 +207,115 @@
     return true;
   }
 
+  /*@3.SUTJ.26*/
+  var MD = {
+    lamp: { js: 1 }, herbal: {}, cornell: {},
+    journey: { js: 1, study: 1 }, recall: { js: 1, study: 1 },
+    words: { js: 1, study: 1 }, summary: { js: 1, study: 1 }, practice: { js: 1, study: 1 }
+  };
+  var MD_IDS = Object.keys(MD);
+  var _design = '', _scripts = {};
+
+  function designChosen() {
+    var raw;
+    try { raw = localStorage.getItem('dashboard_prefs'); } catch (e) { return ''; }
+    if (!raw || raw.indexOf('moduleDesign') < 0) return '';
+    var p = null;
+    try { p = JSON.parse(raw); } catch (e) {}
+    var id = p && typeof p.moduleDesign === 'string' ? p.moduleDesign : '';
+    return MD[id] ? id : '';
+  }
+
+  function designSheet(name) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = _fontBase + 'shared/designs/' + name + '.css';
+    l.setAttribute('data-garden-design', name);
+    l.setAttribute('blocking', 'render');
+    document.head.appendChild(l);
+    return l;
+  }
+
+  function designScript(name, cb) {
+    var st = _scripts[name];
+    if (st === 2) { cb(); return; }
+    if (st && st.push) { st.push(cb); return; }
+    _scripts[name] = [cb];
+    var s = document.createElement('script');
+    s.src = _fontBase + 'shared/designs/' + name + '.js';
+    s.async = false;
+    s.onload = function () { var w = _scripts[name]; _scripts[name] = 2; w.forEach(function (f) { try { f(); } catch (e) {} }); };
+    s.onerror = function () { _scripts[name] = 0; };
+    document.head.appendChild(s);
+  }
+
+  /*@3.SUTJ.29*/
+  function designMount(id) {
+    var D = MD[id];
+    if (!D || !D.js) return;
+    function go() {
+      if (_design !== id) return;
+      var G = window.GardenDesigns && window.GardenDesigns[id];
+      if (G && G.__mounted === false && G.mount) { G.mount(); G.__mounted = true; return; }
+      if (G) return;
+      designScript(id, function () {
+        var g = window.GardenDesigns && window.GardenDesigns[id];
+        if (!g) return;
+        g.__mounted = true;
+        if (_design !== id && g.unmount) { try { g.unmount(); } catch (e) {} g.__mounted = false; }
+      });
+    }
+    function start() { if (D.study) designScript('study-core', go); else go(); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+    else start();
+  }
+
+  function modDesign() {
+    var root = document.documentElement;
+    /*@3.SUTJ.27*/
+    var id = root.hasAttribute('data-subject') ? designChosen() : '';
+    if (id === _design) return;
+    var old = _design;
+    _design = id;
+    var G = old && window.GardenDesigns && window.GardenDesigns[old];
+    if (G && G.unmount && G.__mounted) { try { G.unmount(); } catch (e) {} G.__mounted = false; }
+    var want = id ? (MD[id].study ? ['base', 'study', id] : ['base', id]) : [];
+    var have = {}, drop = [], wait = 0;
+    var ls = document.querySelectorAll('link[data-garden-design]');
+    for (var i = 0; i < ls.length; i++) {
+      var n = ls[i].getAttribute('data-garden-design');
+      if (want.indexOf(n) > -1 && !have[n]) have[n] = 1; else drop.push(ls[i]);
+    }
+    /*@3.SUTJ.28*/
+    function swap() { drop.forEach(function (l) { if (l.parentNode) l.parentNode.removeChild(l); }); drop = []; }
+    if (!id) { swap(); root.removeAttribute('data-mod-design'); return; }
+    root.setAttribute('data-mod-design', id);
+    fontSheet();
+    want.forEach(function (n) {
+      if (have[n]) return;
+      var l = designSheet(n);
+      if (!drop.length) return;
+      wait++;
+      l.addEventListener('load', done); l.addEventListener('error', done);
+    });
+    function done() { if (--wait <= 0) swap(); }
+    if (!wait) swap();
+    designMount(id);
+  }
+
+  function setDesign(id) {
+    var p = readPrefs();
+    p.moduleDesign = MD[id] ? id : 'garden';
+    try { localStorage.setItem('dashboard_prefs', JSON.stringify(p)); } catch (e) {}
+    modDesign();
+    try { document.dispatchEvent(new CustomEvent('garden:moduleDesignChanged', { detail: { design: _design || 'garden' } })); } catch (e) {}
+  }
+
   function run() {
     var root = document.documentElement;
     modTheme();
     modFont();
+    try { modDesign(); } catch (e) {}
     var code = root.getAttribute('data-subject');
     var hex = chosen(code);
     /*@3.SUTJ.17*/
@@ -239,6 +344,7 @@
   window.GardenTint = {
     scale: scale, apply: apply, chosen: chosen, refresh: run,
     THEMES: MT_IDS, THEME_BASE: MT_BASE, applyTheme: modTheme, clearTheme: clearTheme,
-    FONTS: MF_AR, FONTS_LAT: MF_LAT, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont
+    FONTS: MF_AR, FONTS_LAT: MF_LAT, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont,
+    DESIGNS: MD_IDS, design: function () { return _design || 'garden'; }, setDesign: setDesign
   };
 })();

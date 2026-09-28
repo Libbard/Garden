@@ -201,7 +201,7 @@
   }
 
   function inkHex(el) {
-    return el && el.hi ? hiHexOf(el.c) : hexOf(el.c);
+    return (el && el.hi) ? hiHexOf(el.c) : hexOf(el.c);
   }
 
   /*@3.NOCJ.89*/
@@ -385,6 +385,10 @@
     this.onBand = o.onBand || function () {};
     this.onAdd = o.onAdd || function () {};
     this.onTap = o.onTap || function () {};
+    this.unview = o.unview || null;
+    /*@3.NOCJ.116*/
+    this.onTextAt = o.onTextAt || null;
+    this.canText = !!o.onTextAt;
     this.pick = false;
     this.hist = o.hist || null;
     this.host.__cv = this;
@@ -407,7 +411,12 @@
     this.eraseMode = 'whole';
     this.hiStraight = 1;
     this.hiMode = 'text';
+    /*@3.NOCJ.120*/
+    this.hiStyle = 'fill';
     this.snapText = (opts && opts.snapText) || null;
+    this.snapLines = (opts && opts.snapLines) || null;
+    /*@3.NOCJ.124*/
+    this.onShapeBox = (opts && opts.onShapeBox) || null;
 
     this.cam = { x: 0, y: 0, z: 1 };
     this.fitZ = 1;
@@ -429,7 +438,7 @@
     this._ro = (typeof ResizeObserver === 'function')
       ? new ResizeObserver(function () { self.resize(); }) : null;
     if (this._ro) this._ro.observe(this.wrap);
-    this._themeObs = new MutationObserver(function () { self.paint(); });
+    this._themeObs = new MutationObserver(function () { self.inkMode(); self.paint(); });
     this._themeObs.observe(document.documentElement,
       { attributes: true, attributeFilter: ['data-theme', 'data-mod-theme', 'data-tinted'] });
   }
@@ -437,14 +446,19 @@
   Canvas.prototype.build = function () {
     this.wrap = document.createElement('div');
     this.wrap.className = 'nc-wrap';
+    /*@3.NOCJ.128*/
+    this.hi = document.createElement('canvas');
+    this.hi.className = 'nc-hi';
     this.base = document.createElement('canvas');
     this.base.className = 'nc-base';
     this.wet = document.createElement('canvas');
     this.wet.className = 'nc-wet';
     this.wet.setAttribute('role', 'application');
     this.wet.setAttribute('tabindex', '0');
+    this.wrap.appendChild(this.hi);
     this.wrap.appendChild(this.base);
     this.wrap.appendChild(this.wet);
+    this.inkMode();
     /*@3.NOCJ.57*/
     this.selbar = document.createElement('div');
     this.selbar.className = 'nc-selbar';
@@ -571,7 +585,7 @@
     var self = this;
     /*@3.NOCJ.68*/
     function size(hh, dd) {
-      [self.base, self.wet].forEach(function (c) {
+      [self.hi, self.base, self.wet].forEach(function (c) {
         c.width = Math.round(w * dd);
         c.height = Math.round(hh * dd);
         c.style.width = w + 'px';
@@ -608,6 +622,8 @@
       this.winY = target;
     } else return;
     this._wy = target;
+    /*@3.NOCJ.135*/
+    if (this.hi) this.hi.style.insetBlockStart = target + 'px';
     this.base.style.insetBlockStart = target + 'px';
     this.wet.style.insetBlockStart = target + 'px';
     this.cam.y = -target * this.cam.z;
@@ -1123,10 +1139,49 @@
     else this.paintShape(g, el);
   };
 
+  /*@3.NOCJ.129*/
+  function isBand(el) { return !!(el && el.ty === 'st' && el.hi && !el.u); }
+  Canvas.prototype.inkMode = function () {
+    _lightCache = null;
+    if (this.wrap) this.wrap.setAttribute('data-inkdark', isLight() ? '0' : '1');
+  };
+  Canvas.prototype.paintHi = function (g, el) {
+    var pts = el.pts || [], qs = [], i;
+    for (i = 0; i < pts.length; i++) {
+      var p0 = pts[i];
+      var xx = (p0 && p0.x != null) ? p0.x : (p0 && p0[0]), yy = (p0 && p0.y != null) ? p0.y : (p0 && p0[1]);
+      if (xx == null || yy == null) continue;
+      qs.push(this.toScreen({ x: xx, y: yy }));
+    }
+    if (!qs.length) return;
+    g.save();
+    g.globalAlpha = 1;
+    g.strokeStyle = hiHexOf(el.c);
+    var nibS = (NIBS[el.nib] && NIBS[el.nib].scale) || 1;
+    g.lineWidth = Math.max(1, (el.w || 2) * nibS * (this.cam.z || 1));
+    g.lineCap = 'butt';
+    g.lineJoin = 'round';
+    g.beginPath();
+    g.moveTo(qs[0].x, qs[0].y);
+    if (qs.length === 1) g.lineTo(qs[0].x + 0.6, qs[0].y);
+    else if (qs.length === 2) g.lineTo(qs[1].x, qs[1].y);
+    else {
+      for (i = 1; i < qs.length - 1; i++) {
+        var mx = (qs[i].x + qs[i + 1].x) / 2, my = (qs[i].y + qs[i + 1].y) / 2;
+        g.quadraticCurveTo(qs[i].x, qs[i].y, mx, my);
+      }
+      g.lineTo(qs[qs.length - 1].x, qs[qs.length - 1].y);
+    }
+    g.stroke();
+    g.restore();
+  };
+
   Canvas.prototype.paint = function () {
     if (!this.w) return;
     var g = this.base.getContext('2d');
+    var gh = this.hi ? this.hi.getContext('2d') : null;
     g.clearRect(0, 0, this.w, this.h);
+    if (gh) gh.clearRect(0, 0, this.w, this.h);
     var z = this.cam.z || 1;
     var x0 = (0 - this.cam.x) / z, x1 = (this.w - this.cam.x) / z;
     var y0 = (0 - this.cam.y) / z, y1 = (this.h - this.cam.y) / z;
@@ -1134,7 +1189,8 @@
       var el = this.els[i];
       var b = boxOf(el);
       if (b.x > x1 || b.x + b.w < x0 || b.y > y1 || b.y + b.h < y0) continue;
-      this.paintEl(g, el);
+      if (gh && isBand(el)) this.paintHi(gh, el);
+      else this.paintEl(g, el);
     }
     this.paintWet();
   };
@@ -1145,6 +1201,7 @@
     var self = this;
     this._wetQ = requestAnimationFrame(function () {
       self._wetQ = 0;
+      for (var id in self.live) { var st = self.live[id]; if (st && st.ty === 'st' && st.hi) st._lines = textMark(self, st); }
       self.paintWet();
     });
   };
@@ -1154,7 +1211,21 @@
     if (!this.w) return;
     var g = this.wet.getContext('2d');
     g.clearRect(0, 0, this.w, this.h);
-    for (var id in this.live) if (this.live[id]) this.paintEl(g, this.live[id]);
+    var wetHi = false;
+    for (var id in this.live) {
+      if (!this.live[id]) continue;
+      /*@3.NOCJ.133*/
+      if (this.live[id]._lines) {
+        var bl = bandsOf(this, this.live[id], this.live[id]._lines), bq;
+        for (bq = 0; bq < bl.length; bq++) { if (isBand(bl[bq])) { wetHi = true; this.paintHi(g, bl[bq]); } else this.paintEl(g, bl[bq]); }
+        continue;
+      }
+      /*@3.NOCJ.134*/
+      if (this.live[id].ty === 'st' && this.live[id].hi && this.hiMode === 'text' && this.snapLines) continue;
+      if (isBand(this.live[id])) { wetHi = true; this.paintHi(g, this.live[id]); }
+      else this.paintEl(g, this.live[id]);
+    }
+    if (wetHi !== !!this._wetHi) { this._wetHi = wetHi; this.wet.setAttribute('data-hi', wetHi ? '1' : '0'); }
 
     if (this.lasso && this.lasso.length > 1) {
       g.save();
@@ -1581,9 +1652,22 @@
     var self = this;
     var strokes = this.els.filter(function (e) { return e.ty === 'st'; });
     var shapes = this.els.filter(function (e) { return e.ty !== 'st'; });
+    /*@3.NOCJ.136*/
+    var uv = this.unview;
+    if (uv) {
+      shapes = shapes.map(function (e) {
+        var dz = uv(e) || 0, c, k;
+        if (!dz || e.y1 == null) return e;
+        c = {}; for (k in e) if (Object.prototype.hasOwnProperty.call(e, k)) c[k] = e[k];
+        c.y1 = e.y1 - dz; c.y2 = e.y2 - dz; c._bb = null;
+        return c;
+      });
+    }
     /*@3.NOCJ.45*/
     return C().pack(strokes.map(function (e) {
-      return { tool: e.hi ? 'hi' : 'pen', color: inkSafe(e), w: e.w, nib: e.nib, o: e.o, pts: e.pts };
+      var dz = uv ? (uv(e) || 0) : 0;
+      var pts = dz ? e.pts.map(function (p) { return { x: p.x, y: p.y - dz, p: p.p }; }) : e.pts;
+      return { tool: e.hi ? 'hi' : 'pen', color: inkSafe(e), w: e.w, nib: e.nib, o: e.o, pts: pts };
     })).then(function (packed) {
       self.onChange({ ink: packed, shapes: shapes, w: self.w, h: self.pageH,
                       ch: Math.round(self.contentH()) }, quiet);
@@ -1592,31 +1676,8 @@
   };
 
   /*@3.NOCJ.77*/
-  Canvas.prototype.shiftY = function (regs) {
-    if (!regs || !regs.length || !this.els.length) return 0;
-    var moved = 0;
-    function byOf(y) {
-      var d = 0;
-      for (var r = 0; r < regs.length; r++) {
-        if (regs[r].from <= y) d = regs[r].by; else break;
-      }
-      return d;
-    }
-    for (var i = 0; i < this.els.length; i++) {
-      var hit = 0;
-      eachPoint(this.els[i], function (x, y) {
-        var d = byOf(y);
-        if (d) hit = 1;
-        return [x, y + d];
-      });
-      moved += hit;
-    }
-    if (!moved) return 0;
-    this.growIfNeeded();
-    this.paint();
-    this.commit(true);
-    return moved;
-  };
+/*@3.NOCJ.127*/
+/*@3.NOCJ.126*/
 
   Canvas.prototype.mapEl = function (el, ox, oy, nx, ny, s) {
     eachPoint(el, function (x, y) { return [nx + (x - ox) * s, ny + (y - oy) * s]; });
@@ -1652,6 +1713,32 @@
 
 
   /*@3.NOCJ.26*/
+  /*@3.NOCJ.132*/
+  function bandsOf(cv, st, lines) {
+    var bands = [], li, L0, my, th, uy;
+    for (li = 0; li < lines.length; li++) {
+      L0 = lines[li];
+      if (cv.hiStyle === 'under') {
+        var gr = Math.max(1, Math.min(6, (cv.width > 0 ? cv.width : 14) / 6));
+        th = Math.max(1, Math.min(L0.h * 0.34, L0.h * 0.075 * gr));
+        uy = L0.y + L0.h * 0.92 - th / 2;
+        bands.push({ id: uid(), ty: 'st', c: st.c, w: th, nib: 'marker', o: st.o, hi: 0, u: 1,
+                     pts: [{ x: L0.x0, y: uy, p: 0.6 }, { x: L0.x1, y: uy, p: 0.6 }] });
+      } else {
+        my = L0.y + L0.h / 2;
+        bands.push({ id: uid(), ty: 'st', c: st.c, w: Math.max(6, L0.h) / (NIBS.marker.scale || 1), nib: 'marker', o: st.o, hi: 1, u: 0,
+                     pts: [{ x: L0.x0, y: my, p: 0.6 }, { x: L0.x1, y: my, p: 0.6 }] });
+      }
+    }
+    return bands;
+  }
+  function textMark(cv, st) {
+    if (!(st && st.ty === 'st' && st.hi && cv.hiMode === 'text' && cv.snapLines && st.pts && st.pts.length > 1)) return null;
+    var lines = null;
+    try { lines = cv.snapLines(st); } catch (eL) { lines = null; }
+    return (lines && lines.length) ? lines : null;
+  }
+
   function snapHi(cv, st) {
     var pts = st.pts;
     if (!pts || pts.length < 2) return false;
@@ -1673,8 +1760,20 @@
       ax = Math.max(x0, line.x0); bx = Math.min(x1, line.x1);
       if (bx - ax < 3) { ax = line.x0; bx = line.x1; }
     }
+    /*@3.NOCJ.121*/
+    if (cv.hiStyle === 'under') {
+      var gr = Math.max(1, Math.min(6, (cv.width > 0 ? cv.width : 14) / 6));
+      var th = Math.max(1, Math.min(line.h * 0.34, line.h * 0.075 * gr));
+      var uy = line.y + line.h * 0.92 - th / 2;
+      st.w = th;
+      st.nib = 'marker';
+      st.hi = 0;
+      st.pts = [{ x: ax, y: uy, p: 0.6 }, { x: bx, y: uy, p: 0.6 }];
+      return true;
+    }
     var my = line.y + line.h / 2;
-    st.w = Math.max(6, line.h * 0.86);
+    /*@3.NOCJ.130*/
+    st.w = Math.max(6, line.h) / (NIBS.marker.scale || 1);
     st.nib = 'marker';
     st.pts = [{ x: ax, y: my, p: 0.6 }, { x: bx, y: my, p: 0.6 }];
     return true;
@@ -1739,10 +1838,16 @@
     this.emit();
   };
 
+  Canvas.prototype.setHiStyle = function (v) {
+    this.hiStyle = (v === 'under') ? 'under' : 'fill';
+    this.emit();
+  };
+
   Canvas.prototype.setHiMode = function (m) {
     var v = (m === 'line' || m === 'free') ? m : 'text';
     this.hiMode = v;
     this.hiStraight = (v === 'free') ? 0 : 1;
+    if (this.wrap) this.wrap.setAttribute('data-hm', this.tool === 'hi' ? v : '');
     this.emit();
   };
 
@@ -1789,6 +1894,7 @@
     keepTool(t);
     if (t !== 'sel' && t !== 'lasso') { this.sel = {}; this.paintWet(); }
     this.wrap.setAttribute('data-tool', t);
+    this.wrap.setAttribute('data-hm', t === 'hi' ? (this.hiMode || 'text') : '');
     this.emit();
   };
   Canvas.prototype.setColor = function (c) {
@@ -1814,6 +1920,8 @@
     this.onState({
       tool: this.tool, color: this.color, width: this.width, nib: this.nib,
       eraseMode: this.eraseMode, straight: this.hiStraight, hiMode: this.hiMode,
+      /*@3.NOCJ.122*/
+      hiStyle: this.hiStyle,
       zoom: this.userZ, fit: this.fitZ, selection: this.selected().length,
       canUndo: this.hist ? this.hist.canUndo() : !!this.undoS.length,
       canRedo: this.hist ? this.hist.canRedo() : !!this.redoS.length,
@@ -1832,6 +1940,35 @@
   };
 
 
+  /*@3.NOCJ.119*/
+  var T_HOLD_MS = 520, T_HOLD_SLOP = 10;
+
+  Canvas.prototype.holdArm = function (id, pt) {
+    var self = this;
+    this.holdDrop();
+    this._thold = { x: pt.x, y: pt.y };
+    this._thold.t = setTimeout(function () { self.holdFire(); }, T_HOLD_MS);
+  };
+
+  Canvas.prototype.holdMove = function (pt) {
+    var h = this._thold;
+    if (!h || !pt) return;
+    if (Math.abs(pt.x - h.x) > T_HOLD_SLOP || Math.abs(pt.y - h.y) > T_HOLD_SLOP) this.holdDrop();
+  };
+
+  Canvas.prototype.holdDrop = function () {
+    var h = this._thold;
+    this._thold = null;
+    if (h && h.t) clearTimeout(h.t);
+  };
+
+  Canvas.prototype.holdFire = function () {
+    var h = this._thold;
+    this._thold = null;
+    if (!h || !this.onTextAt) return;
+    this.onTextAt(this.toWorld({ x: h.x, y: h.y }));
+  };
+
   Canvas.prototype.bindInput = function () {
     var self = this;
     this.router = window.GardenInkInput.create({
@@ -1842,6 +1979,8 @@
       onBegin: function (id, pt, ptype, act) {
         if (act) { self.beginMod(act); self._modDid = false; }
         var wp = self.toWorld(pt);
+        /*@3.NOCJ.115*/
+        if (self.tool === 'text') { self.holdArm(id, pt); return; }
         if (self.tool === 'era') {
           self._eraseBefore = null;
           var gone = (self.eraseMode === 'part') ? self.erasePart(wp) : self.eraseAt(wp);
@@ -1887,6 +2026,14 @@
           self.paintWet(); self.emit();
           return;
         }
+        if (self.tool === 'shp') {
+          self.live[id] = { id: uid(), ty: 'rect', blk: 1, c: 'violet', w: 1.5,
+                            o: 1, fill: 0, x1: wp.x, y1: wp.y, x2: wp.x, y2: wp.y };
+          /*@3.NOCJ.125*/
+          if (self.onShapeBox) { try { self.live[id].held = self.onShapeBox(wp.x, wp.y, 0, 0, 'start') !== false; } catch (e0) {} }
+          self.paintWet();
+          return;
+        }
         /*@3.NOCJ.5*/
         if (self.tool === 'rect' || self.tool === 'ell' ||
             self.tool === 'line' || self.tool === 'arr') {
@@ -1897,16 +2044,25 @@
           return;
         }
         var hi = self.tool === 'hi';
+        /*@3.NOCJ.123*/
+        var und = hi && self.hiStyle === 'under';
+        var hw = hi ? self.width / NIBS.marker.scale : self.width;
+        if (und) hw = Math.max(1.4, Math.min(6, hw / 6));
         self.live[id] = {
-          id: uid(), ty: 'st', c: self.color, w: hi ? self.width / NIBS.marker.scale : self.width,
+          id: uid(), ty: 'st', c: self.color, w: hw,
           /*@3.NOCJ.82*/
-          nib: hi ? 'marker' : self.nib, o: hi ? 0.8 : self.opacity, hi: hi ? 1 : 0,
+          nib: und ? 'round' : (hi ? 'marker' : self.nib),
+          o: und ? self.opacity : (hi ? 0.8 : self.opacity),
+          hi: hi ? 1 : 0, u: und ? 1 : 0,
           pts: [tiltPt(wp.x, wp.y, pt)]
         };
         self.paintWet();
       },
 
       onMove: function (id, pts) {
+        /*@3.NOCJ.117*/
+        if (self._thold) self.holdMove(pts && pts.length ? pts[pts.length - 1] : null);
+        if (self.tool === 'text') return;
         if (self._erasing && self._erasing[id]) {
           for (var e = 0; e < pts.length; e++) {
             var ew = self.toWorld(pts[e]);
@@ -1990,6 +2146,10 @@
         if (st.ty !== 'st') {
           var w2 = self.toWorld(pts[pts.length - 1]);
           st.x2 = w2.x; st.y2 = w2.y;
+          if (st.blk && st.held && self.onShapeBox) {
+            try { self.onShapeBox(Math.min(st.x1, st.x2), Math.min(st.y1, st.y2), Math.abs(st.x2 - st.x1), Math.abs(st.y2 - st.y1), 'move'); } catch (e1) {}
+            return;
+          }
           self.wetTick();
           return;
         }
@@ -2007,6 +2167,9 @@
       },
 
       onEnd: function (id, keep) {
+        /*@3.NOCJ.118*/
+        if (self._thold) self.holdDrop();
+        if (self.tool === 'text') return;
         if (self._erasing && self._erasing[id]) {
           delete self._erasing[id];
           if (self._eraseBefore) { self.push(self._eraseBefore); self._eraseBefore = null; self.commit(); self.emit(); }
@@ -2049,11 +2212,40 @@
         var st = self.live[id];
         delete self.live[id];
         if (!st) { self.paintWet(); return; }
+        if (st.blk && st.held && self.onShapeBox) {
+          self.paintWet();
+          try { self.onShapeBox(Math.min(st.x1, st.x2), Math.min(st.y1, st.y2), Math.abs(st.x2 - st.x1), Math.abs(st.y2 - st.y1), keep ? 'end' : 'cancel'); } catch (e2) {}
+          return;
+        }
         if (!keep) { self.paintWet(); return; }
+        if (st.blk) {
+          self.paintWet();
+          var bw = Math.abs(st.x2 - st.x1), bh = Math.abs(st.y2 - st.y1);
+          if (bw >= 8 && bh >= 8 && self.onShapeBox) {
+            self.onShapeBox(Math.min(st.x1, st.x2), Math.min(st.y1, st.y2), bw, bh);
+          }
+          return;
+        }
         if (st.ty === 'st' && st.pts.length < 1) { self.paintWet(); return; }
         /*@3.NOCJ.25*/
         if (st.ty === 'st' && st.hi) {
           var snapped = false;
+          /*@3.NOCJ.131*/
+          if (self.hiMode === 'text' && self.snapLines && st.pts.length > 1) {
+            var lines = textMark(self, st);
+            delete st._lines;
+            if (lines) {
+              var bands = bandsOf(self, st, lines), li;
+              self.push(self.snapshot());
+              for (li = 0; li < bands.length; li++) { self.els.push(bands[li]); self.onAdd(bands[li]); }
+              self.used = { tool: 'hi', color: self.color, width: self.width, nib: 'marker', straight: 1 };
+              self.growIfNeeded();
+              self.paint();
+              self.commit();
+              self.emit();
+              return;
+            }
+          }
           if (self.hiMode === 'text' && self.snapText) snapped = snapHi(self, st);
           if (!snapped && self.hiMode !== 'free') straighten(st);
         }
