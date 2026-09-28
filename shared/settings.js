@@ -554,23 +554,96 @@
   }
 
   /*@3.SETJ.21*/
-  function exportData() {
+  function localData() {
     var out = {};
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i);
       if (k && k.indexOf(SYNC_TS_PREFIX) === 0) continue;
       out[k] = localStorage.getItem(k);
     }
-    var blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'digital-garden-backup-' + new Date().toISOString().slice(0, 10) + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
-    toast(L('نزّلت نسختك', 'Backup downloaded'));
+    return out;
   }
 
-  function importData(file) {
+  function need(file, glob) {
+    if (window[glob]) return Promise.resolve(window[glob]);
+    return new Promise(function (res) {
+      var here = document.querySelector('script[src*="shared/settings.js"]');
+      var base = (here && here.src) ? here.src.replace(/settings\.js(\?.*)?$/, '') : '../shared/';
+      var el = document.createElement('script');
+      el.src = base + file;
+      el.onload = function () { res(window[glob] || null); };
+      el.onerror = function () { res(null); };
+      document.head.appendChild(el);
+    });
+  }
+
+  function saveBlob(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+
+  function seq(list, fn) {
+    return list.reduce(function (p, x) { return p.then(function () { return fn(x); }); }, Promise.resolve());
+  }
+
+  /*@3.SETJ.40*/
+  var exBusy = false;
+  function exportData() {
+    if (exBusy) return;
+    exBusy = true;
+    var stamp = new Date().toISOString().slice(0, 10);
+    var ls = localData();
+    toast(L('تُجمع نسختك…', 'Preparing your backup…'));
+    Promise.all([need('zip-lite.js', 'GardenZip'), need('notes-store.js', 'GardenNotesStore')])
+      .then(function (m) {
+        var Z = m[0], St = m[1];
+        if (!Z) {
+          saveBlob(new Blob([JSON.stringify(ls, null, 2)], { type: 'application/json' }),
+                   'digital-garden-backup-' + stamp + '.json');
+          toast(L('نزّلت نسختك — بلا الملاحظات (‏تعذّر تحميلُ الضاغط)',
+                  'Backup downloaded — without notes (compressor failed to load)'));
+          return;
+        }
+        var files = [{ name: 'garden-data.json', data: JSON.stringify(ls) }];
+        var notes = [], imgs = [], lost = false;
+        var body = !St ? Promise.resolve() : St.manifest().then(function (man) {
+          return seq(Object.keys(man), function (id) {
+            return St.getRaw(id).then(function (r) {
+              if (!r) return;
+              var f = 'notes/' + encodeURIComponent(id) + '.json';
+              notes.push({ id: id, t: r.t, f: f });
+              files.push({ name: f, data: r.raw });
+            });
+          });
+        }).then(function () {
+          return St.allImages().then(function (rows) {
+            rows.forEach(function (r) {
+              if (!r || !r.blob) return;
+              var f = 'images/' + encodeURIComponent(r.id);
+              imgs.push({ id: r.id, type: r.type || r.blob.type || '', name: r.name || '', at: r.at || 0, f: f });
+              files.push({ name: f, data: r.blob, compress: false });
+            });
+          });
+        });
+        return body.catch(function () { lost = true; }).then(function () {
+          files.push({ name: 'notes.json', data: JSON.stringify({ v: 1, notes: notes, images: imgs }) });
+          return Z.make(files);
+        }).then(function (blob) {
+          saveBlob(blob, 'digital-garden-backup-' + stamp + '.zip');
+          toast(lost
+            ? L('نزّلت نسختك — وتعذّرت قراءةُ الملاحظات على هذا الجهاز', 'Backup downloaded — notes could not be read on this device')
+            : L('نزّلت نسختك: ' + notes.length + ' ملاحظةً و' + imgs.length + ' صورة',
+                'Backup downloaded: ' + notes.length + ' notes and ' + imgs.length + ' images'));
+        });
+      })
+      .catch(function () { toast(L('تعذّر تجهيزُ النسخة', 'Could not prepare the backup')); })
+      .then(function () { exBusy = false; });
+  }
+
+  function importJson(file) {
     var fr = new FileReader();
     fr.onload = function () {
       var data;
@@ -588,6 +661,59 @@
       setTimeout(function () { location.reload(); }, 900);
     };
     fr.readAsText(file);
+  }
+
+  /*@3.SETJ.41*/
+  function importData(file) {
+    if (!/\.zip$/i.test(file.name || '')) return importJson(file);
+    Promise.all([need('zip-lite.js', 'GardenZip'), need('notes-store.js', 'GardenNotesStore')])
+      .then(function (m) {
+        var Z = m[0], St = m[1];
+        if (!Z) throw new Error('no-zip');
+        return Z.read(file).then(function (fs) {
+          var ls = JSON.parse(Z.text(fs['garden-data.json']) || 'null');
+          var man = JSON.parse(Z.text(fs['notes.json']) || '{}') || {};
+          if (!ls || typeof ls !== 'object') throw new Error('bad');
+          var notes = Array.isArray(man.notes) ? man.notes : [];
+          var imgs = Array.isArray(man.images) ? man.images : [];
+          if ((notes.length || imgs.length) && !St) throw new Error('no-store');
+          if (!window.confirm(L(
+            'ستُستبدل بياناتُ هذا الجهاز بـ' + Object.keys(ls).length + ' مدخلةً، وتُستعاد ' +
+              notes.length + ' ملاحظةً و' + imgs.length + ' صورة (‏ولا تُستبدل ملاحظةٌ أحدثُ على هذا الجهاز). أمتابعٌ؟',
+            Object.keys(ls).length + ' entries will replace this device’s data, and ' + notes.length +
+              ' notes and ' + imgs.length + ' images will be restored (a newer note on this device is kept). Continue?'
+          ))) return null;
+          Object.keys(ls).forEach(function (k) {
+            try { localStorage.setItem(k, ls[k]); } catch (e) {}
+          });
+          var kept = 0, bad = 0;
+          return seq(imgs, function (x) {
+            if (!fs[x.f]) return;
+            return St.getImage(x.id).then(function (cur) {
+              if (cur && cur.blob) return;
+              return St.putImageRow({ id: x.id, blob: new Blob([fs[x.f]], { type: x.type || '' }),
+                                      type: x.type, name: x.name, at: x.at });
+            }).catch(function () { bad++; });
+          }).then(function () {
+            return seq(notes, function (x) {
+              if (!fs[x.f]) return;
+              return St.getRaw(x.id).then(function (cur) {
+                if (cur && Number(cur.t) > Number(x.t)) { kept++; return; }
+                return St.putDoc(x.id, Z.text(fs[x.f]), x.t);
+              }).catch(function () { bad++; });
+            });
+          }).then(function () { return { notes: notes.length - kept - bad, kept: kept, bad: bad }; });
+        });
+      })
+      .then(function (r) {
+        if (!r) return;
+        toast(L('استُوردت ' + r.notes + ' ملاحظةً' + (r.kept ? ' (‏وبقيت ' + r.kept + ' أحدث)' : '') +
+                  (r.bad ? ' · تعذّر ' + r.bad : '') + ' — يُعاد التحميل',
+                'Imported ' + r.notes + ' notes' + (r.kept ? ' (' + r.kept + ' newer kept)' : '') +
+                (r.bad ? ' · ' + r.bad + ' failed' : '') + ' — reloading'));
+        setTimeout(function () { location.reload(); }, 1200);
+      })
+      .catch(function () { toast(L('ملفٌّ غير صالح أو تعذّرت قراءتُه', 'Invalid or unreadable file')); });
   }
 
   /*@3.SETJ.22*/

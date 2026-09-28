@@ -1128,7 +1128,49 @@
       });
   }
 
+  /*@3.FAPJ.95*/
+  function fill(host, who, o, onTitle) {
+    if (!host) return;
+    who = who || {}; o = o || {};
+    var email = who.email || '', name = who.name || '';
+    var seq = (host.__gfFill = (host.__gfFill || 0) + 1);
+    function title(s) { if (onTitle && s) onTitle(s); }
+    function live() { return host.isConnected && host.__gfFill === seq; }
+    host.innerHTML = '<div class="fc-note"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i></div>';
+    load(function () {
+      if (!live()) return;
+      var f = (email && byEmail(email)) || (who.id && byId(who.id)) || (name && byBannerName(name));
+      if (f) { title(nameOf(f)); renderDetail(host, f, o); return; }
+      loadDir(function () {
+        if (!live()) return;
+        var p = (email && dirByEmail(email)) || (name && dirByName(name));
+        if (p) { title(dirNameOf(p)); host.innerHTML = dirDetailHtml(p, o); return; }
+        title(name);
+        host.innerHTML = stubHtml(email, name);
+      });
+    });
+  }
+
+  /*@3.FAPJ.96*/
+  function stubHtml(email, name) {
+    var canRate = !window.GardenFlags || window.GardenFlags.get('ratings.faculty.enabled');
+    return '<div class="fc-d-head"><i class="fa-solid fa-user-slash fc-empty-i" aria-hidden="true"></i>' +
+        '<div class="fc-d-h-t"><div class="fc-d-sub">' +
+        t('لا تقييماتٍ لهذا الأستاذ بعد', 'No ratings for this instructor yet') +
+        '</div></div></div>' +
+      (email ? '<div class="fc-d-mail">' +
+        '<button class="fc-go fc-mail-copy" data-copy="' + esc(email) + '">' +
+          '<i class="fa-regular fa-copy" aria-hidden="true"></i>' + t('انسخ البريد', 'Copy email') +
+          '<span class="fc-go-n ltr">' + esc(email) + '</span></button>' +
+        '<a class="fc-go" href="mailto:' + esc(email) + '">' +
+          '<i class="fa-regular fa-envelope" aria-hidden="true"></i>' + t('راسله', 'Email') + '</a></div>' : '') +
+      (canRate && name ? '<div class="fc-d-acts"><button class="sx-primary fc-rate" data-rate="' +
+        esc(name) + '"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>' +
+        t('كن أوّل من يقيّمه', 'Be the first to rate them') + '</button></div>' : '');
+  }
+
   window.GardenFaculty = {
+    fill: fill,
     load: load, byEmail: byEmail, byId: byId, byBannerName: byBannerName,
     detailHtml: detailHtml, rateHtml: rateHtml, wire: wire,
     ensureDetail: ensureDetail, renderDetail: renderDetail,

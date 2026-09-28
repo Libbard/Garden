@@ -82,8 +82,18 @@
 
   /*@3.SXLJ.9*/
   /*@3.SXLJ.50*/
-  function rowsFor(sec) {
+  /*@3.SXLJ.67*/
+  function inTerm(r, ctx) {
+    if (!ctx || !ctx.term) return true;
+    if (r.sx_term) return r.sx_term === String(ctx.term);
+    return !!ctx.live;
+  }
+
+  function rowsFor(sec, term) {
     var lec = [], ex = [], crn = String(sec.crn);
+    var tag = term ? String(term) : '';
+    /*@3.SXLJ.68*/
+    var idp = 'sx_' + (tag ? tag + '_' : '') + crn;
     var mg = (sec.mg || []).map(function (m, mi) { return { m: m, mi: mi }; });
     var rk = {};
     function slot(pfx) { rk[pfx] = (rk[pfx] || 0) + 1; return pfx + '#' + (rk[pfx] - 1); }
@@ -101,7 +111,7 @@
         (m.days || []).forEach(function (day) {
           var s = slot(day);
           var r = {
-            id: 'sx_' + crn + '_' + s.replace('#', '_'),
+            id: idp + '_' + s.replace('#', '_'),
             course_code: sec.c, day: day,
             start_time: hm24(m.begin), end_time: hm24(m.end),
             room: m.type === 'CLAS' ? (m.room || '') : '',
@@ -112,6 +122,7 @@
             recurring: true, sx_crn: crn, sx_slot: s
           };
           r.sx_snap = lecSnap(r);
+          if (tag) r.sx_term = tag;
           lec.push(r);
         });
       });
@@ -123,7 +134,7 @@
         if (!dt) return;
         var s = slot('x:' + kind);
         var r = {
-          id: 'sx_' + crn + '_x' + kind + '_' + s.split('#')[1],
+          id: idp + '_x' + kind + '_' + s.split('#')[1],
           course_code: sec.c, date: dt,
           /*@3.SXLJ.10*/
           start_time: examHM(m.begin), end_time: examHM(m.end), all_day: false,
@@ -132,13 +143,14 @@
           sx_crn: crn, sx_slot: s
         };
         r.sx_snap = exSnap(r);
+        if (tag) r.sx_term = tag;
         ex.push(r);
       });
     return { lectures: lec, exams: ex };
   }
 
   /*@3.SXLJ.11*/
-  function matcher(crn, sec) {
+  function matcher(crn, sec, ctx) {
     var lecKey = {}, exKey = {};
     if (sec) {
       var rows = rowsFor(sec);
@@ -153,11 +165,11 @@
     return {
       code: sec ? sec.c : null,
       lec: function (r) {
-        return r.sx_crn === crn ||
+        return (r.sx_crn === crn && inTerm(r, ctx)) ||
                (!r.sx_crn && !!lecKey[r.course_code + '|' + r.day + '|' + r.start_time]);
       },
       ex: function (r) {
-        return r.sx_crn === crn ||
+        return (r.sx_crn === crn && inTerm(r, ctx)) ||
                (!r.sx_crn && !!exKey[r.course_code + '|' + r.date + '|' + r.exam_type]);
       }
     };
@@ -170,10 +182,10 @@
     return out;
   }
 
-  function has(crn, sec) {
+  function has(crn, sec, ctx) {
     var d = schLoad();
     if (!d) return false;
-    var m = matcher(crn, sec), hit = false;
+    var m = matcher(crn, sec, ctx), hit = false;
     /*@3.SXLJ.57*/
     (d.lectures || []).forEach(function (r) { if (m.lec(r)) hit = true; });
     (d.exams || []).forEach(function (r) { if (m.ex(r)) hit = true; });
@@ -181,10 +193,10 @@
   }
 
   /*@3.SXLJ.58*/
-  function hasAnywhere(crn, sec) {
+  function hasAnywhere(crn, sec, ctx) {
     var d = schLoad();
     if (!d) return false;
-    var m = matcher(crn, sec), hit = false;
+    var m = matcher(crn, sec, ctx), hit = false;
     boxes(d).forEach(function (b) {
       (b.lectures || []).forEach(function (r) { if (m.lec(r)) hit = true; });
       (b.exams || []).forEach(function (r) { if (m.ex(r)) hit = true; });
@@ -193,14 +205,14 @@
   }
 
   /*@3.SXLJ.51*/
-  function linked(crn) {
+  function linked(crn, ctx) {
     var d = schLoad();
     if (!d) return false;
     crn = String(crn);
     var hit = false;
     boxes(d).forEach(function (b) {
       (b.lectures || []).concat(b.exams || []).forEach(function (r) {
-        if (r && r.sx_crn === crn) hit = true;
+        if (r && r.sx_crn === crn && inTerm(r, ctx)) hit = true;
       });
     });
     return hit;
@@ -208,11 +220,11 @@
 
   /*@3.SXLJ.13*/
   /*@3.SXLJ.44*/
-  function registered() {
+  function registered(ctx) {
     var d = schLoad(), out = {};
     if (!d) return out;
     (d.lectures || []).concat(d.exams || []).forEach(function (r) {
-      if (r && r.sx_crn) out[r.sx_crn] = 1;
+      if (r && r.sx_crn && inTerm(r, ctx)) out[r.sx_crn] = 1;
     });
     return out;
   }
@@ -317,6 +329,8 @@
   function register(secs, opts) {
     opts = opts || {};
     var d = schLoad(true);
+    var ctx = opts.term ? { term: String(opts.term), live: !!opts.live } : null;
+    var foreign = { lectures: [], exams: [] };
     var seenEx = {};
     d.exams.forEach(function (x) {
       seenEx[x.course_code + '|' + x.date + '|' + x.exam_type] = 1;
@@ -341,13 +355,53 @@
       }
       return null;
     }
+    /*@3.SXLJ.69*/
+    function ours(r, code) {
+      return inTerm(r, ctx) && (!ctx || r.course_code === code);
+    }
     function ladder(fresh, crn, sameKind) {
+      var mayAdopt = !ctx || ctx.live || !!opts.force;
       return [
-        function (r) { return r.sx_crn === crn && !!r.sx_slot && r.sx_slot === fresh.sx_slot; },
-        function (r) { return r.sx_crn === crn && !r.sx_slot && sameKind(r); },
-        function (r) { return r.id === fresh.id; },
-        function (r) { return !r.sx_crn && r.course_code === fresh.course_code && sameKind(r); }
+        function (r) { return r.sx_crn === crn && ours(r, fresh.course_code) && !!r.sx_slot && r.sx_slot === fresh.sx_slot; },
+        function (r) { return r.sx_crn === crn && ours(r, fresh.course_code) && !r.sx_slot && sameKind(r); },
+        function (r) { return r.id === fresh.id && ours(r, fresh.course_code); },
+        function (r) { return mayAdopt && !r.sx_crn && r.course_code === fresh.course_code && sameKind(r); }
       ];
+    }
+    function stampTerm(cur) {
+      if (cur && ctx && cur.sx_term !== ctx.term) { cur.sx_term = ctx.term; snapStamped = true; }
+    }
+    function owns(crn, code) {
+      return d.lectures.concat(d.exams).some(function (r) {
+        return r && r.sx_crn === crn && ours(r, code);
+      });
+    }
+    function shiftDay(v, n) {
+      var x = new Date(v + 'T00:00:00Z');
+      if (isNaN(x.getTime())) return '';
+      x.setUTCDate(x.getUTCDate() + n);
+      return x.toISOString().slice(0, 10);
+    }
+    /*@3.SXLJ.70*/
+    function quarantine(crn, sec) {
+      var a = '', b = '';
+      (sec.mg || []).forEach(function (m) {
+        var s = iso(m && m.start_date), e = iso(m && m.end_date) || s;
+        if (s && (!a || s < a)) a = s;
+        if (e && (!b || e > b)) b = e;
+      });
+      if (a) a = shiftDay(a, -30);
+      if (b) b = shiftDay(b, 30);
+      ['lectures', 'exams'].forEach(function (k) {
+        d[k] = d[k].filter(function (r) {
+          if (!r || r.sx_crn !== crn || r.sx_term || claimed.indexOf(r) >= 0) return true;
+          var dt = k === 'lectures' ? (r.start_date || '') : (r.date || '');
+          var off = r.course_code !== sec.c || (!!dt && !!a && !!b && (dt < a || dt > b));
+          if (!off) return true;
+          foreign[k].push(r);
+          return false;
+        });
+      });
     }
 
     /*@3.SXLJ.19*/
@@ -402,11 +456,14 @@
       var noLec = optBlocks(d, crn, 'lectures');
       var noEx = optBlocks(d, crn, 'exams');
       if (noLec && noEx) { rep.blocked.push(crn); return; }
-      var rows = rowsFor(sec), added = 0, touched = 0;
+      /*@3.SXLJ.71*/
+      if (opts.updateOnly && !owns(crn, sec.c)) return;
+      var rows = rowsFor(sec, ctx && ctx.term), added = 0, touched = 0, mine = 0;
       if (noLec) { rows.lectures = []; rep.blocked.push(crn); }
       if (noEx) { rows.exams = []; if (!noLec) rep.blocked.push(crn); }
       rows.lectures.forEach(function (l) {
         var cur = pick(d.lectures, ladder(l, crn, function (r) { return r.day === l.day; }));
+        if (cur) { mine++; stampTerm(cur); }
         /*@3.SXLJ.64*/
         if (cur) {
           if (l.start_date && cur.start_date !== l.start_date) { cur.start_date = l.start_date; snapStamped = true; }
@@ -434,6 +491,7 @@
       rows.exams.forEach(function (x) {
         /*@3.SXLJ.26*/
         var cur = pick(d.exams, ladder(x, crn, function (r) { return r.exam_type === x.exam_type; }));
+        if (cur) { mine++; stampTerm(cur); }
         if (!cur) {
           /*@3.SXLJ.27*/
           var k = x.course_code + '|' + x.date + '|' + x.exam_type;
@@ -458,11 +516,22 @@
       });
       /*@3.SXLJ.42*/
       if (touched) { n++; courses[sec.c] = { sec: sec, crn: crn }; }
-      mergeInstructors(sec.c, sec.f);
+      if (!ctx || mine || touched) mergeInstructors(sec.c, sec.f);
+      if (ctx && ctx.live) quarantine(crn, sec);
     });
 
+    if (foreign.lectures.length || foreign.exams.length) {
+      var q = (d.sx_quarantine && typeof d.sx_quarantine === 'object') ? d.sx_quarantine : {};
+      q.lectures = (Array.isArray(q.lectures) ? q.lectures : []).concat(foreign.lectures);
+      q.exams = (Array.isArray(q.exams) ? q.exams : []).concat(foreign.exams);
+      q.at = new Date().toISOString();
+      d.sx_quarantine = q;
+      rep.quarantined = foreign.lectures.length + foreign.exams.length;
+      snapStamped = true;
+    }
+
     /*@3.SXLJ.65*/
-    if (termStart) {
+    if (termStart && (!ctx || ctx.live)) {
       var stx = d.settings || (d.settings = {});
       if (stx.sx_term_start !== termStart) { stx.sx_term_start = termStart; snapStamped = true; }
     }
@@ -503,7 +572,7 @@
       delete d.sx_optout[crn];
       if (!Object.keys(d.sx_optout).length) delete d.sx_optout;
     }
-    var m = matcher(crn, sec), code = m.code, n = 0;
+    var m = matcher(crn, sec, opts && opts.ctx), code = m.code, n = 0;
     boxes(d).forEach(function (box) {
       if (Array.isArray(box.lectures)) {
         var l0 = box.lectures.length;
@@ -694,6 +763,7 @@
 
   var ACTIVE_PHASES = ['EMPTY', 'ARMED', 'LIVE', 'QUIET', 'POST'];
   var _termsP = null;
+  function isLive(x) { return !!x && ACTIVE_PHASES.indexOf(x.phase) >= 0; }
 
   function terms() {
     if (_termsP) return _termsP;
@@ -721,14 +791,14 @@
   /*@3.SXLJ.35*/
   function rankedTerms(ts) {
     function bySize(a, b) { return b.sections - a.sections; }
-    function isLive(x) { return ACTIVE_PHASES.indexOf(x.phase) >= 0; }
     /*@3.SXLJ.41*/
     var order = ts.filter(isLive).sort(bySize)
       .concat(ts.filter(function (x) { return !isLive(x); }).sort(bySize));
     var saved = savedTerm();
     if (saved) {
       var hit = ts.filter(function (x) { return x.term === saved; })[0];
-      if (hit) {
+      /*@3.SXLJ.72*/
+      if (hit && isLive(hit)) {
         order = order.filter(function (x) { return x.term !== saved; });
         order.unshift(hit);
       }
@@ -778,6 +848,32 @@
     });
   }
 
+  /*@3.SXLJ.73*/
+  function heal() {
+    var d = schLoad();
+    if (!d || !API) return Promise.resolve(null);
+    var legacy = {};
+    d.lectures.concat(d.exams).forEach(function (r) {
+      if (r && r.sx_crn && !r.sx_term) legacy[String(r.sx_crn)] = 1;
+    });
+    if (!Object.keys(legacy).length) return Promise.resolve(null);
+    return terms().then(function (ts) {
+      var live = ts.filter(isLive).sort(function (a, b) { return b.sections - a.sections; })[0];
+      if (!live || (d.settings || {}).sx_healed === live.term) return null;
+      return catalog(live.term).then(function (list) {
+        var secs = list.filter(function (s) { return legacy[String(s.crn)]; });
+        var r = secs.length
+          ? register(secs, { term: live.term, live: true, pending: false, updateOnly: true })
+          : null;
+        var d2 = schLoad(true);
+        d2.settings = d2.settings || {};
+        d2.settings.sx_healed = live.term;
+        schSave(d2);
+        return r;
+      });
+    }).catch(function () { return null; });
+  }
+
   /*@3.SXLJ.38*/
   window.GardenSXLink = {
     SCH_KEY: SCH_KEY,
@@ -797,7 +893,7 @@
     CITY_AR: CITY_AR,
     campusOf: campusOf, campusLabel: campusLabel, resetCampus: resetCampus,
     applyCampuses: applyCampuses,
-    terms: terms, rankedTerms: rankedTerms, savedTerm: savedTerm,
+    terms: terms, rankedTerms: rankedTerms, savedTerm: savedTerm, isLive: isLive, heal: heal, inTerm: inTerm,
     catalog: catalog, cachedCatalog: cachedCatalog, find: find,
     ready: function () { return !!API; }
   };

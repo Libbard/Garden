@@ -1254,16 +1254,21 @@
 
   /*@3.GADJ.142*/
   function bannerTermRange(sched) {
-    var start = '', end = '';
+    /*@3.GADJ.184*/
+    var start = '', end = '', latest = '';
+    (sched.lectures || []).concat(sched.exams || []).forEach(function (r) {
+      if (r && r.sx_crn && r.sx_term && String(r.sx_term) > latest) latest = String(r.sx_term);
+    });
+    function ofTerm(r) { return !latest || String(r.sx_term || '') === latest; }
     (sched.lectures || []).forEach(function (l) {
-      if (!l || !l.sx_crn || !l.start_date) return;
+      if (!l || !l.sx_crn || !l.start_date || !ofTerm(l)) return;
       if (!start || l.start_date < start) start = l.start_date;
     });
     var st = sched.settings || {};
     /*@3.GADJ.166*/
     if (!start && st.sx_term_start) start = String(st.sx_term_start);
     (sched.exams || []).forEach(function (x) {
-      if (!x || !x.sx_crn || x.exam_type !== 'final' || !x.date) return;
+      if (!x || !x.sx_crn || x.exam_type !== 'final' || !x.date || !ofTerm(x)) return;
       if (!end || x.date > end) end = x.date;
     });
     return { start: start, end: end };
@@ -1322,14 +1327,13 @@
     }
 
     /*@3.GADJ.168*/
-    if (!r.start || !r.end) {
-      var probe = termWindow({
-        term_start_date: r.start || st.term_start_date,
-        semester_end_date: r.end || st.semester_end_date
-      });
-      if (!probe.ok && probe.why !== 'missing') {
-        return { changed: false, conflict: r, span: probe };
-      }
+    /*@3.GADJ.185*/
+    var probe = termWindow({
+      term_start_date: r.start || st.term_start_date,
+      semester_end_date: r.end || st.semester_end_date
+    });
+    if (!probe.ok && probe.why !== 'missing') {
+      return { changed: false, conflict: (r.start && r.end) ? null : r, span: probe };
     }
 
     var changed = false;

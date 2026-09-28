@@ -280,6 +280,19 @@
     }).catch(function () { return ''; });
   }
 
+  /*@3.NOSJ.15*/
+  function allImages() {
+    return tx(S_IMGS, 'readonly', function (os) { return os.getAll(); })
+      .then(function (rows) { return rows || []; });
+  }
+  function putImageRow(row) {
+    if (!row || !row.id || !row.blob) return Promise.reject(mkErr('img_empty'));
+    return tx(S_IMGS, 'readwrite', function (os) {
+      return os.put({ id: String(row.id), blob: row.blob, type: row.type || row.blob.type || 'image/png',
+                      bytes: row.blob.size, at: Number(row.at) || Date.now(), name: row.name || '' });
+    }).then(function () { return row.id; });
+  }
+
   function imageBytes() {
     return tx(S_IMGS, 'readonly', function (os) { return os.getAll(); })
       .then(function (rows) {
@@ -310,6 +323,8 @@
     imageUrl: imageUrl,
     imageUrlNow: imageUrlNow,
     imageBytes: imageBytes,
+    allImages: allImages,
+    putImageRow: putImageRow,
     LIMITS: {
       doc: MAX_DOC_BYTES,
       docWarn: WARN_DOC_BYTES,

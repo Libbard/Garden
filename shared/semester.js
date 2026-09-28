@@ -576,7 +576,10 @@
     if (!ins || !ins.name) return null;
     var f = null;
     if (S.facultyReady && window.GardenFaculty) {
-      f = (ins.email && GardenFaculty.byEmail(ins.email)) || GardenFaculty.byBannerName(ins.name);
+      /*@3.SEMJ.219*/
+      f = (ins.email && GardenFaculty.byEmail(ins.email)) ||
+          (ins.faculty_id && GardenFaculty.byId(ins.faculty_id)) ||
+          GardenFaculty.byBannerName(ins.name);
     }
     return { name: ins.name, rating: f };
   }
@@ -698,7 +701,7 @@
           '<small>' + (ins.rating.n || 0) + '</small></span>';
       }
       h += row('fa-chalkboard-user',
-        '<button class="sem-linkish" type="button" data-ins-open="' + esc(entry.code) + '">' +
+        '<button class="sem-linkish" type="button" data-ins-card="' + esc(entry.code) + '">' +
           esc(ins.name) + '</button>', '', rt);
     } else {
       h += row('fa-chalkboard-user', esc(L('لم تُضِف دكتور المادة', 'No instructor added')), '',
@@ -1548,6 +1551,8 @@
   /*@3.SEMJ.147*/
   var crnSeq = 0, crnTimer = 0;
 
+  function crnCtx() { return CRN.term ? { term: CRN.term, live: !!CRN.live } : null; }
+
   function crnLookup(q, all) {
     var seq = ++crnSeq;
     CRN.q = q;
@@ -1557,6 +1562,7 @@
     SXL().find(q, { all: !!all }).then(function (r) {
       if (seq !== crnSeq) return;      /*@3.SEMJ.148*/
       CRN.sec = r.sec; CRN.term = r.term; CRN.more = !!r.more;
+      CRN.live = !!(r.termRow && SXL().isLive(r.termRow));
       CRN.phase = r.sec ? 'found' : 'miss';
       renderCrn();
     }, function () {
@@ -1651,7 +1657,7 @@
 
     var s = CRN.sec;
     /*@3.SEMJ.204*/
-    var linked = SXL().linked(String(s.crn));
+    var linked = SXL().linked(String(s.crn), crnCtx());
     var other = CRN.code && s.c !== CRN.code;
     var f = crnFacts(s);
     var title = crnTitle(s);
@@ -1752,7 +1758,7 @@
     var s = CRN.sec;
     if (!s || CRN.busy || !SXL()) return;
     CRN.busy = true;
-    var r = SXL().register([s], { force: true });
+    var r = SXL().register([s], { force: true, term: CRN.term, live: CRN.live });
     CRN.busy = false;
     if (!r.saved) {
       toast(L('تعذّر الحفظ — مساحةُ التخزين ممتلئة', 'Could not save — storage is full'));
@@ -1792,7 +1798,7 @@
   function doCrnUnlink() {
     var s = CRN.sec;
     if (!s || !SXL()) return;
-    var n = SXL().unregister(String(s.crn), s);
+    var n = SXL().unregister(String(s.crn), s, { ctx: crnCtx() });
     refresh();
     if (el('dlg-add').open) renderAddList();
     renderCrn();
@@ -2135,6 +2141,51 @@
   }
 
   /*@3.SEMJ.91*/
+
+  /*@3.SEMJ.218*/
+  var insDlg = null;
+  function openInsCard(code) {
+    var ins = (GardenData.courseMeta(code).instructors || [])[0];
+    if (!ins || !ins.name || !window.GardenFaculty || !GardenFaculty.fill) { openIns(code); return; }
+    if (!insDlg) {
+      insDlg = document.createElement('dialog');
+      insDlg.className = 'gsf sem-ins-dlg';
+      insDlg.setAttribute('aria-labelledby', 'sem-ins-dlg-t');
+      insDlg.innerHTML = '<div class="gsf-grip" aria-hidden="true"></div>' +
+        '<form method="dialog" class="gsf-x"><button class="gsf-close">' +
+          '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
+        '<header class="gsf-head"><h2 class="gsf-title" id="sem-ins-dlg-t"></h2>' +
+          '<p class="gsf-sub"></p></header>' +
+        '<div class="gsf-body"></div>' +
+        '<footer class="gsf-foot"><div class="gsf-acts">' +
+          '<button type="button" class="gsf-btn gsf-btn--ghost" data-ins-change>' +
+            '<i class="fa-solid fa-user-pen" aria-hidden="true"></i> <span></span></button>' +
+        '</div></footer>';
+      document.body.appendChild(insDlg);
+      insDlg.addEventListener('click', function (e) {
+        if (!(e.target.closest && e.target.closest('[data-ins-change]'))) return;
+        var c = insDlg.getAttribute('data-code');
+        insDlg.close();
+        openIns(c);
+      });
+      GardenFaculty.wire(insDlg, { onSent: function () { insDlg.close(); } });
+    }
+    var x = insDlg.querySelector('.gsf-close');
+    x.setAttribute('aria-label', L('إغلاق', 'Close'));
+    x.setAttribute('data-ar-title', 'إغلاق');
+    x.setAttribute('data-en-title', 'Close');
+    insDlg.querySelector('[data-ins-change] span').textContent = L('غيّر الأستاذ', 'Change instructor');
+    insDlg.setAttribute('data-code', code);
+    var h = insDlg.querySelector('.gsf-title');
+    h.textContent = ins.name;
+    var cname = info({ code: code }).name || '';
+    insDlg.querySelector('.gsf-sub').innerHTML = '<span class="gsf-code">' + esc(code) + '</span> ' +
+      (cname && cname !== code ? esc(cname) : '');
+    GardenFaculty.fill(insDlg.querySelector('.gsf-body'),
+      { email: ins.email, id: ins.faculty_id, name: ins.name }, { base: '', full: 1 },
+      function (title) { h.textContent = title; });
+    if (!insDlg.open) insDlg.showModal();
+  }
 
   function openIns(code) {
     if (!window.GardenInsPicker) return;
@@ -2707,6 +2758,8 @@
       var mAct = t.closest && t.closest('[data-cm]');
       if (mAct) { courseMenuAct(mAct.getAttribute('data-cm')); return; }
 
+      var insCard = t.closest && t.closest('[data-ins-card]');
+      if (insCard) { openInsCard(insCard.getAttribute('data-ins-card')); return; }
       var insOpen = t.closest && t.closest('[data-ins-open]');
       if (insOpen) { openIns(insOpen.getAttribute('data-ins-open')); return; }
 
@@ -2934,6 +2987,12 @@
 
       /*@3.SEMJ.170*/
       if (GW() && GW().ready()) { try { GW().load(); } catch (e) {} }
+
+      if (SXL() && SXL().heal) {
+        SXL().heal().then(function (r) {
+          if (r && r.report && (r.report.updated || r.report.quarantined)) refresh();
+        });
+      }
     });
   }
 

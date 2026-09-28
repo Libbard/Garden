@@ -1271,7 +1271,7 @@
     };
     var c = JSON.parse(JSON.stringify(r));
     c.id = ev.src + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-    delete c.sx_crn; delete c.sx_slot; delete c.sx_snap;
+    delete c.sx_crn; delete c.sx_slot; delete c.sx_snap; delete c.sx_term;
     delete c.completed_at; delete c.done;
     if (ev.src === 'lecture') {
       c.day = DAYS_ORDER[d.getDay()];
@@ -4319,10 +4319,10 @@
       var setTime = (start !== base.start) || (dur !== base.dur);
       var setForm = (form !== base.form) || (attend !== base.attend) || (room !== base.room);
       var prev = schedule.lectures.filter(function (l) { return l.course_code === code; });
-      var byDay = {}, tagAny = '', srcRow = prev[0] || null;
+      var byDay = {}, tagAny = '', tagTerm = '', srcRow = prev[0] || null;
       prev.forEach(function (l) {
         (byDay[l.day] || (byDay[l.day] = [])).push(l);
-        if (!tagAny && l.sx_crn) tagAny = l.sx_crn;
+        if (!tagAny && l.sx_crn) { tagAny = l.sx_crn; tagTerm = l.sx_term || ''; }
       });
       var keepRows = [];
       lecDays.forEach(function (d) {
@@ -4345,6 +4345,7 @@
           color: getCourseColor(code), duration: dur
         };
         if (tagAny) row.sx_crn = tagAny;
+        if (tagTerm) row.sx_term = tagTerm;   /*@3.SCHJ.328*/
         if (srcRow && srcRow.start_date) row.start_date = srcRow.start_date;
         if (srcRow && srcRow.end_date) row.end_date = srcRow.end_date;
         keepRows.push(row);
