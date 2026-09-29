@@ -32,6 +32,20 @@
     document.head.appendChild(l);
   }
 
+  function bytes(n) {
+    var u = ['B', 'KB', 'MB', 'GB'], i = 0, v = Number(n) || 0;
+    while (v >= 1024 && i < 3) { v /= 1024; i++; }
+    return (i === 0 || v >= 100 ? Math.round(v) : v.toFixed(1)) + ' ' + u[i];
+  }
+
+  function filesAr(n) {
+    if (!n) return 'لا ملفَّ محفوظاً بعد';
+    if (n === 1) return 'ملفٌّ واحدٌ محفوظ';
+    if (n === 2) return 'ملفّان محفوظان';
+    if (n >= 3 && n <= 10) return n + ' ملفّاتٍ محفوظة';
+    return n + ' ملفّاً محفوظاً';
+  }
+
   function ago(ts) {
     if (!ts) return L('لم تُزامَن بعد', 'not synced yet');
     var m = Math.round((Date.now() - ts) / 60000);
@@ -127,6 +141,7 @@
     this.paint();
     this.loadGuard();
     this.loadDevices();
+    this.loadFiles();
   }
 
   Panel.prototype.destroy = function () {
@@ -375,9 +390,37 @@
       h += '</div>';
     }
 
+    if (this.files) h += this.vFiles(this.files);
+
     h += '<div class="sp-acts" style="margin-top:1.1rem">' +
       btn('disconnect', 'fa-arrow-right-from-bracket', L('فصلُ هذا الجهاز', 'Disconnect this device'), 'danger wide') + '</div>';
     return h;
+  };
+
+  Panel.prototype.vFiles = function (a) {
+    var used = Number(a.used) || 0, max = Number(a.max_vault) || 0;
+    var n = (a.files || []).length;
+    var pc = max ? Math.min(100, Math.round(used * 100 / max)) : 0;
+    return '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('ملفّاتُك عندنا', 'Your files with us')) + '</p>' +
+      '<div class="sp-vouch"><b><i class="fa-solid fa-cloud"></i>' +
+      '<span class="sp-num">' + esc(bytes(used)) + (max ? ' / ' + esc(bytes(max)) : '') + '</span></b>' +
+      (max ? '<div class="sp-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pc +
+             '" aria-label="' + esc(L('المساحةُ المستعملة', 'Space used')) + '"><span style="--p:' + pc + '%"></span></div>' : '') +
+      '<small>' + esc(L(filesAr(n) + ' — تفتح على أجهزتك كلِّها.',
+                        (n === 1 ? '1 file kept' : n + ' files kept') + ' — they open on all your devices.')) + '</small>' +
+      '<small>' + esc(L('نضمن حفظَ الملفِّ ثلاثةَ أيّامٍ على الأقلّ، وبعدها — إذا امتلأت مساحتُنا — نحذف الأقدمَ أوّلاً. ' +
+                        'أمّا رسمُك وملاحظاتُك فمحفوظةٌ باستمرارٍ ولا تُحذف، والأصلُ باقٍ على جهازك.',
+                        'We keep each file for at least three days; after that, if our space fills up, we remove the oldest first. ' +
+                        'Your drawings and notes are kept continuously and never deleted, and the original stays on your device.')) +
+      '</small></div></div>';
+  };
+
+  Panel.prototype.loadFiles = function () {
+    var self = this, f = window.GardenFiles;
+    if (!f || !f.state || !linked()) return;
+    f.state().then(function (a) {
+      if (a && a.ok) self.set({ files: a });
+    }).catch(function () {});
   };
 
   Panel.prototype.doorsText = function (gd) {

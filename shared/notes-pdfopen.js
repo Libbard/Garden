@@ -318,6 +318,8 @@
         if (a === 'link' && o.onRelink) {
           sp = spec(got, file, pre.pages);
           o.onRelink(sp, (want && want.h) || null);
+          show(file, pre, got.hash);
+          return;
         }
         show(file, pre);
       }
@@ -348,7 +350,7 @@
               sp = spec(r, file, pre.pages);
               o.onRelink(sp, null);
             }
-            show(file, pre);
+            show(file, pre, r.hash);
             return null;
           });
         })['catch'](function (e) {
@@ -359,7 +361,7 @@
       });
     }
 
-    function show(file, pre) {
+    function show(file, pre, hh) {
       busy(L('يُفتح الملفّ…', 'Opening the file…'));
       var p = pre ? Promise.resolve(pre) : unlock(file);
       p.then(function (h) {
@@ -369,6 +371,14 @@
         st.h = h.handle;
         st.total = h.pages;
         build();
+        if (hh && window.GardenPdfCloud) {
+          window.GardenPdfCloud.offer({
+            h: hh, name: sp.n || (file && file.name) || '',
+            getFile: function () {
+              return file ? Promise.resolve(file) : window.GardenPdfDoc.get(hh);
+            }
+          });
+        }
       }, function (e) {
         if (st.dead) return;
         if (e && e.cancelled) { ask(); return; }
@@ -532,6 +542,7 @@
 
     function destroy() {
       st.dead = true;
+      if (window.GardenPdfCloud) { try { window.GardenPdfCloud.forget(); } catch (e8) {} }
       if (st.posT) { clearTimeout(st.posT); st.posT = 0; }
       if (st.fitT) { clearTimeout(st.fitT); st.fitT = 0; }
       if (st.settleT) { clearTimeout(st.settleT); st.settleT = 0; }
@@ -556,15 +567,32 @@
       if (d) { try { d.close(); } catch (e5) {} if (d.parentNode) d.parentNode.removeChild(d); }
     }
 
-    if (o.pre) show(null, o.pre);
+    function fromUs() {
+      var C = window.GardenPdfCloud;
+      if (!C) { ask(); return; }
+      busy(L('يُجلب من نسختك عندنا…', 'Fetching your copy kept with us…'));
+      C.restore(sp.h, sp.n, function (at, of) {
+        var p = stage.querySelector('.npo-msg');
+        if (p && of) {
+          p.textContent = L('يُجلب من نسختك عندنا… ', 'Fetching your copy kept with us… ') +
+                          Math.round(at * 100 / of) + '%';
+        }
+      }).then(function (f) {
+        if (st.dead) return;
+        if (f) show(f, null, sp.h);
+        else ask();
+      });
+    }
+
+    if (o.pre) show(null, o.pre, sp.h || '');
     else if (!sp.h || !window.GardenPdfDoc) ask();
     else {
       busy(L('يُفتح الملفّ…', 'Opening the file…'));
       window.GardenPdfDoc.get(sp.h).then(function (f) {
         if (st.dead) return;
-        if (f) show(f, null);
-        else ask();
-      }, function () { if (!st.dead) ask(); });
+        if (f) show(f, null, sp.h);
+        else fromUs();
+      }, function () { if (!st.dead) fromUs(); });
     }
 
     /*@3.NOPJ5.6*/

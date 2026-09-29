@@ -1208,6 +1208,7 @@
   var MORE = [
     { id: 'na-pin',      icon: 'fa-thumbtack',   ar: 'تثبيت',        en: 'Pin' },
     { id: 'na-remind-btn', icon: 'fa-bell',      ar: 'تنبيهٌ لهذه الملاحظة', en: 'Remind me' },
+    { id: 'na-cloud',    icon: 'fa-cloud',       ar: 'نسخةُ الملفّ عندنا', en: 'File copy with us' },
     { id: 'na-export',   icon: 'fa-file-export', ar: 'استيراد وتصدير', en: 'Import & export' },
     { id: 'na-move-btn', icon: 'fa-folder-open', ar: 'نقل إلى مجلّد', en: 'Move to folder' },
     { id: 'na-del',      icon: 'fa-trash',       ar: 'حذف',          en: 'Delete', danger: 1 }
@@ -1228,7 +1229,10 @@
     m.className = 'ne-menu';
     m.setAttribute('role', 'menu');
     m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
-    m.innerHTML = MORE.map(function (it) {
+    m.innerHTML = MORE.filter(function (it) {
+      var src = it.id ? document.getElementById(it.id) : null;
+      return !(src && src.hidden);
+    }).map(function (it) {
       var src = it.id ? document.getElementById(it.id) : null;
       return '<button type="button" class="ne-menu-i' + (it.danger ? ' ne-menu-i--danger' : '') +
         '" role="menuitem" data-for="' + (it.id || '') + '"' +
