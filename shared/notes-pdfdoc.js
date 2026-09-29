@@ -161,6 +161,18 @@
     return s.setMeta(IDX, o).catch(function () { return false; });
   }
 
+  var _chain = Promise.resolve();
+  function mutate(fn) {
+    var run = _chain.then(function () {
+      return index().then(function (o) {
+        fn(o);
+        return saveIndex(o);
+      });
+    });
+    _chain = run.catch(function () { return null; });
+    return run;
+  }
+
   function name(h) { return h + '.pdf'; }
 
   function writeBytes(h, blob) {
@@ -197,12 +209,11 @@
   /*@3.NOPJ4.7*/
   function put(h, blob, extra) {
     return writeBytes(h, blob).then(function (t) {
-      return index().then(function (o) {
+      return mutate(function (o) {
         var was = o[h] || {};
         var row = { size: blob.size, at: Date.now(), n: (extra && extra.name) || was.n || '', w: t };
         if (extra && extra.sq) row.sq = 1;
         o[h] = row;
-        return saveIndex(o);
       }).then(function () { return true; });
     }).catch(function () { return false; });
   }
@@ -245,7 +256,7 @@
         return idbDo('readwrite', function (st) { st['delete'](h); }).catch(function () { return null; });
       })
       .then(function () {
-        return index().then(function (o) { delete o[h]; return saveIndex(o); });
+        return mutate(function (o) { delete o[h]; });
       }).then(function () { return true; });
   }
 

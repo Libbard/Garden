@@ -22,6 +22,7 @@
   var pdfDial = null;
   var hist = window.GardenNotesHistory ? GardenNotesHistory.create() : null;
   var edId = null;
+  var liveDoc = null;
   var edSaveT = null;
   var findT = null;
 
@@ -3816,6 +3817,10 @@
       if (edId !== id || tok !== _openTok) return;
       if (row && row.loadFail) { renderLoadError(id); return; }
       var doc = (row && row.doc) || { v: 1, blocks: [] };
+      liveDoc = doc;
+      setTimeout(function () {
+        if (edId === id && liveDoc === doc) docEvent(id, (doc.kind === 'pdf' || (rec && rec.k === 'pdf')) ? 'pdf' : 'note');
+      }, 0);
       /*@3.NOAJ.370*/
       delete lastSaved[id]; delete lastSig[id];
       (window.requestIdleCallback || function (f) { return setTimeout(f, 900); })(function () {
@@ -4062,6 +4067,7 @@
     dropPdf();
     if (ed) { try { ed.destroy(); } catch (e) {} }
     ed = null;
+    if (liveDoc) { liveDoc = null; docEvent(null, ''); }
     if (window.GardenNotesFind) { try { GardenNotesFind.show(false); } catch (e2) {} }
   }
 
@@ -4489,6 +4495,8 @@
       flow: pos0 && pos0.fl,
       /*@3.NOAJ.264*/
       marks: doc.marks || null,
+      noteId: id,
+      soloInk: function () { return soloPdf(id, doc.pdf && doc.pdf.h); },
       /*@3.NOAJ.268*/
       dockEl: function () { return document.getElementById('na-favs'); },
       onInkDirty: function (n, why) { if (edId === id) marksDirty(id, doc, why === 'merge'); },
@@ -4533,6 +4541,20 @@
         persist(id, doc, true);
       }
     });
+  }
+
+  /*@3.NOAJ.440*/
+  function soloPdf(id, h) {
+    var St = window.GardenNotesStore;
+    if (!h || !St) return Promise.resolve(false);
+    var others = idxRead().filter(function (r) { return r && r.id !== id && r.k === 'pdf'; });
+    return Promise.all(others.map(function (r) {
+      return St.getDoc(r.id).then(function (row) {
+        var d = row && row.doc;
+        if (!d) return true;
+        return !!((d.pdf && d.pdf.h === h) || (d.was || []).indexOf(h) >= 0);
+      }, function () { return true; });
+    })).then(function (hits) { return !hits.some(Boolean); }, function () { return false; });
   }
 
   /*@3.NOAJ.265*/
@@ -8664,8 +8686,24 @@
     setTimeout(scanBlanks, 1500);
   }
 
+  function docNow() {
+    if (!edId) return null;
+    if (ed && ed.doc) return ed.doc;
+    return liveDoc;
+  }
+
+  function docEvent(id, kind) {
+    try { window.dispatchEvent(new CustomEvent('garden:noteDoc', { detail: { id: id, kind: kind } })); } catch (e) {}
+  }
+
   window.GardenNotesApp = {
     editor: function () { return ed; },
+    doc: docNow,
+    noteId: function () { return edId; },
+    save: function (quiet) {
+      var d = docNow();
+      if (edId && d) persist(edId, d, !!quiet);
+    },
     pdfMeta: pdfMeta,
     pageTopPad: pageTopPad,
     pageBotPad: pageBotPad,

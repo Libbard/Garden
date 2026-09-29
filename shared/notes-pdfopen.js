@@ -696,6 +696,8 @@
       if (!K || st.ink) return null;
       st.ink = K.create({
         id: sp.h || '',
+        ns: o.noteId || '',
+        solo: o.soloInk || null,
         view: st.view,
         seed: o.marks || null,
         t0: Date.now(),

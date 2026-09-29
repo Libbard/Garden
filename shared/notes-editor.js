@@ -664,7 +664,15 @@
     return '';
   };
 
+  /*@3.NOEJ.586*/
+  var LIVE_KEYS = ['aud'];
+
   Editor.prototype.swapDoc = function (next) {
+    for (var li = 0; li < LIVE_KEYS.length; li++) {
+      var lk = LIVE_KEYS[li];
+      if (this.doc && this.doc[lk] !== undefined) next[lk] = this.doc[lk];
+      else delete next[lk];
+    }
     var site = '';
     try { site = this.diffSite(this.doc.blocks, next.blocks); } catch (eS) { site = ''; }
     if (!this.applyDoc(next)) {

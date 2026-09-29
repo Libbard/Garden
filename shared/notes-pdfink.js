@@ -198,7 +198,9 @@
 
   function Ink(o) {
     this.o = o || {};
-    this.id = this.o.id || '';
+    /*@3.NOPJ8.182*/
+    this.fh = this.o.id || '';
+    this.id = (this.o.ns && this.fh) ? this.o.ns + '|' + this.fh : this.fh;
     this.view = this.o.view || null;
     this.pages = {};
     this.undoS = [];
@@ -208,9 +210,31 @@
     this.dead = false;
     this.saveT = {};
     /*@3.NOPJ8.119*/
-    this.ready = this.id ? this.merge(this.o.seed || null) : Promise.resolve(0);
+    var self0 = this;
+    this.ready = this.id
+      ? this.legacy().then(function () { return self0.merge(self0.o.seed || null); })
+      : Promise.resolve(0);
     paper(true);
   }
+
+  Ink.prototype.legacy = function () {
+    var self = this, solo = this.o.solo;
+    if (this.id === this.fh || typeof solo !== 'function') return Promise.resolve(0);
+    return pagesOf(this.id).then(function (mine) {
+      if (mine.length) return 0;
+      return pagesOf(self.fh).then(function (old) {
+        if (!old.length) return 0;
+        return Promise.resolve(solo()).then(function (only) {
+          if (!only) return 0;
+          return old.reduce(function (chain, n) {
+            return chain.then(function () {
+              return read(self.fh, n).then(function (row) { return row ? write(self.id, n, row) : null; });
+            });
+          }, Promise.resolve()).then(function () { return old.length; });
+        });
+      });
+    })['catch'](function () { return 0; });
+  };
 
   /*@3.NOPJ8.120*/
   function toCodec(els) {
