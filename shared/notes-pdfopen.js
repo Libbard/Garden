@@ -675,7 +675,7 @@
         onZoom: function (z) { setScale(z); },
         onFit: function () { refit('page'); },
         onExpand: function (on) { if (o.onExpand) o.onExpand(on); },
-        onDirty: function () { if (o.onInkDirty) o.onInkDirty(); },
+        onDirty: function (n, why) { if (o.onInkDirty) o.onInkDirty(n, why); },
         onField: function (on, bar) { return o.onInkField ? o.onInkField(on, bar) : false; },
         onClosePen: function () { if (o.onInkClose) o.onInkClose(); },
         onShapeBox: function (n, x, y, w, h, W, stage) { return o.onShapeBox ? o.onShapeBox(n, x, y, w, h, W, stage) : false; },

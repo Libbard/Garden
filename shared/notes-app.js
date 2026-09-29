@@ -668,6 +668,7 @@
         return;
       }
       shareCur = { sid: r.shared ? r.sid : null, mode: r.mode || 'view', views: r.views || 0 };
+      shareKnow(want, r.shared, r.mode);
       paintShare();
       shareSay('', r.shared
         ? (L('الرابطُ قائم · شوهد ', 'Link is live · viewed ') + (r.views || 0) +
@@ -693,6 +694,7 @@
           return;
         }
         shareCur = { sid: r.sid, mode: r.mode, views: (shareCur && shareCur.views) || 0 };
+        shareKnow(want, true, r.mode);
         paintShare();
         shareSay('ok', r.created ? L('أُنشئ الرابط.', 'Link created.')
                                  : L('حُدِّثت اللقطة.', 'Snapshot refreshed.'));
@@ -707,19 +709,39 @@
     Sy.shareDrop(want).then(function (r) {
       if (edId !== want) return;
       shareCur = { sid: null, mode: (shareCur && shareCur.mode) || 'view' };
+      if (r.ok) shareKnow(want, false, shareCur.mode);
       paintShare();
       shareSay('ok', r.ok ? L('أُبطل الرابط.', 'The link was revoked.')
                           : L('تعذّر الإبطال.', 'The link could not be revoked.'));
     });
   }
 
+  /*@3.NOAJ.438*/
+  var shareKn = {}, shareQ = {};
+  var SHARE_TTL = 5 * 60 * 1000, SHARE_LAG = 4000;
+  function shareKnow(noteId, on, mode) {
+    shareKn[noteId] = { on: !!on, mode: mode || 'view', at: Date.now() };
+  }
+  function sharePush(noteId) {
+    if (shareQ[noteId]) clearTimeout(shareQ[noteId]);
+    shareQ[noteId] = setTimeout(function () {
+      delete shareQ[noteId];
+      var Sy = window.GardenNotesSync, k = shareKn[noteId];
+      if (!Sy || !Sy.shareSet || !k || !k.on || edId !== noteId || !ed) return;
+      var rec = idxFind(noteId);
+      Sy.shareSet(noteId, ed.doc, (rec && rec.t) || '', k.mode);
+    }, SHARE_LAG);
+  }
   function shareRefreshQuiet(noteId) {
     var Sy = window.GardenNotesSync;
     if (!Sy || !Sy.shareState || !Sy.shareSet || !ed) return;
+    var k = shareKn[noteId];
+    if (k && (Date.now() - k.at) < SHARE_TTL) { if (k.on) sharePush(noteId); return; }
+    shareKnow(noteId, false, k && k.mode);
     Sy.shareState(noteId).then(function (r) {
-      if (!r || !r.ok || !r.shared || edId !== noteId || !ed) return;
-      var rec = idxFind(noteId);
-      Sy.shareSet(noteId, ed.doc, (rec && rec.t) || '', r.mode);
+      if (!r || !r.ok) { delete shareKn[noteId]; return; }
+      shareKnow(noteId, r.shared, r.mode);
+      if (r.shared) sharePush(noteId);
     });
   }
 
@@ -1366,11 +1388,12 @@
   /*@3.NOAJ.196*/
   var lastSig = {};
   var DERIVED = { eng: 1, fpv: 1 };
+  /*@3.NOAJ.437*/
   function contentSig(doc) {
     try {
-      return JSON.stringify(doc, function (k, v) {
-        return DERIVED[k] ? undefined : v;
-      });
+      var o = {}, k;
+      for (k in doc) if (!DERIVED[k]) o[k] = doc[k];
+      return JSON.stringify(o);
     } catch (e) { return null; }
   }
 
@@ -2787,7 +2810,7 @@
     var bare = pvLive() && !noRender;
     if (bare) { try { ed.pvStripAll(); } catch (eS) {} }
     try {
-      pr = K.build({ ed: ed, sheet: sheet, stage: stage, zoom: stageZoom() || 1, H: Math.round(pageH()), topPad: pageTopPad(), botPad: pageBotPad(), inkBox: box, inkEls: [], model: !!noRender });
+      pr = K.build({ ed: ed, sheet: sheet, stage: stage, zoom: stageZoom() || 1, H: Math.round(pageH()), topPad: pageTopPad(), botPad: pageBotPad(), inkBox: box, inkEls: [], model: !!noRender, fit: dgPlan(), fitSvg: pvOn() });
       if (pr && !noRender) paperEls(pr);
     } catch (eB) { pr = null; }
     if (bare) { try { ed.pvApply(); } catch (eA) {} }
@@ -2809,6 +2832,7 @@
   function cutsRecalc() {
     if (!ed || !ed.doc || ed.doc.kind === 'board' || !ed.natOk || !ed.natOk() || _prepWin || settling()) { cutsClear(); if (ed && ed.pvOn && ed.pvOn()) ed.pvSet(null); _pvSpec = null; return null; }
     var pr = null;
+    try { if (ed.dgmRefit) ed.dgmRefit(); } catch (eF) {}
     try { pr = paperNow(true); } catch (e) { pr = null; }
     if (!pr || !pr.lay || !pr.lay.pages) { cutsClear(); return null; }
     var lay = pr.lay, off = pr.off, a = ed.doc.eng && ed.doc.eng.a, bs = ed.doc.blocks, idx = {}, i, p, e;
@@ -3129,7 +3153,7 @@
     var bare = pvLive() && !mm;
     if (bare) { try { ed.pvStripAll(); } catch (eS) {} }
     try {
-      pr = K.build({ ed: ed, sheet: sheet, stage: stage, zoom: stageZoom() || 1, H: H, topPad: pageTopPad(), botPad: pageBotPad(), inkBox: box, inkEls: [], model: mm });
+      pr = K.build({ ed: ed, sheet: sheet, stage: stage, zoom: stageZoom() || 1, H: H, topPad: pageTopPad(), botPad: pageBotPad(), inkBox: box, inkEls: [], model: mm, fit: dgPlan(), fitSvg: pvOn() });
       if (pr) paperEls(pr);
     } catch (eB) { pr = null; }
     if (bare) { try { ed.pvApply(); } catch (eA) {} }
@@ -3831,6 +3855,7 @@
       ed = GardenNotesEditor.mount(host, doc, {
         hist: hist,
         pagePad: pageTopPad,
+        dgFit: function () { return pvOn() ? dgFitMax() : 0; },
         onDirty: function () {
           saveState('saving', L('يُحفظ…', 'Saving…'));
           inkBlocksSync();
@@ -4070,6 +4095,7 @@
 
   function dropPdf() {
     if (pdfUi && pdfUi.ink && pdfUi.ink()) { try { pdfUi.ink().fieldExitAll(); } catch (eX) {} }
+    if (marksFor) { try { flushMarks(); } catch (eM) {} }
     var aeD = document.activeElement;
     if (aeD && aeD.blur && els.docBody && els.docBody.contains(aeD)) { try { aeD.blur(); } catch (eB) {} }
     if (window.GardenNotesFind) { try { GardenNotesFind.show(false); } catch (e0) {} }
@@ -4461,7 +4487,7 @@
       marks: doc.marks || null,
       /*@3.NOAJ.268*/
       dockEl: function () { return document.getElementById('na-favs'); },
-      onInkDirty: function () { if (edId === id) marksDirty(id, doc); },
+      onInkDirty: function (n, why) { if (edId === id) marksDirty(id, doc, why === 'merge'); },
       /*@3.NOAJ.267*/
       onInkField: function (on, bar) { return favsSwap(on, bar); },
       onInkClose: function () { pdfDraw(false); },
@@ -4506,20 +4532,27 @@
   }
 
   /*@3.NOAJ.265*/
-  var marksT = 0;
+  var marksT = 0, marksFor = null;
 
-  function marksDirty(id, doc) {
+  /*@3.NOAJ.439*/
+  function marksDirty(id, doc, quiet) {
     if (marksT) clearTimeout(marksT);
-    marksT = setTimeout(function () {
-      marksT = 0;
-      var ik = (pdfUi && edId === id) ? pdfUi.ink() : null;
-      if (!ik || !ik.bundle) return;
-      ik.bundle().then(function (b) {
-        if (!b || edId !== id) return;
-        doc.marks = b;
-        persist(id, doc);
-      });
-    }, 1400);
+    var q = marksFor && marksFor.id === id ? (marksFor.quiet && quiet) : quiet;
+    marksFor = { id: id, doc: doc, quiet: !!q };
+    marksT = setTimeout(flushMarks, 1400);
+  }
+
+  function flushMarks() {
+    if (marksT) { clearTimeout(marksT); marksT = 0; }
+    var job = marksFor;
+    marksFor = null;
+    var ik = (job && pdfUi) ? pdfUi.ink() : null;
+    if (!ik || !ik.bundle) return;
+    ik.bundle().then(function (b) {
+      if (!b) return;
+      job.doc.marks = b;
+      persist(job.id, job.doc, job.quiet);
+    });
   }
 
   function createPdf() {
@@ -5706,6 +5739,9 @@
 
   /*@3.NOAJ.374*/
   var TOP_MM = 12;
+  /*@3.NOAJ.436*/
+  function dgFitMax() { return Math.round(pageH()) - pageTopPad() - pageBotPad(); }
+  function dgPlan() { return (ed && ed.dgmFitPlan) ? ed.dgmFitPlan(dgFitMax()) : null; }
   function pageTopPad() {
     var h = pageH();
     if (!(h > 200)) return 0;
@@ -8568,6 +8604,7 @@
     });
     /*@3.NOAJ.428*/
     function flushHidden() {
+      if (marksFor) { try { flushMarks(); } catch (eM) {} }
       if (ed && edId) {
         var recH = idxFind(edId);
         if (!(recH && recH.pv && isBlankRec(recH, ed.doc))) { try { ed.save(); } catch (eS) {} }

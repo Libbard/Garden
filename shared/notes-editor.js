@@ -53,6 +53,7 @@
     } catch (e) { return 1; }
   }
   var WIN_PAD = 1600;
+  var WIN_KEEP = 500;
   var WIN_SPAN = 70;
   var TYPE_GROUP_MS = 900;
   var TYPE_GROUP_MAX = 4000;
@@ -441,7 +442,49 @@
     this.dgmPrecache(todo, false).then(fin, fin);
   };
 
-  Editor.prototype.snapshot = function () { return JSON.stringify(this.doc); };
+  /*@3.NOEJ.583*/
+  function Snap(keys, sh, bs, fresh) {
+    this.k = keys; this.sh = sh; this.b = bs; this.length = fresh;
+  }
+  /*@3.NOEJ.584*/
+  Snap.prototype.toString = function () { return JSON.stringify(unsnap(this)); };
+
+  /*@3.NOEJ.585*/
+  function unsnap(s) {
+    if (!(s instanceof Snap)) return JSON.parse(s);
+    var sh = JSON.parse(s.sh), d = {}, bs = new Array(s.b.length), i, k;
+    for (i = 0; i < s.b.length; i++) bs[i] = JSON.parse(s.b[i]);
+    for (i = 0; i < s.k.length; i++) {
+      k = s.k[i];
+      if (k === 'blocks') d[k] = bs;
+      else if (Object.prototype.hasOwnProperty.call(sh, k)) d[k] = sh[k];
+    }
+    return d;
+  }
+
+  Editor.prototype.snapshot = function () {
+    var d = this.doc, bs = d.blocks || [], sh = {}, keys = [], k, i, b, s, p, id;
+    var memo = this._snapMemo, next = new Map(), out = new Array(bs.length), fresh = bs.length * 8;
+    for (k in d) {
+      if (!Object.prototype.hasOwnProperty.call(d, k)) continue;
+      keys.push(k);
+      if (k !== 'blocks') sh[k] = d[k];
+    }
+    for (i = 0; i < bs.length; i++) {
+      b = bs[i];
+      s = JSON.stringify(b);
+      if (s === undefined) s = 'null';
+      id = b ? b.id : null;
+      p = memo && id != null ? memo.get(id) : undefined;
+      if (p === s) s = p; else fresh += s.length;
+      if (id != null) next.set(id, s);
+      out[i] = s;
+    }
+    s = JSON.stringify(sh);
+    if (this._snapSh === s) s = this._snapSh; else { this._snapSh = s; fresh += s.length; }
+    this._snapMemo = next;
+    return new Snap(keys, s, out, fresh);
+  };
 
   /*@3.NOEJ.2*/
   Editor.prototype.pushUndo = function (before) {
@@ -644,7 +687,7 @@
     this.redo.push(cur);
     var popped = this.undo.pop();
     this._undoB = Math.max(0, (this._undoB || 0) - (popped ? popped.length : 0));
-    this.swapDoc(JSON.parse(popped));
+    this.swapDoc(unsnap(popped));
     this.touch();
     this.emitState();
     return true;
@@ -656,7 +699,7 @@
     var cur = this.snapshot();
     this.undo.push(cur);
     this._undoB = (this._undoB || 0) + cur.length;
-    this.swapDoc(JSON.parse(this.redo.pop()));
+    this.swapDoc(unsnap(this.redo.pop()));
     this.touch();
     this.emitState();
     return true;
@@ -1100,6 +1143,7 @@
     this.root.appendChild(frag);
     codeFlush();
     this.tblFitAll();
+    this.dgmFitAll();
     if (rng) { this.winBind(); this.winSet(rng[0], rng[1]); this.freeSync(); }
     /*@3.NOEJ.254*/
     this.roLater();
@@ -1848,6 +1892,7 @@
             var hD = Math.round(dHost.getBoundingClientRect().height / zD);
             if (hD > 0 && Math.abs((b.dh || 0) - hD) >= 1) { b.dh = hD; grew = true; try { self.markLazy(); } catch (eH) {} }
             dHost.style.minBlockSize = '';
+            if (self.dgmFitAll()) grew = true;
           }
           /*@3.NOEJ.447*/
           if (grew || !sv) self.settled();
@@ -3238,7 +3283,7 @@
     if (!st || mode === st.mode) { this.hidePasteOpts(); return; }
     this.hidePasteOpts();
     /*@3.NOEJ.339*/
-    this.swapDoc(JSON.parse(st.before));
+    this.swapDoc(unsnap(st.before));
     var popped = this.undo.pop();
     this._undoB = Math.max(0, (this._undoB || 0) - (popped ? popped.length : 0));
 
@@ -5144,6 +5189,7 @@
     codeFlush();
     this.tblFlushAll();
     this.tblFitAll();
+    this.dgmFitAll();
     var i, b, node;
     var map = this.bidMap();
     var bs = this.doc.blocks, n = bs.length;
@@ -5730,6 +5776,7 @@
     codeFlush();
     for (i = 0; i < nodes.length; i++) if (nodes[i][1].__tblFill) nodes[i][1].__tblFill(true);
     this.tblFitAll(lab);
+    this.dgmFitAll(lab);
     var lr = lab.getBoundingClientRect();
     /*@3.NOEJ.550*/
     var zL = lab.offsetWidth > 0 ? lr.width / lab.offsetWidth : 1;
@@ -6013,6 +6060,136 @@
     }
     return out;
   }
+  /*@3.NOEJ.578*/
+  Editor.prototype.dgmFitMax = function () {
+    var f = this.opts && this.opts.dgFit, v = 0;
+    try { v = f ? (+f() || 0) : 0; } catch (eF) { v = 0; }
+    return v > 80 ? v : 0;
+  };
+  /*@3.NOEJ.581*/
+  Editor.prototype.dgmLead = function (blk) {
+    var id = blk.getAttribute('data-bid'), hit = id ? this.blockAt(id) : null, bs = this.doc.blocks, j;
+    if (!hit) return 0;
+    for (j = hit.i - 1; j >= 0 && bs[j] && bs[j].fp; j--) {}
+    if (j < 0 || !bs[j] || bs[j].ty !== 'h') return 0;
+    var nat = this._nat, idx = this.natIdx ? this.natIdx() : null, k = idx ? idx[id] : null, kp = idx ? idx[bs[j].id] : null;
+    if (nat && k != null && kp != null && nat.ids[kp] === bs[j].id && nat.hgt[kp] > 0) return nat.hgt[kp] + (nat.gap[k] || 0);
+    var pv = this.bidMap()[bs[j].id];
+    if (pv && pv.parentNode === blk.parentNode && blk.offsetWidth > 0) {
+      var z = blk.getBoundingClientRect().width / blk.offsetWidth;
+      return Math.max(0, (blk.getBoundingClientRect().top - pv.getBoundingClientRect().top) / (z > 0.05 ? z : 1));
+    }
+    return 0;
+  };
+  Editor.prototype.dgmFitAll = function (root, over) {
+    var host = root || this.root;
+    if (!host) return 0;
+    var max = (over != null) ? over : this.dgmFitMax();
+    var svgs = host.querySelectorAll('[data-bid] .ne-dgm:not([data-vz]) > svg'), todo = [], i, s, n = 0;
+    for (i = 0; i < svgs.length; i++) if (svgs[i].__dfitK !== max) todo.push(svgs[i]);
+    if (!todo.length) return 0;
+    for (i = 0; i < todo.length; i++) {
+      s = todo[i]; s.__dfitW = s.style.maxBlockSize ? s.style.maxBlockSize : '';
+      if (s.__dfitW) { s.style.maxBlockSize = ''; s.style.inlineSize = ''; }
+    }
+    var meas = new Array(todo.length);
+    for (i = 0; i < todo.length; i++) {
+      s = todo[i];
+      var blk = s.closest('[data-bid]'), ow = blk ? blk.offsetWidth : 0;
+      if (!(ow > 0)) { meas[i] = null; continue; }
+      var br = blk.getBoundingClientRect(), z = br.width / ow, sh = s.getBoundingClientRect().height;
+      if (!(z > 0.05) || !(sh > 0)) { meas[i] = null; continue; }
+      meas[i] = { bh: br.height / z, sh: sh / z, lim: max > 0 ? max - this.dgmLead(blk) : 0 };
+    }
+    for (i = 0; i < todo.length; i++) {
+      s = todo[i];
+      var m = meas[i], v = '';
+      if (!m) { if (s.__dfitW) { s.style.maxBlockSize = s.__dfitW; s.style.inlineSize = 'auto'; } continue; }
+      if (max > 0 && m.bh > m.lim + 0.5) {
+        v = Math.max(48, Math.floor((m.sh - (m.bh - m.lim) - 1) * 100) / 100) + 'px';
+        s.style.maxBlockSize = v; s.style.inlineSize = 'auto';
+      }
+      if (v !== s.__dfitW) n++;
+      s.__dfitK = max;
+    }
+    var ph = host.querySelectorAll('[data-bid] .ne-dgm[data-dh]:not([data-vz])'), pl = [], hp, dh;
+    for (i = 0; i < ph.length; i++) {
+      hp = ph[i];
+      if (hp.hidden || hp.querySelector(':scope > svg') || !hp.style.minBlockSize) continue;
+      dh = parseFloat(hp.getAttribute('data-dh')) || 0;
+      if (!(dh > 0) || (hp.__dfitK === max && hp.__dfitP === hp.style.minBlockSize)) continue;
+      pl.push([hp, dh, hp.style.minBlockSize]);
+      hp.style.minBlockSize = dh + 'px';
+    }
+    for (i = 0; i < pl.length; i++) {
+      hp = pl[i][0]; dh = pl[i][1];
+      var pb = hp.closest('[data-bid]'), pw = pb ? pb.offsetWidth : 0;
+      if (max > 0 && pw > 0) {
+        var prr = pb.getBoundingClientRect(), pz = prr.width / pw, pbh = prr.height / (pz > 0.05 ? pz : 1), plim = max - this.dgmLead(pb);
+        if (pbh > plim + 0.5) hp.style.minBlockSize = Math.max(48, Math.floor((dh - (pbh - plim) - 1) * 100) / 100) + 'px';
+      } else if (max > 0) { hp.style.minBlockSize = pl[i][2]; continue; }
+      if (hp.style.minBlockSize !== pl[i][2]) n++;
+      hp.__dfitK = max; hp.__dfitP = hp.style.minBlockSize;
+    }
+    return n;
+  };
+  /*@3.NOEJ.579*/
+  Editor.prototype.dgmRefit = function () {
+    var max = this.dgmFitMax(), was = this._dgFitK;
+    if (was === max) return false;
+    this._dgFitK = max;
+    if (!this.root || !this.doc || this.doc.kind === 'board') return false;
+    var n = this.dgmFitAll(this.root);
+    if (was == null && !max) return false;
+    var bs = this.doc.blocks, map = this.bidMap(), live = [], off = [], i;
+    for (i = 0; i < bs.length; i++) {
+      if (!bs[i] || !isDiagram(bs[i])) continue;
+      if (map[bs[i].id]) live.push(map[bs[i].id]); else off.push(bs[i].id);
+    }
+    if (!live.length && !off.length) return false;
+    if (this._nat && this.natOk()) {
+      var hit = live.length ? this.natSync(live) : false;
+      var got = off.length ? this.natMeasure(off) : 0;
+      if (!(hit || got)) return false;
+      this.reflowEng();
+      return true;
+    }
+    if (!n) return false;
+    try { this.captureEng(true); } catch (eC) {}
+    return true;
+  };
+  /*@3.NOEJ.580*/
+  Editor.prototype.dgmFitPlan = function (max) {
+    var out = {}, bs = this.doc && this.doc.blocks, nat = this._nat, idx = this.natIdx ? this.natIdx() : null, map = this.bidMap(), list = [], i, b, k, h;
+    if (!bs || !(max > 80) || !this.root || !this.root.parentNode) return out;
+    for (i = 0; i < bs.length; i++) {
+      b = bs[i];
+      if (!b || b.fp || !isDiagram(b) || (b.dgm != null && !b.dgm)) continue;
+      h = 0;
+      if (nat && idx && (k = idx[b.id]) != null && nat.ids[k] === b.id) h = nat.hgt[k] || 0;
+      else if (map[b.id]) h = map[b.id].getBoundingClientRect().height / (this.zoomOf() || 1);
+      if (h > max - 160 || (b.dh || 0) + 60 > max - 160) list.push(b);
+    }
+    var key = max + '|' + list.map(function (x) { return x.id + ':' + String(x.src || '').length + ':' + (x.dh || 0); }).join(',');
+    if (this._dgPlan && this._dgPlan.k === key && this._dgPlan.w === (this.sheetW() || 0)) return this._dgPlan.out;
+    this._dgPlan = { k: key, w: this.sheetW() || 0, out: out };
+    if (!list.length) return out;
+    var lab = this.labRoot(), nodes = [];
+    for (i = 0; i < list.length; i++) { var nd = this.renderBlock(list[i]); lab.appendChild(nd); nodes.push(nd); }
+    this.root.parentNode.appendChild(lab);
+    try {
+      if (this.dgmApply) { try { this.dgmApply(lab); } catch (eD) {} }
+      this.dgmFitAll(lab, max);
+      for (i = 0; i < nodes.length; i++) {
+        var sv = nodes[i].querySelector('.ne-dgm > svg'), ow = nodes[i].offsetWidth;
+        if (!sv || !sv.style.maxBlockSize || !(ow > 0)) continue;
+        var r = nodes[i].getBoundingClientRect(), z = r.width / ow;
+        out[list[i].id] = { h: r.height / (z > 0.05 ? z : 1), mb: sv.style.maxBlockSize };
+      }
+      for (i = 0; i < nodes.length; i++) if (!nodes[i].querySelector('.ne-dgm > svg')) { this._dgPlan = null; break; }
+    } finally { lab.remove(); }
+    return out;
+  };
   Editor.prototype.tblFitAll = function (root) {
     var host = root || this.root;
     if (!host) return 0;
@@ -6294,14 +6471,15 @@
            sc.getBoundingClientRect().top + sc.scrollTop;
   };
 
-  Editor.prototype.winRange = function () {
+  Editor.prototype.winRange = function (pad) {
     var sc = this.scroller();
     if (!sc) return null;
     var eng = this.doc.eng, nat = this._nat, n = this.doc.blocks.length;
     var z = this.zoomOf() || 1;
     var base = this.winBase(sc);
-    var top = (sc.scrollTop - base) / z - WIN_PAD;
-    var bot = (sc.scrollTop - base + sc.clientHeight) / z + WIN_PAD;
+    var P = (pad != null) ? pad : WIN_PAD;
+    var top = (sc.scrollTop - base) / z - P;
+    var bot = (sc.scrollTop - base + sc.clientHeight) / z + P;
     var from = -1, to = -1, i, y0, y1, A = this.pvTops() || eng.a, bs = this.doc.blocks;
     for (i = 0; i < n; i++) {
       if (A[i] == null) continue;
@@ -6414,6 +6592,7 @@
     }
     codeFlush();
     this.tblFitAll();
+    this.dgmFitAll();
     /*@3.NOEJ.305*/
     this.winPads(from, to, false);
     if (anchor && anchor.classList) anchor.classList.add('ne-w0');
@@ -6466,7 +6645,21 @@
     rng = this.winPin(rng);
     var cur = this._win;
     if (!force && cur && cur.from === rng[0] && cur.to === rng[1]) return false;
+    /*@3.NOEJ.582*/
+    if (!force && cur && this.winCovers(cur, rng)) return false;
     return this.winSet(rng[0], rng[1]);
+  };
+
+  Editor.prototype.winCovers = function (cur, rng) {
+    if (cur.to >= this.doc.blocks.length) return false;
+    var need = this.winRange(WIN_KEEP);
+    if (!need || need[0] < cur.from || need[1] > cur.to) return false;
+    var keep = this.winKeep(), i, hit;
+    for (i = 0; i < keep.length; i++) {
+      hit = this.blockAt(keep[i]);
+      if (hit && (hit.i < cur.from || hit.i > cur.to) && hit.i >= rng[0] && hit.i <= rng[1]) return false;
+    }
+    return true;
   };
 
   /*@3.NOEJ.288*/
@@ -7020,6 +7213,7 @@
       if (this._io) { try { this._io.unobserve(h); } catch (eU) {} }
       n++;
     }
+    if (n) this.dgmFitAll(rootOpt || this.root);
     if (n && !rootOpt) {
       if (this.natOk() && this._nat.u) { if (this.natSync(touched)) this.reflowEng(); }
       else { this._nat = null; this._engStale = true; }
@@ -10629,6 +10823,8 @@
     this.undo.length = 0;
     this.redo.length = 0;
     this._undoB = 0;
+    this._snapMemo = null;
+    this._snapSh = null;
     this.root.__ed = null;
     this._winA = null;
     this._winB = null;

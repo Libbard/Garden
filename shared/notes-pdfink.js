@@ -53,7 +53,8 @@
 
   function write(id, page, row) {
     return idbDo('readwrite', function (s) {
-      var keepRow = row && ((row.els && row.els.length) || (row.fdoc && row.fdoc.blocks && row.fdoc.blocks.length));
+      /*@3.NOPJ8.179*/
+      var keepRow = row && (row.x || (row.els && row.els.length) || (row.fdoc && row.fdoc.blocks && row.fdoc.blocks.length));
       if (keepRow) s.put(row, key(id, page));
       else s.delete(key(id, page));
     }).then(function () { return true; }, function () { return false; });
@@ -207,7 +208,7 @@
     this.dead = false;
     this.saveT = {};
     /*@3.NOPJ8.119*/
-    this.ready = this.o.seed ? this.seed(this.o.seed) : Promise.resolve(0);
+    this.ready = this.id ? this.merge(this.o.seed || null) : Promise.resolve(0);
     paper(true);
   }
 
@@ -267,14 +268,16 @@
     return this.flushAll().then(function () {
       return pagesOf(self.id);
     }).then(function (list) {
-      var out = { v: 1, pages: {} };
+      var out = { v: 2, pages: {} };
       return list.reduce(function (chain, n) {
         return chain.then(function () {
           return read(self.id, n).then(function (row) {
-            var fdB = row && row.fdoc && row.fdoc.blocks && row.fdoc.blocks.length ? row.fdoc : null;
-            if ((!row || !row.els || !row.els.length) && !fdB) return null;
-            var parts = toCodec((row && row.els) || []);
-            var page = { els: parts.keep };
+            if (!row) return null;
+            if (row.x) { out.pages[String(n)] = { t: row.t || 0, x: 1 }; return null; }
+            var fdB = row.fdoc && row.fdoc.blocks && row.fdoc.blocks.length ? row.fdoc : null;
+            if ((!row.els || !row.els.length) && !fdB) return null;
+            var parts = toCodec(row.els || []);
+            var page = { t: row.t || 0, els: parts.keep };
             if (fdB) page.fdoc = deep(fdB);
             if (parts.ts.some(function (t) { return t >= 0; })) page.ts = parts.ts;
             if (!parts.st.length || !C || !C.pack) {
@@ -292,30 +295,79 @@
     });
   };
 
-  Ink.prototype.seed = function (data) {
+  function hasF(fd) { return !!(fd && fd.blocks && fd.blocks.length); }
+  function ptOf(p) { return p ? { x: p.x != null ? p.x : p[0], y: p.y != null ? p.y : p[1] } : null; }
+  function near(a, b) { return !!(a && b) && Math.abs(a.x - b.x) < 0.5 && Math.abs(a.y - b.y) < 0.5; }
+  function twin(a, b) {
+    if (!a || !b || a.ty !== b.ty || a.c !== b.c) return false;
+    if (a.ty === 'hl') return same(a, b);
+    if (a.ty !== 'st') return JSON.stringify(a) === JSON.stringify(b);
+    var pa = a.pts || [], pb = b.pts || [];
+    if (!pa.length || pa.length !== pb.length) return false;
+    return near(ptOf(pa[0]), ptOf(pb[0])) && near(ptOf(pa[pa.length - 1]), ptOf(pb[pb.length - 1]));
+  }
+  function pageSig(els, fd) {
+    return JSON.stringify([els || [], hasF(fd) ? fd.blocks : 0, hasF(fd) && fd.bd === 'rtl' ? 1 : 0]);
+  }
+
+  /*@3.NOPJ8.178*/
+  Ink.prototype.merge = function (data) {
     var self = this;
     var C = window.GardenInkCodec;
-    if (!data || !data.pages || !this.id) return Promise.resolve(0);
-    var keys = Object.keys(data.pages);
-    var got = 0;
-    return wipe(this.id).then(function () {
-      return keys.reduce(function (chain, k) {
-        var n = +k, page = data.pages[k];
-        if (!(n > 0) || !page) return chain;
+    var dp = (data && data.pages) || {};
+    var legacy = !(data && data.v >= 2);
+    var push = false, got = 0;
+    function decode(d) {
+      var un = d.st && C && C.unpack ? C.unpack(d.st) : Promise.resolve(d.raw || []);
+      return un.then(function (strokes) { return fromCodec(strokes, d.ts, d.els); });
+    }
+    return pagesOf(this.id).then(function (loc) {
+      var keys = {};
+      Object.keys(dp).forEach(function (k) { if (+k > 0 && dp[k]) keys[+k] = 1; });
+      loc.forEach(function (n) { keys[n] = 1; });
+      var list = Object.keys(keys).map(Number).sort(function (a, b) { return a - b; });
+      return list.reduce(function (chain, n) {
         return chain.then(function () {
-          var un = page.st && C && C.unpack ? C.unpack(page.st) : Promise.resolve(page.raw || []);
-          return un.then(function (strokes) {
-            var els = fromCodec(strokes, page.ts, page.els);
-            var fdS = page.fdoc && page.fdoc.blocks && page.fdoc.blocks.length ? page.fdoc : null;
-            if (!els.length && !fdS) return null;
-            got += els.length + (fdS ? fdS.blocks.length : 0);
-            var rowS = { els: els, t: Date.now() };
-            if (fdS) rowS.fdoc = deep(fdS);
-            return write(self.id, n, rowS);
+          return read(self.id, n).then(function (row) {
+            var d = dp[String(n)] || null;
+            var lt = row ? (row.t || 0) : -1;
+            var live = !!(row && !row.x && ((row.els && row.els.length) || hasF(row.fdoc)));
+            if (!d) { if (live) push = true; return null; }
+            if (d.x) {
+              if (row && !row.x && lt < (d.t || 0)) return write(self.id, n, { els: [], t: d.t || 0, x: 1 });
+              if (live && lt > (d.t || 0)) push = true;
+              return null;
+            }
+            return decode(d).then(function (els) {
+              var fdS = hasF(d.fdoc) ? deep(d.fdoc) : null;
+              var rowN;
+              if (!legacy) {
+                if (row && lt >= (d.t || 0)) { if (lt > (d.t || 0)) push = true; return null; }
+                got += els.length + (fdS ? fdS.blocks.length : 0);
+                rowN = { els: els, t: d.t || Date.now() };
+                if (fdS) rowN.fdoc = fdS;
+                return write(self.id, n, rowN);
+              }
+              push = true;
+              var have = live ? (row.els || []) : [];
+              var add = els.filter(function (e) {
+                for (var i = 0; i < have.length; i++) if (twin(have[i], e)) return false;
+                return true;
+              });
+              var fdK = live && hasF(row.fdoc) ? row.fdoc : fdS;
+              if (live && !add.length && fdK === row.fdoc) return null;
+              got += add.length;
+              rowN = { els: have.concat(add), t: Date.now() };
+              if (fdK) rowN.fdoc = deep(fdK);
+              return write(self.id, n, rowN);
+            });
           });
         });
       }, Promise.resolve());
-    }).then(function () { return got; })['catch'](function () { return got; });
+    }).then(function () {
+      if (push && self.o.onDirty) setTimeout(function () { if (!self.dead) self.o.onDirty(0, 'merge'); }, 0);
+      return got;
+    })['catch'](function () { return got; });
   };
 
   /*@3.NOPJ8.13*/
@@ -448,6 +500,8 @@
       var p = self.pages[n];
       if (!p || self.dead) return null;
       p.loaded = true;
+      p.t = row ? (row.t || 0) : 0;
+      p.sig = row && !row.x ? pageSig(row.els, freeOnly(row.fdoc || null)) : pageSig([], null);
       if (row && row.fdoc && row.fdoc.blocks && !fdocOf(p).blocks.length) p.fdoc = deep(row.fdoc);
       if (row && row.els && row.els.length && !p.els.length) p.els = row.els;
       self.paint(n);
@@ -619,7 +673,8 @@
       n: s.n,
       el: { ty: 'st', pts: [pt], c: t.c, w: w0, nib: und ? 'round' : t.nib, o: t.o,
             hi: t.hi ? 1 : 0, u: und ? 1 : 0,
-            ts: Date.now() - (this.o.t0 || 0) }
+            /*@3.NOPJ8.181*/
+            ts: Date.now() }
     };
     this.drawWet(s.p, this.live.el);
     return true;
@@ -1159,7 +1214,7 @@
     var list = this.pickEls(), ids = [];
     for (var i = 0; i < list.length; i++) {
       var c = deep([list[i]])[0];
-      if (c.ts != null) c.ts = Date.now() - (this.o.t0 || 0) + i;
+      if (c.ts != null) c.ts = Date.now() + i;
       K.eachPoint(c, function (x, y) { return [x + 12, y - 12]; });
       ids.push(p.els.length);
       p.els.push(c);
@@ -1267,7 +1322,7 @@
     var ids = [];
     for (var i = 0; i < list.length; i++) {
       var c = deep([list[i]])[0];
-      c.ts = Date.now() - (this.o.t0 || 0) + i;
+      c.ts = Date.now() + i;
       K.eachPoint(c, function (x, y) { return [x + 16, y - 16]; });
       ids.push(p.els.length);
       p.els.push(c);
@@ -1502,10 +1557,18 @@
     if (this.saveT[n]) { clearTimeout(this.saveT[n]); this.saveT[n] = 0; }
     var p = this.pages[n];
     if (!p || !this.id || !p.loaded) return Promise.resolve(false);
-    var row = { els: p.els, t: Date.now() };
     var fd = freeOnly(fdocOf(p));
+    /*@3.NOPJ8.180*/
+    var sig = pageSig(p.els, fd);
+    if (sig === p.sig) return Promise.resolve(true);
+    var t = Date.now();
+    var row = { els: p.els, t: t };
     if (fd.blocks.length) row.fdoc = fd;
-    return write(this.id, n, row);
+    else if (!p.els.length) row.x = 1;
+    return write(this.id, n, row).then(function (done) {
+      if (done) { p.sig = sig; p.t = t; }
+      return done;
+    });
   };
 
   Ink.prototype.flushAll = function () {

@@ -127,7 +127,7 @@
     return /[:\uFF1A]\s*$/.test(t);
   }
 
-  function measure(ed, sheet, stage, z, model) {
+  function measure(ed, sheet, stage, z, model, fit) {
     var root = ed.root, bs = ed.doc.blocks, map = ed.bidMap();
     var stR = stage.getBoundingClientRect(), rtR = root.getBoundingClientRect(), shR = sheet.getBoundingClientRect();
     var rtl = false;
@@ -160,6 +160,7 @@
           if (!mq.code) { if (uq.vis) mq.vis = 1; else mq.units = null; }
         }
         if (mq.card && uq.ce > 0) mq.cardEnd = uq.ce;
+        fitOne(mq, fit);
         if (keepNext(b, mq.h)) mq.kn = 1;
         blocks.push(mq);
         continue;
@@ -187,6 +188,7 @@
       }
       var u = unitsOf(b, node, r, z);
       m.lead = u.lead; m.units = u.units; m.head = u.head; m.unitEls = u.unitEls; m.code = u.code || null; if (u.vis) m.vis = 1;
+      fitOne(m, fit);
       if (keepNext(b, m.h)) m.kn = 1;
       /*@3.NOPJ10.8*/
       if (m.card && node.hasAttribute('data-card-end')) {
@@ -199,14 +201,22 @@
              rootH: rtR.height / z, blocks: blocks, free: free, rtl: rtl };
   }
 
+  /*@3.NOPJ10.31*/
+  function fitOne(m, fit) {
+    var f = fit ? fit[m.id] : null;
+    if (!f || !(f.h > 0) || !(m.h > f.h + 0.5)) return;
+    m.fitD = m.h - f.h; m.h = f.h; m.units = null; m.code = null; m.vis = 0;
+  }
+
   function items(ms, off) {
-    var out = [], i, k, cur = null, byId = {}, acc = null;
+    var out = [], i, k, cur = null, byId = {}, acc = null, cs = 0;
     for (i = 0; i < ms.blocks.length; i++) {
       var m = ms.blocks[i], nx = ms.blocks[i + 1];
-      m.hh = nx ? Math.max(m.h, nx.t - m.t) : m.h;
+      m.hh = nx ? Math.max(m.h, nx.t - m.t - (m.fitD || 0)) : m.h;
       /*@3.NOPJ10.11*/
-      if (m.ty === 'pb' && acc != null) m.hh = Math.max(0, (nx ? nx.t : m.t + m.h) - acc);
+      if (m.ty === 'pb' && acc != null) m.hh = Math.max(0, (nx ? nx.t : m.t + m.h) - cs - acc);
       acc = (acc == null ? m.t : acc) + m.hh;
+      cs += m.fitD || 0;
       if (m.card) {
         if (!cur || cur.cid !== m.card) {
           cur = { id: 'card:' + m.card + ':' + m.id, ty: 'card', cid: m.card, kids: [], units: [], keep: [], h: 0, head: 0 };
@@ -256,13 +266,21 @@
     var bare = !o.model && ed.pvOn && ed.pvOn();
     if (bare) ed.pvStripAll();
     var ms;
-    try { ms = measure(ed, sheet, stage, z, o.model); } finally { if (bare) ed.pvApply(); }
+    try { ms = measure(ed, sheet, stage, z, o.model, o.fitSvg ? null : (o.fit || null)); } finally { if (bare) ed.pvApply(); }
     var off = ms.rootTop - ms.sheetTop;
     var it = items(ms, off);
     /*@3.NOPJ10.20*/
     /*@3.NOPJ10.21*/
     var lay = P().paginate(it.list, H, o.topPad || 0, o.botPad || 0);
     var i, p, e, k;
+    /*@3.NOPJ10.32*/
+    var fitShift = 0, fq, fs, fr;
+    for (i = 0; i < it.list.length; i++) {
+      fr = it.list[i];
+      if (fitShift && lay.segs[fr.id]) { fs = lay.segs[fr.id]; for (fq = 0; fq < fs.length; fq++) fs[fq] = { from: fs[fq].from, to: fs[fq].to, add: r2(fs[fq].add - fitShift) }; }
+      if (fr.ty === 'card') { for (fq = 0; fq < fr.kids.length; fq++) fitShift += fr.kids[fq].fitD || 0; }
+      else if (fr.m && fr.m.fitD) fitShift += fr.m.fitD;
+    }
     function segOf(bid, dy) {
       var ref = it.byId[bid];
       if (!ref) return 0;
@@ -338,7 +356,7 @@
     for (i = 0; i <= count; i++) cuts.push(r2(ms.sheetTop + i * H));
     return {
       lay: lay, spans: spans, parts: parts, cuts: cuts, pages: count, byId: it.byId, items: it.list, off: off,
-      segOf: segOf, els: shiftEls, freeShift: freeShift, free: freeMap
+      segOf: segOf, els: shiftEls, freeShift: freeShift, free: freeMap, fit: o.fit || null
     };
   }
 
@@ -350,6 +368,12 @@
     for (i = 0; i < kids.length; i++) {
       var bid = kids[i].getAttribute && kids[i].getAttribute('data-bid');
       if (bid) live[bid] = kids[i];
+    }
+    /*@3.NOPJ10.33*/
+    if (pr.fit) for (var fid in pr.fit) {
+      if (!Object.prototype.hasOwnProperty.call(pr.fit, fid) || !live[fid] || !pr.fit[fid].mb) continue;
+      var fsv = live[fid].querySelector('.ne-dgm > svg');
+      if (fsv) { fsv.style.maxBlockSize = pr.fit[fid].mb; fsv.style.inlineSize = 'auto'; }
     }
     /*@3.NOPJ10.16*/
     var skels = {};
