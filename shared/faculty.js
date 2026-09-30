@@ -101,6 +101,7 @@
         openFromHash();
         openFromQuery();
       } catch (e) {
+        if (!state.data) { $('#fc-stats').hidden = true; $('#fc-count').textContent = ''; }
         g.innerHTML = '<div class="sx-state sx-state--err">' +
           '<i class="fa-solid fa-triangle-exclamation"></i>' +
           t('تعذّر جلب التقييمات — حاول بعد قليل.',
@@ -112,7 +113,23 @@
 
   function paintStats() {
     var d = state.data, el = $('#fc-stats');
-    if (!d) return;
+    /*@3.FACJ.52*/
+    if (!d) {
+      el.hidden = false;
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = [
+        stat('fa-chalkboard-user', '—', t('أستاذاً مقيَّماً', 'instructors rated')),
+        stat('fa-comment-dots', '—', t('تقييماً من الطلاب', 'student ratings')),
+        stat('fa-scale-balanced', '—', t('متوسّط الجامعة', 'university average')),
+        stat('fa-link', '—', t('مربوطاً بشُعبه في بانر', 'linked to Banner sections')),
+        '<div class="fc-stat fc-stat--when"><i class="fa-solid fa-clock-rotate-left"></i><span>' +
+          t('آخر تقييم —', 'last rating —') + '</span></div>',
+        '<div class="fc-stat fc-stat--go"><i class="fa-solid fa-pen-to-square"></i><span>' +
+          t('قيّم أستاذاً', 'Rate an instructor') + '</span></div>'
+      ].join('').replace(/class="fc-stat/g, 'class="fc-stat--ph fc-stat');
+      return;
+    }
+    el.removeAttribute('aria-hidden');
     /*@3.FACJ.9*/
     var when = d.updated_at ? new Date(d.updated_at) : null;
     el.hidden = false;
@@ -512,6 +529,9 @@
 
   function boot() {
     paintSort();
+    /*@3.FACJ.52*/
+    buildFilters(); paintStats();
+    $('#fc-count').textContent = t('— أستاذاً', '— instructors');
     wireSingle('#fc-sort', function (v) { state.sort = v; paintSort(); apply(); });
     wireSingle('#fc-subject', function (v) { state.subject = v || ''; buildFilters(); apply(); });
     wireSingle('#fc-gender',  function (v) { state.gender = v || 'all'; buildFilters(); apply(); });
@@ -579,7 +599,7 @@
 
     /*@3.FACJ.30*/
     document.addEventListener('garden:languageChanged', function () {
-      if (!state.data) return;
+      if (!state.data) { paintSort(); buildFilters(); paintStats(); return; }
       paintStats(); paintHow(); paintSort(); buildFilters(); apply();
       /*@3.FACJ.31*/
       if ($('#fc-modal').classList.contains('on')) {

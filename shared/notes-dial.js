@@ -832,7 +832,7 @@
       h += favRow('add', 'fa-star', 'أضِفْ إلى المفضّلة', 'Add to favourites');
     } else if (ix >= 0 && list[ix]) {
       h += '<div class="ndl-favp-h">' + esc(favName(list[ix])) + '</div>';
-      h += favRow('put', 'fa-arrow-down-to-line',
+      h += favRow('put', 'fa-right-left',
                   'ضَعِ الأداةَ الحاليّةَ مكانَها', 'Replace with current tool', !cur);
       h += favRow('back', 'fa-arrow-right-long', 'حرّكْ قبلَها', 'Move earlier', ix <= 0);
       h += favRow('fwd', 'fa-arrow-left-long', 'حرّكْ بعدَها', 'Move later',
@@ -1307,7 +1307,7 @@
     if (isIx) {
       var t = P.lists[P.cur].c[ix];
       h += '<div class="ndl-favp-h">' + esc(TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t) + '</div>';
-      h += favRow('put', 'fa-arrow-down-to-line', 'ضَعِ اللونَ الحاليَّ مكانَه', 'Replace with current colour', !cur);
+      h += favRow('put', 'fa-right-left', 'ضَعِ اللونَ الحاليَّ مكانَه', 'Replace with current colour', !cur);
       h += favRow('del', 'fa-trash', 'أزِلْه من القائمة', 'Remove from list');
       h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
       h += favRow('add', 'fa-plus', 'أضِفِ اللونَ الحاليّ', 'Add current colour', !cur);

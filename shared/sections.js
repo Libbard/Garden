@@ -363,6 +363,9 @@
   /*@3.SECJ.32*/
   function loadTerm(term) {
     var grid = $('#sx-grid');
+    /*@3.SECJ.492*/
+    var seq = loadTerm.seq = (loadTerm.seq || 0) + 1;
+    function current() { return seq === loadTerm.seq; }
     grid.innerHTML = '<div class="sx-state"><i class="fa-solid fa-spinner fa-spin"></i>' +
       t('يُحمَّل الكتالوج…', 'Loading catalog…') + '</div>';
 
@@ -378,13 +381,14 @@
     var FB = window.GardenFallback;
     var drawn = 0;
     /*@3.SECJ.457*/
-    function draw(d) { paintCatalog(term, d, drawn++ > 0); }
+    function draw(d) { if (current()) paintCatalog(term, d, drawn++ > 0); }
 
     var run = FB
       ? FB.through('catalog:' + term, get, { onData: draw })
       : get().then(draw);
 
     return run.catch(function (e) {
+      if (!current()) return;
       grid.innerHTML = '<div class="sx-state"><i class="fa-solid fa-triangle-exclamation"></i>' +
         t('تعذّر تحميل الكتالوج', 'Could not load the catalog') +
         '<div style="font-size:.76rem;margin-top:.4rem">' + esc(e.message) + '</div></div>';

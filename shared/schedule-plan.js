@@ -879,8 +879,9 @@
         return '<button class="ip-pill' + (c.session_minutes === n ? ' active' : '') + '" data-smin="' + n + '">' + n + '</button>';
       }).join('') + '</div>';
     h += '<label class="sch-label">' + T('وقت أول جلسة', 'First session time') + '</label>' +
-      '<div class="sch-timepick"><select class="tp-h"></select><span class="tp-colon">:</span>' +
-      '<select class="tp-m"></select><select class="tp-mer"></select>' +
+      '<div class="sch-timepick"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
+      '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
+      '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
       '<input type="hidden" id="ip-start-time" value="' + c.window.start_time + '"></div>';
     h += '<label class="sch-label">' + T('أيام الراحة', 'Rest days') + '</label>' +
       '<p class="sch-editor-hint">' + T('الجمعة والسبت مغلقتان افتراضياً — افتحهما لو احتجت سعةً أكبر.',
@@ -1557,8 +1558,9 @@
           '<span class="ip-series-meta">' + esc(orderLabel(s0.order)) + ' · ' + esc(nSessions(list.length)) + '</span>' +
         '</div>' +
         '<div class="ip-series-fields">' +
-          '<div class="sch-timepick"><select class="tp-h"></select><span class="tp-colon">:</span>' +
-          '<select class="tp-m"></select><select class="tp-mer"></select>' +
+          '<div class="sch-timepick"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
+          '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
+      '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
           '<input type="hidden" class="ip-series-time" value="' + esc(s0.start_time || DEFAULT_START) + '"></div>' +
           '<input type="number" class="sch-input ip-series-min" min="15" max="240" step="5" value="' + (s0.minutes || 60) + '">' +
           '<button class="sch-btn sch-btn-primary sch-btn-xs ip-series-apply">' + T('طبّق', 'Apply') + '</button>' +
@@ -1579,8 +1581,9 @@
       '<span class="ip-dot" style="background:' + S.courseColor(s.course) + '"></span> ' +
       esc(S.courseShort(s.course)) + ' · ' + esc(sessionLabel(s)) + ' · ' + esc(s.date) + '</div>';
     h += '<label class="sch-label">' + T('الوقت', 'Time') + '</label>' +
-      '<div class="sch-timepick"><select class="tp-h"></select><span class="tp-colon">:</span>' +
-      '<select class="tp-m"></select><select class="tp-mer"></select>' +
+      '<div class="sch-timepick"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
+      '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
+      '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
       '<input type="hidden" id="ip-se-time" value="' + esc(s.start_time || DEFAULT_START) + '"></div>';
     h += '<label class="sch-label">' + T('المدّة (دقيقة)', 'Duration (min)') + '</label>' +
       '<input type="number" class="sch-input" id="ip-se-min" min="15" max="240" step="5" value="' + (s.minutes || 60) + '">';

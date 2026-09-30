@@ -4874,7 +4874,10 @@
   /*@3.GARJ.288*/
 
   /*@3.GARJ.289*/
-  const GARDEN_AI_ENDPOINT = 'https://gardin-main.xxli50xx.workers.dev'; /*@3.GARJ.290*/
+  /*@3.GARJ.662*/
+  const GARDEN_AI_ENDPOINT = (window.GardenEndpoints && 'ai' in window.GardenEndpoints)
+    ? window.GardenEndpoints.ai
+    : 'https://gardin-main.xxli50xx.workers.dev'; /*@3.GARJ.290*/
 
   const AI_CACHE_PREFIX = 'garden_ai_';
   const AI_CACHE_MAX = 50; /*@3.GARJ.291*/

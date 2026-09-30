@@ -138,7 +138,24 @@
       saved_at: Date.now()
     };
     return tx(S_DOCS, 'readwrite', function (os) { return os.put(row); })
-      .then(function () { return { bytes: bytes, t: row.t }; });
+      .then(function () {
+        if (!o.clean) askPersist();
+        return { bytes: bytes, t: row.t };
+      });
+  }
+
+  /*@3.NOSJ.16*/
+  function askPersist() {
+    if (askPersist.done) return;
+    askPersist.done = 1;
+    try {
+      var s = navigator.storage;
+      if (!s || !s.persist || !s.persisted) return;
+      if (/Firefox\//.test(navigator.userAgent || '')) return;
+      s.persisted()
+        .then(function (yes) { if (!yes) return s.persist(); })
+        .catch(function () {});
+    } catch (e) {}
   }
 
   function delDoc(id) {
