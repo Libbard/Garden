@@ -545,6 +545,8 @@
         Object.assign({ id: Number(fdrop) }, identity())).then(function (x) {
         b.disabled = false;
         if (x.s !== 200 || !x.j || !x.j.ok) { flashFac(t('تعذّر السحب. جرّب لاحقاً.', 'Could not withdraw. Try later.')); return; }
+        /*@3.MYRJ.24*/
+        try { localStorage.setItem('gf_fresh_until', String(Date.now() + 130000)); } catch (e) {}
         loadFaculty();
       }).catch(function () {
         b.disabled = false;

@@ -74,6 +74,15 @@
 
   /*@3.FAPJ.2*/
   var DATA = null, LOADING = null, WAIT = [], FRESH = false, DATA_FAILED = false;
+  /*@3.FAPJ.97*/
+  var FRESH_KEY = 'gf_fresh_until';
+  function freshNow() {
+    try { return Number(localStorage.getItem(FRESH_KEY) || 0) > Date.now(); } catch (e) { return false; }
+  }
+  function markFresh() {
+    FRESH = true;
+    try { localStorage.setItem(FRESH_KEY, String(Date.now() + 130000)); } catch (e) {}
+  }
   /*@3.FAPJ.76*/
   function load(cb) {
     if (DATA) { cb && cb(DATA); return; }
@@ -81,7 +90,7 @@
     if (LOADING) return;
     LOADING = true;
     /*@3.FAPJ.16*/
-    var want = FRESH; FRESH = false;
+    var want = FRESH || freshNow(); FRESH = false;
 
     function get() {
       return (want ? fetch(API + '/v1/faculty/cards.json', { cache: 'reload' })
@@ -136,7 +145,8 @@
       delete DET_WAIT[id];
       q.splice(0).forEach(function (fn) { fn(ok); });
     }
-    GardenFetch('/v1/faculty/cm/' + encodeURIComponent(id) + '.json')
+    /*@3.FAPJ.98*/
+    GardenFetch('/v1/faculty/cm/' + encodeURIComponent(id) + '.json', freshNow() ? { cache: 'reload' } : undefined)
       .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); })
       .then(function (d) {
         f.cm = d.cm || [];
@@ -1114,7 +1124,7 @@
           : (x.j.duplicate
             ? t('هذا التقييم مُسجَّلٌ سلفاً.', 'This rating was already recorded.')
             : t('شكراً — سُجِّل رأيُك.', 'Thanks — your rating is in.'))) + note;
-        DATA = null; FRESH = true;         /*@3.FAPJ.13*/
+        DATA = null; markFresh();          /*@3.FAPJ.13*/
         DET_WAIT = {};
         /*@3.FAPJ.56*/
         draftDrop(DKEY);

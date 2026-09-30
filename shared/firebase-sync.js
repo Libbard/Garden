@@ -232,6 +232,8 @@
       if (!r.ok) throw new Error('oracle-get-' + r.status);
       const j = await r.json();
       lockClear();
+      /*@3.FISJ.249*/
+      if (j.own === true) { try { localStorage.setItem('gt_own', '1'); } catch (e) {} }
       return { exists: !!j.exists, sync: j.sync || {}, data: j };
     }
     const snap = await db.collection(collectionName()).doc(docId).get();
