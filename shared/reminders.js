@@ -186,6 +186,14 @@
     } catch (e) { return d.toLocaleString(); }
   }
 
+  function fmtDay(ms) {
+    var d = new Date(ms);
+    var opts = { weekday: 'long', day: 'numeric', month: 'long' };
+    try {
+      return d.toLocaleDateString(lang() === 'ar' ? 'ar-SA-u-ca-gregory' : 'en-GB', opts);
+    } catch (e) { return d.toDateString(); }
+  }
+
   /*@3.REMJ.29*/
   function applyQuiet(ms) {
     var s = load();
@@ -347,7 +355,9 @@
         id: 'dl:' + t.source + ':' + t.id + ':' + stamp(eventMs),
         kind: channel,
         title: titleTxt ? (head + ' — ' + titleTxt) : head,
-        body: tx('الموعد ', 'Due ') + fmtWhen(eventMs),
+        /*@3.REMJ.102*/
+        body: when.allDay ? (tx('الموعد ', 'Due ') + fmtDay(eventMs) + tx(' · طوال اليوم', ' · all day'))
+                          : (tx('الموعد ', 'Due ') + fmtWhen(eventMs)),
         fireAt: applyQuiet(fireAt),
         eventAt: eventMs,
         /*@3.REMJ.91*/

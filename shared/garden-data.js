@@ -1161,7 +1161,7 @@
 
     (s.exams || []).forEach(function (x) {
       if (!x || x.date !== ds) return;
-      var allDay = !!x.all_day && !x.start_time;
+      var allDay = !x.start_time;
       var a = hm(x.start_time);
       if (a === null && !allDay) a = 15 * 60;
       var b = hm(x.end_time);
@@ -1393,18 +1393,30 @@
   function upsertExam(ex) {
     if (!ex || !ex.course_code || !ex.date) return null;
     var s = scheduleRaw();
+    var was = ex.id ? s.exams.filter(function (e) { return e && e.id === ex.id; })[0] : null;
+    var allDay = ex.all_day === true || (ex.all_day === undefined && !!(was && was.all_day) && !ex.start_time);
     var rec = {
       id: ex.id || ('exam_' + Date.now()),
       course_code: ex.course_code,
       date: ex.date,
-      start_time: ex.start_time || '15:00',
-      end_time: ex.end_time || '',
+      start_time: allDay ? '' : (ex.start_time || '15:00'),
+      /*@3.GADJ.189*/
+      end_time: allDay ? '' : (ex.end_time || (was && ex.start_time === was.start_time ? was.end_time || '' : '')),
       exam_type: ex.exam_type || 'exam',
       room: ex.room || '',
       notes: ex.notes || ''
     };
     var i = s.exams.findIndex(function (e) { return e && e.id === rec.id; });
-    if (i > -1) s.exams[i] = rec; else s.exams.push(rec);
+    /*@3.GADJ.187*/
+    if (i > -1) {
+      rec = Object.assign({}, s.exams[i], rec);
+      rec.all_day = allDay;
+      if (allDay) rec.end_time = '';
+      s.exams[i] = rec;
+    } else {
+      if (allDay) rec.all_day = true;
+      s.exams.push(rec);
+    }
     writeSchedule(s);
     return rec;
   }
@@ -1521,6 +1533,47 @@
     });
     if (!hit) return;
     try { localStorage.setItem('garden_ics', JSON.stringify(s)); } catch (e) {}
+  }
+
+  /*@3.GADJ.186*/
+  function icsEdit(fnName, fallback) {
+    try {
+      if (window.GardenICS && window.GardenICS[fnName]) return 'live';
+    } catch (e) {}
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem('garden_ics') || 'null'); } catch (e) { return ''; }
+    if (!s || !s.links || typeof s.links !== 'object') return '';
+    var uid = fallback(s);
+    if (!uid) return '';
+    try { localStorage.setItem('garden_ics', JSON.stringify(s)); } catch (e) { return ''; }
+    return uid;
+  }
+  function icsUid(s, store, id) {
+    var keys = Object.keys(s.links);
+    for (var i = 0; i < keys.length; i++) {
+      var l = s.links[keys[i]];
+      if (l && l.store === store && l.id === id) return keys[i];
+    }
+    return '';
+  }
+  function icsDeleted(store, id) {
+    var r = icsEdit('userDeleted', function (s) {
+      var uid = icsUid(s, store, id);
+      if (uid) { if (!s.skip || typeof s.skip !== 'object') s.skip = {}; s.skip[uid] = 2; }
+      return uid;
+    });
+    return r === 'live' ? window.GardenICS.userDeleted(store, id) : r;
+  }
+  function icsRelink(oldStore, oldId, newStore, newId, code) {
+    var r = icsEdit('relink', function (s) {
+      var uid = icsUid(s, oldStore, oldId);
+      if (uid) {
+        var l = s.links[uid];
+        l.store = newStore; l.id = newId; l.code = newStore === 'task' ? '' : (code || l.code);
+      }
+      return uid;
+    });
+    return r === 'live' ? window.GardenICS.relink(oldStore, oldId, newStore, newId, code) : r;
   }
 
   function removeCourseTraces(code) { return courseTraces(code, true); }
@@ -1843,8 +1896,20 @@
 
   function saveCourseMeta(code, meta) {
     meta.updated_at = Date.now();
-    try { localStorage.setItem(metaKey(code), JSON.stringify(meta)); return true; }
+    try { localStorage.setItem(metaKey(code), JSON.stringify(meta)); }
     catch (e) { return false; }
+    announceData();
+    return true;
+  }
+
+  /*@3.GADJ.188*/
+  var dataTimer = null;
+  function announceData() {
+    if (dataTimer) return;
+    dataTimer = setTimeout(function () {
+      dataTimer = null;
+      try { window.dispatchEvent(new CustomEvent('garden:scheduleChanged', { detail: { from: 'data' } })); } catch (e) {}
+    }, 0);
   }
 
   /*@3.GADJ.95*/
@@ -1911,8 +1976,10 @@
   }
 
   function writeTasks(list) {
-    try { localStorage.setItem(LS.tasks, JSON.stringify(list)); return true; }
+    try { localStorage.setItem(LS.tasks, JSON.stringify(list)); }
     catch (e) { return false; }
+    announceData();
+    return true;
   }
 
   /*@3.GADJ.101*/
@@ -2347,6 +2414,8 @@
     deleteTask: deleteTask,
     toggleTask: toggleTask,
     allDeadlines: allDeadlines,
+    icsDeleted: icsDeleted,
+    icsRelink: icsRelink,
     majorExamWave: majorExamWave,
     daysUntil: daysUntil,
     tasksDueSoon: tasksDueSoon,

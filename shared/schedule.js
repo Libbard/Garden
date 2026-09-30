@@ -651,7 +651,7 @@
     (schedule.exams || []).forEach(function (x) {
       if (x.date !== dstr) return;
       /*@3.SCHJ.61*/
-      var isAllDay = !!x.all_day && !x.start_time;
+      var isAllDay = !x.start_time;
       var s = parseHM(x.start_time); if (s === null && !isAllDay) s = 15 * 60;
       var e = parseHM(x.end_time); if (!isAllDay && (e === null || e <= s)) e = s + 90;
       out.push(normalizeEvent({
@@ -2717,6 +2717,16 @@
       '" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
     if (ev.youtube) rows += '<a class="sch-sheet-link" href="' + escapeH(ev.youtube) + '" target="_blank" rel="noopener">' +
       '<i class="fa-solid fa-arrow-up-right-from-square"></i> ' + (isAr() ? 'فتح الرابط' : 'Open link') + '</a>';
+    /*@3.SCHJ.331*/
+    var bbl = icsLink(ev);
+    if (bbl) {
+      rows += row('fa-graduation-cap', bbl.edited
+        ? (isAr() ? 'من البلاك بورد · عدّلتَه بيدك فيبقى كما كتبتَه' : 'From Blackboard · you edited it, so it stays as you wrote it')
+        : (isAr() ? 'من البلاك بورد · يتحدّث مع كلِّ مزامنة' : 'From Blackboard · updates on every sync'));
+      if (bbl.news) {
+        rows += row('fa-circle-exclamation', (isAr() ? 'البلاك بورد صار يقول: ' : 'Blackboard now says: ') + newsText(bbl.news));
+      }
+    }
     body.innerHTML = rows;
 
     /*@3.SCHJ.147*/
@@ -2741,6 +2751,15 @@
       btns += '<button class="sch-btn sch-btn-secondary" id="sheet-module">' +
         '<i class="fa-solid fa-book-open-reader"></i> ' + (isAr() ? 'ادرس' : 'Study') + '</button>';
     }
+    if (bbl && (bbl.edited || bbl.news)) {
+      var rvT = isAr() ? 'ارجعْ لما يقوله البلاك بورد' : 'Back to what Blackboard says';
+      btns += '<button class="sch-btn sch-btn-secondary" id="sheet-revert" title="' + escapeH(rvT) + '" aria-label="' + escapeH(rvT) + '">' +
+        '<i class="fa-solid fa-rotate-left"></i> ' + (isAr() ? 'الأصل' : 'Original') + '</button>';
+    }
+    if (ev.src === 'exam' || ev.src === 'general' || ev.src === 'task' || ev.src === 'course') {
+      btns += '<button class="sch-btn sch-btn-secondary" id="sheet-copy">' +
+        '<i class="fa-solid fa-copy"></i> ' + (isAr() ? 'انسخْها' : 'Copy') + '</button>';
+    }
     if (canDelete(ev)) {
       btns += '<button class="sch-btn sch-btn-danger" id="sheet-del">' +
         '<i class="fa-solid fa-trash"></i> ' + (isAr() ? 'حذف' : 'Delete') + '</button>';
@@ -2751,6 +2770,8 @@
     bindSheetBtn('sheet-edit', function () { closeSheet(); openEditEvent(ev); });
     bindSheetBtn('sheet-skip', function () { closeSheet(); skipOccurrence(ev); });
     bindSheetBtn('sheet-del', function () { closeSheet(); deleteEvent(ev); });
+    bindSheetBtn('sheet-revert', function () { closeSheet(); if (bbl) revertIcs(bbl.uid); });
+    bindSheetBtn('sheet-copy', function () { closeSheet(); copyAsNew(ev); });
     bindSheetBtn('sheet-module', function () {
       if (window.GardenSchedulePlan && window.GardenSchedulePlan.openModule) window.GardenSchedulePlan.openModule(ev.course_code, ev.module);
     });
@@ -2778,11 +2799,61 @@
     if (ev.src === 'lecture' || ev.src === 'study' || ev.src === 'exam' || ev.src === 'general') return true;
     if (ev.src === 'task') return true;      /*@3.SCHJ.149*/
     if (ev.src === 'intensive') return true;
-    return false;                            /*@3.SCHJ.150*/
+    return ev.src === 'course';              /*@3.SCHJ.150*/
   }
   function canDelete(ev) {
     return ev.src === 'lecture' || ev.src === 'study' || ev.src === 'exam' ||
-           ev.src === 'general' || ev.src === 'task';
+           ev.src === 'general' || ev.src === 'task' || ev.src === 'course';
+  }
+
+  /*@3.SCHJ.329*/
+  function icsStore(ev) { return ev.src === 'course' ? 'date' : ev.src; }
+  function icsLink(ev) {
+    if (!ev || (ev.src !== 'exam' && ev.src !== 'task' && ev.src !== 'course')) return null;
+    if (!window.GardenICS || !window.GardenICS.linkOf) return null;
+    try { return window.GardenICS.linkOf(icsStore(ev), ev.id); } catch (e) { return null; }
+  }
+  function icsForget(src, id) {
+    if (window.GardenData && window.GardenData.icsDeleted) {
+      window.GardenData.icsDeleted(src === 'course' ? 'date' : src, id);
+    }
+  }
+  function dropCourseDate(code, id) {
+    var G = window.GardenData;
+    if (!G || !G.courseMeta || !code) return;
+    var m = G.courseMeta(code);
+    var n = (m.dates || []).length;
+    m.dates = (m.dates || []).filter(function (x) { return !x || x.id !== id; });
+    if (m.dates.length !== n) G.saveCourseMeta(code, m);
+  }
+  function newsText(news) {
+    var out = [], iso = function (s) { return '\u2068' + s + '\u2069'; };
+    if (news.date) out.push(iso(news.date));
+    if (news.time) out.push(iso(news.time));
+    if (news.title) out.push('«' + iso(news.title) + '»');
+    if (!out.length) out.push(isAr() ? 'تفاصيلَ أخرى' : 'other details');
+    return out.join(' · ');
+  }
+  function revertIcs(uid) {
+    var I = window.GardenICS;
+    if (!I || !I.revert) return;
+    I.revert(uid);
+    schSay(isAr() ? 'نعيدها كما في البلاك بورد…' : 'Restoring it from Blackboard…');
+    I.sync().then(function (r) {
+      if (typeof rereadStore === 'function') rereadStore();
+      render();
+      schSay(r && r.ok ? (isAr() ? 'عادت كما في البلاك بورد' : 'Restored from Blackboard')
+                       : (isAr() ? 'تعذّر الاتصال — تعود في المزامنة التالية' : 'Offline — it will be restored on the next sync'));
+    });
+  }
+  /*@3.SCHJ.330*/
+  function copyAsNew(ev) {
+    openEditEvent(ev);
+    editingEvent = null;
+    hideDeleteButtons();
+    var ge = document.getElementById('gen-existing');
+    if (ge) ge.value = '';
+    if (ev.src === 'course') document.getElementById('gen-kind').value = 'task';
   }
 
   function skipOccurrence(ev) {
@@ -2837,9 +2908,10 @@
       isAr() ? 'حذف' : 'Delete',
       function () {
         if (ev.src === 'study') schedule.study_blocks = schedule.study_blocks.filter(function (x) { return x.id !== ev.id; });
-        else if (ev.src === 'exam') schedule.exams = schedule.exams.filter(function (x) { return x.id !== ev.id; });
+        else if (ev.src === 'exam') { icsForget('exam', ev.id); schedule.exams = schedule.exams.filter(function (x) { return x.id !== ev.id; }); }
         else if (ev.src === 'general') schedule.general_events = schedule.general_events.filter(function (x) { return x.id !== ev.id; });
-        else if (ev.src === 'task') { if (window.GardenData) window.GardenData.deleteTask(ev.id); }
+        else if (ev.src === 'task') { icsForget('task', ev.id); if (window.GardenData) window.GardenData.deleteTask(ev.id); }
+        else if (ev.src === 'course') { icsForget('course', ev.id); dropCourseDate(ev.course_code, ev.id); }
         save(); render();
       }, 'fa-trash');
   }
@@ -3311,6 +3383,8 @@
     document.getElementById('exam-kind').value = 'exam';
     document.getElementById('exam-room').value = '';
     document.getElementById('exam-notes').value = '';
+    document.getElementById('exam-timed').checked = true;
+    toggleExamTime();
     document.getElementById('modal-add-exam').style.display = '';
   }
   function prepGeneralModal() {
@@ -3343,6 +3417,10 @@
     var on = document.getElementById('gen-timed').checked;
     document.getElementById('gen-time-wrap').style.display = on ? '' : 'none';
   }
+  function toggleExamTime() {
+    var on = document.getElementById('exam-timed').checked;
+    document.getElementById('exam-time-wrap').style.display = on ? '' : 'none';
+  }
 
   /*@3.SCHJ.166*/
   function refreshGeneralPicker() {
@@ -3367,7 +3445,7 @@
       return;
     }
     hideDeleteButtons();
-    editingEvent = { src: ev.src, id: ev.id, weekId: ev.weekId };
+    editingEvent = { src: ev.src, id: ev.id, weekId: ev.weekId, course: ev.course_code || '' };
     if (ev.src === 'lecture') {
       var l = ev.raw;
       populateCourseSelect('lec-course');
@@ -3404,12 +3482,14 @@
       document.getElementById('exam-date').value = x.date || '';
       TP.set('exam-start', x.start_time || '15:00');
       TP.set('exam-end', x.end_time || '16:30');
+      document.getElementById('exam-timed').checked = !!x.start_time && !x.all_day;
+      toggleExamTime();
       document.getElementById('exam-kind').value = x.exam_type || 'exam';
       document.getElementById('exam-room').value = x.room || '';
       document.getElementById('exam-notes').value = x.notes || '';
       document.getElementById('del-exam').style.display = '';
       document.getElementById('modal-add-exam').style.display = '';
-    } else if (ev.src === 'general' || ev.src === 'task') {
+    } else if (ev.src === 'general' || ev.src === 'task' || ev.src === 'course') {
       populateCourseSelect('gen-course', true);
       document.getElementById('gen-existing-wrap').style.display = 'none';
       if (ev.src === 'general') {
@@ -3423,6 +3503,7 @@
         document.getElementById('gen-notes').value = g.notes || '';
         document.getElementById('gen-link').value = g.link || '';
       } else {
+        /*@3.SCHJ.332*/
         var t = ev.raw;
         document.getElementById('gen-kind').value = 'task';
         document.getElementById('gen-title').value = t.title || '';
@@ -3531,6 +3612,8 @@
       room: document.getElementById('exam-room').value.trim(),
       notes: document.getElementById('exam-notes').value.trim()
     };
+    var timed = document.getElementById('exam-timed').checked;
+    if (!timed) { data.start_time = ''; data.end_time = ''; }
     if (!data.course_code) { alert(isAr() ? 'اختر المادة' : 'Pick a course'); return; }
     if (!data.date) { alert(isAr() ? 'اختر تاريخ الاختبار' : 'Pick an exam date'); return; }
     if (editingEvent && editingEvent.src === 'exam') {
@@ -3539,14 +3622,14 @@
         x.course_code = data.course_code; x.date = data.date;
         x.start_time = data.start_time; x.end_time = data.end_time;
         x.exam_type = data.exam_type; x.room = data.room; x.notes = data.notes;
-        x.all_day = false;      /*@3.SCHJ.169*/
+        x.all_day = !timed;     /*@3.SCHJ.169*/
       }
     } else {
       schedule.exams.push({
         id: 'exam_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
         course_code: data.course_code, date: data.date,
         start_time: data.start_time, end_time: data.end_time,
-        exam_type: data.exam_type, room: data.room, notes: data.notes
+        exam_type: data.exam_type, room: data.room, notes: data.notes, all_day: !timed
       });
     }
     save(); editingEvent = null; hideDeleteButtons();
@@ -3567,6 +3650,14 @@
 
     if (!date) { alert(isAr() ? 'اختر التاريخ' : 'Pick a date'); return; }
     var due = date + (timed ? 'T' + time : '');
+
+    /*@3.SCHJ.333*/
+    if (editingEvent && editingEvent.src === 'course') {
+      saveCourseDate(editingEvent, title, course, date, timed ? time : '', notes);
+      editingEvent = null; hideDeleteButtons();
+      closeModal('modal-add-general'); render();
+      return;
+    }
 
     if (kind === 'task' && window.GardenData && window.GardenData.upsertTask) {
       var id = (editingEvent && editingEvent.src === 'task') ? editingEvent.id : (existing || null);
@@ -3600,6 +3691,30 @@
     }
     editingEvent = null; hideDeleteButtons();
     closeModal('modal-add-general'); render();
+  }
+
+  function saveCourseDate(ed, title, course, date, time, notes) {
+    var G = window.GardenData;
+    if (!G || !G.courseMeta || !ed.course) return;
+    var from = ed.course, to = course || from;
+    var m0 = G.courseMeta(from);
+    var row = (m0.dates || []).filter(function (x) { return x && x.id === ed.id; })[0];
+    if (!row) return;
+    var rec = JSON.parse(JSON.stringify(row));
+    if (title) rec.title = title;
+    rec.date = date; rec.time = time; rec.note = notes;
+    if (to !== from) {
+      m0.dates = m0.dates.filter(function (x) { return !x || x.id !== rec.id; });
+      G.saveCourseMeta(from, m0);
+      var m1 = G.courseMeta(to);
+      m1.dates = (m1.dates || []).filter(function (x) { return !x || x.id !== rec.id; });
+      m1.dates.push(rec);
+      G.saveCourseMeta(to, m1);
+      if (G.icsRelink) G.icsRelink('date', rec.id, 'date', rec.id, to);
+    } else {
+      m0.dates = m0.dates.map(function (x) { return x && x.id === rec.id ? rec : x; });
+      G.saveCourseMeta(from, m0);
+    }
   }
 
   /*@3.SCHJ.172*/
@@ -3787,6 +3902,8 @@
       function () {
         schedule.lectures = schedule.lectures.filter(function (l) { return m.lectures.indexOf(l.id) === -1; });
         schedule.study_blocks = schedule.study_blocks.filter(function (b) { return m.study_blocks.indexOf(b.id) === -1; });
+        /*@3.SCHJ.334*/
+        m.exams.forEach(function (id) { icsForget('exam', id); });
         schedule.exams = schedule.exams.filter(function (x) { return m.exams.indexOf(x.id) === -1; });
         schedule.general_events = (schedule.general_events || []).filter(function (g) { return m.general_events.indexOf(g.id) === -1; });
         var p = activePlan();
@@ -4696,6 +4813,7 @@
     on('study-recurring', 'change', toggleSingleWeekField);
     on('gen-kind', 'change', function () { refreshGeneralPicker(); });
     on('gen-timed', 'change', toggleGenTime);
+    on('exam-timed', 'change', toggleExamTime);
 
     ['lecture','study','exam','general'].forEach(function (k) {
       on('btn-cancel-' + k, 'click', function () {
@@ -4762,6 +4880,7 @@
     });
     on('del-exam', 'click', function () {
       if (editingEvent && editingEvent.src === 'exam') {
+        icsForget('exam', editingEvent.id);
         schedule.exams = schedule.exams.filter(function (x) { return x.id !== editingEvent.id; });
         save();
       }
@@ -4772,7 +4891,11 @@
         schedule.general_events = schedule.general_events.filter(function (g) { return g.id !== editingEvent.id; });
         save();
       } else if (editingEvent && editingEvent.src === 'task' && window.GardenData) {
+        icsForget('task', editingEvent.id);
         window.GardenData.deleteTask(editingEvent.id);
+      } else if (editingEvent && editingEvent.src === 'course') {
+        icsForget('course', editingEvent.id);
+        dropCourseDate(editingEvent.course, editingEvent.id);
       }
       editingEvent = null; hideDeleteButtons(); closeModal('modal-add-general'); render();
     });

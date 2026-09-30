@@ -422,6 +422,7 @@
       return;
     }
     if (act === 'date-del') {
+      if (D.icsDeleted) D.icsDeleted(src === 'schedule' ? 'exam' : 'date', id);
       if (src === 'schedule') D.deleteExam(id);
       else { meta.dates = meta.dates.filter(function (x) { return x.id !== id; }); save(); }
       renderDates(); toast(tx('حُذف', 'Deleted')); return;
@@ -442,20 +443,22 @@
 
       if (isExam) {
         /*@3.COHJ.22*/
-        D.upsertExam({
+        var ex = D.upsertExam({
           id: (id !== 'new' && existingSrc === 'schedule') ? id : null,
-          course_code: CODE, date: date, start_time: v('f-d-time') || '15:00',
+          course_code: CODE, date: date, start_time: v('f-d-time'),
           end_time: '', exam_type: type, room: v('f-d-loc'), notes: v('f-d-note')
         });
+        if (ex && id !== 'new' && existingSrc === 'meta' && D.icsRelink) D.icsRelink('date', id, 'exam', ex.id, CODE);
       } else {
         var prev = meta.dates.find(function (x) { return x.id === id; });
         var rec2 = { id: (id !== 'new' && existingSrc === 'meta') ? id : uid('date'),
-                     type: 'assignment', title: v('f-d-title'), date: date,
+                     type: (prev && prev.type) || 'assignment', title: v('f-d-title'), date: date,
                      time: v('f-d-time'), location: v('f-d-loc'), note: v('f-d-note'),
                      done: !!(prev && prev.done) };
         var j = meta.dates.findIndex(function (x) { return x.id === rec2.id; });
-        if (j > -1) meta.dates[j] = rec2; else meta.dates.push(rec2);
+        if (j > -1) meta.dates[j] = Object.assign({}, meta.dates[j], rec2); else meta.dates.push(rec2);
         save();
+        if (id !== 'new' && existingSrc === 'schedule' && D.icsRelink) D.icsRelink('exam', id, 'date', rec2.id, CODE);
       }
       editing = {}; renderDates(); toast(tx('حُفظ ✓', 'Saved ✓')); return;
     }

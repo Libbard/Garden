@@ -1365,17 +1365,19 @@
   function dedupeExams() {
     var d = S.data();
     if (!Array.isArray(d.exams)) return 0;
-    var best = {}, order = [];
+    var key = function (x) { return x.course_code + '|' + (x.exam_type || 'exam'); };
+    /*@3.SCPJ.114*/
+    var real = {};
+    d.exams.forEach(function (x) { if (x && x.course_code && !x.plan_tab) real[key(x)] = 1; });
+    var out = [], at = {};
     d.exams.forEach(function (x) {
-      if (!x || !x.course_code) return;
-      var k = x.course_code + '|' + (x.exam_type || 'exam');
-      var prev = best[k];
-      if (!prev) { best[k] = x; order.push(k); return; }
-      best[k] = richerExam(prev, x);
+      /*@3.SCPJ.85*/
+      if (!x || !x.course_code || !x.plan_tab) { out.push(x); return; }
+      var k = key(x);
+      if (real[k]) return;
+      if (at[k] === undefined) { at[k] = out.length; out.push(x); return; }
+      out[at[k]] = richerExam(out[at[k]], x);
     });
-    var out = order.map(function (k) { return best[k]; });
-    /*@3.SCPJ.85*/
-    d.exams.forEach(function (x) { if (!x || !x.course_code) out.push(x); });
     var removed = d.exams.length - out.length;
     d.exams = out;
     return removed;

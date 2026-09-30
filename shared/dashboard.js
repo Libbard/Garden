@@ -1822,7 +1822,10 @@
     else if (act === 'tk-edit') openTaskModal(id);
     else if (act === 'tk-toggle') { D.toggleTask(id); afterTaskChange(); }
     else if (act === 'tk-del') {
-      if (confirm(tx('حذف هذه المهمة؟', 'Delete this task?'))) { D.deleteTask(id); afterTaskChange(); }
+      if (confirm(tx('حذف هذه المهمة؟', 'Delete this task?'))) {
+        if (D.icsDeleted) D.icsDeleted('task', id);
+        D.deleteTask(id); afterTaskChange();
+      }
     }
     else if (act === 'tk-save') saveTask();
     else if (act === 'tk-cancel') closeTaskModal();
@@ -1840,6 +1843,7 @@
     }
     else if (act === 'sheet-del') {
       if (sheetTask && confirm(tx('حذف هذه المهمة؟', 'Delete this task?'))) {
+        if (D.icsDeleted) D.icsDeleted('task', sheetTask.id);
         D.deleteTask(sheetTask.id); closeTaskSheet(); afterTaskChange();
       }
     }

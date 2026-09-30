@@ -153,6 +153,7 @@
 
     out += teachView(s);
     out += inboxView(s);
+    out += changesView();
     out += alertsView(s);
     return out;
   }
@@ -312,6 +313,54 @@
     '</div>';
   }
 
+  /*@3.ICPJ.41*/
+  function changesView() {
+    var ICS = window.GardenICS;
+    var list = ICS.changes ? ICS.changes() : [];
+    var gone = ICS.deletedCount ? ICS.deletedCount() : 0;
+    if (!list.length && !gone) return '';
+    function when(o) { return [o.date || '', o.allday ? '' : (o.time || '')].filter(Boolean).join(' '); }
+    var rows = list.map(function (c) {
+      var mine = c.mine || {}, news = c.news || {};
+      var said = [], iso = function (s) { return '\u2068' + s + '\u2069'; };
+      if (news.date || news.time) said.push(iso(when({ date: news.date || mine.date, time: news.time || mine.time })));
+      if (news.title) said.push('«' + iso(news.title) + '»');
+      if (!said.length) said.push(L('تفاصيلَ أخرى', 'other details'));
+      return '<div class="ics-group" data-news="' + esc(c.uid) + '">' +
+        '<ul class="ics-items"><li class="ics-item">' +
+          (c.code ? '<span class="ics-item-c ltr">' + esc(c.code) + '</span>' : '') +
+          '<span class="ics-item-t">' + esc(mine.title || '') + '</span>' +
+          '<span class="ics-item-d ltr">' + esc(when(mine)) + '</span>' +
+        '</li></ul>' +
+        '<p class="set-row-h">' + esc(L('البلاك بورد صار يقول: ', 'Blackboard now says: ')) +
+          '<b>' + esc(said.join(' · ')) + '</b></p>' +
+        '<div class="ics-group-a">' +
+          '<button class="set-btn ics-news-ok"><i class="fa-solid fa-rotate-left"></i><span>' +
+            esc(L('اعتمد ما يقوله البلاك بورد', 'Use what Blackboard says')) + '</span></button>' +
+          '<button class="set-btn ics-news-keep"><i class="fa-solid fa-check"></i><span>' +
+            esc(L('أبقِ تصحيحي', 'Keep my correction')) + '</span></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    return '<div class="ics-inbox">' +
+      (list.length ?
+        '<div class="ics-inbox-h"><i class="fa-solid fa-circle-exclamation"></i>' +
+          '<span>' + esc(L('البلاك بورد غيّر ما صحّحتَه', 'Blackboard changed what you corrected')) + '</span>' +
+          '<span class="ics-count">' + list.length + '</span></div>' +
+        '<p class="set-row-h">' + esc(L(
+          'عدّلتَ هذه بيدك فأبقيناها كما كتبتَها، ثمّ غيّرها الأستاذُ في البلاك بورد. اختر ما يبقى في جدولك.',
+          'You edited these, so we kept them as you wrote them — then the instructor changed them on Blackboard. Choose what stays in your schedule.')) + '</p>' +
+        rows : '') +
+      (gone ?
+        '<div class="set-btns">' +
+          '<span class="set-row-h">' + esc(L(gone + ' حذفتَها من جدولك فلا تعود مع المزامنة.',
+                                             gone + ' you deleted from your schedule — they will not come back on sync.')) + '</span>' +
+          '<button class="set-btn" id="ics-restore"><i class="fa-solid fa-rotate-left"></i><span>' +
+            esc(L('أعِدها', 'Bring them back')) + '</span></button>' +
+        '</div>' : '') +
+    '</div>';
+  }
+
   /*@3.ICPJ.10*/
   function alertsView(s) {
     return '' +
@@ -408,7 +457,8 @@
       if (r.pending) bits.push(L(r.pending + ' بانتظار مادّتها', r.pending + ' awaiting a course'));
       /*@3.ICPJ.13*/
       if (!bits.length) bits.push(L('لا جديد — كلُّ شيءٍ محدَّث', 'Nothing new — all up to date'));
-      if (r.touched) bits.push(L(r.touched + ' عدّلتَها بيدك فلم نلمسها', r.touched + ' you edited — left untouched'));
+      if (r.touched) bits.push(L(r.touched + ' عدّلتَها بيدك فأبقينا تعديلك', r.touched + ' you edited — your edits kept'));
+      if (r.changed) bits.push(L(r.changed + ' غيّرها البلاك بورد بعد تعديلك — انظر أدناه', r.changed + ' changed on Blackboard after your edit — see below'));
       /*@3.ICPJ.28*/
       if (r.blocked) bits.push(L(r.blocked + ' تعذّر إدراجُها — أعد المحاولة',
                                  r.blocked + ' could not be filed — try again'));
@@ -543,6 +593,14 @@
         doSync();
       });
     });
+
+    host.querySelectorAll('[data-news]').forEach(function (g) {
+      var uid = g.getAttribute('data-news');
+      g.querySelector('.ics-news-ok').addEventListener('click', function () { ICS.acceptNews(uid); doSync(); });
+      g.querySelector('.ics-news-keep').addEventListener('click', function () { ICS.keepMine(uid); render(); });
+    });
+    var rst = $('ics-restore');
+    if (rst) rst.addEventListener('click', function () { ICS.restoreDeleted(); doSync(); });
 
     /*@3.ICPJ.38*/
     var tgo = $('ics-teach-go');

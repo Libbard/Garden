@@ -750,12 +750,13 @@
     GardenData.courseExams(CODE).forEach(function (e) {
       out.push({ id: e.id, src: 'exam', type: e.exam_type || 'exam', title: '',
                  date: e.date, time: e.start_time, room: e.room, note: e.notes || '',
-                 done: false });
+                 done: false, allday: !!e.all_day });
     });
     (S.meta.dates || []).forEach(function (d) {
       if (!d || !d.date) return;
       out.push({ id: d.id, src: 'meta', type: d.type || 'assignment', title: d.title || '',
-                 date: d.date, time: d.time, room: d.location, note: d.note || '', done: !!d.done });
+                 date: d.date, time: d.time, room: d.location, note: d.note || '', done: !!d.done,
+                 allday: !d.time });
     });
     GardenData.tasks().forEach(function (t) {
       if (!t || t.course !== CODE) return;
@@ -884,6 +885,9 @@
       (item && item.type) || 'assignment');
     el('d-date').value = (item && item.date) || dstr(new Date());
     el('d-time').value = (item && hhmm(item.time)) || '';
+    /*@3.COUJ.64*/
+    el('d-allday').checked = !!(item && item.allday);
+    el('d-time').disabled = el('d-allday').checked;
     el('d-room').value = (item && item.room) || '';
     el('d-title').value = (item && item.title) || '';
     el('d-note').value = (item && item.note) || '';
@@ -896,6 +900,7 @@
     if (!date) { toast(L('التاريخ مطلوب', 'A date is required')); return; }
     var isExam = type !== 'assignment';
     var prevSrc = editing && editing.src;
+    var allDay = el('d-allday').checked;
 
     /*@3.COUJ.43*/
     if (editing.id) {
@@ -908,22 +913,26 @@
 
     if (isExam) {
       /*@3.COUJ.44*/
-      GardenData.upsertExam({
+      var ex = GardenData.upsertExam({
         id: (editing.id && prevSrc === 'exam') ? editing.id : null,
-        course_code: CODE, date: date, start_time: el('d-time').value || '15:00',
-        end_time: '', exam_type: type, room: el('d-room').value, notes: el('d-note').value
+        course_code: CODE, date: date, start_time: allDay ? '' : (el('d-time').value || '15:00'),
+        end_time: '', exam_type: type, room: el('d-room').value, notes: el('d-note').value,
+        all_day: allDay
       });
+      /*@3.COUJ.63*/
+      if (ex && editing.id && prevSrc === 'meta' && GardenData.icsRelink) GardenData.icsRelink('date', editing.id, 'exam', ex.id, CODE);
     } else {
       var prev = (S.meta.dates || []).filter(function (x) { return x.id === editing.id; })[0];
       var rec = {
         id: (editing.id && prevSrc === 'meta') ? editing.id : uid('date'),
-        type: 'assignment', title: el('d-title').value.trim(), date: date,
-        time: el('d-time').value, location: el('d-room').value,
+        type: (prev && prev.type) || 'assignment', title: el('d-title').value.trim(), date: date,
+        time: allDay ? '' : el('d-time').value, location: el('d-room').value,
         note: el('d-note').value, done: !!(prev && prev.done)
       };
       S.meta.dates = (S.meta.dates || []).filter(function (x) { return x.id !== rec.id; });
       S.meta.dates.push(rec);
       saveMeta();
+      if (editing.id && prevSrc === 'exam' && GardenData.icsRelink) GardenData.icsRelink('exam', editing.id, 'date', rec.id, CODE);
     }
     el('dlg-date').close();
     refresh();
@@ -1117,9 +1126,13 @@
         L('احذف', 'Delete'),
         function () {
           if (e.kind === 'date') {
+            if (GardenData.icsDeleted) GardenData.icsDeleted(e.src === 'exam' ? 'exam' : 'date', e.id);
             if (e.src === 'exam') GardenData.deleteExam(e.id);
             else { S.meta.dates = (S.meta.dates || []).filter(function (x) { return x.id !== e.id; }); saveMeta(); }
-          } else if (e.kind === 'task') { GardenData.deleteTask(e.id); }
+          } else if (e.kind === 'task') {
+            if (GardenData.icsDeleted) GardenData.icsDeleted('task', e.id);
+            GardenData.deleteTask(e.id);
+          }
           else if (e.kind === 'note') { S.meta.notes = (S.meta.notes || []).filter(function (x) { return x.id !== e.id; }); saveMeta(); }
           else { S.meta.links = (S.meta.links || []).filter(function (x) { return x.id !== e.id; }); saveMeta(); }
           refresh();
@@ -1303,6 +1316,10 @@
     });
 
     on('d-ok', 'click', saveDate);
+    on('d-allday', 'change', function () {
+      el('d-time').disabled = el('d-allday').checked;
+      if (el('d-allday').checked) el('d-time').value = '';
+    });
     on('t-ok', 'click', saveTask);
     on('n-ok', 'click', saveNote);
     on('l-ok', 'click', saveLink);

@@ -35,6 +35,8 @@
       props: [],
       /*@3.ICSJ.95*/
       bb: { courses: {}, items: {}, cl: {}, term: '', at: 0 },
+      over: {},
+      over_sig: '',
       count: 0              /*@3.ICSJ.15*/
     };
   }
@@ -72,6 +74,8 @@
     if (!s.links || typeof s.links !== 'object') s.links = {};
     if (!s.uid_map || typeof s.uid_map !== 'object') s.uid_map = {};
     if (!s.skip || typeof s.skip !== 'object') s.skip = {};
+    if (!s.over || typeof s.over !== 'object' || Array.isArray(s.over)) s.over = {};
+    if (typeof s.over_sig !== 'string') s.over_sig = '';
     if (!Array.isArray(s.ranges)) s.ranges = [];
     if (!Array.isArray(s.inbox)) s.inbox = [];
     if (!Array.isArray(s.skip_bands)) s.skip_bands = [];
@@ -388,6 +392,8 @@
 
   function resolve(ev, codes) {
     var s = load();
+    var mine = s.over[ev.uid] && s.over[ev.uid].f ? s.over[ev.uid].f.code : '';
+    if (mine && codes.indexOf(mine) > -1) return { code: mine, why: 'user', sure: true };
     /*@3.ICSJ.39*/
     if (s.uid_map[ev.uid] && codes.indexOf(s.uid_map[ev.uid]) > -1) {
       return { code: s.uid_map[ev.uid], why: 'saved', sure: true };
@@ -773,23 +779,10 @@
   }
 
   function applyPending(ev) {
-    var s = load();
     if (!window.GardenData || !GardenData.upsertTask) return 'blocked';
-    var link = s.links[ev.uid] || null;
+    var link = load().links[ev.uid];
     if (link && link.store !== 'task') return false;
-    var id = link ? link.id : ('ics_p_' + hash(ev.uid));
-    var cur = findTask(id);
-    if (cur && link && link.snap && link.snap !== snapOf(cur)) return 'touched';
-    var when = ev.dtstart;
-    var rec = GardenData.upsertTask({
-      id: id, title: ev.raw, course: null, type: TASK_TYPE[ev.kind] || 'other',
-      due: when.date + (when.time ? 'T' + when.time : ''),
-      done: !!(cur && cur.done), note: (cur && cur.note) || '',
-      origin: { type: 'ics', uid: ev.uid, pending: true }
-    });
-    wrote = true;
-    s.links[ev.uid] = { store: 'task', id: id, code: '', snap: snapOf(rec) };
-    return true;
+    return applyOne(ev, null);
   }
 
   function dropPending(uid) {
@@ -800,90 +793,238 @@
 
   var EXAMISH = { quiz: 1, exam: 1, midterm: 1, final: 1 };
 
+  /*@3.ICSJ.116*/
+  var FIELDS = {
+    exam: ['date', 'time', 'end', 'allday', 'title', 'code', 'kind'],
+    date: ['date', 'time', 'title', 'code', 'kind'],
+    task: ['date', 'time', 'title', 'code', 'kind']
+  };
+  var DATE_T = { assignment: 1, project: 1, discussion: 1 };
+
+  function readRec(store, rec, code) {
+    if (!rec) return null;
+    if (store === 'exam') {
+      return { date: rec.date || '', time: rec.start_time || '', end: rec.end_time || '',
+               allday: !!rec.all_day, title: rec.notes || '', code: rec.course_code || '',
+               kind: rec.exam_type || 'exam' };
+    }
+    if (store === 'date') {
+      return { date: rec.date || '', time: rec.time || '', title: rec.title || '',
+               code: code || '', kind: rec.type || 'assignment' };
+    }
+    var due = String(rec.due || '');
+    return { date: due.slice(0, 10), time: due.slice(11, 16), title: rec.title || '',
+             code: rec.course || '', kind: rec.type || 'other' };
+  }
+
+  /*@3.ICSJ.48*/
+  function bbCanon(ev, code) {
+    var w = ev.dtstart, e = ev.dtend;
+    var deadline = !e || (e.date === w.date && e.time === w.time);
+    return { date: w.date, time: w.time || '', end: deadline ? '' : ((e && e.time) || ''),
+             allday: deadline, title: ev.raw, code: code || '', kind: ev.kind };
+  }
+
+  function locate(link) {
+    if (!link) return null;
+    var i, list;
+    if (link.store === 'exam') {
+      var sch = schedRaw();
+      list = (sch && sch.exams) || [];
+      for (i = 0; i < list.length; i++) if (list[i] && list[i].id === link.id) return list[i];
+      return null;
+    }
+    if (link.store === 'date') {
+      if (!window.GardenData || !GardenData.courseMeta || !link.code) return null;
+      list = GardenData.courseMeta(link.code).dates || [];
+      for (i = 0; i < list.length; i++) if (list[i] && list[i].id === link.id) return list[i];
+      return null;
+    }
+    if (link.store === 'task') return findTask(link.id);
+    return null;
+  }
+
+  function dropRec(link) {
+    if (link.store === 'exam') {
+      var sch = schedRaw();
+      if (sch && Array.isArray(sch.exams)) {
+        var n = sch.exams.length;
+        sch.exams = sch.exams.filter(function (e) { return !e || e.id !== link.id; });
+        if (sch.exams.length !== n) schedWrite(sch);
+      }
+    } else if (link.store === 'date' && window.GardenData && GardenData.courseMeta) {
+      var meta = GardenData.courseMeta(link.code);
+      var m = meta.dates.length;
+      meta.dates = meta.dates.filter(function (d) { return !d || d.id !== link.id; });
+      if (meta.dates.length !== m) GardenData.saveCourseMeta(link.code, meta);
+    } else if (link.store === 'task' && window.GardenData && GardenData.deleteTask) {
+      GardenData.deleteTask(link.id); wrote = true;
+    }
+  }
+
+  /*@3.ICSJ.117*/
+  function capture(s, uid, link, rec) {
+    var store = link.store;
+    var now = readRec(store, rec, link.code);
+    var ov = s.over[uid] || null;
+    var fields = FIELDS[store] || [];
+    if (!link.w) {
+      /*@3.ICSJ.118*/
+      if (!link.snap || link.snap === snapOf(rec)) { link.w = now; return ov; }
+      ov = ov || (s.over[uid] = { f: {}, t: 0 });
+      fields.forEach(function (k) { if (k !== 'code' || now[k]) ov.f[k] = now[k]; });
+      ov.t = Date.now();
+      link.w = now;
+      return ov;
+    }
+    var bbv = link.bb || {};
+    fields.forEach(function (k) {
+      if (now[k] === link.w[k]) return;
+      ov = ov || (s.over[uid] = { f: {}, t: 0 });
+      if (!ov.f) ov.f = {};
+      /*@3.ICSJ.119*/
+      if (bbv[k] !== undefined && now[k] === bbv[k]) ov.f[k] = null;
+      else if (k !== 'code' || now[k]) ov.f[k] = now[k];
+      ov.t = Date.now();
+    });
+    return ov;
+  }
+
   /*@3.ICSJ.46*/
+  function writeRec(store, base, fin, uid) {
+    var r = base ? JSON.parse(JSON.stringify(base)) : {};
+    if (store === 'exam') {
+      r.course_code = fin.code;
+      r.date = fin.date;
+      r.start_time = fin.allday ? '' : (fin.time || '');
+      r.end_time = fin.allday ? '' : (fin.end || '');
+      r.exam_type = (fin.kind === 'quiz' || fin.kind === 'midterm' || fin.kind === 'final') ? fin.kind : 'exam';
+      if (r.room === undefined) r.room = '';
+      r.notes = fin.title;
+      r.all_day = !!fin.allday;        /*@3.ICSJ.49*/
+      if (r.completed_at === undefined) r.completed_at = null;
+      r.ics_uid = uid;
+    } else if (store === 'date') {
+      /*@3.ICSJ.50*/
+      r.title = fin.title;
+      r.date = fin.date;
+      r.time = fin.time || '';
+      r.type = DATE_T[fin.kind] ? fin.kind : 'assignment';
+      if (r.done === undefined) r.done = false;
+      if (r.note === undefined) r.note = '';
+    } else {
+      r.title = fin.title;
+      r.course = fin.code || null;
+      r.type = TASK_TYPE[fin.kind] || fin.kind || 'other';
+      r.due = fin.date + (fin.time ? 'T' + fin.time : '');
+      if (r.done === undefined) r.done = false;
+      if (r.note === undefined) r.note = '';
+      r.origin = { type: 'ics', uid: uid, pending: !fin.code };
+    }
+    return r;
+  }
+
+  /*@3.ICSJ.113*/
+  function carryInto(store, r, from) {
+    var fr = from.rec || {};
+    var done = from.store === 'exam' ? !!fr.completed_at : !!fr.done;
+    var note = from.store === 'exam' ? '' : (fr.note || '');
+    if (store === 'exam') {
+      if (done && !r.completed_at) r.completed_at = fr.completed_at || new Date().toISOString();
+      if (fr.room && !r.room) r.room = fr.room;
+    } else {
+      /*@3.ICSJ.51*/
+      if (done) r.done = true;
+      if (note && !r.note) r.note = note;
+      if (from.store === 'exam' && fr.room && store === 'date' && !r.location) r.location = fr.room;
+    }
+  }
+
+  function same(a, b) {
+    try { return JSON.stringify(a) === JSON.stringify(b); } catch (e) { return false; }
+  }
+
+  function putRec(store, rec, code) {
+    var i;
+    if (store === 'exam') {
+      var sch = schedRaw(true);
+      if (!sch) return null;
+      for (i = 0; i < sch.exams.length; i++) if (sch.exams[i] && sch.exams[i].id === rec.id) break;
+      if (i < sch.exams.length) {
+        if (same(sch.exams[i], rec)) return rec;
+        sch.exams[i] = rec;
+      } else sch.exams.push(rec);
+      /*@3.ICSJ.74*/
+      return schedWrite(sch) ? rec : null;
+    }
+    if (store === 'date') {
+      if (!window.GardenData || !GardenData.courseMeta) return null;
+      var meta = GardenData.courseMeta(code);
+      for (i = 0; i < meta.dates.length; i++) if (meta.dates[i] && meta.dates[i].id === rec.id) break;
+      if (i < meta.dates.length) {
+        if (same(meta.dates[i], rec)) return rec;
+        meta.dates[i] = rec;
+      } else meta.dates.push(rec);
+      GardenData.saveCourseMeta(code, meta);
+      return rec;
+    }
+    if (!window.GardenData || !GardenData.upsertTask) return null;
+    var was = findTask(rec.id);
+    if (was && same(was, rec)) return was;
+    var out = GardenData.upsertTask(rec);
+    wrote = true;
+    return out || rec;
+  }
+
+  function hasFields(ov) {
+    return !!(ov && ov.f && Object.keys(ov.f).some(function (k) { return ov.f[k] !== null; }));
+  }
+
   function applyOne(ev, code) {
     var s = load();
-    var link = s.links[ev.uid] || null;
-    var isExam = !!EXAMISH[ev.kind];
-    var title = ev.raw;
-    var when = ev.dtstart;
+    var uid = ev.uid;
+    var link = s.links[uid] || null;
+    var cur = link ? locate(link) : null;
+    var ov = (link && cur) ? capture(s, uid, link, cur) : (s.over[uid] || null);
 
-    /*@3.ICSJ.113*/
-    var carryDone = false;
-    if (link && link.store === 'task') {
-      var pt = findTask(link.id);
-      carryDone = !!(pt && pt.done);
-      if (window.GardenData && GardenData.deleteTask) GardenData.deleteTask(link.id);
-      delete s.links[ev.uid];
-      link = null;
+    var bb = bbCanon(ev, code);
+    var mine = (ov && ov.f) || {};
+    var fin = {};
+    Object.keys(bb).forEach(function (k) { fin[k] = bb[k]; });
+    /*@3.ICSJ.126*/
+    Object.keys(mine).forEach(function (k) { if (k !== 'code' && mine[k] !== null) fin[k] = mine[k]; });
+    fin.code = code || mine.code || '';
+
+    /*@3.ICSJ.120*/
+    if (ov && link && link.bb) {
+      Object.keys(mine).forEach(function (k) {
+        if (k === 'code' || mine[k] === null || link.bb[k] === undefined) return;
+        if (bb[k] !== link.bb[k] && bb[k] !== mine[k]) (ov.news = ov.news || {})[k] = bb[k];
+      });
     }
+
+    var store = code ? (EXAMISH[fin.kind] ? 'exam' : 'date') : 'task';
 
     /*@3.ICSJ.47*/
-    if (link && link.store === 'exam' && !isExam) {
-      var oldSch = schedRaw(), oldRow = null, q;
-      if (oldSch && Array.isArray(oldSch.exams)) {
-        for (q = 0; q < oldSch.exams.length; q++) {
-          if (oldSch.exams[q] && oldSch.exams[q].id === link.id) { oldRow = oldSch.exams[q]; break; }
-        }
-      }
-      if (!oldRow || !link.snap || link.snap === snapOf(oldRow)) removeLink(ev.uid);
-      else delete s.links[ev.uid];
-      link = null;
+    var from = null;
+    if (link && cur && (link.store !== store || (store === 'date' && link.code !== fin.code))) {
+      from = { store: link.store, rec: cur };
+      dropRec(link);
+      cur = null;
     }
 
-    if (isExam) {
-      var sch = schedRaw(true);
-      if (!sch) return 'blocked';
-      var id = (link && link.store === 'exam') ? link.id : ('exam_ics_' + hash(ev.uid));
-      var i = -1, k;
-      for (k = 0; k < sch.exams.length; k++) if (sch.exams[k] && sch.exams[k].id === id) { i = k; break; }
+    var id = (link && link.store === store && (cur || !from)) ? link.id
+           : (store === 'exam' ? 'exam_ics_' : (store === 'date' ? 'ics_' : 'ics_p_')) + hash(uid);
+    var rec = writeRec(store, cur, fin, uid);
+    rec.id = id;
+    if (from) carryInto(store, rec, from);
 
-      if (i > -1 && link && link.snap && link.snap !== snapOf(sch.exams[i])) return 'touched';
-
-      /*@3.ICSJ.48*/
-      var deadline = !ev.dtend || (ev.dtend.date === when.date && ev.dtend.time === when.time);
-      var rec = {
-        id: id,
-        course_code: code,
-        date: when.date,
-        start_time: deadline ? '' : (when.time || ''),
-        end_time: deadline ? '' : ((ev.dtend && ev.dtend.time) || ''),
-        exam_type: (ev.kind === 'quiz' || ev.kind === 'midterm' || ev.kind === 'final') ? ev.kind : 'exam',
-        room: (i > -1 && sch.exams[i].room) || '',
-        notes: title,
-        all_day: deadline,        /*@3.ICSJ.49*/
-        completed_at: (i > -1 && sch.exams[i].completed_at) || (carryDone ? new Date().toISOString() : null),
-        ics_uid: ev.uid
-      };
-      if (i > -1) sch.exams[i] = rec; else sch.exams.push(rec);
-      /*@3.ICSJ.74*/
-      if (!schedWrite(sch)) return 'blocked';
-      s.links[ev.uid] = { store: 'exam', id: id, code: code, snap: snapOf(rec) };
-      return true;
-    }
-
-    /*@3.ICSJ.50*/
-    if (!window.GardenData || !GardenData.courseMeta) return 'blocked';
-    var meta = GardenData.courseMeta(code);
-    var did = (link && link.store === 'date') ? link.id : ('ics_' + hash(ev.uid));
-    var j = -1, n;
-    for (n = 0; n < meta.dates.length; n++) if (meta.dates[n] && meta.dates[n].id === did) { j = n; break; }
-
-    if (j > -1 && link && link.snap && link.snap !== snapOf(meta.dates[j])) return 'touched';
-
-    var d = {
-      id: did,
-      title: title,
-      date: when.date,
-      time: when.time || '',
-      type: (ev.kind === 'assignment' || ev.kind === 'project' || ev.kind === 'discussion') ? ev.kind : 'assignment',
-      done: (j > -1 && meta.dates[j].done) || carryDone,   /*@3.ICSJ.51*/
-      note: ''
-    };
-    if (j > -1) meta.dates[j] = d; else meta.dates.push(d);
-    GardenData.saveCourseMeta(code, meta);
-    s.links[ev.uid] = { store: 'date', id: did, code: code, snap: snapOf(d) };
-    return true;
+    var put = putRec(store, rec, fin.code);
+    if (!put) return 'blocked';
+    s.links[uid] = { store: store, id: id, code: store === 'task' ? '' : fin.code,
+                     snap: snapOf(put), w: readRec(store, put, fin.code), bb: bb };
+    if (ov && !hasFields(ov) && !(ov.news && Object.keys(ov.news).length)) delete s.over[uid];
+    return hasFields(ov) ? 'touched' : true;
   }
 
   /*@3.ICSJ.52*/
@@ -962,6 +1103,12 @@
                   blocked: 0, ignored: 0, foreign: 0, stale: 0, named: 0, elim: 0, unchanged: same, total: events.length };
       var seen = {}, inbox = [];
 
+      /*@3.ICSJ.125*/
+      events.forEach(function (ev) {
+        var L = s.links[ev.uid], cur = L ? locate(L) : null;
+        if (cur) capture(s, ev.uid, L, cur);
+      });
+
       events.forEach(function (ev) {
         seen[ev.uid] = 1;
         /*@3.ICSJ.92*/
@@ -1025,15 +1172,151 @@
 
       /*@3.ICSJ.56*/
       Object.keys(s.links).forEach(function (uid) { if (!seen[uid]) rep.gone++; });
+      rep.changed = changes().filter(function (c) { return seen[c.uid]; }).length;
+      rep.deleted = deletedCount();
 
       s.inbox = inbox;
       s.last_ok = Date.now();
       s.last_err = '';
       save();
       announceWrites();
+      try { pushOver(); } catch (e) {}
       emit('ics:sync', rep);
       return rep;
     }
+  }
+
+  /*@3.ICSJ.121*/
+  function uidOf(store, id) {
+    var s = load();
+    var keys = Object.keys(s.links);
+    for (var i = 0; i < keys.length; i++) {
+      var L = s.links[keys[i]];
+      if (L && L.store === store && L.id === id) return keys[i];
+    }
+    return '';
+  }
+
+  function userDeleted(store, id) {
+    var uid = uidOf(store, id);
+    if (!uid) return '';
+    var s = load();
+    s.skip[uid] = 2;
+    save();
+    try { pushOver(); } catch (e) {}
+    return uid;
+  }
+
+  /*@3.ICSJ.122*/
+  function relink(oldStore, oldId, newStore, newId, code) {
+    var uid = uidOf(oldStore, oldId);
+    if (!uid) return '';
+    var s = load(), L = s.links[uid];
+    L.store = newStore; L.id = newId; L.code = newStore === 'task' ? '' : (code || L.code);
+    save();
+    return uid;
+  }
+
+  function linkOf(store, id) {
+    var uid = uidOf(store, id);
+    if (!uid) return null;
+    var s = load(), ov = s.over[uid] || null;
+    return { uid: uid, edited: hasFields(ov),
+             news: ov && ov.news && Object.keys(ov.news).length ? ov.news : null };
+  }
+
+  function revert(uid) {
+    var s = load();
+    if (!s.over[uid]) return false;
+    delete s.over[uid];
+    s.stamp = '';
+    save();
+    return true;
+  }
+
+  /*@3.ICSJ.123*/
+  function acceptNews(uid) {
+    var s = load(), ov = s.over[uid];
+    if (!ov || !ov.news) return false;
+    Object.keys(ov.news).forEach(function (k) { if (ov.f) ov.f[k] = null; });
+    delete ov.news;
+    if (!hasFields(ov)) delete s.over[uid];
+    s.stamp = '';
+    save();
+    return true;
+  }
+
+  function keepMine(uid) {
+    var s = load(), ov = s.over[uid];
+    if (!ov || !ov.news) return false;
+    delete ov.news;
+    save();
+    return true;
+  }
+
+  function changes() {
+    var s = load(), out = [];
+    Object.keys(s.over).forEach(function (uid) {
+      var ov = s.over[uid], L = s.links[uid];
+      if (!ov || !ov.news || !Object.keys(ov.news).length || !L || s.skip[uid]) return;
+      out.push({ uid: uid, store: L.store, id: L.id, code: L.code || '',
+                 mine: L.w || {}, news: ov.news });
+    });
+    return out;
+  }
+
+  function deletedCount() {
+    var s = load();
+    return Object.keys(s.skip).filter(function (u) { return s.skip[u] === 2; }).length;
+  }
+
+  function restoreDeleted() {
+    var s = load(), n = 0;
+    Object.keys(s.skip).forEach(function (u) { if (s.skip[u] === 2) { s.skip[u] = 0; n++; } });
+    if (n) { s.stamp = ''; save(); }
+    return n;
+  }
+
+  /*@3.ICSJ.124*/
+  function riyadhMs(date, time) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ''));
+    if (!m) return 0;
+    var t = /^(\d{2}):(\d{2})/.exec(String(time || '')) || [0, '23', '59'];
+    return Date.UTC(+m[1], +m[2] - 1, +m[3], +t[1], +t[2]) - 3 * 3600e3;
+  }
+
+  function overPayload() {
+    var s = load(), hide = [], at = {}, n = 0;
+    Object.keys(s.skip).forEach(function (u) { if (s.skip[u] === 2 && hide.length < 500) hide.push(u); });
+    Object.keys(s.over).forEach(function (u) {
+      var ov = s.over[u], L = s.links[u];
+      if (!ov || !ov.f || !L || !L.w || n >= 500) return;
+      if (ov.f.date == null && ov.f.time == null && ov.f.allday == null) return;
+      var ms = riyadhMs(L.w.date, L.w.allday ? '' : L.w.time);
+      if (ms) { at[u] = ms; n++; }
+    });
+    hide.sort();
+    return { hide: hide, at: at };
+  }
+
+  function pushOver() {
+    var s = load();
+    var base = api();
+    if (!base || !s.url || !s.on_server) return Promise.resolve(false);
+    var body = overPayload();
+    var sig = hash(JSON.stringify(body));
+    if (sig === s.over_sig) return Promise.resolve(true);
+    return vaultId().then(function (vid) {
+      if (!vid) return false;
+      return fetch(base + '/v1/ics/over', {
+        method: 'POST',
+        headers: vh({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ vault_id: vid, hide: body.hide, at: body.at })
+      }).then(function (r) {
+        if (r.ok) { load().over_sig = sig; save(); }
+        return r.ok;
+      }, function () { return false; });
+    });
   }
 
   function emit(name, detail) {
@@ -1064,7 +1347,7 @@
 
   function skip(uid) { var s = load(); s.skip[uid] = 1; save(); return true; }
 
-  function unskip(uid) { var s = load(); delete s.skip[uid]; save(); return true; }
+  function unskip(uid) { var s = load(); if (s.skip[uid]) s.skip[uid] = 0; save(); return true; }
 
   /*@3.ICSJ.59*/
   function disconnect(alsoWipe) {
@@ -1104,7 +1387,11 @@
         })
       }).then(function (r) { return r.ok; }, function () { return false; });
     }).then(function (ok) {
-      s.on_server = ok === true; save(); return ok;
+      s.on_server = ok === true;
+      if (s.on_server) s.over_sig = '';
+      save();
+      if (s.on_server) { try { pushOver(); } catch (e) {} }
+      return ok;
     });
   }
 
@@ -1139,6 +1426,7 @@
   /*@3.ICSJ.63*/
   function bootSync() {
     var s = load();
+    try { pushOver(); } catch (e) {}
     if (!s.url || !s.auto) return;
     if (Date.now() - s.last_ok < FRESH_MS) return;
     sync({ quiet: true });
@@ -1166,6 +1454,17 @@
     skip: skip,
     unskip: unskip,
     removeLink: removeLink,
+    userDeleted: userDeleted,
+    relink: relink,
+    linkOf: linkOf,
+    revert: revert,
+    acceptNews: acceptNews,
+    keepMine: keepMine,
+    changes: changes,
+    deletedCount: deletedCount,
+    restoreDeleted: restoreDeleted,
+    pushOver: pushOver,
+    _overPayload: overPayload,
     myCourses: myCourses,
     myCoursesFull: myCoursesFull,
     teach: teach,
