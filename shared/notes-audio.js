@@ -22,6 +22,10 @@
                    flac: 'audio/flac', caf: 'audio/x-caf', mp4: 'video/mp4', mov: 'video/quicktime',
                    mkv: 'video/x-matroska' };
   var EXT_ACCEPT = 'audio/*,video/*,.m4a,.m4b,.mp3,.wav,.aac,.amr,.3gp,.3gpp,.ogg,.oga,.opus,.webm,.flac,.caf,.mp4,.mov,.mkv';
+  var XS_KEEP = 5;
+  var XS_AGE = 24 * 3600 * 1000;
+  var FILE_AGE = 7 * 24 * 3600 * 1000;
+  var GONE_MS = 15000;
 
   function isAr() {
     return (document.documentElement.lang ||
@@ -200,6 +204,53 @@
       toobig: L('الملفُّ أكبرُ من الحدّ المسموح (‏250 MB).', 'The file is larger than the allowed limit (250 MB).'),
       readfail: L('تعذّرت قراءةُ الملفّ على هذا الجهاز. أعد المحاولة.', 'The file could not be read on this device. Please try again.')
     }[w] || '';
+  }
+
+  function onPhone() {
+    var R = RC();
+    var os = (R && R.support ? R.support() : {}).os || '';
+    return os === 'android' || os === 'ios';
+  }
+  function xmarks(doc) {
+    return (doc && Array.isArray(doc.xs)) ? doc.xs.filter(function (t) { return t > 0 && Date.now() - t < XS_AGE; }) : [];
+  }
+  function openMark(doc) { var m = xmarks(doc); return m.length ? m[m.length - 1] : 0; }
+  function markExt() {
+    var t = Date.now();
+    withDoc(curId(), function (list, doc) {
+      doc.xs = xmarks(doc).concat([t]).slice(-XS_KEEP);
+    }).then(function () { render(); });
+  }
+  function unmarkExt(t) {
+    withDoc(curId(), function (list, doc) {
+      var m = xmarks(doc).filter(function (x) { return x !== t; });
+      if (m.length) doc.xs = m; else delete doc.xs;
+    }).then(function () { render(); });
+  }
+  function clockOf(t) {
+    var d = new Date(t);
+    var hm = pad(d.getHours()) + ':' + pad(d.getMinutes());
+    return new Date().toDateString() === d.toDateString() ? hm : when(t);
+  }
+
+  function away() {
+    if (!live || live.reviving || live.away || live.src !== 'mic' || !onPhone()) return;
+    var was = live.r.paused();
+    if (!was && !live.r.hold()) return;
+    live.away = { at: Date.now(), was: was };
+    note('away', was ? 'held' : 'hold');
+  }
+  function home() {
+    if (!live || !live.away) return;
+    var a = live.away;
+    live.away = null;
+    var ms = Date.now() - a.at;
+    note('home', ms);
+    if (a.was) return;
+    live.r.resume();
+    live.gone = { ms: ms, until: Date.now() + GONE_MS };
+    saveWip();
+    paintStrip(true);
   }
 
   function sysOk() {
@@ -478,8 +529,9 @@
       live.bars.push(v);
       if (live.bars.length > BARS) live.bars.shift();
     }
+    if (live.gone && Date.now() >= live.gone.until) { live.gone = null; paintStrip(true); }
     var say = held ? 'held' : (Date.now() < live.hotUntil ? 'hot' :
-      (Date.now() < live.back ? 'back' : (live.hush > 48 ? 'hush' : 'rec')));
+      (live.gone ? 'gone' : (Date.now() < live.back ? 'back' : (live.hush > 48 ? 'hush' : 'rec'))));
     paintLive(st, say);
   }
 
@@ -536,7 +588,9 @@
         '<b data-say="held">' + T('متوقّفٌ مؤقّتاً', 'Paused') + '</b>' +
         '<b data-say="hush">' + T('لا نسمع صوتاً', 'No sound') + '</b>' +
         '<b data-say="hot">' + T('الصوتُ عالٍ جدّاً', 'Too loud') + '</b>' +
-        '<b data-say="back">' + T('عاد بعد انقطاع', 'Back after a cut') + '</b></span>' +
+        '<b data-say="back">' + T('عاد بعد انقطاع', 'Back after a cut') + '</b>' +
+        (live && live.gone ? '<b data-say="gone">' + T('فاته ' + short(live.gone.ms / 1000) + ' وأنت خارج الصفحة',
+          'Missed ' + short(live.gone.ms / 1000) + ' while away') + '</b>' : '') + '</span>' +
       '<span class="nau-size nau-num"></span>' +
       '<span class="nau-gap"></span>' +
       '<button type="button" class="gsf-btn nau-b" data-au="hold" aria-label="' +
@@ -1047,7 +1101,7 @@
       top += '<p class="nau-livenote" role="status"><span class="na-opening-spin" aria-hidden="true"></span>' +
         T('يُقرأ الملفّ…', 'Reading the file…') + '</p>';
     } else {
-      top += srcHtml() +
+      top += phoneHtml() + srcHtml() +
         '<button type="button" class="gsf-btn gsf-btn--go nau-start" data-au="start">' +
         '<i class="fa-solid fa-microphone" aria-hidden="true"></i>' + T('ابدأ التسجيل', 'Start recording') + '</button>' +
         '<button type="button" class="gsf-btn gsf-btn--ghost nau-imp" data-au="import">' +
@@ -1060,6 +1114,23 @@
     }
     dlg.innerHTML = head + top + '<div class="nau-rows" role="list"></div>' + diag + '</div>';
     paintRows();
+  }
+
+  function phoneHtml() {
+    if (!onPhone()) return '';
+    var mk = openMark(curDoc());
+    if (mk) {
+      return '<div class="gsf-guard nau-ext" role="status"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><p>' +
+        T('بدأتَ تسجيلاً في تطبيقٍ آخر الساعة ' + clockOf(mk) + '. ارسمْ واكتبْ كما تشاء، وحين تنتهي أضفْ ملفَّه من «أضفْ تسجيلاً من جهازك» — نحفظ وقتَ بدئه ليُربط برسمك.',
+          'You started a recording in another app at ' + clockOf(mk) + '. Draw and write as you like; when you finish, add its file with “Add a recording from your device” — we keep its start time to link it with your drawing.') +
+        '</p><button type="button" class="gsf-btn gsf-btn--ghost" data-au="xunmark" data-t="' + mk + '">' + T('ألغِ', 'Cancel') + '</button></div>';
+    }
+    return '<div class="gsf-guard nau-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><p>' +
+      '<b>' + T('على الجوّال يتوقّف الميكروفون إن غادرتَ الصفحة أو أطفأتَ الشاشة', 'On a phone the microphone stops if you leave the page or turn the screen off') + '</b> — ' +
+      T('النظامُ يمنعه عن المتصفّح في الخلفيّة، فلا يُسجَّل ما يقال حينها. لمحاضرةٍ كاملة: سجّلْ بتطبيق التسجيل في جوّالك واضغطْ هنا حين تبدأ، ثمّ أضفْ ملفَّه بعد المحاضرة — نحفظ وقتَ بدئه ليُربط برسمك.',
+        'the system blocks it for browsers in the background, so nothing is recorded meanwhile. For a whole lecture: record with your phone’s recorder app and tap here as you start, then add its file afterwards — we keep its start time to link it with your drawing.') +
+      '</p><button type="button" class="gsf-btn gsf-btn--ghost nau-xbtn" data-au="xmark"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i>' +
+      T('بدأتُ التسجيلَ في تطبيقٍ آخر', 'I started recording in another app') + '</button></div>';
   }
 
   function srcHint(v) {
@@ -1177,6 +1248,10 @@
     return durationOf(file).then(function (ms) {
       var it = { i: uid('aud_'), n: base || 'recording', t: Date.now(), s0: 0, ms: ms, b: file.size,
                  m: mime, lo: 1, x: 1 };
+      var mk = nid === curId() ? openMark(curDoc()) : 0;
+      var lm = file.lastModified || 0;
+      var age = Date.now() - lm;
+      var fs = (lm && ms && age > 3000 && age < FILE_AGE) ? lm - ms : 0;
       if (base) it.nm = base;
       var D = PD();
       var put = D && D.put ? D.put(it.i, file, { name: it.n }) : Promise.resolve(false);
@@ -1187,7 +1262,7 @@
         importing = false;
         if (!wrote) { mem[it.i] = file; lastErr = 'readfail'; if (dlg && dlg.open) render(); return null; }
         nidOf[it.i] = nid;
-        askSave(it, nid, { imp: 1 });
+        askSave(it, nid, { imp: 1, mk: mk, fs: fs });
         return it;
       });
     })['catch'](function () {
@@ -1322,6 +1397,9 @@
       return;
     }
     if (a === 'import') { pickImport(); return; }
+    if (a === 'xmark') { markExt(); return; }
+    if (a === 'xunmark') { unmarkExt(Number(b.getAttribute('data-t')) || 0); return; }
+    if (a === 'when') { if (ask && ask.when) { ask.when.pick = b.getAttribute('data-v'); renderAsk(); } return; }
     if (a === 'diag') {
       var txt = '';
       try { txt = localStorage.getItem(LOG_LS) || ''; } catch (e) {}
@@ -1450,7 +1528,8 @@
     var grp = it.g ? list.filter(function (x) { return x.g === it.g; }) : [it];
     if (!grp.length) grp = [it];
     ask = { it: it, nid: nid, parts: grp, dest: 'here', confirm: false, imp: !!(how && how.imp),
-            name: it.nm || ((noteTitle() || L('تسجيل', 'Recording')) + ' — ' + when(grp[0].s0 || it.t)), cloud: null };
+            name: it.nm || ((noteTitle() || L('تسجيل', 'Recording')) + ' — ' + when(grp[0].s0 || it.t)), cloud: null,
+            when: (how && (how.mk || how.fs)) ? { mk: how.mk || 0, fs: how.fs || 0, pick: how.mk ? 'mk' : 'fs' } : null };
     var d = mkDialog('nau-dlg--save', 'nau-st');
     d._ask = ask;
     renderAsk();
@@ -1492,6 +1571,7 @@
                : T('لم يُحفظ على الجهاز — اختر «عندنا» كي لا يضيع', 'Not saved on the device — choose “With us” so it is not lost')) + '</li></ul>' +
         '<label class="nau-lab">' + T('اسمُ التسجيل', 'Recording name') +
         '<input class="gsf-in nau-name" type="text" maxlength="80" dir="auto" value="' + esc(ask.name) + '"></label>' +
+        whenHtml() +
         (shut0 ? '' :
         '<p class="nau-q">' + T('أين نحفظ نسخةً تفتحها على أجهزتك؟', 'Where should we keep a copy you can open on your devices?') + '</p>' +
         '<div class="nau-opts">' +
@@ -1516,6 +1596,26 @@
     }
   }
 
+  function whenHtml() {
+    var w = ask && ask.imp ? ask.when : null;
+    if (!w) return '';
+    var chip = function (k, ar, en) {
+      var on = w.pick === k;
+      return '<button type="button" class="gsf-chip' + (on ? ' on' : '') + '" role="radio" aria-checked="' + on +
+        '" data-au="when" data-v="' + k + '">' + T(ar, en) + '</button>';
+    };
+    return '<div class="nau-src nau-when"><span class="nau-lab" id="nau-when-l">' +
+      T('متى بدأ هذا التسجيل؟ ليُربط برسمك', 'When did this recording start? To link it with your drawing') + '</span>' +
+      '<div class="gsf-chips" role="radiogroup" aria-labelledby="nau-when-l">' +
+      (w.mk ? chip('mk', 'حين ضغطتَ «بدأتُ» · ' + clockOf(w.mk), 'When you tapped “I started” · ' + clockOf(w.mk)) : '') +
+      (w.fs ? chip('fs', 'من وقت الملفّ · ' + clockOf(w.fs), 'From the file’s time · ' + clockOf(w.fs)) : '') +
+      chip('no', 'لا أعرف', 'I don’t know') + '</div></div>';
+  }
+  function startOf(w) {
+    if (!w) return null;
+    return w.pick === 'mk' ? w.mk : (w.pick === 'fs' ? w.fs : 0);
+  }
+
   function pickDest(v) { if (ask) { ask.dest = v === 'us' ? 'us' : 'here'; renderAsk(); } }
 
   function applyAsk(dest) {
@@ -1525,12 +1625,18 @@
     var inp = dlg && dlg.querySelector('.nau-name');
     var name = ((inp ? inp.value : a.name) || '').replace(/\s+/g, ' ').trim().slice(0, 80);
     var ids = a.parts.map(function (p) { return p.i; });
-    return withDoc(a.nid, function (list) {
+    var s0 = startOf(a.when);
+    return withDoc(a.nid, function (list, doc) {
       list.forEach(function (x) {
         if (ids.indexOf(x.i) < 0) return;
         if (x.i === a.it.i && name) x.nm = name;
+        if (x.i === a.it.i && s0 !== null) x.s0 = s0;
         if (dest === 'us') x.vow = 'us';
       });
+      if (a.when && a.when.pick === 'mk' && doc) {
+        var m = xmarks(doc).filter(function (t) { return t !== a.when.mk; });
+        if (m.length) doc.xs = m; else delete doc.xs;
+      }
     }).then(function () {
       if (dest === 'us') {
         var src = a.nid === curId() ? items(curDoc()) : a.parts;
@@ -1627,8 +1733,8 @@
   window.addEventListener('pagehide', flush);
   document.addEventListener('visibilitychange', function () {
     if (live) note('vis', document.visibilityState + ' rec=' + ((live.r.rec && live.r.rec.state) || '-'));
-    if (document.visibilityState === 'hidden') flush();
-    else checkAlive();
+    if (document.visibilityState === 'hidden') { away(); flush(); }
+    else { home(); checkAlive(); }
   });
   window.addEventListener('pageshow', checkAlive);
   document.addEventListener('freeze', function () { if (live) note('freeze'); });
