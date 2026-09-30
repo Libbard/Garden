@@ -490,7 +490,7 @@
     if (live) return live.r.paused() ? 'held' : 'rec';
     if (cut) return 'cut';
     if (draft) return 'draft';
-    if (pl && au && !(dlg && dlg.open) && (pl.on || au.currentTime > 0)) return 'play';
+    if (pl && au) return 'play';
     return '';
   }
 
@@ -598,9 +598,11 @@
   function miniHtml() {
     return '<button type="button" class="nau-icb nau-icb--play" data-au="mini-toggle" aria-label="' +
       esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid fa-play" aria-hidden="true"></i></button>' +
-      '<button type="button" class="nau-mini-name" data-au="list"></button>' +
-      '<span class="nau-mini-t nau-num"></span>' +
-      '<span class="nau-gap"></span>' +
+      '<button type="button" class="nau-mini-name" data-au="list" title="' + esc(L('التسجيلات', 'Recordings')) + '"></button>' +
+      '<span class="nau-t-cur nau-num">0:00</span>' +
+      '<input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '">' +
+      '<span class="nau-t-all nau-num"></span>' +
+      '<button type="button" class="nau-rate nau-num" data-au="rate" aria-label="' + esc(L('سرعةُ التشغيل', 'Playback speed')) + '">' + rate() + '×</button>' +
       '<button type="button" class="nau-icb" data-au="mini-close" aria-label="' + esc(L('أوقف التشغيل', 'Stop playback')) +
       '" data-ar-title="أوقف التشغيل" data-en-title="Stop playback"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
   }
@@ -611,9 +613,42 @@
     var i = s.querySelector('.nau-icb--play > i');
     if (i) i.className = 'fa-solid ' + (pl.on ? 'fa-pause' : 'fa-play');
     var n = s.querySelector('.nau-mini-name');
-    if (n) n.textContent = pl.title;
-    var t = s.querySelector('.nau-mini-t');
-    if (t) t.textContent = short(pos()) + ' / ' + short(pl.total / 1000);
+    if (n && n.textContent !== pl.title) n.textContent = pl.title;
+    paintSeek(s);
+  }
+
+  function total() {
+    if (!pl) return 0;
+    if (pl.total > 0) return pl.total / 1000;
+    var d = au && au.duration;
+    return (isFinite(d) && d > 0 && pl.parts.length === 1) ? d : 0;
+  }
+  function paintSeek(box) {
+    if (!box || !pl) return;
+    var t = pos(), tot = total();
+    var sk = box.querySelector('.nau-seek');
+    if (sk && !sk._drag) sk.value = String(tot > 0 ? Math.round(Math.min(1, t / tot) * 1000) : 0);
+    var c = box.querySelector('.nau-t-cur');
+    if (c && !(sk && sk._drag)) c.textContent = short(t);
+    var al = box.querySelector('.nau-t-all');
+    if (al) al.textContent = short(tot);
+    var sp = box.querySelector('.nau-rate');
+    if (sp) sp.textContent = rate() + '×';
+  }
+
+  function onSeekInput(e) {
+    var sk = e.target;
+    if (!sk || !sk.classList || !sk.classList.contains('nau-seek') || !pl) return;
+    sk._drag = 1;
+    var box = sk.closest('.nau-player, .nau');
+    var c = box && box.querySelector('.nau-t-cur');
+    if (c) c.textContent = short(Number(sk.value) / 1000 * total());
+  }
+  function onSeekChange(e) {
+    var sk = e.target;
+    if (!sk || !sk.classList || !sk.classList.contains('nau-seek') || !pl) return;
+    sk._drag = 0;
+    seek(Number(sk.value) / 1000);
   }
 
   function checkDraft() {
@@ -844,10 +879,35 @@
       var a = engine();
       a.src = url;
       a.playbackRate = rate();
-      if (at > 0) {
-        var set = function () { try { a.currentTime = at; } catch (e) {} a.removeEventListener('loadedmetadata', set); };
-        a.addEventListener('loadedmetadata', set);
-      }
+      return ready(a).then(function () {
+        if (!pl || pl.key !== key) return;
+        try { a.currentTime = at > 0 ? at : 0; } catch (e) {}
+        pl.at = at > 0 ? at : 0;
+      });
+    });
+  }
+
+  function ready(a) {
+    return new Promise(function (ok) {
+      var done = false;
+      var fin = function () {
+        if (done) return;
+        done = true;
+        a.removeEventListener('loadedmetadata', meta);
+        a.removeEventListener('durationchange', dur);
+        if (pl) pl.fixing = 0;
+        ok();
+      };
+      var dur = function () { if (isFinite(a.duration) && a.duration > 0) fin(); };
+      var meta = function () {
+        if (isFinite(a.duration) && a.duration > 0) { fin(); return; }
+        if (pl) pl.fixing = 1;
+        a.addEventListener('durationchange', dur);
+        try { a.currentTime = 1e7; } catch (e) { fin(); }
+      };
+      if (a.readyState >= 1) meta(); else a.addEventListener('loadedmetadata', meta);
+      a.addEventListener('error', fin, { once: true });
+      setTimeout(fin, 8000);
     });
   }
   function play(key) {
@@ -873,7 +933,7 @@
       var len = (pl.parts[i].ms || 0) / 1000;
       if (t <= acc + len || i === pl.parts.length - 1) {
         var off = t - acc, a = engine(), was = !a.paused;
-        if (i === pl.idx) { try { a.currentTime = off; } catch (e) {} }
+        if (i === pl.idx) { try { a.currentTime = off; } catch (e) {} pl.at = off; paintPlay(true); }
         else load(i, off).then(function () { if (was) engine().play()['catch'](function () {}); });
         return;
       }
@@ -881,7 +941,7 @@
     }
   }
   function onEnded() {
-    if (!pl) return;
+    if (!pl || pl.fixing) return;
     if (pl.idx < pl.parts.length - 1) {
       load(pl.idx + 1, 0).then(function () { engine().play()['catch'](function () {}); });
       return;
@@ -891,7 +951,7 @@
     load(0, 0);
     paintPlay();
   }
-  function onTime() { paintPlay(true); }
+  function onTime() { if (pl && !pl.fixing) { pl.at = au.currentTime || 0; paintPlay(true); } }
   function stopPlay() {
     if (au) { au.pause(); }
     if (pl && pl.url && /^blob:/.test(pl.url)) { try { URL.revokeObjectURL(pl.url); } catch (e) {} }
@@ -910,15 +970,9 @@
     if (dlg && dlg.open && pl) {
       var row = dlg.querySelector('.nau-row[data-g="' + cssq(pl.key) + '"]');
       if (!row || !row.querySelector('.nau-seek')) { if (!light) paintRows(); return; }
-      var t = pos(), tot = pl.total / 1000;
-      var s = row.querySelector('.nau-seek');
-      if (s && document.activeElement !== s) s.value = String(tot > 0 ? Math.round(t / tot * 1000) : 0);
-      var c = row.querySelector('.nau-t-cur');
-      if (c) c.textContent = short(t);
+      paintSeek(row.querySelector('.nau-player'));
       var pb = row.querySelector('.nau-play > i');
       if (pb) pb.className = 'fa-solid ' + (pl.on ? 'fa-pause' : 'fa-play');
-      var sp = row.querySelector('.nau-rate');
-      if (sp) sp.textContent = rate() + '×';
       var er = row.querySelector('.nau-perr');
       if (er) er.hidden = !pl.err;
     }
@@ -950,6 +1004,8 @@
     });
     d.addEventListener('click', onClick);
     d.addEventListener('keydown', onKey);
+    d.addEventListener('input', onSeekInput);
+    d.addEventListener('change', onSeekChange);
     dlg = d;
     return d;
   }
@@ -1557,7 +1613,12 @@
       b.addEventListener('click', function () { openList(); });
     }
     var s = strip();
-    if (s && !s._nau) { s._nau = 1; s.addEventListener('click', onStrip); }
+    if (s && !s._nau) {
+      s._nau = 1;
+      s.addEventListener('click', onStrip);
+      s.addEventListener('input', onSeekInput);
+      s.addEventListener('change', onSeekChange);
+    }
     paintMic();
     refreshHere().then(checkDraft);
   }
@@ -1592,7 +1653,7 @@
     seek: seek,
     state: function () {
       return { live: !!live, paused: !!(live && live.r.paused()), draft: draft ? draft.ptr : null,
-               playing: !!(pl && pl.on), mode: mode() };
+               playing: !!(pl && pl.on), mode: mode(), at: pl ? Math.round(pos() * 10) / 10 : 0 };
     },
     groups: function () { return groups(items(curDoc())); },
     importFile: importFile,
