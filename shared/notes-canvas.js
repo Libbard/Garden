@@ -1663,16 +1663,39 @@
         return c;
       });
     }
+    var ts = strokes.map(function (e) { return e.ts > 0 ? e.ts : -1; });
     /*@3.NOCJ.45*/
     return C().pack(strokes.map(function (e) {
       var dz = uv ? (uv(e) || 0) : 0;
       var pts = dz ? e.pts.map(function (p) { return { x: p.x, y: p.y - dz, p: p.p }; }) : e.pts;
       return { tool: e.hi ? 'hi' : 'pen', color: inkSafe(e), w: e.w, nib: e.nib, o: e.o, pts: pts };
     })).then(function (packed) {
-      self.onChange({ ink: packed, shapes: shapes, w: self.w, h: self.pageH,
-                      ch: Math.round(self.contentH()) }, quiet);
+      var d = { ink: packed, shapes: shapes, w: self.w, h: self.pageH,
+                ch: Math.round(self.contentH()) };
+      if (ts.some(function (t) { return t > 0; })) d.ts = ts;
+      self.onChange(d, quiet);
       return packed;
     });
+  };
+
+  Canvas.prototype.stampAt = function (cx, cy) {
+    var picked = this.selected(), ts = 0, i;
+    for (i = 0; i < picked.length; i++) {
+      if (picked[i].ts > 0 && (!ts || picked[i].ts < ts)) ts = picked[i].ts;
+    }
+    if (ts) return { ts: ts };
+    var wp = this.els.length ? this.worldAt(cx, cy) : null;
+    var el = wp ? this.hit(wp) : null;
+    return (el && el.ts > 0) ? { ts: el.ts } : null;
+  };
+
+  Canvas.prototype.worldAt = function (cx, cy) {
+    if (!this.wet) return null;
+    var r = this.wet.getBoundingClientRect();
+    if (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) return null;
+    var hz = (this.wet.offsetWidth && r.width / this.wet.offsetWidth) || 1;
+    if (!isFinite(hz) || hz <= 0.05) hz = 1;
+    return this.toWorld({ x: (cx - r.left) / hz, y: (cy - r.top) / hz });
   };
 
   /*@3.NOCJ.77*/
@@ -1684,7 +1707,7 @@
     if (s !== 1 && typeof el.w === 'number') el.w = Math.max(0.4, el.w * s);
   };
 
-  Canvas.prototype.load = function (packed, h, shapes) {
+  Canvas.prototype.load = function (packed, h, shapes, ts) {
     var self = this;
     if (h) this.pageH = h;
     this.els = [];
@@ -1697,13 +1720,16 @@
     }
     if (!packed) { this.w = 0; this.resize(); this.paint(); return Promise.resolve(); }
     return C().unpack(packed).then(function (strokes) {
+      var tsOk = Array.isArray(ts) && ts.length === strokes.length;
       for (var k = 0; k < strokes.length; k++) {
         var st = strokes[k];
-        self.els.push({
+        var e = {
           id: uid(), ty: 'st', c: st.color || 'ink', w: st.w || 2.4,
           nib: st.nib || 'round', o: st.tool === 'hi' ? 0.32 : (st.o == null ? 1 : st.o),
           hi: st.tool === 'hi' ? 1 : 0, pts: st.pts
-        });
+        };
+        if (tsOk && ts[k] > 0) e.ts = ts[k];
+        self.els.push(e);
       }
       self.w = 0;
       self.resize();
@@ -1729,6 +1755,7 @@
         bands.push({ id: uid(), ty: 'st', c: st.c, w: Math.max(6, L0.h) / (NIBS.marker.scale || 1), nib: 'marker', o: st.o, hi: 1, u: 0,
                      pts: [{ x: L0.x0, y: my, p: 0.6 }, { x: L0.x1, y: my, p: 0.6 }] });
       }
+      if (st.ts > 0) bands[bands.length - 1].ts = st.ts;
     }
     return bands;
   }
@@ -1966,7 +1993,9 @@
     var h = this._thold;
     this._thold = null;
     if (!h || !this.onTextAt) return;
-    this.onTextAt(this.toWorld({ x: h.x, y: h.y }));
+    var r = this.wet ? this.wet.getBoundingClientRect() : null;
+    var hz = (r && this.wet.offsetWidth && r.width / this.wet.offsetWidth) || 1;
+    this.onTextAt(this.toWorld({ x: h.x, y: h.y }), r ? { x: r.left + h.x * hz, y: r.top + h.y * hz } : null);
   };
 
   Canvas.prototype.bindInput = function () {
@@ -2038,7 +2067,7 @@
         if (self.tool === 'rect' || self.tool === 'ell' ||
             self.tool === 'line' || self.tool === 'arr') {
           self.live[id] = { id: uid(), ty: self.tool, c: self.color, w: self.width,
-                            o: self.opacity, fill: 0,
+                            o: self.opacity, fill: 0, ts: Date.now(),
                             x1: wp.x, y1: wp.y, x2: wp.x, y2: wp.y };
           self.paintWet();
           return;
@@ -2053,7 +2082,7 @@
           /*@3.NOCJ.82*/
           nib: und ? 'round' : (hi ? 'marker' : self.nib),
           o: und ? self.opacity : (hi ? 0.8 : self.opacity),
-          hi: hi ? 1 : 0, u: und ? 1 : 0,
+          hi: hi ? 1 : 0, u: und ? 1 : 0, ts: Date.now(),
           pts: [tiltPt(wp.x, wp.y, pt)]
         };
         self.paintWet();

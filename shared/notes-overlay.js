@@ -360,7 +360,7 @@
       onBand: function (r) { self.onBand(r); },
       onTap: function (p) { self.onTap(p); },
       /*@3.NOOJ.32*/
-      onTextAt: self.onTextAt ? function (p) { self.onTextAt(p); } : null
+      onTextAt: self.onTextAt ? function (p, c) { self.onTextAt(p, c); } : null
     });
     this.cv.setTool(GardenCanvas.lastTool ? GardenCanvas.lastTool() : 'pen');
     if (this.hist) this.hist.register('ink', {
@@ -387,6 +387,11 @@
       self.dim(true);
     });
     this.wet.addEventListener('selectstart', function (e) { e.preventDefault(); });
+    this.wet.addEventListener('contextmenu', function (e) {
+      if (!self.onTextAt || !self.cv || e.pointerType === 'pen' || e.pointerType === 'touch') return;
+      var wp = self.cv.worldAt(e.clientX, e.clientY);
+      if (wp) self.onTextAt(wp, { x: e.clientX, y: e.clientY });
+    });
     this.wet.addEventListener('pointermove', function () {
       if (self.drawing) dropSel();
     });
@@ -415,7 +420,7 @@
       var was = this.data.rw || this.data.w || 0;
       this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
       var self2 = this;
-      var done = this.cv.load(this.data.ink, null, this.data.shapes);
+      var done = this.cv.load(this.data.ink, null, this.data.shapes, this.data.ts);
       if (done && done.then) done.then(function () { self2.migrateRef(was); if (self2.onLoad) self2.onLoad(); });
       else { this.migrateRef(was); if (this.onLoad) this.onLoad(); }
     }
@@ -495,7 +500,7 @@
     this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
     if (this.cv && this.data) {
       var self3 = this;
-      var p = this.cv.load(this.data.ink, null, this.data.shapes);
+      var p = this.cv.load(this.data.ink, null, this.data.shapes, this.data.ts);
       if (p && p.then) p.then(function () { self3.migrateRef(was); if (self3.onLoad) self3.onLoad(); });
       else { this.migrateRef(was); if (this.onLoad) this.onLoad(); }
     }

@@ -3916,6 +3916,13 @@
         hist: hist,
         pagePad: pageTopPad,
         dgFit: function () { return pvOn() ? dgFitMax() : 0; },
+        hearAt: function (x, y, bts) {
+          var NA = window.GardenNotesAudio, cv = inkCv();
+          if (!NA || !NA.momentAt) return null;
+          var stp = (cv && cv.stampAt) ? cv.stampAt(x, y) : null;
+          var mo = NA.momentAt(stp ? stp.ts : bts);
+          return mo ? { label: hearLabel(mo), go: function () { hearGo(mo); } } : null;
+        },
         onDirty: function () {
           saveState('saving', L('يُحفظ…', 'Saving…'));
           inkBlocksSync();
@@ -4059,7 +4066,7 @@
             else ed.clearBlockSel();
           },
           /*@3.NOAJ.271*/
-          onTextAt: function (pt) {
+          onTextAt: function (pt, at) {
             if (!ed || !ed.root || !ed.openCtx) return;
             var b = toRootRect({ x: pt.x, y: pt.y, w: 0, h: 0 });
             if (!b) return;
@@ -4067,7 +4074,7 @@
             var z = ed.zoomOf ? ed.zoomOf() : 1;
             var cx = ed.isRtl && ed.isRtl() ? (r.right - b.x * z) : (r.left + b.x * z);
             var cy = r.top + b.y * z;
-            try { ed.openCtx(ed.root, cx, cy); } catch (e6) {}
+            try { ed.openCtx(ed.root, cx, cy, at); } catch (e6) {}
           }
         });
       }

@@ -2361,6 +2361,7 @@
         height: b.h || 300,
         onChange: function (d) {
           b.ink = d.ink; b.w = d.w; b.h = d.h;
+          if (d.ts) b.ts = d.ts; else delete b.ts;
           b.shapes = d.shapes && d.shapes.length ? d.shapes : null;
           self.touch();
         },
@@ -2370,7 +2371,7 @@
       self.canvases = self.canvases || {};
       self.canvases[b.id] = cv;
       cv.setTool(GardenCanvas.lastTool ? GardenCanvas.lastTool() : 'pen');
-      if (b.ink || (b.shapes && b.shapes.length)) cv.load(b.ink, b.h, b.shapes);
+      if (b.ink || (b.shapes && b.shapes.length)) cv.load(b.ink, b.h, b.shapes, b.ts);
       cv.emit();
     }, 0);
 
@@ -8591,7 +8592,7 @@
   };
 
   /*@3.NOEJ.316*/
-  Editor.prototype.openCtx = function (target, cx, cy) {
+  Editor.prototype.openCtx = function (target, cx, cy, at0) {
     if (this.readOnly) return false;
     if (!target || !this.root.contains(target)) return false;
     if (target.closest('.ne-menu') || target.closest('.ne-rail') ||
@@ -8605,6 +8606,13 @@
     }
     this.closeMenu();
     var at = { x: cx, y: cy };
+    this._ctxHear = null;
+    if (this.opts.hearAt) {
+      var bts = 0, cvB = (node && this.canvases) ? this.canvases[node.getAttribute('data-bid')] : null;
+      var sB = (cvB && cvB.stampAt) ? cvB.stampAt(cx, cy) : null;
+      if (sB) bts = sB.ts;
+      try { this._ctxHear = this.opts.hearAt(at0 ? at0.x : cx, at0 ? at0.y : cy, bts); } catch (eH) {}
+    }
     if (node) {
       var bid = node.getAttribute('data-bid');
       this.touchAct(bid);
@@ -8677,6 +8685,8 @@
     var self = this;
     this.closeMenu();
     var mode = kind || 'insert';
+    var hear = (mode === 'block' || mode === 'paper') ? this._ctxHear : null;
+    this._ctxHear = null;
     var m = el('div', 'ne-menu');
     m.setAttribute('role', 'menu');
     m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
@@ -8806,6 +8816,7 @@
                      it.eg ? L(it.eg.ar, it.eg.en) : '');
       }).join('');
     }
+    if (hear) html = mItem('hear', 'fa-play', hear.label) + html;
     m.innerHTML = html;
     document.body.appendChild(m);
     this.placeMenu(m, anchor);
@@ -8822,6 +8833,7 @@
       if (!btn || btn.disabled) return;
       var act = btn.getAttribute('data-act');
       self.closeMenu();
+      if (act === 'hear') { if (hear && hear.go) hear.go(); return; }
       if (act.indexOf('here:') === 0) {
         var itH = INSERT[Number(act.slice(5))];
         if (itH && pt) {
