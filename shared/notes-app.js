@@ -1294,6 +1294,7 @@
     var B = window.GardenNotesBlocks;
     if (!doc) return false;
     if (doc.ov && (doc.ov.ink || (doc.ov.shapes && doc.ov.shapes.length))) return true;
+    if (Array.isArray(doc.aud) && doc.aud.length) return true;
     var bl = doc.blocks || [], i, k;
     for (i = 0; i < bl.length; i++) {
       var b = bl[i];
@@ -1318,7 +1319,15 @@
   function isBlankRec(rec, doc) {
     if (!rec) return false;
     if (notPh(rec.t)) return false;
+    if (rec.id && audioHolds(rec.id)) return false;
     return !docHasContent(doc);
+  }
+
+  function audioHolds(id) {
+    try {
+      var w = JSON.parse(localStorage.getItem('__audioWip') || 'null');
+      return !!(w && w.note === id);
+    } catch (e) { return false; }
   }
 
   function dropBlank(id) {

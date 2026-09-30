@@ -306,7 +306,7 @@
   function sweep(keep) {
     return list().then(function (rows) {
       var n = keep == null ? 12 : keep;
-      var doomed = rows.slice(n);
+      var doomed = rows.filter(function (r) { return !/^(aud_|wip_)/.test(r.hash); }).slice(n);
       return Promise.all(doomed.map(function (r) { return drop(r.hash); }))
         .then(function () { return doomed.length; });
     });
