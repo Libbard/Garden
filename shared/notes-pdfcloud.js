@@ -44,18 +44,33 @@
     } catch (e) {}
   }
 
-  function restore(h, name, onProgress) {
+  function restoreX(h, name, onProgress) {
     var f = F();
-    if (!f || !h) return Promise.resolve(null);
+    if (!f || !h) return Promise.resolve({ file: null, why: 'none' });
     return f.fetchBytes(refIdOf(h), onProgress).then(function (got) {
-      if (!got || !got.blob || !got.blob.size) return null;
+      if (!got || !got.blob || !got.blob.size) return { file: null, why: 'fail' };
       var file = new File([got.blob], got.name || name || 'file.pdf',
                           { type: got.mime || 'application/pdf' });
       var D = window.GardenPdfDoc;
-      if (!D || !D.put) return file;
-      return D.put(h, file, { name: file.name }).then(function () { return file; },
-                                                     function () { return file; });
-    })['catch'](function () { return null; });
+      if (!D || !D.put) return { file: file, why: '' };
+      return D.put(h, file, { name: file.name }).then(function () { return { file: file, why: '' }; },
+                                                     function () { return { file: file, why: '' }; });
+    })['catch'](function (e) {
+      var m = String((e && e.message) || '');
+      if (/no_vault/.test(m)) return { file: null, why: 'no_vault' };
+      if (/not_found/.test(m)) {
+        return f.state().then(function (s) {
+          return { file: null, why: s.ok ? 'pending' : (s.why || 'fail') };
+        }, function () { return { file: null, why: 'offline' }; });
+      }
+      if (/locked|vault-locked/.test(m)) return { file: null, why: 'locked' };
+      if (!navigator.onLine || e instanceof TypeError) return { file: null, why: 'offline' };
+      return { file: null, why: 'fail' };
+    });
+  }
+
+  function restore(h, name, onProgress) {
+    return restoreX(h, name, onProgress).then(function (r) { return r.file; });
   }
 
   var slimBusy = Object.create(null);
@@ -553,6 +568,7 @@
   window.GardenPdfCloud = {
     refIdOf: refIdOf,
     restore: restore,
+    restoreX: restoreX,
     offer: offer,
     forget: forget,
     ask: ask,

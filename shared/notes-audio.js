@@ -11,6 +11,17 @@
   var RETRY = [5000, 20000, 60000];
   var CLOSED = /not_enrolled|no_vault|not_configured|origin|bad_vault|none/;
   var OTHER_TAB_MS = 12000;
+  var LOG_LS = '__audioLog';
+  var DIAG = /[?&]diag=1/.test(location.search);
+  var SRC_LS = '__audioSrc';
+  var SRCS = ['mic', 'system', 'both'];
+  var EXT_MAX = 250 * 1024 * 1024;
+  var EXT_MIME = { m4a: 'audio/x-m4a', m4b: 'audio/x-m4a', mp3: 'audio/mpeg', wav: 'audio/wav',
+                   aac: 'audio/aac', amr: 'audio/amr', '3gp': 'audio/3gpp', '3gpp': 'audio/3gpp',
+                   ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/opus', webm: 'audio/webm',
+                   flac: 'audio/flac', caf: 'audio/x-caf', mp4: 'video/mp4', mov: 'video/quicktime',
+                   mkv: 'video/x-matroska' };
+  var EXT_ACCEPT = 'audio/*,video/*,.m4a,.m4b,.mp3,.wav,.aac,.amr,.3gp,.3gpp,.ogg,.oga,.opus,.webm,.flac,.caf,.mp4,.mov,.mkv';
 
   function isAr() {
     return (document.documentElement.lang ||
@@ -157,8 +168,12 @@
   var draft = null;
   var lastErr = '';
 
-  function why(e) {
+  function why(e, src) {
     var n = (e && (e.name || e.message)) || '';
+    var m = (e && e.message) || '';
+    if (/no_system_audio/.test(m)) return 'nosys';
+    if (/system_audio_unsupported|no_display_media/.test(m)) return 'nosysup';
+    if (src && src !== 'mic' && /NotAllowed|Permission|denied|Abort/i.test(n)) return 'cancel';
     if (/NotAllowed|Permission|denied/i.test(n)) return 'denied';
     if (/NotFound|DevicesNotFound|Overconstrained/i.test(n)) return 'nomic';
     if (/NotReadable|TrackStart/i.test(n)) return 'busy';
@@ -174,8 +189,31 @@
       unsupported: L('هذا المتصفّح لا يدعم التسجيل. جرّب كروم أو إيدج أو سفاري حديثاً.',
                      'This browser cannot record. Try a recent Chrome, Edge or Safari.'),
       insecure: L('التسجيلُ يحتاج اتصالاً آمناً (https).', 'Recording needs a secure (https) connection.'),
-      fail: L('تعذّر بدءُ التسجيل. أعد المحاولة.', 'Could not start recording. Please try again.')
+      fail: L('تعذّر بدءُ التسجيل. أعد المحاولة.', 'Could not start recording. Please try again.'),
+      nosys: L('لم يصلنا صوتٌ من المشاركة — أعد المحاولة وفعّلْ خيارَ «مشاركة الصوت» في نافذة المتصفّح قبل أن توافق.',
+               'No sound came with the share — try again and turn on “Share audio” in the browser window before you confirm.'),
+      nosysup: L('متصفّحك لا يشارك صوتَ الجهاز — استعملْ كروم أو إيدج على الحاسب.',
+                 'Your browser cannot share device audio — use Chrome or Edge on a computer.'),
+      cancel: L('أُلغيت مشاركةُ الصوت، فلم يبدأ التسجيل.', 'Audio sharing was cancelled, so recording did not start.'),
+      badfile: L('هذا الملفُّ ليس صيغةَ صوتٍ نعرفها — جرّب m4a أو mp3 أو wav أو تسجيلَ شاشة.',
+                 'This file is not an audio format we know — try m4a, mp3, wav or a screen recording.'),
+      toobig: L('الملفُّ أكبرُ من الحدّ المسموح (‏250 MB).', 'The file is larger than the allowed limit (250 MB).'),
+      readfail: L('تعذّرت قراءةُ الملفّ على هذا الجهاز. أعد المحاولة.', 'The file could not be read on this device. Please try again.')
     }[w] || '';
+  }
+
+  function sysOk() {
+    var R = RC();
+    var sup = R && R.support ? R.support() : {};
+    return !!(sup.system && sup.systemLikely);
+  }
+  function pickedSrc() {
+    var v = '';
+    try { v = localStorage.getItem(SRC_LS) || ''; } catch (e) {}
+    return (SRCS.indexOf(v) > 0 && sysOk()) ? v : 'mic';
+  }
+  function setSrc(v) {
+    try { localStorage.setItem(SRC_LS, SRCS.indexOf(v) >= 0 ? v : 'mic'); } catch (e) {}
   }
 
   function start(opts) {
@@ -187,15 +225,23 @@
     if (sup.secure === false) return failStart('insecure');
     var nid = o.nid || curId();
     if (!nid) return Promise.resolve(false);
-    var r = new R.Recorder({ bps: BPS, source: 'mic' });
+    var src = SRCS.indexOf(o.src) >= 0 ? o.src : pickedSrc();
+    if (src !== 'mic' && !sysOk()) return failStart('nosysup');
+    var r = new R.Recorder({ bps: BPS, source: src });
     lastErr = '';
     return r.open().then(function () {
       var id = uid('w');
-      live = { r: r, id: id, nid: nid, g: o.g || '', k: o.k | 0, bytes: 0, parts: 0,
-               bars: [], hush: 0, hotN: 0, hotUntil: 0, tickN: 0, lost: false,
+      live = { r: r, id: id, nid: nid, g: o.g || '', k: o.k | 0, bytes: 0, parts: 0, src: src,
+               bars: [], hush: 0, hotN: 0, hotUntil: 0, tickN: 0, lost: false, at: Date.now(),
+               back: o.back ? Date.now() + 9000 : 0,
                wake: (F() && F().awake) ? F().awake() : null, confirm: '' };
+      watchTracks(r, src);
+      if (o.back && trail) note('continue', o.k | 0); else trailStart(r, src);
       r.onData = function (blob, i) {
         if (!live || live.r !== r) return;
+        var gap = Date.now() - live.at;
+        note('data', blob.size + (gap > 7500 ? ' gap=' + gap : ''));
+        live.at = Date.now();
         live.bytes += blob.size;
         live.parts = i + 1;
         var D = PD();
@@ -214,8 +260,108 @@
       return true;
     }, function (e) {
       try { r.release(); } catch (e2) {}
-      return failStart(why(e));
+      return failStart(why(e, src));
     });
+  }
+
+  function watchTracks(r, src) {
+    (r.raw || []).forEach(function (st, idx) {
+      var sys = src === 'system' || (src === 'both' && idx === 1);
+      st.getAudioTracks().forEach(function (t) {
+        t.addEventListener('ended', function () {
+          if (!live || live.r !== r) return;
+          if (sys) { if (src === 'system') stop(); return; }
+          revive();
+        });
+      });
+    });
+    if (r.rec) r.rec.addEventListener('error', function () { if (live && live.r === r) revive(); });
+  }
+
+  function dead(cur) {
+    var rec = cur && cur.r && cur.r.rec;
+    if (!rec) return false;
+    if (rec.state === 'inactive') return true;
+    var mic = (cur.r.raw || [])[0];
+    if (!mic || cur.src === 'system') return false;
+    var ts = mic.getAudioTracks();
+    return ts.length > 0 && ts.every(function (t) { return t.readyState === 'ended'; });
+  }
+
+  var trail = null;
+  function note(k, v) {
+    if (!trail) return;
+    trail.e.push([Date.now() - trail.t0, k, v == null ? '' : v]);
+    if (trail.e.length > 400) trail.e.splice(1, 1);
+    try { localStorage.setItem(LOG_LS, JSON.stringify(trail)); } catch (e) {}
+  }
+  function trailStart(r, src) {
+    trail = { t0: Date.now(), ua: navigator.userAgent, src: src,
+              pwa: !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches), e: [] };
+    note('start', r.type || '');
+    (r.raw || []).forEach(function (st, idx) {
+      st.getAudioTracks().forEach(function (t) {
+        ['mute', 'unmute', 'ended'].forEach(function (k) {
+          t.addEventListener(k, function () { note('track' + idx + ':' + k); });
+        });
+      });
+    });
+    if (r.rec) {
+      ['pause', 'resume', 'error', 'stop'].forEach(function (k) {
+        r.rec.addEventListener(k, function () { note('rec:' + k); });
+      });
+    }
+  }
+
+  var cut = null;
+  function revive() {
+    if (!live || live.reviving) return;
+    live.reviving = 1;
+    note('revive', document.visibilityState);
+    var cur = endLive();
+    var g = cur.g || uid('g');
+    var k = cur.k | 0;
+    paintStrip(true);
+    cur.r.stop().then(function (res) {
+      if (!res.blob || res.blob.size < 1024) {
+        wipDrop(cur.id); clearWip(cur.id);
+        return null;
+      }
+      return finalize({ blob: res.blob, sec: res.sec, t0: res.t0, holds: res.holds, m: res.type,
+                        nid: cur.nid, g: g, k: k, last: false, wipId: cur.id });
+    }).then(function (it) {
+      var nid = (it && nidOf[it.i]) || cur.nid;
+      var nk = it ? k + 1 : k;
+      emit('garden:audioRec', { state: 'cut', note: nid });
+      if (cur.src === 'mic' && document.visibilityState === 'visible') {
+        return start({ nid: nid, g: g, k: nk, src: 'mic', back: 1 }).then(function (ok) {
+          if (!ok) { cut = { nid: nid, g: g, k: nk, src: cur.src, it: it }; paintStrip(true); }
+        });
+      }
+      cut = { nid: nid, g: g, k: nk, src: cur.src, it: it };
+      paintStrip(true);
+    });
+  }
+
+  function cutGo() {
+    var c = cut;
+    cut = null;
+    if (!c) return;
+    paintStrip(true);
+    start({ nid: c.nid, g: c.g, k: c.k, src: c.src, back: 1 });
+  }
+  function cutEnd() {
+    var c = cut;
+    cut = null;
+    paintStrip(true);
+    if (!c || !c.it) return;
+    withDoc(c.nid, function (list) {
+      list.forEach(function (x) { if (x.i === c.it.i) x.gl = 1; });
+    }).then(function () { c.it.gl = 1; askSave(c.it, c.nid); });
+  }
+
+  function checkAlive() {
+    if (live && !live.reviving && dead(live)) revive();
   }
   function failStart(w) {
     lastErr = w;
@@ -228,7 +374,7 @@
     var st = live.r.stats();
     writeWip({ id: live.id, t0: live.r.t0, at: Date.now(), sec: Math.round(st.sec),
                bytes: live.bytes, m: (live.r.type || '').split(';')[0], note: live.nid,
-               src: 'mic', g: live.g || undefined, k: live.g ? live.k : undefined,
+               src: live.src || 'mic', g: live.g || undefined, k: live.g ? live.k : undefined,
                n: noteTitle() });
   }
 
@@ -314,6 +460,7 @@
 
   function tick() {
     if (!live) return;
+    if (!live.reviving && dead(live)) { revive(); return; }
     var st = live.r.stats();
     if (st.sec >= MAX_SEC) { stop(); return; }
     live.tickN++;
@@ -331,7 +478,8 @@
       live.bars.push(v);
       if (live.bars.length > BARS) live.bars.shift();
     }
-    var say = held ? 'held' : (Date.now() < live.hotUntil ? 'hot' : (live.hush > 48 ? 'hush' : 'rec'));
+    var say = held ? 'held' : (Date.now() < live.hotUntil ? 'hot' :
+      (Date.now() < live.back ? 'back' : (live.hush > 48 ? 'hush' : 'rec')));
     paintLive(st, say);
   }
 
@@ -340,6 +488,7 @@
 
   function mode() {
     if (live) return live.r.paused() ? 'held' : 'rec';
+    if (cut) return 'cut';
     if (draft) return 'draft';
     if (pl && au && !(dlg && dlg.open) && (pl.on || au.currentTime > 0)) return 'play';
     return '';
@@ -357,6 +506,7 @@
     s.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     if (m === 'rec' || m === 'held') s.innerHTML = liveHtml(m);
     else if (m === 'draft') s.innerHTML = draftHtml();
+    else if (m === 'cut') s.innerHTML = cutHtml();
     else s.innerHTML = miniHtml();
     if (m === 'rec' || m === 'held') { var st = live.r.stats(); paintLive(st, m === 'held' ? 'held' : 'rec'); }
     if (m === 'play') paintMini();
@@ -376,14 +526,17 @@
         (dis ? T('احذف', 'Delete') : T('أنهِ واحفظ', 'Stop & save')) + '</button>' +
         '<button type="button" class="gsf-btn gsf-btn--ghost" data-au="nevermind">' + T('تراجع', 'Cancel') + '</button></div>';
     }
+    var srcI = live && live.src === 'system' ? 'fa-display' : (live && live.src === 'both' ? 'fa-sliders' : '');
     return '<span class="nau-dot" aria-hidden="true"></span>' +
+      (srcI ? '<i class="fa-solid ' + srcI + ' nau-srci" aria-hidden="true"></i>' : '') +
       '<span class="nau-clock nau-num" role="timer" aria-live="off">00:00</span>' +
       '<span class="nau-wave" aria-hidden="true">' + bars + '</span>' +
       '<span class="nau-say" aria-live="polite">' +
         '<b data-say="rec">' + T('يسجّل', 'Recording') + '</b>' +
         '<b data-say="held">' + T('متوقّفٌ مؤقّتاً', 'Paused') + '</b>' +
         '<b data-say="hush">' + T('لا نسمع صوتاً', 'No sound') + '</b>' +
-        '<b data-say="hot">' + T('الصوتُ عالٍ جدّاً', 'Too loud') + '</b></span>' +
+        '<b data-say="hot">' + T('الصوتُ عالٍ جدّاً', 'Too loud') + '</b>' +
+        '<b data-say="back">' + T('عاد بعد انقطاع', 'Back after a cut') + '</b></span>' +
       '<span class="nau-size nau-num"></span>' +
       '<span class="nau-gap"></span>' +
       '<button type="button" class="gsf-btn nau-b" data-au="hold" aria-label="' +
@@ -431,6 +584,15 @@
       '<button type="button" class="gsf-btn gsf-btn--go nau-b" data-au="draft-go">' + T('أكمل التسجيل', 'Continue recording') + '</button>' +
       '<button type="button" class="gsf-btn nau-b" data-au="draft-save">' + T('احفظه كما هو', 'Save it as is') + '</button>' +
       '<button type="button" class="gsf-btn gsf-btn--ghost nau-b" data-au="draft-ask">' + T('احذفه', 'Delete it') + '</button>';
+  }
+
+  function cutHtml() {
+    return '<i class="fa-solid fa-triangle-exclamation nau-warn" aria-hidden="true"></i>' +
+      '<span class="nau-draft"><b>' + T('توقّف التسجيل', 'Recording stopped') + '</b> ' +
+      T('حين غادرتَ الصفحة — وحُفظ ما سُجّل قبلها.', 'when you left the page — what came before is saved.') + '</span>' +
+      '<span class="nau-gap"></span>' +
+      '<button type="button" class="gsf-btn gsf-btn--go nau-b" data-au="cut-go">' + T('أكمل التسجيل', 'Continue recording') + '</button>' +
+      '<button type="button" class="gsf-btn gsf-btn--ghost nau-b" data-au="cut-end">' + T('يكفي، أنهِه', 'That is all, finish') + '</button>';
   }
 
   function miniHtml() {
@@ -489,7 +651,7 @@
     }).then(function (it) {
       if (!it) return null;
       var at = nidOf[it.i] || nid;
-      if (cont) return start({ nid: at, g: g, k: k + 1 }).then(function () { return it; });
+      if (cont) return start({ nid: at, g: g, k: k + 1, src: p.src }).then(function () { return it; });
       askSave(it, at);
       return it;
     });
@@ -822,12 +984,160 @@
     } else if (draft) {
       top += '<p class="nau-livenote">' +
         T('عندك تسجيلٌ لم يكتمل — أكمله أو احفظه من الشريط أعلى الملاحظة.', 'You have an unfinished recording — continue or save it from the bar above the note.') + '</p>';
+    } else if (cut) {
+      top += '<p class="nau-livenote">' +
+        T('توقّف تسجيلُك حين غادرتَ الصفحة — أكمله أو أنهِه من الشريط أعلى الملاحظة.', 'Your recording stopped when you left the page — continue or finish it from the bar above the note.') + '</p>';
+    } else if (importing) {
+      top += '<p class="nau-livenote" role="status"><span class="na-opening-spin" aria-hidden="true"></span>' +
+        T('يُقرأ الملفّ…', 'Reading the file…') + '</p>';
     } else {
-      top += '<button type="button" class="gsf-btn gsf-btn--go nau-start" data-au="start">' +
-        '<i class="fa-solid fa-microphone" aria-hidden="true"></i>' + T('ابدأ التسجيل', 'Start recording') + '</button>';
+      top += srcHtml() +
+        '<button type="button" class="gsf-btn gsf-btn--go nau-start" data-au="start">' +
+        '<i class="fa-solid fa-microphone" aria-hidden="true"></i>' + T('ابدأ التسجيل', 'Start recording') + '</button>' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost nau-imp" data-au="import">' +
+        '<i class="fa-solid fa-file-import" aria-hidden="true"></i>' + T('أضفْ تسجيلاً من جهازك', 'Add a recording from your device') + '</button>';
     }
-    dlg.innerHTML = head + top + '<div class="nau-rows" role="list"></div></div>';
+    var diag = '';
+    if (DIAG) {
+      diag = '<button type="button" class="gsf-btn gsf-btn--ghost nau-diag" data-au="diag">' +
+        '<i class="fa-solid fa-circle-info" aria-hidden="true"></i>' + T('انسخ تقريرَ آخرِ تسجيل', 'Copy the last recording report') + '</button>';
+    }
+    dlg.innerHTML = head + top + '<div class="nau-rows" role="list"></div>' + diag + '</div>';
     paintRows();
+  }
+
+  function srcHint(v) {
+    var R = RC();
+    var sup = R && R.support ? R.support() : {};
+    var os = sup.os || '';
+    if (!sup.system) {
+      return (os === 'android' || os === 'ios')
+        ? L('على الجوّال والآيباد لا يُلتقط صوتُ الجهاز من المتصفّح — الميكروفونُ وحدَه. ولتسجيلٍ من الجهاز نفسِه: سجّلْه بمسجّل الشاشة ثمّ أضفه من «أضفْ تسجيلاً من جهازك».',
+            'On phones and iPads the browser cannot capture device audio — the microphone only. To keep device audio: record it with the screen recorder, then add it with “Add a recording from your device”.')
+        : '';
+    }
+    if (!sup.systemLikely) {
+      return L('متصفّحك لا يشارك صوتَ الجهاز — استعملْ كروم أو إيدج.', 'Your browser cannot share device audio — use Chrome or Edge.');
+    }
+    if (v === 'mic') return '';
+    var tail = v === 'both' ? L(' والميكروفونُ يُسجَّل معه.', ' The microphone is recorded with it.') : '';
+    if (os === 'mac') {
+      return L('ستفتح نافذةُ المشاركة: اخترْ تبويباً وفعّلْ «مشاركة صوت التبويب». وصوتُ الجهاز كلِّه يحتاج ماك 14.2 وكروم 141 فأحدث.',
+               'A sharing window opens: pick a tab and turn on “Share tab audio”. Whole-device audio needs macOS 14.2 and Chrome 141 or newer.') + tail;
+    }
+    if (os === 'linux') {
+      return L('ستفتح نافذةُ المشاركة: على لينكس يُلتقط صوتُ تبويبٍ واحد — اخترْه وفعّلْ «مشاركة صوت التبويب».',
+               'A sharing window opens: on Linux one tab’s audio is captured — pick it and turn on “Share tab audio”.') + tail;
+    }
+    return L('ستفتح نافذةُ المشاركة: اخترْ «الشاشة بأكملها» وفعّلْ «مشاركة صوت النظام» — أو اخترْ تبويباً وفعّلْ «مشاركة صوت التبويب».',
+             'A sharing window opens: pick “Entire screen” and turn on “Share system audio” — or pick a tab and turn on “Share tab audio”.') + tail;
+  }
+
+  function srcHtml() {
+    var R = RC();
+    var sup = R && R.support ? R.support() : {};
+    var v = pickedSrc();
+    var hint = srcHint(v);
+    if (!sup.system) {
+      return hint ? '<p class="nau-hint"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>' + esc(hint) + '</span></p>' : '';
+    }
+    var off = !sup.systemLikely;
+    var chip = function (k, icon, ar, en) {
+      var on = v === k;
+      return '<button type="button" class="gsf-chip' + (on ? ' on' : '') + '" role="radio" aria-checked="' + on + '" data-au="src" data-v="' + k + '"' +
+        (off && k !== 'mic' ? ' disabled' : '') + '><i class="fa-solid ' + icon + '" aria-hidden="true"></i>' + T(ar, en) + '</button>';
+    };
+    return '<div class="nau-src"><span class="nau-lab" id="nau-src-l">' + T('ماذا نسجّل؟', 'What should we record?') + '</span>' +
+      '<div class="gsf-chips" role="radiogroup" aria-labelledby="nau-src-l">' +
+      chip('mic', 'fa-microphone', 'الميكروفون', 'Microphone') +
+      chip('system', 'fa-display', 'صوتُ الجهاز', 'Device audio') +
+      chip('both', 'fa-sliders', 'كلاهما', 'Both') + '</div>' +
+      (hint ? '<p class="nau-hint"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>' + esc(hint) + '</span></p>' : '') +
+      '</div>';
+  }
+
+  var importing = false;
+  function extOf(name) {
+    var m = /\.([a-z0-9]{2,4})$/i.exec(String(name || ''));
+    return m ? m[1].toLowerCase() : '';
+  }
+  function judgeMime(file) {
+    var f = F();
+    var norm = (f && f.normMime) ? f.normMime : function (m) {
+      var v = String(m || '').split(';')[0].trim().toLowerCase();
+      return /^audio\/|^video\//.test(v) ? v : '';
+    };
+    return norm(file.type) || norm(EXT_MIME[extOf(file.name)]) || '';
+  }
+  function durationOf(blob) {
+    return new Promise(function (ok) {
+      var a = document.createElement('audio');
+      var url = URL.createObjectURL(blob);
+      var done = false;
+      var fin = function (sec) {
+        if (done) return;
+        done = true;
+        try { a.removeAttribute('src'); a.load(); } catch (e) {}
+        try { URL.revokeObjectURL(url); } catch (e) {}
+        ok(sec > 0 && isFinite(sec) ? Math.round(sec * 1000) : 0);
+      };
+      a.preload = 'metadata';
+      a.muted = true;
+      a.addEventListener('loadedmetadata', function () {
+        if (isFinite(a.duration) && a.duration > 0) { fin(a.duration); return; }
+        a.addEventListener('durationchange', function () {
+          if (isFinite(a.duration) && a.duration > 0) fin(a.duration);
+        });
+        try { a.currentTime = 1e7; } catch (e) { fin(0); }
+      });
+      a.addEventListener('error', function () { fin(0); });
+      setTimeout(function () { fin(0); }, 10000);
+      a.src = url;
+    });
+  }
+  function pickImport() {
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = EXT_ACCEPT;
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', function () {
+      var f = inp.files && inp.files[0];
+      if (inp.parentNode) inp.parentNode.removeChild(inp);
+      if (f) importFile(f);
+    });
+    inp.click();
+  }
+  function importFile(file, nid0) {
+    var nid = nid0 || curId();
+    if (!nid || !file) return Promise.resolve(null);
+    var mime = judgeMime(file);
+    if (!mime) return failStart('badfile').then(function () { return null; });
+    if (file.size > EXT_MAX) return failStart('toobig').then(function () { return null; });
+    lastErr = '';
+    importing = true;
+    if (dlg && dlg.open) render();
+    var base = String(file.name || '').replace(/\.[a-z0-9]{2,4}$/i, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    return durationOf(file).then(function (ms) {
+      var it = { i: uid('aud_'), n: base || 'recording', t: Date.now(), s0: 0, ms: ms, b: file.size,
+                 m: mime, lo: 1, x: 1 };
+      if (base) it.nm = base;
+      var D = PD();
+      var put = D && D.put ? D.put(it.i, file, { name: it.n }) : Promise.resolve(false);
+      return put.then(function (ok) {
+        if (ok) here[it.i] = file.size; else { mem[it.i] = file; it.lo = 0; }
+        return withDoc(nid, function (list) { list.push(it); });
+      }).then(function (wrote) {
+        importing = false;
+        if (!wrote) { mem[it.i] = file; lastErr = 'readfail'; if (dlg && dlg.open) render(); return null; }
+        nidOf[it.i] = nid;
+        askSave(it, nid, { imp: 1 });
+        return it;
+      });
+    })['catch'](function () {
+      importing = false;
+      return failStart('readfail').then(function () { return null; });
+    });
   }
 
   function paintRows() {
@@ -947,6 +1257,24 @@
   function act(a, key, b) {
     var g = key ? groupByKey(key) : null;
     if (a === 'start') { start(); return; }
+    if (a === 'src') {
+      setSrc(b.getAttribute('data-v'));
+      var sh = dlg && dlg.querySelector('.nau-src, .nau-hint');
+      if (sh) { var tmp = document.createElement('div'); tmp.innerHTML = srcHtml(); sh.replaceWith(tmp.firstChild); }
+      var f0 = dlg && dlg.querySelector('.nau-src [aria-checked="true"]');
+      if (f0) try { f0.focus({ preventScroll: true }); } catch (e) {}
+      return;
+    }
+    if (a === 'import') { pickImport(); return; }
+    if (a === 'diag') {
+      var txt = '';
+      try { txt = localStorage.getItem(LOG_LS) || ''; } catch (e) {}
+      var done = function () { b.lastChild.textContent = L('نُسخ — الصقه لنا', 'Copied — paste it to us'); };
+      if (navigator.clipboard && txt) navigator.clipboard.writeText(txt).then(done, function () {});
+      return;
+    }
+    if (a === 'cut-go') { cutGo(); return; }
+    if (a === 'cut-end') { cutEnd(); return; }
     if (a === 'hold') { hold(); return; }
     if (a === 'ask-stop' || a === 'ask-discard') {
       if (live) { live.confirm = a === 'ask-stop' ? 'stop' : 'discard'; paintStrip(true); focusStrip(); }
@@ -1061,12 +1389,12 @@
     });
   }
 
-  function askSave(it, nid) {
+  function askSave(it, nid, how) {
     var list = nid === curId() ? items(curDoc()) : [it];
     var grp = it.g ? list.filter(function (x) { return x.g === it.g; }) : [it];
     if (!grp.length) grp = [it];
-    ask = { it: it, nid: nid, parts: grp, dest: 'here', confirm: false,
-            name: (noteTitle() || L('تسجيل', 'Recording')) + ' — ' + when(grp[0].s0 || it.t), cloud: null };
+    ask = { it: it, nid: nid, parts: grp, dest: 'here', confirm: false, imp: !!(how && how.imp),
+            name: it.nm || ((noteTitle() || L('تسجيل', 'Recording')) + ' — ' + when(grp[0].s0 || it.t)), cloud: null };
     var d = mkDialog('nau-dlg--save', 'nau-st');
     d._ask = ask;
     renderAsk();
@@ -1119,7 +1447,8 @@
     dlg.innerHTML = '<div class="gsf-grip" aria-hidden="true"></div>' +
       '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' + esc(L('إغلاق', 'Close')) +
       '" data-ar-title="إغلاق" data-en-title="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
-      '<div class="gsf-body"><div class="gsf-head"><h2 class="gsf-title" id="nau-st">' + T('انتهى التسجيل', 'Recording finished') + '</h2></div>' +
+      '<div class="gsf-body"><div class="gsf-head"><h2 class="gsf-title" id="nau-st">' +
+      (ask.imp ? T('أُضيف التسجيل', 'Recording added') : T('انتهى التسجيل', 'Recording finished')) + '</h2></div>' +
       body + '</div>' +
       (ask.confirm ? '' : '<div class="gsf-foot"><div class="gsf-acts nau-acts">' +
         '<button type="button" class="gsf-btn gsf-btn--go" data-au="save">' + T('احفظ', 'Save') + '</button>' +
@@ -1236,8 +1565,13 @@
   window.addEventListener('garden:noteDoc', onNoteDoc);
   window.addEventListener('pagehide', flush);
   document.addEventListener('visibilitychange', function () {
+    if (live) note('vis', document.visibilityState + ' rec=' + ((live.r.rec && live.r.rec.state) || '-'));
     if (document.visibilityState === 'hidden') flush();
+    else checkAlive();
   });
+  window.addEventListener('pageshow', checkAlive);
+  document.addEventListener('freeze', function () { if (live) note('freeze'); });
+  document.addEventListener('resume', function () { if (live) note('resume'); });
   window.addEventListener('beforeunload', function (e) {
     if (!live) return;
     flush();
@@ -1261,6 +1595,8 @@
                playing: !!(pl && pl.on), mode: mode() };
     },
     groups: function () { return groups(items(curDoc())); },
+    importFile: importFile,
+    source: pickedSrc,
     checkDraft: checkDraft,
     local: local,
     refresh: refreshHere

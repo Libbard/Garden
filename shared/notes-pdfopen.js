@@ -542,6 +542,7 @@
 
     function destroy() {
       st.dead = true;
+      unhook();
       if (window.GardenPdfCloud) { try { window.GardenPdfCloud.forget(); } catch (e8) {} }
       if (st.posT) { clearTimeout(st.posT); st.posT = 0; }
       if (st.fitT) { clearTimeout(st.fitT); st.fitT = 0; }
@@ -567,21 +568,83 @@
       if (d) { try { d.close(); } catch (e5) {} if (d.parentNode) d.parentNode.removeChild(d); }
     }
 
-    function fromUs() {
+    var US_WAIT = [4000, 8000, 15000, 30000];
+    var usN = 0;
+    function fromUs(quiet) {
       var C = window.GardenPdfCloud;
-      if (!C) { ask(); return; }
-      busy(L('يُجلب من نسختك عندنا…', 'Fetching your copy kept with us…'));
-      C.restore(sp.h, sp.n, function (at, of) {
+      if (!C || !(C.restoreX || C.restore)) { ask(); return; }
+      if (st.usT) { clearTimeout(st.usT); st.usT = 0; }
+      if (!quiet) busy(L('يُجلب من نسختك عندنا…', 'Fetching your copy kept with us…'));
+      var got = C.restoreX ? C.restoreX(sp.h, sp.n, function (at, of) {
         var p = stage.querySelector('.npo-msg');
         if (p && of) {
           p.textContent = L('يُجلب من نسختك عندنا… ', 'Fetching your copy kept with us… ') +
                           Math.round(at * 100 / of) + '%';
         }
-      }).then(function (f) {
+      }) : C.restore(sp.h, sp.n).then(function (f) { return { file: f, why: f ? '' : 'none' }; });
+      got.then(function (r) {
         if (st.dead) return;
-        if (f) show(f, null, sp.h);
-        else ask();
+        if (r.file) { unhook(); show(r.file, null, sp.h); return; }
+        if (!/^(pending|offline|fail|locked|rate_limited)$/.test(r.why)) { unhook(); ask(); return; }
+        wait(r.why);
       });
+    }
+
+    function wait(why) {
+      var pend = why === 'pending';
+      var head = pend ? L('الملفُّ في طريقه إلى نسختك عندنا', 'The file is on its way to your copy with us')
+        : (why === 'locked' ? L('مزامنتُك مقفلة', 'Your sync is locked')
+                            : L('تعذّر جلبُ الملفِّ الآن', 'Could not fetch the file right now'));
+      var body = pend
+        ? L('إن كنتَ ترفعه من جهازٍ آخر فسيُفتح هنا وحدَه حين يكتمل رفعُه — ابقَ على هذه الصفحة.',
+            'If you are uploading it from another device, it will open here by itself once the upload finishes — stay on this page.')
+        : (why === 'locked'
+          ? L('افتحها من إعدادات المزامنة، ثمّ عُد إلى هنا فيُجلب الملفّ.',
+              'Unlock it in sync settings, then come back here and the file will be fetched.')
+          : L('نعيد المحاولة وحدَنا حين يعود الاتّصال.', 'We will try again by ourselves when the connection is back.'));
+      card(pend ? 'fa-cloud-arrow-down' : 'fa-triangle-exclamation', esc(sp.n || head),
+        (sp.n ? '<b>' + esc(head) + '</b><br>' : '') + esc(body) +
+        '<span class="npo-waitline" role="status"><span class="na-opening-spin" aria-hidden="true"></span>' +
+        esc(L('ننتظر…', 'Waiting…')) + '</span>',
+        '<div class="npo-acts"><button type="button" class="gsf-btn gsf-btn--go npo-again">' +
+        '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' +
+        esc(L('جرّب الآن', 'Try now')) + '</button>' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost npo-pick">' +
+        '<i class="fa-solid fa-file-import" aria-hidden="true"></i> ' +
+        esc(L('اخترْه من جهازك', 'Pick it from your device')) + '</button></div>');
+      var a = stage.querySelector('.npo-again');
+      if (a) a.addEventListener('click', function () { usN = 0; fromUs(); });
+      var b = stage.querySelector('.npo-pick');
+      if (b) b.addEventListener('click', function () { unhook(); take(); });
+      hook();
+      var ms = US_WAIT[Math.min(usN, US_WAIT.length - 1)];
+      usN++;
+      if (usN > 40) return;
+      st.usT = setTimeout(function () {
+        st.usT = 0;
+        if (st.dead) return;
+        if (document.visibilityState === 'hidden') { st.usLate = 1; return; }
+        fromUs(true);
+      }, ms);
+    }
+
+    function kick(e) {
+      if (st.dead) { unhook(); return; }
+      if (document.visibilityState === 'hidden' || !stage.querySelector('.npo-again')) return;
+      if (st.usLate || !st.usT || (e && e.type === 'online')) { st.usLate = 0; usN = 0; fromUs(true); }
+    }
+    function hook() {
+      if (st.usHook) return;
+      st.usHook = kick;
+      window.addEventListener('online', kick);
+      document.addEventListener('visibilitychange', kick);
+    }
+    function unhook() {
+      if (st.usT) { clearTimeout(st.usT); st.usT = 0; }
+      if (!st.usHook) return;
+      window.removeEventListener('online', st.usHook);
+      document.removeEventListener('visibilitychange', st.usHook);
+      st.usHook = null;
     }
 
     if (o.pre) show(null, o.pre, sp.h || '');

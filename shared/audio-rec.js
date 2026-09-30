@@ -20,7 +20,8 @@
     return {
       mic: !!md.getUserMedia,
       system: !!md.getDisplayMedia,
-      systemLikely: !!md.getDisplayMedia && !ffx(),
+      systemLikely: !!md.getDisplayMedia && !ffx() && !safari(),
+      os: osOf(),
       recorder: !!window.MediaRecorder,
       type: pickType(),
       secure: window.isSecureContext !== false
@@ -40,6 +41,20 @@
   }
 
   function ffx() { return /Firefox\//.test(navigator.userAgent || ''); }
+  function safari() {
+    var u = navigator.userAgent || '';
+    return /Safari\//.test(u) && !/Chrome|Chromium|CriOS|Edg\//.test(u);
+  }
+  function osOf() {
+    var u = navigator.userAgent || '';
+    if (/Android/i.test(u)) return 'android';
+    if (/iPhone|iPad|iPod/i.test(u) || (/Macintosh/.test(u) && navigator.maxTouchPoints > 1)) return 'ios';
+    if (/Windows/i.test(u)) return 'win';
+    if (/CrOS/.test(u)) return 'cros';
+    if (/Macintosh|Mac OS X/.test(u)) return 'mac';
+    if (/Linux/i.test(u)) return 'linux';
+    return '';
+  }
 
   function systemStream() {
     if (!navigator.mediaDevices.getDisplayMedia) {

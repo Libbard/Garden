@@ -1208,7 +1208,12 @@
   /*@3.NOAJ.139*/
   var MORE = [
     { id: 'na-pin',      icon: 'fa-thumbtack',   ar: 'تثبيت',        en: 'Pin' },
-    { id: 'na-remind-btn', icon: 'fa-bell',      ar: 'تنبيهٌ لهذه الملاحظة', en: 'Remind me' },
+    { id: 'na-remind-btn', icon: 'fa-bell',      ar: 'تنبيهٌ لهذه الملاحظة', en: 'Remind me', fold: 1 },
+    { id: 'na-mic',      icon: 'fa-microphone',  ar: 'التسجيلات',    en: 'Recordings', fold: 1 },
+    { id: 'na-find-btn', icon: 'fa-magnifying-glass', ar: 'بحث في الملاحظة', en: 'Find in note', fold: 1 },
+    { id: 'na-page-btn', icon: 'fa-palette',     ar: 'تنسيق الصفحة', en: 'Page setup', fold: 1 },
+    { id: 'na-share-btn', icon: 'fa-share-nodes', ar: 'مشاركة',      en: 'Share', fold: 1 },
+    { id: 'na-inkhide',  icon: 'fa-eye',         ar: 'أخفِ الرسم أو أظهره', en: 'Hide or show drawings', fold: 1 },
     { id: 'na-cloud',    icon: 'fa-cloud',       ar: 'نسخةُ الملفّ عندنا', en: 'File copy with us' },
     { id: 'na-export',   icon: 'fa-file-export', ar: 'استيراد وتصدير', en: 'Import & export' },
     { id: 'na-move-btn', icon: 'fa-folder-open', ar: 'نقل إلى مجلّد', en: 'Move to folder' },
@@ -1232,6 +1237,7 @@
     m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     m.innerHTML = MORE.filter(function (it) {
       var src = it.id ? document.getElementById(it.id) : null;
+      if (it.fold && !(src && src.getAttribute('data-fold') === '1')) return false;
       return !(src && src.hidden);
     }).map(function (it) {
       var src = it.id ? document.getElementById(it.id) : null;
@@ -1259,6 +1265,41 @@
       var src = document.getElementById(b.getAttribute('data-for'));
       if (src) src.click();
     });
+  }
+
+  var FOLD = ['na-inkhide', 'na-share-btn', 'na-page-btn', 'na-remind-btn', 'na-find-btn', 'na-mic'];
+  var foldMq = window.matchMedia ? window.matchMedia('(max-width: 768px)') : null;
+  var foldBusy = false;
+  function foldTop() {
+    var top = document.querySelector('.na-doc-top');
+    if (!top || foldBusy) return;
+    foldBusy = true;
+    FOLD.forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) b.removeAttribute('data-fold');
+    });
+    if (foldMq && foldMq.matches && top.clientWidth > 0) {
+      for (var i = 0; i < FOLD.length && top.scrollWidth > top.clientWidth + 1; i++) {
+        var b = document.getElementById(FOLD[i]);
+        if (b && !b.hidden) b.setAttribute('data-fold', '1');
+      }
+    }
+    foldBusy = false;
+    if (moreMenu) closeMore();
+  }
+  function watchFold() {
+    var top = document.querySelector('.na-doc-top');
+    if (!top || top._fold) return;
+    top._fold = 1;
+    if (window.ResizeObserver) new ResizeObserver(function () { foldTop(); }).observe(top);
+    if (window.MutationObserver) {
+      new MutationObserver(function () { foldTop(); })
+        .observe(top, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    }
+    if (foldMq && foldMq.addEventListener) foldMq.addEventListener('change', foldTop);
+    window.addEventListener('garden:noteDoc', function () { setTimeout(foldTop, 0); });
+    window.addEventListener('resize', foldTop);
+    foldTop();
   }
 
   /*@3.NOAJ.67*/
@@ -8379,7 +8420,9 @@
       var two = els.app.getAttribute('data-bars') === '2';
       els.app.setAttribute('data-bars', two ? '1' : '2');
       barsBtn.setAttribute('aria-pressed', two ? 'false' : 'true');
+      foldTop();
     });
+    watchFold();
 
     if (els.docBody) {
       var sw = null;
