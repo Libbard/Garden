@@ -529,7 +529,7 @@
 
   function boot() {
     paintSort();
-    /*@3.FACJ.52*/
+    /*@3.FACJ.53*/
     buildFilters(); paintStats();
     $('#fc-count').textContent = t('— أستاذاً', '— instructors');
     wireSingle('#fc-sort', function (v) { state.sort = v; paintSort(); apply(); });

@@ -65,18 +65,6 @@
     return L('بعد ' + Math.round(m / 1440) + ' يوم', 'in ' + Math.round(m / 1440) + 'd');
   }
 
-  function srcTag(src) {
-    var ar = src === 'server' ? 'من الخادم' : 'من جهازك';
-    var en = src === 'server' ? 'server' : 'this device';
-    var ic = src === 'server' ? 'fa-cloud' : 'fa-mobile-screen';
-    return '<span class="nt-chip" data-src="' + src + '">' +
-           '<i class="fa-solid ' + ic + '" aria-hidden="true"></i>' + esc(L(ar, en)) + '</span>';
-  }
-  function timeChip(at) {
-    var w = when(at);
-    return w ? '<span class="nt-chip is-time">' + esc(w) + '</span>' : '';
-  }
-
   /*@3.NOTJ.7*/
 
   /*@3.NOTJ.8*/
@@ -91,7 +79,7 @@
           id: 'w:' + (a.id || a.ev_key || a.at),
           title: a.title || L('تنبيهُ شعبة', 'Section alert'),
           body: a.body || '',
-          at: a.at, src: 'server', unread: !a.seen,
+          at: a.at, src: 'server', read: !!a.read,         /*@3.NOTJ.62*/
           icon: a.kind === 'term' ? 'fa-calendar-plus'
               : a.kind === 'seat' ? 'fa-chair' : 'fa-layer-group',
           tone: a.kind === 'term' ? 'ok' : ''
@@ -265,17 +253,7 @@
             '<i class="fa-solid fa-bell" aria-hidden="true"></i>' +
             esc(L('شغّل التنبيهات', 'Turn on')) + '</button>';
     } else {
-      var bg = cap && cap.background;
-      tone = bg ? 'ok' : 'warn'; ico = 'fa-bell';
-      t = L('التنبيهاتُ تعمل', 'Reminders are on');
-      sub = bg
-        ? L('تصلك ولو كان الموقعُ مغلقاً.', 'They reach you even when the site is closed.')
-        /*@3.NOTJ.15*/
-        : L('تصلك حين يكون الموقعُ مفتوحاً فقط — الدفعُ غيرُ مفعَّلٍ على هذا الجهاز.',
-            'They only arrive while the site is open — push is not active on this device.');
-      act = '<button type="button" class="nt-btn" data-act="test">' +
-            '<i class="fa-solid fa-paper-plane" aria-hidden="true"></i>' +
-            esc(L('جرّب تنبيهاً', 'Send a test')) + '</button>';
+      return deviceCardHtml();
     }
 
     return '<div class="nt-cta"' + (tone ? ' data-tone="' + tone + '"' : '') + '>' +
@@ -285,43 +263,111 @@
     '</div>';
   }
 
-  /*@3.NOTJ.16*/
-  function statsHtml() {
-    var W = window.GardenWatch, R = window.Reminders;
-    var S = (W && W.state) ? W.state() : {};
-    var ws = S.watches || [];
-    var on = ws.length, armed = 0;
-    ws.forEach(function (w) { if (w.armed) armed++; });
-    var s = null;
-    try { s = R ? R.settings() : null; } catch (e) {}
-    if (s && s.enabled && s.channels) {
-      Object.keys(s.channels).forEach(function (k) { if (s.channels[k]) on++; });
+  /*@3.NOTJ.68*/
+  function devName(x) {
+    var ua = String(x.ua || '');
+    return /android/i.test(ua) ? L('أندرويد', 'Android')
+      : /iphone|ipad|ios/i.test(ua) ? L('آيفون', 'iPhone')
+      : /mac/i.test(ua) ? 'Mac' : /windows/i.test(ua) ? 'Windows' : /linux/i.test(ua) ? 'Linux'
+      : kindName(x.kind);
+  }
+  function devChips(list) {
+    if (!list || !list.length) return '';
+    return '<div class="nt-devs">' + list.map(function (x) {
+      var fresh = x.last_ok_at && (Date.now() - x.last_ok_at < 7 * 86400000);
+      var st = x.fail_count >= 3 ? 'bad' : fresh ? 'ok' : 'warn';
+      var sub = x.last_ok_at ? L('وصله ', 'reached ') + when(x.last_ok_at) : L('لم يصله شيء', 'nothing yet');
+      return '<span class="nt-dchip" data-st="' + st + '">' +
+        esc((x.self ? L('هذا الجهاز', 'This device') + ' · ' : '') + devName(x) + ' · ' + sub) + '</span>';
+    }).join('') + '</div>';
+  }
+  function card(tone, ico, t, sub, extra) {
+    return '<div class="nt-cta"' + (tone ? ' data-tone="' + tone + '"' : '') + '>' +
+      '<span class="nt-cta-ic"><i class="fa-solid ' + ico + '" aria-hidden="true"></i></span>' +
+      '<div class="nt-cta-t"><b>' + esc(t) + '</b><span>' + esc(sub) + '</span>' + (extra || '') + '</div>' +
+    '</div>';
+  }
+  function deviceCardHtml() {
+    var PU = window.GardenPush, p = CACHE.push;
+    if (!PU || !PU.supported || !PU.supported()) {
+      return card('warn', 'fa-bell', L('التنبيهاتُ تعمل والموقعُ مفتوح', 'Reminders work while the site is open'),
+        L('هذا المتصفّحُ لا يستقبل من الخادم، فلا يصلك شيءٌ والموقعُ مغلق.',
+          'This browser cannot receive from the server, so nothing arrives while the site is closed.'));
     }
-    var got = CACHE.log ? CACHE.log.length : 0;
-    var last = (CACHE.log && CACHE.log.length) ? CACHE.log[0].at : 0;
-
-    /*@3.NOTJ.17*/
-    var h = '<span>' + esc(L('مفعَّل', 'active')) + ' <b' + (on ? ' data-t="ok"' : '') + '>' + on + '</b></span>' +
-            '<span>' + esc(L('في الانتظار', 'pending')) + ' <b' + (armed ? ' data-t="warn"' : '') + '>' + armed + '</b></span>' +
-            '<span>' + esc(L('وصلك', 'received')) + ' <b>' + got + '</b></span>';
-    if (last) {
-      h += '<span class="nt-last"><i class="fa-solid fa-clock" aria-hidden="true"></i> ' +
-           esc(L('آخرُ تنبيه ', 'last ') + when(last)) + '</span>';
+    if (!p) {
+      return card('', 'fa-bell', L('التنبيهاتُ تعمل', 'Reminders are on'),
+        L('نتحقّق هل يستقبل هذا الجهازُ من الخادم…', 'Checking whether this device receives from the server…'));
     }
-    return '<div class="nt-stats">' + h + '</div>';
+    var list = (p.ok && p.devices_list) || [];
+    var mine = null;
+    list.forEach(function (x) { if (x.self) mine = x; });
+    if (p.ok && mine) {
+      return card('ok', 'fa-bell', L('هذا الجهازُ يستقبل من الخادم', 'This device receives from the server'),
+        mine.last_ok_at
+          ? L('آخرُ تنبيهٍ وصله ', 'The last alert reached it ') + when(mine.last_ok_at)
+          : L('لم يصله تنبيهٌ بعد — جرّبه من «الضبط».', 'Nothing has reached it yet. Test it from Settings.'),
+        devChips(list));
+    }
+    if (!p.ok && p.reason !== 'device_not_subscribed') {
+      return card('warn', 'fa-bell', L('التنبيهاتُ تعمل', 'Reminders are on'),
+        L('لم يُجب الخادمُ الآن، فلم نتحقّق من هذا الجهاز. نعيد بعد دقيقة.',
+          'The server did not answer, so this device was not checked. We will retry in a minute.'));
+    }
+    /*@3.NOTJ.15*/
+    var last = PU.lastError ? PU.lastError() : null;
+    var full = (last && PU.explain) ? PU.explain(last.why) : '';
+    var why = navigator.brave
+      ? L('متصفّحُ Brave يوقف خدمةَ الإشعارات افتراضيّاً: افتح brave://settings/privacy وفعّل «Use Google services for push messaging» ثمّ أعِد تشغيله.',
+          'Brave turns push messaging off by default: open brave://settings/privacy, enable "Use Google services for push messaging", then restart it.')
+      : (full ? full.split('\n')[0] : L('لم يُسجَّل لدى خدمة الإشعارات بعد.', 'It is not registered with the push service yet.'));
+    return card('warn', 'fa-bell-slash', L('هذا الجهازُ لا يستقبل من الخادم', 'This device does not receive from the server'),
+      L('تصلك التنبيهاتُ هنا والموقعُ مفتوحٌ فقط. ', 'Reminders reach you here only while the site is open. ') + why,
+      (full && !navigator.brave ? '<details class="nt-why"><summary>' + esc(L('الأسبابُ وطرقُ الإصلاح', 'Causes and fixes')) +
+        '</summary><p>' + esc(full) + '</p></details>' : '') +
+      '<div class="nt-cta-a"><button type="button" class="nt-btn is-primary" data-act="resub">' +
+        '<i class="fa-solid fa-rotate" aria-hidden="true"></i>' + esc(L('سجّله الآن', 'Register it now')) + '</button></div>' +
+      devChips(list));
   }
 
-  function rowHtml(r) {
-    return '<article class="nt-row' + (r.unread ? ' is-unread' : '') + '"' +
+  /*@3.NOTJ.66*/
+  function tsOf(at) { return typeof at === 'number' ? at : (Date.parse(at) || 0); }
+  function clock(ms) {
+    return new Date(ms).toLocaleTimeString(isAr() ? LOC : 'en-GB', { hour: 'numeric', minute: '2-digit' });
+  }
+  function dayStart(ms) { var d = new Date(ms); d.setHours(0, 0, 0, 0); return d.getTime(); }
+  var GROUPS = [['اليوم', 'Today'], ['أمس', 'Yesterday'], ['هذا الأسبوع', 'This week'], ['أقدم', 'Older']];
+  function groupOf(ms) {
+    var d = Math.round((dayStart(Date.now()) - dayStart(ms)) / 86400000);
+    return d <= 0 ? 0 : d === 1 ? 1 : d < 7 ? 2 : 3;
+  }
+  function stampFor(ms, g) {
+    if (g === 0 && Date.now() - ms < 3600000) return when(ms);
+    if (g <= 1) return clock(ms);
+    var d = new Date(ms);
+    if (g === 2) return d.toLocaleDateString(isAr() ? LOC : 'en-GB', { weekday: 'long' });
+    var o = { day: 'numeric', month: 'short' };
+    if (d.getFullYear() !== new Date().getFullYear()) o.year = 'numeric';
+    return d.toLocaleDateString(isAr() ? LOC : 'en-GB', o);
+  }
+  function iconBtn(act, ico, ar, en, extra) {
+    var t = L(ar, en);
+    return '<button type="button" class="nt-ib' + (extra ? ' ' + extra : '') + '" ' + act +
+      ' aria-label="' + esc(t) + '" title="' + esc(t) + '" data-ar-title="' + esc(ar) + '" data-en-title="' + esc(en) + '">' +
+      '<i class="fa-solid ' + ico + '" aria-hidden="true"></i></button>';
+  }
+  function srcIcon(src) {
+    var ar = src === 'server' ? 'وصل من الخادم' : 'أطلقه هذا الجهاز';
+    var en = src === 'server' ? 'Sent by the server' : 'Fired by this device';
+    return '<i class="fa-solid ' + (src === 'server' ? 'fa-cloud' : 'fa-mobile-screen') + ' nt-src" role="img" aria-label="' +
+      esc(L(ar, en)) + '" title="' + esc(L(ar, en)) + '"></i>';
+  }
+  function rowHtml(r, side) {
+    return '<article class="nt-r' + (r.unread ? ' is-unread' : '') + '"' +
         (r.tone ? ' data-tone="' + r.tone + '"' : '') + '>' +
       '<span class="nt-ic"><i class="fa-solid ' + esc(r.icon || 'fa-bell') + '" aria-hidden="true"></i></span>' +
-      '<div class="nt-txt">' +
-        '<p class="nt-t">' + esc(r.title) + '</p>' +
-        (r.body ? '<p class="nt-b">' + esc(r.body) + '</p>' : '') +
-        '<div class="nt-m">' + srcTag(r.src) + timeChip(r.at) +
-          (r.extra || '') +
-        '</div>' +
-      '</div>' +
+      '<div class="nt-txt"><p class="nt-t">' + esc(r.title) + '</p>' +
+        (r.body ? '<p class="nt-b">' + esc(r.body) + '</p>' : '') + '</div>' +
+      '<div class="nt-side">' + (side || '') + '</div>' +
     '</article>';
   }
 
@@ -330,125 +376,253 @@
            '<p>' + esc(msg) + '</p></div>';
   }
 
+  /*@3.NOTJ.63*/
+  var ARCH_KEY = 'garden_notify_arch';
+  var SHOWN_KEY = 'garden_notify_shown';
+  var ARCH_MAX = 800;
+  var OLD_OPEN = false;
+  var FIND_Q = '';
+  var SETTLED_IDS = null;
+  /*@3.NOTJ.71*/
+  var LAST_STAMP = 0;
+  function stamp() { LAST_STAMP = Math.max(Date.now(), LAST_STAMP + 1); return LAST_STAMP; }
+  function archState() {
+    var o = null;
+    try { o = JSON.parse(localStorage.getItem(ARCH_KEY) || 'null'); } catch (e) {}
+    var s = { a: {}, b: {}, upTo: 0 };
+    if (o && typeof o === 'object') {
+      if (o.a && typeof o.a === 'object') s.a = o.a;
+      if (o.b && typeof o.b === 'object') s.b = o.b;
+      s.upTo = +o.upTo || 0;
+    }
+    return s;
+  }
+  function trim(m) {
+    var ks = Object.keys(m);
+    if (ks.length <= ARCH_MAX) return m;
+    ks.sort(function (x, y) { return m[y] - m[x]; });
+    var out = {};
+    ks.slice(0, ARCH_MAX).forEach(function (k) { out[k] = m[k]; });
+    return out;
+  }
+  function saveArch(s) {
+    s.a = trim(s.a); s.b = trim(s.b);
+    try { localStorage.setItem(ARCH_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  function isArchived(r, s) {
+    var bt = s.b[r.id] || 0;
+    if (s.a[r.id] && s.a[r.id] > bt) return true;
+    if (s.upTo && tsOf(r.at) <= s.upTo && s.upTo > bt) return true;
+    return r.read === true && !bt;
+  }
+  function archive(ids) {
+    var s = archState();
+    ids.forEach(function (id) { s.a[id] = stamp(); });
+    saveArch(s);
+  }
+  function restore(id) {
+    var s = archState();
+    s.b[id] = stamp();
+    saveArch(s);
+  }
+  function split() {
+    var a = archState(), inbox = [], arch = [];
+    (CACHE.log || []).forEach(function (r) {
+      var x = isArchived(r, a);
+      r.unread = !x;
+      (x ? arch : inbox).push(r);
+    });
+    return { inbox: inbox, arch: arch };
+  }
+  function visibleLog() { return split().inbox; }
+
+  /*@3.NOTJ.70*/
+  (function settleShown() {
+    try {
+      var p = JSON.parse(localStorage.getItem(SHOWN_KEY) || 'null');
+      localStorage.removeItem(SHOWN_KEY);
+      if (!p || !Array.isArray(p.ids) || !p.ids.length) return;
+      archive(p.ids);
+      SETTLED_IDS = p.ids;
+    } catch (e) {}
+  })();
+  function noteShown(inbox) {
+    if (!inbox.length) return;
+    try {
+      localStorage.setItem(SHOWN_KEY, JSON.stringify({ ids: inbox.map(function (r) { return r.id; }) }));
+    } catch (e) {}
+  }
+  var SEEN_IO = null;
+  var LAST_SHOWN = [];
+  function watchSeen(host) {
+    if (!('IntersectionObserver' in window)) return;
+    var panel = host.querySelector('.nt-panel');
+    if (!panel || TAB !== 'log') return;
+    if (!SEEN_IO) {
+      SEEN_IO = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          clearTimeout(e.target.__ntSeen);
+          if (e.isIntersecting && TAB === 'log') {
+            e.target.__ntSeen = setTimeout(function () { noteShown(LAST_SHOWN); }, 1500);
+          }
+        });
+      }, { threshold: 0.25 });
+    }
+    SEEN_IO.disconnect();
+    SEEN_IO.observe(panel);
+  }
+
+  function normQ(s) {
+    return String(s || '').toLowerCase()
+      .replace(/[ً-ْـ]/g, '')
+      .replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه');
+  }
+  function foundHtml(q) {
+    var n = normQ(q).trim();
+    if (!n) return '';
+    var arch = split().arch.filter(function (r) { return normQ(r.title + ' ' + r.body).indexOf(n) >= 0; });
+    if (!arch.length) {
+      return '<p class="nt-found-none">' + esc(L('لا شيءَ في الأرشيف يطابق «' + q.trim() + '».', 'Nothing archived matches “' + q.trim() + '”.')) + '</p>';
+    }
+    return arch.slice(0, 60).map(function (r) {
+      var t = tsOf(r.at);
+      return rowHtml(r, '<span class="nt-when">' + esc(stampFor(t, groupOf(t))) + '</span>' +
+        '<span class="nt-acts">' + srcIcon(r.src) +
+          iconBtn('data-back="' + esc(r.id) + '"', 'fa-rotate-left', 'أعِده إلى الوارد', 'Back to inbox', 'is-sm') + '</span>');
+    }).join('') + (arch.length > 60
+      ? '<p class="nt-found-none">' + esc(L('وأكثرُ من ذلك — ضيّقِ البحث.', 'More matches. Narrow the search.')) + '</p>' : '');
+  }
+
+  function settleServer() {
+    if (!SETTLED_IDS || !CACHE.log) return;
+    var ids = SETTLED_IDS; SETTLED_IDS = null;
+    var pend = CACHE.log.filter(function (r) { return r.src === 'server' && r.read === false; });
+    var W = window.GardenWatch;
+    if (pend.length && pend.every(function (r) { return ids.indexOf(r.id) >= 0; }) && W && W.markSeen) W.markSeen();
+  }
+
   function logHtml() {
     if (!CACHE.log) return '<div class="nt-skel"></div><div class="nt-skel"></div><div class="nt-skel"></div>';
-    if (!CACHE.log.length) {
-      return emptyHtml('fa-inbox', L(
-        'لم يصلك تنبيهٌ بعد. ولا يُعرض هنا إلا ما يشهد بإرساله الخادمُ أو جهازُك — فالفراغُ يعني «لم يُرسَل» لا «لم يُسجَّل».',
-        'Nothing yet. Only alerts the server or this device confirm sending appear here.'));
-    }
-    var unread = 0;
-    CACHE.log.forEach(function (r) { if (r.unread) unread++; });
-    var head = unread
-      ? '<div class="nt-bar"><span>' + esc(L(unread + ' لم تُقرأ', unread + ' unread')) + '</span>' +
-        '<button type="button" class="nt-btn" data-act="seen">' +
-        '<i class="fa-solid fa-check-double" aria-hidden="true"></i>' +
-        esc(L('علّمها كلَّها مقروءة', 'Mark all read')) + '</button></div>'
+    var sp = split();
+    var inbox = sp.inbox, nArch = sp.arch.length;
+    var find = (nArch || FIND_Q)
+      ? '<div class="nt-arch"><label class="nt-find-w"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>' +
+        '<input type="search" class="nt-find" value="' + esc(FIND_Q) + '" autocomplete="off" enterkeyhint="search"' +
+        ' aria-label="' + esc(L('ابحث في الأرشيف', 'Search the archive')) + '"' +
+        ' placeholder="' + esc(L('ابحث في الأرشيف · ' + nArch + ' تنبيهاً', 'Search the archive · ' + nArch)) + '"></label>' +
+        '<div class="nt-found" aria-live="polite">' + foundHtml(FIND_Q) + '</div></div>'
       : '';
+    if (!inbox.length) {
+      return emptyHtml(nArch ? 'fa-check' : 'fa-inbox', nArch
+        ? L('لا جديد. ما قرأتَه في الأرشيف — ابحثْ عنه بكلمةٍ من عنوانه أو برمز المادّة.',
+            'Nothing new. What you read is archived. Search it by a word or a course code.')
+        : L('لم يصلك تنبيهٌ بعد. ولا يُعرض هنا إلا ما يشهد بإرساله الخادمُ أو جهازُك — فالفراغُ يعني «لم يُرسَل» لا «لم يُسجَّل».',
+            'Nothing yet. Only alerts the server or this device confirm sending appear here.')) + find;
+    }
+    var head = '<div class="nt-head"><span>' + esc(L(inbox.length + ' جديدة', inbox.length + ' new')) + '</span>' +
+      iconBtn('data-act="archive-all"', 'fa-box-archive', 'أرشِفها كلَّها', 'Archive all') + '</div>';
+
+    var groups = [[], [], [], []];
+    inbox.forEach(function (r) { groups[groupOf(tsOf(r.at))].push(r); });
+    var body = '';
+    LAST_SHOWN = [];
+    groups.forEach(function (list, g) {
+      if (!list.length) return;
+      var label = L(GROUPS[g][0], GROUPS[g][1]);
+      if (g === 3 && !OLD_OPEN) {
+        body += '<button type="button" class="nt-older" data-act="older" aria-expanded="false">' +
+          '<span>' + esc(label + ' · ' + list.length) + '</span>' +
+          '<span>' + esc(L('اعرضها', 'Show')) + ' <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></span></button>';
+        return;
+      }
+      body += '<p class="nt-day">' + esc(label) + '</p>' + list.map(function (r) {
+        LAST_SHOWN.push(r);
+        return rowHtml(r,
+          '<span class="nt-when">' + esc(stampFor(tsOf(r.at), g)) + '</span>' +
+          '<span class="nt-acts">' + srcIcon(r.src) +
+            iconBtn('data-arch="' + esc(r.id) + '"', 'fa-box-archive', 'أرشِفه', 'Archive', 'is-sm') + '</span>');
+      }).join('');
+    });
     /*@3.NOTJ.18*/
-    return head + CACHE.log.map(rowHtml).join('') +
+    return head + body + find +
       '<p class="nt-note">' + esc(L(
-        'كلُّ سطرٍ هو نصُّ التنبيه كما وصلك — بلغته يومَ أُرسل، لا بلغة الشاشة الآن. ' +
-        'وسجلُّ الخادم يُحفظ ٦٠ يوماً ثم يُمسح، وسجلُّ الجهاز يعيش على هذا الجهاز وحدَه.',
-        'Each line is the alert exactly as it reached you — in the language it was sent, not the language on screen now. ' +
-        'Server history is kept for 60 days; device history lives only on this device.')) + '</p>';
+        'ما قرأتَه هنا يُؤرشَف في زيارتك التالية ويختفي، ويبقى في الأرشيف تبحث عنه متى شئت. وكلُّ سطرٍ نصُّ التنبيه كما وصلك. وسجلُّ الخادم يُحفظ ٦٠ يوماً، والأرشفةُ تعيش على هذا الجهاز.',
+        'What you read here is archived on your next visit and disappears, but stays searchable. Each line is the alert as it reached you. Server history is kept for 60 days; archiving lives on this device.')) + '</p>';
   }
 
-  /*@3.NOTJ.19*/
-  function registeredHtml() {
-    var out = [], W = window.GardenWatch, R = window.Reminders;
-    var S = (W && W.state) ? W.state() : {};
-    var ws = S.watches || [];
+  function arCount(n, one, two, few, many) {
+    return n === 1 ? one : n === 2 ? two : (n >= 3 && n <= 10) ? n + ' ' + few : n + ' ' + many;
+  }
+  function leadWord(min) {
+    if (min >= 1440) { var d = Math.round(min / 1440); return L(arCount(d, 'يوم', 'يومين', 'أيام', 'يوماً'), d + 'd'); }
+    if (min >= 60) { var h = Math.round(min / 60); return L(arCount(h, 'ساعة', 'ساعتين', 'ساعات', 'ساعة'), h + 'h'); }
+    return L(arCount(min, 'دقيقة', 'دقيقتين', 'دقائق', 'دقيقة'), min + 'm');
+  }
+  function beforeWord(min) {
+    var w = leadWord(min);
+    return L('قبلها ' + (/^[0-9]/.test(w) ? 'بـ' : 'ب') + w, w + ' before');
+  }
 
-    var KIND = {
-      term:    ['متابعةُ الفصول الجديدة', 'New-term watch', 'fa-calendar-plus'],
-      seat:    ['انتظارُ مقعد', 'Seat watch', 'fa-chair'],
-      course:  ['انتظارُ نزول شعبة', 'Section-opening watch', 'fa-layer-group'],
-      changes: ['تغيّراتُ شعبتك', 'Section changes', 'fa-arrows-rotate']
-    };
-    ws.forEach(function (w) {
-      var k = KIND[w.kind] || [w.kind, w.kind, 'fa-bell'];
-      var target = w.kind === 'term' ? L('أيُّ فصلٍ ينزل', 'any new term') : w.target;
-      /*@3.NOTJ.20*/
-      out.push(rowHtml({
-        id: 'r:' + w.kind + w.target, title: L(k[0], k[1]),
-        body: String(target), at: w.created_at, src: 'server',
-        icon: k[2], tone: w.armed ? 'ok' : 'mute',
-        extra: '<button type="button" class="nt-drop" data-drop="' +
-          esc(w.kind + '|' + w.term + '|' + w.target) + '" title="' +
-          esc(L('أوقف المتابعة', 'Stop watching')) + '" aria-label="' +
-          esc(L('أوقف المتابعة', 'Stop watching')) + '">' +
-          '<i class="fa-solid fa-xmark" aria-hidden="true"></i>' +
-          esc(L('أوقفها', 'Stop')) + '</button>'
-      }));
-    });
-
+  /*@3.NOTJ.67*/
+  var KIND_ICON = { lectures: 'fa-chalkboard', exams: 'fa-file-pen', tasks: 'fa-list-check',
+                    study: 'fa-bolt', events: 'fa-calendar-day', review: 'fa-repeat' };
+  function nextHtml(list) {
+    var out = '', W = window.GardenWatch, R = window.Reminders;
+    var S = (W && W.ready && W.ready() && W.state) ? W.state() : {};
     var s = null;
     try { s = R ? R.settings() : null; } catch (e) {}
+
     if (s && s.enabled) {
       var CH = {
-        lectures: ['قبل المحاضرة', 'Before lectures', 'fa-chalkboard'],
-        exams:    ['قبل الاختبار', 'Before exams', 'fa-file-pen'],
-        tasks:    ['المهامُّ والمواعيد', 'Tasks and due dates', 'fa-list-check'],
-        review:   ['نداءُ المراجعة اليوميّ', 'Daily review call', 'fa-repeat']
+        lectures: ['المحاضرات', 'Lectures'], exams: ['الاختبارات', 'Exams'], tasks: ['المهامّ', 'Tasks'],
+        study: ['المذاكرة', 'Study'], events: ['الأحداث', 'Events'], review: ['المراجعة', 'Review']
       };
-      Object.keys(CH).forEach(function (k) {
-        if (!s.channels || !s.channels[k]) return;
+      var chips = Object.keys(CH).filter(function (k) { return s.channels && s.channels[k]; }).map(function (k) {
         var lead = s.lead && s.lead[k];
-        out.push(rowHtml({
-          id: 'c:' + k, title: L(CH[k][0], CH[k][1]),
-          body: lead ? L('قبلها بـ' + leadWord(lead), leadWord(lead) + ' before') : '',
-          at: 0, src: 'device', icon: CH[k][2], tone: 'ok'
-        }));
-      });
+        var t = L(CH[k][0], CH[k][1]) + (k === 'review' ? ' · ' + (s.reviewTime || '')
+              : lead ? ' · ' + beforeWord(lead) : '');
+        return '<span class="nt-ch"><i class="fa-solid ' + KIND_ICON[k] + '" aria-hidden="true"></i>' + esc(t) + '</span>';
+      }).join('');
+      out += '<div class="nt-chs">' + (chips || '<span class="nt-ch">' + esc(L('لا قناةَ مفعَّلة', 'No channel is on')) + '</span>') +
+        '<button type="button" class="nt-link" data-tab="opt">' + esc(L('غيّرها', 'Change')) + '</button></div>';
     }
 
-    if (!out.length) {
-      return emptyHtml('fa-bell-slash', L(
-        'لا تنبيهَ مفعَّلٌ الآن. شغّل ما تريده من لسان «الخيارات».',
-        'Nothing is switched on. Enable what you want from the Options tab.'));
+    if (list && list.length) {
+      out += '<p class="nt-day">' + esc(L('يُطلقها جهازُك', 'From your device')) + '</p>' +
+        list.map(function (i) {
+          return rowHtml({ title: i.title || L('تذكير', 'Reminder'), body: i.body || '',
+                           icon: KIND_ICON[i.kind] || 'fa-clock', tone: 'mute' },
+                         '<span class="nt-when">' + esc(ahead(i.fireAt)) + '</span>');
+        }).join('');
     }
-    return out.join('');
-  }
 
-  function leadWord(min) {
-    if (min >= 1440) { var d = Math.round(min / 1440); return L(d === 1 ? 'يوم' : d + ' أيام', d + 'd'); }
-    if (min >= 60) { var h = Math.round(min / 60); return L(h === 1 ? 'ساعة' : h + ' ساعات', h + 'h'); }
-    return L(min + ' دقيقة', min + 'm');
-  }
+    var KIND = {
+      term:    ['نزولُ فصلٍ جديد', 'A new term', 'fa-calendar-plus'],
+      seat:    ['مقعدٌ يتحرّر', 'A seat opening', 'fa-chair'],
+      course:  ['نزولُ شعبة', 'A section opening', 'fa-layer-group'],
+      changes: ['تغيّراتُ شعبتك', 'Section changes', 'fa-arrows-rotate']
+    };
+    var ws = S.watches || [];
+    if (ws.length) {
+      out += '<p class="nt-day">' + esc(L('يراقبه الخادمُ لك', 'Watched by the server')) + '</p>' +
+        ws.map(function (w) {
+          var k = KIND[w.kind] || [w.kind, w.kind, 'fa-bell'];
+          /*@3.NOTJ.20*/
+          return rowHtml({ title: L(k[0], k[1]),
+                           body: w.kind === 'term' ? L('أيُّ فصلٍ ينزل في بانر', 'any term published in Banner') : String(w.target),
+                           icon: k[2], tone: w.armed ? 'ok' : 'mute' },
+            '<span class="nt-when">' + esc(w.armed ? L('ينتظر', 'waiting') : L('أدّى مهمّته', 'done')) + '</span>' +
+            '<button type="button" class="nt-drop" data-drop="' + esc(w.kind + '|' + w.term + '|' + w.target) + '">' +
+              esc(L('أوقفها', 'Stop')) + '</button>');
+        }).join('');
+    }
 
-  /*@3.NOTJ.21*/
-  function pendingHtml(list) {
-    var out = [], W = window.GardenWatch;
-    var S = (W && W.state) ? W.state() : {};
-    (S.watches || []).forEach(function (w) {
-      if (!w.armed) return;
-      var t = w.kind === 'term'
-            ? [L('ينتظر نزولَ فصلٍ جديد', 'Waiting for a new term'), L('أيُّ فصلٍ ينزل', 'any new term'), 'fa-calendar-plus']
-        : w.kind === 'seat'
-            ? [L('ينتظر تحرُّرَ مقعد', 'Waiting for a seat'), String(w.target), 'fa-chair']
-        : w.kind === 'course'
-            ? [L('ينتظر نزولَ شعبة', 'Waiting for a section'), String(w.target), 'fa-layer-group']
-            : [L('يراقب تغيّراتِ شعبتك', 'Watching your section'), String(w.target), 'fa-arrows-rotate'];
-      out.push(rowHtml({ id: 'p:' + w.kind + w.target, title: t[0], body: t[1],
-                         at: 0, src: 'server', icon: t[2], tone: 'warn' }));
-    });
-
-    (list || []).forEach(function (i) {
-      out.push('<article class="nt-row" data-tone="mute">' +
-        '<span class="nt-ic"><i class="fa-solid fa-clock" aria-hidden="true"></i></span>' +
-        '<div class="nt-txt"><p class="nt-t">' + esc(i.title || L('تذكير', 'Reminder')) + '</p>' +
-        (i.body ? '<p class="nt-b">' + esc(i.body) + '</p>' : '') +
-        '<div class="nt-m">' + srcTag('device') +
-        '<span class="nt-chip is-time">' + esc(ahead(i.fireAt)) + '</span></div></div></article>');
-    });
-
-    if (!out.length) {
+    if (!out) {
       return emptyHtml('fa-hourglass-half', L(
-        'لا شيءَ في الانتظار. متابعاتُ الشعب والفصول تظهر هنا ما دامت مسلَّحة، ومعها تذكيراتُ جهازك المجدولة.',
-        'Nothing is pending. Armed section and term watches appear here with your scheduled device reminders.'));
+        'لا شيءَ قادم. شغّلِ التنبيهاتِ فتظهر هنا محاضراتُك واختباراتُك قبل وقتها، ومعها ما يراقبه الخادمُ لك من شعبٍ وفصول.',
+        'Nothing upcoming. Turn reminders on to see lectures and exams here, with the sections and terms the server watches for you.'));
     }
-    return out.join('');
+    return out;
   }
 
   /*@3.NOTJ.22*/
@@ -569,7 +743,10 @@
       h = chainRow('warn', L('تجاوزتَ حدَّ التجربة (٥ في الساعة)', 'You hit the test limit (5 per hour)'),
         L('ليس عطلاً — انتظر قليلاً.', 'Not a fault. Wait a little.'), '');
     } else if (v.state === 'fail') {
-      h = chainRow('bad', L('لم تُرسَل التجربة', 'The test was not sent'), v.reason || '', '');
+      var PX = window.GardenPush, why = (PX && PX.explain && PX.explain(v.reason)) || v.reason || '';
+      h = chainRow('bad', v.stage === 'subscribe'
+          ? L('هذا الجهازُ لم يشترك — فلم تُرسَل التجربة', 'This device could not subscribe, so the test was not sent')
+          : L('لم تُرسَل التجربة', 'The test was not sent'), why, '');
     }
     return h ? '<div class="nt-health nt-verdict">' + h + '</div>' : '';
   }
@@ -608,8 +785,10 @@
       return '<div class="nt-health">' + h + '</div>';
     }
     if (!p.ok) {
-      h += chainRow('warn', L('رُفعت إلى الخادم', 'Uploaded to the server'),
-        L('لم يُجب الخادمُ الآن — أعِدِ الفتحَ بعد قليل.',
+      /*@3.NOTJ.65*/
+      var px = (PU.explain && PU.explain(p.reason)) || '';
+      h += chainRow(px ? 'bad' : 'warn', px ? L('خدمةُ الدفع تقبل', 'The push service accepts') : L('رُفعت إلى الخادم', 'Uploaded to the server'),
+        px || L('لم يُجب الخادمُ الآن — أعِدِ الفتحَ بعد قليل.',
           'The server did not answer just now. Try again shortly.'), '');
       return '<div class="nt-health">' + h + '</div>';
     }
@@ -803,38 +982,33 @@
     return t.outerHTML;
   }
 
-  /*@3.NOTJ.35*/
+  /*@3.NOTJ.69*/
   var TABS = [
-    ['log', 'السجلّ', 'History', 'fa-clock-rotate-left', 'info'],
-    ['reg', 'المسجَّل', 'Active', 'fa-bell', 'ok'],
-    ['pend', 'المنتظَر', 'Pending', 'fa-hourglass-half', 'warn'],
-    ['opt', 'الخيارات', 'Options', 'fa-sliders', ''],
-    ['help', 'المساعدة', 'Help', 'fa-life-ring', '']
+    ['log', 'الوارد', 'Inbox', 'fa-inbox'],
+    ['next', 'القادم', 'Upcoming', 'fa-hourglass-half'],
+    ['opt', 'الضبط', 'Settings', 'fa-sliders']
   ];
 
   function shell(pending) {
-    var counts = {
-      log: CACHE.log ? CACHE.log.length : 0,
-      reg: 0, pend: 0, opt: 0
-    };
+    var unread = 0;
+    visibleLog().forEach(function (r) { if (r.unread) unread++; });
     var tabs = TABS.map(function (t) {
-      var n = counts[t[0]];
-      return '<button type="button" class="nt-tab" role="tab" data-tab="' + t[0] + '"' +
-        (t[4] ? ' data-t="' + t[4] + '"' : '') +
+      var n = t[0] === 'log' ? unread : 0;
+      return '<button type="button" class="nt-seg-b" role="tab" data-tab="' + t[0] + '"' +
         ' aria-selected="' + (TAB === t[0] ? 'true' : 'false') + '">' +
         '<i class="fa-solid ' + t[3] + '" aria-hidden="true"></i>' +
         '<span data-ar="' + esc(t[1]) + '" data-en="' + esc(t[2]) + '">' + esc(L(t[1], t[2])) + '</span>' +
-        (n ? '<span class="nt-tab-n">' + n + '</span>' : '') + '</button>';
+        (n ? '<span class="nt-seg-n">' + n + '</span>' : '') + '</button>';
     }).join('');
 
     var body = TAB === 'log' ? logHtml()
-             : TAB === 'reg' ? registeredHtml()
-             : TAB === 'pend' ? pendingHtml(pending)
-             : TAB === 'help' ? helpHtml()
-             : optionsHtml();
+             : TAB === 'next' ? nextHtml(pending)
+             : optionsHtml() +
+               '<details class="nt-help"><summary>' + esc(L('دليلُ الأعطال', 'Troubleshooting')) + '</summary>' +
+               helpHtml() + '</details>';
 
-    return ctaHtml() + statsHtml() +
-      '<div class="nt-tabs" role="tablist">' + tabs + '</div>' +
+    return ctaHtml() +
+      '<div class="nt-seg" role="tablist">' + tabs + '</div>' +
       '<div class="nt-panel" role="tabpanel">' + body + '</div>';
   }
 
@@ -851,6 +1025,21 @@
     host.querySelectorAll('[data-act]').forEach(function (b) {
       b.addEventListener('click', function () { act(b.getAttribute('data-act')); });
     });
+    host.querySelectorAll('[data-arch]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        archive([b.getAttribute('data-arch')]);
+        HOSTS.forEach(function (x) { paint(x, []); });
+      });
+    });
+    var fi = host.querySelector('.nt-find');
+    if (fi) {
+      fi.addEventListener('input', function () {
+        FIND_Q = fi.value;
+        var out = host.querySelector('.nt-found');
+        if (out) out.innerHTML = foundHtml(FIND_Q);
+      });
+    }
+    watchSeen(host);
     host.querySelectorAll('[data-opt]').forEach(function (b) {
       b.addEventListener('click', function () { toggleOpt(b.getAttribute('data-opt')); });
     });
@@ -947,13 +1136,32 @@
           VERDICT = { state: 'rate' };
           HOSTS.forEach(function (x) { paint(x, []); });
         } else {
-          VERDICT = { state: 'fail', reason: (r && r.reason) || L('غير معروف', 'unknown') };
+          VERDICT = { state: 'fail', stage: r && r.stage, reason: (r && r.reason) || L('غير معروف', 'unknown') };
           HOSTS.forEach(function (x) { paint(x, []); });
         }
       });
-    } else if (what === 'seen') {
+    } else if (what === 'archive-all') {
+      /*@3.NOTJ.64*/
+      var a = archState();
+      a.upTo = stamp();
+      saveArch(a);
+      try { localStorage.removeItem(SHOWN_KEY); } catch (e) {}
+      HOSTS.forEach(function (x) { paint(x, []); });
       var W = window.GardenWatch;
-      if (W && W.markSeen) W.markSeen().then(function () { CACHE.log = null; refresh(); });
+      if (W && W.markSeen) W.markSeen();
+    } else if (what === 'older') {
+      OLD_OPEN = true;
+      HOSTS.forEach(function (x) { paint(x, []); });
+    } else if (what === 'resub') {
+      var PU = window.GardenPush;
+      if (!PU || !PU.subscribe) return;
+      note(L('نسجّل هذا الجهاز…', 'Registering this device…'));
+      PU.subscribe().then(function (r) {
+        CACHE.push = null; CACHE.pushAt = 0;
+        note(r && r.ok ? L('سُجّل ✓ — جرّبه من «الضبط».', 'Registered ✓ — test it from Settings.')
+                       : L('رفض المتصفّحُ التسجيل. السببُ في البطاقة.', 'The browser refused. The reason is on the card.'));
+        refresh();
+      });
     }
   }
 
@@ -1011,9 +1219,10 @@
   function refresh() {
     if (!HOSTS.length) return;
     /*@3.NOTJ.54*/
-    if (TAB === 'opt' && !PBUSY && window.GardenPush && GardenPush.status &&
+    if (!PBUSY && window.GardenPush && GardenPush.status &&
         GardenPush.supported && GardenPush.supported() &&
-        (!CACHE.push || Date.now() - CACHE.pushAt > 60000)) {
+        (!CACHE.push || Date.now() - CACHE.pushAt > 60000 ||
+         (!CACHE.push.ok && CACHE.push.reason !== 'device_not_subscribed'))) {
       PBUSY = true;
       var done = function (r) {
         CACHE.push = (r && typeof r === 'object') ? r : { ok: false };
@@ -1024,7 +1233,7 @@
       GardenPush.status().then(done, function () { done(null); });
     }
     var needLog = TAB === 'log' && (!CACHE.log || Date.now() - CACHE.at > 60000);
-    var pendP = TAB === 'pend' && window.Reminders
+    var pendP = TAB === 'next' && window.Reminders
       ? Reminders.upcoming(20).catch(function () { return []; })
       : Promise.resolve([]);
 
@@ -1033,6 +1242,7 @@
       HOSTS.forEach(function (h) { paint(h, []); });      /*@3.NOTJ.47*/
       loadLog().then(function (rows) {
         CACHE.log = rows; CACHE.at = Date.now(); BUSY = false;
+        settleServer();
         HOSTS.forEach(function (h) { paint(h, []); });
       }, function () { CACHE.log = []; BUSY = false; HOSTS.forEach(function (h) { paint(h, []); }); });
       return;
@@ -1045,6 +1255,12 @@
     if (!el || HOSTS.indexOf(el) >= 0) return null;
     el.classList.add('nt');
     HOSTS.push(el);
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-back]');
+      if (!b || !el.contains(b)) return;
+      restore(b.getAttribute('data-back'));
+      HOSTS.forEach(function (x) { paint(x, []); });
+    });
     refresh();
     return el;
   }
@@ -1070,7 +1286,11 @@
 
   window.GardenNotify = {
     mount: mount,
-    refresh: function () { CACHE.log = null; refresh(); },
+    refresh: function (all) {
+      CACHE.log = null;
+      if (all) { CACHE.push = null; CACHE.pushAt = 0; }
+      refresh();
+    },
     breakage: breakage,
     breakSeen: breakSeen,
     muteBreak: muteBreak

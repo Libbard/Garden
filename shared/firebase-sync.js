@@ -104,6 +104,8 @@
     /^garden_ink_bar$/,
     /*@3.FISJ.247*/
     /^garden_[A-Z0-9]+_m(\d+|review)_study$/,
+    /*@3.FISJ.248*/
+    /^garden_notify_arch$/,
   ];
   /*@3.FISJ.22*/
   const NEVER_SYNC = new Set([
@@ -359,6 +361,7 @@
     'dashboard_prefs',
     'student_profile',
     'garden_ics',
+    'garden_notify_arch',
   ]);
   const MERGE_DEEP_PATTERNS = [
     /^course_meta_[A-Z0-9_]+$/,

@@ -665,7 +665,7 @@
   };
 
   /*@3.NOEJ.586*/
-  var LIVE_KEYS = ['aud'];
+  var LIVE_KEYS = ['aud', 'xs'];
 
   Editor.prototype.swapDoc = function (next) {
     for (var li = 0; li < LIVE_KEYS.length; li++) {

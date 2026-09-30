@@ -125,6 +125,18 @@
 
   /*@3.PUCJ.14*/
 
+  /*@3.PUCJ.38*/
+  var ERR_LS = 'garden_push_err';
+  function noteErr(why) {
+    try {
+      if (why) localStorage.setItem(ERR_LS, JSON.stringify({ why: String(why).slice(0, 200), at: Date.now() }));
+      else localStorage.removeItem(ERR_LS);
+    } catch (e) {}
+  }
+  function lastError() {
+    try { return JSON.parse(localStorage.getItem(ERR_LS) || 'null'); } catch (e) { return null; }
+  }
+
   function subscribe() {
     if (!supported()) return Promise.resolve({ ok: false, reason: 'unsupported' });
     if (!('Notification' in window) || Notification.permission !== 'granted') {
@@ -164,10 +176,13 @@
             window.GardenWatch.refreshPush();
           }
         } catch (e) {}
+        noteErr(null);
         return { ok: true };
       });
     }).catch(function (e) {
-      return { ok: false, reason: String(e && e.message || e) };
+      var why = String(e && e.message || e);
+      noteErr(why);
+      return { ok: false, reason: why };
     });
   }
 
@@ -218,21 +233,8 @@
   }
 
   /*@3.PUCJ.23*/
-  var EARLY_MINUTES = 3;
-
-  function spreadSlot(seed) {
-    /*@3.PUCJ.24*/
-    var h = 0x811c9dc5;
-    for (var i = 0; i < seed.length; i++) {
-      h ^= seed.charCodeAt(i);
-      h = (h + (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24)) >>> 0;
-    }
-    return h % EARLY_MINUTES;          /*@3.PUCJ.25*/
-  }
-
   function remPayload(items) {
     var now = Date.now();
-    var dev = deviceId();
     var out = [];
     (items || []).forEach(function (i) {
       if (!i || typeof i.fireAt !== 'number' || i.fireAt <= now) return;
@@ -242,8 +244,8 @@
       var id = String(i.id).replace(/[^A-Za-z0-9:._-]/g, '_').slice(0, 64);
       out.push({
         id: id,
-        /*@3.PUCJ.26*/
-        at: Math.floor(i.fireAt / 60000) * 60000 - spreadSlot(dev + '|' + id) * 60000,
+        /*@3.PUCJ.37*/
+        at: Math.floor(i.fireAt / 60000) * 60000,
         title: String(i.title).slice(0, 120),
         body: String(i.body || '').slice(0, 240),
         url: url.replace(/^\/+/, '')
@@ -283,7 +285,7 @@
     if (!supported()) return Promise.resolve({ ok: false, reason: 'unsupported' });
     /*@3.PUCJ.30*/
     return subscribe().then(function (s) {
-      if (!s.ok) return { ok: false, reason: s.reason };
+      if (!s.ok) return { ok: false, reason: s.reason, stage: 'subscribe' };
       return post('/v1/test', { vault_id: vaultId(), device_id: deviceId() })
         .then(function (r) {
           return { ok: !!(r && r.ok), devices: r && r.devices, reason: r && r.error,
@@ -298,6 +300,46 @@
           };
         });
     });
+  }
+
+  /*@3.PUCJ.36*/
+  function explain(why) {
+    var ar = (document.documentElement.lang || 'ar').toLowerCase().indexOf('en') !== 0;
+    var t = function (a, e) { return ar ? a : e; };
+    why = String(why || '');
+    if (/Registration failed|push service|AbortError/i.test(why)) {
+      return t('متصفّحُ هذا الجهاز لم يستطع التسجيلَ لدى خدمة الدفع — والعطلُ خارج موقعنا.\n'
+             + 'الأسبابُ بترتيب الاحتمال:\n'
+             + '١) Brave: خدمةُ الدفع مُعطَّلةٌ فيه افتراضيّاً. افتح brave://settings/privacy '
+             + 'وفعّل «Use Google services for push messaging» ثمّ أعِد تشغيل المتصفّح.\n'
+             + '٢) إضافةٌ مانعةٌ للإعلانات تحجب googleapis.com.\n'
+             + '٣) جدارُ حمايةٍ أو VPN يحجب fcmregistrations.googleapis.com.\n'
+             + 'جرّبْ نافذةَ تصفّحٍ خفيٍّ بلا إضافاتٍ لتتأكّد. وأجهزتُك المشترِكةُ الأخرى لا يمسّها هذا.',
+               'This device’s browser could not register with the push service — the fault is outside our site.\n'
+             + 'Most likely causes:\n'
+             + '1) Brave: push messaging is off by default. Open brave://settings/privacy, enable '
+             + '"Use Google services for push messaging", then restart the browser.\n'
+             + '2) An ad blocker blocking googleapis.com.\n'
+             + '3) A firewall or VPN blocking fcmregistrations.googleapis.com.\n'
+             + 'Try an incognito window without extensions to confirm. Your other subscribed devices are not affected.');
+    }
+    if (why === 'device_not_subscribed') {
+      return t('هذا الجهازُ ليس مشترِكاً في خزنتك، فالخادمُ لا يقبل منه طلباً. فعّلِ التنبيهاتِ عليه أوّلاً — وإن رفض متصفّحُه التسجيلَ فجرّبْ من جهازٍ مشترِكٍ كجوّالك.',
+               'This device is not subscribed to your vault, so the server will not accept its requests. Turn reminders on here first, or test from a subscribed device such as your phone.');
+    }
+    if (why === 'not-granted') {
+      return t('لا إذنَ بالإشعارات على هذا الجهاز — اسمحْ بها من إعدادات المتصفّح.',
+               'Notification permission is missing on this device. Allow it in browser settings.');
+    }
+    if (why === 'no_devices') {
+      return t('لا جهازَ مشترِكٌ في هذه الخزنة بعد. فعّلِ التنبيهاتِ في هذا الجهاز أوّلاً ثمّ أعِد المحاولة.',
+               'No subscribed devices in this vault yet. Turn reminders on here first, then retry.');
+    }
+    if (why === 'sw-timeout' || why === 'no-sw') {
+      return t('عاملُ الخدمة لم يجهز بعد — أعِد تحميلَ الصفحة ثمّ جرّب.',
+               'The service worker is not ready yet. Reload the page and try again.');
+    }
+    return '';
   }
 
   /*@3.PUCJ.32*/
@@ -348,6 +390,8 @@
     syncWakes: syncWakes,
     serverTest: serverTest,
     awaitShown: awaitShown,
+    explain: explain,
+    lastError: lastError,
     vaultId: vaultId,
     deviceId: deviceId,
     /*@3.PUCJ.33*/

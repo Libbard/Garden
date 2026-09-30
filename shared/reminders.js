@@ -210,12 +210,19 @@
   }
 
   /*@3.REMJ.97*/
+  var NAME_MAX = 30;
   function courseName(code) {
     if (!code) return '';
+    var c = String(code);
+    var custom = c.indexOf('__CUSTOM_') === 0;
+    var nm = '';
     try {
-      if (window.GardenData && GardenData.courseTitle) return GardenData.courseTitle(code);
+      if (window.GardenData && GardenData.courseTitle) nm = String(GardenData.courseTitle(code) || '').trim();
     } catch (e) {}
-    return String(code).indexOf('__CUSTOM_') === 0 ? '' : code;
+    if (custom) return nm.indexOf('__CUSTOM_') === 0 ? '' : nm;
+    if (!nm || nm.toUpperCase() === c.toUpperCase()) return c;
+    if (nm.length > NAME_MAX) nm = nm.slice(0, NAME_MAX - 1).replace(/[\s·\-–—,،:]+$/, '') + '…';
+    return c + ' · ' + nm;          /*@3.REMJ.101*/
   }
 
   /*@3.REMJ.31*/

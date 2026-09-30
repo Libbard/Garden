@@ -248,7 +248,7 @@
     note('home', ms);
     if (a.was) return;
     live.r.resume();
-    live.gone = { ms: ms, until: Date.now() + GONE_MS };
+    live.gone = { ms: ms, at: a.at, until: Date.now() + GONE_MS };
     saveWip();
     paintStrip(true);
   }
@@ -285,6 +285,7 @@
       live = { r: r, id: id, nid: nid, g: o.g || '', k: o.k | 0, bytes: 0, parts: 0, src: src,
                bars: [], hush: 0, hotN: 0, hotUntil: 0, tickN: 0, lost: false, at: Date.now(),
                back: o.back ? Date.now() + 9000 : 0,
+               gone: o.away ? { ms: Date.now() - o.away, at: o.away, until: Date.now() + GONE_MS } : null,
                wake: (F() && F().awake) ? F().awake() : null, confirm: '' };
       watchTracks(r, src);
       if (o.back && trail) note('continue', o.k | 0); else trailStart(r, src);
@@ -372,6 +373,7 @@
     var cur = endLive();
     var g = cur.g || uid('g');
     var k = cur.k | 0;
+    var aw = cur.away ? cur.away.at : (cur.gone ? cur.gone.at : 0);
     paintStrip(true);
     cur.r.stop().then(function (res) {
       if (!res.blob || res.blob.size < 1024) {
@@ -385,11 +387,11 @@
       var nk = it ? k + 1 : k;
       emit('garden:audioRec', { state: 'cut', note: nid });
       if (cur.src === 'mic' && document.visibilityState === 'visible') {
-        return start({ nid: nid, g: g, k: nk, src: 'mic', back: 1 }).then(function (ok) {
-          if (!ok) { cut = { nid: nid, g: g, k: nk, src: cur.src, it: it }; paintStrip(true); }
+        return start({ nid: nid, g: g, k: nk, src: 'mic', back: 1, away: aw }).then(function (ok) {
+          if (!ok) { cut = { nid: nid, g: g, k: nk, src: cur.src, it: it, away: aw }; paintStrip(true); }
         });
       }
-      cut = { nid: nid, g: g, k: nk, src: cur.src, it: it };
+      cut = { nid: nid, g: g, k: nk, src: cur.src, it: it, away: aw };
       paintStrip(true);
     });
   }
@@ -399,7 +401,7 @@
     cut = null;
     if (!c) return;
     paintStrip(true);
-    start({ nid: c.nid, g: c.g, k: c.k, src: c.src, back: 1 });
+    start({ nid: c.nid, g: c.g, k: c.k, src: c.src, back: 1, away: c.away });
   }
   function cutEnd() {
     var c = cut;

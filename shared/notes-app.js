@@ -1336,6 +1336,7 @@
     if (!doc) return false;
     if (doc.ov && (doc.ov.ink || (doc.ov.shapes && doc.ov.shapes.length))) return true;
     if (Array.isArray(doc.aud) && doc.aud.length) return true;
+    if (Array.isArray(doc.xs) && doc.xs.length) return true;
     var bl = doc.blocks || [], i, k;
     for (i = 0; i < bl.length; i++) {
       var b = bl[i];

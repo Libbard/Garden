@@ -178,9 +178,8 @@
       }
       var why = String(r.reason || '');
       var msg;
-      if (why === 'no_devices') {
-        msg = tx('لا جهاز مشترك في هذه الخزنة بعد. فعّل التنبيهات في هذا الجهاز أولاً ثم أعد المحاولة.',
-                 'No subscribed devices in this vault yet. Turn reminders on here first, then retry.');
+      if (GardenPush.explain && GardenPush.explain(why)) {   /*@3.REUJ.14*/
+        msg = GardenPush.explain(why);
       } else if (why === 'test_rate_limited' || why === 'http-429' || why === 'rate_limited') {
         /*@3.REUJ.13*/
         var sec = r.retryAfter || 0;
@@ -195,22 +194,6 @@
                + 'Try again ' + when + '.\n\n'
                + 'The cap exists because every press really does wake all your devices. To test this device alone, '
                + 'use “Send a test” — it has no cap.');
-      } else if (/Registration failed|push service|AbortError/i.test(why)) {
-        /*@3.REUJ.14*/
-        msg = tx('متصفحك لم يستطع التسجيل لدى خدمة الدفع — والعطل خارج موقعنا تماماً.\n\n'
-               + 'الأسباب بترتيب الاحتمال:\n'
-               + '١) متصفح Brave: خدمة الدفع مُعطّلة فيه افتراضياً. افتح brave://settings/privacy '
-               + 'وفعّل «Use Google services for push messaging» ثم أعد تشغيل المتصفح.\n'
-               + '٢) إضافة مانعة للإعلانات تحجب googleapis.com — وهي نفسها التي تحجب فايربيس عندك.\n'
-               + '٣) جدار حماية أو VPN يحجب fcmregistrations.googleapis.com.\n\n'
-               + 'جرّب في نافذة تصفّح خفيّ بلا إضافات للتأكد.',
-                 'Your browser could not register with the push service — this failure is outside our site.\n\n'
-               + 'Most likely causes:\n'
-               + '1) Brave: push messaging is off by default. Open brave://settings/privacy and enable '
-               + '"Use Google services for push messaging", then restart the browser.\n'
-               + '2) An ad blocker blocking googleapis.com — the same one blocking Firebase for you.\n'
-               + '3) A firewall or VPN blocking fcmregistrations.googleapis.com.\n\n'
-               + 'Try an incognito window with extensions disabled to confirm.');
       } else if (why === 'http-403') {
         msg = tx('رفض الخادم الأصل — تأكد أن ALLOWED_ORIGINS في كلاودفلير يطابق نطاق الموقع تماماً.',
                  'The server rejected the origin — check ALLOWED_ORIGINS in Cloudflare matches the site origin exactly.');
