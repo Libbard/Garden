@@ -4197,6 +4197,11 @@
     var h = '';
     var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
     var nSel = (ik && ik.pick && ik.pick.ids) ? ik.pick.ids.length : 0;
+    pdfHear = pdfMoment(x, y);
+    if (pdfHear) {
+      h += ctxItem('phear', 'fa-play', hearLabel(pdfHear));
+      h += '<div class="na-ctx-sep" aria-hidden="true"></div>';
+    }
     if (nSel) {
       h += ctxItem('psdup', 'fa-clone', L('كرِّرِ المحدَّد', 'Duplicate selection'));
       h += ctxItem('pscopy', 'fa-copy', L('انسخِ المحدَّد', 'Copy selection'));
@@ -4234,8 +4239,32 @@
     return true;
   }
 
+  var pdfHear = null;
+  function pdfMoment(x, y) {
+    var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
+    var NA = window.GardenNotesAudio;
+    var stp = (ik && ik.stampAt && NA && NA.momentAt) ? ik.stampAt(x, y) : null;
+    return stp ? NA.momentAt(stp.ts) : null;
+  }
+  function hearLabel(mo) {
+    return L('اسمعْ ما قيل هنا · ', 'Hear what was said here · ') + clockSec(mo.sec);
+  }
+  function hearGo(mo) {
+    if (mo && window.GardenNotesAudio && window.GardenNotesAudio.playAt) window.GardenNotesAudio.playAt(mo.key, mo.sec);
+  }
+  function clockSec(sec) {
+    var t = Math.max(0, Math.floor(+sec || 0)), m = Math.floor(t / 60), r = t % 60;
+    return m >= 60 ? Math.floor(m / 60) + ':' + ('0' + (m % 60)).slice(-2) + ':' + ('0' + r).slice(-2)
+                   : m + ':' + ('0' + r).slice(-2);
+  }
   function pdfMenuAct(act) {
     var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
+    if (act === 'phear') {
+      var hm = pdfHear;
+      pdfHear = null;
+      hearGo(hm);
+      return;
+    }
     if (act === 'psdup') { if (ik) ik.dupPick(); return; }
     if (act === 'pscopy') { if (ik) ik.copyPick(); return; }
     if (act === 'psrot') { if (ik) ik.rotatePick(15); return; }
@@ -4570,6 +4599,10 @@
       },
       onShapeBox: function (n, x, y, w, h, W, stage) { return shapeFromBox('pdf', n, x, y, w, h, W, stage); },
       onFileMenu: function (x, y) { pdfMenu(x, y); },
+      hearAt: function (x, y) {
+        var mo = pdfMoment(x, y);
+        return mo ? { label: hearLabel(mo), go: function () { hearGo(mo); } } : null;
+      },
       /*@3.NOAJ.309*/
       holdFit: function () { var K0 = pdfUi && pdfUi.ink && pdfUi.ink(); return !!(K0 && K0._fpage); },
       onExpand: function () { toggleFull(); },

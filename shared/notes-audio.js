@@ -8,6 +8,7 @@
   var TICK = 250;
   var BARS = 14;
   var RATES = [1, 1.25, 1.5, 1.75, 2, 0.75];
+  var LEAD_S = 2, END_SLACK = 1500;
   var RETRY = [5000, 20000, 60000];
   var CLOSED = /not_enrolled|no_vault|not_configured|origin|bad_vault|none/;
   var OTHER_TAB_MS = 12000;
@@ -981,6 +982,62 @@
       if (pl && pl.key === key) engine().play()['catch'](function () {});
     }, function () { if (pl) { pl.err = 1; paintPlay(); } });
   }
+  function secIn(it, ts) {
+    var s0 = +it.s0 || 0, ms = +it.ms || 0;
+    if (!(s0 > 0) || !(ms > 0) || !(ts > 0)) return -1;
+    var rel = ts - s0;
+    if (rel < 0) return -1;
+    var held = 0, hz = Array.isArray(it.hz) ? it.hz : [];
+    for (var i = 0; i < hz.length; i++) {
+      var h0 = +hz[i][0] || 0, h1 = +hz[i][1] || 0;
+      if (!(h1 > h0)) continue;
+      if (rel >= h1) held += h1 - h0;
+      else if (rel > h0) held += rel - h0;
+    }
+    var at = rel - held;
+    return at <= ms + END_SLACK ? Math.min(at, ms) / 1000 : -1;
+  }
+  function momentAt(ts) {
+    var best = null;
+    groups(items(curDoc())).forEach(function (g) {
+      var before = 0;
+      g.parts.forEach(function (p) {
+        var s = secIn(p, ts);
+        if (s >= 0 && (!best || p.s0 > best.s0)) {
+          best = { key: g.key, sec: Math.round((before + s) * 10) / 10, s0: p.s0, title: gTitle(g) };
+        }
+        before += (p.ms || 0) / 1000;
+      });
+    });
+    return best ? { key: best.key, sec: best.sec, title: best.title } : null;
+  }
+  function playAt(key, sec) {
+    var g = groups(items(curDoc())).filter(function (x) { return x.key === key; })[0];
+    if (!g) return false;
+    var a = engine();
+    if (!pl || pl.key !== key) {
+      if (!a.paused) a.pause();
+      pl = { key: key, parts: g.parts, idx: 0, total: g.ms, title: gTitle(g), on: false, url: '', err: 0 };
+      paintRows();
+    }
+    var t = Math.max(0, (+sec || 0) - LEAD_S), acc = 0, i = 0;
+    for (; i < g.parts.length - 1; i++) {
+      var len = (g.parts[i].ms || 0) / 1000;
+      if (t < acc + len) break;
+      acc += len;
+    }
+    if (pl.url && pl.idx === i && !pl.err) {
+      try { a.currentTime = t - acc; } catch (e) {}
+      pl.at = t - acc;
+      paintPlay();
+      a.play()['catch'](function () {});
+      return true;
+    }
+    load(i, t - acc).then(function () {
+      if (pl && pl.key === key) { paintPlay(); engine().play()['catch'](function () {}); }
+    }, function () { if (pl) { pl.err = 1; paintPlay(); } });
+    return true;
+  }
   function seek(frac) {
     if (!pl) return;
     var t = Math.max(0, Math.min(1, frac)) * (pl.total / 1000);
@@ -1759,6 +1816,8 @@
     open: openList,
     play: play,
     seek: seek,
+    momentAt: momentAt,
+    playAt: playAt,
     state: function () {
       return { live: !!live, paused: !!(live && live.r.paused()), draft: draft ? draft.ptr : null,
                playing: !!(pl && pl.on), mode: mode(), at: pl ? Math.round(pos() * 10) / 10 : 0 };

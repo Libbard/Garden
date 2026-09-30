@@ -719,6 +719,7 @@
 
   /*@3.NOPJ8.145*/
   var HOLD_MS = 520, HOLD_SLOP = 10;
+  var STAMP_PAD = 9;
 
   Ink.prototype.clientAt = function (p, x, y) {
     if (!p || !p.el) return null;
@@ -786,6 +787,21 @@
         });
         m.insertBefore(fb, m.firstChild);
       }
+    }
+    var hr = (ok && this.o.hearAt) ? this.o.hearAt(cx, cy) : null;
+    var hm = hr ? document.querySelector('.ne-menu') : null;
+    if (hm && !hm.querySelector('[data-act="phear"]')) {
+      var hb = document.createElement('button');
+      hb.type = 'button'; hb.className = 'ne-menu-i ne-menu-i--file'; hb.setAttribute('role', 'menuitem');
+      hb.setAttribute('data-act', 'phear');
+      hb.innerHTML = '<i class="fa-solid fa-play" aria-hidden="true"></i> <b></b>';
+      hb.lastChild.textContent = hr.label;
+      hb.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        try { ed.closeMenu(); } catch (e2) {}
+        hr.go();
+      });
+      hm.insertBefore(hb, hm.firstChild);
     }
     return ok;
   };
@@ -1059,6 +1075,34 @@
       }
     }
     return -1;
+  };
+
+  Ink.prototype.stampAt = function (cx, cy) {
+    var self = this, pk = this.pick, ts, i;
+    if (pk && pk.ids && pk.ids.length && this.pages[pk.n]) {
+      var pe = this.pages[pk.n].els;
+      for (i = 0; i < pk.ids.length; i++) {
+        var q = pe[pk.ids[i]];
+        if (q && q.ts > 0 && (!ts || q.ts < ts)) ts = q.ts;
+      }
+      if (ts) return { ts: ts, n: pk.n };
+    }
+    var found = null;
+    Object.keys(this.pages).some(function (k) {
+      var p = self.pages[k];
+      if (!p || !p.el || !p.els || !p.els.length) return false;
+      var b = p.el.getBoundingClientRect();
+      if (cx < b.left || cx > b.right || cy < b.top || cy > b.bottom) return false;
+      var f = self.frameOf(p, p.scale);
+      if (!f || !(f.w > 0) || !(f.h > 0)) return false;
+      var kx = b.width / f.w, ky = b.height / f.h;
+      var pt = f.toPt((cx - b.left) / kx, (cy - b.top) / ky);
+      var n = +k, at = self.hit(n, pt.x, pt.y, STAMP_PAD);
+      if (at < 0 || !(p.els[at].ts > 0)) return false;
+      found = { ts: p.els[at].ts, n: n };
+      return true;
+    });
+    return found;
   };
 
   /*@3.NOPJ8.39*/

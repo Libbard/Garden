@@ -773,6 +773,7 @@
         onClosePen: function () { if (o.onInkClose) o.onInkClose(); },
         onShapeBox: function (n, x, y, w, h, W, stage) { return o.onShapeBox ? o.onShapeBox(n, x, y, w, h, W, stage) : false; },
         onFileMenu: function (x, y) { if (o.onFileMenu) o.onFileMenu(x, y); },
+        hearAt: function (x, y) { return o.hearAt ? o.hearAt(x, y) : null; },
         /*@3.NOPJ5.23*/
         onGesture: function (phase, g) { if (o.onInkGesture) o.onInkGesture(phase, g); }
       });
