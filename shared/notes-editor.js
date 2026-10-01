@@ -9200,44 +9200,52 @@
     var self = this;
     var root = this.root;
 
-    root.addEventListener('contextmenu', function (e) {
-      if (self.readOnly) return;
-      if (self._selMode) return;
-      self._ctxAt = Date.now();
-      self.lpDrop();
-      if (self.openCtx(e.target, e.clientX, e.clientY)) e.preventDefault();
-    });
-
     /*@3.NOEJ.317*/
     this.lpDrop = function () {
       if (self._lpT) { clearTimeout(self._lpT); self._lpT = 0; }
       self._lpAt = null;
     };
-    root.addEventListener('pointerdown', function (e) {
-      self.lpDrop();
-      if (e.pointerType === 'mouse' || self._selMode || self.readOnly) return;
-      if (e.isPrimary === false) return;
-      var tgt = e.target, sx = e.clientX, sy = e.clientY;
-      self._lpAt = { x: sx, y: sy };
-      self._lpT = setTimeout(function () {
-        self._lpT = 0;
-        if (!self._lpAt) return;
-        if (self._ctxAt && Date.now() - self._ctxAt < 1200) return;
-        if (self._drag || self._bdrag || self._wdrag || self._rdrag) return;
-        if (self.openCtx(tgt, sx, sy)) {
-          self._eatClick = 1;
-          try { window.getSelection().removeAllRanges(); } catch (eS) {}
-        }
-      }, 520);
-    }, true);
-    ['pointermove', 'pointercancel'].forEach(function (ty) {
-      root.addEventListener(ty, function (e) {
-        if (!self._lpAt) return;
-        if (ty === 'pointercancel') { self.lpDrop(); return; }
-        if (Math.hypot(e.clientX - self._lpAt.x, e.clientY - self._lpAt.y) > 10) self.lpDrop();
+    this.ctxOn = function (el, gate) {
+      var subs = [], on = function (ty, fn, cap) { el.addEventListener(ty, fn, cap); subs.push([ty, fn, cap]); };
+      var away = function (e) { return gate && (self.root.contains(e.target) || !gate()); };
+      on('contextmenu', function (e) {
+        if (self.readOnly) return;
+        if (self._selMode) return;
+        if (away(e)) return;
+        self._ctxAt = Date.now();
+        self.lpDrop();
+        if (self.openCtx(gate ? self.root : e.target, e.clientX, e.clientY,
+                         gate ? { x: e.clientX, y: e.clientY } : null)) e.preventDefault();
+      });
+      on('pointerdown', function (e) {
+        if (away(e)) return;
+        self.lpDrop();
+        if (e.pointerType === 'mouse' || self._selMode || self.readOnly) return;
+        if (e.isPrimary === false) return;
+        var tgt = gate ? self.root : e.target, sx = e.clientX, sy = e.clientY;
+        self._lpAt = { x: sx, y: sy };
+        self._lpT = setTimeout(function () {
+          self._lpT = 0;
+          if (!self._lpAt) return;
+          if (self._ctxAt && Date.now() - self._ctxAt < 1200) return;
+          if (self._drag || self._bdrag || self._wdrag || self._rdrag) return;
+          if (self.openCtx(tgt, sx, sy, gate ? { x: sx, y: sy } : null)) {
+            self._eatClick = 1;
+            try { window.getSelection().removeAllRanges(); } catch (eS) {}
+          }
+        }, 520);
       }, true);
-    });
-    root.addEventListener('pointerup', function () { self.lpDrop(); }, true);
+      ['pointermove', 'pointercancel'].forEach(function (ty) {
+        on(ty, function (e) {
+          if (!self._lpAt) return;
+          if (ty === 'pointercancel') { self.lpDrop(); return; }
+          if (Math.hypot(e.clientX - self._lpAt.x, e.clientY - self._lpAt.y) > 10) self.lpDrop();
+        }, true);
+      });
+      on('pointerup', function () { self.lpDrop(); }, true);
+      return function () { subs.forEach(function (x) { el.removeEventListener(x[0], x[1], x[2]); }); subs = []; };
+    };
+    this.ctxOn(root, null);
 
     root.addEventListener('pointerdown', function (e) {
       /*@3.NOEJ.139*/

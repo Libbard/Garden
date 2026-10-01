@@ -387,11 +387,6 @@
       self.dim(true);
     });
     this.wet.addEventListener('selectstart', function (e) { e.preventDefault(); });
-    this.wet.addEventListener('contextmenu', function (e) {
-      if (!self.onTextAt || !self.cv || e.pointerType === 'pen' || e.pointerType === 'touch') return;
-      var wp = self.cv.worldAt(e.clientX, e.clientY);
-      if (wp) self.onTextAt(wp, { x: e.clientX, y: e.clientY });
-    });
     this.wet.addEventListener('pointermove', function () {
       if (self.drawing) dropSel();
     });

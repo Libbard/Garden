@@ -1077,6 +1077,33 @@
     return -1;
   };
 
+  Ink.prototype.stamps = function () {
+    var self = this;
+    if (!this.id) return Promise.resolve([]);
+    var mid = function (e) {
+      if (e.pts && e.pts.length) return e.pts[Math.floor(e.pts.length / 2)];
+      if (e.x1 != null) return { x: (e.x1 + e.x2) / 2, y: (e.y1 + e.y2) / 2 };
+      return null;
+    };
+    return this.ready.then(function () { return pagesOf(self.id); }).then(function (list) {
+      var ns = {}, out = [];
+      (list || []).forEach(function (n) { ns[n] = 1; });
+      Object.keys(self.pages).forEach(function (k) { if (self.pages[k].loaded) ns[k] = 1; });
+      return Object.keys(ns).map(Number).sort(function (a, b) { return a - b; }).reduce(function (ch, n) {
+        return ch.then(function () {
+          var p = self.pages[n];
+          var got = (p && p.loaded) ? Promise.resolve(p.els) : read(self.id, n).then(function (row) { return (row && row.els) || []; });
+          return got.then(function (els) {
+            (els || []).forEach(function (e) {
+              var m = (e && e.ts > 0) ? mid(e) : null;
+              if (m) out.push({ n: n, ts: e.ts, x: m.x, y: m.y });
+            });
+          });
+        });
+      }, Promise.resolve()).then(function () { return out; });
+    });
+  };
+
   Ink.prototype.stampAt = function (cx, cy) {
     var self = this, pk = this.pick, ts, i;
     if (pk && pk.ids && pk.ids.length && this.pages[pk.n]) {

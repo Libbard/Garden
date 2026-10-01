@@ -1137,18 +1137,18 @@ html[dir="ltr"] .na-undo { transform: translateX(-50%); }
 .na-page[data-kind="board"] { inline-size: 100%; }
 .na-page[data-kind="board"] .na-sheet {
   min-block-size: calc(100vh - 15rem);
-  min-block-size: calc(100dvh - 15rem);
+  min-block-size: calc((100dvh - 15rem) / var(--na-zin, 1));
   block-size: calc(100vh - 15rem);
-  block-size: calc(100dvh - 15rem);
+  block-size: calc((100dvh - 15rem) / var(--na-zin, 1));
 }
 .na-page[data-kind="board"] .na-sheet::before { background-image: none; }
 .na-page[data-kind="board"] .ne-root { display: none; }
 .na-page[data-kind="board"] .na-pgbar { display: none; }
 html.na-full .na-page[data-kind="board"] .na-sheet {
   min-block-size: calc(100vh - 8rem);
-  min-block-size: calc(100dvh - 8rem);
+  min-block-size: calc((100dvh - 8rem) / var(--na-zin, 1));
   block-size: calc(100vh - 8rem);
-  block-size: calc(100dvh - 8rem);
+  block-size: calc((100dvh - 8rem) / var(--na-zin, 1));
 }
 .na-page[data-kind="board"] ~ .nov-host,
 .na-tf > .na-page[data-kind="board"] + .nov-host { z-index: 30; }
@@ -1505,3 +1505,16 @@ html.na-guest .ne-img-edit { display: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .na-penwing, .na-shptray { animation: none; }
 }
+
+.na-flash {
+  position: fixed; z-index: 70; pointer-events: none;
+  inline-size: 3rem; block-size: 3rem; translate: -50% -50%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--gsf-tint) 65%, transparent);
+  animation: na-flash 1.4s ease-out forwards;
+}
+@keyframes na-flash { from { scale: .55; opacity: 1; } to { scale: 1.5; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .na-flash { animation: na-flash-rm 1.4s linear forwards; }
+}
+@keyframes na-flash-rm { from { opacity: 1; } 70% { opacity: 1; } to { opacity: 0; } }

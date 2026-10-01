@@ -3926,6 +3926,7 @@
         onDirty: function () {
           saveState('saving', L('يُحفظ…', 'Saving…'));
           inkBlocksSync();
+          marksSoon();
           /*@3.NOAJ.177*/
           queueGrow();
         },
@@ -4044,6 +4045,7 @@
             cur.ov = (d.ink || (d.shapes && d.shapes.length)) ? d : null;
             if (!quiet) inkReanchor();
             inkStamp(cur);
+            marksSoon();
             /*@3.NOAJ.167*/
             /*@3.NOAJ.381*/
             if (quiet && ed.markLazy) ed.markLazy(); else ed.mark(!!quiet);
@@ -4079,6 +4081,9 @@
         });
       }
       if (overlay && overlay.show) { try { overlay.show(); } catch (e3) {} }
+      if (sheetCtxOff) { try { sheetCtxOff(); } catch (e4) {} sheetCtxOff = null; }
+      if (isBoard && ed && ed.ctxOn) sheetCtxOff = ed.ctxOn(host, function () { return !!overlay && !overlay.on; });
+      marksSoon();
       watchPage();
       applyInkHidden();
       if (isBoard && overlay && !overlay.on) {
@@ -4247,6 +4252,7 @@
   }
 
   var pdfHear = null;
+  var sheetCtxOff = null;
   function pdfMoment(x, y) {
     var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
     var NA = window.GardenNotesAudio;
@@ -4258,6 +4264,93 @@
   }
   function hearGo(mo) {
     if (mo && window.GardenNotesAudio && window.GardenNotesAudio.playAt) window.GardenNotesAudio.playAt(mo.key, mo.sec);
+  }
+  function marksSoon() {
+    var NA = window.GardenNotesAudio;
+    if (!NA || !NA.setMarks) return;
+    if (!NA._gm) { NA._gm = 1; NA.setMarks(inkMarks); }
+    else NA.refreshMarks();
+  }
+  function inkMarks() {
+    var out = [];
+    if (pdfOn()) {
+      var ik = pdfUi.ink ? pdfUi.ink() : null;
+      if (!ik || !ik.stamps) return Promise.resolve(out);
+      return ik.stamps().then(function (list) {
+        return list.map(function (m) {
+          return { ts: m.ts, lbl: L('ص ', 'p. ') + m.n, go: function () { pdfJump(m); } };
+        });
+      });
+    }
+    var cv = inkCv(), board = isBoardOpen(), H = pageH();
+    var midOf = function (e) {
+      if (e.pts && e.pts.length) return e.pts[Math.floor(e.pts.length / 2)];
+      if (e.x1 != null) return { x: (e.x1 + e.x2) / 2, y: (e.y1 + e.y2) / 2 };
+      return null;
+    };
+    var add = function (c, e, lbl) {
+      var m = e && e.ts > 0 ? midOf(e) : null;
+      if (m) out.push({ ts: e.ts, lbl: lbl, go: function () { cvJump(c, m); } });
+    };
+    if (cv) cv.els.forEach(function (e) {
+      var m = midOf(e);
+      add(cv, e, (!board && m && H > 40) ? L('ص ', 'p. ') + (Math.floor(m.y / H) + 1) : '');
+    });
+    if (ed && ed.canvases) Object.keys(ed.canvases).forEach(function (bid) {
+      var c = ed.canvases[bid];
+      if (c && c.wet && document.contains(c.wet)) c.els.forEach(function (e) { add(c, e, ''); });
+    });
+    return Promise.resolve(out);
+  }
+  function flashAt(x, y) {
+    var f = document.createElement('div');
+    f.className = 'na-flash';
+    f.style.left = Math.round(x) + 'px';
+    f.style.top = Math.round(y) + 'px';
+    document.body.appendChild(f);
+    setTimeout(function () { if (f.parentNode) f.parentNode.removeChild(f); }, 1500);
+  }
+  function scrollerOf(el) {
+    for (var n = el && el.parentElement; n && n !== document.body; n = n.parentElement) {
+      var oy = getComputedStyle(n).overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1) return n;
+    }
+    return els.docBody;
+  }
+  function centerOn(el, at, again) {
+    var sc = scrollerOf(el), p = at();
+    if (!sc || !p) return;
+    var r = sc.getBoundingClientRect();
+    if (p.y < r.top + r.height * 0.2 || p.y > r.top + r.height * 0.75) sc.scrollTop += p.y - (r.top + r.height * 0.4);
+    requestAnimationFrame(function () {
+      var q = at();
+      if (again && q) again(q);
+      q = at();
+      if (q) flashAt(q.x, q.y);
+    });
+  }
+  function cvJump(c, m) {
+    if (!c || !c.wet) return;
+    var at = function () {
+      var r = c.wet.getBoundingClientRect(), s = c.toScreen(m);
+      var hz = (c.wet.offsetWidth && r.width / c.wet.offsetWidth) || 1;
+      return { x: r.left + s.x * hz, y: r.top + s.y * hz, r: r, hz: hz };
+    };
+    centerOn(c.wet, at, c.bound ? null : function (q) {
+      if (q.x >= q.r.left && q.x <= q.r.right && q.y >= q.r.top && q.y <= q.r.bottom) return;
+      c.panBy((q.r.left + q.r.width / 2 - q.x) / q.hz, (q.r.top + q.r.height / 2 - q.y) / q.hz);
+    });
+  }
+  function pdfJump(m) {
+    if (!pdfOn()) return;
+    try { pdfUi.goTo(m.n, 0); } catch (e) {}
+    var tries = 0;
+    (function wait() {
+      var ik = pdfUi && pdfUi.ink ? pdfUi.ink() : null, p = ik && ik.pages ? ik.pages[m.n] : null;
+      if (!(p && p.el && p.loaded) && ++tries < 20) { setTimeout(wait, 80); return; }
+      if (!p || !p.el) return;
+      centerOn(p.el, function () { return ik.clientAt(p, m.x, m.y); });
+    })();
   }
   function clockSec(sec) {
     var t = Math.max(0, Math.floor(+sec || 0)), m = Math.floor(t / 60), r = t % 60;
@@ -4601,6 +4694,7 @@
       },
       /*@3.NOAJ.235*/
       onInk: function () {
+        marksSoon();
         if (pdfDial) { try { pdfDial.sync(); } catch (e) {} }
         paintDrawBtn();
       },
@@ -4618,6 +4712,7 @@
       onView: function () { applyFs(); },
       onReady: function () {
         if (edId !== id) return;
+        marksSoon();
         applyFs();
         applyPdfInv();
         applyPdfInkOff();
@@ -4983,7 +5078,7 @@
 
     var St = window.GardenNotesStore;
     var doc = { v: 1, blocks: board ? [] : [window.GardenNotesBlocks.blank('p')] };
-    if (!board) pgvSeed(doc);
+    if (!board) { pgvSeed(doc); doc.pg = 2; }
     if (board) doc.kind = 'board';
     var go = function () { reload({ keepOpen: true }); openNote(id, { focus: !board }); };
     if (St) St.putDoc(id, doc, now).then(go, go); else go();
@@ -5566,6 +5661,7 @@
     if (!tf) return;
     var want = (Math.abs(curZoom - 1) < 0.00005) ? 'none' : ('scale(' + curZoom + ')');
     if (tf.style.transform !== want) tf.style.transform = want;
+    setVar(tf, '--na-zin', curZoom < 1 ? String(curZoom) : '');
   }
   function zoomVar() { return curZoom; }
   var _stageQ = 0;

@@ -657,7 +657,7 @@
       esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid fa-play" aria-hidden="true"></i></button>' +
       '<button type="button" class="nau-mini-name" data-au="list" title="' + esc(L('التسجيلات', 'Recordings')) + '"></button>' +
       '<span class="nau-t-cur nau-num">0:00</span>' +
-      '<input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '">' +
+      '<span class="nau-trk"><input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '"><span class="nau-lane" hidden></span></span>' +
       '<span class="nau-t-all nau-num"></span>' +
       '<button type="button" class="nau-rate nau-num" data-au="rate" aria-label="' + esc(L('سرعةُ التشغيل', 'Playback speed')) + '">' + rate() + '×</button>' +
       '<button type="button" class="nau-icb" data-au="mini-close" aria-label="' + esc(L('أوقف التشغيل', 'Stop playback')) +
@@ -672,6 +672,7 @@
     var n = s.querySelector('.nau-mini-name');
     if (n && n.textContent !== pl.title) n.textContent = pl.title;
     paintSeek(s);
+    paintLane(s);
   }
 
   function total() {
@@ -997,9 +998,10 @@
     var at = rel - held;
     return at <= ms + END_SLACK ? Math.min(at, ms) / 1000 : -1;
   }
-  function momentAt(ts) {
+  function momentAt(ts) { return momentIn(groups(items(curDoc())), ts); }
+  function momentIn(gs, ts) {
     var best = null;
-    groups(items(curDoc())).forEach(function (g) {
+    gs.forEach(function (g) {
       var before = 0;
       g.parts.forEach(function (p) {
         var s = secIn(p, ts);
@@ -1010,6 +1012,82 @@
       });
     });
     return best ? { key: best.key, sec: best.sec, title: best.title } : null;
+  }
+  var MARK_GAP_S = 4, MARK_MAX = 60;
+  var markSrc = null, marks = [], markSeq = 0, markT = 0, markStale = true, markMemo = { k: '', v: null };
+  function setMarks(fn) { markSrc = typeof fn === 'function' ? fn : null; markStale = true; refreshMarks(); }
+  function refreshMarks() {
+    markStale = true;
+    if (!pl || !markSrc) return;
+    clearTimeout(markT);
+    markT = setTimeout(function () {
+      var seq = ++markSeq, got = null;
+      markStale = false;
+      try { got = markSrc(); } catch (e) { got = null; }
+      Promise.resolve(got).then(function (list) {
+        if (seq !== markSeq) return;
+        marks = Array.isArray(list) ? list.filter(function (m) { return m && m.ts > 0; }) : [];
+        markMemo.k = '';
+        paintLanes();
+      }, function () {});
+    }, 250);
+  }
+  function marksOf(key) {
+    var gs = groups(items(curDoc())), g = gs.filter(function (x) { return x.key === key; })[0];
+    if (!g) return { list: [], tot: 0 };
+    var mk = key + '|' + markSeq + '|' + marks.length + '|' + gs.length + '|' + g.ms;
+    if (markMemo.k === mk) return markMemo.v;
+    var tot = (g.ms || 0) / 1000, pts = [], out = [], i;
+    for (i = 0; i < marks.length; i++) {
+      var mo = momentIn(gs, marks[i].ts);
+      if (mo && mo.key === key) pts.push({ sec: mo.sec, m: marks[i] });
+    }
+    pts.sort(function (a, b) { return a.sec - b.sec; });
+    var gap = Math.max(MARK_GAP_S, tot / MARK_MAX);
+    for (i = 0; i < pts.length; i++) {
+      var last = out[out.length - 1];
+      if (last && pts[i].sec - last.sec < gap) { last.n++; continue; }
+      out.push({ sec: pts[i].sec, n: 1, m: pts[i].m });
+    }
+    markMemo = { k: mk, v: { list: out, tot: tot } };
+    return markMemo.v;
+  }
+  function nStrokes(n) {
+    return n === 2 ? L('ضربتان', '2 strokes') : L(n + (n <= 10 ? ' ضربات' : ' ضربة'), n + ' strokes');
+  }
+  function paintLane(box) {
+    var ln = box && box.querySelector('.nau-lane');
+    if (!ln || !pl) return;
+    if (markStale) refreshMarks();
+    var r = marksOf(pl.key), tot = total() || r.tot;
+    var sig = pl.key + '|' + tot + '|' + r.list.map(function (c) { return c.sec + 'x' + c.n; }).join(',') + '|' + isAr();
+    if (ln._sig === sig) return;
+    ln._sig = sig; ln._cl = r.list;
+    ln.hidden = !r.list.length;
+    var h = '';
+    r.list.forEach(function (c, i) {
+      var pct = tot > 0 ? Math.max(0, Math.min(100, c.sec / tot * 100)) : 0;
+      var lab = (c.m.lbl ? c.m.lbl + ' · ' : '') + short(c.sec) + (c.n > 1 ? ' · ' + nStrokes(c.n) : '');
+      h += '<button type="button" class="nau-pin" data-au="mark" data-i="' + i + '" style="inset-inline-start:' + pct.toFixed(2) +
+        '%" title="' + esc(lab) + '" aria-label="' + esc(L('اذهبْ إلى ما رُسم هنا: ', 'Go to what was drawn here: ') + lab) + '">' +
+        (c.n > 1 ? '<b class="nau-num">' + c.n + '</b>' : '<i></i>') + '</button>';
+    });
+    ln.innerHTML = h;
+  }
+  function paintLanes() {
+    var s = strip();
+    if (s && stripMode === 'play') paintLane(s);
+    if (dlg && dlg.open && pl) {
+      var row = dlg.querySelector('.nau-row[data-g="' + cssq(pl.key) + '"] .nau-player');
+      if (row) paintLane(row);
+    }
+  }
+  function goMark(b) {
+    var ln = b.closest('.nau-lane'), c = ln && ln._cl ? ln._cl[+b.getAttribute('data-i')] : null;
+    if (!c || !pl) return;
+    if (b.closest('dialog')) shut();
+    playAt(pl.key, c.sec);
+    if (c.m.go) { try { c.m.go(); } catch (e) {} }
   }
   function playAt(key, sec) {
     var g = groups(items(curDoc())).filter(function (x) { return x.key === key; })[0];
@@ -1069,6 +1147,7 @@
     if (au) { au.pause(); }
     if (pl && pl.url && /^blob:/.test(pl.url)) { try { URL.revokeObjectURL(pl.url); } catch (e) {} }
     pl = null;
+    markStale = true;
     paintRows();
     paintStrip(true);
   }
@@ -1084,6 +1163,7 @@
       var row = dlg.querySelector('.nau-row[data-g="' + cssq(pl.key) + '"]');
       if (!row || !row.querySelector('.nau-seek')) { if (!light) paintRows(); return; }
       paintSeek(row.querySelector('.nau-player'));
+      paintLane(row.querySelector('.nau-player'));
       var pb = row.querySelector('.nau-play > i');
       if (pb) pb.className = 'fa-solid ' + (pl.on ? 'fa-pause' : 'fa-play');
       var er = row.querySelector('.nau-perr');
@@ -1419,7 +1499,7 @@
     if (cur) {
       h += '<div class="nau-player">' +
         '<span class="nau-t-cur nau-num">0:00</span>' +
-        '<input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '">' +
+        '<span class="nau-trk"><input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '"><span class="nau-lane" hidden></span></span>' +
         '<span class="nau-t-all nau-num">' + esc(short(g.ms / 1000)) + '</span>' +
         '<button type="button" class="nau-rate nau-num" data-au="rate" aria-label="' + esc(L('سرعةُ التشغيل', 'Playback speed')) + '">' + rate() + '×</button>' +
         '<p class="nau-perr" hidden>' + T('تعذّر تشغيلُ هذا التسجيل.', 'This recording could not be played.') + '</p>' +
@@ -1445,6 +1525,7 @@
   }
 
   function act(a, key, b) {
+    if (a === 'mark') { goMark(b); return; }
     var g = key ? groupByKey(key) : null;
     if (a === 'start') { start(); return; }
     if (a === 'src') {
@@ -1818,6 +1899,9 @@
     seek: seek,
     momentAt: momentAt,
     playAt: playAt,
+    setMarks: setMarks,
+    refreshMarks: refreshMarks,
+    marks: function () { return pl ? marksOf(pl.key).list.map(function (c) { return { sec: c.sec, n: c.n, lbl: c.m.lbl || '' }; }) : []; },
     state: function () {
       return { live: !!live, paused: !!(live && live.r.paused()), draft: draft ? draft.ptr : null,
                playing: !!(pl && pl.on), mode: mode(), at: pl ? Math.round(pos() * 10) / 10 : 0 };
