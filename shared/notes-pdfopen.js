@@ -700,7 +700,7 @@
     }
 
     function missing() {
-      if (!(sp.gd && o.drive && o.driveAuto && o.driveAuto())) { fromUs(); return; }
+      if (!(sp.gd && o.drive)) { fromUs(); return; }
       busy(L('يُجلب من درايف…', 'Fetching from Drive…'));
       o.drive(sp, function (pct) {
         var p = stage.querySelector('.npo-msg');

@@ -876,7 +876,7 @@
     idxPut(rec);
     var St = window.GardenNotesStore;
     var go = function () { location.href = location.pathname + '?id=' + encodeURIComponent(id); };
-    if (St) St.putDoc(id, guestShare.doc, now).then(go, go); else go();
+    if (St) putBorn(id, guestShare.doc, now).then(go, go); else go();
   }
 
   /*@3.NOAJ.112*/
@@ -3676,7 +3676,7 @@
         made.push({ id: id, doc: n.doc });
       });
       var jobs = made.map(function (m2) {
-        return St ? St.putDoc(m2.id, m2.doc, now) : Promise.resolve();
+        return St ? putBorn(m2.id, m2.doc, now) : Promise.resolve();
       });
       Promise.all(jobs).then(function () {
         impMsg('ok', made.length === 1
@@ -3820,6 +3820,54 @@
     saveState('error', L('تعذّر الجلب', 'Fetch failed'));
   }
 
+  /*@3.NOAJ.444*/
+  var BODY_WAIT = [2500, 4000, 6000, 10000, 15000, 20000, 30000];
+  function waitBody(id, tok) {
+    var St = window.GardenNotesStore, Sy = window.GardenNotesSync;
+    return new Promise(function (done) {
+      var n = 0, tm = 0, over = false;
+      function live() { return edId === id && tok === _openTok; }
+      function fin(v) {
+        if (over) return;
+        over = true;
+        clearTimeout(tm);
+        window.removeEventListener('garden:notesPulled', heard);
+        document.removeEventListener('visibilitychange', wake);
+        done(v);
+      }
+      function got() {
+        St.getDoc(id).then(function (r) { if (r && r.doc) fin(r); }, function () {});
+      }
+      function heard(e) { if (!over && e && e.detail && e.detail.id === id) got(); }
+      function wake() {
+        if (over || document.visibilityState !== 'visible') return;
+        clearTimeout(tm); n = 0; again();
+      }
+      function again() {
+        if (!live()) { fin(null); return; }
+        Sy.pull(id).then(function (res) {
+          if (over) return;
+          if (!live()) { fin(null); return; }
+          if (res && res.ok) { St.getDoc(id).then(fin, function () { fin({ loadFail: true }); }); return; }
+          if (n >= BODY_WAIT.length) { fin({ loadFail: true }); return; }
+          tm = setTimeout(again, BODY_WAIT[n++]);
+        });
+      }
+      if (els.docBody) {
+        els.docBody.innerHTML =
+          '<div class="na-opening" role="status">' +
+          '<span class="na-opening-spin" aria-hidden="true"></span>' +
+          '<p>' + esc(L('محتوى هذه الملاحظة في طريقه من جهازك الآخر — تُفتح وحدَها حين يصل.',
+                        'This note’s content is on its way from your other device — it opens by itself when it arrives.')) +
+          '</p></div>';
+      }
+      saveState('', L('ينتظر المحتوى…', 'Waiting for the content…'));
+      window.addEventListener('garden:notesPulled', heard);
+      document.addEventListener('visibilitychange', wake);
+      tm = setTimeout(again, BODY_WAIT[n++]);
+    });
+  }
+
   var _openTok = 0;
   function openNote(id, opts) {
     var rec = idxFind(id);
@@ -3874,6 +3922,8 @@
       return Sy.pull(id).then(function (res) {
         if (edId !== id || tok !== _openTok) return null;
         if (res && res.ok) return St.getDoc(id);
+        /*@3.NOAJ.445*/
+        if (res && res.reason === 'not-found' && (rec.k === 'pdf' || rec.sz > 0)) return waitBody(id, tok);
         if (res && (res.reason === 'not-found' || res.reason === 'no-endpoint' ||
                     res.reason === 'no-vault')) return row;
         return { loadFail: true };
@@ -4743,10 +4793,6 @@
         doc.pdf.gd = gid;
         persist(id, doc, true);
       },
-      driveAuto: function () {
-        if (window.GardenDrive) return window.GardenDrive.linked();
-        try { var c = JSON.parse(localStorage.getItem('__gdLink') || 'null'); return !!(c && c.on); } catch (e) { return false; }
-      },
       soloInk: function () { return soloPdf(id, doc.pdf && doc.pdf.h); },
       /*@3.NOAJ.268*/
       dockEl: function () { return document.getElementById('na-favs'); },
@@ -4906,6 +4952,15 @@
     });
   }
 
+  /*@3.NOAJ.443*/
+  function putBorn(id, doc, t) {
+    return window.GardenNotesStore.putDoc(id, doc, t).then(function (r) {
+      var Sy = window.GardenNotesSync;
+      if (Sy && Sy.push) { try { Sy.push(id); } catch (e) {} }
+      return r;
+    });
+  }
+
   function adoptPdf(file, gd, after) {
     var O = window.GardenPdfOpen;
     if (!O || !file) return;
@@ -4950,7 +5005,7 @@
           openNote(id);
           if (after) setTimeout(after, 900);
         };
-        if (St) St.putDoc(id, doc, now).then(go, go); else go();
+        if (St) putBorn(id, doc, now).then(go, go); else go();
       }, function (e) {
         O.drop(null);
         if (e && e.cancelled) { saveState('', ''); docEmpty(); setReading(false); setMob('list'); return; }
@@ -5035,7 +5090,7 @@
         reload({ keepOpen: true });
         openNote(id);
       };
-      if (St) absorbDataImgs(doc).then(function () { return St.putDoc(id, doc, now); }).then(go, go); else go();
+      if (St) absorbDataImgs(doc).then(function () { return putBorn(id, doc, now); }).then(go, go); else go();
     };
     fr.readAsText(file);
   }
@@ -5213,7 +5268,7 @@
     if (!board) { pgvSeed(doc); doc.pg = 2; }
     if (board) doc.kind = 'board';
     var go = function () { reload({ keepOpen: true }); openNote(id, { focus: !board }); };
-    if (St) St.putDoc(id, doc, now).then(go, go); else go();
+    if (St) putBorn(id, doc, now).then(go, go); else go();
   }
 
   /*@3.NOAJ.148*/
@@ -5265,7 +5320,7 @@
     var doc = { v: 1, blocks: [B0.blank('h', { lv: 1, rt: [{ s: rec.t }] }), B0.blank('p')] };
     var St = window.GardenNotesStore;
     var go = function () { reload({ keepOpen: true }); openNote(id, { focus: true }); };
-    if (St) St.putDoc(id, doc, now).then(go, go); else go();
+    if (St) putBorn(id, doc, now).then(go, go); else go();
   }
 
   /*@3.NOAJ.149*/
@@ -5335,7 +5390,7 @@
       reload({ keepOpen: true });
       openNote(id, { focus: true });
     };
-    if (St) St.putDoc(id, doc, now).then(go, go); else go();
+    if (St) putBorn(id, doc, now).then(go, go); else go();
   }
 
   /*@3.NOAJ.68*/
@@ -7574,7 +7629,7 @@
       var St = window.GardenNotesStore;
       if (St && St.getDoc && St.putDoc) {
         St.getDoc(id).then(function (row) {
-          if (row && row.doc) return St.putDoc(nid, row.doc, Date.now());
+          if (row && row.doc) return putBorn(nid, row.doc, Date.now());
           return null;
         }).then(function () { reload({ keepOpen: true }); })
           .catch(function () {});
