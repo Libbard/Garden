@@ -566,6 +566,7 @@
     else s.innerHTML = miniHtml();
     if (m === 'rec' || m === 'held') { var st = live.r.stats(); paintLive(st, m === 'held' ? 'held' : 'rec'); }
     if (m === 'play') paintMini();
+    if (m === 'link') { paintSeek(s); paintLane(s); }
   }
 
   function liveHtml(m) {
@@ -653,18 +654,32 @@
       '<button type="button" class="gsf-btn gsf-btn--ghost nau-b" data-au="cut-end">' + T('يكفي، أنهِه', 'That is all, finish') + '</button>';
   }
 
-  function miniHtml() {
-    return '<button type="button" class="nau-icb nau-icb--play" data-au="mini-toggle" aria-label="' +
-      esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid fa-play" aria-hidden="true"></i></button>' +
-      '<button type="button" class="nau-mini-name" data-au="list" title="' + esc(L('التسجيلات', 'Recordings')) + '"></button>' +
-      '<span class="nau-t-cur nau-num">0:00</span>' +
+  /*@3.NOAJ3.2*/
+  function tpHtml(stop) {
+    var sk = function (d, ic, ar, en) {
+      return '<button type="button" class="nau-icb nau-skip" data-au="skip" data-d="' + d + '" aria-label="' + esc(L(ar, en)) +
+        '" data-ar-title="' + ar + '" data-en-title="' + en + '"><i class="fa-solid ' + ic + '" aria-hidden="true"></i><b class="nau-num">15</b></button>';
+    };
+    return '<span class="nau-tp">' +
+      (stop ? '<button type="button" class="nau-icb nau-stop" data-au="mini-close" aria-label="' + esc(L('أوقفْ وأخفِ الشريط', 'Stop and hide the bar')) +
+        '" data-ar-title="أوقفْ وأخفِ الشريط" data-en-title="Stop and hide the bar"><i class="fa-solid fa-stop" aria-hidden="true"></i></button>' : '') +
+      sk(-15, 'fa-rotate-left', 'ارجعْ ‎15 ثانية', 'Back 15 seconds') +
+      '<button type="button" class="nau-icb nau-icb--play" data-au="mini-toggle" aria-label="' +
+        esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid ' + (pl && pl.on ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i></button>' +
+      sk(15, 'fa-rotate-right', 'تقدّمْ ‎15 ثانية', 'Forward 15 seconds') + '</span>';
+  }
+  function trkHtml() {
+    return '<span class="nau-t-cur nau-num">' + short(pos()) + '</span>' +
       '<span class="nau-trk"><input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '"><span class="nau-lane" hidden></span></span>' +
-      '<span class="nau-t-all nau-num"></span>' +
+      '<span class="nau-t-all nau-num"></span>';
+  }
+  function miniHtml() {
+    return tpHtml(true) +
+      '<button type="button" class="nau-mini-name" data-au="list" title="' + esc(L('التسجيلات', 'Recordings')) + '"></button>' +
+      '<span class="nau-brk" aria-hidden="true"></span>' + trkHtml() +
       '<button type="button" class="nau-rate nau-num" data-au="rate" aria-label="' + esc(L('سرعةُ التشغيل', 'Playback speed')) + '">' + rate() + '×</button>' +
       '<button type="button" class="nau-icb" data-au="link-on" aria-label="' + esc(L('اربطْ هذا التسجيلَ بالرسم', 'Link this recording to the drawing')) +
-      '" data-ar-title="اربطْ هذا التسجيلَ بالرسم" data-en-title="Link this recording to the drawing"><i class="fa-solid fa-link" aria-hidden="true"></i></button>' +
-      '<button type="button" class="nau-icb" data-au="mini-close" aria-label="' + esc(L('أوقف التشغيل', 'Stop playback')) +
-      '" data-ar-title="أوقف التشغيل" data-en-title="Stop playback"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
+      '" data-ar-title="اربطْ هذا التسجيلَ بالرسم" data-en-title="Link this recording to the drawing"><i class="fa-solid fa-link" aria-hidden="true"></i></button>';
   }
 
   function paintMini() {
@@ -1103,7 +1118,7 @@
   }
   function paintLanes() {
     var s = strip();
-    if (s && stripMode === 'play') paintLane(s);
+    if (s && (stripMode === 'play' || stripMode === 'link')) paintLane(s);
     if (dlg && dlg.open && pl) {
       var row = dlg.querySelector('.nau-row[data-g="' + cssq(pl.key) + '"] .nau-player');
       if (row) paintLane(row);
@@ -1178,9 +1193,7 @@
     var g = groups(items(curDoc())).filter(function (x) { return x.key === pl.key; })[0];
     var an = g ? anchorsOf(g).slice().sort(function (a, b) { return a[0] - b[0]; }) : [];
     var miss = linkSaid && Date.now() - linkSaid < 2000;
-    var h = '<button type="button" class="nau-icb nau-icb--play" data-au="mini-toggle" aria-label="' +
-      esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid ' + (pl.on ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i></button>' +
-      '<span class="nau-t-cur nau-num">' + short(pos()) + '</span>' +
+    var h = tpHtml(false) + trkHtml() + '<span class="nau-brk" aria-hidden="true"></span>' +
       '<span class="nau-link-tag"><i class="fa-solid fa-link" aria-hidden="true"></i>' + T('الربط', 'Linking') + '</span>' +
       '<span class="nau-link-msg" role="status"' + (miss ? ' data-miss="1"' : '') + '>' + (miss
         ? T('لا رسمَ هنا — اضغطْ على خطٍّ مرسوم.', 'No drawing here — press on a drawn line.')
@@ -1238,6 +1251,11 @@
       acc += len;
     }
   }
+  function jump(d) {
+    var tot = total();
+    if (!pl || !(tot > 0)) return;
+    seek(Math.max(0, Math.min(tot, pos() + d)) / tot);
+  }
   function onEnded() {
     if (!pl || pl.fixing) return;
     if (pl.idx < pl.parts.length - 1) {
@@ -1279,8 +1297,8 @@
     }
     if (!light || stripMode === 'play') { paintStrip(); paintMini(); }
     if (stripMode === 'link') {
-      var ls = strip(), lc = ls && ls.querySelector('.nau-t-cur'), li = ls && ls.querySelector('.nau-icb--play > i');
-      if (lc) lc.textContent = short(pos());
+      var ls = strip(), li = ls && ls.querySelector('.nau-icb--play > i');
+      if (ls) { paintSeek(ls); paintLane(ls); }
       if (li) li.className = 'fa-solid ' + (pl && pl.on ? 'fa-pause' : 'fa-play');
     }
   }
@@ -1685,6 +1703,7 @@
     if (a === 'list') { openList(); return; }
     if (a === 'mini-toggle') { if (pl) play(pl.key); return; }
     if (a === 'mini-close') { stopPlay(); return; }
+    if (a === 'skip') { jump(+b.getAttribute('data-d') || 0); return; }
     if (a === 'play' && g) { play(key); return; }
     if (a === 'rate') { cycleRate(); return; }
     if (a === 'rename' && g) { edits[key] = 1; delete dels[key]; paintRowsWith(key); return; }
