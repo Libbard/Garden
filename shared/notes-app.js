@@ -4736,6 +4736,13 @@
         });
       } : null,
       driveWhy: function (e) { return window.GardenDrive ? window.GardenDrive.reason(e) : ''; },
+      driveSave: driveOn() ? needDrive : null,
+      course: (function () { var r0 = idxFind(id); return (r0 && r0.o && r0.o.c) || ''; }()),
+      onDrive: function (gid) {
+        if (!doc.pdf) return;
+        doc.pdf.gd = gid;
+        persist(id, doc, true);
+      },
       driveAuto: function () {
         if (window.GardenDrive) return window.GardenDrive.linked();
         try { var c = JSON.parse(localStorage.getItem('__gdLink') || 'null'); return !!(c && c.on); } catch (e) { return false; }
@@ -9041,7 +9048,10 @@
     state: S,
     folders: foldersRead,
     /*@3.NOAJ.281*/
-    overlay: function () { return overlay; }
+    overlay: function () { return overlay; },
+    needDrive: needDrive,
+    course: function () { var r = idxFind(edId); return (r && r.o && r.o.c) || ''; },
+    toast: function (m) { toast(m); }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

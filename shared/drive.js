@@ -4,6 +4,9 @@
 
   var SCOPE = 'https://www.googleapis.com/auth/drive.file';
   var API = 'https://www.googleapis.com/drive/v3';
+  var UP = 'https://www.googleapis.com/upload/drive/v3';
+  var FOLDER = 'Digital Garden';
+  var KINDS = { pdf: 'PDF', aud: 'Recordings' };
   var GSI = 'https://accounts.google.com/gsi/client';
   var GAPI = 'https://apis.google.com/js/api.js';
   var SLACK_MS = 60 * 1000;
@@ -348,8 +351,11 @@
     return L('تعذّر الوصولُ إلى درايف.', 'Drive could not be reached.');
   }
 
-  function call(method, url, t) {
-    return fetch(url, { method: method, headers: { Authorization: 'Bearer ' + t } }).then(function (r) {
+  function call(method, url, t, body, extra) {
+    var h = { Authorization: 'Bearer ' + t }, o = { method: method, headers: h };
+    if (body) { h['Content-Type'] = 'application/json'; o.body = JSON.stringify(body); }
+    if (extra) Object.keys(extra).forEach(function (k) { h[k] = extra[k]; });
+    return fetch(url, o).then(function (r) {
       if (r.status === 401) { forget(); throw err('token_expired'); }
       if (r.status === 403) throw err('forbidden');
       if (r.status === 404) throw err('not_found');
@@ -387,6 +393,96 @@
       };
       return pump();
     });
+  }
+
+  function json(method, url, body) {
+    return authed(function (t) { return call(method, url, t, body).then(function (r) { return r.json(); }); });
+  }
+  function q(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+  /*@3.DRIJ.2*/
+  var dirs = {};
+  function dir(name, props, parent) {
+    var key = (parent || '') + '|' + JSON.stringify(props);
+    if (dirs[key]) return dirs[key];
+    var cond = "mimeType='application/vnd.google-apps.folder' and trashed=false";
+    Object.keys(props).forEach(function (k) { cond += " and appProperties has { key='" + k + "' and value='" + q(props[k]) + "' }"; });
+    if (parent) cond += " and '" + q(parent) + "' in parents";
+    dirs[key] = json('GET', API + '/files?q=' + encodeURIComponent(cond) + '&fields=files(id,name)&pageSize=1&spaces=drive').then(function (r) {
+      var got = (r.files && r.files[0]) || null;
+      if (got) {
+        if (got.name === name) return got.id;
+        return json('PATCH', API + '/files/' + encodeURIComponent(got.id) + '?fields=id', { name: name })
+          .then(function () { return got.id; }, function () { return got.id; });
+      }
+      var body = { name: name, mimeType: 'application/vnd.google-apps.folder', appProperties: props };
+      if (parent) body.parents = [parent];
+      return json('POST', API + '/files?fields=id', body).then(function (f) { return f.id; });
+    }).then(null, function (e) { delete dirs[key]; throw e; });
+    return dirs[key];
+  }
+  function course(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12); }
+  function place(c, kind) {
+    var code = course(c) || 'GENERAL';
+    return dir(FOLDER, { garden: '1', role: 'root' }).then(function (root) {
+      return dir(code === 'GENERAL' ? 'General' : code, { garden: '1', role: 'course', c: code }, root);
+    }).then(function (cid) {
+      return dir(KINDS[kind] || 'Files', { garden: '1', role: 'kind', c: code, k: kind || 'file' }, cid);
+    });
+  }
+  function bySha(sha) {
+    if (!sha) return Promise.resolve(null);
+    var cond = "trashed=false and appProperties has { key='sha256' and value='" + q(String(sha).slice(0, 64)) + "' }";
+    return json('GET', API + '/files?q=' + encodeURIComponent(cond) + '&fields=files(id,name,size)&pageSize=1&spaces=drive')
+      .then(function (r) { return (r.files && r.files[0]) || null; }, function () { return null; });
+  }
+  function put(url, blob, mime, onProgress, signal) {
+    return new Promise(function (ok, no) {
+      var x = new XMLHttpRequest();
+      x.open('PUT', url, true);
+      x.setRequestHeader('Content-Type', mime);
+      if (onProgress) x.upload.onprogress = function (e) { if (e.lengthComputable) { try { onProgress(e.loaded, e.total); } catch (e2) {} } };
+      x.onload = function () {
+        if (x.status >= 200 && x.status < 300) {
+          var j = null;
+          try { j = JSON.parse(x.responseText || '{}'); } catch (e) {}
+          ok({ id: j && j.id, name: j && j.name, size: Number(j && j.size) || blob.size });
+        } else no(err('http_' + x.status));
+      };
+      x.onerror = function () { no(err('http_network')); };
+      x.onabort = function () { no(err('put_aborted')); };
+      if (signal) {
+        if (signal.aborted) x.abort();
+        else signal.addEventListener('abort', function () { try { x.abort(); } catch (e) {} });
+      }
+      x.send(blob);
+    });
+  }
+  function upload(blob, opts) {
+    var o = opts || {};
+    var mime = o.mime || blob.type || 'application/octet-stream';
+    return bySha(o.sha).then(function (had) {
+      if (had) return { id: had.id, name: had.name, size: Number(had.size) || blob.size, had: true };
+      return place(o.course, o.kind).then(function (fid) {
+        var props = { garden: '1' };
+        if (o.sha) props.sha256 = String(o.sha).slice(0, 64);
+        if (o.kind) props.tag = String(o.kind);
+        return authed(function (t) {
+          return call('POST', UP + '/files?uploadType=resumable&fields=id,name,size', t,
+            { name: String(o.name || 'file'), parents: [fid], appProperties: props },
+            { 'X-Upload-Content-Type': mime, 'X-Upload-Content-Length': String(blob.size) });
+        }).then(function (r) {
+          var loc = r.headers.get('location');
+          if (!loc) throw err('no_session');
+          return put(loc, blob, mime, o.onProgress, o.signal);
+        });
+      });
+    });
+  }
+  function trash(id) {
+    if (!id) return Promise.resolve(false);
+    return json('PATCH', API + '/files/' + encodeURIComponent(id) + '?fields=id', { trashed: true })
+      .then(function () { return true; }, function () { return false; });
   }
 
   function wayOut(shut) {
@@ -499,6 +595,9 @@
     pick: pick,
     meta: meta,
     download: download,
+    upload: upload,
+    trash: trash,
+    folderName: function () { return FOLDER; },
     reason: reason,
     linkReason: linkReason
   };

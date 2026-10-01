@@ -407,6 +407,9 @@
         if (hh && window.GardenPdfCloud) {
           window.GardenPdfCloud.offer({
             h: hh, name: sp.n || (file && file.name) || '',
+            gd: sp.gd || null, drive: o.driveSave || null, course: o.course || '',
+            size: (file && file.size) || sp.sz || 0,
+            onDrive: function (id) { sp.gd = String(id); if (o.onDrive) o.onDrive(String(id)); },
             getFile: function () {
               return file ? Promise.resolve(file) : window.GardenPdfDoc.get(hh);
             }

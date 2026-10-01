@@ -74,6 +74,13 @@
   }
 
   function A() { return window.GardenNotesApp || null; }
+  function gdOn() { return !!(window.GardenEndpoints && window.GardenEndpoints.googleClientId); }
+  function GDv() {
+    var a = A();
+    if (window.GardenDrive) return Promise.resolve(window.GardenDrive);
+    return a && a.needDrive ? a.needDrive() : Promise.reject(new Error('no-drive'));
+  }
+  function courseOf() { var a = A(); try { return (a && a.course && a.course()) || ''; } catch (e) { return ''; } }
   function PD() { return window.GardenPdfDoc || null; }
   function F() { return window.GardenFiles || null; }
   function RC() { return window.GardenAudioRec || null; }
@@ -865,6 +872,8 @@
     return L('تسجيل ', 'Recording ') + when(it.s0 || it.t);
   }
   function gWhere(g) {
+    if (g.parts.some(function (p) { return gdBusy[p.i]; })) return 'gdup';
+    if (g.parts.every(function (p) { return p.gd; })) return 'gd';
     if (g.parts.every(function (p) { return p.aup; })) return 'us';
     if (g.parts.some(function (p) { return up.busy[p.i]; })) return 'up';
     if (g.parts.some(function (p) { return p.upE; })) return 'err';
@@ -878,6 +887,37 @@
   function fileName(it) {
     var ext = /ogg/.test(it.m) ? '.ogg' : (/mp4|m4a|aac/.test(it.m) ? '.m4a' : '.webm');
     return (it.nm || it.n || 'recording').replace(/[\\/:*?"<>|]+/g, ' ').slice(0, 80) + ext;
+  }
+
+  /*@3.NOAJ3.4*/
+  var gdBusy = Object.create(null);
+  function toDrive(parts, nid, name) {
+    var n = parts.length;
+    return GDv().then(function (GD) {
+      var chain = Promise.resolve();
+      parts.forEach(function (it, k) {
+        chain = chain.then(function () {
+          if (it.gd) return null;
+          gdBusy[it.i] = 1;
+          paintRows();
+          return blobOf(it).then(function (blob) {
+            if (!blob) throw Object.assign(new Error('gone'), { code: 'gone' });
+            var base = fileName(Object.assign({}, it, { nm: name || it.nm }));
+            var nm = n > 1 ? base.replace(/(\.[a-z0-9]+)$/i, ' — ' + (k + 1) + '$1') : base;
+            return GD.upload(blob, { name: nm, mime: it.m || blob.type || 'audio/webm', sha: it.i, kind: 'aud', course: courseOf() });
+          }).then(function (r) {
+            delete gdBusy[it.i];
+            it.gd = r.id;
+            return withDoc(nid, function (list) { list.forEach(function (x) { if (x.i === it.i) x.gd = r.id; }); });
+          }, function (e) {
+            delete gdBusy[it.i];
+            paintRows();
+            throw e;
+          });
+        });
+      });
+      return chain.then(function () { paintRows(); paintMic(); });
+    });
   }
 
   function enqueue(it, nid) {
@@ -980,6 +1020,13 @@
     return blobOf(it).then(function (b) {
       if (b) return URL.createObjectURL(b);
       if (it.aup && F() && F().link) return F().link(it.i).then(function (l) { return l.url; });
+      if (it.gd && gdOn()) {
+        return GDv().then(function (GD) { return GD.download(it.gd); }).then(function (bl) {
+          var b2 = new Blob([bl], { type: it.m || bl.type || 'audio/webm' });
+          mem[it.i] = b2;
+          return URL.createObjectURL(b2);
+        });
+      }
       throw new Error('gone');
     });
   }
@@ -1612,6 +1659,8 @@
   }
 
   function whereText(w, g) {
+    if (w === 'gd') return '<i class="fa-brands fa-google-drive nau-gd" aria-hidden="true"></i>' + T('في درايفك', 'In your Drive');
+    if (w === 'gdup') return '<i class="fa-brands fa-google-drive nau-gd" aria-hidden="true"></i>' + T('يُرفع إلى درايفك…', 'Uploading to your Drive…');
     if (w === 'us') return '<i class="fa-solid fa-cloud" aria-hidden="true"></i>' + T('عندنا', 'With us');
     if (w === 'here') return '<i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>' + T('هذا الجهاز', 'This device');
     if (w === 'up') {
@@ -1860,6 +1909,7 @@
     var inp = d.querySelector('.nau-name');
     if (inp) { try { inp.focus(); inp.select(); } catch (e) {} }
     cloudState().then(function (s) { if (ask && dlg === d) { ask.cloud = s; renderAsk(true); } });
+    if (gdOn()) GDv().then(function (GD) { GD.warm(); }, function () {});
   }
 
   function renderAsk(keepInput) {
@@ -1872,8 +1922,8 @@
     var cs = ask.cloud;
     var opt = function (v, icon, ar, en, subAr, subEn, off) {
       var on = ask.dest === v;
-      return '<button type="button" class="nau-opt" data-au="dest" data-v="' + v + '" aria-pressed="' + on + '"' + (off ? ' disabled' : '') + '>' +
-        '<i class="fa-solid ' + icon + '" aria-hidden="true"></i><span><b>' + T(ar, en) + '</b><span>' + T(subAr, subEn) + '</span></span></button>';
+      return '<button type="button" class="nau-opt' + (v === 'gd' ? ' nau-opt--gd' : '') + '" data-au="dest" data-v="' + v + '" aria-pressed="' + on + '"' + (off ? ' disabled' : '') + '>' +
+        '<i class="' + (icon.indexOf('fa-brands') === 0 ? icon : 'fa-solid ' + icon) + '" aria-hidden="true"></i><span><b>' + T(ar, en) + '</b><span>' + T(subAr, subEn) + '</span></span></button>';
     };
     var shut0 = !!(cs && !cs.ok && CLOSED.test(cs.why || ''));
     var usOff = !cs || !cs.ok;
@@ -1898,6 +1948,9 @@
         (shut0 ? '' :
         '<p class="nau-q">' + T('أين نحفظ نسخةً تفتحها على أجهزتك؟', 'Where should we keep a copy you can open on your devices?') + '</p>' +
         '<div class="nau-opts">' +
+        (gdOn() ? opt('gd', 'fa-brands fa-google-drive', 'في درايفي', 'In my Drive',
+            'الخيارُ الأفضل لك: يبقى دائماً بجودته كاملة، بلا ضغطٍ ولا حذفٍ حين تمتلئ مساحتُنا — في مجلّد Digital Garden.',
+            'The best choice for you: it stays for good at full quality, never squeezed or deleted when our space fills — in the Digital Garden folder.', false) : '') +
         opt('us', 'fa-cloud', 'عندنا', 'With us', usSub[0], usSub[1], usOff) +
         opt('here', 'fa-mobile-screen', 'هذا الجهاز فقط', 'This device only',
             'لا يخرج من جهازك، ولا تجده على جهازك الآخر.', 'It never leaves your device, and you will not find it on your other device.', false) +
@@ -1939,7 +1992,7 @@
     return w.pick === 'mk' ? w.mk : (w.pick === 'fs' ? w.fs : 0);
   }
 
-  function pickDest(v) { if (ask) { ask.dest = v === 'us' ? 'us' : 'here'; renderAsk(); } }
+  function pickDest(v) { if (ask) { ask.dest = v === 'us' ? 'us' : (v === 'gd' ? 'gd' : 'here'); renderAsk(); } }
 
   function applyAsk(dest) {
     var a = ask;
@@ -1972,6 +2025,24 @@
 
   function saveAsked() {
     var dest = ask ? ask.dest : 'here';
+    if (dest === 'gd') {
+      var a = ask, nm0 = dlg && dlg.querySelector('.nau-name');
+      var name = ((nm0 ? nm0.value : a.name) || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      var tokP = window.GardenDrive ? window.GardenDrive.token(true) : GDv().then(function (GD) { return GD.token(true); });
+      var p0 = applyAsk('here');
+      shut();
+      return Promise.all([p0, tokP]).then(function () {
+        var src = a.nid === curId() ? items(curDoc()) : a.parts;
+        var ids = a.parts.map(function (x) { return x.i; });
+        return toDrive(src.filter(function (x) { return ids.indexOf(x.i) >= 0; }), a.nid, name);
+      })['catch'](function (e) {
+        paintRows();
+        var GD = window.GardenDrive;
+        var why = GD ? GD.reason(e) : T('تعذّر الحفظُ في درايف.', 'Could not save to Drive.');
+        var b = A();
+        if (b && b.toast) b.toast(why);
+      });
+    }
     var p = applyAsk(dest);
     shut();
     return p;

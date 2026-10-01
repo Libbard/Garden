@@ -121,20 +121,20 @@
   function paint() {
     var b = btn();
     if (!b) return;
-    var on = !!(cur && cur.ok);
+    var on = !!(cur && (cur.ok || cur.drive));
     b.hidden = !on;
     if (!on) {
       ['data-home', 'data-busy', 'data-new'].forEach(function (k) { b.removeAttribute(k); });
       return;
     }
-    var us = !!cur.row;
-    b.setAttribute('data-home', us ? 'us' : 'here');
+    var us = !!cur.row, gd = !!cur.gd;
+    b.setAttribute('data-home', gd ? 'drive' : (us ? 'us' : 'here'));
     if (busy) b.setAttribute('data-busy', '1'); else b.removeAttribute('data-busy');
-    if (cur.nu && !us) b.setAttribute('data-new', '1'); else b.removeAttribute('data-new');
+    if (cur.nu && !us && !gd) b.setAttribute('data-new', '1'); else b.removeAttribute('data-new');
     var i = b.querySelector('i');
-    if (i) i.className = 'fa-solid ' + (us ? 'fa-cloud' : 'fa-cloud-arrow-up');
-    var ar = busy ? 'يُرفع الملفّ…' : (us ? 'نسخةُ الملفّ محفوظةٌ عندنا' : 'احفظْ نسخةً من الملفّ عندنا');
-    var en = busy ? 'Uploading the file…' : (us ? 'A copy of the file is kept with us' : 'Keep a copy of the file with us');
+    if (i) i.className = gd ? 'fa-brands fa-google-drive' : ('fa-solid ' + (us ? 'fa-cloud' : 'fa-cloud-arrow-up'));
+    var ar = busy ? 'يُرفع الملفّ…' : (gd ? 'نسخةُ الملفّ في درايفك' : (us ? 'نسخةُ الملفّ محفوظةٌ عندنا' : 'أين نحفظ الملفّ؟'));
+    var en = busy ? 'Uploading the file…' : (gd ? 'A copy of the file is in your Drive' : (us ? 'A copy of the file is kept with us' : 'Where should we keep the file?'));
     b.setAttribute('aria-label', L(ar, en));
     b.setAttribute('data-ar-title', ar);
     b.setAttribute('data-en-title', en);
@@ -224,28 +224,63 @@
       esc(L('نسأل عنه…', 'Checking…')) + '</p>');
   }
 
+  /*@3.NOPJ12.1*/
+  var BIG_US = 40 * 1024 * 1024;
+  function where() {
+    var c = String((cur && cur.course) || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return 'Digital Garden / ' + (c || 'General') + ' / PDF';
+  }
+  function opt(a, icon, title, sub, mod, chip, off) {
+    return '<button type="button" class="npc-opt' + (mod ? ' npc-opt--' + mod : '') + '" data-a="' + a + '"' + (off ? ' disabled' : '') + '>' +
+      '<i class="' + icon + '" aria-hidden="true"></i><span class="npc-opt-t"><b>' + esc(title) + '</b>' +
+      (sub ? '<small>' + sub + '</small>' : '') + '</span>' + (chip ? '<em class="npc-chip">' + esc(chip) + '</em>' : '') + '</button>';
+  }
+  function driveOpt() {
+    if (!cur || !cur.drive) return '';
+    return opt('drive', 'fa-brands fa-google-drive', L('في درايفي', 'In my Drive'),
+      esc(L('يبقى دائماً، بلا ضغطٍ ولا حذف، ويفتح على كلِّ أجهزتك.', 'It stays for good, never squeezed or deleted, and opens on all your devices.')) +
+      ' <span class="npc-path" dir="ltr">' + esc(where()) + '</span>', 'gd', L('ننصح به', 'Recommended'));
+  }
+  function usOpt(a, title) {
+    var big = cur && cur.size > BIG_US;
+    var shut = !(cur && cur.ok);
+    var sub = shut ? esc(L('حفظُ الملفّاتِ عندنا لم يُفتح لحسابك بعد.', 'Keeping files with us is not open to your account yet.'))
+      : (big ? esc(L('أكبرُ من ‎40 م.ب — مكانُه درايف.', 'Over 40 MB — Drive is the place for it.'))
+             : esc(L('نضمنه ثلاثةَ أيّام، ثمّ يُحذف الأقدمُ حين تمتلئ مساحتُنا.', 'We keep it three days; after that the oldest goes when our space fills.')));
+    return opt(a, 'fa-solid fa-cloud', title, sub, '', '', shut || big);
+  }
   function sayHere() {
-    view('here', L('على هذا الجهاز وحدَه', 'On this device only'),
-      '<p>' + esc(L('احفظْ نسخةً عندنا فيفتح الملفُّ على أجهزتك الأخرى برسمِك.',
-                    'Keep a copy with us and the file opens on your other devices, with your drawings.')) +
-      '</p>' + vow(),
-      button('later', L('ليس الآن', 'Not now'), 'ghost') +
-      button('keep', L('احفظْ نسخةً عندنا', 'Keep a copy with us'), 'go', 'fa-cloud-arrow-up'));
+    view('here', L('أين نحفظ هذا الملفّ؟', 'Where should we keep this file?'),
+      '<div class="npc-opts">' + driveOpt() +
+      usOpt('keep', L('عندكم', 'With you')) +
+      opt('later', 'fa-solid fa-laptop', L('على هذا الجهاز وحدَه', 'On this device only'),
+        esc(L('رسمُك يُزامَن، والملفُّ لا يُرفع.', 'Your drawings sync; the file is not uploaded.'))) + '</div>' +
+      (cur && cur.ok ? vow() : ''));
+  }
+
+  function sayGd() {
+    var link = 'https://drive.google.com/file/d/' + encodeURIComponent(cur.gd) + '/view';
+    view('drive', L('نسخةٌ في درايفك', 'A copy is in your Drive'),
+      '<p>' + esc(L('يفتح هذا الملفُّ على أجهزتك جميعاً من درايفك — باقٍ بلا ضغطٍ ولا حذف.',
+                    'This file opens on all your devices from your Drive — kept for good, never squeezed or deleted.')) + '</p>' +
+      '<p class="npc-path" dir="ltr">' + esc(where()) + '</p>',
+      '<a class="gsf-btn gsf-btn--ghost" href="' + esc(link) + '" target="_blank" rel="noopener"><i class="fa-brands fa-google-drive" aria-hidden="true"></i><span>' +
+        esc(L('افتحْه في درايف', 'Open it in Drive')) + '</span></a>');
   }
 
   function sayHave(hit) {
     var n = hit && Number(hit.stored_bytes) || 0;
-    view('have', L('هذا الملفُّ عندنا سلفاً', 'We already have this file'),
-      '<p>' + esc(L('اربطْه بحسابك فيفتح على أجهزتك — بلا رفع',
-                    'Link it to your account and it opens on your devices — no upload')) +
-      (n ? ' · ' + num(size(n)) : '') + '</p>' + vow(),
-      button('later', L('ليس الآن', 'Not now'), 'ghost') +
-      button('link', L('اربطْه', 'Link it'), 'go', 'fa-link'));
+    view('have', L('أين نحفظ هذا الملفّ؟', 'Where should we keep this file?'),
+      '<div class="npc-opts">' + driveOpt() +
+      opt('link', 'fa-solid fa-link', L('عندكم — موجودٌ سلفاً', 'With you — already there'),
+        esc(L('اربطْه بحسابك فيفتح على أجهزتك بلا رفع', 'Link it to your account and it opens on your devices, no upload')) + (n ? ' · ' + num(size(n)) : '')) +
+      opt('later', 'fa-solid fa-laptop', L('على هذا الجهاز وحدَه', 'On this device only'),
+        esc(L('رسمُك يُزامَن، والملفُّ لا يُرفع.', 'Your drawings sync; the file is not uploaded.'))) + '</div>' + vow());
   }
 
   function sayUp() {
     var pc = Math.round(prog * 100);
-    var d = view('up', L('يُرفع الملفّ', 'Uploading the file'),
+    var d = view('up', busy === 'gd' ? L('يُرفع إلى درايفك', 'Uploading to your Drive') : L('يُرفع الملفّ', 'Uploading the file'),
       '<div class="npc-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' +
       pc + '"><span style="--p:' + pc + '%"></span></div>' +
       '<p><b class="npc-pc">' + num(pc + '%') + '</b> · ' +
@@ -402,12 +437,14 @@
     markSeen(mine.h);
     paint();
     if (busy) { sayUp(); return true; }
+    if (mine.gd) { sayGd(); return true; }
     var f = F();
-    if (!f) { bad(excuse(''), L('نسخةُ هذا الملفّ', 'This file’s copy')); return true; }
+    if (!f) { if (mine.drive) sayHere(); else bad(excuse(''), L('نسخةُ هذا الملفّ', 'This file’s copy')); return true; }
     wait();
     f.state().then(function (a) {
       if (mine !== cur || !shown()) return;
-      if (!a.ok) { bad(excuse(a.why), L('نسخةُ هذا الملفّ', 'This file’s copy')); return; }
+      if (!a.ok) { if (mine.drive) { mine.ok = false; sayHere(); return; } bad(excuse(a.why), L('نسخةُ هذا الملفّ', 'This file’s copy')); return; }
+      mine.ok = true;
       var row = (a.files || []).filter(function (x) { return x.ref_id === refIdOf(mine.h); })[0];
       mine.row = row || null;
       mine.slim = slimPlan(row);
@@ -419,9 +456,43 @@
       });
     })['catch'](function (e) {
       if (mine !== cur || !shown()) return;
+      if (mine.drive) { mine.ok = false; sayHere(); return; }
       bad(reason(e));
     });
     return true;
+  }
+
+  function toDrive() {
+    var mine = cur;
+    if (!mine || !mine.drive) return;
+    grab().then(function (file) {
+      if (mine !== cur) return;
+      if (!file) { bad(L('تعذّرت قراءةُ الملفِّ من هذا الجهاز.', 'The file could not be read from this device.')); return; }
+      busy = 'gd'; prog = 0;
+      paint();
+      sayUp();
+      return Promise.resolve(mine.drive()).then(function (GD) {
+        return GD.token(true).then(function () {
+          return GD.upload(file, { name: mine.name || file.name || 'file.pdf', mime: 'application/pdf', sha: mine.h,
+            kind: 'pdf', course: mine.course, onProgress: function (at, of) { prog = of ? at / of : 0; tick(); } });
+        }).then(function (r) {
+          busy = false;
+          mine.gd = r.id;
+          emit('garden:fileDrive', { h: mine.h, id: r.id, name: r.name });
+          if (mine.onDrive) { try { mine.onDrive(r.id); } catch (e0) {} }
+          if (mine !== cur) return;
+          paint();
+          flash();
+          if (shown()) sayGd();
+        }, function (e) {
+          busy = false;
+          if (mine !== cur) return;
+          paint();
+          if (!shown()) open();
+          bad(GD.reason(e), L('لم يُحفظ في درايف', 'It was not saved to Drive'));
+        });
+      });
+    });
   }
 
   function grab() {
@@ -513,6 +584,7 @@
 
   function act(a) {
     if (a === 'later') { shut(); return; }
+    if (a === 'drive') { toDrive(); return; }
     if (a === 'keep' || a === 'link') { keep(false); return; }
     if (a === 'over') {
       var f0 = cur && cur.over;
@@ -530,7 +602,8 @@
     var f = F();
     if (!o || !o.h) return;
     var mine = cur = { h: o.h, name: o.name || '', getFile: o.getFile || null,
-                       ok: false, row: null, nu: false, slim: null };
+                       ok: false, row: null, nu: false, slim: null,
+                       gd: o.gd || null, drive: o.drive || null, course: o.course || '', size: o.size || 0, onDrive: o.onDrive || null };
     busy = false;
     prog = 0;
     paint();
