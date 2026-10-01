@@ -1119,9 +1119,29 @@
   var linking = null, linkSaid = 0;
   function linkOn() { return !!(linking && pl && linking.key === pl.key); }
   function setLink(on) {
-    linking = (on && pl) ? { key: pl.key } : null;
+    var an0 = null;
+    if (on && pl) {
+      var g0 = groups(items(curDoc())).filter(function (x) { return x.key === pl.key; })[0];
+      var p00 = g0 && g0.parts[0];
+      an0 = (p00 && Array.isArray(p00.an)) ? JSON.parse(JSON.stringify(p00.an)) : null;
+    }
+    linking = (on && pl) ? { key: pl.key, an0: an0 } : null;
     paintStrip(true);
     if (api.onLink) { try { api.onLink(linkOn()); } catch (e) {} }
+  }
+  /*@3.NOAJ3.1*/
+  function cancelLink() {
+    if (!linkOn()) { setLink(false); return; }
+    var key = linking.key, an0 = linking.an0;
+    withDoc(curId(), function (list) {
+      var head = groups(list).filter(function (x) { return x.key === key; })[0];
+      var p0 = head && head.parts[0];
+      if (!p0) return;
+      if (an0 && an0.length) p0.an = an0; else delete p0.an;
+    });
+    markMemo.k = ''; linkSaid = 0;
+    setLink(false);
+    paintLanes();
   }
   function anchor(ts) {
     if (!linkOn()) return null;
@@ -1161,14 +1181,20 @@
     var h = '<button type="button" class="nau-icb nau-icb--play" data-au="mini-toggle" aria-label="' +
       esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid ' + (pl.on ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i></button>' +
       '<span class="nau-t-cur nau-num">' + short(pos()) + '</span>' +
-      '<span class="nau-link-msg" role="status">' + (miss
+      '<span class="nau-link-tag"><i class="fa-solid fa-link" aria-hidden="true"></i>' + T('الربط', 'Linking') + '</span>' +
+      '<span class="nau-link-msg" role="status"' + (miss ? ' data-miss="1"' : '') + '>' + (miss
         ? T('لا رسمَ هنا — اضغطْ على خطٍّ مرسوم.', 'No drawing here — press on a drawn line.')
-        : '<b>' + T('الربط', 'Linking') + '</b> ' + T('— اسمع، ثمّ اضغط الرسمَ الذي قيل معه', '— listen, then press the drawing that was said with it')) + '</span>';
+        : T('اسمعْ، ثمّ اضغطِ الرسمَ الذي قيل معه', 'Listen, then press the drawing that was said with it')) + '</span>';
+    if (an.length) h += '<span class="nau-ans">';
     an.forEach(function (a, i) {
       h += '<button type="button" class="nau-an nau-num" data-au="an-del" data-i="' + i + '" aria-label="' +
         esc(L('احذفْ مرساة ', 'Remove anchor ') + short(a[0])) + '">' + short(a[0]) + ' <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
     });
-    return h + '<button type="button" class="gsf-btn gsf-btn--go nau-b" data-au="link-done">' + T('تمّ', 'Done') + '</button>';
+    if (an.length) h += '</span>';
+    return h + '<span class="nau-link-acts">' +
+      '<button type="button" class="gsf-btn gsf-btn--ghost nau-lb" data-au="link-cancel" aria-label="' +
+        esc(L('ألغِ ما ربطتَه الآن وارجعْ إلى التسجيل', 'Undo these links and go back to the recording')) + '">' + T('إلغاء', 'Cancel') + '</button>' +
+      '<button type="button" class="gsf-btn nau-lb nau-lb--done" data-au="link-done"><i class="fa-solid fa-check" aria-hidden="true"></i>' + T('تمّ', 'Done') + '</button></span>';
   }
   function playAt(key, sec) {
     var g = groups(items(curDoc())).filter(function (x) { return x.key === key; })[0];
@@ -1615,6 +1641,7 @@
     if (a === 'mark') { goMark(b); return; }
     if (a === 'link-on') { setLink(true); return; }
     if (a === 'link-done') { setLink(false); return; }
+    if (a === 'link-cancel') { cancelLink(); return; }
     if (a === 'an-del') { dropAnchor(+b.getAttribute('data-i')); return; }
     var g = key ? groupByKey(key) : null;
     if (a === 'start') { start(); return; }

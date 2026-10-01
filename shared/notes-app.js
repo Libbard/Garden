@@ -2468,7 +2468,7 @@
 
   function expTotalPages() {
     var n = 1;
-    try { n = growPages(); } catch (e) {}
+    try { n = contentPages(); } catch (e) {}
     return Math.max(1, n | 0);
   }
 
@@ -3261,7 +3261,7 @@
     pm.land = false;
     pm.pageW = Math.round(pageWpx());
     pm.pageH = Math.round(pageH());
-    pm.pages = growPages();
+    pm.pages = contentPages();
     /*@3.NOAJ.321*/
     paperInto(pm);
     pm.css = printCss();
@@ -6369,6 +6369,12 @@
     applyPages(Math.max(1, Math.max(neededPages(), manualPages())));
   }
 
+  /*@3.NOAJ.441*/
+  function contentPages() {
+    growPages();
+    return Math.max(1, neededPages());
+  }
+
   /*@3.NOAJ.25*/
   function growPages(min) {
     /*@3.NOAJ.92*/
@@ -7230,7 +7236,8 @@
     alignRules();
     applyFs();
     if (ed && ed.layoutFree) { try { ed.layoutFree(); } catch (e) {} }
-    applyPages(Math.max(1, neededPages()));
+    /*@3.NOAJ.442*/
+    applyPages(Math.max(1, neededPages(), ed && ed.doc ? manualPages() : 1));
     if (overlay && overlay.fit) { try { overlay.fit(); } catch (e) {} }
   }
 
