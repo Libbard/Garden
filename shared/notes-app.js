@@ -635,8 +635,9 @@
     if (rev) rev.hidden = !on;
     if (link && on) link.value = shareUrl(shareCur.sid);
     if (mk) {
-      var ar = on ? 'حدِّثِ اللقطة' : 'أنشئ الرابط';
-      var en = on ? 'Refresh snapshot' : 'Create link';
+      var up0 = sharePdf() && !on && shareUp !== true;
+      var ar = on ? 'حدِّثِ اللقطة' : (up0 ? 'ارفعِ الملفَّ وأنشئ الرابط' : 'أنشئ الرابط');
+      var en = on ? 'Refresh snapshot' : (up0 ? 'Upload the file and create the link' : 'Create link');
       mk.textContent = L(ar, en);
       mk.setAttribute('data-ar', ar);
       mk.setAttribute('data-en', en);
@@ -645,6 +646,172 @@
     [].forEach.call(dlg.querySelectorAll('[data-shmode]'), function (b) {
       b.setAttribute('aria-pressed', b.getAttribute('data-shmode') === mode ? 'true' : 'false');
     });
+    paintSharePdf(dlg);
+  }
+
+  /*@3.NOAJ.446*/
+  var shareUp = null, dropArm = 0;
+  function sharePdf() { return !!(edId && liveDoc && liveDoc.kind === 'pdf' && liveDoc.pdf && liveDoc.pdf.h); }
+  function sharePdfRef() {
+    var h = liveDoc.pdf.h;
+    return window.GardenPdfCloud ? GardenPdfCloud.refIdOf(h) : ('pdf_' + String(h).slice(0, 40));
+  }
+  function shareTxt(el, ar, en) {
+    if (!el) return;
+    el.setAttribute('data-ar', ar);
+    el.setAttribute('data-en', en);
+    el.textContent = L(ar, en);
+  }
+  function paintSharePdf(dlg) {
+    var on = sharePdf();
+    var box = dlg.querySelector('[data-role="pdf"]');
+    if (box) box.hidden = !on;
+    var t = dlg.querySelector('#na-share-t'), sub = dlg.querySelector('.gsf-head .gsf-sub');
+    if (on) {
+      shareTxt(t, 'مشاركة الملفّ', 'Share this file');
+      shareTxt(sub, 'يُنشأ رابطٌ يفتح الملفَّ ورسوماتِك عليه كما هي الآن.',
+        'A link is created that opens the file with your drawings as they are now.');
+    } else {
+      shareTxt(t, 'مشاركة الملاحظة', 'Share this note');
+      shareTxt(sub, 'يُنشَأ رابطٌ قصيرٌ يحمل لقطةً من الملاحظة كما هي الآن.',
+        'A short link is created carrying a snapshot of the note as it is now.');
+    }
+    var df = dlg.querySelector('[data-role="dropfile"]');
+    if (df) {
+      df.hidden = !(on && shareUp === true);
+      if (!dropArm) shareTxt(df, 'احذفْ نسختَه من عندكم', 'Delete the copy from your server');
+    }
+    if (!on) return;
+    var p = liveDoc.pdf;
+    var fn = dlg.querySelector('[data-role="fname"]');
+    if (fn) fn.textContent = p.n || L('ملفُّ PDF', 'PDF file');
+    var fs = dlg.querySelector('[data-role="fsub"]');
+    var sz = (window.GardenPdfOpen && p.sz) ? GardenPdfOpen.size(p.sz) + ' · ' : '';
+    if (fs) {
+      fs.textContent = sz + (shareUp === true ? L('نسختُه عندنا', 'A copy is with us')
+        : (shareUp === false ? L('على جهازك فقط', 'On your device only') : L('يُقرأ…', 'Checking…')));
+    }
+    var vow = dlg.querySelector('[data-role="vow"]');
+    if (vow) vow.hidden = shareUp === true;
+  }
+  function shareBar(f) {
+    var b = document.querySelector('#na-share [data-role="bar"]');
+    if (!b) return;
+    b.hidden = f == null;
+    var i = b.firstElementChild;
+    if (i && f != null) i.style.inlineSize = Math.round(Math.max(0, Math.min(1, f)) * 100) + '%';
+  }
+  function shareUpWhy(e) {
+    var c = (e && (e.error || e.message)) || '';
+    if (c === 'no_local') return L('الملفُّ ليس على هذا الجهاز — افتحْه هنا أوّلاً ثمّ شارِكْه.', 'The file is not on this device — open it here first, then share it.');
+    if (c === 'too_large' || c === 'over_exhausted') return L('الملفُّ أكبرُ من حدِّ الرفع إلى خادمنا — احفظْه في درايفك وشارِكه من هناك.', 'The file is over our upload limit — save it to your Drive and share it from there.');
+    if (c === 'vault_full') return L('مساحتُك عندنا ممتلئة — احذفْ ملفّاتٍ قديمةً من زرِّ السحابة ثمّ أعد المحاولة.', 'Your space with us is full — delete old files from the cloud button, then try again.');
+    if (c === 'not_found' || c === 'files_not_configured') return L('رفعُ الملفّات إلى خادمنا لم يُفتح لحسابك بعد — فلا رابطَ لهذا الملفّ الآن.', 'Uploading files to our server is not open for your account yet, so this file cannot get a link now.');
+    if (c === 'no_vault' || c === 'locked') return L('فعّلِ المزامنةَ أوّلاً لتشاركَ ملفّاتِك.', 'Turn sync on first to share your files.');
+    return L('تعذّر رفعُ الملفّ — تحقّقْ من الاتّصال وأعد المحاولة.', 'The file could not be uploaded — check your connection and try again.');
+  }
+  function shareCheckUp(want) {
+    shareUp = null;
+    var F = window.GardenFiles;
+    if (!F || !sharePdf()) return;
+    var ref = sharePdfRef();
+    F.state().then(function (a) {
+      if (edId !== want) return;
+      shareUp = !!(a.ok && (a.files || []).some(function (x) { return x.ref_id === ref; }));
+      paintShare();
+    }, function () { if (edId === want) { shareUp = false; paintShare(); } });
+  }
+  function shareMakePdf(mode) {
+    var Sy = window.GardenNotesSync, F = window.GardenFiles;
+    var want = edId, doc = liveDoc, p = doc.pdf;
+    var rec = idxFind(want);
+    var dlg = document.getElementById('na-share');
+    var mk = dlg && dlg.querySelector('[data-role="make"]');
+    if (mk) mk.disabled = true;
+    var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
+    var up = shareUp === true ? Promise.resolve(true) : (function () {
+      if (!F || !window.GardenPdfDoc) return Promise.reject({ error: 'not_found' });
+      shareSay('', L('يُرفع الملفّ…', 'Uploading the file…'));
+      shareBar(0);
+      return GardenPdfDoc.get(p.h).then(function (file) {
+        if (!file) throw { error: 'no_local' };
+        var ref = sharePdfRef();
+        var on = function (e) {
+          var d = e.detail || {};
+          if (d.ref_id !== ref) return;
+          if (d.stage === 'upload' && d.of) shareBar(d.at / d.of);
+          if (d.stage === 'deduped' || d.stage === 'commit') shareBar(1);
+        };
+        window.addEventListener('garden:fileProgress', on);
+        return F.upload(file, { refId: ref, name: p.n || file.name || 'file.pdf', mime: 'application/pdf',
+                                course: (rec && rec.o && rec.o.c) || null })
+          .then(function () {
+            window.removeEventListener('garden:fileProgress', on);
+            shareUp = true;
+            return true;
+          }, function (e) { window.removeEventListener('garden:fileProgress', on); throw e; });
+      });
+    }());
+    up.then(function () {
+      return (ik && ik.bundle) ? ik.bundle()['catch'](function () { return null; }) : null;
+    }).then(function (b) {
+      if (b) doc.marks = b;
+      shareSay('', L('يُرسَل…', 'Sending…'));
+      var snap = { v: 1, kind: 'pdf', pdf: { h: p.h, n: p.n || '', sz: p.sz || 0, pg: p.pg || 0 },
+                   marks: doc.marks || null, blocks: [] };
+      return Sy.shareSet(want, snap, (rec && rec.t) || p.n || '', mode || (shareCur && shareCur.mode) || 'view');
+    }).then(function (r) {
+      if (mk) mk.disabled = false;
+      shareBar(null);
+      if (edId !== want) return;
+      if (!r.ok) {
+        paintShare();
+        shareSay('warn', r.status === 413
+          ? L('الرسوماتُ على الملفّ أكبرُ من حدِّ المشاركة.', 'The drawings on this file are over the share size limit.')
+          : L('تعذّر إنشاءُ الرابط.', 'The link could not be created.'));
+        return;
+      }
+      shareCur = { sid: r.sid, mode: r.mode, views: (shareCur && shareCur.views) || 0 };
+      shareKnow(want, true, r.mode);
+      paintShare();
+      shareSay('ok', r.created ? L('أُنشئ الرابط.', 'Link created.') : L('حُدِّثت اللقطة.', 'Snapshot refreshed.'));
+    }, function (e) {
+      if (mk) mk.disabled = false;
+      shareBar(null);
+      if (edId !== want) return;
+      paintShare();
+      shareSay('warn', shareUpWhy(e));
+    });
+  }
+  function shareDropFile() {
+    var dlg = document.getElementById('na-share');
+    var btn = dlg && dlg.querySelector('[data-role="dropfile"]');
+    if (!dropArm) {
+      dropArm = setTimeout(function () { dropArm = 0; paintShare(); }, 5000);
+      shareTxt(btn, 'اضغطْ ثانيةً: يُبطَل الرابطُ وتُحذف النسخة', 'Press again: revokes the link and deletes the copy');
+      return;
+    }
+    clearTimeout(dropArm);
+    dropArm = 0;
+    var want = edId, F = window.GardenFiles, Sy = window.GardenNotesSync;
+    if (!F || !sharePdf()) return;
+    var ref = sharePdfRef();
+    shareSay('', L('يُحذف…', 'Deleting…'));
+    ((shareCur && shareCur.sid && Sy && Sy.shareDrop) ? Sy.shareDrop(want) : Promise.resolve({ ok: true }))
+      .then(function () { return F.remove(ref); })
+      .then(function (okd) {
+        if (!okd) throw new Error('drop_failed');
+        if (edId !== want) return;
+        shareUp = false;
+        shareCur = { sid: null, mode: (shareCur && shareCur.mode) || 'view' };
+        shareKnow(want, false, shareCur.mode);
+        paintShare();
+        shareSay('ok', L('حُذفت نسختُه من عندنا وأُبطل الرابط.', 'The copy was deleted from our server and the link revoked.'));
+      })['catch'](function () {
+        if (edId !== want) return;
+        paintShare();
+        shareSay('warn', L('لم يقبل الخادمُ الحذفَ الآن — أعد المحاولة.', 'The server did not accept the delete — please try again.'));
+      });
   }
 
   function openShare() {
@@ -660,6 +827,9 @@
       return;
     }
     var want = edId;
+    if (dropArm) { clearTimeout(dropArm); dropArm = 0; }
+    shareBar(null);
+    shareCheckUp(want);
     Sy.shareState(want).then(function (r) {
       if (edId !== want) return;
       if (!r.ok) {
@@ -680,6 +850,7 @@
 
   function shareMake(mode) {
     var Sy = window.GardenNotesSync;
+    if (Sy && Sy.shareSet && sharePdf()) { shareMakePdf(mode); return; }
     if (!Sy || !Sy.shareSet || !ed || !edId) return;
     var want = edId;
     var rec = idxFind(want);
@@ -762,6 +933,7 @@
       }
       if (e.target.closest('[data-role="make"]')) { shareMake(); return; }
       if (e.target.closest('[data-role="revoke"]')) { shareRevoke(); return; }
+      if (e.target.closest('[data-role="dropfile"]')) { shareDropFile(); return; }
       if (e.target.closest('[data-role="copy"]')) {
         var inp = dlg.querySelector('[data-role="link"]');
         if (!inp || !inp.value) return;
@@ -803,6 +975,7 @@
       guestShare = { sid: sid, mode: r.mode, title: r.title, doc: r.doc };
       setMob('doc');
       if (els.docTitle) els.docTitle.value = r.title || '';
+      if (r.doc.kind === 'pdf' && r.doc.pdf && window.GardenPdfOpen) { openSharedPdf(sid, r); return; }
       var doc = window.GardenNotesBlocks.normalize(r.doc);
       var isBoard = doc.kind === 'board';
       els.docBody.innerHTML =
@@ -845,13 +1018,58 @@
     });
   }
 
+  /*@3.NOAJ.447*/
+  function openSharedPdf(sid, r) {
+    var Sy = window.GardenNotesSync;
+    if (els.app) els.app.setAttribute('data-kind', 'pdf');
+    showGuestBar(r);
+    GardenPdfOpen.open(els.docBody, r.doc.pdf, {
+      scroller: els.docBody,
+      room: widthRoom,
+      marks: r.doc.marks || null,
+      noteId: 'share:' + sid,
+      stamp: function (n, of) { return isAr() ? (n + ' من ' + of) : (n + ' of ' + of); },
+      share: function (onPct) {
+        return Sy.shareFile(sid).then(function (f) {
+          if (!f.ok) {
+            if (f.status === 404) return null;
+            throw new Error(f.why || 'fetch');
+          }
+          return fetch(f.url).then(function (res) {
+            if (!res.ok) throw new Error('download_' + res.status);
+            var total = Number(res.headers.get('content-length') || f.bytes || 0);
+            var done = function (blob) {
+              var file = new File([blob], f.name || 'shared.pdf', { type: 'application/pdf' });
+              guestShare.file = file;
+              return file;
+            };
+            if (!res.body || !res.body.getReader) return res.blob().then(done);
+            var rd = res.body.getReader(), parts = [], got = 0;
+            var pump = function () {
+              return rd.read().then(function (s) {
+                if (s.done) return done(new Blob(parts));
+                parts.push(s.value);
+                got += s.value.length;
+                if (total && onPct) onPct(Math.round(got * 100 / total));
+                return pump();
+              });
+            };
+            return pump();
+          });
+        });
+      }
+    });
+    saveState('', '');
+  }
+
   function showGuestBar(r) {
     var bar = document.createElement('div');
     bar.className = 'na-guest-bar';
     bar.innerHTML =
       '<i class="fa-solid fa-share-nodes" aria-hidden="true"></i>' +
-      '<span>' + esc(L('ملاحظةٌ شاركها معك أحدُهم — أنت تقرؤها فقط.',
-                       'A note someone shared with you — you are reading it only.')) + '</span>' +
+      '<span>' + esc(r.doc && r.doc.kind === 'pdf'
+        ? L('ملفٌّ شاركه معك أحدُهم برسوماته — أنت تقرؤه فقط.', 'A file someone shared with you, with their drawings — you are reading it only.')
+        : L('ملاحظةٌ شاركها معك أحدُهم — أنت تقرؤها فقط.', 'A note someone shared with you — you are reading it only.')) + '</span>' +
       (r.mode === 'copy'
         ? '<button type="button" class="na-guest-copy">' +
           esc(L('انسخْها إلى ملاحظاتي', 'Copy into my notes')) + '</button>'
@@ -869,14 +1087,18 @@
     if (!guestShare || !guestShare.doc) return;
     var id = newId('rn');
     var now = Date.now();
+    var isPdf = guestShare.doc.kind === 'pdf';
     var rec = { id: id, t: guestShare.title || L('ملاحظةٌ مشتركة', 'Shared note'),
-                k: guestShare.doc.kind === 'board' ? 'board' : 'rich',
+                k: isPdf ? 'pdf' : (guestShare.doc.kind === 'board' ? 'board' : 'rich'),
                 o: {}, g: [], c: null, f: null, p: 0, a: 0,
                 ca: now, updated_at: now, sz: 0 };
     idxPut(rec);
     var St = window.GardenNotesStore;
     var go = function () { location.href = location.pathname + '?id=' + encodeURIComponent(id); };
-    if (St) putBorn(id, guestShare.doc, now).then(go, go); else go();
+    var keep = (isPdf && guestShare.file && window.GardenPdfDoc)
+      ? GardenPdfDoc.put(guestShare.doc.pdf.h, guestShare.file, { name: guestShare.file.name || '' })['catch'](function () {})
+      : Promise.resolve();
+    if (St) keep.then(function () { return putBorn(id, guestShare.doc, now); }).then(go, go); else go();
   }
 
   /*@3.NOAJ.112*/
@@ -1185,7 +1407,14 @@
 
   function setDocActions(on) {
     var shb = document.getElementById('na-share-btn');
-    if (shb) shb.disabled = !on;
+    if (shb) {
+      shb.disabled = !on;
+      if (!shb.__t0) shb.__t0 = [shb.getAttribute('aria-label') || '', shb.getAttribute('data-ar-title') || '', shb.getAttribute('data-en-title') || ''];
+      shb.setAttribute('aria-label', shb.__t0[0]);
+      shb.setAttribute('data-ar-title', shb.__t0[1]);
+      shb.setAttribute('data-en-title', shb.__t0[2]);
+      shb.title = L(shb.__t0[1], shb.__t0[2]);
+    }
     /*@3.NOAJ.143*/
     var rb0 = document.getElementById('na-remind-btn');
     if (rb0) rb0.disabled = !on;
@@ -4729,13 +4958,11 @@
     var shb2 = document.getElementById('na-share-btn');
     /*@3.NOAJ.258*/
     if (shb2) {
-      shb2.disabled = true;
-      shb2.title = L('ملفُّ الـPDF يبقى على جهازك ولا يُرفع — فلا رابطَ مشاركةٍ له.',
-        'The PDF stays on your device and is never uploaded, so it has no share link.');
-      shb2.setAttribute('data-ar-title',
-        'ملفُّ الـPDF يبقى على جهازك ولا يُرفع — فلا رابطَ مشاركةٍ له.');
-      shb2.setAttribute('data-en-title',
-        'The PDF stays on your device and is never uploaded, so it has no share link.');
+      shb2.disabled = false;
+      shb2.title = L('شارِكِ الملفَّ ورسوماتِك برابط', 'Share the file and your drawings with a link');
+      shb2.setAttribute('aria-label', L('مشاركة الملفّ', 'Share the file'));
+      shb2.setAttribute('data-ar-title', 'شارِكِ الملفَّ ورسوماتِك برابط');
+      shb2.setAttribute('data-en-title', 'Share the file and your drawings with a link');
     }
     /*@3.NOAJ.253*/
     var ihb = document.getElementById('na-inkhide');

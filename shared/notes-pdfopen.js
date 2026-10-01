@@ -404,7 +404,7 @@
         st.h = h.handle;
         st.total = h.pages;
         build();
-        if (hh && window.GardenPdfCloud) {
+        if (hh && window.GardenPdfCloud && !o.share) {
           window.GardenPdfCloud.offer({
             h: hh, name: sp.n || (file && file.name) || '',
             gd: sp.gd || null, drive: o.driveSave || null, course: o.course || '',
@@ -688,7 +688,26 @@
       st.usHook = null;
     }
 
-    if (o.pre) show(null, o.pre, sp.h || '');
+    /*@3.NOPJ5.39*/
+    function fromShare() {
+      var say = L('يُجلب الملفُّ المشترك… ', 'Fetching the shared file… ');
+      busy(say.trim());
+      o.share(function (pct) {
+        var p = stage.querySelector('.npo-msg');
+        if (p) p.textContent = say + pct + '%';
+      }).then(function (file) {
+        if (st.dead) return;
+        if (file) { show(file, null, null); return; }
+        ask(L('صاحبُ الملفِّ حذفه من عندنا، فلم يعد الرابطُ يحمله. إن كان عندك الملفُّ نفسُه فاخترْه لترى الرسومَ عليه.',
+              'Its owner removed the file from our server, so the link no longer carries it. If you have the same file, pick it to see the drawings on it.'));
+      }, function () {
+        if (!st.dead) ask(L('تعذّر جلبُ الملفِّ الآن — أعد فتحَ الرابط بعد قليل، أو اخترْ نسختَك منه.',
+                            'The file could not be fetched right now — open the link again shortly, or pick your own copy.'));
+      });
+    }
+
+    if (o.share) fromShare();
+    else if (o.pre) show(null, o.pre, sp.h || '');
     else if (!sp.h || !window.GardenPdfDoc) ask();
     else {
       busy(L('يُفتح الملفّ…', 'Opening the file…'));

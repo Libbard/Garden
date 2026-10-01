@@ -387,6 +387,16 @@
     });
   }
 
+  /*@3.NOSJ2.14*/
+  function shareFile(sid) {
+    if (!endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
+    return req('GET', endpoint() + '/v1/nshare/' + encodeURIComponent(sid) + '/file')
+      .then(function (r) {
+        if (!r.ok || !r.body || !r.body.url) return { ok: false, status: r.status, why: (r.body && r.body.error) || '' };
+        return { ok: true, url: r.body.url, name: r.body.name || '', bytes: r.body.bytes || 0 };
+      }, function () { return { ok: false, why: 'offline' }; });
+  }
+
   function shareRead(sid) {
     if (!endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
     return req('GET', endpoint() + '/v1/nshare/' + encodeURIComponent(sid))
@@ -405,6 +415,7 @@
     shareSet: shareSet,
     shareDrop: shareDrop,
     shareRead: shareRead,
+    shareFile: shareFile,
     pull: pull,
     remove: remove,
     schedule: schedule,
