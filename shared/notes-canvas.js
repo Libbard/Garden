@@ -1678,8 +1678,8 @@
     });
   };
 
-  Canvas.prototype.stampAt = function (cx, cy) {
-    var picked = this.selected(), ts = 0, i;
+  Canvas.prototype.stampAt = function (cx, cy, hitOnly) {
+    var picked = hitOnly ? [] : this.selected(), ts = 0, i;
     for (i = 0; i < picked.length; i++) {
       if (picked[i].ts > 0 && (!ts || picked[i].ts < ts)) ts = picked[i].ts;
     }

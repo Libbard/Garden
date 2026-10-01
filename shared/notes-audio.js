@@ -545,7 +545,7 @@
     if (live) return live.r.paused() ? 'held' : 'rec';
     if (cut) return 'cut';
     if (draft) return 'draft';
-    if (pl && au) return 'play';
+    if (pl && au) return linkOn() ? 'link' : 'play';
     return '';
   }
 
@@ -562,6 +562,7 @@
     if (m === 'rec' || m === 'held') s.innerHTML = liveHtml(m);
     else if (m === 'draft') s.innerHTML = draftHtml();
     else if (m === 'cut') s.innerHTML = cutHtml();
+    else if (m === 'link') s.innerHTML = linkHtml();
     else s.innerHTML = miniHtml();
     if (m === 'rec' || m === 'held') { var st = live.r.stats(); paintLive(st, m === 'held' ? 'held' : 'rec'); }
     if (m === 'play') paintMini();
@@ -660,6 +661,8 @@
       '<span class="nau-trk"><input class="nau-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="' + esc(L('موضعُ التشغيل', 'Playback position')) + '"><span class="nau-lane" hidden></span></span>' +
       '<span class="nau-t-all nau-num"></span>' +
       '<button type="button" class="nau-rate nau-num" data-au="rate" aria-label="' + esc(L('سرعةُ التشغيل', 'Playback speed')) + '">' + rate() + '×</button>' +
+      '<button type="button" class="nau-icb" data-au="link-on" aria-label="' + esc(L('اربطْ هذا التسجيلَ بالرسم', 'Link this recording to the drawing')) +
+      '" data-ar-title="اربطْ هذا التسجيلَ بالرسم" data-en-title="Link this recording to the drawing"><i class="fa-solid fa-link" aria-hidden="true"></i></button>' +
       '<button type="button" class="nau-icb" data-au="mini-close" aria-label="' + esc(L('أوقف التشغيل', 'Stop playback')) +
       '" data-ar-title="أوقف التشغيل" data-en-title="Stop playback"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
   }
@@ -999,10 +1002,34 @@
     return at <= ms + END_SLACK ? Math.min(at, ms) / 1000 : -1;
   }
   function momentAt(ts) { return momentIn(groups(items(curDoc())), ts); }
+  function anchorsOf(g) {
+    var a = g && g.parts[0] ? g.parts[0].an : null;
+    if (!Array.isArray(a)) return [];
+    return a.filter(function (x) { return x && x[1] > 0 && x[0] >= 0; })
+      .slice().sort(function (p, q) { return p[1] - q[1]; });
+  }
+  function secByAn(an, ts) {
+    var i, a, b, z = an[an.length - 1];
+    if (ts <= an[0][1]) return an[0][0] + (ts - an[0][1]) / 1000;
+    if (ts >= z[1]) return z[0] + (ts - z[1]) / 1000;
+    for (i = 1; i < an.length; i++) {
+      a = an[i - 1]; b = an[i];
+      if (ts <= b[1]) return a[0] + (b[1] > a[1] ? (ts - a[1]) / (b[1] - a[1]) : 0) * (b[0] - a[0]);
+    }
+    return -1;
+  }
   function momentIn(gs, ts) {
     var best = null;
+    if (!(ts > 0)) return null;
     gs.forEach(function (g) {
-      var before = 0;
+      var before = 0, an = anchorsOf(g);
+      if (an.length) {
+        var sa = secByAn(an, ts), tot = (g.ms || 0) / 1000, rk = an[0][1] - an[0][0] * 1000;
+        if (sa >= -END_SLACK / 1000 && sa <= tot + END_SLACK / 1000 && (!best || rk > best.s0)) {
+          best = { key: g.key, sec: Math.round(Math.max(0, Math.min(tot, sa)) * 10) / 10, s0: rk, title: gTitle(g) };
+        }
+        return;
+      }
       g.parts.forEach(function (p) {
         var s = secIn(p, ts);
         if (s >= 0 && (!best || p.s0 > best.s0)) {
@@ -1089,6 +1116,60 @@
     playAt(pl.key, c.sec);
     if (c.m.go) { try { c.m.go(); } catch (e) {} }
   }
+  var linking = null, linkSaid = 0;
+  function linkOn() { return !!(linking && pl && linking.key === pl.key); }
+  function setLink(on) {
+    linking = (on && pl) ? { key: pl.key } : null;
+    paintStrip(true);
+    if (api.onLink) { try { api.onLink(linkOn()); } catch (e) {} }
+  }
+  function anchor(ts) {
+    if (!linkOn()) return null;
+    if (!(ts > 0)) { linkSaid = Date.now(); paintStrip(true); setTimeout(function () { if (linkOn()) paintStrip(true); }, 2100); return null; }
+    var sec = Math.round(pos() * 10) / 10, key = pl.key, n = 0;
+    withDoc(curId(), function (list) {
+      var head = groups(list).filter(function (x) { return x.key === key; })[0];
+      if (!head) return;
+      var p0 = head.parts[0], an = Array.isArray(p0.an) ? p0.an.filter(function (x) { return x && x[1] !== ts; }) : [];
+      an.push([sec, ts]);
+      an.sort(function (a, b) { return a[1] - b[1]; });
+      p0.an = an.slice(-24);
+      n = p0.an.length;
+    });
+    markMemo.k = ''; linkSaid = 0;
+    paintStrip(true); paintLanes();
+    return { sec: sec, n: n };
+  }
+  function dropAnchor(i) {
+    if (!pl) return;
+    var key = pl.key;
+    withDoc(curId(), function (list) {
+      var head = groups(list).filter(function (x) { return x.key === key; })[0];
+      var p0 = head && head.parts[0];
+      if (!p0 || !Array.isArray(p0.an)) return;
+      var srt = p0.an.slice().sort(function (a, b) { return a[0] - b[0]; }), gone = srt[i];
+      p0.an = p0.an.filter(function (x) { return x !== gone; });
+      if (!p0.an.length) delete p0.an;
+    });
+    markMemo.k = '';
+    paintStrip(true); paintLanes();
+  }
+  function linkHtml() {
+    var g = groups(items(curDoc())).filter(function (x) { return x.key === pl.key; })[0];
+    var an = g ? anchorsOf(g).slice().sort(function (a, b) { return a[0] - b[0]; }) : [];
+    var miss = linkSaid && Date.now() - linkSaid < 2000;
+    var h = '<button type="button" class="nau-icb nau-icb--play" data-au="mini-toggle" aria-label="' +
+      esc(L('تشغيل أو إيقاف', 'Play or pause')) + '"><i class="fa-solid ' + (pl.on ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i></button>' +
+      '<span class="nau-t-cur nau-num">' + short(pos()) + '</span>' +
+      '<span class="nau-link-msg" role="status">' + (miss
+        ? T('لا رسمَ هنا — اضغطْ على خطٍّ مرسوم.', 'No drawing here — press on a drawn line.')
+        : '<b>' + T('الربط', 'Linking') + '</b> ' + T('— اسمع، ثمّ اضغط الرسمَ الذي قيل معه', '— listen, then press the drawing that was said with it')) + '</span>';
+    an.forEach(function (a, i) {
+      h += '<button type="button" class="nau-an nau-num" data-au="an-del" data-i="' + i + '" aria-label="' +
+        esc(L('احذفْ مرساة ', 'Remove anchor ') + short(a[0])) + '">' + short(a[0]) + ' <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
+    });
+    return h + '<button type="button" class="gsf-btn gsf-btn--go nau-b" data-au="link-done">' + T('تمّ', 'Done') + '</button>';
+  }
   function playAt(key, sec) {
     var g = groups(items(curDoc())).filter(function (x) { return x.key === key; })[0];
     if (!g) return false;
@@ -1148,6 +1229,7 @@
     if (pl && pl.url && /^blob:/.test(pl.url)) { try { URL.revokeObjectURL(pl.url); } catch (e) {} }
     pl = null;
     markStale = true;
+    if (linking) { linking = null; if (api.onLink) { try { api.onLink(false); } catch (eL) {} } }
     paintRows();
     paintStrip(true);
   }
@@ -1170,6 +1252,11 @@
       if (er) er.hidden = !pl.err;
     }
     if (!light || stripMode === 'play') { paintStrip(); paintMini(); }
+    if (stripMode === 'link') {
+      var ls = strip(), lc = ls && ls.querySelector('.nau-t-cur'), li = ls && ls.querySelector('.nau-icb--play > i');
+      if (lc) lc.textContent = short(pos());
+      if (li) li.className = 'fa-solid ' + (pl && pl.on ? 'fa-pause' : 'fa-play');
+    }
   }
   function cssq(s) { return String(s).replace(/["\\]/g, '\\$&'); }
 
@@ -1526,6 +1613,9 @@
 
   function act(a, key, b) {
     if (a === 'mark') { goMark(b); return; }
+    if (a === 'link-on') { setLink(true); return; }
+    if (a === 'link-done') { setLink(false); return; }
+    if (a === 'an-del') { dropAnchor(+b.getAttribute('data-i')); return; }
     var g = key ? groupByKey(key) : null;
     if (a === 'start') { start(); return; }
     if (a === 'src') {
@@ -1889,7 +1979,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  window.GardenNotesAudio = {
+  var api = window.GardenNotesAudio = {
     start: start,
     stop: stop,
     hold: hold,
@@ -1900,6 +1990,9 @@
     momentAt: momentAt,
     playAt: playAt,
     setMarks: setMarks,
+    linking: linkOn,
+    link: setLink,
+    anchor: anchor,
     refreshMarks: refreshMarks,
     marks: function () { return pl ? marksOf(pl.key).list.map(function (c) { return { sec: c.sec, n: c.n, lbl: c.m.lbl || '' }; }) : []; },
     state: function () {

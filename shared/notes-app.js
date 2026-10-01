@@ -4268,8 +4268,42 @@
   function marksSoon() {
     var NA = window.GardenNotesAudio;
     if (!NA || !NA.setMarks) return;
-    if (!NA._gm) { NA._gm = 1; NA.setMarks(inkMarks); }
+    if (!NA._gm) { NA._gm = 1; NA.setMarks(inkMarks); NA.onLink = onLink; }
     else NA.refreshMarks();
+  }
+  function stampUnder(x, y) {
+    if (pdfOn()) {
+      var ik = pdfUi.ink ? pdfUi.ink() : null;
+      return (ik && ik.stampAt) ? ik.stampAt(x, y, true) : null;
+    }
+    var cv = inkCv(), st = (cv && cv.stampAt) ? cv.stampAt(x, y, true) : null;
+    if (st) return st;
+    if (ed && ed.canvases) {
+      var ks = Object.keys(ed.canvases), i;
+      for (i = 0; i < ks.length; i++) {
+        var c = ed.canvases[ks[i]];
+        st = (c && c.wet && document.contains(c.wet) && c.stampAt) ? c.stampAt(x, y, true) : null;
+        if (st) return st;
+      }
+    }
+    return null;
+  }
+  var linkClick = null;
+  function onLink(on) {
+    if (linkClick) { document.removeEventListener('click', linkClick, true); linkClick = null; }
+    if (!on) return;
+    if (pdfOn() && pdfUi.drawing && pdfUi.drawing()) { try { pdfDraw(false); } catch (e) {} }
+    if (overlay && overlay.on) { try { overlay.toggle(false); } catch (e2) {} paintTopTools(); }
+    linkClick = function (e) {
+      var NA = window.GardenNotesAudio;
+      if (!NA || !NA.linking || !NA.linking()) { onLink(false); return; }
+      if (!els.docBody || !els.docBody.contains(e.target)) return;
+      var st = stampUnder(e.clientX, e.clientY);
+      if (!st) { NA.anchor(0); return; }
+      e.preventDefault(); e.stopPropagation();
+      if (NA.anchor(st.ts)) flashAt(e.clientX, e.clientY);
+    };
+    document.addEventListener('click', linkClick, true);
   }
   function inkMarks() {
     var out = [];

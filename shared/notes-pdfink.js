@@ -1104,8 +1104,8 @@
     });
   };
 
-  Ink.prototype.stampAt = function (cx, cy) {
-    var self = this, pk = this.pick, ts, i;
+  Ink.prototype.stampAt = function (cx, cy, hitOnly) {
+    var self = this, pk = hitOnly ? null : this.pick, ts, i;
     if (pk && pk.ids && pk.ids.length && this.pages[pk.n]) {
       var pe = this.pages[pk.n].els;
       for (i = 0; i < pk.ids.length; i++) {
