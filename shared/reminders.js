@@ -316,6 +316,23 @@
     return out;
   }
 
+  /*@3.REMJ.103*/
+  function evId(uid, ymd) {
+    var x = String(uid || '').replace(/\\/g, '').trim();
+    var h = 0x811c9dc5;
+    for (var i = 0; i < x.length; i++) { h ^= x.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return 'ev.' + ('0000000' + h.toString(16)).slice(-8) + '.' + String(ymd || '').replace(/-/g, '');
+  }
+  /*@3.REMJ.104*/
+  function icsFire(at, ymd, lead, now) {
+    var p = String(ymd).split('-').map(Number);
+    var base = Date.UTC(p[0], p[1] - 1, p[2] - (lead | 0), 9, 0) - 3 * 3600000;
+    return Math.max(Math.min(base, at - 3600000), now);
+  }
+  function icsState() {
+    try { return JSON.parse(localStorage.getItem('garden_ics') || 'null') || {}; } catch (e) { return {}; }
+  }
+
   /*@3.REMJ.34*/
   function deadlineReminders(now, horizon) {
     var s = load();
@@ -323,7 +340,7 @@
     var list = [];
     try { list = GardenData.allDeadlines() || []; } catch (e) { return []; }
 
-    var out = [];
+    var out = [], seen = {}, ics = icsState();
     list.forEach(function (t) {
       if (!t || t.done || !t.due) return;
 
@@ -343,6 +360,12 @@
 
       var leadMin = (channel === 'exams') ? s.lead.exams : s.lead.tasks;
       var fireAt = eventMs - (leadMin || 0) * 60000;
+      var ymd = String(t.due).slice(0, 10);
+      var rid = t.uid ? evId(t.uid, ymd) : 'dl:' + t.source + ':' + t.id + ':' + stamp(eventMs);
+      if (seen[rid]) return;
+      seen[rid] = 1;
+      if (t.uid && ics.on_server) fireAt = icsFire(when.allDay ? eventMs : when.ms, ymd, ics.lead_days, now);
+      else fireAt = applyQuiet(fireAt);
       if (fireAt > horizon) return;   /*@3.REMJ.36*/
 
       var cname = t.course ? courseName(t.course) : '';
@@ -352,13 +375,13 @@
       var titleTxt = (t.title || t.label || '').trim();
 
       out.push({
-        id: 'dl:' + t.source + ':' + t.id + ':' + stamp(eventMs),
+        id: rid,
         kind: channel,
         title: titleTxt ? (head + ' — ' + titleTxt) : head,
         /*@3.REMJ.102*/
         body: when.allDay ? (tx('الموعد ', 'Due ') + fmtDay(eventMs) + tx(' · طوال اليوم', ' · all day'))
                           : (tx('الموعد ', 'Due ') + fmtWhen(eventMs)),
-        fireAt: applyQuiet(fireAt),
+        fireAt: fireAt,
         eventAt: eventMs,
         /*@3.REMJ.91*/
         url: (t.origin && t.origin.type === 'note' && t.origin.uid)

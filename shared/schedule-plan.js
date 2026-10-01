@@ -650,6 +650,11 @@
       wizard.editing = true;
       wizard.cfg.start_date = todayStr();
       wizard.cfg.exam_dates = clone(p.exam_dates);
+      var live = S.data(), want = wizard.tab === 'midterm' ? 'midterm' : 'final';
+      Object.keys(wizard.cfg.exam_dates).forEach(function (c) {
+        var x = realExam(live, c, want);
+        if (x && x.date && !x.plan_tab) wizard.cfg.exam_dates[c] = x.date;
+      });
       wizard.cfg.courses = p.courses.filter(function (c) { return courses.indexOf(c) !== -1; });
       if (!wizard.cfg.courses.length) wizard.cfg.courses = courses.slice();
       wizard.cfg.modules = clone(p.modules);
@@ -662,6 +667,8 @@
       wizard.cfg.extra_reviews = clone(p.extra_reviews);
       wizard.cfg.window = clone(p.window);
     }
+    /*@3.SCPJ.116*/
+    wizard.shown = clone(wizard.cfg.exam_dates);
 
     showWizard();
     loadModulesFor(courses).then(function (m) {
@@ -693,10 +700,22 @@
     wizard.all.forEach(function (c) {
       if (fp.start) wizard.cfg.exam_dates[c] = fp.start;
     });
-    (d.exams || []).forEach(function (x) {
-      if (x.exam_type === wantType && x.course_code) wizard.cfg.exam_dates[x.course_code] = x.date;
+    wizard.all.forEach(function (c) {
+      var x = realExam(d, c, wantType);
+      if (x && x.date) wizard.cfg.exam_dates[c] = x.date;
     });
     wizard.cfg.start_date = todayStr();
+  }
+
+  /*@3.SCPJ.115*/
+  function realExam(d, code, type) {
+    var best = null, rank = -1;
+    (d.exams || []).forEach(function (x) {
+      if (!x || x.course_code !== code || (x.exam_type || 'exam') !== type) return;
+      var r = x.sx_crn ? 2 : (x.plan_tab ? 0 : 1);
+      if (r > rank) { best = x; rank = r; }
+    });
+    return best;
   }
 
   /*@3.SCPJ.65*/
@@ -1342,13 +1361,11 @@
     Object.keys(examDates || {}).forEach(function (code) {
       var date = examDates[code];
       if (!date) return;
-      var found = null;
-      for (var i = 0; i < d.exams.length; i++) {
-        var x = d.exams[i];
-        if (x.course_code === code && (x.exam_type || 'exam') === type) { found = x; break; }
-      }
+      var found = realExam(d, code, type);
+
       if (found) {
-        if (found.date !== date) found.date = date;
+        var shown = (wizard && wizard.shown) ? wizard.shown[code] : undefined;
+        if (found.date !== date && date !== shown) found.date = date;
         return;                                  /*@3.SCPJ.83*/
       }
       d.exams.push({
@@ -2006,6 +2023,11 @@
       return m ? modTitle(m) : '';
     },
     moduleNum: function (mid) { return modNum(mid); },
+    _syncExams: function (tab, dates, shown) {
+      var w = wizard;
+      wizard = { shown: shown || {} };
+      try { syncExamEvents(tab, dates); } finally { wizard = w; }
+    },
     openDetails: function (code, mid) { if (S) openModuleDetails(code, mid); },
     editSession: function (id) { if (S) openSessionEditor(id); },
     /*@3.SCPJ.111*/

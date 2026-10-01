@@ -2200,9 +2200,11 @@
         /*@3.GADJ.139*/
         origin: t.origin || null,
         /*@3.GADJ.179*/
-        pending_course: !!(t.origin && t.origin.type === 'ics' && !t.course)
+        pending_course: !!(t.origin && t.origin.type === 'ics' && !t.course),
+        uid: (t.origin && t.origin.type === 'ics' && t.origin.uid) || ''
       };
     });
+    var icsDate = icsDateUids();
 
     /*@3.GADJ.114*/
     var sem = semester();
@@ -2223,7 +2225,8 @@
         out.push({
           id: d.id, source: 'course', editable: false,
           course: code, title: d.title || '', type: d.type || 'assignment',
-          due: d.date + (d.time ? 'T' + d.time : ''), done: !!d.done, note: d.note || ''
+          due: d.date + (d.time ? 'T' + d.time : ''), done: !!d.done, note: d.note || '',
+          uid: icsDate[code + '|' + d.id] || ''
         });
       });
     });
@@ -2241,7 +2244,8 @@
         label: e.notes || '',
         /*@3.GADJ.172*/
         due: due, done: !!e.completed_at || (d !== null && d < 0),
-        note: e.room || ''
+        note: e.room || '',
+        uid: e.ics_uid || ''
       });
     });
 
@@ -2251,6 +2255,17 @@
       if (!a.due) return 1;
       if (!b.due) return -1;
       return String(a.due).localeCompare(String(b.due));
+    });
+    return out;
+  }
+
+  /*@3.GADJ.190*/
+  function icsDateUids() {
+    var out = {}, links = null;
+    try { links = (JSON.parse(localStorage.getItem('garden_ics') || 'null') || {}).links; } catch (e) {}
+    Object.keys(links || {}).forEach(function (u) {
+      var L = links[u];
+      if (L && L.store === 'date' && L.code && L.id) out[L.code + '|' + L.id] = u;
     });
     return out;
   }

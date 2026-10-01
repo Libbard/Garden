@@ -746,6 +746,16 @@
     if (!Array.isArray(d.exams)) d.exams = [];
     return d;
   }
+  /*@3.ICSJ.127*/
+  function bannerExam(code, kind) {
+    var sch = schedRaw();
+    var list = (sch && sch.exams) || [];
+    for (var i = 0; i < list.length; i++) {
+      var x = list[i];
+      if (x && x.sx_crn && x.course_code === code && x.exam_type === kind) return x;
+    }
+    return null;
+  }
   function schedWrite(s) {
     s.updated_at = new Date().toISOString();
     try {
@@ -1004,6 +1014,11 @@
     }
 
     var store = code ? (EXAMISH[fin.kind] ? 'exam' : 'date') : 'task';
+    if (store === 'exam' && (fin.kind === 'midterm' || fin.kind === 'final') && bannerExam(fin.code, fin.kind)) {
+      if (link && cur) dropRec(link);
+      delete s.links[uid];
+      return 'banner';
+    }
 
     /*@3.ICSJ.47*/
     var from = null;
@@ -1138,6 +1153,7 @@
         var out = applyOne(ev, r2.code);
         if (out === 'touched') rep.touched++;
         else if (out === true) { if (had) rep.updated++; else rep.added++; }
+        else if (out === 'banner') rep.banner = (rep.banner || 0) + 1;
         /*@3.ICSJ.85*/
         else rep.blocked++;
       });
