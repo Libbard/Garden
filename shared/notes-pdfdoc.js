@@ -164,10 +164,15 @@
   var _chain = Promise.resolve();
   function mutate(fn) {
     var run = _chain.then(function () {
-      return index().then(function (o) {
-        fn(o);
-        return saveIndex(o);
-      });
+      var go = function () {
+        return index().then(function (o) {
+          fn(o);
+          return saveIndex(o);
+        });
+      };
+      /*@3.NOPJ4.9*/
+      var L = navigator.locks;
+      return (L && L.request) ? L.request('garden-pdfdoc-index', go) : go();
     });
     _chain = run.catch(function () { return null; });
     return run;
