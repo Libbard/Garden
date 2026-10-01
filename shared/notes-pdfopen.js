@@ -346,7 +346,7 @@
       o.drive(sp, function (pct) {
         var p = stage.querySelector('.npo-msg');
         if (p) p.textContent = L('يُجلب من درايف… ', 'Fetching from Drive… ') + pct + '%';
-      }).then(function (file) {
+      }, true).then(function (file) {
         if (st.dead) return;
         if (!file) { ask(); return; }
         useFile(file, sp.gd);
@@ -692,7 +692,19 @@
       window.GardenPdfDoc.get(sp.h).then(function (f) {
         if (st.dead) return;
         if (f) show(f, null, sp.h);
-        else fromUs();
+        else missing();
+      }, function () { if (!st.dead) missing(); });
+    }
+
+    function missing() {
+      if (!(sp.gd && o.drive && o.driveAuto && o.driveAuto())) { fromUs(); return; }
+      busy(L('يُجلب من درايف…', 'Fetching from Drive…'));
+      o.drive(sp, function (pct) {
+        var p = stage.querySelector('.npo-msg');
+        if (p) p.textContent = L('يُجلب من درايف… ', 'Fetching from Drive… ') + pct + '%';
+      }).then(function (file) {
+        if (st.dead) return;
+        if (file) useFile(file, sp.gd); else fromUs();
       }, function () { if (!st.dead) fromUs(); });
     }
 

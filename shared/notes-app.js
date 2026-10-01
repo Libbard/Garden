@@ -4728,14 +4728,18 @@
       /*@3.NOAJ.264*/
       marks: doc.marks || null,
       noteId: id,
-      drive: driveOn() ? function (sp, onPct) {
+      drive: driveOn() ? function (sp, onPct, ask) {
         return needDrive().then(function (GD) {
-          return GD.download(sp.gd, function (at, of) { if (of && onPct) onPct(Math.round(at * 100 / of)); }).then(function (blob) {
+          return (ask ? GD.token(true) : Promise.resolve()).then(function () { return GD.download(sp.gd, function (at, of) { if (of && onPct) onPct(Math.round(at * 100 / of)); }).then(function (blob) {
             return new File([blob], sp.n || 'drive.pdf', { type: 'application/pdf' });
-          });
+          }); });
         });
       } : null,
       driveWhy: function (e) { return window.GardenDrive ? window.GardenDrive.reason(e) : ''; },
+      driveAuto: function () {
+        if (window.GardenDrive) return window.GardenDrive.linked();
+        try { var c = JSON.parse(localStorage.getItem('__gdLink') || 'null'); return !!(c && c.on); } catch (e) { return false; }
+      },
       soloInk: function () { return soloPdf(id, doc.pdf && doc.pdf.h); },
       /*@3.NOAJ.268*/
       dockEl: function () { return document.getElementById('na-favs'); },
