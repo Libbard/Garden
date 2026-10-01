@@ -408,8 +408,8 @@
                'We do not accept this format yet' + (e && e.mime ? ' (' + e.mime + ')' : '') + '.');
     }
     if (k === 'vault_full') {
-      return L('امتلأت مساحتُك عندنا. احذفْ ملفّاً قديماً ثمَّ أعِدْ المحاولة.',
-               'Your space with us is full. Remove an old file, then try again.');
+      return L('مساحتُك عندنا ممتلئةٌ بملفّاتٍ لم تُكمل ثلاثةَ أيّام — احذفْ ما لا تحتاجه من «المزامنة ⇐ ملفّاتُك عندنا» ثمّ أعِدِ المحاولة.',
+               'Your space with us is full of files under three days old — delete what you do not need in “Sync ⇒ Your files with us”, then try again.');
     }
     if (k === 'not_uploaded') {
       return L('انقطع الرفعُ قبل أن يصل شيء — أعِدْ المحاولة.',
@@ -636,6 +636,27 @@
   document.addEventListener('click', function (e) {
     var b = e.target && e.target.closest ? e.target.closest('#na-cloud') : null;
     if (b && !b.hidden) ask();
+  });
+
+  window.addEventListener('garden:fileStored', function (e) {
+    var d = (e && e.detail) || {};
+    if (!cur || busy || d.ref_id !== refIdOf(cur.h)) return;
+    if (!cur.row) {
+      cur.row = { ref_id: d.ref_id, stored_bytes: d.bytes || 0, orig_bytes: d.bytes || 0,
+                  squeeze: 0, created_at: new Date().toISOString() };
+    }
+    cur.ok = true;
+    cur.nu = false;
+    markSeen(cur.h);
+    paint();
+  });
+  window.addEventListener('garden:fileRemoved', function (e) {
+    var d = (e && e.detail) || {};
+    if (!cur || d.ref_id !== refIdOf(cur.h) || !cur.row) return;
+    cur.row = null;
+    cur.slim = null;
+    paint();
+    if (shown() && !busy) sayHere();
   });
 
   window.GardenPdfCloud = {

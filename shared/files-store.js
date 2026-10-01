@@ -184,8 +184,11 @@
           }).then(function (r) {
             if (!r.ok) throw Object.assign(new Error(r.body.error || 'commit_failed'), r.body);
             stage('done', { deduped: !!r.body.deduped, bytes: r.body.bytes });
+            var gone = r.body.pruned || [];
+            gone.forEach(function (x) { emit('garden:fileRemoved', { ref_id: x.ref_id, name: x.name, why: 'pruned' }); });
+            emit('garden:fileStored', { ref_id: refId, bytes: r.body.bytes, name: name, mime: mime });
             return { ref_id: refId, key: r.body.key, bytes: r.body.bytes,
-                     deduped: !!r.body.deduped };
+                     deduped: !!r.body.deduped, pruned: gone };
           });
         })
         .catch(function (e) {
@@ -244,7 +247,10 @@
     return vaultId().then(function (id) {
       if (!id) throw new Error('no_vault');
       return jreq('DELETE', base(id) + '/f/' + encodeURIComponent(refId), id)
-        .then(function (r) { return r.ok; });
+        .then(function (r) {
+          if (r.ok) emit('garden:fileRemoved', { ref_id: refId, why: 'deleted' });
+          return r.ok;
+        });
     });
   }
 
@@ -259,7 +265,8 @@
           return { ok: true, why: '', files: r.body.files || [],
                    used: Number(r.body.used || 0), max: Number(r.body.max || 0),
                    max_audio: Number(r.body.max_audio || 0),
-                   max_vault: Number(r.body.max_vault || 0) };
+                   max_vault: Number(r.body.max_vault || 0),
+                   keep_days: Number(r.body.keep_days || 0) };
         }
         return { ok: false, status: r.status, files: [],
                  why: WHY[r.status] || (r.body && r.body.error) || ('http_' + r.status),

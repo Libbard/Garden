@@ -235,6 +235,7 @@
       : v === 'locked'  ? this.vLocked()
       : v === 'disarm'  ? this.vDisarm()
       : v === 'drive'   ? this.vDrive()
+      : v === 'files'   ? this.vFileList()
       :                   this.vHome();
 
     this.host.innerHTML = (solo ? '' : this.hero(st)) + body + this.msgBox();
@@ -491,11 +492,138 @@
              '" aria-label="' + esc(L('المساحةُ المستعملة', 'Space used')) + '"><span style="--p:' + pc + '%"></span></div>' : '') +
       '<small>' + esc(L(filesAr(n) + ' — تفتح على أجهزتك كلِّها.',
                         (n === 1 ? '1 file kept' : n + ' files kept') + ' — they open on all your devices.')) + '</small>' +
-      '<small>' + esc(L('نضمن حفظَ الملفِّ ثلاثةَ أيّامٍ على الأقلّ، وبعدها — إذا امتلأت مساحتُنا — نحذف الأقدمَ أوّلاً. ' +
-                        'أمّا رسمُك وملاحظاتُك فمحفوظةٌ باستمرارٍ ولا تُحذف، والأصلُ باقٍ على جهازك.',
-                        'We keep each file for at least three days; after that, if our space fills up, we remove the oldest first. ' +
-                        'Your drawings and notes are kept continuously and never deleted, and the original stays on your device.')) +
-      '</small></div></div>';
+      '<small>' + esc(vowText()) + '</small>' +
+      (n ? '<div class="sp-acts">' + btn('files', 'fa-folder-open', L('استعرضْ ملفّاتي واحذفْ ما لا أحتاجه', 'Review my files and delete what I do not need'), 'wide') + '</div>' : '') +
+      '</div></div>';
+  };
+
+  function vowText() {
+    return L('نضمن حفظَ الملفِّ ثلاثةَ أيّامٍ على الأقلّ، وبعدها — إذا امتلأت مساحتُك عندنا — نحذف الأقدمَ أوّلاً ليدخل الجديد. ' +
+             'أمّا رسمُك وملاحظاتُك فمحفوظةٌ باستمرارٍ ولا تُحذف، والأصلُ باقٍ على جهازك.',
+             'We keep each file for at least three days; after that, if your space with us fills up, we remove the oldest first to make room. ' +
+             'Your drawings and notes are kept continuously and never deleted, and the original stays on your device.');
+  }
+
+  function fileDay(t) {
+    try {
+      return new Date(t).toLocaleDateString(L('ar', 'en'), { weekday: 'long' });
+    } catch (e) { return ''; }
+  }
+
+  function fileCount(n) {
+    if (n === 1) return L('ملفٌّ واحد', '1 file');
+    if (n === 2) return L('ملفّان', '2 files');
+    return L(n + (n <= 10 ? ' ملفّات' : ' ملفّاً'), n + ' files');
+  }
+
+  Panel.prototype.vFileList = function () {
+    var a = this.files, self = this;
+    if (!a) {
+      this.loadFiles();
+      return '<div class="sp-vouch"><b><i class="fa-solid fa-spinner fa-spin"></i>' +
+        esc(L('تُقرأ ملفّاتُك…', 'Reading your files…')) + '</b></div>' + back('home');
+    }
+    var used = Number(a.used) || 0, max = Number(a.max_vault) || 0;
+    var keep = (Number(a.keep_days) || 3) * 86400000;
+    var pc = max ? Math.min(100, Math.round(used * 100 / max)) : 0;
+    var now = Date.now(), arm = this.fArm, mode = this.fSort || 'size';
+    var sel = this.fSel || (this.fSel = {});
+    var all = (a.files || []).slice();
+    Object.keys(sel).forEach(function (k) {
+      if (!all.some(function (f) { return f.ref_id === k; })) delete sel[k];
+    });
+    var bySize = function (x, y) { return (Number(y.stored_bytes) || 0) - (Number(x.stored_bytes) || 0); };
+    var byAge = function (x, y) { return Date.parse(x.created_at) - Date.parse(y.created_at); };
+    all.sort(mode === 'old' ? byAge : bySize);
+
+    var h = '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('ملفّاتُك عندنا', 'Your files with us')) + '</p>' +
+      '<div class="sp-vouch"><b><i class="fa-solid fa-cloud"></i>' +
+      '<span class="sp-num">' + esc(bytes(used)) + (max ? ' / ' + esc(bytes(max)) : '') + '</span></b>' +
+      (max ? '<div class="sp-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pc +
+             '" aria-label="' + esc(L('المساحةُ المستعملة', 'Space used')) + '"><span style="--p:' + pc + '%"></span></div>' : '') +
+      '<small>' + esc(vowText()) + '</small></div>';
+    if (!all.length) {
+      return h + '<p class="sp-note">' + esc(L('لا ملفَّ محفوظاً عندنا الآن.', 'No files are kept with us right now.')) + '</p></div>' + back('home');
+    }
+
+    function seg(v, icon, t) {
+      return '<button type="button" class="sp-seg-b" data-sp="fsort" data-v="' + v + '" aria-pressed="' + (mode === v) + '">' +
+        '<i class="fa-solid ' + icon + '"></i>' + esc(t) + '</button>';
+    }
+    h += '<div class="sp-seg" role="group" aria-label="' + esc(L('ترتيبُ الملفّات', 'Sort files')) + '">' +
+      seg('size', 'fa-arrow-down-wide-short', L('الأكبر', 'Largest')) +
+      seg('old', 'fa-clock-rotate-left', L('الأقدم', 'Oldest')) +
+      seg('dir', 'fa-folder', L('بالمجلّد', 'By folder')) + '</div>';
+
+    var picked = all.filter(function (f) { return sel[f.ref_id]; });
+    var pickedB = picked.reduce(function (n, f) { return n + (Number(f.stored_bytes) || 0); }, 0);
+    var allOn = picked.length === all.length;
+    h += '<div class="sp-fbar">' +
+      '<label class="sp-pick"><input type="checkbox" data-sp-chk="all"' + (allOn ? ' checked' : '') +
+      ' aria-label="' + esc(L('حدِّدِ الكلّ', 'Select all')) + '">' +
+      '<span>' + esc(picked.length
+        ? L('حُدِّد ' + picked.length + ' · ', picked.length + ' selected · ')
+        : L(filesAr(all.length), all.length + ' files')) +
+      (picked.length ? '<span class="sp-num">' + esc(bytes(pickedB)) + '</span>' : '') + '</span></label>' +
+      (picked.length
+        ? '<button type="button" class="sp-btn sp-btn--danger sp-bulk" data-sp="fbulk">' +
+          '<i class="fa-solid fa-trash-can"></i>' +
+          esc(this.fBulkArm ? L('اضغطْ ثانيةً لحذف ' + picked.length, 'Press again to delete ' + picked.length)
+                            : L('احذفِ المحدَّد', 'Delete selected')) + '</button>'
+        : '') + '</div>';
+
+    function row(f) {
+      var t = Date.parse(f.created_at) || now;
+      var safe = (t + keep) > now || f.pinned;
+      var audio = /^(audio|video)\//.test(f.mime || '');
+      var on = arm === f.ref_id;
+      var tag = safe
+        ? '<span class="sp-ftag sp-ftag--safe">' + esc(f.pinned ? L('مثبَّت', 'Pinned')
+            : L('محميٌّ حتى ' + fileDay(t + keep), 'Kept until ' + fileDay(t + keep))) + '</span>'
+        : '<span class="sp-ftag sp-ftag--next">' + esc(L('يُحذف عند الامتلاء', 'Goes first when full')) + '</span>';
+      return '<div class="sp-dev sp-file' + (sel[f.ref_id] ? ' is-on' : '') + '">' +
+        '<input type="checkbox" class="sp-chk" data-sp-chk="' + esc(f.ref_id) + '"' + (sel[f.ref_id] ? ' checked' : '') +
+        ' aria-label="' + esc(L('حدِّدْ ', 'Select ') + (f.name || '')) + '">' +
+        '<i class="fa-solid ' + (audio ? 'fa-microphone' : 'fa-file-lines') + '"></i>' +
+        '<span class="sp-dev-n"><span class="sp-file-n" dir="auto">' + esc(f.name || L('ملفّ', 'File')) + '</span>' +
+        '<small><span class="sp-num">' + esc(bytes(f.stored_bytes)) + '</span>' +
+        (f.course && mode !== 'dir' ? ' · <span class="sp-num">' + esc(f.course) + '</span>' : '') + ' · ' + esc(ago(t)) + '</small>' +
+        tag + '</span>' +
+        '<button type="button" class="sp-x' + (on ? ' sp-x--arm' : '') + '" data-sp="fdel" data-v="' + esc(f.ref_id) +
+        '" aria-label="' + esc((on ? L('تأكيدُ حذف ', 'Confirm deleting ') : L('احذفْ ', 'Delete ')) + (f.name || '')) + '">' +
+        (on ? esc(L('مؤكَّد؟', 'Sure?')) : '<i class="fa-solid fa-trash-can"></i>') + '</button></div>';
+    }
+
+    if (mode === 'dir') {
+      var dirs = {}, order = [];
+      all.forEach(function (f) {
+        var k = String(f.course || '').trim();
+        if (!dirs[k]) { dirs[k] = []; order.push(k); }
+        dirs[k].push(f);
+      });
+      order.sort(function (x, y) {
+        if (!x) return 1;
+        if (!y) return -1;
+        return x.localeCompare(y);
+      });
+      h += order.map(function (k) {
+        var fs = dirs[k].sort(bySize);
+        var sum = fs.reduce(function (n, f) { return n + (Number(f.stored_bytes) || 0); }, 0);
+        var on = fs.every(function (f) { return sel[f.ref_id]; });
+        return '<div class="sp-dir"><label class="sp-pick sp-dir-h"><input type="checkbox" data-sp-chk="dir:' + esc(k) + '"' +
+          (on ? ' checked' : '') + ' aria-label="' + esc(L('حدِّدْ مجلّدَ ', 'Select folder ') + (k || L('عامّ', 'General'))) + '">' +
+          '<i class="fa-solid fa-folder"></i><b>' + (k ? '<span class="sp-num">' + esc(k) + '</span>' : esc(L('عامّ', 'General'))) + '</b>' +
+          '<small>' + esc(fileCount(fs.length)) +
+          ' · <span class="sp-num">' + esc(bytes(sum)) + '</span></small></label>' +
+          fs.map(row).join('') + '</div>';
+      }).join('');
+    } else {
+      h += all.map(row).join('');
+    }
+    h += '<p class="sp-note"><i class="fa-solid fa-circle-info"></i> ' + esc(L(
+      'الحذفُ من هنا يُزيل نسختَنا وحدَها — الملفُّ على جهازك وفي درايفك كما هو.',
+      'Deleting here removes only our copy — the file on your device and in your Drive stays as it is.')) + '</p></div>';
+    return h + back('home');
   };
 
   Panel.prototype.loadFiles = function () {
@@ -787,6 +915,9 @@
 
   Panel.prototype.bind = function () {
     var self = this;
+    this.host.querySelectorAll('[data-sp-chk]').forEach(function (c) {
+      c.addEventListener('change', function () { self.pick(c.getAttribute('data-sp-chk'), c.checked); });
+    });
     this.host.querySelectorAll('[data-sp]').forEach(function (b) {
       b.addEventListener('click', function () { self.act(b.getAttribute('data-sp'), b.getAttribute('data-v')); });
     });
@@ -808,6 +939,17 @@
     this.mountGoogle();
   };
 
+  Panel.prototype.pick = function (k, on) {
+    var sel = this.fSel || (this.fSel = {});
+    var fs = (this.files && this.files.files) || [];
+    var hit = k === 'all' ? fs
+      : k.indexOf('dir:') === 0 ? fs.filter(function (f) { return String(f.course || '').trim() === k.slice(4); })
+      : fs.filter(function (f) { return f.ref_id === k; });
+    hit.forEach(function (f) { if (on) sel[f.ref_id] = 1; else delete sel[f.ref_id]; });
+    this.fBulkArm = false;
+    this.paint();
+  };
+
   Panel.prototype.copy = function (text, okMsg) {
     var self = this;
     if (!navigator.clipboard) return;
@@ -823,6 +965,63 @@
         a === 'key' || a === 'unlink' || a === 'shield' || a === 'disarm' ||
         a === 'locked') return this.go(a);
     if (a === 'drive') { this.drv = null; return this.go('drive'); }
+    if (a === 'files') { this.fArm = null; this.fSel = {}; this.fBulkArm = false; this.loadFiles(); return this.go('files'); }
+    if (a === 'fsort') { this.fSort = v || 'size'; this.fBulkArm = false; this.paint(); return; }
+    if (a === 'fbulk') {
+      var ids = Object.keys(this.fSel || {});
+      if (!ids.length || !window.GardenFiles) return;
+      if (!this.fBulkArm) {
+        this.fBulkArm = true;
+        clearTimeout(this.fBulkT);
+        this.fBulkT = setTimeout(function () { if (self.fBulkArm) { self.fBulkArm = false; self.paint(); } }, 5000);
+        this.paint();
+        return;
+      }
+      clearTimeout(this.fBulkT);
+      this.fBulkArm = false;
+      var done = 0, bad = 0;
+      this.set({ busy: true, err: '', msg: L('يُحذف…', 'Deleting…') });
+      ids.reduce(function (chain, id) {
+        return chain.then(function () {
+          return window.GardenFiles.remove(id).then(function (okd) {
+            if (okd) { done++; delete self.fSel[id]; } else bad++;
+          }, function () { bad++; }).then(function () {
+            self.set({ msg: L('حُذف ' + done + ' من ' + ids.length + '…', 'Deleted ' + done + ' of ' + ids.length + '…') });
+          });
+        });
+      }, Promise.resolve()).then(function () {
+        var gone = {};
+        ids.forEach(function (id) { if (!self.fSel[id]) gone[id] = 1; });
+        self.files = Object.assign({}, self.files, {
+          files: (self.files.files || []).filter(function (x) { return !gone[x.ref_id]; }) });
+        self.set({ busy: false, msg: bad ? '' : L('حُذفت ' + done + ' من نسخنا.', done + ' of our copies were deleted.'),
+                   err: bad ? L('لم يُحذف ' + bad + ' — أعِدِ المحاولة.', bad + ' were not deleted — please try again.') : '' });
+        self.loadFiles();
+      });
+      return;
+    }
+    if (a === 'fdel') {
+      if (!v || !window.GardenFiles) return;
+      if (this.fArm !== v) {
+        this.fArm = v;
+        clearTimeout(this.fArmT);
+        this.fArmT = setTimeout(function () { if (self.fArm === v) { self.fArm = null; self.paint(); } }, 5000);
+        this.paint();
+        return;
+      }
+      clearTimeout(this.fArmT);
+      this.set({ busy: true, err: '', msg: '', fArm: null });
+      window.GardenFiles.remove(v).then(function (okd) {
+        if (!okd) throw new Error('drop');
+        var left = (self.files.files || []).filter(function (x) { return x.ref_id !== v; });
+        self.files = Object.assign({}, self.files, { files: left });
+        self.set({ busy: false, msg: L('حُذفت نسختُنا من الملفّ.', 'Our copy of the file was deleted.') });
+        self.loadFiles();
+      }).catch(function () {
+        self.set({ busy: false, err: L('لم يقبل الخادمُ الحذفَ الآن — أعِدِ المحاولة.', 'The server did not accept the delete — please try again.') });
+      });
+      return;
+    }
     if (a === 'drv-retry') { this.drv = null; this.paint(); return; }
     if (a === 'drv-all' || a === 'drv-off') {
       this.set({ busy: true, err: '', msg: '' });

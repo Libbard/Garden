@@ -252,6 +252,20 @@
     var t = readJSON(LS_TOMB, {});
     if (t && typeof t === 'object') { t[id] = Date.now(); writeJSON(LS_TOMB, t); }
   }
+  var LS_PV = '__notes_pv_mine';
+  function pvMine() {
+    try { var m = JSON.parse(localStorage.getItem(LS_PV) || '{}'); return (m && typeof m === 'object') ? m : {}; }
+    catch (e) { return {}; }
+  }
+  function pvClaim(id) {
+    var m = pvMine(), cut = Date.now() - 30 * 86400000, k;
+    for (k in m) if (m[k] < cut) delete m[k];
+    m[id] = Date.now();
+    try { localStorage.setItem(LS_PV, JSON.stringify(m)); } catch (e) {}
+  }
+  function pvHidden(rec) {
+    return !!(rec && rec.pv && !pvMine()[rec.id]);
+  }
   function newId(p) {
     return (p || 'rn') + '_' + Date.now().toString(36) + '_' +
            Math.random().toString(36).slice(2, 7);
@@ -705,7 +719,7 @@
     var c = (e && (e.error || e.message)) || '';
     if (c === 'no_local') return L('الملفُّ ليس على هذا الجهاز — افتحْه هنا أوّلاً ثمّ شارِكْه.', 'The file is not on this device — open it here first, then share it.');
     if (c === 'too_large' || c === 'over_exhausted') return L('الملفُّ أكبرُ من حدِّ الرفع إلى خادمنا — احفظْه في درايفك وشارِكه من هناك.', 'The file is over our upload limit — save it to your Drive and share it from there.');
-    if (c === 'vault_full') return L('مساحتُك عندنا ممتلئة — احذفْ ملفّاتٍ قديمةً من زرِّ السحابة ثمّ أعد المحاولة.', 'Your space with us is full — delete old files from the cloud button, then try again.');
+    if (c === 'vault_full') return L('مساحتُك عندنا ممتلئةٌ بملفّاتٍ لم تُكمل ثلاثةَ أيّام — احذفْ ما لا تحتاجه من «المزامنة ⇐ ملفّاتُك عندنا» ثمّ أعِدِ المحاولة.', 'Your space with us is full of files under three days old — delete what you do not need in “Sync ⇒ Your files with us”, then try again.');
     if (c === 'not_found' || c === 'files_not_configured') return L('رفعُ الملفّات إلى خادمنا لم يُفتح لحسابك بعد — فلا رابطَ لهذا الملفّ الآن.', 'Uploading files to our server is not open for your account yet, so this file cannot get a link now.');
     if (c === 'no_vault' || c === 'locked') return L('فعّلِ المزامنةَ أوّلاً لتشاركَ ملفّاتِك.', 'Turn sync on first to share your files.');
     return L('تعذّر رفعُ الملفّ — تحقّقْ من الاتّصال وأعد المحاولة.', 'The file could not be uploaded — check your connection and try again.');
@@ -721,6 +735,16 @@
       paintShare();
     }, function () { if (edId === want) { shareUp = false; paintShare(); } });
   }
+  function shareHeard(on) {
+    return function (e) {
+      var d = (e && e.detail) || {};
+      if (!sharePdf() || d.ref_id !== sharePdfRef()) return;
+      shareUp = on;
+      paintShare();
+    };
+  }
+  window.addEventListener('garden:fileStored', shareHeard(true));
+  window.addEventListener('garden:fileRemoved', shareHeard(false));
   function shareMakePdf(mode) {
     var Sy = window.GardenNotesSync, F = window.GardenFiles;
     var want = edId, doc = liveDoc, p = doc.pdf;
@@ -5182,8 +5206,8 @@
   /*@3.NOAJ.443*/
   function putBorn(id, doc, t) {
     return window.GardenNotesStore.putDoc(id, doc, t).then(function (r) {
-      var Sy = window.GardenNotesSync;
-      if (Sy && Sy.push) { try { Sy.push(id); } catch (e) {} }
+      var Sy = window.GardenNotesSync, rec = idxFind(id);
+      if (Sy && Sy.push && !(rec && rec.pv)) { try { Sy.push(id); } catch (e) {} }
       return r;
     });
   }
@@ -5485,6 +5509,7 @@
 
     var rec = { id: id, t: '', k: board ? 'board' : 'rich', o: origin, g: [], c: null, f: null,
                 p: 0, a: 0, ca: now, updated_at: now, sz: 0, pv: 1 };
+    pvClaim(id);
     if (S.view.k === 'folder') rec.f = S.view.id;
     if (S.view.k === 'course' && !rec.o.c) rec.o.c = S.view.code;
     if (S.view.k === 'tag') rec.g = [S.view.tag];
@@ -7678,7 +7703,9 @@
   function reload(opts) {
     var M = window.GardenNotesModel;
     if (!M) return;
-    S.all = M.all({ withArchived: true }).map(function (n) {
+    S.all = M.all({ withArchived: true }).filter(function (n) {
+      return !(n.src === 'rich' && pvHidden(idxFind(n.id)));
+    }).map(function (n) {
       if (n.src === 'rich') {
         var rec = idxFind(n.id);
         n.folder = (rec && rec.f) || null;

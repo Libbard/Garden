@@ -968,7 +968,7 @@
 
   function upErr(w) {
     if (/not_enrolled/.test(w)) return L('الحفظُ عندنا غيرُ مفتوحٍ لحسابك بعد.', 'Keeping files with us is not open for your account yet.');
-    if (/vault_full/.test(w)) return L('امتلأت مساحتُك عندنا.', 'Your space with us is full.');
+    if (/vault_full/.test(w)) return L('مساحتُك عندنا ممتلئةٌ بملفّاتٍ لم تُكمل ثلاثةَ أيّام — احذفْ ما لا تحتاجه من «المزامنة ⇐ ملفّاتُك عندنا» ثمّ أعِدِ المحاولة.', 'Your space with us is full of files under three days old — delete what you do not need in “Sync ⇒ Your files with us”, then try again.');
     if (/too_big/.test(w)) return L('التسجيلُ أكبرُ من الحدّ المسموح.', 'The recording is larger than allowed.');
     if (/locked/.test(w)) return L('حسابك مقفل — افتحه من إعدادات المزامنة.', 'Your account is locked — unlock it in sync settings.');
     if (/gone/.test(w)) return L('لم نجد التسجيلَ على هذا الجهاز.', 'The recording is not on this device.');
