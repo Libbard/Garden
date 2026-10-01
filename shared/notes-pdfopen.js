@@ -239,11 +239,20 @@
               'This file is not on this device — pick it to open it.')) +
         (sp.sz ? '<br>' + num(size(sp.sz)) +
           (sp.pg ? ' · ' + num(String(sp.pg)) + ' ' + esc(L('صفحة', 'pages')) : '') : ''),
-        '<button type="button" class="gsf-btn gsf-btn--go npo-pick">' +
-        '<i class="fa-solid fa-file-import" aria-hidden="true"></i> ' +
-        esc(L('اخترِ الملفّ', 'Choose the file')) + '</button>');
+        (sp.gd && o.drive
+          ? '<div class="npo-acts"><button type="button" class="gsf-btn gsf-btn--gd npo-drive">' +
+            '<i class="fa-brands fa-google-drive" aria-hidden="true"></i> ' +
+            esc(L('افتحْ من درايف', 'Open from Drive')) + '</button>' +
+            '<button type="button" class="gsf-btn gsf-btn--ghost npo-pick">' +
+            '<i class="fa-solid fa-file-import" aria-hidden="true"></i> ' +
+            esc(L('اخترْه من جهازي', 'Pick it from my device')) + '</button></div>'
+          : '<button type="button" class="gsf-btn gsf-btn--go npo-pick">' +
+            '<i class="fa-solid fa-file-import" aria-hidden="true"></i> ' +
+            esc(L('اخترِ الملفّ', 'Choose the file')) + '</button>'));
       var b = stage.querySelector('.npo-pick');
       if (b) b.addEventListener('click', take);
+      var gdB = stage.querySelector('.npo-drive');
+      if (gdB) gdB.addEventListener('click', fromDrive);
       if (!note && window.GardenPdfDoc) {
         window.GardenPdfDoc.available().then(function (a) {
           if (st.dead || a.ok) return;
@@ -317,6 +326,7 @@
         if (a === 'no') { drop(pre); ask(); return; }
         if (a === 'link' && o.onRelink) {
           sp = spec(got, file, pre.pages);
+          if (st.gdNext) sp.gd = st.gdNext;
           o.onRelink(sp, (want && want.h) || null);
           show(file, pre, got.hash);
           return;
@@ -331,9 +341,31 @@
       try { dlg.showModal(); } catch (e2) { close('once'); }
     }
 
+    function fromDrive() {
+      busy(L('يُجلب من درايف…', 'Fetching from Drive…'));
+      o.drive(sp, function (pct) {
+        var p = stage.querySelector('.npo-msg');
+        if (p) p.textContent = L('يُجلب من درايف… ', 'Fetching from Drive… ') + pct + '%';
+      }).then(function (file) {
+        if (st.dead) return;
+        if (!file) { ask(); return; }
+        useFile(file, sp.gd);
+      }, function (e) {
+        if (st.dead) return;
+        ask(o.driveWhy ? o.driveWhy(e) : '');
+      });
+    }
+
     function take() {
       pickFile().then(function (file) {
         if (!file || st.dead) return;
+        useFile(file, null);
+      });
+    }
+
+    function useFile(file, gd) {
+      st.gdNext = gd || null;
+      (function () {
         var D = window.GardenPdfDoc;
         if (!D) { fail(broken()); return; }
         busy(L('تُقرأ بصمةُ الملفّ…', 'Reading the file fingerprint…'));
@@ -348,6 +380,7 @@
             if (sp.h && r.hash !== sp.h) { warn(r, file, pre); return null; }
             if (!sp.h && o.onRelink) {
               sp = spec(r, file, pre.pages);
+              if (st.gdNext) sp.gd = st.gdNext;
               o.onRelink(sp, null);
             }
             show(file, pre, r.hash);
@@ -358,7 +391,7 @@
           if (e && e.cancelled) { ask(); return; }
           fail(locked(e) ? sealed() : broken());
         });
-      });
+      }());
     }
 
     function show(file, pre, hh) {
@@ -609,6 +642,9 @@
         '<div class="npo-acts"><button type="button" class="gsf-btn gsf-btn--go npo-again">' +
         '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' +
         esc(L('جرّب الآن', 'Try now')) + '</button>' +
+        (sp.gd && o.drive ? '<button type="button" class="gsf-btn gsf-btn--gd npo-drive">' +
+          '<i class="fa-brands fa-google-drive" aria-hidden="true"></i> ' +
+          esc(L('افتحْ من درايف', 'Open from Drive')) + '</button>' : '') +
         '<button type="button" class="gsf-btn gsf-btn--ghost npo-pick">' +
         '<i class="fa-solid fa-file-import" aria-hidden="true"></i> ' +
         esc(L('اخترْه من جهازك', 'Pick it from your device')) + '</button></div>');
@@ -616,6 +652,8 @@
       if (a) a.addEventListener('click', function () { usN = 0; fromUs(); });
       var b = stage.querySelector('.npo-pick');
       if (b) b.addEventListener('click', function () { unhook(); take(); });
+      var gw = stage.querySelector('.npo-drive');
+      if (gw) gw.addEventListener('click', function () { unhook(); if (st.usT) { clearTimeout(st.usT); st.usT = 0; } fromDrive(); });
       hook();
       var ms = US_WAIT[Math.min(usN, US_WAIT.length - 1)];
       usN++;

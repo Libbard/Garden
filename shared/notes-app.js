@@ -2752,6 +2752,24 @@
     return _pdfMod;
   }
 
+  var _driveMod = null;
+  function driveOn() { return !!(window.GardenEndpoints && window.GardenEndpoints.googleClientId); }
+  function needDrive() {
+    if (window.GardenDrive) return Promise.resolve(window.GardenDrive);
+    if (_driveMod) return _driveMod;
+    _driveMod = new Promise(function (res, rej) {
+      var probe = document.querySelector('script[src*="notes-app.js"]');
+      var src = probe ? (probe.getAttribute('src') || '') : '';
+      var v = src.split('?')[1] || '';
+      var el = document.createElement('script');
+      el.src = src.replace(/notes-app\.js.*$/, '') + 'drive.js' + (v ? ('?' + v) : '');
+      el.onload = function () { if (window.GardenDrive) res(window.GardenDrive); else rej(new Error('no api')); };
+      el.onerror = function () { _driveMod = null; rej(new Error('load')); };
+      document.head.appendChild(el);
+    });
+    return _driveMod;
+  }
+
   /*@3.NOAJ.333*/
   var _prepWin = null, _prepLeft = 0;
   function paperPrep(capMs, lite) {
@@ -4710,6 +4728,14 @@
       /*@3.NOAJ.264*/
       marks: doc.marks || null,
       noteId: id,
+      drive: driveOn() ? function (sp, onPct) {
+        return needDrive().then(function (GD) {
+          return GD.download(sp.gd, function (at, of) { if (of && onPct) onPct(Math.round(at * 100 / of)); }).then(function (blob) {
+            return new File([blob], sp.n || 'drive.pdf', { type: 'application/pdf' });
+          });
+        });
+      } : null,
+      driveWhy: function (e) { return window.GardenDrive ? window.GardenDrive.reason(e) : ''; },
       soloInk: function () { return soloPdf(id, doc.pdf && doc.pdf.h); },
       /*@3.NOAJ.268*/
       dockEl: function () { return document.getElementById('na-favs'); },
@@ -4804,13 +4830,72 @@
   function createPdf() {
     var O = window.GardenPdfOpen;
     if (!O) return;
-    O.pickFile().then(function (file) {
-      if (!file) return;
-      adoptPdf(file);
+    var fromDevice = function () {
+      O.pickFile().then(function (file) {
+        if (!file) return;
+        adoptPdf(file);
+      });
+    };
+    if (!driveOn()) { fromDevice(); return; }
+    needDrive().then(function (GD) { GD.warm(); }, function () {});
+    var dlg = document.createElement('dialog');
+    dlg.className = 'gsf gsf--snug na-pdfsrc';
+    dlg.setAttribute('aria-label', L('افتحْ ملفَّ PDF', 'Open a PDF file'));
+    dlg.innerHTML =
+      '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' + esc(L('إغلاق', 'Close')) + '">' +
+        '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
+      '<div class="gsf-body"><div class="gsf-head"><h2 class="gsf-title">' + esc(L('افتحْ ملفَّ PDF', 'Open a PDF file')) + '</h2></div>' +
+      '<div class="na-pdfsrc-tiles">' +
+        '<button type="button" class="na-pdfsrc-t" data-a="dev"><i class="fa-solid fa-laptop" aria-hidden="true"></i>' +
+          '<b>' + esc(L('من جهازي', 'From my device')) + '</b></button>' +
+        '<button type="button" class="na-pdfsrc-t" data-a="gd"><i class="fa-brands fa-google-drive" aria-hidden="true"></i>' +
+          '<b>' + esc(L('من قوقل درايف', 'From Google Drive')) + '</b></button>' +
+      '</div></div>';
+    document.body.appendChild(dlg);
+    var shut = function () { try { dlg.close(); } catch (e) {} if (dlg.parentNode) dlg.parentNode.removeChild(dlg); };
+    dlg.addEventListener('close', shut);
+    dlg.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-a]') : null;
+      if (!b) return;
+      shut();
+      if (b.getAttribute('data-a') === 'dev') { fromDevice(); return; }
+      pdfFromDrive();
+    });
+    try { dlg.showModal(); } catch (e) { shut(); fromDevice(); }
+  }
+
+  function pdfFromDrive() {
+    needDrive().then(function (GD) {
+      return GD.pick().then(function (pk) {
+        if (!pk || !pk.id) return;
+        return takeDrive(GD, pk.id, pk.name).then(function (file) {
+          adoptPdf(file, pk.id, function () { GD.maybeOffer()['catch'](function () {}); });
+        });
+      })['catch'](function (e) {
+        var why = GD.reason(e);
+        saveState('error', why);
+        toast(why);
+        setTimeout(function () { if (els.save && els.save.getAttribute('data-s') === 'error') saveState('', ''); }, 7000);
+      });
+    }, function () {
+      toast(L('تعذّر تحميلُ ربطِ درايف — تحقّقْ من الاتّصال.', 'Could not load Drive — check your connection.'));
     });
   }
 
-  function adoptPdf(file) {
+  function takeDrive(GD, id, name) {
+    saveState('saving', L('يُجلب من درايف…', 'Fetching from Drive…'));
+    var named = name ? Promise.resolve(name) : GD.meta(id).then(function (m) { return (m && m.name) || ''; }, function () { return ''; });
+    return named.then(function (nm) {
+      return GD.download(id, function (at, of) {
+        if (of) saveState('saving', L('يُجلب من درايف… ', 'Fetching from Drive… ') + Math.round(at * 100 / of) + '%');
+      }).then(function (blob) {
+        saveState('', '');
+        return new File([blob], nm || 'drive.pdf', { type: 'application/pdf' });
+      });
+    });
+  }
+
+  function adoptPdf(file, gd, after) {
     var O = window.GardenPdfOpen;
     if (!O || !file) return;
     (function (file) {
@@ -4845,12 +4930,14 @@
         if (S.view.k === 'course') rec.o.c = S.view.code;
         if (S.view.k === 'tag') rec.g = [S.view.tag];
         idxPut(rec);
+        if (gd) res.spec.gd = String(gd);
         var doc = { v: 1, kind: 'pdf', pdf: res.spec, blocks: [] };
         var St = window.GardenNotesStore;
         var go = function () {
           pdfPre = { id: id, pre: res.pre };
           reload({ keepOpen: true });
           openNote(id);
+          if (after) setTimeout(after, 900);
         };
         if (St) St.putDoc(id, doc, now).then(go, go); else go();
       }, function (e) {

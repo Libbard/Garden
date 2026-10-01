@@ -23,6 +23,21 @@
     try { return !!(g && g.lastSync && g.lastSync()); } catch (e) { return false; }
   }
 
+  var _gdMod = null;
+  function gdOn() { return !!(window.GardenEndpoints && window.GardenEndpoints.googleClientId); }
+  function needDrive() {
+    if (window.GardenDrive) return Promise.resolve(window.GardenDrive);
+    if (_gdMod) return _gdMod;
+    _gdMod = new Promise(function (res, rej) {
+      var el = document.createElement('script');
+      el.src = ROOT + 'shared/drive.js';
+      el.onload = function () { if (window.GardenDrive) res(window.GardenDrive); else rej(new Error('no api')); };
+      el.onerror = function () { _gdMod = null; rej(new Error('load')); };
+      document.head.appendChild(el);
+    });
+    return _gdMod;
+  }
+
   function ensureCSS() {
     if (document.querySelector('link[data-sync-panel]')) return;
     var l = document.createElement('link');
@@ -219,6 +234,7 @@
       : v === 'shield'  ? this.vShield()
       : v === 'locked'  ? this.vLocked()
       : v === 'disarm'  ? this.vDisarm()
+      : v === 'drive'   ? this.vDrive()
       :                   this.vHome();
 
     this.host.innerHTML = (solo ? '' : this.hero(st)) + body + this.msgBox();
@@ -391,10 +407,77 @@
     }
 
     if (this.files) h += this.vFiles(this.files);
+    if (gdOn()) {
+      h += '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('قوقل درايف', 'Google Drive')) + '</p><div class="sp-doors">' +
+        door('drive', 'fa-cloud', L('درايفي', 'My Drive'), this.drvSub(), 'gd') + '</div></div>';
+    }
 
     h += '<div class="sp-acts" style="margin-top:1.1rem">' +
       btn('disconnect', 'fa-arrow-right-from-bracket', L('فصلُ هذا الجهاز', 'Disconnect this device'), 'danger wide') + '</div>';
     return h;
+  };
+
+  Panel.prototype.drvSub = function () {
+    var GD = window.GardenDrive;
+    if (GD && GD.linked()) return L('موصولٌ على كلِّ أجهزتك', 'Connected on all your devices') + (GD.linkedEmail() ? ' · ' + GD.linkedEmail() : '');
+    return L('افتحْ ملفّاتِ PDF من درايفك', 'Open PDF files from your Drive');
+  };
+
+  Panel.prototype.loadDrive = function () {
+    var self = this;
+    if (this.drvBusy) return;
+    this.drvBusy = true;
+    needDrive().then(function (GD) { return GD.linkStatus(); }).then(function (st) {
+      self.drvBusy = false;
+      self.drv = st || { unknown: true };
+      if (self.view === 'drive') self.paint();
+    }, function () {
+      self.drvBusy = false;
+      self.drv = { unknown: true, why: 'load' };
+      if (self.view === 'drive') self.paint();
+    });
+  };
+
+  /*@3.SYPJ.49*/
+  Panel.prototype.vDrive = function () {
+    var d = this.drv;
+    if (!d) {
+      this.loadDrive();
+      return '<div class="sp-vouch"><b><i class="fa-solid fa-spinner fa-spin"></i>' +
+        esc(L('تُقرأ حالُ درايف…', 'Reading Drive status…')) + '</b></div>' + back('home');
+    }
+    var GD = window.GardenDrive;
+    var head, body, acts = '', warn = '';
+    if (d.unknown) {
+      head = L('تعذّر قراءةُ حالِ درايف الآن', 'Could not read the Drive status right now');
+      body = d.why === 'drive_not_configured'
+        ? L('ربطُ درايف لم يُفعَّل على خادمنا بعد. فتحُ ملفٍّ من درايف يعمل على هذا الجهاز بإذنٍ مؤقّت.',
+            'Drive linking is not enabled on our server yet. Opening a file from Drive still works on this device with a temporary permission.')
+        : L('تحقّقْ من اتّصالك ثمّ أعِدْ المحاولة. فتحُ ملفٍّ من درايف يبقى ممكناً على هذا الجهاز.',
+            'Check your connection and retry. Opening a file from Drive still works on this device.');
+      acts = btn('drv-retry', 'fa-rotate-right', L('أعِدِ المحاولة', 'Retry'), 'wide');
+    } else if (d.linked) {
+      head = L('موصولٌ على كلِّ أجهزتك', 'Connected on all your devices');
+      body = L('الإذنُ محفوظٌ مشفَّراً في حسابك عندنا، فيفتح جوّالُك ملفّاتِ درايف بلا دخولٍ جديد. لا نرى إلا الملفّاتِ التي تختارها أنت.',
+               'The permission is kept encrypted in your account, so your phone opens your Drive files with no new sign-in. We only see the files you pick.');
+      acts = btn('drv-off', 'fa-link-slash', L('افصلْ درايف', 'Disconnect Drive'), 'danger wide');
+    } else {
+      var here = GD && GD.declined();
+      head = here ? L('درايف على هذا الجهاز وحدَه', 'Drive on this device only') : L('درايف غيرُ موصول', 'Drive is not connected');
+      body = L('حين تفتح ملفّاً من درايف يطلب قوقلُ إذنَك على هذا الجهاز لساعة. اربطْه بحسابك ليجده جوّالُك وأجهزتُك الأخرى.',
+               'When you open a file from Drive, Google asks for your permission on this device for an hour. Link it to your account so your phone and other devices find it too.');
+      if (!d.armed) {
+        warn = '<small class="sp-warn-s"><i class="fa-solid fa-shield-halved"></i> ' +
+          esc(L('لحفظ الإذن في حسابك احمِ حسابَك أوّلاً — كي لا يدخلَه أحدٌ سواك.', 'To keep the permission in your account, protect your account first — so nobody but you can get in.')) + '</small>';
+        acts = btn('shield', 'fa-shield-halved', L('احمِ حسابي', 'Protect my account'), 'wide');
+      } else {
+        acts = btn('drv-all', 'fa-cloud', L('اربطْه بكلِّ أجهزتي', 'Link it to all my devices'), 'gd wide');
+      }
+    }
+    return '<div class="sp-vouch sp-vouch--gd"><b><i class="fa-brands fa-google-drive"></i>' + esc(head) + '</b>' +
+      (d.linked && d.email ? '<small class="sp-num" dir="ltr">' + esc(d.email) + '</small>' : '') +
+      '<small>' + esc(body) + '</small>' + warn + '</div>' +
+      '<div class="sp-acts">' + acts + '</div>' + back('home');
   };
 
   Panel.prototype.vFiles = function (a) {
@@ -739,6 +822,20 @@
     if (a === 'have' || a === 'code' || a === 'recover' || a === 'paste' || a === 'vouch' ||
         a === 'key' || a === 'unlink' || a === 'shield' || a === 'disarm' ||
         a === 'locked') return this.go(a);
+    if (a === 'drive') { this.drv = null; return this.go('drive'); }
+    if (a === 'drv-retry') { this.drv = null; this.paint(); return; }
+    if (a === 'drv-all' || a === 'drv-off') {
+      this.set({ busy: true, err: '', msg: '' });
+      needDrive().then(function (GD) {
+        return (a === 'drv-all' ? GD.linkNow() : GD.unlink()).then(function () {
+          self.drv = null;
+          self.set({ busy: false, msg: a === 'drv-all'
+            ? L('رُبط درايف بحسابك — يجده جوّالُك الآن.', 'Drive is linked to your account — your phone finds it now.')
+            : L('فُصل درايف. ملفّاتُك هناك لم تُمسّ.', 'Drive is disconnected. Your files there are untouched.') });
+        }, function (e) { self.set({ busy: false, err: GD.linkReason(e) }); });
+      }, function () { self.set({ busy: false, err: L('تعذّر تحميلُ ربطِ درايف.', 'Could not load Drive.') }); });
+      return;
+    }
     if (a === 'guard-retry') { this.set({ err: '', msg: '' }); this.loadGuard(); return; }
     if (a && a.indexOf('to-') === 0) return this.go(a.slice(3));
 

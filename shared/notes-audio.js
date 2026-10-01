@@ -540,6 +540,48 @@
 
   function strip() { return document.getElementById('na-audio'); }
   var stripMode = '';
+  var fold = false, foldRO = null;
+  function docBox() { return document.getElementById('na-doc-body'); }
+  function place() {
+    var s = strip(), b = docBox();
+    if (!s) return;
+    if (stripMode !== 'play' || !b) { s.style.removeProperty('--nau-top'); return; }
+    s.style.setProperty('--nau-top', b.offsetTop + 'px');
+  }
+  function setFold(on) {
+    fold = !!on;
+    var s = strip();
+    if (!s) return;
+    if (fold && stripMode === 'play') s.setAttribute('data-fold', '1'); else s.removeAttribute('data-fold');
+  }
+  /*@3.NOAJ3.3*/
+  function bindFold() {
+    var s = strip(), b = docBox();
+    if (!s || !b || s._fold) return;
+    s._fold = 1;
+    var away = function (e) {
+      if (stripMode !== 'play' || fold) return;
+      if (e && e.target && s.contains(e.target)) return;
+      setFold(true);
+    };
+    document.addEventListener('pointerdown', function (e) { if (b.contains(e.target)) away(e); }, true);
+    b.addEventListener('wheel', away, { passive: true });
+    b.addEventListener('scroll', function () { if (Date.now() - (b._nauUser || 0) < 900) away(); }, { passive: true });
+    b.addEventListener('touchmove', function () { b._nauUser = Date.now(); }, { passive: true });
+    b.addEventListener('pointerdown', function () { b._nauUser = Date.now(); }, true);
+    var hover = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine)') : null;
+    s.addEventListener('pointerenter', function () { if (fold && hover && hover.matches) setFold(false); });
+    s.addEventListener('focusin', function () { if (fold) setFold(false); });
+    s.addEventListener('click', function (e) {
+      if (!fold || stripMode !== 'play') return;
+      setFold(false);
+      if (!e.detail) return;
+      e.preventDefault(); e.stopPropagation();
+    }, true);
+    s.addEventListener('pointerdown', function (e) { if (fold && stripMode === 'play') e.preventDefault(); }, true);
+    if (window.ResizeObserver) { foldRO = new ResizeObserver(place); foldRO.observe(b); }
+    window.addEventListener('resize', place);
+  }
 
   function mode() {
     if (live) return live.r.paused() ? 'held' : 'rec';
@@ -554,9 +596,11 @@
     if (!s) return;
     var m = mode();
     s.hidden = !m;
-    if (!m) { s.removeAttribute('data-mode'); s.innerHTML = ''; stripMode = ''; return; }
+    if (!m) { s.removeAttribute('data-mode'); s.removeAttribute('data-fold'); s.style.removeProperty('--nau-top'); s.innerHTML = ''; stripMode = ''; return; }
     if (!force && m === stripMode) return;
+    if (m !== stripMode && m === 'play' && stripMode !== 'link') fold = false;
     stripMode = m;
+    bindFold();
     s.setAttribute('data-mode', m);
     s.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     if (m === 'rec' || m === 'held') s.innerHTML = liveHtml(m);
@@ -567,6 +611,8 @@
     if (m === 'rec' || m === 'held') { var st = live.r.stats(); paintLive(st, m === 'held' ? 'held' : 'rec'); }
     if (m === 'play') paintMini();
     if (m === 'link') { paintSeek(s); paintLane(s); }
+    setFold(fold);
+    place();
   }
 
   function liveHtml(m) {
@@ -996,6 +1042,7 @@
     }
     if (!a.paused) a.pause();
     pl = { key: key, parts: g.parts, idx: 0, total: g.ms, title: gTitle(g), on: false, url: '', err: 0 };
+    setFold(false);
     paintRows();
     load(0, 0).then(function () {
       if (pl && pl.key === key) engine().play()['catch'](function () {});
@@ -2006,6 +2053,10 @@
   }
 
   window.addEventListener('garden:noteDoc', onNoteDoc);
+  document.addEventListener('garden:languageChanged', function () {
+    var s = strip();
+    if (s && stripMode) paintStrip(true);
+  });
   window.addEventListener('pagehide', flush);
   document.addEventListener('visibilitychange', function () {
     if (live) note('vis', document.visibilityState + ' rec=' + ((live.r.rec && live.r.rec.state) || '-'));
