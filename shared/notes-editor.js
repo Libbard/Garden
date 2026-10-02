@@ -151,8 +151,8 @@
     { ty: 'shape',   icon: 'fa-shapes',          ar: 'شكل',         en: 'Shape',
       eg: { ar: 'مستطيلٌ أو نجمةٌ أو سهم — ويُكتب داخله',
             en: 'A box, a star, an arrow — and you write inside it' } },
-    { ty: 'img',     icon: 'fa-image',           ar: 'صورة برابط',  en: 'Image by URL',
-      eg: { ar: 'https://\u2026 — لا رفعَ ملفّات', en: 'https://\u2026 — no uploads' } },
+    { ty: 'img',     icon: 'fa-image',           ar: 'صورة',        en: 'Image',
+      eg: { ar: 'من جهازك أو قوقل درايف أو رابط — أو الصقْها واسحبْها', en: 'From your device, Google Drive or a link — or paste and drop' } },
     { ty: 'hr',      icon: 'fa-minus',           ar: 'فاصل',        en: 'Divider',
       eg: { ar: 'خطٌّ يفصل قسمين', en: 'A line between sections' } },
     { ty: 'gap',     icon: 'fa-arrows-up-down',  ar: 'فراغ',         en: 'Spacer',
@@ -302,6 +302,7 @@
     this.lastSel = null;
     this.root = el('div', 'ne-root');
     this.root.__ed = this;
+    if (!this.opts.pickDrive) this.root.setAttribute('data-nogd', '1');
     this.host.innerHTML = '';
     this.host.appendChild(this.root);
     this.render();
@@ -2162,16 +2163,33 @@
       edit.appendChild(cd);
       return bd;
     };
-    var cardSrc = cardOf('src', 'المصدر', 'Source', 'fa-link', !hasSrc0);
+    var acts = el('div', 'ne-img-acts');
+    var edB = el('button', 'gsf-btn gsf-btn--go ne-img-ed', { type: 'button', 'data-imgedit': '1' });
+    edB.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span>' +
+      B().esc(L('تعديلُ الصورة', 'Edit image')) + '</span>';
+    acts.appendChild(edB);
+    if (B().imgSrc(b.was)) {
+      var orB = el('button', 'gsf-btn gsf-btn--ghost ne-img-orig', { type: 'button', 'data-imgorig': '1' });
+      orB.innerHTML = '<i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>' +
+        B().esc(L('الصورةُ الأصليّة', 'Original')) + '</span>';
+      acts.appendChild(orB);
+    }
+    edit.appendChild(acts);
+    var cardSrc = cardOf('src', 'استبدالُ الصورة', 'Replace image', 'fa-repeat', !hasSrc0);
     var cardCap = cardOf('cap', 'العنوان', 'Caption', 'fa-heading', false);
     var cardLook = cardOf('look', 'الشكلُ والحجم', 'Look and size', 'fa-crop-simple', false);
 
+    cardSrc.appendChild(srcBtns(true));
     /*@3.NOEJ.371*/
     var isLoc = !!(B().localImg && B().localImg(b.url));
     var urlIn = el('input', 'ne-img-url', {
       type: 'url', value: isLoc ? '' : (b.url || ''), dir: 'ltr', spellcheck: 'false',
-      placeholder: isLoc ? L('ضعْ رابطاً لتُزامَن', 'Add a link to sync it') : 'https://i.imgur.com/…',
-      'aria-label': L('رابط الصورة المباشر', 'Direct image link')
+      placeholder: L('أو الصقْ رابطَ صورة…', 'Or paste an image link…'),
+      'aria-label': L('رابطُ الصورة', 'Image link')
+    });
+    var selfR = this;
+    urlIn.addEventListener('change', function () {
+      if (B().httpsOnly(urlIn.value)) selfR.imgLinkSet(b.id, urlIn.value, true);
     });
     cardSrc.appendChild(urlIn);
     var unsBtn = el('button', 'ne-mini ne-img-uns', {
@@ -2223,8 +2241,7 @@
     var dims = [
       { k: 'iw', min: 20, max: 100, ar: 'الحجم', en: 'Size', d: 100 },
       { k: 'zm', min: 40, max: 320, ar: 'حجم الصورة داخل الإطار', en: 'Image size inside frame', d: 0 },
-      { k: 'br', min: 20, max: 150, ar: 'السطوع', en: 'Brightness', d: 100 },
-      { k: 'op', min: 15, max: 100, ar: 'الوضوح', en: 'Opacity', d: 100 }
+      { k: 'op', min: 15, max: 100, ar: 'درجةُ الظهور', en: 'Opacity', d: 100 }
     ];
     dims.forEach(function (d) {
       var row = el('label', 'ne-img-sl');
@@ -2274,31 +2291,12 @@
     rst.textContent = L('إعادة للأصل', 'Reset');
     cardLook.appendChild(rst);
 
-    /*@3.NOEJ.365*/
-    if (B().localImg && B().localImg(b.url)) {
-      var loc = el('p', 'ne-hint ne-hint--warn');
-      loc.textContent = L(
-        'هذه الصورةُ محفوظةٌ في هذا الجهازِ وحدَه: لا تُزامَن ولا تظهر في أجهزتِك الأخرى. ' +
-        'وللمزامنةِ ولبقاءِ جودتِها كاملةً ضعْ لها رابطاً مباشراً في الحقلِ أعلاه.',
-        'This image lives on this device only: it is not synced and will not appear on your other devices. ' +
-        'To sync it — and keep its full quality — put a direct link in the field above.');
-      cardSrc.appendChild(loc);
-    }
-
     var hint = el('p', 'ne-hint');
-    hint.innerHTML = L(
-      '<b>ثلاثُ طرقٍ لوضعِ صورة:</b> الصقْها أو اسحبْها إلى الورقةِ (تُحفظ في هذا الجهاز)، أو ضعْ رابطاً مباشراً في الحقلِ أعلاه (يُزامَن بين أجهزتك)، أو ابحثْ في أنسبلاش. ' +
-      'ما تلصقه يخرج معك في <b>تصديرِ PDF</b> ويعود بالاستيرادِ في أيِّ وقت. وللرابطِ المباشرِ مستضيفاتٌ تأذن بالتصدير: ' +
-      '<a href="https://imgur.com" target="_blank" rel="noopener noreferrer">imgur.com</a> · ' +
-      '<a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com</a>؛ ' +
-      'و<a href="https://ibb.co" target="_blank" rel="noopener noreferrer">ibb.co</a> و<a href="https://postimages.org" target="_blank" rel="noopener noreferrer">postimages.org</a> تُعرض ولا تُصدَّر. ' +
-      'الصورةُ بالرابطِ تُعرض من موقعها ولا تُحفظ عندنا — فلا تظهر بلا إنترنت.',
-      '<b>Three ways to add an image:</b> paste or drop it on the page (kept on this device), put a direct link in the field above (synced across your devices), or search Unsplash. ' +
-      'Pasted images travel with your <b>PDF export</b> and come back on import. Hosts that allow export: ' +
-      '<a href="https://imgur.com" target="_blank" rel="noopener noreferrer">imgur.com</a> · ' +
-      '<a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com</a>; ' +
-      '<a href="https://ibb.co" target="_blank" rel="noopener noreferrer">ibb.co</a> and <a href="https://postimages.org" target="_blank" rel="noopener noreferrer">postimages.org</a> display but do not export. ' +
-      'A linked image is shown from its host and not stored here — it will not appear offline.');
+    hint.textContent = L(
+      'الصورةُ تُحفظ مع ملاحظتك: تصل أجهزتَك الأخرى، وتظهر بلا إنترنت، وتخرج في PDF. ' +
+      'والرابطُ نحفظ منه نسخةً إن سمح موقعُه، وإلا عُرضت الصورةُ من موقعها.',
+      'The image is kept with your note: it reaches your other devices, shows offline and exports to PDF. ' +
+      'From a link we keep a copy when its site allows it; otherwise it is shown from its site.');
     cardSrc.appendChild(hint);
 
     applyImgStyle(fig, b);
@@ -2483,11 +2481,7 @@
     if (B().localImg && B().localImg(url)) { paintLocal(host, url, alt, lk); return; }
     var u = B().httpsOnly(url);
     if (!u) {
-      var ph = el('div', 'ne-img-ph');
-      ph.innerHTML = '<i class="fa-solid fa-image" aria-hidden="true"></i><span>' +
-        B().esc(L('لا صورةَ بعد — اضغطْ هنا لوضعِ رابطٍ، أو الصقْ صورةً من الحافظة',
-                  'No image yet — tap here to add a link, or paste an image')) + '</span>';
-      host.appendChild(ph);
+      host.appendChild(pickZone());
       return;
     }
     var img = el('img', 'ne-img', {
@@ -2539,6 +2533,296 @@
     if (wrapA) { wrapA.appendChild(img); host.appendChild(wrapA); }
     else host.appendChild(img);
   }
+
+  /*@3.NOEJ.587*/
+  var IMG_SRCS = [
+    ['dev', 'fa-solid fa-laptop', 'من جهازي', 'My device'],
+    ['gd', 'fa-brands fa-google-drive', 'قوقل درايف', 'Google Drive'],
+    ['url', 'fa-solid fa-link', 'رابط', 'Link'],
+    ['paste', 'fa-solid fa-paste', 'لصق', 'Paste']
+  ];
+  function srcBtns(compact) {
+    var g = el('div', 'ne-img-srcs' + (compact ? ' ne-img-srcs--c' : ''));
+    IMG_SRCS.forEach(function (s) {
+      if (compact && s[0] === 'url') return;
+      var bt = el('button', 'ne-img-src', { type: 'button', 'data-imgsrc': s[0] });
+      bt.innerHTML = '<i class="' + s[1] + '" aria-hidden="true"></i><span>' + B().esc(L(s[2], s[3])) + '</span>';
+      g.appendChild(bt);
+    });
+    return g;
+  }
+  function pickZone() {
+    var z = el('div', 'ne-img-pick', { contenteditable: 'false' });
+    z.innerHTML = '<i class="fa-solid fa-image ne-img-pick-i" aria-hidden="true"></i>' +
+      '<b class="ne-img-pick-t">' + B().esc(L('اسحبْ صورةً إلى هنا، أو الصقْها، أو اخترْ من أين',
+        'Drop an image here, paste it, or choose where from')) + '</b>' +
+      '<span class="ne-img-pick-busy" role="status">' + B().esc(L('تُحفظ الصورة…', 'Saving the image…')) + '</span>';
+    z.appendChild(srcBtns(false));
+    var row = el('div', 'ne-img-lnrow');
+    row.hidden = true;
+    var inp = el('input', 'gsf-in ne-img-lnk', {
+      type: 'url', dir: 'ltr', spellcheck: 'false', autocomplete: 'off',
+      placeholder: L('رابطُ الصورة، أو رابطُ مشاركتها من درايف', 'An image link, or its Drive share link'),
+      'aria-label': L('رابطُ الصورة', 'Image link')
+    });
+    var go = el('button', 'gsf-btn gsf-btn--go', { type: 'button', 'data-imglnk': '1' });
+    go.textContent = L('أضِف', 'Add');
+    inp.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      e.preventDefault(); e.stopPropagation();
+      go.click();
+    });
+    row.appendChild(inp); row.appendChild(go);
+    z.appendChild(row);
+    var ft = el('p', 'ne-img-pick-f');
+    ft.innerHTML = B().esc(L('تُحفظ مع ملاحظتك، وتصل أجهزتَك، وتخرج في PDF · ',
+      'Kept with your note, on all your devices, and in your PDF · ')) +
+      '<button type="button" class="ne-img-unsl" data-imguns="1">' +
+      B().esc(L('صورٌ مجّانيّة من أنسبلاش', 'Free photos from Unsplash')) + '</button>';
+    z.appendChild(ft);
+    return z;
+  }
+
+  /*@3.NOEJ.588*/
+  function hostOf(u) { try { return new URL(u).hostname; } catch (e) { return ''; } }
+  function driveImgUrl(u) {
+    var m = /^https:[/][/](?:drive|docs)[.]google[.]com[/](?:file[/]d[/]|open[?]id=|uc[?](?:[^#]*&)?id=)([A-Za-z0-9_-]{10,})/.exec(String(u || '').trim());
+    return m ? ('https://lh3.googleusercontent.com/d/' + m[1]) : '';
+  }
+  var COPY_MAX = 8 * 1024 * 1024;
+  function fetchCopy(u) {
+    if (!window.fetch || /(^|[.])unsplash[.]com$/i.test(hostOf(u))) return Promise.resolve(null);
+    var ctl = window.AbortController ? new AbortController() : null;
+    var t = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+    return fetch(u, { mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer', signal: ctl ? ctl.signal : undefined })
+      .then(function (r) {
+        if (!r.ok || !/^image[/](png|jpe?g|webp|gif|avif|bmp)/i.test(String(r.headers.get('content-type') || ''))) return null;
+        if ((Number(r.headers.get('content-length')) || 0) > COPY_MAX) return null;
+        return r.blob();
+      })
+      .then(function (bl) {
+        clearTimeout(t);
+        return (bl && bl.size && bl.size <= COPY_MAX && /^image[/]/.test(bl.type)) ? bl : null;
+      }, function () { clearTimeout(t); return null; });
+  }
+  /*@3.NOEJ.589*/
+  function squeeze(blob, side) {
+    var mk = window.createImageBitmap ? createImageBitmap(blob) : Promise.reject(new Error('no_bitmap'));
+    return mk.then(function (bm) {
+      var k = Math.min(1, (side || 3000) / Math.max(bm.width, bm.height, 1));
+      var cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(bm.width * k)); cv.height = Math.max(1, Math.round(bm.height * k));
+      var g = cv.getContext('2d');
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(bm, 0, 0, cv.width, cv.height);
+      try { bm.close(); } catch (e) {}
+      return new Promise(function (ok) {
+        cv.toBlob(function (o) {
+          if (o && o.type === 'image/webp') { ok(o); return; }
+          cv.toBlob(function (j) { ok(j); }, 'image/jpeg', 0.9);
+        }, 'image/webp', 0.9);
+      });
+    });
+  }
+  function pickFiles(cb) {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+    inp.setAttribute('aria-hidden', 'true');
+    inp.style.cssText = 'position:fixed;inset-inline-start:-9999px;inset-block-start:0;opacity:0;';
+    document.body.appendChild(inp);
+    var gone = function () { if (inp.parentNode) inp.parentNode.removeChild(inp); };
+    inp.addEventListener('change', function () {
+      var fs = [].slice.call(inp.files || []);
+      gone();
+      if (fs.length) cb(fs);
+    });
+    inp.addEventListener('cancel', gone);
+    inp.click();
+  }
+
+  Editor.prototype.imgNote = function (ar, en) {
+    if (this.opts && this.opts.onNote) this.opts.onNote(L(ar, en));
+  };
+  Editor.prototype.imgNode = function (id) {
+    return this.root ? this.root.querySelector('[data-bid="' + id + '"]') : null;
+  };
+  Editor.prototype.imgBusy = function (id, on) {
+    var nd = this.imgNode(id);
+    if (!nd) return;
+    if (on) nd.setAttribute('data-imgbusy', '1'); else nd.removeAttribute('data-imgbusy');
+  };
+  /*@3.NOEJ.590*/
+  Editor.prototype.imgSet = function (id, url, extra, keep) {
+    var hit = this.blockAt(id);
+    if (!hit || hit.b.ty !== 'img') return false;
+    var before = this.snapshot();
+    var b = hit.b;
+    b.url = url;
+    delete b.iar; delete b.inw;
+    if (!keep) { delete b.by; delete b.byLink; delete b.was; delete b.ie; delete b.loc; delete b.via; }
+    if (extra) Object.assign(b, extra);
+    this.pushUndo(before);
+    this.renderOne(id);
+    this.touch();
+    this.emitState();
+    return true;
+  };
+  Editor.prototype.imgFrom = function (id, kind) {
+    var self = this;
+    if (kind === 'dev') {
+      pickFiles(function (fs) { self.takeImages({ files: fs }, self.imgNode(id), id); });
+    } else if (kind === 'gd') {
+      if (!this.opts.pickDrive) return;
+      this.opts.pickDrive().then(function (f) {
+        if (f) self.takeImages({ files: [f] }, self.imgNode(id), id);
+      });
+    } else if (kind === 'url') {
+      var nd = this.imgNode(id);
+      var row = nd ? nd.querySelector('.ne-img-lnrow') : null;
+      if (!row) return;
+      row.hidden = false;
+      var inp = row.querySelector('input');
+      if (inp) { try { inp.focus({ preventScroll: true }); } catch (eF) { inp.focus(); } }
+    } else if (kind === 'paste') {
+      this.imgPaste(id);
+    }
+  };
+  Editor.prototype.imgPaste = function (id) {
+    var self = this;
+    var C = navigator.clipboard;
+    var nope = function () {
+      self.imgNote('لم يُسمح بقراءة الحافظة — اضغطْ Ctrl+V بعد أن تنسخ الصورة.',
+                   'Clipboard access was not allowed — press Ctrl+V after copying the image.');
+    };
+    if (!C || !C.read) {
+      if (C && C.readText) {
+        C.readText().then(function (s) {
+          if (B().httpsOnly(s)) self.imgLinkSet(id, s);
+          else nope();
+        }, nope);
+      } else nope();
+      return;
+    }
+    C.read().then(function (items) {
+      var it = null, ty = '', txt = null, i, j;
+      for (i = 0; i < (items || []).length && !it; i++) {
+        for (j = 0; j < (items[i].types || []).length; j++) {
+          var t = items[i].types[j];
+          if (/^image[/]/.test(t)) { it = items[i]; ty = t; break; }
+          if (t === 'text/plain' && !txt) txt = items[i];
+        }
+      }
+      if (it) {
+        return it.getType(ty).then(function (bl) {
+          var f = new File([bl], 'pasted.' + (ty.split('/')[1] || 'png'), { type: ty });
+          self.takeImages({ files: [f] }, self.imgNode(id), id);
+        });
+      }
+      if (txt) {
+        return txt.getType('text/plain').then(function (bl) { return bl.text(); }).then(function (s) {
+          if (B().httpsOnly(s)) { self.imgLinkSet(id, s); return; }
+          self.imgNote('لا صورةَ في الحافظة — انسخْ صورةً أوّلاً.', 'No image on the clipboard — copy one first.');
+        });
+      }
+      self.imgNote('لا صورةَ في الحافظة — انسخْ صورةً أوّلاً.', 'No image on the clipboard — copy one first.');
+    })['catch'](nope);
+  };
+  Editor.prototype.imgLinkGo = function (node, id) {
+    var inp = node ? node.querySelector('.ne-img-lnk') : null;
+    this.imgLinkSet(id, inp ? inp.value : '');
+  };
+  Editor.prototype.imgLinkSet = function (id, raw, keepOpen) {
+    var self = this;
+    var u = B().httpsOnly(raw);
+    if (!u) {
+      this.imgNote('الصقْ رابطاً يبدأ بـ https://', 'Paste a link that starts with https://');
+      return Promise.resolve(false);
+    }
+    u = driveImgUrl(u) || u;
+    var S = window.GardenNotesStore;
+    this.imgBusy(id, true);
+    var put = function (url, extra) {
+      self.imgBusy(id, false);
+      if (keepOpen) { if (!self._imgOpen) self._imgOpen = {}; self._imgOpen[id] = 1; }
+      return self.imgSet(id, url, extra);
+    };
+    return fetchCopy(u).then(function (bl) {
+      if (!bl || !S || !S.putImage) return put(u);
+      return S.putImage(bl, { name: '' }).then(function (rid) {
+        return put('byte-local:' + rid, { loc: 1, via: u });
+      }, function () { return put(u); });
+    });
+  };
+
+  var _ieP = null;
+  function needImgEdit() {
+    if (window.GardenImgEdit) return Promise.resolve(window.GardenImgEdit);
+    if (_ieP) return _ieP;
+    var me = document.querySelector('script[src*="notes-editor.js"]');
+    var src = me ? me.getAttribute('src') : '../shared/notes-editor.js';
+    var base = src.replace(/notes-editor[.]js.*$/, ''), q = (/[?]v=[^&]+/.exec(src) || [''])[0];
+    _ieP = new Promise(function (ok, no) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet'; l.href = base + 'notes-imgedit.css' + q;
+      document.head.appendChild(l);
+      var sc = document.createElement('script');
+      sc.src = base + 'notes-imgedit.js' + q;
+      sc.onload = function () { if (window.GardenImgEdit) ok(window.GardenImgEdit); else no(new Error('ie_missing')); };
+      sc.onerror = function () { no(new Error('ie_load')); };
+      document.head.appendChild(sc);
+    })['catch'](function (e) { _ieP = null; throw e; });
+    return _ieP;
+  }
+  function imgUrlOf(ref) {
+    var S = window.GardenNotesStore;
+    if (B().localImg(ref)) return S && S.imageUrl ? S.imageUrl(String(ref).slice(11)) : Promise.resolve('');
+    return Promise.resolve(B().httpsOnly(ref));
+  }
+  /*@3.NOEJ.591*/
+  Editor.prototype.imgEdit = function (id) {
+    var self = this;
+    var hit = this.blockAt(id);
+    if (!hit || hit.b.ty !== 'img' || !B().imgSrc(hit.b.url)) return;
+    var b = hit.b;
+    var base = B().imgSrc(b.was) || b.url;
+    var ie0 = b.ie || null;
+    if (!ie0 && b.br != null && b.br !== 100) ie0 = { br: b.br };
+    needImgEdit().then(function (IE) {
+      IE.open({
+        src: imgUrlOf(base),
+        ie: ie0,
+        onSave: function (blob, ie) {
+          var S = window.GardenNotesStore;
+          if (!S || !S.putImage) return Promise.reject(new Error('no_store'));
+          var put = function (bl) { return S.putImage(bl, { name: 'edited' }); };
+          return put(blob)['catch'](function (e) {
+            if (e && e.code === 'img_too_large') return squeeze(blob, 3000).then(put);
+            throw e;
+          }).then(function (rid) {
+            var cur = self.blockAt(id);
+            if (!cur) return;
+            var was = B().imgSrc(cur.b.was) || cur.b.url;
+            self.imgSet(id, 'byte-local:' + rid, { loc: 1, was: was, ie: ie, br: 100 }, true);
+          });
+        },
+        onRestore: B().imgSrc(b.was) ? function () { self.imgOrig(id); } : null
+      });
+    }, function () {
+      self.imgNote('تعذّر فتحُ محرّرِ الصورة — تحقّقْ من الاتّصال.', 'Could not open the image editor — check the connection.');
+    });
+  };
+  Editor.prototype.imgOrig = function (id) {
+    var hit = this.blockAt(id);
+    var was = hit ? B().imgSrc(hit.b.was) : '';
+    if (!was) return;
+    var before = this.snapshot();
+    hit.b.url = was;
+    delete hit.b.was; delete hit.b.ie; delete hit.b.iar; delete hit.b.inw;
+    this.pushUndo(before);
+    this.renderOne(id);
+    this.touch();
+    this.emitState();
+  };
 
   /*@3.NOEJ.21*/
   function paintCode(pre, b, root) {
@@ -2984,20 +3268,43 @@
   }
 
   /*@3.NOEJ.364*/
-  Editor.prototype.takeImages = function (dt, node) {
+  Editor.prototype.takeImages = function (dt, node, intoId) {
     var self = this;
     var files = imgsIn(dt);
     var S = window.GardenNotesStore;
     if (!files || !S || !S.putImage) return false;
     var afterId = node && node.getAttribute ? node.getAttribute('data-bid') : null;
+    /*@3.NOEJ.592*/
+    var fill = intoId || null;
+    if (!fill && afterId) {
+      var tg = this.blockAt(afterId);
+      if (tg && tg.b.ty === 'img' && !B().imgSrc(tg.b.url)) fill = afterId;
+    }
+    if (fill) this.imgBusy(fill, true);
+    var put = function (f) {
+      return S.putImage(f, { name: f.name || '' })['catch'](function (e) {
+        if (e && e.code === 'img_too_large') return squeeze(f, 3000).then(function (sm) { return S.putImage(sm, { name: f.name || '' }); });
+        throw e;
+      });
+    };
+    var chain = Promise.resolve();
     files.slice(0, 6).forEach(function (f) {
-      S.putImage(f, { name: f.name || '' }).then(function (rid) {
+      chain = chain.then(function () { return put(f); }).then(function (rid) {
         if (!self.root || !self.root.isConnected) return;
-        var made = self.addBlock('img', afterId, null,
-          { url: 'byte-local:' + rid, alt: '', loc: 1 });
-        afterId = made || afterId;
+        if (fill) {
+          var into = fill;
+          fill = null;
+          self.imgBusy(into, false);
+          self.imgSet(into, 'byte-local:' + rid, { loc: 1 });
+          afterId = into;
+        } else {
+          var made = self.addBlock('img', afterId, null,
+            { url: 'byte-local:' + rid, alt: '', loc: 1 });
+          afterId = made || afterId;
+        }
         if (self.opts.onLocalImage) self.opts.onLocalImage(1);
       }, function (err) {
+        if (fill) self.imgBusy(fill, false);
         if (self.opts.onLocalImage) self.opts.onLocalImage(0, err && err.code);
       });
     });
@@ -3222,7 +3529,19 @@
 
     if (navigator.clipboard.read) {
       return navigator.clipboard.read().then(function (items) {
-        var jobs = [], html = '', txt = '';
+        /*@3.NOEJ.594*/
+        var jobs = [], html = '', txt = '', pic = null;
+        (items || []).forEach(function (it) {
+          (it.types || []).forEach(function (ty) {
+            if (!pic && /^image[/]/.test(ty)) pic = { it: it, ty: ty };
+          });
+        });
+        if (pic && mode !== 'text') {
+          return pic.it.getType(pic.ty).then(function (bl) {
+            var f = new File([bl], 'pasted.' + (pic.ty.split('/')[1] || 'png'), { type: pic.ty });
+            return self.takeImages({ files: [f] }, node);
+          });
+        }
         (items || []).forEach(function (it) {
           (it.types || []).forEach(function (ty) {
             if (ty === 'text/html') jobs.push(it.getType(ty).then(function (b) { return b.text(); })
@@ -9804,7 +10123,14 @@
         return;
       }
 
-      var imf = e.target.closest('.ne-fig');
+      var isrc = e.target.closest('[data-imgsrc]');
+      if (isrc) { if (!self.readOnly) self.imgFrom(id, isrc.getAttribute('data-imgsrc')); return; }
+      if (e.target.closest('[data-imglnk]')) { if (!self.readOnly) self.imgLinkGo(node, id); return; }
+      if (e.target.closest('[data-imgedit]')) { if (!self.readOnly) self.imgEdit(id); return; }
+      if (e.target.closest('[data-imgorig]')) { if (!self.readOnly) self.imgOrig(id); return; }
+      var pickZ = e.target.closest('.ne-img-pick');
+      if (pickZ && !e.target.closest('[data-imguns]')) return;
+      var imf = pickZ ? null : e.target.closest('.ne-fig');
       if (imf && imf.getAttribute('data-sh') === 'circle' && self._imgDragged) {
         self._imgDragged = false;
         return;
@@ -10350,12 +10676,23 @@
 
     /*@3.NOEJ.143*/
     /*@3.NOEJ.362*/
+    /*@3.NOEJ.593*/
+    var overZ = null;
+    var unover = function () { if (overZ) { overZ.removeAttribute('data-over'); overZ = null; } };
     root.addEventListener('dragover', function (e) {
       e.preventDefault();
       if (!e.dataTransfer) return;
-      e.dataTransfer.dropEffect = imgsIn(e.dataTransfer) ? 'copy' : 'none';
+      var withImg = !!imgsIn(e.dataTransfer) || [].indexOf.call(e.dataTransfer.types || [], 'Files') >= 0;
+      e.dataTransfer.dropEffect = withImg ? 'copy' : 'none';
+      var tz = elOf(e.target);
+      var z = (withImg && tz && tz.closest) ? tz.closest('.ne-img-pick') : null;
+      if (z !== overZ) { unover(); if (z) { z.setAttribute('data-over', '1'); overZ = z; } }
+    });
+    root.addEventListener('dragleave', function (e) {
+      if (overZ && !overZ.contains(e.relatedTarget)) unover();
     });
     root.addEventListener('drop', function (e) {
+      unover();
       if (self.readOnly || !e.dataTransfer || !imgsIn(e.dataTransfer)) return;
       e.preventDefault();
       e.stopPropagation();

@@ -4311,18 +4311,19 @@
         onEng: function () { freePlace(); growPages(); placeInk(); cutsSoon(120); mathSettle(); dgmSettleOpen(); legacyUnpin(); },
         onFree: function (b) { freeMark(b); freePlace(); },
         onImagePaste: function () {
-          saveState('error', L('الصور برابط خارجيّ', 'Images by link only'));
+          saveState('error', L('تعذّر لصقُ الصورة — جرّبْ «من جهازي»', 'Could not paste the image — try “My device”'));
         },
+        pickDrive: driveOn() ? imgFromDrive : null,
         /*@3.NOAJ.270*/
         onLocalImage: function (ok, code) {
           if (ok) {
-            saveState('ok', L('حُفظت في هذا الجهاز — للمزامنة الصقْ رابطاً مباشراً',
-                              'Saved on this device — paste a direct link to sync it'));
+            saveState('ok', L('أُضيفت الصورة — تُحفظ مع ملاحظتك وتصل أجهزتَك',
+                              'Image added — kept with your note and on your devices'));
             return;
           }
           saveState('error', code === 'img_too_large'
             ? L('الصورةُ أكبرُ من ٨ م.ب', 'The image is larger than 8 MB')
-            : L('تعذّر حفظُ الصورةِ في هذا الجهاز', 'Could not save the image on this device'));
+            : L('تعذّر حفظُ الصورة', 'Could not save the image'));
         }
       });
       if (hist) {
@@ -5634,9 +5635,40 @@
       setTimeout(function () { if (els.save && els.save.getAttribute('data-s') === 'error') saveState('', ''); }, 7000);
     });
   }
+  /*@3.NOAJ.449*/
+  var IMG_MIMES = 'image/png,image/jpeg,image/webp,image/gif';
+  function imgTake(GD, pk) {
+    if (!pk || !pk.id) return Promise.resolve(null);
+    saveState('saving', L('تُجلب الصورةُ من درايف…', 'Fetching the image from Drive…'));
+    return GD.download(pk.id).then(function (blob) {
+      saveState('', '');
+      var ty = (blob && /^image[/]/.test(blob.type)) ? blob.type : (pk.mime || 'image/jpeg');
+      return new File([blob], pk.name || 'drive-image', { type: ty });
+    });
+  }
+  function imgFromDrive() {
+    return needDrive().then(function (GD) {
+      return GD.pick({ mime: IMG_MIMES, title: L('اخترْ صورةً من درايف', 'Pick an image from Drive') })
+        .then(function (pk) { return imgTake(GD, pk); });
+    })['catch'](function (e) {
+      saveState('', '');
+      toast(window.GardenDrive ? window.GardenDrive.reason(e) : L('تعذّر الوصولُ إلى درايف.', 'Drive could not be reached.'));
+      return null;
+    });
+  }
   function driveBack(GD, r) {
     if (!r) return;
     if (r.k === 'err') { toast(GD.reason(r.e)); return; }
+    if (r.k === 'pick' && r.pick && /^image[/]/.test(r.pick.mime || '')) {
+      var tries = 0;
+      var wait = function () {
+        if (!ed || !ed.takeImages) { if (++tries < 40) setTimeout(wait, 250); return; }
+        imgTake(GD, r.pick).then(function (f) { if (f && ed) ed.takeImages({ files: [f] }, null); },
+          function (e) { saveState('', ''); toast(GD.reason(e)); });
+      };
+      wait();
+      return;
+    }
     if (r.k === 'pick') drivePicked(GD, Promise.resolve(r.pick));
   }
 

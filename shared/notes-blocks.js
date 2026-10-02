@@ -560,6 +560,8 @@
       if (b.ty === 'img') {
         /*@3.NOBJ.28*/
         b.url = imgSrc(b.url);
+        /*@3.NOBJ.51*/
+        if (b.was != null) { b.was = imgSrc(b.was); if (!b.was) delete b.was; }
         /*@3.NOBJ.23*/
         if (b.lk != null) { var lkN = normUrl(b.lk); if (lkN) b.lk = lkN; else delete b.lk; }
       }
