@@ -8642,7 +8642,8 @@
     return '<div class="ne-menu-h">' + B().esc(L('النصُّ المحدَّد', 'Selected text')) +
       ' — <span class="ne-menu-q">' + B().esc(cut) + '</span></div>' +
       mItem('selcopy', 'fa-copy', L('نسخُ النصّ', 'Copy text')) +
-      mItem('selcut', 'fa-scissors', L('قصُّ النصّ', 'Cut text'));
+      mItem('selcut', 'fa-scissors', L('قصُّ النصّ', 'Cut text')) +
+      (window.GardenTr ? mItem('seltr', 'fa-language', L('ترجمةُ النصّ', 'Translate text')) : '');
   };
 
   Editor.prototype.lkHtml = function () {
@@ -8890,6 +8891,11 @@
                               : L('لا عناوينَ تُبنى عليها بطاقات — ابدأِ الأقسامَ بعنوانٍ أو بسطرٍ عريضٍ ينتهي بنقطتين.',
                                   'No headings to build cards from — start sections with a heading or a bold line ending in a colon.'));
         }
+      }
+      else if (act === 'seltr') {
+        var trR = null;
+        try { trR = self._ctxSel ? self._ctxSel.getBoundingClientRect() : null; } catch (eT) {}
+        if (window.GardenTr) GardenTr.open(self._ctxSelTxt, trR && (trR.width || trR.height) ? trR : null);
       }
       else if (act === 'selcopy' || act === 'selcut') {
         if (!self.copySel(act === 'selcut') && self.opts.onNote) {

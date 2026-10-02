@@ -766,6 +766,11 @@
   /*@3.NOPJ8.148*/
   Ink.prototype.paperMenu = function (p, cx, cy, eat) {
     var ed = this.fieldEd(p, true);
+    var trT = '', trR = null;
+    if (window.GardenTr && this.view && this.view.selText) {
+      try { trT = String(this.view.selText() || '').trim(); } catch (eT) {}
+      if (trT) trR = GardenTr.selRect();
+    }
     if (!ed || !ed.openCtx || !ed.root) return false;
     /*@3.NOPJ8.150*/
     var ok;
@@ -787,6 +792,20 @@
         });
         m.insertBefore(fb, m.firstChild);
       }
+    }
+    var tm = (ok && trT) ? document.querySelector('.ne-menu') : null;
+    if (tm && !tm.querySelector('[data-act="ptr"]')) {
+      var tb = document.createElement('button');
+      tb.type = 'button'; tb.className = 'ne-menu-i ne-menu-i--file'; tb.setAttribute('role', 'menuitem');
+      tb.setAttribute('data-act', 'ptr');
+      tb.innerHTML = '<i class="fa-solid fa-language" aria-hidden="true"></i> <b></b>';
+      tb.lastChild.textContent = (localStorage.getItem('garden_lang') || 'ar') === 'ar' ? 'ترجمةُ المحدَّد' : 'Translate selection';
+      tb.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        try { ed.closeMenu(); } catch (e2) {}
+        GardenTr.open(trT, trR);
+      });
+      tm.insertBefore(tb, tm.firstChild);
     }
     var hr = (ok && this.o.hearAt) ? this.o.hearAt(cx, cy) : null;
     var hm = hr ? document.querySelector('.ne-menu') : null;
