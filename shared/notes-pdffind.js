@@ -8,12 +8,13 @@
     var view = o.view;
     var n = h.doc.numPages;
     var pg = new Array(n + 1);
-    var st = { done: 0, dead: false, q: '', hits: [], cur: -1, scanning: false };
+    var st = { done: 0, dead: false, q: '', hits: [], cur: -1, scanning: false, ocr: '' };
+    var oc = null, ot = {};
 
     function tell() {
       if (o.onState) {
         o.onState({ q: st.q, total: st.hits.length, cur: st.cur,
-                    scanned: st.done, pages: n, scanning: st.scanning });
+                    scanned: st.done, pages: n, scanning: st.scanning, ocr: st.ocr });
       }
     }
 
@@ -64,9 +65,57 @@
       st.hits.sort(function (a, b) { return a.p - b.p || a.s - b.s; });
     }
 
+    function ocrOf(i) {
+      if (!oc || !oc[i]) return null;
+      if (ot[i]) return ot[i];
+      var T = window.GardenPdfText, txt = '', ws = [], L = oc[i], a, b;
+      for (a = 0; a < L.length; a++) {
+        var line = L[a] || [], words = line[5] || [];
+        if (a) txt += '\n';
+        for (b = 0; b < words.length; b++) {
+          var w = words[b];
+          if (b) txt += ' ';
+          ws.push({ s: txt.length, e: txt.length + String(w[4]).length, x: +w[0], y: +w[1], w: +w[2], h: +w[3] });
+          txt += String(w[4]);
+        }
+      }
+      var f = T.mapFold(txt);
+      ot[i] = { t: txt, f: f.t, m: f.m, ws: ws };
+      return ot[i];
+    }
+
+    function ocrPage(i) {
+      var d = ocrOf(i);
+      if (!d) return;
+      var q = st.q, at = 0, guard = 0;
+      while (guard++ < 5000) {
+        var j = d.f.indexOf(q, at);
+        if (j < 0) break;
+        at = j + Math.max(1, q.length);
+        var s = d.m[j];
+        var e = d.m[Math.min(d.m.length - 1, j + q.length)];
+        if (e > s) st.hits.push({ p: i, s: s, e: e, o: 1 });
+      }
+    }
+
+    function setOcr(data, state) {
+      if (st.dead) return;
+      st.ocr = state || (data ? 'ready' : '');
+      if (data && data.p) { oc = data.p; ot = {}; }
+      if (st.q && oc) {
+        st.hits = st.hits.filter(function (x) { return !x.o; });
+        for (var k in oc) if (oc.hasOwnProperty(k) && +k >= 1 && +k <= n) ocrPage(+k);
+        sortHits();
+        repaintAll();
+      }
+      tell();
+    }
+
     function addPage(i) {
       var d = pg[i];
-      if (!d || !st.q) return;
+      if (!st.q) return;
+      ocrPage(i);
+      if (!d) return;
       var q = st.q, at = 0, guard = 0;
       while (guard++ < 5000) {
         var j = d.f.indexOf(q, at);
@@ -86,7 +135,7 @@
       st.hits = [];
       st.cur = -1;
       if (q) {
-        for (var i = 1; i <= n; i++) if (pg[i]) addPage(i);
+        for (var i = 1; i <= n; i++) if (pg[i] || (oc && oc[i])) addPage(i);
         sortHits();
       }
       repaintAll();
@@ -157,12 +206,25 @@
       return list;
     }
 
+    function ocrBoxes(i, hit, base) {
+      var d = ocrOf(i), out = [];
+      var W = (view.pw && view.pw[i]) || view.defW || 0;
+      if (!d || !(W > 0) || !(base.width > 0)) return out;
+      var k = base.width / W;
+      for (var j = 0; j < d.ws.length; j++) {
+        var w = d.ws[j];
+        if (w.e <= hit.s || w.s >= hit.e) continue;
+        out.push({ x: w.x * k, y: w.y * k, w: w.w * k, h: w.h * k });
+      }
+      return out;
+    }
+
     function paint(i, td) {
       if (st.dead || !view) return;
       var host = view.marks ? view.marks(i) : null;
       if (!host) return;
       wipeMine(host);
-      if (!st.q || !td) return;
+      if (!st.q) return;
       var slot = view.slots && view.slots[i];
       if (!slot) return;
       var base = slot.el.getBoundingClientRect();
@@ -170,14 +232,19 @@
       for (var k = 0; k < st.hits.length; k++) {
         var hit = st.hits[k];
         if (hit.p !== i) continue;
-        var rects = rectsOf(i, td, hit);
-        if (!rects.length) continue;
-        var boxes = V.merge(rects, base.left, base.top);
+        var boxes;
+        if (hit.o) boxes = ocrBoxes(i, hit, base);
+        else {
+          if (!td) continue;
+          var rects = rectsOf(i, td, hit);
+          if (!rects.length) continue;
+          boxes = V.merge(rects, base.left, base.top);
+        }
         var on = (k === st.cur);
         for (var j = 0; j < boxes.length; j++) {
           var b = boxes[j];
           var el = document.createElement('div');
-          el.className = 'gpv-mark' + (on ? ' on' : '');
+          el.className = 'gpv-mark' + (on ? ' on' : '') + (hit.o ? ' gpv-mark--ocr' : '');
           el.setAttribute('data-k', String(k));
           el.style.insetInlineStart = b.x.toFixed(2) + 'px';
           el.style.insetBlockStart = b.y.toFixed(2) + 'px';
@@ -200,7 +267,7 @@
       for (var k in view.slots) {
         var s = view.slots[k];
         if (s.hl) wipeMine(s.hl);
-        if (s.td) paint(+k, s.td);
+        if (s.td || (oc && oc[k])) paint(+k, s.td);
       }
     }
 
@@ -245,9 +312,11 @@
       destroy: destroy,
       state: function () {
         return { q: st.q, total: st.hits.length, cur: st.cur,
-                 scanned: st.done, pages: n, scanning: st.scanning };
+                 scanned: st.done, pages: n, scanning: st.scanning, ocr: st.ocr };
       },
       hit: function (k) { return st.hits[k] || null; },
+      setOcr: setOcr,
+      ocrText: function (i) { var d = ocrOf(i); return d ? d.t : ''; },
       text: function (i) { return pg && pg[i] ? pg[i].t : ''; }
     };
   }

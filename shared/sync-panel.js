@@ -529,7 +529,7 @@
 
   Panel.prototype.vFiles = function (a) {
     var used = Number(a.used) || 0, max = Number(a.max_vault) || 0;
-    var n = (a.files || []).length;
+    var n = (a.files || []).filter(notPic).length;
     var pc = max ? Math.min(100, Math.round(used * 100 / max)) : 0;
     return '<div class="sp-sec"><p class="sp-sec-t">' + esc(L('ملفّاتُك عندنا', 'Your files with us')) + '</p>' +
       '<div class="sp-vouch"><b><i class="fa-solid fa-cloud"></i>' +
@@ -538,10 +538,26 @@
              '" aria-label="' + esc(L('المساحةُ المستعملة', 'Space used')) + '"><span style="--p:' + pc + '%"></span></div>' : '') +
       '<small>' + esc(L(filesAr(n) + ' — تفتح على أجهزتك كلِّها.',
                         (n === 1 ? '1 file kept' : n + ' files kept') + ' — they open on all your devices.')) + '</small>' +
-      '<small>' + esc(vowText()) + '</small>' +
+      '<small>' + esc(vowText()) + '</small>' + picLine(a.files) +
       (n ? '<div class="sp-acts">' + btn('files', 'fa-folder-open', L('استعرضْ ملفّاتي واحذفْ ما لا أحتاجه', 'Review my files and delete what I do not need'), 'wide') + '</div>' : '') +
       '</div></div>';
   };
+
+  function isPic(f) { return /^image\//.test((f && f.mime) || ''); }
+  function notPic(f) { return !isPic(f); }
+  function picLine(files) {
+    var ps = (files || []).filter(isPic);
+    if (!ps.length) return '';
+    var b = ps.reduce(function (n, f) { return n + (Number(f.stored_bytes) || 0); }, 0);
+    var k = ps.length;
+    var ar = k === 1 ? 'صورةٌ واحدة' : k === 2 ? 'صورتان' : (k + (k <= 10 ? ' صور' : ' صورة'));
+    return '<small class="sp-pics"><i class="fa-solid fa-image"></i> ' +
+      esc(L(ar + ' من ملاحظاتك · ', (k === 1 ? '1 image' : k + ' images') + ' from your notes · ')) +
+      '<span class="sp-num">' + esc(bytes(b)) + '</span> — ' +
+      esc(L('تبقى حتى نهاية الفصل وتصل أجهزتَك كلَّها، والأصلُ باقٍ على الجهاز الذي أُلصقت فيه.',
+            'kept until the end of the term and reach all your devices; the original stays on the device it was pasted on.')) +
+      '</small>';
+  }
 
   function vowText() {
     return L('نضمن حفظَ الملفِّ ثلاثةَ أيّامٍ على الأقلّ، وبعدها — إذا امتلأت مساحتُك عندنا — نحذف الأقدمَ أوّلاً ليدخل الجديد. ' +
@@ -574,7 +590,7 @@
     var pc = max ? Math.min(100, Math.round(used * 100 / max)) : 0;
     var now = Date.now(), arm = this.fArm, mode = this.fSort || 'size';
     var sel = this.fSel || (this.fSel = {});
-    var all = (a.files || []).slice();
+    var all = (a.files || []).filter(notPic);
     Object.keys(sel).forEach(function (k) {
       if (!all.some(function (f) { return f.ref_id === k; })) delete sel[k];
     });
@@ -587,7 +603,7 @@
       '<span class="sp-num">' + esc(bytes(used)) + (max ? ' / ' + esc(bytes(max)) : '') + '</span></b>' +
       (max ? '<div class="sp-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pc +
              '" aria-label="' + esc(L('المساحةُ المستعملة', 'Space used')) + '"><span style="--p:' + pc + '%"></span></div>' : '') +
-      '<small>' + esc(vowText()) + '</small></div>';
+      '<small>' + esc(vowText()) + '</small>' + picLine(a.files) + '</div>';
     if (!all.length) {
       return h + '<p class="sp-note">' + esc(L('لا ملفَّ محفوظاً عندنا الآن.', 'No files are kept with us right now.')) + '</p></div>' + back('home');
     }

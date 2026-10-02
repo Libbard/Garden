@@ -266,10 +266,130 @@
     if (blob.size > MAX_IMG_BYTES) {
       return Promise.reject(mkErr('img_too_large', { bytes: blob.size, max: MAX_IMG_BYTES }));
     }
-    var row = { id: imgId(), blob: blob, type: blob.type || 'image/png',
-                bytes: blob.size, at: Date.now(), name: (meta && meta.name) || '' };
-    return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); })
-      .then(function () { return row.id; });
+    return sha256(blob).then(function (h) {
+      var id = h ? h.slice(0, 24) : imgId();
+      return getImage(id).then(function (old) {
+        if (old && old.blob && old.bytes === blob.size) return id;
+        var row = { id: id, blob: blob, type: blob.type || 'image/png',
+                    bytes: blob.size, at: Date.now(), name: (meta && meta.name) || '' };
+        return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); })
+          .then(function () { return id; });
+      });
+    }).then(function (id) { sendSoon(id); return id; });
+  }
+
+  /*@3.NOSJ.17*/
+  function hex(buf) {
+    var a = new Uint8Array(buf), s = '';
+    for (var i = 0; i < a.length; i++) s += (a[i] + 256).toString(16).slice(1);
+    return s;
+  }
+  function sha256(blob) {
+    var C = self.crypto && self.crypto.subtle;
+    if (!C || !blob.arrayBuffer) return Promise.resolve('');
+    return blob.arrayBuffer().then(function (b) { return C.digest('SHA-256', b); })
+      .then(hex, function () { return ''; });
+  }
+
+  /*@3.NOSJ.18*/
+  var SHRINK_PX = 1600, SHRINK_Q = 0.82;
+  var UP_TYPES = /^image\/(webp|jpeg|png|gif)$/;
+  function decode(blob) {
+    if (self.createImageBitmap) {
+      return createImageBitmap(blob).then(function (b) { return { src: b, w: b.width, h: b.height, done: function () { try { b.close(); } catch (e) {} } }; });
+    }
+    return new Promise(function (ok, no) {
+      var u = URL.createObjectURL(blob), im = new Image();
+      im.onload = function () { ok({ src: im, w: im.naturalWidth, h: im.naturalHeight, done: function () { URL.revokeObjectURL(u); } }); };
+      im.onerror = function () { URL.revokeObjectURL(u); no(mkErr('img_decode')); };
+      im.src = u;
+    });
+  }
+  function toBlob(cv, type, q) {
+    if (cv.convertToBlob) return cv.convertToBlob({ type: type, quality: q });
+    return new Promise(function (ok) { cv.toBlob(function (b) { ok(b); }, type, q); });
+  }
+  function shrink(blob) {
+    if (/gif/i.test(blob.type || '')) return Promise.resolve(blob);
+    return decode(blob).then(function (d) {
+      var k = Math.min(1, SHRINK_PX / Math.max(d.w, d.h, 1));
+      var w = Math.max(1, Math.round(d.w * k)), h = Math.max(1, Math.round(d.h * k));
+      var cv = self.OffscreenCanvas ? new OffscreenCanvas(w, h) : document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      var g = cv.getContext('2d');
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(d.src, 0, 0, w, h);
+      d.done();
+      return toBlob(cv, 'image/webp', SHRINK_Q).then(function (b) {
+        if (b && b.type === 'image/webp') return b;
+        return toBlob(cv, /png/i.test(blob.type || '') ? 'image/png' : 'image/jpeg', 0.85);
+      }).then(function (b) {
+        if (!b) return blob;
+        if (k === 1 && b.size >= blob.size && UP_TYPES.test(blob.type || '')) return blob;
+        return b;
+      });
+    });
+  }
+
+  /*@3.NOSJ.19*/
+  var UPQ = [], UPON = {}, upBusy = false;
+  function refOf(id) { return 'img_' + id; }
+  function sendSoon(id) {
+    id = String(id || '');
+    if (!/^[0-9a-f]{24}$/.test(id) || UPON[id]) return;
+    UPON[id] = 1;
+    UPQ.push(id);
+    setTimeout(pump, 1500);
+  }
+  function pump() {
+    var F = window.GardenFiles;
+    if (upBusy || !UPQ.length) return;
+    if (!F || !F.upload || (navigator.onLine === false)) { setTimeout(pump, 30000); return; }
+    var id = UPQ.shift();
+    upBusy = true;
+    var fin = function () { upBusy = false; if (UPQ.length) setTimeout(pump, 400); };
+    getImage(id).then(function (row) {
+      if (!row || !row.blob || row.up) return null;
+      return shrink(row.blob).then(function (small) {
+        var mime = F.normMime(small.type) ? small.type : '';
+        if (!mime) return null;
+        return sha256(small).then(function (h) {
+          if (!h) return null;
+          return F.upload(small, { refId: refOf(id), name: 'image-' + id.slice(0, 8) + '.' + mime.split('/')[1],
+                                   mime: mime, hash: h }).then(function (r) {
+            row.up = 1; row.cb = r.bytes || small.size;
+            return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); });
+          });
+        });
+      });
+    }).then(fin, function (e) {
+      var m = String((e && (e.error || e.message)) || '');
+      if (!/no_vault|not_found|not_configured|bad_mime|too_large|vault_full|too_many/.test(m)) {
+        delete UPON[id];
+      }
+      fin();
+    });
+  }
+  function ensureUp(id) {
+    return getImage(id).then(function (row) { if (row && row.blob && !row.up) sendSoon(id); });
+  }
+
+  /*@3.NOSJ.20*/
+  var PULL = {};
+  function pullImage(id) {
+    var F = window.GardenFiles;
+    if (!F || !F.fetchBytes) return Promise.resolve(null);
+    if (PULL[id]) return PULL[id];
+    PULL[id] = F.fetchBytes(refOf(id)).then(function (got) {
+      if (!got || !got.blob || !got.blob.size) return null;
+      var blob = got.blob.type ? got.blob : new Blob([got.blob], { type: got.mime || 'image/webp' });
+      var row = { id: id, blob: blob, type: blob.type, bytes: blob.size, at: Date.now(), name: '', up: 1, far: 1 };
+      return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); }).then(function () { return row; });
+    }).catch(function () { return null; }).then(function (r) {
+      if (!r) delete PULL[id];
+      return r;
+    });
+    return PULL[id];
   }
 
   function getImage(id) {
@@ -290,7 +410,11 @@
   function imageUrl(id) {
     if (URLS[id]) return Promise.resolve(URLS[id]);
     return getImage(id).then(function (row) {
+      if (row && row.blob) { if (!row.up) sendSoon(id); return row; }
+      return pullImage(String(id));
+    }).then(function (row) {
       if (!row || !row.blob) return '';
+      if (URLS[id]) return URLS[id];
       var u = URL.createObjectURL(row.blob);
       URLS[id] = u;
       return u;
@@ -335,13 +459,18 @@
     setMeta: setMeta,
     byteLen: byteLen,
     putImage: putImage,
-    getImage: getImage,
+    getImage: function (id) {
+      return getImage(id).then(function (r) { return (r && r.blob) ? r : pullImage(String(id)); });
+    },
     delImage: delImage,
     imageUrl: imageUrl,
     imageUrlNow: imageUrlNow,
     imageBytes: imageBytes,
     allImages: allImages,
     putImageRow: putImageRow,
+    shrinkImage: shrink,
+    ensureImageUp: ensureUp,
+    pullImage: pullImage,
     LIMITS: {
       doc: MAX_DOC_BYTES,
       docWarn: WARN_DOC_BYTES,

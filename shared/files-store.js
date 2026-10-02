@@ -8,7 +8,8 @@
     'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/opus',
     'audio/x-m4a', 'audio/aac', 'audio/mpeg', 'audio/wav', 'audio/x-wav',
     'audio/3gpp', 'audio/amr', 'audio/flac', 'audio/x-caf',
-    'video/mp4', 'video/webm', 'video/quicktime', 'video/x-matroska', 'video/3gpp'
+    'video/mp4', 'video/webm', 'video/quicktime', 'video/x-matroska', 'video/3gpp',
+    'image/webp', 'image/jpeg', 'image/png', 'image/gif'
   ];
 
   var ALIAS = {
@@ -159,7 +160,8 @@
       }
 
       stage('hash', { at: 0, of: blob.size });
-      return hashOf(blob, function (at, of) { stage('hash', { at: at, of: of }); })
+      var pre = /^[0-9a-f]{64}$/.test(String(o.hash || '')) ? Promise.resolve({ hash: o.hash }) : null;
+      return (pre || hashOf(blob, function (at, of) { stage('hash', { at: at, of: of }); }))
         .then(function (h) {
           stage('probe');
           return jreq('POST', base(id) + '/probe', id, {
@@ -224,6 +226,14 @@
           return r.body;
         });
     });
+  }
+
+  function ocrState(refId) {
+    return vaultId().then(function (id) {
+      if (!id) return null;
+      return jreq('GET', base(id) + '/f/' + encodeURIComponent(refId) + '?ocr=1', id)
+        .then(function (r) { return r.ok ? r.body : null; });
+    }).catch(function () { return null; });
   }
 
   function fetchBytes(refId, onProgress) {
@@ -298,6 +308,35 @@
 
   function available() { return state(); }
 
+  var WARN_DAYS = 3;
+  function termEnds(now) {
+    var y = now.getUTCFullYear();
+    var cut = [Date.UTC(y, 0, 1), Date.UTC(y, 5, 1), Date.UTC(y, 7, 1), Date.UTC(y + 1, 0, 1)];
+    for (var i = 0; i < cut.length; i++) if (cut[i] > now.getTime()) return cut[i];
+    return cut[3];
+  }
+  function termWarn() {
+    var now = new Date();
+    var left = Math.ceil((termEnds(now) - now.getTime()) / 86400000);
+    if (left > WARN_DAYS || left < 1) return Promise.resolve(false);
+    var day = 'gf_term_warn_' + now.toISOString().slice(0, 10);
+    try { if (localStorage.getItem(day)) return Promise.resolve(false); } catch (e) {}
+    return state().then(function (s) {
+      var kept = (s.files || []).filter(function (f) { return /^(audio|video|image)\//.test(f.mime || '') && !f.pinned; });
+      if (!s.ok || !kept.length) return false;
+      try { localStorage.setItem(day, '1'); } catch (e) {}
+      var G = window.Garden, ar = document.documentElement.lang !== 'en';
+      var n = left === 1 ? (ar ? 'غداً' : 'tomorrow') : left === 2 ? (ar ? 'بعد يومين' : 'in 2 days') : (ar ? 'بعد ' + left + ' أيّام' : 'in ' + left + ' days');
+      var msg = ar
+        ? 'ينتهي الفصلُ ' + n + '، ومعه تُحذف من خادمنا تسجيلاتُك وصورُ ملاحظاتك المرفوعة. نزّلْ ما تحتاجه — والأصلُ باقٍ على جهازك.'
+        : 'The term ends ' + n + ', and with it your uploaded recordings and note images are removed from our server. Download what you need — the originals stay on your device.';
+      if (G && G.toast) { try { G.toast(msg); } catch (e) {} }
+      emit('garden:termWarn', { days: left, files: kept.length });
+      return true;
+    }, function () { return false; });
+  }
+  setTimeout(function () { if (window.GardenSync && GardenSync.vaultId) termWarn(); }, 9000);
+
   window.GardenFiles = {
     mimes: MIMES,
     normMime: normMime,
@@ -308,7 +347,10 @@
     list: list,
     link: link,
     fetchBytes: fetchBytes,
+    ocrState: ocrState,
     remove: remove,
-    available: available
+    available: available,
+    termWarn: termWarn,
+    termEnds: termEnds
   };
 })();

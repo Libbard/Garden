@@ -422,6 +422,13 @@
     var P = this.pdf();
     if (P) {
       var st = P.state();
+      var hint = this.bar.querySelector('.nf-ocr');
+      var soon = !!(st.q && st.ocr === 'pending');
+      if (soon && !hint) { hint = document.createElement('p'); hint.className = 'nf-ocr'; this.bar.appendChild(hint); }
+      if (hint) {
+        hint.hidden = !soon;
+        if (soon) hint.textContent = L('نصوصُ الصور ستُتاح للبحث قريباً', 'Text inside images will be searchable soon');
+      }
       if (!st.q) { out.textContent = ''; out.removeAttribute('data-none'); return; }
       var scan = st.scanning
         ? ' \u00b7 ' + Math.round(st.scanned * 100 / Math.max(1, st.pages)) + '%'

@@ -862,6 +862,10 @@
         onState: function (s2) { if (o.onFind) o.onFind(s2); }
       });
       st.find.scan(st.page);
+      var C = window.GardenPdfCloud, fh = sp && sp.h, fd = st.find;
+      if (C && C.ocr && fh) C.ocr(fh).then(function (r) {
+        if (r && st.find === fd && !st.dead) fd.setOcr(r.data || null, r.state);
+      });
     }
 
     /*@3.NOPJ5.8*/
@@ -969,6 +973,7 @@
       setScale: setScale,
       spec: function () { return sp; },
       doc: function () { return (st.h && st.h.doc) || null; },
+      handle: function () { return st.h || null; },
       pick: take
     };
   }

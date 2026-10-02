@@ -659,6 +659,36 @@
     if (shown() && !busy) sayHere();
   });
 
+  var OCR_META = 'pdfocr:';
+  var OCRQ = {};
+  function ocr(h) {
+    if (!/^[0-9a-f]{64}$/.test(String(h || ''))) return Promise.resolve(null);
+    if (OCRQ[h]) return OCRQ[h];
+    var S = window.GardenNotesStore, f = F();
+    var p = (S && S.meta ? S.meta(OCR_META + h, null) : Promise.resolve(null)).then(function (c) {
+      if (c && c.v === 1) return { state: 'ready', data: c };
+      if (!f || !f.ocrState) return null;
+      return f.ocrState(refIdOf(h)).then(function (r) {
+        if (!r || r.ocr === 'none') return null;
+        if (r.ocr !== 'ready' || !r.url) return { state: 'pending' };
+        if (typeof DecompressionStream !== 'function') return null;
+        return fetch(r.url).then(function (res) {
+          if (!res.ok || !res.body) throw new Error('ocr_' + res.status);
+          return new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).json();
+        }).then(function (d) {
+          if (!d || d.v !== 1 || typeof d.p !== 'object') return null;
+          if (S && S.setMeta) S.setMeta(OCR_META + h, d);
+          return { state: 'ready', data: d };
+        });
+      });
+    })['catch'](function () { return null; }).then(function (r) {
+      if (!r || r.state !== 'ready') delete OCRQ[h];
+      return r;
+    });
+    OCRQ[h] = p;
+    return p;
+  }
+
   window.GardenPdfCloud = {
     refIdOf: refIdOf,
     restore: restore,
@@ -669,6 +699,7 @@
     close: shut,
     busy: function () { return busy; },
     slim: slim,
-    slimPlan: slimPlan
+    slimPlan: slimPlan,
+    ocr: ocr
   };
 })();

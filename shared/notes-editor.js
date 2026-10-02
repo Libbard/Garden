@@ -2417,8 +2417,15 @@
     var put = function (u) {
       if (!u) {
         var bad = el('div', 'ne-img-bad');
-        bad.textContent = L('الصورةُ المحفوظةُ في هذا الجهازِ لم تعد موجودة.',
-                            'The image saved on this device is gone.');
+        bad.textContent = L('لم تصل هذه الصورةُ بعد — تُرفع من الجهاز الذي أُلصقت فيه حين يُفتح متّصلاً.',
+                            'This image has not arrived yet — it uploads from the device it was pasted on when that device is online.');
+        var again = el('button', 'gsf-btn gsf-btn--ghost ne-img-again', { type: 'button' });
+        again.textContent = L('حاولْ ثانيةً', 'Try again');
+        again.addEventListener('click', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          paintLocal(host, ref, alt, lk);
+        });
+        bad.appendChild(again);
         host.appendChild(bad);
         return;
       }

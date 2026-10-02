@@ -4584,6 +4584,13 @@
     h += ctxItem('pgoto', 'fa-hashtag', L('اذهبْ إلى صفحة…', 'Go to page…'));
     h += ctxItem('pfit', 'fa-expand', L('لائمِ الصفحةَ كاملةً', 'Fit whole page'));
     h += '<div class="gsf-menu-sep" role="separator"></div>';
+    h += ctxItem('porg', 'fa-table-cells-large', L('نظِّمْ صفحاتِ الملفّ…', 'Organise the file’s pages…'));
+    h += ctxItem('protpg', 'fa-rotate-right', L('دوِّرْ هذه الصفحة', 'Rotate this page'));
+    h += ctxItem('pdelpg', 'fa-trash-can', L('احذفْ هذه الصفحة', 'Delete this page'), 1);
+    if (liveDoc && liveDoc.ed && liveDoc.ed.from) {
+      h += ctxItem('pundo', 'fa-clock-rotate-left', L('ارجعْ إلى الملفّ قبل التحرير', 'Back to the file before editing'));
+    }
+    h += '<div class="gsf-menu-sep" role="separator"></div>';
     h += ctxItem('psnip', 'fa-crop-simple', L('قُصَّ منطقةً لتنسخها أو تشرحها', 'Cut out an area to copy or explain'));
     h += ctxItem('ppage', 'fa-image', L('انسخِ الصفحةَ صورةً', 'Copy the page as an image'));
     h += ctxItem('ppagex', 'fa-wand-magic-sparkles', L('انسخِ الصفحةَ واشرحها', 'Copy the page and explain it'));
@@ -4810,6 +4817,14 @@
   function pdfMenuAct(act) {
     var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
     if (act === 'psnip') { snipStart(); return; }
+    if (act === 'porg' || act === 'protpg' || act === 'pdelpg') {
+      var pgE = snapPage(snapAt);
+      var pnE = pgE ? (Number(pgE.getAttribute('data-p')) || 0) : (pdfUi ? pdfUi.page() : 0);
+      if (act === 'porg') pdfOrganize(pnE ? [pnE] : []);
+      else pdfQuickEdit(pnE, act === 'pdelpg' ? 'del' : 'rot');
+      return;
+    }
+    if (act === 'pundo') { pdfRevert(); return; }
     if (act === 'ppage' || act === 'ppagex') {
       var pg = snapPage(snapAt);
       if (!pg || !window.GardenPdfSnap) return;
@@ -5221,6 +5236,204 @@
     if (els.naPdf) els.naPdf.disabled = false;
     if (els.naPage) els.naPage.disabled = true;
     if (window.GardenNotesFind) { try { GardenNotesFind.show(false); } catch (e) {} }
+  }
+
+  var editP = null;
+  function needEdit() {
+    if (window.GardenPdfEdit) return Promise.resolve(window.GardenPdfEdit);
+    if (editP) return editP;
+    var me = document.querySelector('script[src*="notes-app.js"]');
+    var src = me ? me.getAttribute('src') : '../shared/notes-app.js';
+    var base = src.replace(/notes-app[.]js.*$/, ''), q = (/[?]v=[^&]+/.exec(src) || [''])[0];
+    editP = new Promise(function (ok, no) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet'; l.href = base + 'notes-pdfedit.css' + q;
+      document.head.appendChild(l);
+      var sc = document.createElement('script');
+      sc.src = base + 'notes-pdfedit.js' + q;
+      sc.onload = function () { if (window.GardenPdfEdit) ok(window.GardenPdfEdit); else no(new Error('edit_missing')); };
+      sc.onerror = function () { no(new Error('edit_load')); };
+      document.head.appendChild(sc);
+    })['catch'](function (e) { editP = null; throw e; });
+    return editP;
+  }
+
+  function editCtx() {
+    if (!pdfUi || !liveDoc || liveDoc.kind !== 'pdf' || !liveDoc.pdf || !edId) return null;
+    var hd = pdfUi.handle ? pdfUi.handle() : null;
+    if (!hd || !hd.doc) return null;
+    return { id: edId, doc: liveDoc, h: liveDoc.pdf.h, hd: hd };
+  }
+
+  function editPrep(c) {
+    var D = window.GardenPdfDoc;
+    return Promise.all([needEdit(), D && D.get ? D.get(c.h) : Promise.resolve(null)]).then(function (r) {
+      if (!r[1]) {
+        var e = new Error('no_bytes'); e.code = 'no_bytes'; throw e;
+      }
+      return { E: r[0], bytes: r[1] };
+    });
+  }
+
+  function editFail(e) {
+    var c = e && e.code;
+    toast(c === 'no_bytes' ? L('الملفُّ ليس محفوظاً على هذا الجهاز بعد — انتظرْ حتى يكتمل فتحُه ثمّ أعِدْ.', 'The file is not saved on this device yet — wait until it finishes opening, then try again.')
+        : c === 'encrypted' ? L('هذا الملفُّ محميٌّ بكلمة مرور، ولا يُحرَّر.', 'This file is password-protected and cannot be edited.')
+        : /edit_/.test(String(e && e.message)) ? L('تعذّر تحميلُ محرّرِ الصفحات — تحقّقْ من الاتّصال.', 'Could not load the page editor — check your connection.')
+        : L('تعذّر تعديلُ الملفّ — لم يتغيّر شيء.', 'Could not edit the file — nothing was changed.'));
+  }
+
+  function pdfOrganize(sel) {
+    var c = editCtx();
+    if (!c) return;
+    editPrep(c).then(function (k) {
+      k.E.open({ handle: c.hd, bytes: k.bytes, name: c.doc.pdf.n || '', select: sel || [],
+        onSave: function (res) { return editApply(c, res); },
+        onExtract: function (res) { return editExtract(c, res); } });
+    }, editFail);
+  }
+
+  function pdfQuickEdit(page, kind) {
+    var c = editCtx();
+    if (!c || !(page >= 1)) return;
+    var n = c.hd.doc.numPages;
+    if (kind === 'del' && n <= 1) { toast(L('لا تُحذف الصفحةُ الوحيدة في الملفّ.', 'The only page of a file cannot be deleted.')); return; }
+    editPrep(c).then(function (k) {
+      var items = [];
+      for (var i = 1; i <= n; i++) {
+        if (kind === 'del' && i === page) continue;
+        items.push({ f: 0, i: i, r: (kind === 'rot' && i === page) ? 90 : 0 });
+      }
+      saveState('saving', L('يُكتب الملفّ…', 'Writing the file…'));
+      return k.E.quick({ bytes: k.bytes }, items).then(function (res) { return editApply(c, res); }).then(function () {
+        saveState('', '');
+        toast(kind === 'del'
+          ? L('حُذفت الصفحة ' + page + ' — وللتراجع: «ارجعْ إلى الملفّ قبل التحرير» في قائمة الملفّ.', 'Page ' + page + ' deleted — to undo, choose “Back to the file before editing” in the file menu.')
+          : L('دُوِّرت الصفحة ' + page + '.', 'Page ' + page + ' rotated.'));
+      });
+    })['catch'](function (e) { saveState('', ''); editFail(e); });
+  }
+
+  function remapMarks(mk, map) {
+    if (!mk || !mk.pages) return mk || null;
+    var out = {}, k;
+    for (k in mk) if (Object.prototype.hasOwnProperty.call(mk, k) && k !== 'pages') out[k] = mk[k];
+    out.pages = {};
+    Object.keys(map).forEach(function (j) {
+      var row = mk.pages[String(map[j])];
+      if (row && !row.x) out.pages[String(j)] = row;
+    });
+    return out;
+  }
+
+  function copyInk(fromNs, toNs, map) {
+    var Ik = window.GardenPdfInk;
+    if (!Ik || !Ik.read || !Ik.write) return Promise.resolve(0);
+    return Promise.resolve(Ik.wipe ? Ik.wipe(toNs) : 0).then(function () {
+      return Promise.all(Object.keys(map).map(function (j) {
+        return Ik.read(fromNs, map[j]).then(function (row) {
+          return (row && !row.x) ? Ik.write(toNs, +j, row) : null;
+        });
+      }));
+    });
+  }
+
+  function editBorn(res, name) {
+    var O = window.GardenPdfOpen;
+    var file = new File([res.blob], name || 'file.pdf', { type: 'application/pdf' });
+    return O.adopt(file).then(function (ad) {
+      try { O.drop(ad.pre); } catch (e) {}
+      return { spec: ad.spec, file: file };
+    });
+  }
+
+  function editApply(c, res) {
+    var ik = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
+    var oldSpec = c.doc.pdf, h1 = oldSpec.h;
+    if (marksT) { clearTimeout(marksT); marksT = 0; }
+    marksFor = null;
+    return Promise.resolve(ik && ik.bundle ? ik.bundle() : null).then(function (mk) {
+      mk = mk || c.doc.marks || null;
+      return editBorn(res, oldSpec.n).then(function (nb) {
+        var h2 = nb.spec.h;
+        return copyInk(c.id + '|' + h1, c.id + '|' + h2, res.map).then(function () {
+          var d = c.doc;
+          var spec = { h: h2, n: oldSpec.n || nb.file.name, sz: nb.spec.sz, pg: nb.spec.pg };
+          d.ed = { from: oldSpec, mk: mk, at: Date.now() };
+          if (h1 !== h2) d.was = (d.was || []).filter(function (x) { return x !== h1; }).concat([h1]);
+          d.pdf = spec;
+          d.marks = remapMarks(mk, res.map);
+          var pos = pdfPos(c.id);
+          if (pos && pos.p) {
+            var to = 0;
+            Object.keys(res.map).forEach(function (j) { if (!to && res.map[j] === pos.p) to = +j; });
+            pos.p = to || Math.min(pos.p, res.pages || pos.p);
+            pos.f = to ? pos.f : 0;
+            pdfPos(c.id, pos);
+          }
+          persist(c.id, d, false);
+          editHost(h1, spec, nb.file);
+          if (edId === c.id) openPdf(c.id, d);
+          return spec;
+        });
+      });
+    });
+  }
+
+  function editHost(h1, spec, file) {
+    var F = window.GardenFiles, C = window.GardenPdfCloud;
+    if (!F || !F.state || !F.upload || !C || !C.refIdOf) return;
+    F.state().then(function (a) {
+      if (!a || !a.ok) return;
+      var had = (a.files || []).some(function (x) { return x.ref_id === C.refIdOf(h1); });
+      if (!had) return;
+      return F.upload(file, { refId: C.refIdOf(spec.h), name: spec.n || file.name, mime: 'application/pdf', hash: spec.h });
+    })['catch'](function () {});
+  }
+
+  function editExtract(c, res) {
+    var ik = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
+    var base = String(c.doc.pdf.n || 'file.pdf').replace(/[.]pdf$/i, '');
+    var name = base + ' — ' + L('مقتطع', 'extract') + '.pdf';
+    return Promise.resolve(ik && ik.bundle ? ik.bundle() : null).then(function (mk) {
+      mk = mk || c.doc.marks || null;
+      return editBorn(res, name).then(function (nb) {
+        var rec0 = idxFind(c.id) || {};
+        var place = { f: rec0.f || null, c: (rec0.o && rec0.o.c) || null, g: null };
+        return pdfNote({ spec: nb.spec }, nb.file, place, null, base + ' — ' + L('مقتطع', 'extract')).then(function (nid) {
+          return copyInk(c.id + '|' + c.h, nid + '|' + nb.spec.h, res.map).then(function () {
+            var St = window.GardenNotesStore;
+            if (!St) return nid;
+            return St.getDoc(nid).then(function (row) {
+              var d = row && row.doc;
+              if (!d) return nid;
+              d.marks = remapMarks(mk, res.map);
+              persist(nid, d, true);
+              return nid;
+            });
+          });
+        });
+      });
+    }).then(function (nid) {
+      renderList && renderList();
+      return nid;
+    });
+  }
+
+  function pdfRevert() {
+    var c = editCtx();
+    if (!c || !c.doc.ed || !c.doc.ed.from) return;
+    if (marksT) { clearTimeout(marksT); marksT = 0; }
+    marksFor = null;
+    var d = c.doc, back = d.ed;
+    var h2 = d.pdf.h;
+    d.pdf = back.from;
+    d.marks = back.mk || null;
+    d.was = (d.was || []).filter(function (x) { return x !== back.from.h; }).concat(h2 && h2 !== back.from.h ? [h2] : []);
+    delete d.ed;
+    persist(c.id, d, false);
+    openPdf(c.id, d);
+    toast(L('عاد الملفُّ كما كان قبل التحرير.', 'The file is back to how it was before editing.'));
   }
 
   function openPdf(id, doc) {
