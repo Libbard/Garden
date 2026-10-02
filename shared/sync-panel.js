@@ -23,6 +23,52 @@
     try { return !!(g && g.lastSync && g.lastSync()); } catch (e) { return false; }
   }
 
+  function lsJSON(k, f) {
+    try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? f : v; } catch (e) { return f; }
+  }
+  var _nsMod = null;
+  function notesStore() {
+    if (window.GardenNotesStore) return Promise.resolve(window.GardenNotesStore);
+    if (_nsMod) return _nsMod;
+    _nsMod = new Promise(function (k) {
+      var sc = document.createElement('script');
+      sc.src = ROOT + 'shared/notes-store.js';
+      sc.onload = function () { k(window.GardenNotesStore || null); };
+      sc.onerror = function () { _nsMod = null; k(null); };
+      document.head.appendChild(sc);
+    });
+    return _nsMod;
+  }
+  function fileHomes() {
+    var idx = lsJSON('notes_index', []), fl = lsJSON('notes_folders', []), byId = {}, out = {};
+    if (!Array.isArray(idx) || !idx.length) return Promise.resolve(out);
+    (Array.isArray(fl) ? fl : []).forEach(function (f) { if (f && f.id) byId[f.id] = f; });
+    var path = function (id) {
+      var p = [], cur = byId[id], n = 0;
+      while (cur && n++ < 8) { p.unshift(cur.n || L('مجلّد', 'Folder')); cur = (cur.p && cur.p !== cur.id) ? byId[cur.p] : null; }
+      return p.join(' / ');
+    };
+    var put = function (ref, rec) {
+      if (ref && !out[ref]) out[ref] = { dir: rec.f ? path(rec.f) : '', course: (rec.o && rec.o.c) || '' };
+    };
+    return notesStore().then(function (St) {
+      if (!St) return out;
+      return Promise.all(idx.map(function (rec) {
+        if (!rec || !rec.id) return null;
+        return St.getDoc(rec.id).then(function (row) {
+          var d = row && row.doc;
+          if (!d) return;
+          if (d.pdf && d.pdf.h) put('pdf_' + String(d.pdf.h).slice(0, 40), rec);
+          (Array.isArray(d.aud) ? d.aud : []).forEach(function (it) {
+            if (!it) return;
+            put(it.i, rec);
+            if (it.g) put(String(it.g), rec);
+          });
+        }, function () {});
+      })).then(function () { return out; });
+    }).catch(function () { return out; });
+  }
+
   var _gdMod = null;
   function gdOn() { return !!(window.GardenEndpoints && window.GardenEndpoints.googleClientId); }
   function needDrive() {
@@ -595,24 +641,33 @@
     }
 
     if (mode === 'dir') {
+      if (!this.fHome && !this.fHomeBusy) {
+        this.fHomeBusy = true;
+        fileHomes().then(function (m) { self.fHomeBusy = false; self.set({ fHome: m || {} }); },
+                            function () { self.fHomeBusy = false; self.set({ fHome: {} }); });
+      }
       var dirs = {}, order = [];
       all.forEach(function (f) {
-        var k = String(f.course || '').trim();
+        var k = self.fileDir(f);
         if (!dirs[k]) { dirs[k] = []; order.push(k); }
         dirs[k].push(f);
       });
       order.sort(function (x, y) {
         if (!x) return 1;
         if (!y) return -1;
+        var dx = x.charAt(0) === 'd', dy = y.charAt(0) === 'd';
+        if (dx !== dy) return dx ? -1 : 1;
         return x.localeCompare(y);
       });
       h += order.map(function (k) {
         var fs = dirs[k].sort(bySize);
         var sum = fs.reduce(function (n, f) { return n + (Number(f.stored_bytes) || 0); }, 0);
         var on = fs.every(function (f) { return sel[f.ref_id]; });
+        var nm = k.slice(2), mine = k.charAt(0) === 'd';
         return '<div class="sp-dir"><label class="sp-pick sp-dir-h"><input type="checkbox" data-sp-chk="dir:' + esc(k) + '"' +
-          (on ? ' checked' : '') + ' aria-label="' + esc(L('حدِّدْ مجلّدَ ', 'Select folder ') + (k || L('عامّ', 'General'))) + '">' +
-          '<i class="fa-solid fa-folder"></i><b>' + (k ? '<span class="sp-num">' + esc(k) + '</span>' : esc(L('عامّ', 'General'))) + '</b>' +
+          (on ? ' checked' : '') + ' aria-label="' + esc(L('حدِّدْ مجلّدَ ', 'Select folder ') + (nm || L('عامّ', 'General'))) + '">' +
+          '<i class="fa-solid ' + (mine ? 'fa-folder' : 'fa-folder-open') + '"></i><b>' +
+          (!nm ? esc(L('عامّ', 'General')) : mine ? '<span dir="auto">' + esc(nm) + '</span>' : '<span class="sp-num">' + esc(nm) + '</span>') + '</b>' +
           '<small>' + esc(fileCount(fs.length)) +
           ' · <span class="sp-num">' + esc(bytes(sum)) + '</span></small></label>' +
           fs.map(row).join('') + '</div>';
@@ -626,11 +681,18 @@
     return h + back('home');
   };
 
+  Panel.prototype.fileDir = function (f) {
+    var h = this.fHome && this.fHome[f.ref_id];
+    if (h && h.dir) return 'd:' + h.dir;
+    var c = String((h && h.course) || f.course || '').trim();
+    return c ? 'c:' + c : '';
+  };
+
   Panel.prototype.loadFiles = function () {
     var self = this, f = window.GardenFiles;
     if (!f || !f.state || !linked()) return;
     f.state().then(function (a) {
-      if (a && a.ok) self.set({ files: a });
+      if (a && a.ok) self.set({ files: a, fHome: null });
     }).catch(function () {});
   };
 
@@ -940,10 +1002,10 @@
   };
 
   Panel.prototype.pick = function (k, on) {
-    var sel = this.fSel || (this.fSel = {});
+    var sel = this.fSel || (this.fSel = {}), self = this;
     var fs = (this.files && this.files.files) || [];
     var hit = k === 'all' ? fs
-      : k.indexOf('dir:') === 0 ? fs.filter(function (f) { return String(f.course || '').trim() === k.slice(4); })
+      : k.indexOf('dir:') === 0 ? fs.filter(function (f) { return self.fileDir(f) === k.slice(4); })
       : fs.filter(function (f) { return f.ref_id === k; });
     hit.forEach(function (f) { if (on) sel[f.ref_id] = 1; else delete sel[f.ref_id]; });
     this.fBulkArm = false;
@@ -1201,6 +1263,7 @@
   var openBox = null;
   window.GardenSyncPanel = {
     mount: function (el, opts) { if (!el) return null; ensureCSS(); return new Panel(el, opts); },
+    fileHomes: fileHomes,
     openModal: function (opts) {
       ensureCSS();
       if (openBox) { openBox.remove(); openBox = null; }

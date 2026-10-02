@@ -83,7 +83,7 @@
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (r.ok && j && typeof j.out === 'string') { keep(k, j.out); return j.out; }
           var c = (j && j.error) || ('http_' + r.status);
-          throw fail(c === 'daily_cap' || c === 'quota' ? 'cap' : c === 'rate_limited' ? 'busy' : 'down');
+          throw fail(c === 'daily_cap' ? 'cap' : c === 'month_cap' || c === 'quota' ? 'capm' : c === 'rate_limited' ? 'busy' : 'down');
         });
       }, function () { throw fail(navigator.onLine === false ? 'offline' : 'down'); })
       .then(function (v) { clearTimeout(t); return v; }, function (e) { clearTimeout(t); throw e; });
@@ -105,6 +105,7 @@
   function why(code) {
     if (code === 'offline') return L('لا اتّصال الآن — الترجمةُ تحتاج الشبكة.', 'You are offline — translation needs a connection.');
     if (code === 'cap') return L('بلغت الترجمةُ حدَّها لليوم، وتعود غداً.', 'Translation reached today’s limit. It will be back tomorrow.');
+    if (code === 'capm') return L('بلغت الترجمةُ حدَّها لهذا الشهر، وتعود أوّلَ الشهر القادم.', 'Translation reached this month’s limit. It will be back next month.');
     if (code === 'busy') return L('طلباتٌ كثيرةٌ في دقيقة — انتظرْ قليلاً ثمّ أعِدْ.', 'Too many requests this minute — wait a moment and retry.');
     if (code === 'empty') return L('لا نصَّ محدَّداً لترجمته.', 'No selected text to translate.');
     return L('تعذّرت الترجمةُ الآن — أعِدِ المحاولة.', 'Could not translate right now — try again.');
@@ -116,7 +117,8 @@
   function close() {
     if (!cur) return;
     var c = cur; cur = null;
-    document.removeEventListener('pointerdown', c.away, true);
+    document.removeEventListener('pointerdown', c.down, true);
+    document.removeEventListener('pointerup', c.up, true);
     document.removeEventListener('keydown', c.key, true);
     window.removeEventListener('scroll', c.scroll, true);
     window.removeEventListener('resize', c.scroll);
@@ -131,6 +133,13 @@
     b.innerHTML = '<i class="fa-solid ' + icon + '" aria-hidden="true"></i><span></span>';
     b.lastChild.textContent = label;
     return b;
+  }
+
+  function grab() {
+    try {
+      var s = window.getSelection();
+      return (s && s.rangeCount && !s.isCollapsed) ? s.getRangeAt(0).cloneRange() : null;
+    } catch (e) { return null; }
   }
 
   /*@3.GATJ2.9*/
@@ -215,19 +224,67 @@
     bSwap.addEventListener('click', function () { to = to === 'ar' ? 'en' : 'ar'; run(); });
     bX.addEventListener('click', close);
 
+    var range = grab(), pinned = false, raf = 0, tap = null;
+    function keepIn() {
+      var vw = window.innerWidth, vh = window.innerHeight, w = el.offsetWidth, h = el.offsetHeight;
+      el.style.left = Math.max(8, Math.min(parseFloat(el.style.left) || 0, vw - w - 8)) + 'px';
+      el.style.top = Math.max(8, Math.min(parseFloat(el.style.top) || 0, vh - h - 8)) + 'px';
+    }
+    function follow() {
+      raf = 0;
+      if (cur !== state || el.classList.contains('gtr--sheet')) return;
+      if (pinned) { keepIn(); return; }
+      var r = null;
+      try { r = range && range.getBoundingClientRect(); } catch (e) { r = null; }
+      if (r && (r.width || r.height) && r.bottom > 0 && r.top < window.innerHeight) at = r;
+      place(el, at);
+    }
+    var grip = el.querySelector('.gtr-grip');
+    grip.addEventListener('pointerdown', function (e) {
+      if (el.classList.contains('gtr--sheet') || e.button > 0) return;
+      e.preventDefault();
+      var x0 = e.clientX, y0 = e.clientY, l0 = parseFloat(el.style.left) || 0, t0 = parseFloat(el.style.top) || 0;
+      try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+      el.classList.add('is-drag');
+      function mv(ev) {
+        pinned = true;
+        el.style.left = (l0 + ev.clientX - x0) + 'px';
+        el.style.top = (t0 + ev.clientY - y0) + 'px';
+        keepIn();
+      }
+      function up() {
+        el.classList.remove('is-drag');
+        grip.removeEventListener('pointermove', mv);
+        grip.removeEventListener('pointerup', up);
+        grip.removeEventListener('pointercancel', up);
+      }
+      grip.addEventListener('pointermove', mv);
+      grip.addEventListener('pointerup', up);
+      grip.addEventListener('pointercancel', up);
+    });
+
     var state = {
       el: el,
       back: opts.back || null,
-      away: function (e) { if (!el.contains(e.target)) close(); },
+      down: function (e) { tap = el.contains(e.target) ? null : { x: e.clientX, y: e.clientY, t: Date.now() }; },
+      up: function (e) {
+        var t = tap; tap = null;
+        if (!t || el.contains(e.target)) return;
+        if (Math.abs(e.clientX - t.x) + Math.abs(e.clientY - t.y) < 10 && Date.now() - t.t < 600) close();
+      },
       key: function (e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } },
-      scroll: function (e) { if (e && e.target && e.target.nodeType === 1 && el.contains(e.target)) return; close(); }
+      scroll: function (e) {
+        if (e && e.target && e.target.nodeType === 1 && el.contains(e.target)) return;
+        if (!raf) raf = requestAnimationFrame(follow);
+      }
     };
     cur = state;
     (document.fullscreenElement || document.body).appendChild(el);
     place(el, at);
     setTimeout(function () {
       if (cur !== state) return;
-      document.addEventListener('pointerdown', state.away, true);
+      document.addEventListener('pointerdown', state.down, true);
+      document.addEventListener('pointerup', state.up, true);
       document.addEventListener('keydown', state.key, true);
       window.addEventListener('scroll', state.scroll, true);
       window.addEventListener('resize', state.scroll);
