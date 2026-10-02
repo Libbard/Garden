@@ -968,6 +968,7 @@
       refit: function (m) { return refit(m, 1); },
       setScale: setScale,
       spec: function () { return sp; },
+      doc: function () { return (st.h && st.h.doc) || null; },
       pick: take
     };
   }

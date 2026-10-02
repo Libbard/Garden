@@ -1630,10 +1630,12 @@
     });
     inp.click();
   }
-  function importFile(file, nid0) {
+  function importFile(file, nid0, how0) {
     var nid = nid0 || curId();
+    var quiet = !!(how0 && how0.quiet);
     if (!nid || !file) return Promise.resolve(null);
     var mime = judgeMime(file);
+    if (quiet && (!mime || file.size > EXT_MAX)) return Promise.reject(new Error(!mime ? 'badfile' : 'toobig'));
     if (!mime) return failStart('badfile').then(function () { return null; });
     if (file.size > EXT_MAX) return failStart('toobig').then(function () { return null; });
     lastErr = '';
@@ -1655,13 +1657,18 @@
         return withDoc(nid, function (list) { list.push(it); });
       }).then(function (wrote) {
         importing = false;
-        if (!wrote) { mem[it.i] = file; lastErr = 'readfail'; if (dlg && dlg.open) render(); return null; }
+        if (!wrote) {
+          mem[it.i] = file;
+          if (quiet) throw new Error('readfail');
+          lastErr = 'readfail'; if (dlg && dlg.open) render(); return null;
+        }
         nidOf[it.i] = nid;
-        askSave(it, nid, { imp: 1, mk: mk, fs: fs });
+        if (!quiet) askSave(it, nid, { imp: 1, mk: mk, fs: fs });
         return it;
       });
-    })['catch'](function () {
+    })['catch'](function (e) {
       importing = false;
+      if (quiet) throw (e && e.message ? e : new Error('readfail'));
       return failStart('readfail').then(function () { return null; });
     });
   }
@@ -2200,6 +2207,8 @@
     },
     groups: function () { return groups(items(curDoc())); },
     importFile: importFile,
+    maxBytes: EXT_MAX,
+    isMedia: function (f) { return !!judgeMime(f); },
     source: pickedSrc,
     checkDraft: checkDraft,
     local: local,

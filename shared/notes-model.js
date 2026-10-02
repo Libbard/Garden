@@ -230,6 +230,7 @@
         color: r.c || null,
         pinned: !!r.p,
         archived: !!r.a,
+        deleted: (typeof r.d === 'number' && r.d > 0) ? r.d : 0,
         remind_at: r.r || null,
         reminder_done: !!r.rd,
         tags: Array.isArray(r.g) ? r.g.slice() : [],
@@ -259,6 +260,7 @@
     if (o.modules !== false) out = out.concat(fromModules());
     if (o.courses !== false) out = out.concat(fromCourses());
     if (!o.withArchived) out = out.filter(function (x) { return !x.archived; });
+    if (!o.withDeleted) out = out.filter(function (x) { return !x.deleted; });
     out.sort(function (a, b) {
       if (!!b.pinned !== !!a.pinned) return b.pinned ? 1 : -1;
       return (b.updated_at || 0) - (a.updated_at || 0);
