@@ -5173,21 +5173,29 @@
   }
 
   function pdfFromDrive() {
-    needDrive().then(function (GD) {
-      return GD.pick().then(function (pk) {
-        if (!pk || !pk.id) return;
-        return takeDrive(GD, pk.id, pk.name).then(function (file) {
-          adoptPdf(file, pk.id, function () { GD.maybeOffer()['catch'](function () {}); });
-        });
-      })['catch'](function (e) {
-        var why = GD.reason(e);
-        saveState('error', why);
-        toast(why);
-        setTimeout(function () { if (els.save && els.save.getAttribute('data-s') === 'error') saveState('', ''); }, 7000);
-      });
-    }, function () {
+    var run = function (GD) { return drivePicked(GD, GD.pick()); };
+    if (window.GardenDrive) { run(window.GardenDrive); return; }
+    needDrive().then(run, function () {
       toast(L('تعذّر تحميلُ ربطِ درايف — تحقّقْ من الاتّصال.', 'Could not load Drive — check your connection.'));
     });
+  }
+  function drivePicked(GD, picking) {
+    return picking.then(function (pk) {
+      if (!pk || !pk.id) return;
+      return takeDrive(GD, pk.id, pk.name).then(function (file) {
+        adoptPdf(file, pk.id, function () { GD.maybeOffer()['catch'](function () {}); });
+      });
+    })['catch'](function (e) {
+      var why = GD.reason(e);
+      saveState('error', why);
+      toast(why);
+      setTimeout(function () { if (els.save && els.save.getAttribute('data-s') === 'error') saveState('', ''); }, 7000);
+    });
+  }
+  function driveBack(GD, r) {
+    if (!r) return;
+    if (r.k === 'err') { toast(GD.reason(r.e)); return; }
+    if (r.k === 'pick') drivePicked(GD, Promise.resolve(r.pick));
   }
 
   function takeDrive(GD, id, name) {
@@ -9363,6 +9371,25 @@
     toast: function (m) { toast(m); }
   };
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
+  /*@3.NOAJ.448*/
+  var boot = function () {
+    if (!/[?&]state=/.test(location.search) || !/[?&](code|error)=/.test(location.search)) { init(); return; }
+    needDrive().then(function (GD) {
+      return GD.topBack().then(function (r) {
+        if (r && r.k === 'relayed') {
+          setTimeout(function () {
+            if (window.closed) return;
+            document.body.innerHTML = '<p class="na-gdback" role="status">' +
+              esc(L('تمّ — عُدْ إلى صفحتك، فالملفُّ يُفتح هناك.', 'Done — go back to your page; the file opens there.')) + '</p>';
+          }, 400);
+          return;
+        }
+        if (r && r.k === 'away') return;
+        init();
+        driveBack(GD, r);
+      });
+    })['catch'](function () { init(); });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();

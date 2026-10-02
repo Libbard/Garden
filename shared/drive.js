@@ -159,6 +159,7 @@
     tokNet = via.then(function (t0) {
       if (t0) return t0;
       if (!interactive && !activated()) throw err('no_gesture');
+      if (interactive && topPreferred()) return topGo('tok').then(function () { return tok; });
       return gisToken();
     }).then(function (t) { tokNet = null; return t; }, function (e) { tokNet = null; throw e; });
     return tokNet;
@@ -186,6 +187,7 @@
           if (done) return;
           done = true;
           var t = (e && e.type) || '';
+          if (t === 'popup_failed_to_open') topPrefer(true);
           rej(err(t === 'popup_closed' ? 'consent_closed' : t === 'popup_failed_to_open' ? 'popup_blocked' : 'no_token', e && e.message));
         };
         try { client.requestAccessToken({ prompt: '' }); }
@@ -402,7 +404,7 @@
 
   /*@3.DRIJ.2*/
   var dirs = {};
-  function dir(name, props, parent) {
+  function dir(name, props, parent, also) {
     var key = (parent || '') + '|' + JSON.stringify(props);
     if (dirs[key]) return dirs[key];
     var cond = "mimeType='application/vnd.google-apps.folder' and trashed=false";
@@ -411,7 +413,7 @@
     dirs[key] = json('GET', API + '/files?q=' + encodeURIComponent(cond) + '&fields=files(id,name)&pageSize=1&spaces=drive').then(function (r) {
       var got = (r.files && r.files[0]) || null;
       if (got) {
-        if (got.name === name) return got.id;
+        if (got.name === name || (also && also.indexOf(got.name) >= 0)) return got.id;
         return json('PATCH', API + '/files/' + encodeURIComponent(got.id) + '?fields=id', { name: name })
           .then(function () { return got.id; }, function () { return got.id; });
       }
@@ -422,12 +424,17 @@
     return dirs[key];
   }
   function course(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12); }
+  /*@3.DRIJ.3*/
+  var NAMES = { GENERAL: ['عامّ', 'General'], pdf: ['PDF', 'PDF'], aud: ['تسجيلات', 'Recordings'], file: ['ملفّات', 'Files'] };
+  function named(k) { var n = NAMES[k]; return n ? { name: L(n[0], n[1]), also: n } : null; }
   function place(c, kind) {
     var code = course(c) || 'GENERAL';
+    var cn = code === 'GENERAL' ? named('GENERAL') : { name: code };
+    var kn = named(KINDS[kind] ? kind : 'file');
     return dir(FOLDER, { garden: '1', role: 'root' }).then(function (root) {
-      return dir(code === 'GENERAL' ? 'General' : code, { garden: '1', role: 'course', c: code }, root);
+      return dir(cn.name, { garden: '1', role: 'course', c: code }, root, cn.also);
     }).then(function (cid) {
-      return dir(KINDS[kind] || 'Files', { garden: '1', role: 'kind', c: code, k: kind || 'file' }, cid);
+      return dir(kn.name, { garden: '1', role: 'kind', c: code, k: kind || 'file' }, cid, kn.also);
     });
   }
   function bySha(sha) {
@@ -485,6 +492,153 @@
       .then(function () { return true; }, function () { return false; });
   }
 
+  /*@3.DRIJ.4*/
+  var AUTH = 'https://accounts.google.com/o/oauth2/v2/auth';
+  var TOP_LS = 'garden.gd.top', TOP_RES = 'garden.gd.top.res', TOP_PREF = '__gdTopOnly', TOP_BC = 'garden-drive';
+  var TOP_MS = 10 * 60 * 1000, TOP_GRACE_MS = 8000;
+  function backTo() {
+    var p = location.pathname, i = p.indexOf('/hub/');
+    return location.origin + (i >= 0 ? p.slice(0, i + 1) : p.replace(/[^/]*$/, '')) + 'hub/notes.html';
+  }
+  function topPreferred() { try { return localStorage.getItem(TOP_PREF) === '1'; } catch (e) { return false; } }
+  function topPrefer(on) { try { if (on) localStorage.setItem(TOP_PREF, '1'); else localStorage.removeItem(TOP_PREF); } catch (e) {} }
+  function standalone() {
+    try { return !!(navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)); }
+    catch (e) { return false; }
+  }
+  function topUrl(w) {
+    return AUTH + '?client_id=' + encodeURIComponent(clientId()) +
+      '&redirect_uri=' + encodeURIComponent(backTo()) +
+      '&response_type=code&scope=' + encodeURIComponent(SCOPE) +
+      (w.k === 'pick' ? '&trigger_onepick=true&mimetypes=' + encodeURIComponent(w.mime || 'application/pdf') : '') +
+      '&state=' + encodeURIComponent(w.s);
+  }
+  function topWant() {
+    try {
+      var w = JSON.parse(localStorage.getItem(TOP_LS) || 'null');
+      return w && w.s && Date.now() - Number(w.t || 0) < TOP_MS ? w : null;
+    } catch (e) { return null; }
+  }
+  function topParse(search) {
+    var p;
+    try { p = new URLSearchParams(search || ''); } catch (e) { return null; }
+    var s = p.get('state'), code = p.get('code'), bad = p.get('error');
+    if (!s || (!code && !bad)) return null;
+    return { s: s, code: code || '', bad: bad || '', ids: String(p.get('picked_file_ids') || '').split(',').filter(Boolean) };
+  }
+  function exchange(code) {
+    if (!apiBase()) return Promise.reject(err('no_endpoint'));
+    return fetch(apiBase() + '/v1/drive-code', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, redirect: backTo(), keep: false })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.ok && j && j.access_token) { hold(j.access_token, j.expires_in); return tok; }
+        throw err('no_token', (j && j.error) || ('http_' + r.status));
+      });
+    });
+  }
+  function topFinish(w, got) {
+    if (!got || got.s !== w.s) return Promise.reject(err('state_mismatch'));
+    if (got.bad) return Promise.reject(err(got.bad === 'access_denied' ? 'consent_denied' : 'no_token', got.bad));
+    return exchange(got.code).then(function () {
+      if (w.k !== 'pick') return { k: 'tok' };
+      if (!got.ids.length) return { k: 'pick', pick: null };
+      var id = got.ids[0];
+      return meta(id).then(function (m) {
+        return { k: 'pick', pick: { id: id, name: (m && m.name) || '', size: Number(m && m.size) || 0, mime: (m && m.mimeType) || '' } };
+      }, function () { return { k: 'pick', pick: { id: id, name: '', size: 0, mime: '' } }; });
+    });
+  }
+  function topWait(w) {
+    return new Promise(function (res, rej) {
+      var bc = null, done = false, graceT = 0, capT = 0;
+      function read() { try { return JSON.parse(localStorage.getItem(TOP_RES) || 'null'); } catch (e) { return null; } }
+      function end() {
+        done = true;
+        clearTimeout(graceT); clearTimeout(capT);
+        window.removeEventListener('storage', onStore);
+        window.removeEventListener('focus', onBack);
+        document.removeEventListener('visibilitychange', onBack);
+        if (bc) { try { bc.close(); } catch (e) {} }
+      }
+      function take(v) {
+        if (done || !v || v.s !== w.s) return;
+        end();
+        try { localStorage.removeItem(TOP_RES); localStorage.removeItem(TOP_LS); } catch (e) {}
+        res(v);
+      }
+      function onStore(e) { if (e.key === TOP_RES) take(read()); }
+      function onBack() {
+        if (document.visibilityState === 'hidden') return;
+        clearTimeout(graceT);
+        graceT = setTimeout(function () {
+          var v = read();
+          if (v) { take(v); return; }
+          if (!done) { end(); rej(err('consent_closed')); }
+        }, TOP_GRACE_MS);
+      }
+      try { bc = new BroadcastChannel(TOP_BC); bc.onmessage = function (e) { take(e.data); }; } catch (e) {}
+      window.addEventListener('storage', onStore);
+      window.addEventListener('focus', onBack);
+      document.addEventListener('visibilitychange', onBack);
+      capT = setTimeout(function () { if (!done) { end(); rej(err('consent_closed')); } }, TOP_MS);
+    });
+  }
+  function topGo(k, mime) {
+    if (!enabled()) return Promise.reject(err('drive_disabled'));
+    if (!apiBase()) return Promise.reject(err('no_endpoint'));
+    var w = { s: Date.now().toString(36) + '.' + Math.random().toString(36).slice(2, 12), t: Date.now(), k: k, mime: mime || '', back: location.href, m: 'pop' };
+    var save = function () {
+      try { localStorage.setItem(TOP_LS, JSON.stringify(w)); localStorage.removeItem(TOP_RES); return true; }
+      catch (e) { return false; }
+    };
+    if (!save()) return Promise.reject(err('no_store'));
+    var pop = null;
+    if (!standalone()) {
+      try {
+        var sw = (window.screen && window.screen.width) || 560, sh = (window.screen && window.screen.height) || 720;
+        pop = window.open(topUrl(w), 'gardenDrive', 'width=' + Math.min(560, sw) + ',height=' + Math.min(720, sh));
+      } catch (e) { pop = null; }
+    }
+    if (!pop) {
+      w.m = 'tab';
+      if (!save()) return Promise.reject(err('no_store'));
+      location.href = topUrl(w);
+      return new Promise(function () {});
+    }
+    return topWait(w).then(function (got) { return topFinish(w, got); });
+  }
+
+  function topBack() {
+    var got = topParse(location.search);
+    if (!got) return Promise.resolve(null);
+    var w = topWant();
+    var clean = location.pathname;
+    if (w && w.s === got.s && w.m === 'pop') {
+      try { localStorage.setItem(TOP_RES, JSON.stringify(got)); } catch (e) {}
+      try { var bc = new BroadcastChannel(TOP_BC); bc.postMessage(got); bc.close(); } catch (e) {}
+      try { history.replaceState(null, '', clean); } catch (e) {}
+      try { window.close(); } catch (e) {}
+      return Promise.resolve({ k: 'relayed' });
+    }
+    try { localStorage.removeItem(TOP_LS); } catch (e) {}
+    if (!w || w.s !== got.s) {
+      try { history.replaceState(null, '', clean); } catch (e) {}
+      return Promise.resolve({ k: 'err', e: err('state_mismatch') });
+    }
+    var here = '';
+    try { var b = new URL(w.back); if (b.origin === location.origin && b.pathname === location.pathname) here = b.pathname + b.search + b.hash; } catch (e) {}
+    try { history.replaceState(null, '', here || clean); } catch (e) {}
+    return topFinish(w, got).then(function (r) {
+      if (r.k === 'tok' && !here && w.back) {
+        try { if (new URL(w.back).origin === location.origin) { location.replace(w.back); return { k: 'away' }; } } catch (e) {}
+      }
+      return r;
+    }, function (e) { return { k: 'err', e: e }; });
+  }
+  function topReturning() { return !!topParse(location.search); }
+
   function wayOut(shut) {
     var tries = 0;
     var t = setInterval(function () {
@@ -509,9 +663,21 @@
   }
 
   var MUTE_MS = 9000;
+  /*@3.DRIJ.5*/
+  function muteBar(dlg, go) {
+    if (dlg.querySelector('.gdl-mute')) return;
+    var bar = document.createElement('div');
+    bar.className = 'gdl-mute';
+    bar.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    bar.innerHTML = '<span>' + esc(L('لم تستجبْ نافذةُ درايف على متصفّحك.', 'The Drive window did not respond in your browser.')) + '</span>' +
+      '<button type="button">' + esc(L('افتحْ درايف بصفحةٍ كاملة', 'Open Drive full page')) + '</button>';
+    bar.querySelector('button').addEventListener('click', go);
+    dlg.appendChild(bar);
+  }
   function pick(opts) {
     var o = opts || {};
     if (!enabled()) return Promise.reject(err('picker_disabled'));
+    if (topPreferred() && !fresh()) return topGo('pick', o.mime).then(function (r) { return (r && r.pick) || null; });
     return token(true).then(function (t) {
       return script(GAPI, function () { return !!window.gapi; }).then(function (ok) {
         if (!ok) throw err('gapi_unavailable');
@@ -536,13 +702,14 @@
           var vw = Math.max(320, window.innerWidth || 1024), vh = Math.max(400, window.innerHeight || 768);
           var pk = null, stop = null, seen = false, gone = false, muteT = 0;
           var onKey = function (e) { if (e.key === 'Escape') { e.stopPropagation(); fin(null); } };
-          var fin = function (v, bad) {
+          var fin = function (v, bad, quiet) {
             if (gone) return;
             gone = true;
             clearTimeout(muteT);
             document.removeEventListener('keydown', onKey, true);
             if (stop) stop();
             try { if (pk) { pk.setVisible(false); pk.dispose(); } } catch (e2) {}
+            if (quiet) return;
             if (bad) rej(bad); else res(v);
           };
           var b = new P.PickerBuilder()
@@ -568,7 +735,18 @@
             document.addEventListener('keydown', onKey, true);
             stop = wayOut(function () { fin(null); });
             pk.setVisible(true);
-            muteT = setTimeout(function () { if (!seen && !document.querySelector('.picker-dialog iframe')) fin(null, err('picker_mute')); }, MUTE_MS);
+            muteT = setTimeout(function () {
+              if (seen || gone) return;
+              var dlg = document.querySelector('.picker-dialog');
+              if (!dlg || !dlg.querySelector('iframe')) { fin(null, err('picker_mute')); return; }
+              muteBar(dlg, function () {
+                if (gone) return;
+                topPrefer(true);
+                var pr = topGo('pick', mimes);
+                fin(null, null, true);
+                pr.then(function (r) { res((r && r.pick) || null); }, rej);
+              });
+            }, MUTE_MS);
           } catch (e) {
             fin(null, err('picker_failed', e && e.message));
           }
@@ -598,6 +776,8 @@
     upload: upload,
     trash: trash,
     folderName: function () { return FOLDER; },
+    topBack: topBack,
+    topReturning: topReturning,
     reason: reason,
     linkReason: linkReason
   };
