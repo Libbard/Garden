@@ -1,7 +1,7 @@
 ;(function () {
   'use strict';
 
-  var MAX_PAGES = 900;
+  var MAX_PAGES = 9000;
   var LIB = 'shared/vendor/pdflib/pdf-lib.min.js';
 
   function isAr() {
