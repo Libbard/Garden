@@ -76,6 +76,14 @@
 
   var AIR_CLICK_MS = 900;
   var BTN_DEFAULT = { barrel: 'era', tip: 'era', second: 'sel' };
+  var ACTS = [
+    { k: 'era',   ar: 'ممحاة',        en: 'Eraser' },
+    { k: 'sel',   ar: 'تحديد',        en: 'Select' },
+    { k: 'lasso', ar: 'لاسو',         en: 'Lasso' },
+    { k: 'hand',  ar: 'تمرير',        en: 'Scroll' },
+    { k: 'hi',    ar: 'تظليل',        en: 'Highlight' },
+    { k: 'none',  ar: 'بلا فعل',      en: 'Nothing' }
+  ];
 
   function penButtons() {
     var out = { barrel: BTN_DEFAULT.barrel, tip: BTN_DEFAULT.tip, second: BTN_DEFAULT.second };
@@ -689,6 +697,7 @@
       return cur;
     },
     penMods: penMods,
+    ACTS: ACTS,
     mods: function (adapter) { return new Mods(adapter); },
     splitAct: splitAct,
     keys: keys,

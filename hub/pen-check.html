@@ -14,10 +14,10 @@
       document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
     })();
   </script>
-  <link rel="stylesheet" href="../shared/vendor/fonts/garden/garden-core.css?v=1.0.6.12">
-  <link rel="stylesheet" href="../shared/skin.css?v=1.0.6.12">
-  <link rel="stylesheet" href="../shared/surface.css?v=1.0.6.12">
-  <link rel="stylesheet" href="../shared/vendor/fontawesome/css/garden-icons.css?v=1.0.6.12">
+  <link rel="stylesheet" href="../shared/vendor/fonts/garden/garden-core.css?v=1.0.6.17">
+  <link rel="stylesheet" href="../shared/skin.css?v=1.0.6.17">
+  <link rel="stylesheet" href="../shared/surface.css?v=1.0.6.17">
+  <link rel="stylesheet" href="../shared/vendor/fontawesome/css/garden-icons.css?v=1.0.6.17">
   <link rel="icon" type="image/svg+xml" href="../shared/icons/logo-mark.svg">
   <style>
     body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-ar, system-ui), system-ui, sans-serif; }
@@ -44,6 +44,17 @@
     .pc-tbl { inline-size: 100%; border-collapse: collapse; font-size: .82rem; }
     .pc-tbl th, .pc-tbl td { padding: .35rem .5rem; border-block-end: 1px solid var(--border-color, rgba(127,127,127,.2)); text-align: start; }
     .pc-tbl td:last-child { direction: ltr; unicode-bidi: isolate; text-align: end; font-variant-numeric: tabular-nums; }
+    .pc-row { display: grid; gap: 6px; font-size: .88rem; color: var(--text-secondary); }
+    .pc-spec { margin: 0; padding-inline-start: 1.2rem; display: grid; gap: .3rem; font-size: .86rem; line-height: 1.7; color: var(--text-secondary); }
+    .pc-spec b { color: var(--text-primary); }
+    .pc-bgrid, .pc-keys { display: grid; gap: 8px; }
+    .pc-b { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(8rem, 12rem); gap: 10px; align-items: center; padding: .55rem .7rem; border-radius: 12px; border: 1px solid var(--border-color, rgba(127,127,127,.25)); }
+    .pc-b[data-got="1"] { border-color: color-mix(in oklab, var(--st-success, #10b981) 55%, transparent); background: color-mix(in oklab, var(--st-success, #10b981) 10%, transparent); }
+    .pc-b-n { font-size: .9rem; }
+    .pc-b-n small { display: block; color: var(--text-secondary); font-size: .76rem; }
+    .pc-b-s { font: 600 .76rem/1.4 ui-monospace, monospace; direction: ltr; unicode-bidi: isolate; color: var(--text-secondary); }
+    .pc-small { font-size: .8rem; }
+    @media (max-width: 640px) { .pc-b { grid-template-columns: minmax(0, 1fr) minmax(7rem, 9rem); } .pc-b-s { grid-column: 1 / -1; } }
     @media (max-width: 640px) { .pc-pad { block-size: 300px; } .pc-cmp canvas { block-size: 90px; } }
   </style>
 <!--garden-ga-->
@@ -63,6 +74,7 @@
         <li data-t="s2"><b>عشرةُ خطوطٍ عاديّة</b> كما تكتب في محاضرة.</li>
         <li data-t="s3"><b>خمسةُ خطوطٍ خفيفةٍ جدّاً، ثمّ خمسةٌ بضغطٍ شديد</b> — ثمّ انظرْ إلى المقارنة واخترِ العمودَ الأقربَ لما أردت.</li>
         <li data-t="s4"><b>ضعْ راحةَ يدك على الشاشة</b> وأنت ترسم ثلاثةَ خطوط (‏الأجهزةُ اللمسيّة فقط).</li>
+        <li data-t="s4b"><b>اخترْ نوعَ قلمك ثمّ اضغطْ كلَّ زرٍّ فيه</b> (‏والممحاةَ إن وُجدت) والقلمُ فوق اللوح ثمّ ملامسٌ له، واربطْ ما وصل بأداة.</li>
         <li data-t="s5"><b>فعّلْ «اختبارَ التمدّد»</b> وارسمْ خطّاً واحداً طويلاً نزولاً حتى يتجاوز أسفلَ اللوح، ولا ترفعِ القلم.</li>
         <li data-t="s6"><b>اضغطْ «انسخِ النتيجة»</b> والصقها لي — ومعها أيُّ عمودٍ اخترت في الخطوة ٣.</li>
       </ol>
@@ -78,6 +90,18 @@
         <button type="button" class="gsf-btn gsf-btn--ghost" id="pc-clear"><i class="fa-solid fa-eraser" aria-hidden="true"></i> <span data-t="clear">امسحِ اللوح</span></button>
         <button type="button" class="gsf-btn gsf-btn--ghost" id="pc-ceil0"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> <span data-t="ceil0">صفّرْ سقفَ الضغط المحفوظ</span></button>
       </div>
+    </section>
+
+    <section class="pc-card" id="pc-btns">
+      <h2><i class="fa-solid fa-pen" aria-hidden="true"></i> <span data-t="bt">أزرارُ قلمك — نتعرّفها ثمّ تربطها</span></h2>
+      <p class="pc-lead" data-t="bt1">لا يستطيع المتصفّحُ أن يعرف طرازَ قلمك، لكنه يعرف ما يصله من كلِّ زرّ. اخترْ نوعَ قلمك (‏خمّنّاه لك)، ثمّ اضغطْ كلَّ زرٍّ فيه والقلمُ فوق اللوح أو ملامسٌ له — فيُعلَّم ما وصل، وتربطه بأداةٍ تعمل في ملاحظاتك على هذا الجهاز.</p>
+      <label class="pc-row"><span data-t="kind">نوعُ قلمك</span>
+        <select class="gsf-in" id="pc-kind" aria-label="نوعُ قلمك" data-ar-title="نوعُ قلمك" data-en-title="Your pen type"></select>
+      </label>
+      <ul class="pc-spec" id="pc-spec"></ul>
+      <div class="pc-bgrid" id="pc-bgrid"></div>
+      <div class="pc-keys" id="pc-keys"></div>
+      <p class="pc-lead pc-small" id="pc-bnote"></p>
     </section>
 
     <section class="pc-card">
@@ -99,7 +123,7 @@
     </section>
   </main>
 
-  <script src="../shared/notes-input.js?v=1.0.6.12"></script>
+  <script src="../shared/notes-input.js?v=1.0.6.17"></script>
   <script>
   (function () {
     'use strict';
@@ -112,6 +136,10 @@
       s2: 'Ten ordinary strokes, as you write in a lecture.',
       s3: 'Five very light strokes, then five hard ones — then pick the column closest to what you meant.',
       s4: 'Rest your palm on the screen while drawing three strokes (touch devices only).',
+      s4b: 'Pick your pen type, then press each of its buttons (and the eraser end if any) with the pen over the pad and then touching it, and bind what arrived to a tool.',
+      bt: 'Your pen buttons — we detect them, you bind them',
+      bt1: 'The browser cannot tell your pen model, but it knows what each button sends. Pick your pen type (we guessed it), then press each button with the pen over or touching the pad — what arrives is marked, and you bind it to a tool that works in your Notes on this device.',
+      kind: 'Your pen type',
       s5: 'Turn on “Growth test” and draw one long stroke downward past the bottom of the pad, without lifting the pen.',
       s6: 'Press “Copy result” and paste it to me — with the column you picked in step 3.',
       grow: 'Growth test', clear: 'Clear the pad', ceil0: 'Reset saved pressure ceiling',
@@ -238,6 +266,129 @@
       if (e.pointerType === 'touch' && prof.penSeen) D.rejected++;
     });
 
+    var KINDS = [
+      { k: 'apple', ar: 'Apple Pencil (‏آيباد)', en: 'Apple Pencil (iPad)', spec: [
+        ['لا زرَّ جانبيّاً يصل المتصفّح: النقرُ المزدوج والعصرُ (‏Pencil 2 وPro) متاحان للتطبيقات الأصليّة وحدَها لا لسفاري.', 'No side button reaches the browser: double-tap and squeeze (Pencil 2 and Pro) are for native apps only, not Safari.'],
+        ['يصل الضغطُ والميلُ، والتحويمُ فوق الشاشة في الطرز التي تدعمه.', 'Pressure and tilt arrive, and hover above the screen on models that support it.'],
+        ['البديلُ عندنا: الممحاةُ والتحديدُ من القرص أو الشريط بلمسة.', 'Our alternative: eraser and select from the dial or bar with one tap.']] },
+      { k: 'surface', ar: 'Surface Pen / Slim Pen (‏ويندوز)', en: 'Surface Pen / Slim Pen (Windows)', spec: [
+        ['الزرُّ الجانبيّ يصل كزرٍّ أيمن (‏buttons = 2).', 'The side button arrives as a right button (buttons = 2).'],
+        ['الممحاةُ في الطرف العلويّ تصل عند ملامسة الشاشة (‏buttons = 32).', 'The eraser on the top end arrives on contact (buttons = 32).'],
+        ['النقرُ على الزرّ العلويّ يذهب إلى ويندوز (‏اختصارُ النظام) ولا يصل المتصفّح.', 'Clicking the top button goes to Windows (a system shortcut) and never reaches the browser.']] },
+      { k: 'wacom', ar: 'Wacom (‏Intuos · One · Cintiq · Bamboo)', en: 'Wacom (Intuos · One · Cintiq · Bamboo)', spec: [
+        ['الزرُّ السفليّ يصل افتراضاً كزرٍّ أيمن (‏buttons = 2).', 'The lower button arrives by default as a right button (buttons = 2).'],
+        ['العلويُّ افتراضاً «تمرير» في برنامج Wacom ⇐ اجعله «نقرٌ أوسط» فيصل (‏buttons = 4) أو مفتاحاً من لوحة المفاتيح.', 'The upper one defaults to “Pan” in the Wacom driver ⇒ set it to “Middle click” (buttons = 4) or a keystroke.'],
+        ['الممحاةُ في الطرف الآخر حسّاسةٌ للضغط (‏buttons = 32).', 'The eraser end is pressure-sensitive (buttons = 32).']] },
+      { k: 'xp', ar: 'XP-Pen · Huion · Gaomon', en: 'XP-Pen · Huion · Gaomon', spec: [
+        ['الزرّان يُضبطان في برنامج اللوح: «نقرٌ أيمن» يصل (‏buttons = 2)، أو مفتاحٌ من لوحة المفاتيح نربطه هنا.', 'Both buttons are set in the tablet software: “Right click” arrives (buttons = 2), or a keystroke you bind here.'],
+        ['بعضُ برامجها يرسل حدثَ فأرةٍ توأماً لكلِّ حدثِ قلم — نُسقطه آليّاً.', 'Some drivers send a twin mouse event for every pen event — we drop it automatically.']] },
+      { k: 'spen', ar: 'Samsung S Pen (‏أندرويد)', en: 'Samsung S Pen (Android)', spec: [
+        ['زرُّ S Pen غيرُ مكشوفٍ للمتصفّح رسميّاً (‏Samsung تتيحه للتطبيقات الأصليّة). وبعضُ الإصدارات ترسله زرّاً أيمن — هذه الصفحةُ تحسم جهازَك.', 'The S Pen button is not officially exposed to browsers (Samsung offers it to native apps). Some versions send it as a right button — this page settles it for your device.']] },
+      { k: 'usi', ar: 'USI / MPP أخرى (‏كروم بوك · لينوفو · HP · Dell)', en: 'Other USI / MPP (Chromebook · Lenovo · HP · Dell)', spec: [
+        ['الزرُّ الجانبيّ يصل زرّاً أيمن (‏buttons = 2)، والممحاةُ إن وُجدت (‏buttons = 32).', 'The side button arrives as a right button (buttons = 2), and the eraser if any (buttons = 32).']] },
+      { k: 'other', ar: 'لا أعرف / غيرُ ذلك', en: "I don't know / other", spec: [
+        ['اضغطْ كلَّ زرّ — الصفحةُ تقول ما وصل منه.', 'Press each button — the page tells you what arrived.']] }
+    ];
+    function guessKind() {
+      var ua = navigator.userAgent || '';
+      if (/iPad|iPhone/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'apple';
+      if (/Android/.test(ua) && /SM-|Samsung/i.test(ua)) return 'spen';
+      if (/CrOS/.test(ua)) return 'usi';
+      return 'other';
+    }
+    var MODS = [
+      { m: 'barrel', ar: 'الزرُّ الجانبيّ', en: 'Side button', bit: 2 },
+      { m: 'tip', ar: 'رأسُ الممحاة', en: 'Eraser end', bit: 32 },
+      { m: 'second', ar: 'الزرُّ الثاني', en: 'Second button', bit: 4 }
+    ];
+    var ACTS = I.ACTS || [];
+    D.pen = { guess: guessKind(), kind: '', got: {}, keys: {}, ctx: 0, aux: 0, binds: I.penButtons(), keyBinds: I.penKeys() };
+    D.pen.kind = D.pen.guess;
+    var kindSel = document.getElementById('pc-kind');
+    KINDS.forEach(function (k) {
+      var o = document.createElement('option');
+      o.value = k.k; o.textContent = L(k.ar, k.en) + (k.k === D.pen.guess && k.k !== 'other' ? L(' — تخمينُنا', ' — our guess') : '');
+      kindSel.appendChild(o);
+    });
+    kindSel.value = D.pen.kind;
+    function paintSpec() {
+      var k = KINDS.filter(function (x) { return x.k === D.pen.kind; })[0] || KINDS[KINDS.length - 1];
+      var ul = document.getElementById('pc-spec'); ul.innerHTML = '';
+      k.spec.forEach(function (s) { var li = document.createElement('li'); li.textContent = L(s[0], s[1]); ul.appendChild(li); });
+    }
+    function actOpts(cur, withNone) {
+      return ACTS.filter(function (a) { return withNone || a.k !== 'none'; }).map(function (a) {
+        return '<option value="' + a.k + '"' + (a.k === cur ? ' selected' : '') + '></option>';
+      }).join('');
+    }
+    function nameOpts(sel) {
+      [].forEach.call(sel.options, function (o) { var a = ACTS.filter(function (x) { return x.k === o.value; })[0]; if (a) o.textContent = L(a.ar, a.en); });
+    }
+    function paintBtns() {
+      var g = document.getElementById('pc-bgrid'); g.innerHTML = '';
+      var binds = I.penButtons();
+      MODS.forEach(function (b) {
+        var got = D.pen.got[b.m];
+        var row = document.createElement('div');
+        row.className = 'pc-b'; row.setAttribute('data-got', got ? '1' : '0');
+        row.innerHTML = '<span class="pc-b-n"></span><span class="pc-b-s"></span><select class="gsf-in" data-m="' + b.m + '">' + actOpts(binds[b.m], true) + '</select>';
+        row.querySelector('.pc-b-n').innerHTML = '<b></b><small></small>';
+        row.querySelector('b').textContent = L(b.ar, b.en);
+        row.querySelector('small').textContent = got ? L('وصل ✓', 'arrived ✓') : L('اضغطْه والقلمُ فوق اللوح', 'press it with the pen over the pad');
+        row.querySelector('.pc-b-s').textContent = got ? ('buttons=' + got.buttons + ' button=' + got.button + (got.air ? ' · air' : ' · contact') + ' ×' + got.n) : 'buttons&' + b.bit;
+        var sel = row.querySelector('select'); nameOpts(sel);
+        sel.setAttribute('aria-label', L('أداةُ ', 'Tool for ') + L(b.ar, b.en));
+        g.appendChild(row);
+      });
+      var kz = document.getElementById('pc-keys'); kz.innerHTML = '';
+      var km = I.penKeys();
+      Object.keys(D.pen.keys).forEach(function (key) {
+        var row = document.createElement('div');
+        row.className = 'pc-b'; row.setAttribute('data-got', '1');
+        row.innerHTML = '<span class="pc-b-n"><b></b><small></small></span><span class="pc-b-s"></span><select class="gsf-in" data-key="' + key + '"><option value="none"></option>' + actOpts(km[key], false) + '</select>';
+        row.querySelector('b').textContent = L('مفتاحٌ من برنامج القلم: ', 'Key from the pen software: ') + key.toUpperCase();
+        row.querySelector('small').textContent = L('وصل بعد حركة القلم مباشرةً — على الأرجح من زرّه', 'arrived right after pen movement — most likely from its button');
+        row.querySelector('.pc-b-s').textContent = 'key=' + key + ' ×' + D.pen.keys[key];
+        var sel = row.querySelector('select'); nameOpts(sel); sel.options[0].textContent = L('بلا فعل', 'Nothing');
+        sel.setAttribute('aria-label', L('أداةُ المفتاح ', 'Tool for key ') + key.toUpperCase());
+        kz.appendChild(row);
+      });
+      var bn = document.getElementById('pc-bnote');
+      bn.textContent = L('الربطُ يُحفظ لملاحظاتك على هذا المتصفّح فوراً. ', 'Bindings apply to your Notes in this browser at once. ') +
+        (D.pen.ctx ? L('وصل «زرٌّ أيمن» ', 'Right-click arrived ') + D.pen.ctx + L(' مرّة (‏يُمنع في الملاحظات ولا يفتح قائمة). ', ' times (blocked in Notes, no menu opens). ') : '');
+    }
+    kindSel.addEventListener('change', function () { D.pen.kind = kindSel.value; paintSpec(); report(); });
+    document.getElementById('pc-btns').addEventListener('change', function (e) {
+      var s = e.target;
+      if (s.hasAttribute('data-m')) { var m = {}; m[s.getAttribute('data-m')] = s.value; I.setPenButtons(m); }
+      else if (s.hasAttribute('data-key')) I.setPenKey(s.getAttribute('data-key'), s.value);
+      else return;
+      D.pen.binds = I.penButtons(); D.pen.keyBinds = I.penKeys(); report();
+    });
+    var lastPenAt = 0;
+    function seenBtn(e) {
+      if (e.pointerType !== 'pen') return;
+      lastPenAt = Date.now();
+      var mod = I.penMods(e);
+      if (!mod) return;
+      var g = D.pen.got[mod] || (D.pen.got[mod] = { n: 0, buttons: e.buttons, button: e.button, air: !(e.pressure > 0) });
+      g.n++; g.buttons = e.buttons; if (e.button >= 0) g.button = e.button;
+      if (g.n === 1 || g.n % 20 === 0) { paintBtns(); report(); }
+    }
+    window.addEventListener('pointerdown', seenBtn, true);
+    window.addEventListener('pointermove', seenBtn, true);
+    pad.addEventListener('contextmenu', function () { D.pen.ctx++; paintBtns(); report(); });
+    pad.addEventListener('auxclick', function () { D.pen.aux++; });
+    window.addEventListener('keydown', function (e) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (Date.now() - lastPenAt > 3000) return;
+      var k = I.keyOf(e); if (!k || k.length !== 1) return;
+      D.pen.keys[k] = (D.pen.keys[k] || 0) + 1;
+      paintBtns(); report();
+    }, true);
+    paintSpec(); paintBtns();
+
     function pct(a, q) { if (!a.length) return 0; var b = a.slice().sort(function (x, y) { return x - y; }); return b[Math.min(b.length - 1, Math.floor(q * (b.length - 1)))]; }
     function compare(pts) {
       var p95 = Math.max(0.2, pct(raws.slice(-2000), 0.95)), ceil = prof.ceiling();
@@ -276,6 +427,8 @@
         [L('حدثٌ ⇐ إطار (‏مل)', 'event → frame (ms)'), o.latencyMs == null ? '—' : o.latencyMs],
         [L('لمسٌ رُفض (‏راحة اليد) · إيماءات', 'touch rejected (palm) · gestures'), D.rejected + ' · ' + D.gestures],
         [L('فأرةٌ توأمٌ للقلم', 'mouse twins of pen'), D.twins],
+        [L('نوعُ القلم (‏تخمينُنا)', 'pen type (our guess)'), D.pen.kind + ' (' + D.pen.guess + ')'],
+        [L('أزرارٌ وصلت', 'buttons that arrived'), (Object.keys(D.pen.got).join(' · ') || '—') + (Object.keys(D.pen.keys).length ? ' · keys ' + Object.keys(D.pen.keys).join('') : '') + (D.pen.ctx ? ' · ctx ' + D.pen.ctx : '')],
         [L('التمدّد: مرّات · نقاطٌ بعده · أطولُ فجوة · فقدُ الالتقاط', 'growth: times · pts after · max gap · lost capture'),
           D.grow.grows + ' · ' + D.grow.ptsAfterGrow + ' · ' + D.grow.maxGapMs + 'ms · ' + D.grow.lostCapture + (D.grow.cancel ? ' · cancel ' + D.grow.cancel : '')]
       ];

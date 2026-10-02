@@ -8,6 +8,7 @@
   var TICK = 250;
   var BARS = 14;
   var RATES = [1, 1.25, 1.5, 1.75, 2, 0.75];
+  var LINK_SLACK_MS = 15000;
   var LEAD_S = 2, END_SLACK = 1500;
   var RETRY = [5000, 20000, 60000];
   var CLOSED = /not_enrolled|no_vault|not_configured|origin|bad_vault|none/;
@@ -311,6 +312,9 @@
         saveWip();
       };
       r.start();
+      /*@3.NOAJ3.6*/
+      var Dp = PD();
+      if (Dp && Dp.persist) Dp.persist();
       saveWip();
       live.timer = setInterval(tick, TICK);
       shut();
@@ -1009,8 +1013,29 @@
     au.addEventListener('ended', onEnded);
     au.addEventListener('play', function () { if (pl) { pl.on = true; paintPlay(); } });
     au.addEventListener('pause', function () { if (pl) { pl.on = false; paintPlay(); } });
-    au.addEventListener('error', function () { if (pl) { pl.on = false; pl.err = 1; paintPlay(); } });
+    au.addEventListener('playing', function () { if (pl) pl.renew = 0; });
+    au.addEventListener('error', function () {
+      if (!pl) return;
+      var was = pl.on;
+      if (pl.url && !/^blob:/.test(pl.url) && (pl.renew || 0) < 2) {
+        pl.renew = (pl.renew || 0) + 1;
+        relink(was);
+        return;
+      }
+      pl.on = false; pl.err = 1; paintPlay();
+    });
     return au;
+  }
+  /*@3.NOAJ3.5*/
+  var linkExp = Object.create(null);
+  function stale() {
+    return !!(pl && pl.url && linkExp[pl.url] && Date.now() > linkExp[pl.url] - LINK_SLACK_MS);
+  }
+  function relink(go) {
+    var a = engine(), at = a.currentTime || pl.at || 0;
+    return load(pl.idx, at).then(function () {
+      if (go && pl) engine().play()['catch'](function () {});
+    }, function () { if (pl) { pl.on = false; pl.err = 1; paintPlay(); } });
   }
   function rate() {
     var r = Number(localStorage.getItem(RATE_LS) || 1);
@@ -1019,7 +1044,12 @@
   function srcOf(it) {
     return blobOf(it).then(function (b) {
       if (b) return URL.createObjectURL(b);
-      if (it.aup && F() && F().link) return F().link(it.i).then(function (l) { return l.url; });
+      if (it.aup && F() && F().link) {
+        return F().link(it.i).then(function (l) {
+          linkExp[l.url] = Date.now() + (Number(l.expires_in) || 300) * 1000;
+          return l.url;
+        });
+      }
       if (it.gd && gdOn()) {
         return GDv().then(function (GD) { return GD.download(it.gd); }).then(function (bl) {
           var b2 = new Blob([bl], { type: it.m || bl.type || 'audio/webm' });
@@ -1084,7 +1114,8 @@
     if (!g) return;
     var a = engine();
     if (pl && pl.key === key) {
-      if (a.paused) a.play()['catch'](function () {}); else a.pause();
+      if (!a.paused) { a.pause(); return; }
+      if (stale()) relink(true); else a.play()['catch'](function () {});
       return;
     }
     if (!a.paused) a.pause();
@@ -1318,7 +1349,7 @@
       if (t < acc + len) break;
       acc += len;
     }
-    if (pl.url && pl.idx === i && !pl.err) {
+    if (pl.url && pl.idx === i && !pl.err && !stale()) {
       try { a.currentTime = t - acc; } catch (e) {}
       pl.at = t - acc;
       paintPlay();
@@ -1338,7 +1369,7 @@
       var len = (pl.parts[i].ms || 0) / 1000;
       if (t <= acc + len || i === pl.parts.length - 1) {
         var off = t - acc, a = engine(), was = !a.paused;
-        if (i === pl.idx) { try { a.currentTime = off; } catch (e) {} pl.at = off; paintPlay(true); }
+        if (i === pl.idx && !stale()) { try { a.currentTime = off; } catch (e) {} pl.at = off; paintPlay(true); }
         else load(i, off).then(function () { if (was) engine().play()['catch'](function () {}); });
         return;
       }

@@ -4061,6 +4061,11 @@
   }
 
   /*@3.NOAJ.118*/
+  function openingSay(msg) {
+    var p = els.docBody && els.docBody.querySelector('.na-opening p');
+    if (p) p.textContent = msg;
+  }
+
   function renderLoadError(id) {
     if (!els.docBody) return;
     els.docBody.innerHTML = '<div class="na-loadfail"><p>' +
@@ -5180,12 +5185,19 @@
     });
   }
   function drivePicked(GD, picking) {
+    var shown = false;
     return picking.then(function (pk) {
       if (!pk || !pk.id) return;
+      shown = true;
+      setMob('doc');
+      setReading(true);
+      renderOpening('pdf');
+      openingSay(L('يُجلب من درايف…', 'Fetching from Drive…'));
       return takeDrive(GD, pk.id, pk.name).then(function (file) {
         adoptPdf(file, pk.id, function () { GD.maybeOffer()['catch'](function () {}); });
       });
     })['catch'](function (e) {
+      if (shown) { docEmpty(); setReading(false); setMob('list'); }
       var why = GD.reason(e);
       saveState('error', why);
       toast(why);
@@ -5203,7 +5215,10 @@
     var named = name ? Promise.resolve(name) : GD.meta(id).then(function (m) { return (m && m.name) || ''; }, function () { return ''; });
     return named.then(function (nm) {
       return GD.download(id, function (at, of) {
-        if (of) saveState('saving', L('يُجلب من درايف… ', 'Fetching from Drive… ') + Math.round(at * 100 / of) + '%');
+        if (!of) return;
+        var msg = L('يُجلب من درايف… ', 'Fetching from Drive… ') + Math.round(at * 100 / of) + '%';
+        saveState('saving', msg);
+        openingSay(msg);
       }).then(function (blob) {
         saveState('', '');
         return new File([blob], nm || 'drive.pdf', { type: 'application/pdf' });

@@ -53,14 +53,22 @@
 
   function base(id) { return endpoint() + '/v1/files/' + encodeURIComponent(id); }
 
+  /*@3.FISJ2.1*/
+  var JREQ_MS = 20000;
   function jreq(method, url, id, body) {
+    var ac = typeof AbortController === 'function' ? new AbortController() : null;
+    var t = ac ? setTimeout(function () { ac.abort(); }, JREQ_MS) : 0;
     return fetch(url, {
       method: method,
       headers: headers(id, body ? { 'Content-Type': 'application/json' } : {}),
-      body: body ? JSON.stringify(body) : undefined
+      body: body ? JSON.stringify(body) : undefined,
+      signal: ac ? ac.signal : undefined
     }).then(function (r) {
       return r.json().catch(function () { return null; })
-        .then(function (j) { return { status: r.status, ok: r.ok, body: j || {} }; });
+        .then(function (j) { clearTimeout(t); return { status: r.status, ok: r.ok, body: j || {} }; });
+    }, function (e) {
+      clearTimeout(t);
+      throw new Error(e && e.name === 'AbortError' ? 'timeout' : 'network');
     });
   }
 

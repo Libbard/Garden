@@ -392,15 +392,6 @@
     return PALM_ORDER.indexOf(m) >= 0 ? m : 'auto';
   }
 
-  var PEN_ACTS = [
-    { k: 'era',   ar: 'ممحاة',        en: 'Eraser' },
-    { k: 'sel',   ar: 'تحديد',        en: 'Select' },
-    { k: 'lasso', ar: 'لاسو',         en: 'Lasso' },
-    { k: 'hand',  ar: 'تمرير',        en: 'Scroll' },
-    { k: 'hi',    ar: 'تظليل',        en: 'Highlight' },
-    { k: 'none',  ar: 'بلا فعل',      en: 'Nothing' }
-  ];
-
   function isFixed(f) {
     if (!f) return false;
     for (var i = 0; i < FAV_FIXED.length; i++) {
@@ -2206,7 +2197,8 @@
 
   Dial.prototype.penBtnDialog = function () {
     var I = window.GardenInkInput;
-    if (!I || !I.penButtons) return null;
+    if (!I || !I.penButtons || !I.ACTS) return null;
+    var PEN_ACTS = I.ACTS;
     var map = I.penButtons();
     /*@3.NODJ.34*/
     var stale = document.getElementById('ndl-penbtn');
