@@ -300,6 +300,8 @@
       /*@3.NOEJ3.2*/
       (n.fileBytes ? '<dt>' + esc(L('الملفّ', 'The file')) + '</dt><dd>' + lat(fmtSize(n.fileBytes)) + '</dd>' +
         '<dt>' + esc(L('ما كتبتَه عليه', 'Your marks on it')) + '</dt><dd>' + (n.dataBytes ? lat(fmtSize(n.dataBytes)) : '<span class="nx-dim">—</span>') + '</dd>' : '') +
+      /*@3.NOEJ3.8*/
+      (n.imgBytes ? '<dt>' + esc(L('الصور', 'Images')) + '</dt><dd>' + lat(fmtSize(n.imgBytes)) + '</dd>' : '') +
       '<dt data-role="au" hidden>' + esc(L('التسجيلات', 'Recordings')) + '</dt><dd data-role="au" hidden></dd>';
     if (n.created_at) h += '<dt>' + esc(L('أُنشئت', 'Created')) + '</dt><dd>' + esc(fmtDate(n.created_at)) + '</dd>';
     if (n.updated_at) h += '<dt>' + esc(L('عُدّلت', 'Modified')) + '</dt><dd>' + esc(fmtDate(n.updated_at)) + '</dd>';

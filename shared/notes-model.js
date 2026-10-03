@@ -236,7 +236,8 @@
         tags: Array.isArray(r.g) ? r.g.slice() : [],
         kind: r.k || 'rich',
         /*@3.NOMJ.10*/
-        bytes: (r.sz || 0) + (r.fz || 0),
+        bytes: (r.sz || 0) + (r.fz || 0) + (r.iz || 0),
+        imgBytes: r.iz || 0,
         dataBytes: r.sz || 0,
         fileBytes: r.fz || 0,
         origin: {

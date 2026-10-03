@@ -1723,23 +1723,53 @@
   }
 
   /*@3.NOAJ.461*/
+  /*@3.NOAJ.467*/
+  var imgSz = null, imgSzAt = 0;
+  function imgSizes(force) {
+    var St = window.GardenNotesStore;
+    if (!St || !St.allImages) return Promise.resolve({});
+    if (imgSz && !force && Date.now() - imgSzAt < 60000) return Promise.resolve(imgSz);
+    return St.allImages().then(function (rows) {
+      var m = {};
+      (rows || []).forEach(function (r) { m[r.id] = r.bytes || (r.blob && r.blob.size) || 0; });
+      imgSz = m; imgSzAt = Date.now();
+      return m;
+    }, function () { return imgSz || {}; });
+  }
+  function imgBytesOf(doc) {
+    var s = '';
+    try { s = JSON.stringify(doc) || ''; } catch (e) {}
+    var ids = {}, re = /byte-local:([0-9a-f]{24})/g, m;
+    while ((m = re.exec(s))) ids[m[1]] = 1;
+    var ks = Object.keys(ids);
+    if (!ks.length) return Promise.resolve(0);
+    return imgSizes(ks.some(function (k) { return !imgSz || imgSz[k] == null; })).then(function (sz) {
+      var n = 0;
+      ks.forEach(function (k) { n += sz[k] || 0; });
+      return n;
+    });
+  }
   var fzDone = false;
   function fzFill() {
     var St = window.GardenNotesStore;
     if (fzDone || !St || !St.getDoc) return;
     fzDone = true;
-    var cand = idxRead().filter(function (r) { return r && r.k === 'pdf' && r.fz == null && !r.d; }).slice(0, 300);
+    var cand = idxRead().filter(function (r) { return r && !r.d && ((r.k === 'pdf' && r.fz == null) || r.iz == null); }).slice(0, 300);
     if (!cand.length) return;
     var got = 0;
     cand.reduce(function (chain, r) {
       return chain.then(function () {
         return St.getDoc(r.id).then(function (row) {
-          var sz = row && row.doc && row.doc.pdf && row.doc.pdf.sz;
-          var rec = idxFind(r.id);
-          if (!rec || rec.fz != null) return;
-          rec.fz = sz > 0 ? sz : 0;
-          idxPut(rec);
-          if (sz > 0) got++;
+          var doc = row && row.doc;
+          var sz = doc && doc.pdf && doc.pdf.sz;
+          return imgBytesOf(doc).then(function (iz) {
+            var rec = idxFind(r.id);
+            if (!rec) return;
+            var ch = false;
+            if (rec.k === 'pdf' && rec.fz == null) { rec.fz = sz > 0 ? sz : 0; ch = true; if (sz > 0) got++; }
+            if (rec.iz == null) { rec.iz = iz; ch = true; if (iz > 0) got++; }
+            if (ch) idxPut(rec);
+          });
         })['catch'](function () {});
       });
     }, Promise.resolve()).then(function () { if (got) reload({ keepOpen: true }); });
@@ -1858,6 +1888,12 @@
         rec.sz = res.bytes;
         /*@3.NOAJ.460*/
         if (doc && doc.pdf && doc.pdf.sz > 0) rec.fz = doc.pdf.sz; else delete rec.fz;
+        imgBytesOf(doc).then(function (iz) {
+          var r2 = idxFind(id);
+          if (!r2 || r2.iz === iz) return;
+          r2.iz = iz;
+          idxPut(r2);
+        });
         /*@3.NOAJ.193*/
         rec.x = docPreview(doc);
         idxPut(rec);

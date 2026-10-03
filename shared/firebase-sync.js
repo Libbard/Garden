@@ -429,7 +429,7 @@
 
   /*@3.FISJ.245*/
   /*@3.FISJ.250*/
-  const BOOKKEEP = { notes_index: ['sz', 'fz', 'x'] };
+  const BOOKKEEP = { notes_index: ['sz', 'fz', 'iz', 'x'] };
   function _canonBk(x, bk) {
     if (!bk || !bk.length || !_isObj(x)) return _canonStr(x);
     const o = {};
