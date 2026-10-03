@@ -4514,8 +4514,9 @@
     docEmpty();
     history.replaceState(null, '', location.pathname);
     setReading(false);
-    setMob('list');
-    showPanel('list');
+    /*@3.NOAJ.453*/
+    if (phoneEx()) setMob('doc');
+    else { setMob('list'); showPanel('list'); }
     renderList();
   }
 
@@ -5660,7 +5661,7 @@
         adoptPdf(file, pk.id, function () { GD.maybeOffer()['catch'](function () {}); });
       });
     })['catch'](function (e) {
-      if (shown) { docEmpty(); setReading(false); setMob('list'); }
+      if (shown) { docEmpty(); setReading(false); setMob(homeMob()); }
       var why = GD.reason(e);
       saveState('error', why);
       toast(why);
@@ -5881,7 +5882,7 @@
         });
       }, function (e) {
         O.drop(null);
-        if (e && e.cancelled) { saveState('', ''); docEmpty(); setReading(false); setMob('list'); return; }
+        if (e && e.cancelled) { saveState('', ''); docEmpty(); setReading(false); setMob(homeMob()); return; }
         var many = e && e.pages;
         var heavy = e && e.bytes;
         var why = many
@@ -5894,7 +5895,7 @@
                 'Could not read this file — it may be damaged or not a PDF.'));
         docEmpty();
         setReading(false);
-        setMob('list');
+        setMob(homeMob());
         /*@3.NOAJ.263*/
         saveState('error', why);
         toast(why);
@@ -6587,6 +6588,17 @@
   function isPhone() {
     try { return window.matchMedia('(max-width: 768px)').matches; }
     catch (e) { return false; }
+  }
+
+  /*@3.NOAJ.452*/
+  function phoneEx() { return isPhone() && !!window.GardenNotesExplorer; }
+  function homeMob() { return phoneEx() ? 'doc' : 'list'; }
+
+  /*@3.NOAJ.454*/
+  function exHome() {
+    if (!phoneEx()) return;
+    if (edId || pdfOn()) { closeNote(); return; }
+    setMob('doc');
   }
 
   /*@3.NOAJ.99*/
@@ -8331,7 +8343,7 @@
     /*@3.NOAJ.223*/
     if (isPhone()) {
       var openNow = els.app && els.app.getAttribute('data-mob') === 'list';
-      if (openNow && (edId || pdfOn())) { setMob('doc'); return; }
+      if (openNow && (edId || pdfOn() || phoneEx())) { setMob('doc'); return; }
       setMob('list'); setAcc(which); setPanel(true);
       return;
     }
@@ -8495,6 +8507,7 @@
     setAcc('list');
     renderRail();
     renderList();
+    exHome();
   }
 
   /*@3.NOAJ.50*/
@@ -8676,6 +8689,7 @@
     setAcc('list');
     renderRail();
     renderList();
+    exHome();
   }
 
   function confirmSub(ar, en) {
@@ -8990,6 +9004,7 @@
         else if (n.href) location.href = n.href;
       },
       openFolder: function (id) { exSetView({ k: 'folder', id: id }); },
+      sections: function () { setMob('list'); setAcc('folders'); setPanel(true); },
       newNote: function () { createNote(); },
       newFolder: function () { newFolder(S.view.k === 'folder' ? S.view.id : ''); },
       move: function (uids) {
@@ -9823,7 +9838,7 @@
       });
     }
 
-    setMob(edId ? 'doc' : 'list');
+    setMob(edId ? 'doc' : homeMob());
 
     var scrim = document.getElementById('na-scrim');
     if (scrim) scrim.addEventListener('click', function () { setPanel(false); });

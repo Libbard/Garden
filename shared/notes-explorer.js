@@ -125,6 +125,10 @@
   function barHtml(trash) {
     var s = sortOf(), vm = vmOf();
     var h = '<div class="nx-bar">' +
+      /*@3.NOEJ3.1*/
+      (A.sections ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b nx-side" data-x="side" ' +
+        'aria-label="' + esc(L('الأقسام', 'Sections')) + '" data-ar-title="الأقسام" data-en-title="Sections">' +
+        '<i class="fa-solid fa-bars" aria-hidden="true"></i><span class="nx-b-t">' + esc(L('الأقسام', 'Sections')) + '</span></button>' : '') +
       '<nav class="nx-crumb" aria-label="' + esc(L('المسار', 'Path')) + '">' + crumbHtml() + '</nav>' +
       '<div class="nx-tools">' +
       '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="sort" aria-haspopup="true" ' +
@@ -448,6 +452,7 @@
         paint();
         return;
       case 'vm': A.uiSet('xvm', x.getAttribute('data-v')); paint(); return;
+      case 'side': if (A.sections) A.sections(); return;
       case 'nnote': A.newNote(); return;
       case 'nfolder': A.newFolder(); return;
       case 'import': pickFiles(); return;
