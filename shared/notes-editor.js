@@ -9145,9 +9145,7 @@
     var mode = kind || 'insert';
     var hear = (mode === 'block' || mode === 'paper') ? this._ctxHear : null;
     this._ctxHear = null;
-    var m = el('div', 'ne-menu');
-    m.setAttribute('role', 'menu');
-    m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    var m = null;
 
     var html = '';
     if (mode === 'block') {
@@ -9275,8 +9273,22 @@
       }).join('');
     }
     if (hear) html = mItem('hear', 'fa-play', hear.label) + html;
-    m.innerHTML = html;
-    document.body.appendChild(m);
+    /*@3.NOEJ.609*/
+    if (window.GardenMenu && GardenMenu.open) {
+      var ar0 = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
+      m = GardenMenu.open(ar0 ? ar0.left : (anchor ? anchor.x : 0), ar0 ? ar0.bottom : (anchor ? anchor.y : 0), html, null, {
+        cls: 'ne-menu', attr: 'data-act', focus: false, keys: false, keepFocus: true,
+        label: L('خيارات', 'Options'),
+        onClose: function () { if (self.menu === m) { self.menu = null; self.menuFor = null; } }
+      });
+    }
+    if (!m) {
+      m = el('div', 'ne-menu');
+      m.setAttribute('role', 'menu');
+      m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+      m.innerHTML = html;
+      document.body.appendChild(m);
+    }
     this.placeMenu(m, anchor);
     this.menu = m;
     this._menuAt = Date.now();
@@ -9620,8 +9632,12 @@
   };
 
   Editor.prototype.closeMenu = function () {
-    if (this.menu) { this.menu.remove(); this.menu = null; }
+    var m = this.menu;
+    this.menu = null;
     this.menuFor = null;
+    if (!m) return;
+    if (m.classList.contains('gsf-menu') && window.GardenMenu && GardenMenu.isOpen()) GardenMenu.close();
+    if (m.isConnected) m.remove();
   };
 
 

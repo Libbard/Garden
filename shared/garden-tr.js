@@ -13,6 +13,11 @@
   function E() { return window.GardenEndpoints || {}; }
   function isAr() { return (document.documentElement.getAttribute('lang') || 'ar').indexOf('ar') === 0; }
   function L(a, b) { return isAr() ? a : b; }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
   function squash(s) { return String(s || '').replace(/[​­]/g, '').replace(/\s+/g, ' ').trim(); }
 
   /*@3.GATJ2.3*/
@@ -69,19 +74,22 @@
 
   /*@3.GATJ2.6*/
   function one(q, to) {
-    var k = to + '|' + q;
+    var k = 'g2|' + to + '|' + q;
     var hit = memo(k);
-    if (hit != null) return Promise.resolve(hit);
+    if (hit != null && typeof hit === 'object') return Promise.resolve(hit);
     var base = E().sync;
     if (!base) return Promise.reject(fail('off'));
     if (navigator.onLine === false) return Promise.reject(fail('offline'));
     var ac = window.AbortController ? new AbortController() : null;
     var t = setTimeout(function () { if (ac) ac.abort(); }, WAIT_MS);
-    return fetch(base + '/v1/tr?to=' + to + '&q=' + encodeURIComponent(q),
+    return fetch(base + '/v1/tr?to=' + to + '&g=2&q=' + encodeURIComponent(q),
                  { signal: ac ? ac.signal : undefined, credentials: 'omit' })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
-          if (r.ok && j && typeof j.out === 'string') { keep(k, j.out); return j.out; }
+          if (r.ok && j && typeof j.out === 'string') {
+            var v = { o: j.out, t: Array.isArray(j.terms) ? j.terms.slice(0, 8) : [] };
+            keep(k, v); return v;
+          }
           var c = (j && j.error) || ('http_' + r.status);
           throw fail(c === 'daily_cap' ? 'cap' : c === 'month_cap' || c === 'quota' ? 'capm' : c === 'rate_limited' ? 'busy' : 'down');
         });
@@ -89,17 +97,63 @@
       .then(function (v) { clearTimeout(t); return v; }, function (e) { clearTimeout(t); throw e; });
   }
 
+  /*@3.GATJ2.11*/
+  var MARK = /^((?:[-*•●◦▪‣–—·]|\(?[0-9٠-٩]{1,3}[.)\-]|\(?[A-Za-z][.)])\s+)/;
+  function lines(raw) {
+    var out = [];
+    String(raw || '').replace(/\r\n?/g, '\n').replace(/[\u200b\u00ad]/g, '').split('\n').forEach(function (ln) {
+      var t = ln.replace(/[ \t\f\v\u00a0]+/g, ' ').trim();
+      var last = out[out.length - 1];
+      if (!t) { if (last && last.body) out.push({ pre: '', body: '' }); return; }
+      var m = t.match(MARK), pre = m ? m[1] : '', body = m ? t.slice(m[1].length) : t;
+      if (!pre && last && last.body && !/[.:;!?؟]["'”’)\]]?$/.test(last.body)) { last.body += ' ' + body; return; }
+      out.push({ pre: pre, body: body });
+    });
+    while (out.length && !out[out.length - 1].body) out.pop();
+    return out;
+  }
+
   /*@3.GATJ2.7*/
   function text(src, to) {
-    var p = parts(src);
-    if (!p.list.length) return Promise.reject(fail('empty'));
-    to = to || toFor(src);
-    var acc = [], i = 0;
-    function next() {
-      if (i >= p.list.length) return { out: acc.join(' '), to: to, cut: p.cut };
-      return one(p.list[i++], to).then(function (v) { acc.push(v); return next(); });
+    var ls = lines(src);
+    var all = squash(ls.map(function (x) { return x.body; }).join(' '));
+    if (!all) return Promise.reject(fail('empty'));
+    to = to || toFor(all);
+    var left = MAX_ALL, cut = false, jobs = [];
+    ls.forEach(function (x) {
+      if (cut) return;
+      if (!x.body) { jobs.push({ pre: '', list: [] }); return; }
+      var body = x.body;
+      if (body.length > left) {
+        var sp = body.lastIndexOf(' ', left);
+        body = body.slice(0, sp > left * 0.6 ? sp : left);
+        cut = true;
+      }
+      left -= body.length;
+      if (body) jobs.push({ pre: x.pre, list: parts(body).list });
+    });
+    var outL = [], terms = [], seen = {}, j = 0;
+    function line() {
+      if (j >= jobs.length) {
+        while (outL.length && !outL[outL.length - 1]) outL.pop();
+        return { out: outL.join('\n'), to: to, cut: cut, terms: terms };
+      }
+      var jb = jobs[j++], acc = [], i = 0;
+      if (!jb.list.length) { outL.push(''); return line(); }
+      function next() {
+        if (i >= jb.list.length) { outL.push(jb.pre + acc.join(' ')); return line(); }
+        return one(jb.list[i++], to).then(function (v) {
+          acc.push(typeof v === 'string' ? v : v.o);
+          (v && v.t || []).forEach(function (t) {
+            if (!t || !t.en || seen[t.en]) return;
+            seen[t.en] = 1; terms.push(t);
+          });
+          return next();
+        });
+      }
+      return next();
     }
-    return Promise.resolve().then(next);
+    return Promise.resolve().then(line);
   }
 
   function why(code) {
@@ -160,6 +214,7 @@
   function open(src, at, opts) {
     close();
     opts = opts || {};
+    var raw = String(src || '');
     src = squash(src);
     var el = document.createElement('div');
     el.className = 'gtr';
@@ -170,10 +225,11 @@
       '<div class="gtr-grip" aria-hidden="true"></div>' +
       '<div class="gtr-src" dir="auto"></div>' +
       '<div class="gtr-out" dir="auto" aria-live="polite"></div>' +
+      '<div class="gtr-terms" hidden></div>' +
       '<div class="gtr-cut" hidden></div>' +
       '<div class="gtr-acts"></div>' +
       '<div class="gtr-foot"></div>';
-    var srcEl = el.querySelector('.gtr-src'), outEl = el.querySelector('.gtr-out');
+    var srcEl = el.querySelector('.gtr-src'), outEl = el.querySelector('.gtr-out'), termsEl = el.querySelector('.gtr-terms');
     var cutEl = el.querySelector('.gtr-cut'), acts = el.querySelector('.gtr-acts');
     el.querySelector('.gtr-foot').textContent = L('ترجمةٌ آليّة — قد تخطئ في المصطلح.', 'Machine translation — terms may be off.');
     srcEl.textContent = src.length > 140 ? src.slice(0, 140) + '…' : src;
@@ -197,11 +253,21 @@
       outEl.textContent = L('جارٍ الترجمة…', 'Translating…');
       bCopy.disabled = true;
       swapLabel();
-      text(src, to).then(function (r) {
+      termsEl.hidden = true;
+      text(raw, to).then(function (r) {
         if (my !== gen || cur !== state) return;
         done = r.out;
         outEl.textContent = r.out;
         outEl.setAttribute('lang', r.to);
+        /*@3.GATJ2.12*/
+        if (r.terms && r.terms.length) {
+          termsEl.innerHTML = '<b class="gtr-terms-h">' + esc(L('مصطلحاتٌ من هذه الجملة', 'Terms in this sentence')) + '</b><ul>' +
+            r.terms.map(function (t) {
+              return '<li><span class="gtr-t-en" dir="ltr" lang="en">' + esc(t.en) + '</span>' +
+                '<span class="gtr-t-ar" dir="rtl" lang="ar">' + esc(t.a || t.t) + '</span></li>';
+            }).join('') + '</ul>';
+          termsEl.hidden = false;
+        }
         cutEl.hidden = !r.cut;
         if (r.cut) cutEl.textContent = L('تُرجم أوّلُ ' + MAX_ALL + ' حرفٍ — حدِّدْ ما بعده وترجمْه.',
                                          'Translated the first ' + MAX_ALL + ' characters — select the rest to continue.');
@@ -304,5 +370,5 @@
     } catch (e) { return null; }
   }
 
-  window.GardenTr = { open: open, close: close, text: text, parts: parts, toFor: toFor, selRect: selRect, MAX_Q: MAX_Q };
+  window.GardenTr = { open: open, close: close, text: text, parts: parts, lines: lines, toFor: toFor, selRect: selRect, MAX_Q: MAX_Q };
 })();

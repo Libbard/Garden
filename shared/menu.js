@@ -51,6 +51,8 @@
     var bs = buttons(), i = bs.indexOf(document.activeElement);
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
     if (e.key === 'Tab') { close(true); return; }
+    /*@3.MENJ.1*/
+    if (cur.ownKeys) return;
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
       if (!bs.length) return;
@@ -111,7 +113,7 @@
       if (onAct) onAct(act, b);
     });
 
-    cur = { el: el, ret: ret, onClose: o.onClose || null };
+    cur = { el: el, ret: ret, onClose: o.onClose || null, ownKeys: o.keys === false };
     setTimeout(function () {
       if (!cur || cur.el !== el) return;
       document.addEventListener('pointerdown', away, true);
