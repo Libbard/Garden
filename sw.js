@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.6.45'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.6.46'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -751,6 +751,27 @@ self.addEventListener('notificationclose', function (event) {
   event.waitUntil(self.ReminderDB.markFired(data.id, 'dismissed').catch(function () {}));
 });
 
+/*@0.SWJ.133*/
+var RUNTIME_MAX = 250, _puts = 0;
+function trimRuntime(cache) {
+  _puts++;
+  if (_puts !== 1 && _puts % 20) return Promise.resolve();
+  return cache.match(STATE_KEY).then(function(r) { return r ? r.json() : null; }).then(function(st) {
+    if (!st || !st.files) return null;
+    return cache.keys().then(function(ks) {
+      var run = ks.filter(function(rq) {
+        var rel = relOf(rq.url);
+        return rel && rel !== STATE_KEY && !st.files[rel] && !PRE_SET[rel];
+      });
+      var last = {}, doomed = [], live = [];
+      run.forEach(function(rq, i) { last[relOf(rq.url)] = i; });
+      run.forEach(function(rq, i) { if (last[relOf(rq.url)] === i) live.push(rq); else doomed.push(rq); });
+      if (live.length > RUNTIME_MAX) doomed = doomed.concat(live.slice(0, live.length - RUNTIME_MAX));
+      return Promise.all(doomed.map(function(rq) { return cache.delete(rq); }));
+    });
+  }).catch(function() {});
+}
+
 /*@0.SWJ.121*/
 function offlineFallback(event, cache) {
   if (event.request.mode === 'navigate') {
@@ -794,7 +815,9 @@ self.addEventListener('fetch', function(event) {
       return cache.match(event.request).then(function(cachedResponse) {
         var fetchPromise = fetch(event.request).then(function(networkResponse) {
           if (networkResponse && networkResponse.ok) {
-            cache.put(event.request, networkResponse.clone());
+            cache.put(event.request, networkResponse.clone()).then(function() {
+              return trimRuntime(cache);
+            }).catch(function() {});
           }
           return networkResponse;
         }).catch(function() { return cachedResponse || offlineFallback(event, cache); });
