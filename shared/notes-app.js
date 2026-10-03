@@ -9321,13 +9321,14 @@
     return Promise.all([
       est,
       PD && PD.list ? PD.list().catch(function () { return []; }) : [],
+      window.GardenPdfInk && GardenPdfInk.inkRows ? GardenPdfInk.inkRows() : [],
       St && St.imageBytes ? St.imageBytes().catch(function () { return 0; }) : 0,
       St && St.totalBytes ? St.totalBytes().catch(function () { return 0; }) : 0,
       Fl && Fl.list ? Fl.list().catch(function () { return { files: [] }; }) : { files: [] },
       spaceDocs(),
       pageCache().then(function (pc) { return pc ? pagesSize(pc) : null; })
     ]).then(function (r) {
-      var e = r[0] || {}, local = r[1] || [], srv = (r[4] && r[4].files) || [], docs = r[5] || [];
+      var e = r[0] || {}, local = r[1] || [], ink = r[2] || [], srv = (r[5] && r[5].files) || [], docs = r[6] || [];
       var dev = {}, us = {}, seen = {}, files = [];
       local.forEach(function (x) { dev[x.hash] = x; });
       srv.forEach(function (f) { if (f && f.ref_id) us[f.ref_id] = f; });
@@ -9346,6 +9347,15 @@
         });
       });
       var pdfB = 0, audB = 0, orph = { n: 0, bytes: 0, safe: 0, safeB: 0, list: [] }, young = Date.now() - 600000;
+      /*@3.NOAJ.472*/
+      var live = {};
+      idxRead().forEach(function (r) { if (r) live[r.id] = 1; });
+      orph.ink = [];
+      ink.forEach(function (x) {
+        if (!x.note || live[x.note]) return;
+        orph.ink.push(x.k); orph.bytes += x.bytes; orph.safeB += x.bytes;
+      });
+      if (orph.ink.length) { var inkN = {}; ink.forEach(function (x) { if (orph.ink.indexOf(x.k) >= 0) inkN[x.note] = 1; }); orph.n += Object.keys(inkN).length; orph.safe += Object.keys(inkN).length; }
       local.forEach(function (x) {
         if (/^wip_/.test(x.hash)) return;
         if (/^aud_/.test(x.hash)) audB += x.size || 0; else pdfB += x.size || 0;
@@ -9360,8 +9370,8 @@
       var cats = [
         { k: 'pdf', label: 'PDF', bytes: pdfB },
         { k: 'aud', label: L('تسجيلات', 'Recordings'), bytes: audB },
-        { k: 'img', label: L('صور', 'Images'), bytes: r[2] || 0 },
-        { k: 'notes', label: L('ملاحظات', 'Notes'), bytes: r[3] || 0 },
+        { k: 'img', label: L('صور', 'Images'), bytes: r[3] || 0 },
+        { k: 'notes', label: L('ملاحظات', 'Notes'), bytes: r[4] || 0 },
         { k: 'pages', label: L('صفحاتُ الموقع', 'Site pages'), bytes: ud.caches || 0 }
       ];
       var known = cats.reduce(function (s, c) { return s + c.bytes; }, 0);
@@ -9369,7 +9379,7 @@
       if (used - known > 1048576) cats.push({ k: 'other', label: L('أخرى', 'Other'), bytes: used - known });
       files.sort(function (a, b) { return b.bytes - a.bytes; });
       return { used: used, quota: e.quota || 0, cats: cats.filter(function (c) { return c.bytes > 0; }), files: files, orph: orph,
-               pages: r[6], vault: !!(Fl && Fl.list) };
+               pages: r[7], vault: !!(Fl && Fl.list) };
     });
   }
   /*@3.NOAJ.470*/
@@ -9426,8 +9436,10 @@
       if (!PD || !PD.drop) return Promise.resolve({ n: 0, bytes: 0 });
       return spaceInfo().then(function (s) {
         var go = s.orph.list.filter(function (x) { return x.safe; });
-        return Promise.all(go.map(function (x) { return PD.drop(x.hash); }))
-          .then(function () { return { n: go.length, bytes: s.orph.safeB }; });
+        var K = window.GardenPdfInk;
+        var inkGo = (s.orph.ink.length && K && K.dropKeys) ? K.dropKeys(s.orph.ink) : null;
+        return Promise.all(go.map(function (x) { return PD.drop(x.hash); }).concat([inkGo]))
+          .then(function () { return { n: s.orph.safe, bytes: s.orph.safeB }; });
       });
     }
     return Promise.resolve({ n: 0, bytes: 0 });

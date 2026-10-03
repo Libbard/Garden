@@ -380,9 +380,9 @@
       pg.bytes, true, 'فرِّغْها', 'Clear them');
     if (o.n) {
       var wait = o.n - o.safe;
-      var sub = L('ملاحظاتُها حُذفت نهائيّاً أو لم يكتمل استيرادُها', 'Their notes were erased or never finished importing');
+      var sub = L('ملفّاتٌ وحبرٌ لا يتبع أيَّ ملاحظة: مُحيت ملاحظاتُها أو لم يكتمل استيرادُها', 'Files and ink that belong to no note: their notes were erased or never finished importing');
       if (wait) sub += ' · ' + L(wait + ' كُتب في آخر عشر دقائق فينتظر (‏قد يكون استيراداً جارياً)', wait + ' written in the last ten minutes, so it waits (it may be an import in progress)');
-      h += row('orph', 'fa-broom', 'ملفّاتٌ لا تتبع أيَّ ملاحظة', 'Files that belong to no note', sub,
+      h += row('orph', 'fa-broom', 'بقايا ملاحظاتٍ محذوفة', 'Leftovers of deleted notes', sub,
         o.safe ? o.safeB : o.bytes, o.safe > 0, 'احذفْها من الجهاز', 'Remove from device');
     }
     if (!h) h = '<p class="nx-hint">' + esc(L('لا شيءَ يُنظَّف — الجهازُ نظيف.', 'Nothing to clean — this device is tidy.')) + '</p>';

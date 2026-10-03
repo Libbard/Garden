@@ -86,6 +86,26 @@
     });
   }
 
+/*@3.NOPJ8.186*/
+  function inkRows() {
+    return idbDo('readonly', function (s, put) {
+      var out = [], rq = s.openCursor();
+      rq.onsuccess = function () {
+        var c = rq.result;
+        if (!c) { put(out); return; }
+        var k = String(c.key), i = k.indexOf('|'), b = 0;
+        try { b = JSON.stringify(c.value).length; } catch (e) {}
+        out.push({ k: k, note: i > 0 ? k.slice(0, i) : '', bytes: b });
+        c['continue']();
+      };
+    }).catch(function () { return []; });
+  }
+  function dropKeys(ks) {
+    if (!ks || !ks.length) return Promise.resolve(true);
+    return idbDo('readwrite', function (s) { for (var i = 0; i < ks.length; i++) s['delete'](ks[i]); })
+      .then(function () { return true; }, function () { return false; });
+  }
+
   /*@3.NOPJ8.1*/
   function frame(page, scale) {
     var vp = page.getViewport({ scale: scale || 1 });
@@ -3490,6 +3510,8 @@
     read: read,
     write: write,
     pagesOf: pagesOf,
-    wipe: wipe
+    wipe: wipe,
+    inkRows: inkRows,
+    dropKeys: dropKeys
   };
 })();
