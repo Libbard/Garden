@@ -661,13 +661,15 @@
   });
 
   var OCR_META = 'pdfocr:';
+  var OCR_E = 2;
   var OCRQ = {};
   function ocr(h) {
     if (!/^[0-9a-f]{64}$/.test(String(h || ''))) return Promise.resolve(null);
     if (OCRQ[h]) return OCRQ[h];
     var S = window.GardenNotesStore, f = F();
     var p = (S && S.meta ? S.meta(OCR_META + h, null) : Promise.resolve(null)).then(function (c) {
-      if (c && c.v === 1) return { state: 'ready', data: c };
+      /*@3.NOPJ12.3*/
+      if (c && c.v === 1 && ((c.e || 1) >= OCR_E || (c._at && Date.now() - c._at < 864e5))) return { state: 'ready', data: c };
       if (!f || !f.ocrState) return null;
       return f.ocrState(refIdOf(h)).then(function (r) {
         if (!r || r.ocr === 'none') return null;
@@ -678,6 +680,7 @@
           return new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).json();
         }).then(function (d) {
           if (!d || d.v !== 1 || typeof d.p !== 'object') return null;
+          d._at = Date.now();
           if (S && S.setMeta) S.setMeta(OCR_META + h, d);
           return { state: 'ready', data: d };
         });
