@@ -27,7 +27,7 @@
   var findT = null;
 
   var S = {
-    view: { k: 'recent' },
+    view: { k: 'home' },
     q: '',
     all: [],
     list: [],
@@ -315,6 +315,8 @@
   function vName(v) {
     switch (v.k) {
       case 'recent':  return L('الأخيرة', 'Recent');
+      case 'home':    return L('ملاحظاتي', 'My notes');
+      case 'courses': return L('المواد', 'Courses');
       case 'pinned':  return L('المثبَّتة', 'Pinned');
       case 'remind':  return L('لها تنبيه', 'With reminder');
       case 'general': return L('ملاحظات عامّة', 'General notes');
@@ -341,6 +343,8 @@
   function matches(n, v) {
     switch (v.k) {
       case 'recent':  return !n.archived;
+      case 'home':    return !n.archived && !n.folder && !(n.origin && n.origin.course);
+      case 'courses': return false;
       case 'pinned':  return !n.archived && !!n.pinned;
       case 'remind':  return !n.archived && !!n.remind_at;
       case 'archive': return !!n.archived;
@@ -507,6 +511,7 @@
     var h = '';
 
     /*@3.NOAJ.183*/
+    h += itemHtml({ k: 'home' }, L('ملاحظاتي', 'My notes'), 'fa-house', inView({ k: 'home' }).length);
     h += itemHtml({ k: 'recent' }, L('الأخيرة', 'Recent'), 'fa-clock', inView({ k: 'recent' }).length);
     h += itemHtml({ k: 'pinned' }, L('المثبَّتة', 'Pinned'), 'fa-thumbtack', inView({ k: 'pinned' }).length);
     var nr = inView({ k: 'remind' }).length;
@@ -936,6 +941,25 @@
   var SHARE_TTL = 5 * 60 * 1000, SHARE_LAG = 4000;
   function shareKnow(noteId, on, mode) {
     shareKn[noteId] = { on: !!on, mode: mode || 'view', at: Date.now() };
+    /*@3.NOAJ.464*/
+    try {
+      var m = sharedMap();
+      if (on) m[noteId] = mode || 'view'; else delete m[noteId];
+      localStorage.setItem('notes_shared', JSON.stringify(m));
+    } catch (e) {}
+  }
+  function sharedMap() {
+    try { var m = JSON.parse(localStorage.getItem('notes_shared') || '{}'); return m && typeof m === 'object' ? m : {}; }
+    catch (e) { return {}; }
+  }
+  function shareNoteId(id) {
+    if (edId === id && ed) { openShare(); return; }
+    openNote(id);
+    var t0 = Date.now();
+    (function wait() {
+      if (edId === id && ed) { openShare(); return; }
+      if (Date.now() - t0 < 6000) setTimeout(wait, 120);
+    })();
   }
   function sharePush(noteId) {
     if (shareQ[noteId]) clearTimeout(shareQ[noteId]);
@@ -4218,6 +4242,7 @@
     if (ed && edId === id && !(opts && opts.remount)) { setMob('doc'); return; }
     setMob('doc');
     if (ed && edId && edId !== id) {
+      thumbCap(edId);
       if (!leaveProvisional(edId, ed.doc)) { try { ed.save(); } catch (e) {} }
     }
     if (overlay) { try { overlay.destroy(); } catch (e3) {} overlay = null; }
@@ -4547,6 +4572,7 @@
   }
 
   function closeNote() {
+    if (edId) { thumbCap(edId); S.lastNote = edId; }
     var gone = leaveProvisional(edId, ed && ed.doc);
     if (ed && !gone) { try { ed.save(); } catch (e) {} }
     if (hist) { hist.onChange = null; hist.reset(); }
@@ -6586,7 +6612,7 @@
     var dlg = document.getElementById('na-folder');
     try { dlg.close(); } catch (e) {}
     if (S.view.k === 'folder' && S.view.id === gone) {
-      S.view = { k: 'recent' };
+      S.view = { k: 'home' };
       uiSet('view', S.view);
     }
     reload({ keepOpen: true });
@@ -8620,6 +8646,95 @@
     exHome();
   }
 
+  /*@3.NOAJ.465*/
+  function dupNotes(ids) {
+    var St = window.GardenNotesStore, n = 0;
+    (ids || []).forEach(function (id) {
+      var rec = idxFind(id);
+      if (!rec) return;
+      var nid = newId('rn'), now = Date.now() + n;
+      idxPut(Object.assign({}, rec, { id: nid, t: (notPh(rec.t) || '') + L(' — نسخة', ' — copy'), ca: now, updated_at: now, p: 0 }));
+      if (St && St.getDoc) {
+        St.getDoc(id).then(function (row) { return row && row.doc ? putBorn(nid, row.doc, now) : null; })
+          .then(function () { reload({ keepOpen: true }); }, function () {});
+      }
+      n++;
+    });
+    if (!n) return;
+    clearPicked();
+    saveState('', L(n === 1 ? 'كُرِّرت' : 'كُرِّرت ' + n, n === 1 ? 'Duplicated' : n + ' duplicated'));
+    reload({ keepOpen: true });
+  }
+
+  /*@3.NOAJ.466*/
+  var TH_W = 320, TH_H = 240, thQ = Promise.resolve(), thBusy = {};
+  function thumbFit(src) {
+    var t = document.createElement('canvas');
+    t.width = TH_W; t.height = TH_H;
+    var x = t.getContext('2d');
+    x.fillStyle = '#ffffff';
+    x.fillRect(0, 0, TH_W, TH_H);
+    var k = Math.max(TH_W / src.width, TH_H / src.height), dw = src.width * k, dh = src.height * k;
+    x.drawImage(src, (TH_W - dw) / 2, 0, dw, dh);
+    var d = x.getImageData(0, 0, TH_W, TH_H).data, ink = 0;
+    for (var i = 0; i < d.length; i += 4 * 97) if (d[i] < 236 || d[i + 1] < 236 || d[i + 2] < 236) ink++;
+    if (ink < 6) return null;
+    var u = t.toDataURL('image/webp', 0.72);
+    return u.indexOf('data:image/webp') === 0 ? u : t.toDataURL('image/jpeg', 0.75);
+  }
+  function thumbCap(id) {
+    try {
+      var St = window.GardenNotesStore;
+      if (!id || !els.docBody || !St || !St.setMeta) return;
+      var best = els.docBody.querySelector('.gpv-page[data-p="1"] canvas.gpv-cv'), area = 0;
+      if (!best || !best.width) {
+        best = null;
+        var cvs = els.docBody.querySelectorAll('canvas');
+        for (var i = 0; i < cvs.length; i++) {
+          var r = cvs[i].getBoundingClientRect();
+          if (!cvs[i].width || r.width < 80 || r.height < 60) continue;
+          if (r.width * r.height > area) { area = r.width * r.height; best = cvs[i]; }
+        }
+      }
+      if (!best) return;
+      var u = thumbFit(best);
+      if (u) St.setMeta('nxth:' + id, { u: u, at: Date.now() });
+    } catch (e) {}
+  }
+  function thumbGet(id) {
+    var St = window.GardenNotesStore;
+    if (!St || !St.meta) return Promise.resolve(null);
+    return St.meta('nxth:' + id, null).then(function (v) { return v && v.u ? v.u : null; });
+  }
+  function thumbMake(n) {
+    if (!n || n.kind !== 'pdf' || thBusy[n.id] || !window.GardenPdfDoc || !window.GardenPdfView) return Promise.resolve(null);
+    thBusy[n.id] = 1;
+    var St = window.GardenNotesStore;
+    var p = thQ.then(function () {
+      return St.getDoc(n.id).then(function (row) {
+        var h = row && row.doc && row.doc.pdf && row.doc.pdf.h;
+        return h ? GardenPdfDoc.get(h) : null;
+      }).then(function (f) {
+        return f ? f.arrayBuffer().then(function (buf) { return GardenPdfView.load(new Uint8Array(buf)); }) : null;
+      }).then(function (o) {
+        if (!o || !o.doc) return null;
+        return o.doc.getPage(1).then(function (pg) {
+          var v1 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: TH_W / v1.width });
+          var c = document.createElement('canvas');
+          c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+          return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () {
+            try { o.doc.destroy(); } catch (e) {}
+            var u = thumbFit(c);
+            if (u) St.setMeta('nxth:' + n.id, { u: u, at: Date.now() });
+            return u;
+          });
+        });
+      });
+    })['catch'](function () { return null; }).then(function (u) { delete thBusy[n.id]; return u; });
+    thQ = p.then(function () {}, function () {});
+    return p;
+  }
+
   /*@3.NOAJ.50*/
   function pasteNotes(intoFolder) {
     var clip = S.clip;
@@ -8734,6 +8849,8 @@
       ctxItem('cut', 'fa-scissors', L('قُصَّ', 'Cut') + plural) +
       ctxItem('paste', 'fa-paste', L('ألصِقْ هنا', 'Paste here')) +
       ctxItem('move', 'fa-folder-open', L('انقلْ إلى مجلّد', 'Move to folder') + plural) +
+      ctxItem('dup', 'fa-clone', L('كرِّرْ', 'Duplicate') + plural) +
+      (n === 1 ? ctxItem('share', 'fa-share-nodes', L('شارِكْ', 'Share')) : '') +
       ctxItem('del', 'fa-trash', L('احذفْ', 'Delete') + plural, 1),
       function (act) { ctxAct(act, uid); });
   }
@@ -8870,6 +8987,8 @@
       return;
     }
     if (act === 'paste') { pasteNotes(); return; }
+    if (act === 'dup') { dupNotes(recs.map(function (r) { return r.id; })); return; }
+    if (act === 'share') { if (recs[0]) shareNoteId(recs[0].id); return; }
     if (act === 'move') {
       if (recs.length === 1) { openNote(recs[0].id, { silent: 1 }); moveNote(); return; }
       S.moveMany = recs.map(function (r) { return r.id; });
@@ -9063,8 +9182,12 @@
   }
 
   function exCrumbs() {
-    var v = S.view, root = { v: { k: 'recent' }, label: L('ملاحظاتي', 'My notes') }, out = [root];
-    if (v.k === 'recent') return out;
+    var v = S.view, root = { v: { k: 'home' }, label: L('ملاحظاتي', 'My notes') }, out = [root];
+    if (v.k === 'home') return out;
+    var cs = { v: { k: 'courses' }, label: L('المواد', 'Courses') };
+    if (v.k === 'courses') return out.concat([cs]);
+    if (v.k === 'course') return out.concat([cs, { v: v, label: vName(v) }]);
+    if (v.k === 'module') return out.concat([cs, { v: { k: 'course', code: v.code }, label: courseLabel(v.code) }, { v: v, label: vName(v) }]);
     if (v.k === 'folder') {
       var T = folderTree(), chain = [], cur = T.byId[v.id], guard = 0;
       while (cur && guard++ < MAX_DEPTH + 2) {
@@ -9078,16 +9201,69 @@
     return out;
   }
 
+  /*@3.NOAJ.462*/
+  function courseCounts() {
+    var c = {}, i, n;
+    for (i = 0; i < S.all.length; i++) {
+      n = S.all[i];
+      if (n.archived || !n.origin || !n.origin.course) continue;
+      c[n.origin.course] = (c[n.origin.course] || 0) + 1;
+    }
+    return c;
+  }
   function exFolders() {
     var v = S.view, par;
+    if (v.k === 'courses') {
+      var cc = courseCounts();
+      return Object.keys(cc).sort().map(function (code) {
+        return { v: { k: 'course', code: code }, name: courseLabel(code), count: cc[code], icon: 'fa-graduation-cap', tone: courseTone(code) };
+      });
+    }
     if (v.k === 'folder') par = v.id;
-    else if (v.k === 'recent') par = '';
+    else if (v.k === 'home') par = '';
     else return [];
     var T = folderTree(), C = folderCounts(), kids = (T.kids[par] || []).slice();
     kids.sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); });
-    return kids.map(function (f) {
+    var out = kids.map(function (f) {
       return { id: f.id, name: f.n || L('مجلّد', 'Folder'), count: C.total[f.id] || 0 };
     });
+    if (v.k === 'home') {
+      var cc2 = courseCounts(), nc = 0;
+      for (var k in cc2) nc += cc2[k];
+      if (nc) out.push({ v: { k: 'courses' }, name: L('المواد', 'Courses'), count: nc, icon: 'fa-graduation-cap' });
+    }
+    return out;
+  }
+  /*@3.NOAJ.463*/
+  function exPlaces() {
+    var out = [], T = folderTree(), C = folderCounts();
+    var add = function (v, icon, ar, en, n, always) {
+      if (always || n) out.push({ v: v, icon: icon, label: L(ar, en), n: n || 0 });
+    };
+    add({ k: 'home' }, 'fa-house', 'ملاحظاتي', 'My notes', inView({ k: 'home' }).length, 1);
+    add({ k: 'recent' }, 'fa-clock', 'الأحدث', 'Recent', inView({ k: 'recent' }).length, 1);
+    add({ k: 'pinned' }, 'fa-thumbtack', 'المثبَّتة', 'Pinned', inView({ k: 'pinned' }).length);
+    add({ k: 'remind' }, 'fa-bell', 'لها تنبيه', 'With reminder', inView({ k: 'remind' }).length);
+    var cc = courseCounts(), nc = 0;
+    for (var k in cc) nc += cc[k];
+    add({ k: 'courses' }, 'fa-graduation-cap', 'المواد', 'Courses', nc);
+    var roots = (T.kids[''] || []).slice().sort(function (a, b) { return (a.ord || 0) - (b.ord || 0); });
+    out.push({ head: L('مجلّداتي', 'My folders'), add: 1 });
+    roots.forEach(function (f) { out.push({ v: { k: 'folder', id: f.id }, icon: 'fa-folder', label: f.n || L('مجلّد', 'Folder'), n: C.total[f.id] || 0 }); });
+    out.push({ head: '' });
+    add({ k: 'archive' }, 'fa-box-archive', 'الأرشيف', 'Archive', inView({ k: 'archive' }).length, 1);
+    add({ k: 'trash' }, 'fa-trash-can', 'السلّة', 'Trash', (S.trash || []).length, 1);
+    return out;
+  }
+  function exPlaceOf(v) {
+    if (!v) return 'home';
+    if (v.k === 'course' || v.k === 'module') return vKey({ k: 'courses' });
+    if (v.k === 'folder') {
+      var T = folderTree(), cur = T.byId[v.id], g = 0;
+      while (cur && cur.p && T.byId[cur.p] && cur.p !== cur.id && g++ < MAX_DEPTH + 2) cur = T.byId[cur.p];
+      return cur ? vKey({ k: 'folder', id: cur.id }) : vKey(v);
+    }
+    return vKey(v);
   }
 
   function exApi() {
@@ -9100,7 +9276,18 @@
       crumbs: exCrumbs,
       items: function () { return inView(S.view); },
       folders: exFolders,
-      canFolder: function () { return S.view.k === 'folder' || S.view.k === 'recent'; },
+      canFolder: function () { return S.view.k === 'folder' || S.view.k === 'home'; },
+      places: exPlaces,
+      placeKey: function (v) { return v ? vKey(v) : exPlaceOf(S.view); },
+      last: function () { var r = S.lastNote && idxFind(S.lastNote); return r && !r.d ? { id: r.id, t: notPh(r.t) || L('بلا عنوان', 'Untitled') } : null; },
+      back: function () { if (S.lastNote && idxFind(S.lastNote)) openNote(S.lastNote); },
+      thumb: thumbGet,
+      thumbMake: thumbMake,
+      shared: function (id) { return !!sharedMap()[id]; },
+      share: function (uid) { var r = richOf(uid); if (r) shareNoteId(r.id); },
+      dup: function (uids) { dupNotes(recsOf(uids).map(function (x) { return x.id; })); },
+      canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },
+      paste: function () { pasteNotes(); },
       folderName: folderName,
       folderPath: function (id) { return folderPath(id).join(' / '); },
       when: whenOf,
@@ -9162,6 +9349,7 @@
         openExport();
       },
       ctx: openCtx,
+      folderCtx: openFolderCtx,
       menu: openMenuAt,
       menuItem: ctxItem,
       doc: function (id) {
@@ -10084,7 +10272,7 @@
         if (fid) {
           folderDrop(fid);
           if (S.view.k === 'folder' && S.view.id === fid) {
-            S.view = { k: 'recent' };
+            S.view = { k: 'home' };
             uiSet('view', S.view);
           }
           reload({ keepOpen: true });
