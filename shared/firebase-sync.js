@@ -428,7 +428,8 @@
   function _canonStr(x) { return JSON.stringify(_canon(x)); }
 
   /*@3.FISJ.245*/
-  const BOOKKEEP = { notes_index: ['sz', 'x'] };
+  /*@3.FISJ.250*/
+  const BOOKKEEP = { notes_index: ['sz', 'fz', 'x'] };
   function _canonBk(x, bk) {
     if (!bk || !bk.length || !_isObj(x)) return _canonStr(x);
     const o = {};

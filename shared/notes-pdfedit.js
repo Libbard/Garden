@@ -281,6 +281,7 @@
     this.names = [o.name || ''];
     this.sel = {};
     this.last = -1;
+    this.anchor = -1; this.touchSel = false;
     this.seq = 0;
     this.dirty = false;
     this.busy = false;
@@ -335,8 +336,22 @@
     this.d = d;
     this.grid = d.querySelector('[data-pe="grid"]');
     d.addEventListener('click', function (e) { self.click(e); });
-    d.addEventListener('cancel', function (e) { e.preventDefault(); self.close(); });
+    d.addEventListener('cancel', function (e) {
+      e.preventDefault();
+      if (self.picked().length && !self.busy) { self.sel = {}; self.touchSel = false; self.paint(); self.refocus(); return; }
+      self.close();
+    });
     d.addEventListener('keydown', function (e) { self.key(e); });
+    /*@3.NOPJ13.4*/
+    d.addEventListener('keydown', function (e) {
+      var tg = e.target && e.target.tagName;
+      if (tg === 'INPUT' || tg === 'TEXTAREA') return;
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA')) {
+        e.preventDefault();
+        self.sel = {}; self.items.forEach(function (it) { self.sel[it.k] = 1; });
+        self.paint(); self.refocus();
+      }
+    }, true);
     var rg = d.querySelector('[data-pe="range"]');
     rg.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); self.byRange(rg.value); } });
     rg.addEventListener('change', function () { self.byRange(rg.value); });
@@ -440,6 +455,8 @@
 
   Editor.prototype.click = function (e) {
     var b = e.target.closest('[data-pe]');
+    /*@3.NOPJ13.2*/
+    if (b && b === this.grid) b = null;
     if (b && !b.disabled) {
       var a = b.getAttribute('data-pe');
       if (a === 'close') return this.close();
@@ -457,12 +474,32 @@
     if (this._dragged) { this._dragged = false; return; }
     var pg = e.target.closest('.npe-pg');
     if (!pg) return;
-    var j = +pg.getAttribute('data-j'), k = pg.getAttribute('data-k');
-    if (e.shiftKey && this.last >= 0) {
-      var a0 = Math.min(this.last, j), b0 = Math.max(this.last, j);
+    var j = +pg.getAttribute('data-j');
+    var mod = e.ctrlKey || e.metaKey;
+    this.pick(j, e.shiftKey ? (mod ? 'range+' : 'range') : ((mod || this.touchSel) ? 'toggle' : 'only'));
+  };
+
+  /*@3.NOPJ13.3*/
+  Editor.prototype.refocus = function () {
+    var n = this.grid.querySelector('[data-j="' + Math.max(0, this.last) + '"]');
+    if (n) { try { n.focus({ preventScroll: true }); } catch (e) {} }
+  };
+  Editor.prototype.pick = function (j, mode) {
+    var it = this.items[j];
+    if (!it) return;
+    var k = it.k;
+    if ((mode === 'range' || mode === 'range+') && this.anchor >= 0 && this.anchor < this.items.length) {
+      if (mode === 'range') this.sel = {};
+      var a0 = Math.min(this.anchor, j), b0 = Math.max(this.anchor, j);
       for (var q = a0; q <= b0; q++) this.sel[this.items[q].k] = 1;
-    } else if (this.sel[k]) delete this.sel[k];
-    else this.sel[k] = 1;
+    } else if (mode === 'toggle') {
+      if (this.sel[k]) delete this.sel[k]; else this.sel[k] = 1;
+      this.anchor = j;
+    } else {
+      this.sel = {}; this.sel[k] = 1;
+      this.anchor = j;
+    }
+    if (!this.picked().length) this.touchSel = false;
     this.last = j;
     this.paint();
     var back = this.grid.querySelector('[data-j="' + j + '"]');
@@ -473,7 +510,7 @@
     var pg = e.target.closest && e.target.closest('.npe-pg');
     if (!pg) return;
     var j = +pg.getAttribute('data-j'), to = -1;
-    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pg.click(); return; }
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); this.pick(j, e.shiftKey ? 'range+' : 'toggle'); return; }
     if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); this.drop(); return; }
     var rtl = getComputedStyle(this.grid).direction === 'rtl';
     if (e.key === 'ArrowRight') to = j + (rtl ? -1 : 1);
@@ -669,6 +706,8 @@
       if (!s.on) return;
       self._dragged = true;
       setTimeout(function () { self._dragged = false; }, 0);
+      /*@3.NOPJ13.5*/
+      if (!s.to && s.touch) { self.touchSel = true; if (!self.sel[self.items[s.j].k]) self.pick(s.j, 'toggle'); else self.paint(); return; }
       if (!s.to) { self.paint(); return; }
       var moving = self.sel[self.items[s.j].k] ? self.picked() : [s.j];
       var target = s.to.j + (s.to.after ? 1 : 0);

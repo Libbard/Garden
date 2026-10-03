@@ -426,7 +426,8 @@
   function course(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12); }
   /*@3.DRIJ.3*/
   var NAMES = { GENERAL: ['عامّ', 'General'], pdf: ['PDF', 'PDF'], aud: ['تسجيلات', 'Recordings'], file: ['ملفّات', 'Files'] };
-  function named(k) { var n = NAMES[k]; return n ? { name: L(n[0], n[1]), also: n } : null; }
+  /*@3.DRIJ.6*/
+  function named(k) { var n = NAMES[k]; return n ? { name: n[1], also: [n[1]] } : null; }
   function place(c, kind) {
     var code = course(c) || 'GENERAL';
     var cn = code === 'GENERAL' ? named('GENERAL') : { name: code };

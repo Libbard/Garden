@@ -228,7 +228,8 @@
   var BIG_US = 40 * 1024 * 1024;
   function where() {
     var c = String((cur && cur.course) || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    return 'Digital Garden / ' + (c || L('عامّ', 'General')) + ' / PDF';
+    /*@3.NOPJ12.2*/
+    return 'Digital Garden / ' + (c || 'General') + ' / PDF';
   }
   function opt(a, icon, title, sub, mod, chip, off) {
     return '<button type="button" class="npc-opt' + (mod ? ' npc-opt--' + mod : '') + '" data-a="' + a + '"' + (off ? ' disabled' : '') + '>' +

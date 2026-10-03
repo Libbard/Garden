@@ -258,6 +258,9 @@
       '<dt data-role="pg" hidden>' + esc(L('الصفحات', 'Pages')) + '</dt><dd data-role="pg" hidden></dd>' +
       '<dt data-role="sz"' + (n.bytes ? '' : ' hidden') + '>' + esc(L('الحجم', 'Size')) + '</dt>' +
         '<dd data-role="sz"' + (n.bytes ? '' : ' hidden') + '>' + lat(fmtSize(n.bytes)) + '</dd>' +
+      /*@3.NOEJ3.2*/
+      (n.fileBytes ? '<dt>' + esc(L('الملفّ', 'The file')) + '</dt><dd>' + lat(fmtSize(n.fileBytes)) + '</dd>' +
+        '<dt>' + esc(L('ما كتبتَه عليه', 'Your marks on it')) + '</dt><dd>' + (n.dataBytes ? lat(fmtSize(n.dataBytes)) : '<span class="nx-dim">—</span>') + '</dd>' : '') +
       '<dt data-role="au" hidden>' + esc(L('التسجيلات', 'Recordings')) + '</dt><dd data-role="au" hidden></dd>';
     if (n.created_at) h += '<dt>' + esc(L('أُنشئت', 'Created')) + '</dt><dd>' + esc(fmtDate(n.created_at)) + '</dd>';
     if (n.updated_at) h += '<dt>' + esc(L('عُدّلت', 'Modified')) + '</dt><dd>' + esc(fmtDate(n.updated_at)) + '</dd>';
@@ -284,7 +287,7 @@
       }
       if (d.pdf) {
         if (d.pdf.pg) put('pg', lat(String(d.pdf.pg)));
-        if (d.pdf.sz && !n.bytes) put('sz', lat(fmtSize(d.pdf.sz)));
+        if (d.pdf.sz && !n.fileBytes) put('sz', lat(fmtSize(d.pdf.sz + (n.dataBytes || 0))));
       } else if (Array.isArray(d.pages) && d.pages.length) {
         put('pg', lat(String(d.pages.length)));
       }

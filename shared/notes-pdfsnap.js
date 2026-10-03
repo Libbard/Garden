@@ -29,6 +29,68 @@
     return out;
   }
 
+  /*@3.NOPJ14.1*/
+  function angleOf(el, stop) {
+    var a = 0;
+    for (var p = el; p && p !== stop; p = p.parentElement) {
+      var t = getComputedStyle(p).transform;
+      if (!t || t === 'none') continue;
+      var m = t.match(/matrix\(([^)]+)\)/);
+      if (!m) continue;
+      var v = m[1].split(',').map(parseFloat);
+      a += Math.atan2(v[1], v[0]);
+    }
+    return a;
+  }
+  function scaleOf(el, stop) {
+    var host = el.closest ? el.closest('.gpi-fed') : null;
+    if (!host || !host.offsetWidth) return 1;
+    return host.getBoundingClientRect().width / host.offsetWidth;
+  }
+  function cleanImg(img) {
+    try {
+      var t = document.createElement('canvas'); t.width = 1; t.height = 1;
+      var tx = t.getContext('2d'); tx.drawImage(img, 0, 0, 1, 1); tx.getImageData(0, 0, 1, 1);
+      return true;
+    } catch (e) { return false; }
+  }
+  function drawImgs(ctx, page) {
+    var list = page.querySelectorAll('.gpi-fed img');
+    for (var i = 0; i < list.length; i++) {
+      var img = list[i], s = shown(img);
+      if (!s || !img.complete || !(img.naturalWidth > 0) || !cleanImg(img)) continue;
+      var k = scaleOf(img, page);
+      var w = img.offsetWidth * k, h = img.offsetHeight * k;
+      if (!(w > 0 && h > 0)) continue;
+      var cx = s.r.left + s.r.width / 2, cy = s.r.top + s.r.height / 2;
+      var view = img.closest('.ne-img-view') || img.parentElement;
+      var vs = view ? getComputedStyle(view) : null;
+      var circ = !!(view && view.closest('.ne-fig[data-sh="circle"]'));
+      var rad = (parseFloat(s.cs.borderTopLeftRadius) || 0) * k;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angleOf(img, page));
+      var op = parseFloat(s.cs.opacity);
+      ctx.globalAlpha = isFinite(op) ? op : 1;
+      if (s.cs.filter && s.cs.filter !== 'none') { try { ctx.filter = s.cs.filter; } catch (eF) {} }
+      if (circ && view) {
+        var vw = view.offsetWidth * k, vh = view.offsetHeight * k;
+        ctx.beginPath(); ctx.ellipse(0, 0, vw / 2, vh / 2, 0, 0, Math.PI * 2); ctx.clip();
+      } else if (rad > 0 && ctx.roundRect) {
+        ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, rad); ctx.clip();
+      }
+      var fit = s.cs.objectFit, nw = img.naturalWidth, nh = img.naturalHeight;
+      var dw = w, dh = h;
+      if (fit === 'contain' || fit === 'cover') {
+        var r = fit === 'contain' ? Math.min(w / nw, h / nh) : Math.max(w / nw, h / nh);
+        dw = nw * r; dh = nh * r;
+      }
+      if (fit === 'cover') { ctx.beginPath(); ctx.rect(-w / 2, -h / 2, w, h); ctx.clip(); }
+      try { ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh); } catch (eD) {}
+      ctx.restore();
+    }
+  }
+
   function compose(page, crop, base) {
     var pr = page.getBoundingClientRect();
     var c = crop || { left: pr.left, top: pr.top, width: pr.width, height: pr.height };
@@ -73,6 +135,7 @@
       }
       ctx.restore();
     }
+    drawImgs(ctx, page);
     var fields = page.querySelectorAll('.gpi-fed > *');
     for (var j = 0; j < fields.length; j++) {
       var f = shown(fields[j]);

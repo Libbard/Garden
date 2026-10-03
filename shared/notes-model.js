@@ -235,7 +235,10 @@
         reminder_done: !!r.rd,
         tags: Array.isArray(r.g) ? r.g.slice() : [],
         kind: r.k || 'rich',
-        bytes: r.sz || 0,
+        /*@3.NOMJ.10*/
+        bytes: (r.sz || 0) + (r.fz || 0),
+        dataBytes: r.sz || 0,
+        fileBytes: r.fz || 0,
         origin: {
           kind: o.p ? 'page' : (o.c ? (o.m != null ? 'module' : 'course') : 'rich'),
           label: label,

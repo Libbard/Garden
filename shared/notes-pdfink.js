@@ -777,8 +777,26 @@
     try { ok = !!ed.openCtx(ed.root, cx, cy); } catch (e) { return false; }
     /*@3.NOPJ8.165*/
     if (ok && eat) ed._eatClick = 1;
-    if (ok && this.o.onFileMenu) {
-      var self = this, m = document.querySelector('.ne-menu');
+    if (ok) this.menuFile(ed, cx, cy, trT, trR, 0);
+    return ok;
+  };
+
+  /*@3.NOPJ8.184*/
+  Ink.prototype.menuFile = function (ed, cx, cy, trT, trR, end) {
+    var m0 = ed && ed.menu;
+    if (!m0 || !m0.isConnected) return false;
+    var put = function (b) {
+      if (!end) { m0.insertBefore(b, m0.firstChild); return; }
+      if (!m0.querySelector('.ne-menu-h--file')) {
+        var hd = document.createElement('div');
+        hd.className = 'ne-menu-h ne-menu-h--file';
+        hd.textContent = (localStorage.getItem('garden_lang') || 'ar') === 'ar' ? 'الملفّ' : 'The file';
+        m0.appendChild(hd);
+      }
+      m0.appendChild(b);
+    };
+    if (this.o.onFileMenu) {
+      var self = this, m = m0;
       if (m && !m.querySelector('[data-act="pdfopts"]')) {
         var fb = document.createElement('button');
         fb.type = 'button'; fb.className = 'ne-menu-i ne-menu-i--file'; fb.setAttribute('role', 'menuitem');
@@ -790,10 +808,10 @@
           try { ed.closeMenu(); } catch (e2) {}
           self.o.onFileMenu(cx, cy);
         });
-        m.insertBefore(fb, m.firstChild);
+        put(fb);
       }
     }
-    var tm = (ok && trT) ? document.querySelector('.ne-menu') : null;
+    var tm = trT ? m0 : null;
     if (tm && !tm.querySelector('[data-act="ptr"]')) {
       var tb = document.createElement('button');
       tb.type = 'button'; tb.className = 'ne-menu-i ne-menu-i--file'; tb.setAttribute('role', 'menuitem');
@@ -805,10 +823,10 @@
         try { ed.closeMenu(); } catch (e2) {}
         GardenTr.open(trT, trR);
       });
-      tm.insertBefore(tb, tm.firstChild);
+      put(tb);
     }
-    var hr = (ok && this.o.hearAt) ? this.o.hearAt(cx, cy) : null;
-    var hm = hr ? document.querySelector('.ne-menu') : null;
+    var hr = (!end && this.o.hearAt) ? this.o.hearAt(cx, cy) : null;
+    var hm = hr ? m0 : null;
     if (hm && !hm.querySelector('[data-act="phear"]')) {
       var hb = document.createElement('button');
       hb.type = 'button'; hb.className = 'ne-menu-i ne-menu-i--file'; hb.setAttribute('role', 'menuitem');
@@ -820,9 +838,10 @@
         try { ed.closeMenu(); } catch (e2) {}
         hr.go();
       });
-      hm.insertBefore(hb, hm.firstChild);
+      put(hb);
     }
-    return ok;
+    if (end && ed.placeMenu) { try { ed.placeMenu(m0, { x: cx, y: cy }); } catch (eP) {} }
+    return true;
   };
 
   /*@3.NOPJ8.149*/
@@ -2833,8 +2852,20 @@
         if (self.paperMenu(p, e.clientX, e.clientY)) e.gpiMenu = 1;
       });
     }
+    /*@3.NOPJ8.185*/
     h.addEventListener('contextmenu', function (e) {
-      if (e.target.closest && e.target.closest('[data-bid]')) return;
+      if (e.target.closest && e.target.closest('[data-bid]')) {
+        if (e.defaultPrevented && p.fed && p.fed.menu) {
+          var trB = '', trRB = null;
+          if (window.GardenTr && self.view && self.view.selText) {
+            try { trB = String(self.view.selText() || '').trim(); } catch (eB) {}
+            if (trB) trRB = GardenTr.selRect();
+          }
+          self.menuFile(p.fed, e.clientX, e.clientY, trB, trRB, 1);
+          e.gpiMenu = 1;
+        }
+        return;
+      }
       e.preventDefault();
       self.holdDrop();
       if (self.paperMenu(p, e.clientX, e.clientY)) e.gpiMenu = 1;

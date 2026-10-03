@@ -2122,6 +2122,17 @@
     if (this._imgOpen[b.id] == null) this._imgOpen[b.id] = 0;
     edit.hidden = !this._imgOpen[b.id];
     if (!hasSrc0) this._imgOpen[b.id] = 0;
+    /*@3.NOEJ.606*/
+    if (this.floatsImg()) {
+      edit.setAttribute('popover', 'manual');
+      if (!edit.hidden) {
+        var edF = this;
+        requestAnimationFrame(function () {
+          var ndF = edit.isConnected && !edit.hidden ? edit.closest('[data-bid]') : null;
+          if (ndF) edF.placeImgPanel(ndF);
+        });
+      }
+    }
     var headI = el('div', 'ne-img-head');
     headI.innerHTML = '<i class="fa-solid fa-sliders" aria-hidden="true"></i><span>' +
       B().esc(L('إعداداتُ الصورة', 'Image settings')) + '</span>' +
@@ -2135,11 +2146,25 @@
         if (e.target.closest('button')) return;
         var z = edr.zoomOf() || 1;
         D0 = { x: e.clientX, y: e.clientY, l: pan.offsetLeft, t: pan.offsetTop, z: z, id: e.pointerId };
+        /*@3.NOEJ.604*/
+        if (imgPanOpen(pan)) {
+          var rF = pan.getBoundingClientRect();
+          D0.fl = 1; D0.l = rF.left; D0.t = rF.top; D0.w = rF.width; D0.h = rF.height;
+        }
         try { head.setPointerCapture(e.pointerId); } catch (eC) {}
         e.preventDefault();
       });
       head.addEventListener('pointermove', function (e) {
         if (!D0 || e.pointerId !== D0.id) return;
+        if (D0.fl) {
+          var vwF = window.innerWidth, vhF = window.innerHeight;
+          var fx = Math.round(Math.max(8, Math.min(vwF - D0.w - 8, D0.l + e.clientX - D0.x)));
+          var fy = Math.round(Math.max(8, Math.min(vhF - Math.min(D0.h, vhF - 16) - 8, D0.t + e.clientY - D0.y)));
+          pan.style.left = fx + 'px'; pan.style.top = fy + 'px';
+          var ndD = pan.closest('[data-bid]');
+          if (ndD) { if (!edr._imgFloat) edr._imgFloat = {}; edr._imgFloat[ndD.getAttribute('data-bid')] = { x: fx, y: fy }; }
+          return;
+        }
         var nl = Math.max(0, Math.round(D0.l + (e.clientX - D0.x) / D0.z));
         var nt = Math.max(0, Math.round(D0.t + (e.clientY - D0.y) / D0.z));
         pan.style.insetInlineStart = 'auto'; pan.style.right = 'auto';
@@ -9406,6 +9431,16 @@
     });
   };
 
+  /*@3.NOEJ.603*/
+  function imgPanOpen(pan) {
+    try { return !!(pan && pan.hasAttribute('popover') && pan.matches(':popover-open')); } catch (e) { return false; }
+  }
+  function imgPanShut(pan) {
+    if (!pan) return;
+    pan.hidden = true;
+    if (imgPanOpen(pan)) { try { pan.hidePopover(); } catch (e) {} }
+  }
+
   function mItem(act, icon, label, disabled, extra, eg) {
     return '<button type="button" class="ne-menu-i' + (extra ? ' ' + extra : '') +
       (eg ? ' ne-menu-i--eg' : '') +
@@ -9488,6 +9523,7 @@
     if (!window.GardenImgEdit && !_ieP && !this.readOnly && navigator.onLine !== false) {
       setTimeout(function () { needImgEdit()['catch'](function () {}); }, 800);
     }
+    if (pan.hasAttribute('popover') && this.floatImgPanel(node, pan, fig)) return;
     pan.style.top = '';
     pan.style.maxBlockSize = '';
     var fr = fig.getBoundingClientRect();
@@ -9531,6 +9567,44 @@
     pan.style.top = Math.round(top) + 'px';
   };
 
+  /*@3.NOEJ.602*/
+  Editor.prototype.floatsImg = function () {
+    return !!(this.root && this.root.closest && this.root.closest('.gpi-fed') &&
+              window.HTMLElement && HTMLElement.prototype.showPopover);
+  };
+  Editor.prototype.floatImgPanel = function (node, pan, fig) {
+    if (!imgPanOpen(pan)) { try { pan.showPopover(); } catch (eS) { return false; } }
+    pan.classList.add('ne-img-edit--float');
+    pan.style.insetInlineStart = ''; pan.style.right = '';
+    var vw = window.innerWidth || 800, vh = window.innerHeight || 600;
+    var pad = 8, gap = 10;
+    pan.style.maxBlockSize = Math.max(160, vh - pad * 2) + 'px';
+    var pw = pan.offsetWidth || 280, ph = pan.offsetHeight || 200;
+    var id = node.getAttribute('data-bid');
+    var mem = this._imgFloat && this._imgFloat[id];
+    var x, y;
+    if (mem) { x = mem.x; y = mem.y; }
+    else {
+      var fr = fig.getBoundingClientRect();
+      var rtl = this.isRtl();
+      var aft = rtl ? fr.left - gap - pw : fr.right + gap;
+      var bef = rtl ? fr.right + gap : fr.left - gap - pw;
+      var fits = function (v) { return v >= pad && v + pw <= vw - pad; };
+      y = fr.top;
+      if (fits(aft)) x = aft;
+      else if (fits(bef)) x = bef;
+      else {
+        x = fr.left + fr.width / 2 - pw / 2;
+        y = (fr.bottom + gap + ph <= vh - pad) ? fr.bottom + gap
+          : (fr.top - gap - ph >= pad ? fr.top - gap - ph : (fr.bottom < vh / 2 ? vh - pad - ph : pad));
+      }
+    }
+    x = Math.max(pad, Math.min(vw - pad - pw, x));
+    y = Math.max(pad, Math.min(vh - pad - ph, y));
+    pan.style.left = Math.round(x) + 'px'; pan.style.top = Math.round(y) + 'px';
+    return true;
+  };
+
   Editor.prototype.closeImgPanels = function (keep) {
     if (!this.root) return;
     var list = this.root.querySelectorAll('.ne-img-edit');
@@ -9539,7 +9613,7 @@
       if (pan.hidden) continue;
       if (keep && keep.contains(pan)) continue;
       var blkP = pan.closest('[data-bid]');
-      pan.hidden = true;
+      imgPanShut(pan);
       if (!this._imgOpen) this._imgOpen = {};
       if (blkP) { this._imgOpen[blkP.getAttribute('data-bid')] = 0; blkP.removeAttribute('data-imged'); }
     }
@@ -10248,7 +10322,7 @@
       if (imf && !e.target.closest('.ne-cap')) {
         var pan = node.querySelector('.ne-img-edit');
         if (pan) {
-          pan.hidden = !pan.hidden;
+          if (pan.hidden) pan.hidden = false; else imgPanShut(pan);
           if (!self._imgOpen) self._imgOpen = {};
           self._imgOpen[id] = pan.hidden ? 0 : 1;
           if (pan.hidden) node.removeAttribute('data-imged'); else node.setAttribute('data-imged', '1');
@@ -10303,7 +10377,8 @@
       var imx = e.target.closest('[data-imgx]');
       if (imx) {
         var panX = imx.closest('.ne-img-edit');
-        if (panX) panX.hidden = true;
+        if (panX) imgPanShut(panX);
+        node.removeAttribute('data-imged');
         if (!self._imgOpen) self._imgOpen = {};
         self._imgOpen[id] = 0;
         return;
@@ -10328,6 +10403,7 @@
       if (imc) {
         var hitC = self.blockAt(id);
         if (!hitC) return;
+        self.pushUndo(self.snapshot());
         hitC.b.cap = hitC.b.cap ? 0 : 1;
         imc.setAttribute('aria-pressed', hitC.b.cap ? 'true' : 'false');
         imc.innerHTML = '<i class="fa-solid fa-' + (hitC.b.cap ? 'eye' : 'eye-slash') +
@@ -10359,9 +10435,12 @@
         return;
       }
       var ims = e.target.closest('[data-imgs]');
+      /*@3.NOEJ.608*/
       if (ims) {
         var hitS = self.blockAt(id);
         if (!hitS) return;
+        if ((hitS.b.sh || 'rect') === ims.getAttribute('data-imgs')) return;
+        self.pushUndo(self.snapshot());
         hitS.b.sh = ims.getAttribute('data-imgs');
         [].forEach.call(node.querySelectorAll('[data-imgs]'), function (x) {
           x.setAttribute('aria-pressed', x === ims ? 'true' : 'false');
@@ -10374,6 +10453,7 @@
       if (ima) {
         var hitA = self.blockAt(id);
         if (!hitA) return;
+        self.pushUndo(self.snapshot());
         hitA.b.al = ima.getAttribute('data-imga');
         [].forEach.call(node.querySelectorAll('[data-imga]'), function (x) {
           x.setAttribute('aria-pressed', x === ima ? 'true' : 'false');
@@ -10386,6 +10466,7 @@
       if (imr) {
         var hitR = self.blockAt(id);
         if (!hitR) return;
+        self.pushUndo(self.snapshot());
         hitR.b.iw = 100; hitR.b.br = 100; hitR.b.op = 100;
         delete hitR.b.sh; delete hitR.b.al;
         [].forEach.call(node.querySelectorAll('[data-imgs]'), function (x) {
@@ -10829,11 +10910,48 @@
       self.closeImgPanels(e.target.closest('.ne-b[data-ty="img"]'));
     };
     document.addEventListener('click', this._onDocClick);
+    /*@3.NOEJ.601*/
     this._onDocKey = function (e) {
-      if (e.key !== 'Escape' || !self.root) return;
-      if (self.root.querySelector('.ne-img-edit:not([hidden])')) self.closeImgPanels(null);
+      if (!self.root) return;
+      if (e.key === 'Escape') {
+        if (self.menu && !e.defaultPrevented) { e.preventDefault(); self.closeMenu(); return; }
+        if (self.root.querySelector('.ne-img-edit:not([hidden])')) self.closeImgPanels(null);
+        return;
+      }
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || self.readOnly || self.menu) return;
+      var ae = document.activeElement;
+      if (ae && ae !== document.body && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return;
+      if (ae && ae !== document.body && !self.root.contains(ae)) return;
+      if (!self._actId) return;
+      var nd = self.root.querySelector(':scope > [data-bid="' + self._actId + '"][data-ty="img"][data-act="1"]');
+      if (!nd || !nd.getClientRects().length) return;
+      e.preventDefault();
+      self.closeImgPanels(null);
+      self.remove(self._actId);
     };
     document.addEventListener('keydown', this._onDocKey);
+    /*@3.NOEJ.605*/
+    this._onImgAway = function (e) {
+      if (!self.root) return;
+      var t = e.target;
+      if (!t || !t.closest) return;
+      if (t.closest('.ne-img-edit, dialog[open], .gsf-menu, .ne-menu, [popover]')) return;
+      var list = self.root.querySelectorAll('.ne-img-edit--float');
+      for (var i = 0; i < list.length; i++) {
+        var pn = list[i];
+        if (pn.hidden || !imgPanOpen(pn)) continue;
+        var bk = pn.closest('[data-bid]');
+        if (bk && bk.contains(t)) continue;
+        imgPanShut(pn);
+        if (bk) {
+          if (!self._imgOpen) self._imgOpen = {};
+          self._imgOpen[bk.getAttribute('data-bid')] = 0;
+          bk.removeAttribute('data-imged');
+        }
+      }
+    };
+    document.addEventListener('pointerdown', this._onImgAway, true);
 
     /*@3.NOEJ.16*/
     this._onScroll = function (e) {
@@ -11065,12 +11183,20 @@
         var dxN = sg * (e.clientX - D.x) / (zf * D.W);
         var dyN = (e.clientY - D.y) / zf;
         var lo = -Infinity, hi = Infinity, dLo = -Infinity, gi, g, gw;
+        /*@3.NOEJ.607*/
         for (gi = 0; gi < D.grp.length; gi++) {
           g = D.grp[gi];
+          if (g.dye == null) {
+            var gW = g.node.offsetWidth || 120, gH = g.node.offsetHeight || 24;
+            var th = ((g.b.rot || 0) % 360) * Math.PI / 180;
+            var cs = Math.abs(Math.cos(th)), sn = Math.abs(Math.sin(th));
+            g.dxe = ((gW * cs + gH * sn) - gW) / 2;
+            g.dye = ((gW * sn + gH * cs) - gH) / 2;
+          }
           gw = (g.node.offsetWidth || 120) / D.W;
-          lo = Math.max(lo, -g.ox);
-          hi = Math.min(hi, Math.max(0.04, 1 - gw) - g.ox);
-          dLo = Math.max(dLo, -g.oy);
+          lo = Math.max(lo, g.dxe / D.W - g.ox);
+          hi = Math.min(hi, Math.max(0.04, 1 - gw - g.dxe / D.W) - g.ox);
+          dLo = Math.max(dLo, g.dye - g.oy);
         }
         if (lo > hi) hi = lo;
         dxN = Math.max(lo, Math.min(hi, dxN));
@@ -11080,7 +11206,7 @@
           var dHi = Infinity;
           for (gi = 0; gi < D.grp.length; gi++) {
             g = D.grp[gi];
-            dHi = Math.min(dHi, Math.max(0, shH - (g.node.offsetHeight || 24)) - g.oy);
+            dHi = Math.min(dHi, Math.max(0, shH - (g.node.offsetHeight || 24) - g.dye) - g.oy);
           }
           if (dHi < dLo) dHi = dLo;
           dyN = Math.min(dHi, dyN);
@@ -11088,7 +11214,7 @@
         for (gi = 0; gi < D.grp.length; gi++) {
           g = D.grp[gi];
           g.b.fp.x = g.ox + dxN;
-          self.fpAuthor(g.b, Math.max(0, Math.round(g.oy + dyN)));
+          self.fpAuthor(g.b, Math.max(Math.min(0, Math.round(g.dye)), Math.round(g.oy + dyN)));
           self.applyFree(g.node, g.b);
         }
         D.moved = true;
@@ -11283,6 +11409,7 @@
     this.canvases = {};
     document.removeEventListener('click', this._onDocClick);
     if (this._onDocKey) document.removeEventListener('keydown', this._onDocKey);
+    if (this._onImgAway) document.removeEventListener('pointerdown', this._onImgAway, true);
     if (this._onDocPaste) document.removeEventListener('paste', this._onDocPaste);
     if (this._ro) { try { this._ro.disconnect(); } catch (eR) {} this._ro = null; }
     if (this._io) { try { this._io.disconnect(); } catch (eI) {} this._io = null; }
