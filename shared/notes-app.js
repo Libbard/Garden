@@ -317,6 +317,7 @@
       case 'recent':  return L('الأخيرة', 'Recent');
       case 'home':    return L('ملاحظاتي', 'My notes');
       case 'courses': return L('المواد', 'Courses');
+      case 'space':   return L('مساحتي', 'My storage');
       case 'pinned':  return L('المثبَّتة', 'Pinned');
       case 'remind':  return L('لها تنبيه', 'With reminder');
       case 'general': return L('ملاحظات عامّة', 'General notes');
@@ -345,6 +346,7 @@
       case 'recent':  return !n.archived;
       case 'home':    return !n.archived && !n.folder && !(n.origin && n.origin.course);
       case 'courses': return false;
+      case 'space':   return false;
       case 'pinned':  return !n.archived && !!n.pinned;
       case 'remind':  return !n.archived && !!n.remind_at;
       case 'archive': return !!n.archived;
@@ -9222,6 +9224,7 @@
     if (v.k === 'home') return out;
     var cs = { v: { k: 'courses' }, label: L('المواد', 'Courses') };
     if (v.k === 'courses') return out.concat([cs]);
+    if (v.k === 'space') return out.concat([{ v: v, label: vName(v) }]);
     if (v.k === 'course') return out.concat([cs, { v: v, label: vName(v) }]);
     if (v.k === 'module') return out.concat([cs, { v: { k: 'course', code: v.code }, label: courseLabel(v.code) }, { v: v, label: vName(v) }]);
     if (v.k === 'folder') {
@@ -9287,10 +9290,81 @@
     out.push({ head: L('مجلّداتي', 'My folders'), add: 1 });
     roots.forEach(function (f) { out.push({ v: { k: 'folder', id: f.id }, icon: 'fa-folder', label: f.n || L('مجلّد', 'Folder'), n: C.total[f.id] || 0 }); });
     out.push({ head: '' });
+    add({ k: 'space' }, 'fa-hard-drive', 'مساحتي', 'My storage', 0, 1);
     add({ k: 'archive' }, 'fa-box-archive', 'الأرشيف', 'Archive', inView({ k: 'archive' }).length, 1);
     add({ k: 'trash' }, 'fa-trash-can', 'السلّة', 'Trash', (S.trash || []).length, 1);
     return out;
   }
+  /*@3.NOAJ.468*/
+  function spaceDocs() {
+    var St = window.GardenNotesStore;
+    if (!St || !St.getDoc) return Promise.resolve([]);
+    var recs = idxRead().filter(function (r) { return r && !r.d; }), out = [], i = 0;
+    function batch() {
+      var part = recs.slice(i, i + 25);
+      i += 25;
+      if (!part.length) return Promise.resolve(out);
+      return Promise.all(part.map(function (r) {
+        return St.getDoc(r.id).then(function (row) {
+          var d = row && row.doc;
+          if (d && ((d.pdf && d.pdf.h) || (d.aud && d.aud.length))) out.push({ id: r.id, t: notPh(r.t) || L('بلا عنوان', 'Untitled'), pdf: d.pdf, aud: d.aud });
+        }, function () {});
+      })).then(batch);
+    }
+    return batch();
+  }
+  function spaceInfo() {
+    var St = window.GardenNotesStore, PD = window.GardenPdfDoc, Fl = window.GardenFiles;
+    var est = (navigator.storage && navigator.storage.estimate) ? navigator.storage.estimate().catch(function () { return {}; }) : Promise.resolve({});
+    return Promise.all([
+      est,
+      PD && PD.list ? PD.list().catch(function () { return []; }) : [],
+      St && St.imageBytes ? St.imageBytes().catch(function () { return 0; }) : 0,
+      St && St.totalBytes ? St.totalBytes().catch(function () { return 0; }) : 0,
+      Fl && Fl.list ? Fl.list().catch(function () { return { files: [] }; }) : { files: [] },
+      spaceDocs()
+    ]).then(function (r) {
+      var e = r[0] || {}, local = r[1] || [], srv = (r[4] && r[4].files) || [], docs = r[5] || [];
+      var dev = {}, us = {}, seen = {}, files = [];
+      local.forEach(function (x) { dev[x.hash] = x; });
+      srv.forEach(function (f) { if (f && f.ref_id) us[f.ref_id] = f; });
+      docs.forEach(function (d) {
+        if (d.pdf && d.pdf.h) {
+          var h = d.pdf.h;
+          seen[h] = 1;
+          files.push({ kind: 'pdf', name: d.pdf.n || d.t, note: d.id, nt: d.t, bytes: (dev[h] && dev[h].size) || d.pdf.sz || 0,
+                       dev: !!dev[h], us: !!us['pdf_' + String(h).slice(0, 40)], gd: !!d.pdf.gd });
+        }
+        (d.aud || []).forEach(function (a) {
+          if (!a || !a.i) return;
+          seen[a.i] = 1;
+          files.push({ kind: 'aud', name: a.n || L('تسجيل', 'Recording'), note: d.id, nt: d.t, bytes: (dev[a.i] && dev[a.i].size) || a.b || 0,
+                       dev: !!dev[a.i], us: !!a.aup, gd: !!a.gd });
+        });
+      });
+      var pdfB = 0, audB = 0, orph = { n: 0, bytes: 0 };
+      local.forEach(function (x) {
+        if (/^wip_/.test(x.hash)) return;
+        if (/^aud_/.test(x.hash)) audB += x.size || 0; else pdfB += x.size || 0;
+        if (!seen[x.hash]) { orph.n++; orph.bytes += x.size || 0; }
+      });
+      var ud = e.usageDetails || {};
+      var cats = [
+        { k: 'pdf', label: 'PDF', bytes: pdfB },
+        { k: 'aud', label: L('تسجيلات', 'Recordings'), bytes: audB },
+        { k: 'img', label: L('صور', 'Images'), bytes: r[2] || 0 },
+        { k: 'notes', label: L('ملاحظات', 'Notes'), bytes: r[3] || 0 },
+        { k: 'pages', label: L('صفحاتُ الموقع', 'Site pages'), bytes: ud.caches || 0 }
+      ];
+      var known = cats.reduce(function (s, c) { return s + c.bytes; }, 0);
+      var used = Math.max(e.usage || 0, known);
+      if (used - known > 1048576) cats.push({ k: 'other', label: L('أخرى', 'Other'), bytes: used - known });
+      files.sort(function (a, b) { return b.bytes - a.bytes; });
+      return { used: used, quota: e.quota || 0, cats: cats.filter(function (c) { return c.bytes > 0; }), files: files, orph: orph,
+               vault: !!(Fl && Fl.list) };
+    });
+  }
+
   function exPlaceOf(v) {
     if (!v) return 'home';
     if (v.k === 'course' || v.k === 'module') return vKey({ k: 'courses' });
@@ -9323,6 +9397,8 @@
       share: function (uid) { var r = richOf(uid); if (r) shareNoteId(r.id); },
       dup: function (uids) { dupNotes(recsOf(uids).map(function (x) { return x.id; })); },
       canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },
+      spaceInfo: spaceInfo,
+      openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },
       folderName: folderName,
       folderPath: function (id) { return folderPath(id).join(' / '); },
@@ -10478,6 +10554,8 @@
         if (qs.get('p')) wantPage(wanted, qs.get('p'));
         openNote(wanted);
       }
+      /*@3.NOAJ.469*/
+      else if (qs.get('view') === 'space') { history.replaceState(null, '', location.pathname); exSetView({ k: 'space' }); }
       else if (qs.get('new') === '1') createNote();
       /*@3.NOAJ.202*/
       else if (!idxRead().length) createNote();

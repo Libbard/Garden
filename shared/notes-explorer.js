@@ -57,7 +57,8 @@
     if (b <= 0) return '';
     if (b < 1024) return b + ' B';
     if (b < 1048576) return Math.max(1, Math.round(b / 1024)) + ' KB';
-    return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB';
+    if (b < 1073741824) return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' MB';
+    return (b / 1073741824).toFixed(1) + ' GB';
   }
   function fmtDate(t) {
     if (!t) return '';
@@ -361,8 +362,42 @@
     return h + '</div>';
   }
 
+  /*@3.NOEJ3.9*/
+  var SPACE = null;
+  function spaceHtml(s) {
+    if (!s) return '<div class="nx-space"><p class="nx-hint">' + esc(L('أجرد ما على هذا الجهاز…', 'Counting what is on this device…')) + '</p></div>';
+    var h = '<div class="nx-space"><section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('مساحةُ هذا الجهاز', 'This device')) + '</b>' +
+      '<span>' + lat(fmtSize(s.used) || '0 B') + (s.quota ? ' ' + esc(L('من', 'of')) + ' ' + lat(fmtSize(s.quota)) : '') + '</span></div>';
+    var tot = s.cats.reduce(function (a, c) { return a + c.bytes; }, 0) || 1;
+    h += '<div class="nx-meter" role="img" aria-label="' + esc(s.cats.map(function (c) { return c.label + ' ' + fmtSize(c.bytes); }).join(' · ')) + '">';
+    s.cats.forEach(function (c) { h += '<i data-k="' + esc(c.k) + '" style="inline-size:' + Math.max(1, Math.round(c.bytes / tot * 1000) / 10) + '%"></i>'; });
+    h += '</div><div class="nx-legend">';
+    s.cats.forEach(function (c) { h += '<span><i data-k="' + esc(c.k) + '"></i>' + esc(c.label) + ' ' + lat(fmtSize(c.bytes)) + '</span>'; });
+    h += '</div>';
+    if (s.orph.n) h += '<p class="nx-hint">' + esc(L(s.orph.n + ' ملفّاتٍ على الجهاز لا تتبع أيَّ ملاحظةٍ باقية · ', s.orph.n + ' files on this device belong to no remaining note · ')) + lat(fmtSize(s.orph.bytes)) + '</p>';
+    h += '</section><section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
+    if (!s.files.length) h += '<p class="nx-hint">' + esc(L('لا ملفّاتِ PDF ولا تسجيلات بعد.', 'No PDFs or recordings yet.')) + '</p>';
+    s.files.forEach(function (f) {
+      var chip = function (on, ar, en) { return '<span class="nx-chip"' + (on ? ' data-on="1"' : '') + '>' + esc(L(ar, en)) + '</span>'; };
+      h += '<button type="button" class="nx-frow" data-x="opennote" data-id="' + esc(f.note) + '">' +
+        '<i class="fa-solid ' + (f.kind === 'pdf' ? 'fa-file-lines' : 'fa-microphone') + '" aria-hidden="true"></i>' +
+        '<span class="nx-fr-n"><b dir="auto">' + esc(f.name) + '</b><small dir="auto">' + esc(f.nt) + '</small></span>' +
+        '<span class="nx-fr-s">' + lat(fmtSize(f.bytes)) + '</span>' +
+        '<span class="nx-chips">' + chip(f.dev, 'الجهاز', 'Device') + chip(f.us, 'عندنا', 'Our copy') + chip(f.gd, 'درايف', 'Drive') + '</span></button>';
+    });
+    return h + '</section></div>';
+  }
+
   function render() {
     if (!host || !host.isConnected || !A) return;
+    if (A.view().k === 'space') {
+      host.setAttribute('data-trash', '0');
+      host.innerHTML = barHtml(false).replace(/<div class="nx-tools">[\s\S]*$/, '</div>') +
+        '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' + spaceHtml(SPACE) + '</div></div>';
+      A.i18n(host);
+      if (!SPACE && A.spaceInfo) A.spaceInfo().then(function (s) { SPACE = s; if (A.view().k === 'space') render(); SPACE = null; });
+      return;
+    }
     var trash = A.view().k === 'trash';
     var fs = trash ? [] : A.folders();
     var list = sorted(A.items());
@@ -536,6 +571,7 @@
       case 'nfolder': A.newFolder(); return;
       case 'nfolder-root': if (A.view().k !== 'home') A.setView({ k: 'home' }); A.newFolder(); return;
       case 'back': if (A.back) A.back(); return;
+      case 'opennote': if (A.openId) A.openId(x.getAttribute('data-id')); return;
       case 'import': pickFiles(); return;
       case 'empty': A.emptyTrash(); return;
       case 'unpick': clear(); return;
