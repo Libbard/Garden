@@ -626,31 +626,55 @@
       });
     }
 
+    /*@3.NOPJ5.40*/
+    var UP_FRESH = 20 * 60 * 1000;
+    function upAgo() {
+      var t = o.upAt ? Number(o.upAt()) || 0 : 0;
+      var d = Date.now() - t;
+      return t && d >= 0 && d < UP_FRESH ? d : -1;
+    }
+    function agoTxt(ms) {
+      var m = Math.round(ms / 60000);
+      if (m < 1) return L('لحظات', 'moments');
+      if (!isAr()) return m + ' min';
+      return m === 1 ? 'دقيقة' : m === 2 ? 'دقيقتين' : m <= 10 ? m + ' دقائق' : m + ' دقيقة';
+    }
+
     function wait(why) {
-      var pend = why === 'pending';
+      var ago = why === 'pending' ? upAgo() : -1;
+      var pend = ago >= 0;
+      var none = why === 'pending' && !pend;
+      var gdOk = !!(sp.gd && o.drive);
       var head = pend ? L('الملفُّ في طريقه إلى نسختك عندنا', 'The file is on its way to your copy with us')
+        : none ? L('هذا الملفُّ ليس على هذا الجهاز، ولا نسخةَ منه عندنا', 'This file is not on this device, and there is no copy of it with us')
         : (why === 'locked' ? L('مزامنتُك مقفلة', 'Your sync is locked')
                             : L('تعذّر جلبُ الملفِّ الآن', 'Could not fetch the file right now'));
       var body = pend
-        ? L('إن كنتَ ترفعه من جهازٍ آخر فسيُفتح هنا وحدَه حين يكتمل رفعُه — ابقَ على هذه الصفحة.',
-            'If you are uploading it from another device, it will open here by itself once the upload finishes — stay on this page.')
+        ? L('بدأ رفعُه من جهازٍ آخر قبل ' + agoTxt(ago) + '، وسيُفتح هنا وحدَه حين يكتمل — ابقَ على هذه الصفحة.',
+            'Another device started uploading it ' + agoTxt(ago) + ' ago; it will open here by itself once done — stay on this page.')
+        : none
+          ? (gdOk ? L('اخترْه من جهازك أو افتحْه من درايف ليُفتح.', 'Pick it from your device or open it from Drive.')
+                  : L('اخترْه من جهازك ليُفتح.', 'Pick it from your device to open it.'))
         : (why === 'locked'
           ? L('افتحها من إعدادات المزامنة، ثمّ عُد إلى هنا فيُجلب الملفّ.',
               'Unlock it in sync settings, then come back here and the file will be fetched.')
           : L('نعيد المحاولة وحدَنا حين يعود الاتّصال.', 'We will try again by ourselves when the connection is back.'));
-      card(pend ? 'fa-cloud-arrow-down' : 'fa-triangle-exclamation', esc(sp.n || head),
-        (sp.n ? '<b>' + esc(head) + '</b><br>' : '') + esc(body) +
-        '<span class="npo-waitline" role="status"><span class="na-opening-spin" aria-hidden="true"></span>' +
-        esc(L('ننتظر…', 'Waiting…')) + '</span>',
-        '<div class="npo-acts"><button type="button" class="gsf-btn gsf-btn--go npo-again">' +
-        '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' +
-        esc(L('جرّب الآن', 'Try now')) + '</button>' +
-        (sp.gd && o.drive ? '<button type="button" class="gsf-btn gsf-btn--gd npo-drive">' +
-          '<i class="fa-brands fa-google-drive" aria-hidden="true"></i> ' +
-          esc(L('افتحْ من درايف', 'Open from Drive')) + '</button>' : '') +
-        '<button type="button" class="gsf-btn gsf-btn--ghost npo-pick">' +
+      var pick = '<button type="button" class="gsf-btn ' + (none ? 'gsf-btn--go' : 'gsf-btn--ghost') + ' npo-pick">' +
         '<i class="fa-solid fa-file-import" aria-hidden="true"></i> ' +
-        esc(L('اخترْه من جهازك', 'Pick it from your device')) + '</button></div>');
+        esc(L('اخترْه من جهازك', 'Pick it from your device')) + '</button>';
+      var again = '<button type="button" class="gsf-btn ' + (none ? 'gsf-btn--ghost' : 'gsf-btn--go') + ' npo-again">' +
+        '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' +
+        esc(none ? L('تحقّقْ ثانيةً', 'Check again') : L('جرّب الآن', 'Try now')) + '</button>';
+      var gdBtn = gdOk ? '<button type="button" class="gsf-btn gsf-btn--gd npo-drive">' +
+          '<i class="fa-brands fa-google-drive" aria-hidden="true"></i> ' +
+          esc(L('افتحْ من درايف', 'Open from Drive')) + '</button>' : '';
+      card(pend ? 'fa-cloud-arrow-down' : none ? 'fa-file-lines' : 'fa-triangle-exclamation', esc(sp.n || head),
+        (sp.n ? '<b>' + esc(head) + '</b><br>' : '') + esc(body) +
+        (none && sp.sz ? '<br>' + num(size(sp.sz)) +
+          (sp.pg ? ' · ' + num(String(sp.pg)) + ' ' + esc(L('صفحة', 'pages')) : '') : '') +
+        (none ? '' : '<span class="npo-waitline" role="status"><span class="na-opening-spin" aria-hidden="true"></span>' +
+          esc(L('ننتظر…', 'Waiting…')) + '</span>'),
+        '<div class="npo-acts">' + (none ? pick + gdBtn + again : again + gdBtn + pick) + '</div>');
       var a = stage.querySelector('.npo-again');
       if (a) a.addEventListener('click', function () { usN = 0; fromUs(); });
       var b = stage.querySelector('.npo-pick');
@@ -846,6 +870,7 @@
         onShapeBox: function (n, x, y, w, h, W, stage) { return o.onShapeBox ? o.onShapeBox(n, x, y, w, h, W, stage) : false; },
         onFileMenu: function (x, y) { if (o.onFileMenu) o.onFileMenu(x, y); },
         hearAt: function (x, y) { return o.hearAt ? o.hearAt(x, y) : null; },
+        onHistEdge: function (dir) { return o.onHistEdge ? o.onHistEdge(dir) : false; },
         /*@3.NOPJ5.23*/
         onGesture: function (phase, g) { if (o.onInkGesture) o.onInkGesture(phase, g); }
       });

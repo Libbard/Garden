@@ -2313,27 +2313,56 @@
     return box;
   };
 
+  /*@3.NOEJ.600*/
   Editor.prototype.gripWire = function (gr, fig, id) {
     var self = this, D = null;
     gr.addEventListener('pointerdown', function (e) {
-      if (!e.target.closest('.ne-img-grip') || e.button > 0 || self.readOnly) return;
+      var gp = e.target.closest('.ne-img-grip');
+      if (!gp || e.button > 0 || self.readOnly) return;
       var hit = self.blockAt(id);
       if (!hit) return;
       e.preventDefault(); e.stopPropagation();
       var r = gr.parentNode.getBoundingClientRect();
       var col = fig.parentNode.getBoundingClientRect();
       var blk = fig.closest('.ne-b'), al = (blk && blk.getAttribute('data-al')) || '';
-      var rtl = getComputedStyle(fig).direction === 'rtl';
-      var right = (al === 'end') !== rtl;
-      D = { id: e.pointerId, ax: al === 'center' ? (r.left + r.right) / 2 : (right ? r.right : r.left),
+      var gb = gp.getBoundingClientRect();
+      var onRight = (gb.left + gb.right) / 2 > (r.left + r.right) / 2;
+      D = { id: e.pointerId, x0: e.clientX, on: false,
+            ax: al === 'center' ? (r.left + r.right) / 2 : (onRight ? r.left : r.right),
             k: al === 'center' ? 2 : 1, W: col.width || 1,
             iw: hit.b.iw == null ? 100 : hit.b.iw, before: self.snapshot() };
       D.iw0 = D.iw;
+      if (hit.b.fp) {
+        var node = fig.closest('[data-bid]');
+        var rtl = self.isRtl();
+        D.free = { node: node, start: rtl ? onRight : !onRight, sgn: rtl ? -1 : 1,
+                   SW: self.sheetW() || 794, z: self.zoomOf() || 1,
+                   ox: hit.b.fp.x || 0, wm0: hit.b.wm, fx0: hit.b.fp.x };
+        D.free.ow = (node.offsetWidth || node.getBoundingClientRect().width) / D.free.SW;
+      }
       try { gr.setPointerCapture(e.pointerId); } catch (e2) {}
       fig.classList.add('ne-fig--sizing');
     });
     gr.addEventListener('pointermove', function (e) {
       if (!D || e.pointerId !== D.id) return;
+      if (!D.on && Math.abs(e.clientX - D.x0) < 3) return;
+      D.on = true;
+      if (D.free) {
+        var F = D.free, hit = self.blockAt(id);
+        if (!hit || !hit.b.fp) return;
+        var dw = F.sgn * (e.clientX - D.x0) / (F.z * F.SW);
+        if (F.start) {
+          var nx = Math.max(0, Math.min(F.ox + F.ow - 0.06, F.ox + dw));
+          hit.b.wm = Math.max(0.06, F.ow - (nx - F.ox));
+          hit.b.fp.x = nx;
+        } else {
+          hit.b.wm = Math.max(0.06, Math.min(Math.max(0.08, 1 - F.ox), F.ow + dw));
+        }
+        D.iw = 100;
+        fig.style.inlineSize = '100%';
+        self.applyFree(F.node, hit.b);
+        return;
+      }
       var w = Math.abs(e.clientX - D.ax) * D.k;
       D.iw = Math.max(10, Math.min(100, Math.round(w / D.W * 100)));
       fig.style.inlineSize = D.iw + '%';
@@ -2344,7 +2373,8 @@
       fig.classList.remove('ne-fig--sizing');
       var hit = self.blockAt(id);
       if (!hit) return;
-      if (d.iw === d.iw0) { applyImgStyle(fig, hit.b); return; }
+      var freeMoved = !!(d.free && d.on && hit.b.fp && (hit.b.wm !== d.free.wm0 || hit.b.fp.x !== d.free.fx0));
+      if (d.iw === d.iw0 && !freeMoved) { applyImgStyle(fig, hit.b); return; }
       hit.b.iw = d.iw;
       self.pushUndo(d.before);
       var node = fig.closest('[data-bid]');
@@ -10757,6 +10787,11 @@
     /*@3.NOEJ.143*/
     /*@3.NOEJ.362*/
     /*@3.NOEJ.593*/
+    /*@3.NOEJ.599*/
+    root.addEventListener('dragstart', function (e) {
+      var tg = elOf(e.target);
+      if (tg && tg.tagName === 'IMG' && tg.closest && tg.closest('[data-bid]')) e.preventDefault();
+    });
     var overZ = null;
     var unover = function () { if (overZ) { overZ.removeAttribute('data-over'); overZ = null; } };
     root.addEventListener('dragover', function (e) {

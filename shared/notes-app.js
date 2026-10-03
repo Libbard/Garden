@@ -748,6 +748,22 @@
   }
   window.addEventListener('garden:fileStored', shareHeard(true));
   window.addEventListener('garden:fileRemoved', shareHeard(false));
+  /*@3.NOAJ.455*/
+  var UP_BEAT = 3 * 60 * 1000;
+  window.addEventListener('garden:fileProgress', function (e) {
+    var d = (e && e.detail) || {}, C = window.GardenPdfCloud;
+    if (!edId || !d.ref_id || !C || !C.refIdOf) return;
+    var doc = docNow(), p = doc && doc.pdf;
+    if (!p || !p.h || C.refIdOf(p.h) !== d.ref_id) return;
+    var t = Date.now();
+    if (d.stage === 'done' || d.stage === 'error') {
+      if (!p.up) return;
+      delete p.up;
+    } else if (!p.up || t - p.up > UP_BEAT) {
+      p.up = t;
+    } else return;
+    persist(edId, doc, true);
+  });
   function shareMakePdf(mode) {
     var Sy = window.GardenNotesSync, F = window.GardenFiles;
     var want = edId, doc = liveDoc, p = doc.pdf;
@@ -4621,9 +4637,10 @@
     h += ctxItem('porg', 'fa-table-cells-large', L('نظِّمْ صفحاتِ الملفّ…', 'Organise the file’s pages…'));
     h += ctxItem('protpg', 'fa-rotate-right', L('دوِّرْ هذه الصفحة', 'Rotate this page'));
     h += ctxItem('pdelpg', 'fa-trash-can', L('احذفْ هذه الصفحة', 'Delete this page'), 1);
-    if (liveDoc && liveDoc.ed && liveDoc.ed.from) {
-      h += ctxItem('pundo', 'fa-clock-rotate-left', L('ارجعْ إلى الملفّ قبل التحرير', 'Back to the file before editing'));
-    }
+    var ec = edsCount(liveDoc);
+    if (ec.u) h += ctxItem('pundo', 'fa-rotate-left', L('تراجعْ عن آخر تعديلٍ للصفحات', 'Undo the last page edit'));
+    if (ec.r) h += ctxItem('predo', 'fa-rotate-right', L('أعِدْ تعديلَ الصفحات', 'Redo the page edit'));
+    if (ec.u > 1) h += ctxItem('porig', 'fa-clock-rotate-left', L('ارجعْ إلى الملفّ الأصليّ', 'Back to the original file'));
     h += '<div class="gsf-menu-sep" role="separator"></div>';
     h += ctxItem('psnip', 'fa-crop-simple', L('قُصَّ منطقةً لتنسخها أو تشرحها', 'Cut out an area to copy or explain'));
     h += ctxItem('ppage', 'fa-image', L('انسخِ الصفحةَ صورةً', 'Copy the page as an image'));
@@ -4858,7 +4875,9 @@
       else pdfQuickEdit(pnE, act === 'pdelpg' ? 'del' : 'rot');
       return;
     }
-    if (act === 'pundo') { pdfRevert(); return; }
+    if (act === 'pundo') { pdfStep(-1); return; }
+    if (act === 'predo') { pdfStep(1); return; }
+    if (act === 'porig') { pdfStep(-1, true); return; }
     if (act === 'ppage' || act === 'ppagex') {
       var pg = snapPage(snapAt);
       if (!pg || !window.GardenPdfSnap) return;
@@ -5342,7 +5361,7 @@
       return k.E.quick({ bytes: k.bytes }, items).then(function (res) { return editApply(c, res); }).then(function () {
         saveState('', '');
         toast(kind === 'del'
-          ? L('حُذفت الصفحة ' + page + ' — وللتراجع: «ارجعْ إلى الملفّ قبل التحرير» في قائمة الملفّ.', 'Page ' + page + ' deleted — to undo, choose “Back to the file before editing” in the file menu.')
+          ? L('حُذفت الصفحة ' + page + ' — وCtrl+Z يعيدها.', 'Page ' + page + ' deleted — Ctrl+Z brings it back.')
           : L('دُوِّرت الصفحة ' + page + '.', 'Page ' + page + ' rotated.'));
       });
     })['catch'](function (e) { saveState('', ''); editFail(e); });
@@ -5393,7 +5412,11 @@
         return copyInk(c.id + '|' + h1, c.id + '|' + h2, res.map).then(function () {
           var d = c.doc;
           var spec = { h: h2, n: oldSpec.n || nb.file.name, sz: nb.spec.sz, pg: nb.spec.pg };
-          d.ed = { from: oldSpec, mk: mk, at: Date.now() };
+          var eds = edsOf(d);
+          eds.push({ from: oldSpec, mk: mk, at: Date.now() });
+          edsTrim(eds, true);
+          delete d.rdo;
+          histKeep(c.id, h1);
           if (h1 !== h2) d.was = (d.was || []).filter(function (x) { return x !== h1; }).concat([h1]);
           d.pdf = spec;
           d.marks = remapMarks(mk, res.map);
@@ -5454,20 +5477,72 @@
     });
   }
 
-  function pdfRevert() {
+  /*@3.NOAJ.458*/
+  var EDS_MAX = 10;
+  var inkHist = {};
+  function edsOf(d) {
+    if (!d.eds && d.ed && d.ed.from) d.eds = [d.ed];
+    delete d.ed;
+    if (!d.eds) d.eds = [];
+    return d.eds;
+  }
+  function edsTrim(list, keepFirst) {
+    while (list.length > EDS_MAX) list.splice(keepFirst ? 1 : 0, 1);
+    for (var i = keepFirst ? 1 : 0; i < list.length - 1; i++) if (list[i].mk) list[i].mk = null;
+  }
+  function edsCount(d) {
+    if (!d) return { u: 0, r: 0 };
+    return { u: (d.eds && d.eds.length) || (d.ed && d.ed.from ? 1 : 0), r: (d.rdo && d.rdo.length) || 0 };
+  }
+  function histKeep(id, h) {
+    var K = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
+    if (!K || !h) return;
+    inkHist[id + '|' + h] = { u: (K.undoS || []).slice(), r: (K.redoS || []).slice() };
+  }
+  function histBack(id, h) {
+    var s = inkHist[id + '|' + h];
+    var K = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
+    if (!s || !K) return;
+    delete inkHist[id + '|' + h];
+    if ((K.undoS && K.undoS.length) || (K.redoS && K.redoS.length)) return;
+    K.undoS = s.u.slice();
+    K.redoS = s.r.slice();
+    paintHist();
+  }
+  function pdfStep(dir, all) {
     var c = editCtx();
-    if (!c || !c.doc.ed || !c.doc.ed.from) return;
+    if (!c) return false;
+    var d = c.doc, eds = edsOf(d), rdo = d.rdo || (d.rdo = []);
+    var src = dir < 0 ? eds : rdo;
+    if (!src.length) { if (!eds.length) delete d.eds; if (!rdo.length) delete d.rdo; return false; }
+    var ik = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
     if (marksT) { clearTimeout(marksT); marksT = 0; }
     marksFor = null;
-    var d = c.doc, back = d.ed;
-    var h2 = d.pdf.h;
-    d.pdf = back.from;
-    d.marks = back.mk || null;
-    d.was = (d.was || []).filter(function (x) { return x !== back.from.h; }).concat(h2 && h2 !== back.from.h ? [h2] : []);
-    delete d.ed;
-    persist(c.id, d, false);
-    openPdf(c.id, d);
-    toast(L('عاد الملفُّ كما كان قبل التحرير.', 'The file is back to how it was before editing.'));
+    histKeep(c.id, d.pdf.h);
+    Promise.resolve(ik && ik.bundle ? ik.bundle() : null).then(function (mk) {
+      var cur = d.pdf, curMk = mk || d.marks || null, ent;
+      do {
+        ent = src.pop();
+        if (dir < 0) rdo.push({ to: cur, mk: curMk, at: Date.now() });
+        else eds.push({ from: cur, mk: curMk, at: Date.now() });
+        cur = dir < 0 ? ent.from : ent.to;
+        curMk = ent.mk || null;
+      } while (all && src.length);
+      var h0 = d.pdf.h;
+      d.pdf = cur;
+      d.marks = curMk;
+      d.was = (d.was || []).filter(function (x) { return x !== cur.h && x !== h0; }).concat(h0 && h0 !== cur.h ? [h0] : []);
+      edsTrim(eds, true);
+      edsTrim(rdo, false);
+      if (!eds.length) delete d.eds;
+      if (!rdo.length) delete d.rdo;
+      persist(c.id, d, false);
+      openPdf(c.id, d);
+      toast(dir > 0 ? L('أُعيد تعديلُ الصفحات.', 'The page edit is back.')
+        : all ? L('عاد الملفُّ الأصليّ — وCtrl+Y يعيد تعديلاتِك واحداً واحداً.', 'The original file is back — Ctrl+Y brings your edits back one by one.')
+        : L('تراجعتُ عن آخر تعديلٍ للصفحات — وCtrl+Y يعيده.', 'The last page edit was undone — Ctrl+Y brings it back.'));
+    });
+    return true;
   }
 
   function openPdf(id, doc) {
@@ -5514,6 +5589,7 @@
         persist(id, doc, true);
       },
       soloInk: function () { return soloPdf(id, doc.pdf && doc.pdf.h); },
+      upAt: function () { var d0 = (edId === id && docNow()) || doc; return (d0 && d0.pdf && d0.pdf.up) || 0; },
       /*@3.NOAJ.268*/
       dockEl: function () { return document.getElementById('na-favs'); },
       onInkDirty: function (n, why) { if (edId === id) marksDirty(id, doc, why === 'merge'); },
@@ -5547,8 +5623,10 @@
       onPage: function () { pgNavSoon(); },
       onZoom: function () { applyFs(); },
       onView: function () { applyFs(); },
+      onHistEdge: function (dir) { if (edId === id) { pdfStep(dir); paintHist(); } },
       onReady: function () {
         if (edId !== id) return;
+        histBack(id, doc.pdf && doc.pdf.h);
         marksSoon();
         applyFs();
         applyPdfInv();
@@ -6084,9 +6162,15 @@
     if (!root || root.__drop) return;
     root.__drop = 1;
     var depth = 0;
+    /*@3.NOAJ.456*/
+    var inner = false;
+    var unzone = function () { depth = 0; root.removeAttribute('data-drop'); };
+    document.addEventListener('dragstart', function (e) { if (!e.defaultPrevented) inner = true; });
+    document.addEventListener('dragend', function () { inner = false; unzone(); }, true);
+    window.addEventListener('drop', function () { inner = false; unzone(); }, true);
     var has = function (e) {
       var d = e.dataTransfer;
-      if (!d || !d.types) return false;
+      if (inner || !d || !d.types) return false;
       for (var i = 0; i < d.types.length; i++) if (d.types[i] === 'Files') return true;
       return false;
     };
@@ -7928,8 +8012,8 @@
   /*@3.NOAJ.306*/
   function histState() {
     if (pdfOn() && pdfUi.ink()) {
-      var K = pdfUi.ink();
-      return { u: !!(K.undoS && K.undoS.length), r: !!(K.redoS && K.redoS.length) };
+      var K = pdfUi.ink(), ec = edsCount(liveDoc);
+      return { u: !!((K.undoS && K.undoS.length) || ec.u), r: !!((K.redoS && K.redoS.length) || ec.r) };
     }
     if (edId && ed) {
       if (hist && hist.canUndo) return { u: hist.canUndo(), r: hist.canRedo() };
@@ -7939,8 +8023,9 @@
   }
   function doHist(kind) {
     if (pdfOn() && pdfUi.ink()) {
-      var K = pdfUi.ink();
-      try { if (kind === 'undo') K.undo(); else K.redo(); } catch (e) {}
+      var K = pdfUi.ink(), done = false;
+      try { done = kind === 'undo' ? K.undo() : K.redo(); } catch (e) {}
+      if (!done) pdfStep(kind === 'undo' ? -1 : 1);
     } else if (edId && ed) {
       if (kind === 'undo') { if (hist) hist.undo(); else ed.doUndo(); }
       else { if (hist) hist.redo(); else ed.doRedo(); }
@@ -9297,6 +9382,13 @@
     if (mod && (e.key === '+' || e.key === '=' || e.key === '-' || e.key === '_' || e.key === '0')) {
       e.preventDefault();
       if (e.key === '0') resetFs(); else stepFs((e.key === '-' || e.key === '_') ? -1 : 1);
+      return true;
+    }
+    /*@3.NOAJ.457*/
+    var kz = keyOf(e);
+    if (mod && (kz === 'z' || kz === 'y')) {
+      e.preventDefault();
+      doHist((kz === 'y' || e.shiftKey) ? 'redo' : 'undo');
       return true;
     }
     if (mod && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA')) {

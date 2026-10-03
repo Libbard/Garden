@@ -1818,9 +1818,9 @@
     var has = function () { return !!(self.pick && self.pick.ids.length); };
     /*@3.NOPJ8.49*/
     this._key = I.keys({
-      'mod+z': function () { self.undo(); },
-      'mod+shift+z': function () { self.redo(); },
-      'mod+y': function () { self.redo(); },
+      'mod+z': function () { if (!self.undo() && self.o.onHistEdge) self.o.onHistEdge(-1); },
+      'mod+shift+z': function () { if (!self.redo() && self.o.onHistEdge) self.o.onHistEdge(1); },
+      'mod+y': function () { if (!self.redo() && self.o.onHistEdge) self.o.onHistEdge(1); },
       'mod+a': function () { self.selectAll(); },
       'mod+d': function () { if (!has()) return false; self.dupPick(); },
       'mod+c': function () { if (!has()) return false; self.copyPick(); },
