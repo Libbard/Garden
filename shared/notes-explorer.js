@@ -364,6 +364,51 @@
 
   /*@3.NOEJ3.9*/
   var SPACE = null;
+  /*@3.NOEJ3.10*/
+  var CLEAN = { msg: '' };
+  function cleanHtml(s) {
+    var pg = s.pages || { n: 0, bytes: 0 }, o = s.orph, h = '';
+    var row = function (k, icon, ar, en, sub, bytes, can, btnAr, btnEn) {
+      return '<div class="nx-cl-row" data-k="' + k + '"><i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
+        '<span class="nx-cl-t"><b>' + esc(L(ar, en)) + '</b><small>' + esc(sub) + '</small></span>' +
+        '<span class="nx-fr-s">' + lat(fmtSize(bytes) || '0 B') + '</span>' +
+        (can ? '<button type="button" class="gsf-btn gsf-btn--sm" data-x="clean" data-k="' + k + '" data-ar="' + esc(btnAr) + '" data-en="' + esc(btnEn) + '">' + esc(L(btnAr, btnEn)) + '</button>' : '') +
+        '</div>';
+    };
+    if (pg.n) h += row('pages', 'fa-globe', 'صفحاتُ الموقع المحفوظة', 'Saved site pages',
+      L('عددُها ' + pg.n + ' · حُفظت لتفتحها بلا اتّصال، وتُجلب من جديد حين تزورها', pg.n + ' items kept for offline use · fetched again when you visit'),
+      pg.bytes, true, 'فرِّغْها', 'Clear them');
+    if (o.n) {
+      var wait = o.n - o.safe;
+      var sub = L('ملاحظاتُها حُذفت نهائيّاً أو لم يكتمل استيرادُها', 'Their notes were erased or never finished importing');
+      if (wait) sub += ' · ' + L(wait + ' كُتب في آخر عشر دقائق فينتظر (‏قد يكون استيراداً جارياً)', wait + ' written in the last ten minutes, so it waits (it may be an import in progress)');
+      h += row('orph', 'fa-broom', 'ملفّاتٌ لا تتبع أيَّ ملاحظة', 'Files that belong to no note', sub,
+        o.safe ? o.safeB : o.bytes, o.safe > 0, 'احذفْها من الجهاز', 'Remove from device');
+    }
+    if (!h) h = '<p class="nx-hint">' + esc(L('لا شيءَ يُنظَّف — الجهازُ نظيف.', 'Nothing to clean — this device is tidy.')) + '</p>';
+    return '<section class="nx-sp-card nx-clean"><div class="nx-sp-h"><b>' + esc(L('تنظيفٌ آمن', 'Safe cleanup')) + '</b>' +
+      '<span>' + esc(L('لا يمسّ ملاحظةً ولا ملفّاً تحتاجه', 'Never touches a note or a file you need')) + '</span></div>' + h +
+      '<p class="nx-hint" role="status" data-role="clean-msg">' + esc(CLEAN.msg) + '</p></section>';
+  }
+  function cleanGo(b) {
+    var k = b.getAttribute('data-k'), now = Date.now();
+    if (!(+b.getAttribute('data-armed') > now - 5000)) {
+      b.setAttribute('data-armed', String(now));
+      b.textContent = L('اضغطْ ثانيةً للتأكيد', 'Press again to confirm');
+      setTimeout(function () {
+        if (!b.isConnected || +b.getAttribute('data-armed') !== now) return;
+        b.removeAttribute('data-armed');
+        b.textContent = L(b.getAttribute('data-ar'), b.getAttribute('data-en'));
+      }, 5000);
+      return;
+    }
+    b.disabled = true;
+    b.removeAttribute('data-armed');
+    A.spaceClean(k).then(function (r) {
+      CLEAN.msg = r.n ? L('حُرِّر ', 'Freed ') + fmtSize(r.bytes) + ' · ' + L('عددُها ' + r.n, r.n + ' items') : L('لم يُحذف شيء.', 'Nothing was removed.');
+    }, function () { CLEAN.msg = L('تعذّر التنظيف — لم يُحذف شيء.', 'Cleanup failed — nothing was removed.'); })
+      .then(function () { SPACE = null; render(); });
+  }
   function spaceHtml(s) {
     if (!s) return '<div class="nx-space"><p class="nx-hint">' + esc(L('أجرد ما على هذا الجهاز…', 'Counting what is on this device…')) + '</p></div>';
     var h = '<div class="nx-space"><section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('مساحةُ هذا الجهاز', 'This device')) + '</b>' +
@@ -374,8 +419,7 @@
     h += '</div><div class="nx-legend">';
     s.cats.forEach(function (c) { h += '<span><i data-k="' + esc(c.k) + '"></i>' + esc(c.label) + ' ' + lat(fmtSize(c.bytes)) + '</span>'; });
     h += '</div>';
-    if (s.orph.n) h += '<p class="nx-hint">' + esc(L(s.orph.n + ' ملفّاتٍ على الجهاز لا تتبع أيَّ ملاحظةٍ باقية · ', s.orph.n + ' files on this device belong to no remaining note · ')) + lat(fmtSize(s.orph.bytes)) + '</p>';
-    h += '</section><section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
+    h += '</section>' + cleanHtml(s) + '<section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
     if (!s.files.length) h += '<p class="nx-hint">' + esc(L('لا ملفّاتِ PDF ولا تسجيلات بعد.', 'No PDFs or recordings yet.')) + '</p>';
     s.files.forEach(function (f) {
       var chip = function (on, ar, en) { return '<span class="nx-chip"' + (on ? ' data-on="1"' : '') + '>' + esc(L(ar, en)) + '</span>'; };
@@ -572,6 +616,7 @@
       case 'nfolder-root': if (A.view().k !== 'home') A.setView({ k: 'home' }); A.newFolder(); return;
       case 'back': if (A.back) A.back(); return;
       case 'opennote': if (A.openId) A.openId(x.getAttribute('data-id')); return;
+      case 'clean': if (A.spaceClean) cleanGo(x); return;
       case 'import': pickFiles(); return;
       case 'empty': A.emptyTrash(); return;
       case 'unpick': clear(); return;

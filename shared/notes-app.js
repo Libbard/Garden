@@ -9324,7 +9324,8 @@
       St && St.imageBytes ? St.imageBytes().catch(function () { return 0; }) : 0,
       St && St.totalBytes ? St.totalBytes().catch(function () { return 0; }) : 0,
       Fl && Fl.list ? Fl.list().catch(function () { return { files: [] }; }) : { files: [] },
-      spaceDocs()
+      spaceDocs(),
+      pageCache().then(function (pc) { return pc ? pagesSize(pc) : null; })
     ]).then(function (r) {
       var e = r[0] || {}, local = r[1] || [], srv = (r[4] && r[4].files) || [], docs = r[5] || [];
       var dev = {}, us = {}, seen = {}, files = [];
@@ -9344,11 +9345,16 @@
                        dev: !!dev[a.i], us: !!a.aup, gd: !!a.gd });
         });
       });
-      var pdfB = 0, audB = 0, orph = { n: 0, bytes: 0 };
+      var pdfB = 0, audB = 0, orph = { n: 0, bytes: 0, safe: 0, safeB: 0, list: [] }, young = Date.now() - 600000;
       local.forEach(function (x) {
         if (/^wip_/.test(x.hash)) return;
         if (/^aud_/.test(x.hash)) audB += x.size || 0; else pdfB += x.size || 0;
-        if (!seen[x.hash]) { orph.n++; orph.bytes += x.size || 0; }
+        if (!seen[x.hash]) {
+          var safe = !(x.at > young);
+          orph.n++; orph.bytes += x.size || 0;
+          if (safe) { orph.safe++; orph.safeB += x.size || 0; }
+          orph.list.push({ hash: x.hash, name: x.name, bytes: x.size || 0, safe: safe });
+        }
       });
       var ud = e.usageDetails || {};
       var cats = [
@@ -9363,8 +9369,68 @@
       if (used - known > 1048576) cats.push({ k: 'other', label: L('أخرى', 'Other'), bytes: used - known });
       files.sort(function (a, b) { return b.bytes - a.bytes; });
       return { used: used, quota: e.quota || 0, cats: cats.filter(function (c) { return c.bytes > 0; }), files: files, orph: orph,
-               vault: !!(Fl && Fl.list) };
+               pages: r[6], vault: !!(Fl && Fl.list) };
     });
+  }
+  /*@3.NOAJ.470*/
+  function pageCache() {
+    var SW = navigator.serviceWorker;
+    if (!window.caches || !SW || !SW.getRegistration) return Promise.resolve(null);
+    return SW.getRegistration().then(function (reg) {
+      if (!reg) return null;
+      var sc = reg.scope;
+      return caches.has('garden-static').then(function (has) {
+        if (!has) return null;
+        return caches.open('garden-static').then(function (c) {
+          return c.match(sc + '__precache-state__').then(function (res) { return res ? res.json() : null; })
+            .then(function (st) {
+              var keep = st && st.files;
+              if (!keep) return null;
+              return c.keys().then(function (ks) {
+                return { c: c, run: ks.filter(function (rq) {
+                  if (rq.url.indexOf(sc) !== 0) return false;
+                  var rel = rq.url.slice(sc.length).split('?')[0];
+                  return rel !== '__precache-state__' && !keep[rel];
+                }) };
+              });
+            });
+        });
+      });
+    })['catch'](function () { return null; });
+  }
+  function pagesSize(pc) {
+    var n = 0, i = 0;
+    function step() {
+      var part = pc.run.slice(i, i + 20);
+      i += 20;
+      if (!part.length) return Promise.resolve({ n: pc.run.length, bytes: n });
+      return Promise.all(part.map(function (rq) {
+        return pc.c.match(rq).then(function (res) { return res ? res.blob() : null; })
+          .then(function (b) { n += b ? b.size : 0; }, function () {});
+      })).then(step);
+    }
+    return step();
+  }
+  /*@3.NOAJ.471*/
+  function spaceClean(k) {
+    if (k === 'pages') {
+      return pageCache().then(function (pc) {
+        if (!pc) return { n: 0, bytes: 0 };
+        return pagesSize(pc).then(function (sz) {
+          return Promise.all(pc.run.map(function (rq) { return pc.c['delete'](rq); })).then(function () { return sz; });
+        });
+      });
+    }
+    if (k === 'orph') {
+      var PD = window.GardenPdfDoc;
+      if (!PD || !PD.drop) return Promise.resolve({ n: 0, bytes: 0 });
+      return spaceInfo().then(function (s) {
+        var go = s.orph.list.filter(function (x) { return x.safe; });
+        return Promise.all(go.map(function (x) { return PD.drop(x.hash); }))
+          .then(function () { return { n: go.length, bytes: s.orph.safeB }; });
+      });
+    }
+    return Promise.resolve({ n: 0, bytes: 0 });
   }
 
   function exPlaceOf(v) {
@@ -9400,6 +9466,7 @@
       dup: function (uids) { dupNotes(recsOf(uids).map(function (x) { return x.id; })); },
       canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },
       spaceInfo: spaceInfo,
+      spaceClean: spaceClean,
       openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },
       folderName: folderName,
