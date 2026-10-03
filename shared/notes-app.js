@@ -9299,7 +9299,7 @@
   function spaceDocs() {
     var St = window.GardenNotesStore;
     if (!St || !St.getDoc) return Promise.resolve([]);
-    var recs = idxRead().filter(function (r) { return r && !r.d; }), out = [], i = 0;
+    var recs = idxRead().filter(function (r) { return !!r; }), out = [], i = 0;
     function batch() {
       var part = recs.slice(i, i + 25);
       i += 25;
@@ -9307,7 +9307,9 @@
       return Promise.all(part.map(function (r) {
         return St.getDoc(r.id).then(function (row) {
           var d = row && row.doc;
-          if (d && ((d.pdf && d.pdf.h) || (d.aud && d.aud.length))) out.push({ id: r.id, t: notPh(r.t) || L('بلا عنوان', 'Untitled'), pdf: d.pdf, aud: d.aud });
+          if (d && ((d.pdf && d.pdf.h) || (d.aud && d.aud.length))) {
+            out.push({ id: r.id, t: (notPh(r.t) || L('بلا عنوان', 'Untitled')) + (r.d ? L(' · في السلّة', ' · in trash') : ''), pdf: d.pdf, aud: d.aud });
+          }
         }, function () {});
       })).then(batch);
     }
