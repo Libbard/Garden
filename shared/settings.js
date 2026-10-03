@@ -718,7 +718,23 @@
 
   /*@3.SETJ.22*/
   var wipeArmed = 0;
+  /*@3.SETJ.42*/
+  function wipeBlocked() {
+    var GS = window.GardenSync, np = {};
+    try { np = JSON.parse(localStorage.getItem('__notesPending') || '{}') || {}; } catch (e) {}
+    var on = !!(GS && GS.getKey && GS.getKey());
+    var waiting = (GS && GS.pending && GS.pending()) || Object.keys(np).length > 0;
+    return { on: on, waiting: on && waiting };
+  }
   function onWipe(btn) {
+    var wb = wipeBlocked();
+    if (wb.waiting) {
+      wipeArmed = 0;
+      try { if (window.GardenSync && GardenSync.syncNow) GardenSync.syncNow(); } catch (e) {}
+      toast(L('تغييراتٌ لم تصل الخزنةَ بعد — بدأتُ رفعَها. انتظرْ حتى تكتمل المزامنةُ ثمّ امحُ.',
+              'Some changes have not reached the vault yet — uploading them now. Wait for sync to finish, then erase.'));
+      return;
+    }
     if (Date.now() - wipeArmed < 5000) {
       var keep = {};
       /*@3.SETJ.23*/
@@ -743,7 +759,8 @@
     wipeArmed = Date.now();
     var sp = btn.querySelector('span'), old = sp.textContent;
     btn.classList.add('is-armed');
-    sp.textContent = L('اضغط ثانيةً للتأكيد', 'Press again to confirm');
+    sp.textContent = wb.on ? L('اضغط ثانيةً للتأكيد', 'Press again to confirm')
+                           : L('المزامنةُ متوقّفة: لن يعود شيء — اضغط ثانيةً', 'Sync is off: nothing comes back — press again');
     setTimeout(function () {
       if (Date.now() - wipeArmed >= 5000) { sp.textContent = old; btn.classList.remove('is-armed'); }
     }, 5100);
