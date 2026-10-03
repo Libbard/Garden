@@ -300,9 +300,14 @@
       '<div class="gsf-grip" aria-hidden="true"></div>' +
       '<div class="gsf-x"><button type="button" class="gsf-close" data-pe="close" aria-label="' + esc(L('أغلق', 'Close')) + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>' +
       '<div class="gsf-head npe-head"><h2 class="gsf-title" id="npe-t">' + esc(L('صفحاتُ الملفّ', 'File pages')) + '</h2>' +
-      '<p class="gsf-sub" dir="auto">' + esc(this.o.name || '') + '</p></div>' +
+      /*@3.NOPJ13.6*/
+      '<p class="gsf-sub"><bdi>' + esc(this.o.name || '') + '</bdi></p></div>' +
       '<div class="npe-bar" role="toolbar" aria-label="' + esc(L('أفعالُ الصفحات', 'Page actions')) + '">' +
         '<span class="npe-count" data-pe="count" aria-live="polite"></span>' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost npe-b npe-multi" data-pe="multi" aria-pressed="false">' +
+          '<i class="fa-solid fa-list-check" aria-hidden="true"></i><span class="npe-b-t">' + esc(L('تحديدٌ متعدّد', 'Multi-select')) + '</span></button>' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost npe-b npe-all" data-pe="all">' +
+          '<i class="fa-solid fa-check-double" aria-hidden="true"></i><span class="npe-b-t">' + esc(L('الكلّ', 'All')) + '</span></button>' +
         '<input class="gsf-in npe-range" data-pe="range" type="text" inputmode="numeric" dir="ltr" autocomplete="off" ' +
           'placeholder="' + esc(L('3-7، 12', '3-7, 12')) + '" aria-label="' + esc(L('حدِّدْ بأرقام الصفحات', 'Select by page numbers')) + '">' +
         '<div class="npe-acts">' +
@@ -330,7 +335,7 @@
     function btn(a, icon, label, iconOnly, kind) {
       return '<button type="button" class="gsf-btn gsf-btn--' + (kind || 'ghost') + ' npe-b' + (iconOnly ? ' npe-b--i' : '') + '" data-pe="' + a + '"' +
         ' aria-label="' + esc(label) + '" data-tip="' + esc(label) + '"><i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
-        (iconOnly ? '' : '<span>' + esc(label) + '</span>') + '</button>';
+        '<span class="npe-b-t">' + esc(label) + '</span></button>';
     }
     document.body.appendChild(d);
     this.d = d;
@@ -404,6 +409,10 @@
     c.innerHTML = n ? esc(L('حُدِّد ', '')) + num(n) + esc(L(' من ', ' of ')) + num(total) + esc(L('', ' selected'))
                     : num(total) + esc(L(' صفحة', ' pages'));
     c.classList.toggle('is-on', n > 0);
+    var mb = this.d.querySelector('[data-pe="multi"]');
+    if (mb) mb.setAttribute('aria-pressed', String(!!(this.multi || this.touchSel)));
+    var ab = this.d.querySelector('[data-pe="all"]');
+    if (ab) ab.disabled = n >= total;
     var dis = function (a, v) { var b = this.d.querySelector('[data-pe="' + a + '"]'); if (b) b.disabled = v; }.bind(this);
     dis('rotr', !n || this.busy); dis('rotl', !n || this.busy); dis('ext', !n || this.busy);
     dis('del', !n || n >= total || this.busy);
@@ -469,6 +478,8 @@
       if (a === 'ins') return this.d.querySelector('[data-pe="file"]').click();
       if (a === 'ext') return this.extract();
       if (a === 'save') return this.save();
+      if (a === 'multi') { var onM = !!(this.multi || this.touchSel); this.multi = !onM; this.touchSel = false; this.paint(); return; }
+      if (a === 'all') { for (var q = 0; q < this.items.length; q++) this.sel[this.items[q].k] = 1; this.paint(); return; }
       return;
     }
     if (this._dragged) { this._dragged = false; return; }
@@ -476,7 +487,7 @@
     if (!pg) return;
     var j = +pg.getAttribute('data-j');
     var mod = e.ctrlKey || e.metaKey;
-    this.pick(j, e.shiftKey ? (mod ? 'range+' : 'range') : ((mod || this.touchSel) ? 'toggle' : 'only'));
+    this.pick(j, e.shiftKey ? (mod ? 'range+' : 'range') : ((mod || this.touchSel || this.multi) ? 'toggle' : 'only'));
   };
 
   /*@3.NOPJ13.3*/

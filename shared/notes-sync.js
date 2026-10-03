@@ -200,9 +200,25 @@
     }).catch(function (e) { return { ok: false, reason: String((e && e.message) || e) }; });
   }
 
+  /*@3.NOSJ2.15*/
+  function filesOf(ids) {
+    var st = S(), out = [];
+    if (!st || !st.getDoc || !ids.length) return Promise.resolve(out);
+    return Promise.all(ids.map(function (id) {
+      return st.getDoc(id).then(function (row) {
+        var d = row && row.doc;
+        if (!d) return;
+        if (d.pdf && d.pdf.h) out.push({ h: d.pdf.h, k: 'pdf', note: id });
+        (d.aud || []).forEach(function (a) { if (a && a.i) out.push({ h: a.i, k: 'aud', note: id, up: !!a.aup }); });
+      }, function () {});
+    })).then(function () { return out; });
+  }
+
   function remove(noteId) {
     if (!S()) return Promise.resolve({ ok: false });
-    return S().delDoc(noteId).then(function () {
+    var files = [];
+    return filesOf([noteId]).then(function (fs) { files = fs; return S().delDoc(noteId); }).then(function () {
+      emit('garden:notesErased', { ids: [noteId], files: files, own: true });
       if (!endpoint()) return { ok: true, remote: false };
       return vaultId().then(function (vid) {
         if (!vid) return { ok: true, remote: false };
@@ -303,7 +319,11 @@
           }).then(function () {
             return chunked(toPush, push);
           }).then(function () {
-            return Promise.all(toDropLocal.map(function (id) { return st.delDoc(id); }));
+            return filesOf(toDropLocal).then(function (fs) {
+              return Promise.all(toDropLocal.map(function (id) { return st.delDoc(id); })).then(function () {
+                if (toDropLocal.length) emit('garden:notesErased', { ids: toDropLocal, files: fs, own: false });
+              });
+            });
           }).then(function () {
             return Promise.all(toDropRemote.map(function (id) {
               return authed('DELETE', base(vid) + '/' + encodeURIComponent(id), vid)

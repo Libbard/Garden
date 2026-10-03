@@ -4276,6 +4276,7 @@
   function openNote(id, opts) {
     var rec = idxFind(id);
     if (!rec) { closeNote(); return; }
+    var navFrom = (isPhone() && els.app && els.app.getAttribute('data-mob') === 'list') ? 'side' : 'home';
     /*@3.NOAJ.116*/
     if (ed && edId === id && !(opts && opts.remount)) { setMob('doc'); return; }
     setMob('doc');
@@ -4590,9 +4591,53 @@
       }
     });
 
-    history.replaceState(null, '', location.pathname + '?id=' + encodeURIComponent(id));
+    navNote(id, navFrom);
     setReading(true);
     renderList();
+  }
+
+  /*@3.NOAJ.473*/
+  var navCur = null, navOn = false;
+  function navSet(st, url, push) {
+    try { if (push) history.pushState(st, '', url); else history.replaceState(st, '', url); } catch (e) {}
+    navCur = st;
+  }
+  function navIdx() { var s = history.state; return (s && typeof s.i === 'number') ? s.i : 0; }
+  function navNote(id, from) {
+    var url = location.pathname + '?id=' + encodeURIComponent(id);
+    var st = history.state;
+    if (st && st.na === 'note') { navSet({ na: 'note', id: id, from: st.from, i: navIdx() }, url, false); return; }
+    if (st && st.na === 'side') { navSet({ na: 'note', id: id, from: from, i: navIdx() }, url, false); return; }
+    if (!st || st.na !== 'home') navSet({ na: 'home', i: navIdx() }, location.pathname, false);
+    navSet({ na: 'note', id: id, from: from, i: navIdx() + 1 }, url, true);
+  }
+  function navHome() { navSet({ na: 'home', i: navIdx() }, location.pathname, false); }
+  function navSide() {
+    var st = history.state;
+    if (st && st.na === 'side') return;
+    if (!st) navSet({ na: 'home', i: 0 }, location.pathname + location.search, false);
+    navSet({ na: 'side', i: navIdx() + 1 }, location.pathname + location.search, true);
+  }
+  function navPop(e) {
+    var st = e.state || { na: 'home', i: 0 };
+    var back = (typeof st.i === 'number' ? st.i : 0) < ((navCur && typeof navCur.i === 'number') ? navCur.i : 0);
+    var was = navCur;
+    navCur = st;
+    var sideOpen = isPhone() && els.app && els.app.getAttribute('data-mob') === 'list';
+    var acted = false;
+    if (st.na === 'note' && st.id) {
+      if (edId !== st.id && idxFind(st.id)) { openNote(st.id); acted = true; }
+    } else if (st.na === 'side') {
+      if (isPhone() && !sideOpen && !edId && !pdfOn()) { setMob('list'); setAcc(S.acc || 'list'); setPanel(true); acted = true; }
+    } else if (edId || pdfOn()) {
+      var from = was && was.na === 'note' ? was.from : null;
+      closeNote();
+      if (from === 'side' && isPhone()) { setMob('list'); setAcc(S.acc || 'list'); setPanel(true); }
+      acted = true;
+    } else if (sideOpen) {
+      setMob('doc'); acted = true;
+    }
+    if (!acted && back) { try { history.back(); } catch (eB) {} }
   }
 
   function histChanged() {
@@ -4617,7 +4662,7 @@
     dropEditor(); edId = null;
     if (els.app) els.app.removeAttribute('data-kind');
     docEmpty();
-    history.replaceState(null, '', location.pathname);
+    navHome();
     setReading(false);
     /*@3.NOAJ.453*/
     if (phoneEx()) setMob('doc');
@@ -5919,6 +5964,8 @@
     var base = String(file.name || '').replace(/\.pdf$/i, '').trim();
     var rec = bornRec(id, 'pdf', title || base || L('ملفُّ PDF', 'PDF file'), place);
     if (gd) res.spec.gd = String(gd);
+    /*@3.NOAJ.474*/
+    try { if (window.GardenSync && GardenSync.deviceId) res.spec.dv = GardenSync.deviceId(); } catch (eD) {}
     var doc = { v: 1, kind: 'pdf', pdf: res.spec, blocks: [] };
     var St = window.GardenNotesStore;
     var back = function () { return id; };
@@ -6499,7 +6546,7 @@
     else if (window.GardenNotesStore) window.GardenNotesStore.delDoc(id);
     dropEditor(); edId = null;
     docEmpty();
-    history.replaceState(null, '', location.pathname);
+    navHome();
     setReading(false);
     showPanel('list');
     reload();
@@ -6779,6 +6826,7 @@
     if (!els.app) return;
     els.app.setAttribute('data-mob', m);
     if (!isPhone()) return;
+    if (m === 'list' && navOn) navSide();
     if (m === 'doc') {
       setPanel(false);
       document.documentElement.classList.add('na-full');
@@ -9308,7 +9356,7 @@
         return St.getDoc(r.id).then(function (row) {
           var d = row && row.doc;
           if (d && ((d.pdf && d.pdf.h) || (d.aud && d.aud.length))) {
-            out.push({ id: r.id, t: (notPh(r.t) || L('بلا عنوان', 'Untitled')) + (r.d ? L(' · في السلّة', ' · in trash') : ''), pdf: d.pdf, aud: d.aud });
+            out.push({ id: r.id, t: (notPh(r.t) || L('بلا عنوان', 'Untitled')) + (r.d ? L(' · في السلّة', ' · in trash') : ''), pdf: d.pdf, aud: d.aud, tr: !!r.d });
           }
         }, function () {});
       })).then(batch);
@@ -9326,25 +9374,35 @@
       St && St.totalBytes ? St.totalBytes().catch(function () { return 0; }) : 0,
       Fl && Fl.list ? Fl.list().catch(function () { return { files: [] }; }) : { files: [] },
       spaceDocs(),
-      pageCache().then(function (pc) { return pc ? pagesSize(pc) : null; })
+      pageCache().then(function (pc) { return pc ? pagesSize(pc) : null; }),
+      window.GardenSync && GardenSync.devices ? GardenSync.devices().catch(function () { return null; }) : null
     ]).then(function (r) {
       var e = r[0] || {}, local = r[1] || [], ink = r[2] || [], srv = (r[5] && r[5].files) || [], docs = r[6] || [];
       var dev = {}, us = {}, seen = {}, files = [];
+      /*@3.NOAJ.475*/
+      var me = (window.GardenSync && GardenSync.deviceId) ? GardenSync.deviceId() : '', devN = {};
+      ((r[8] && r[8].devices) || []).forEach(function (x) { if (x && x.device_id) devN[x.device_id] = x.name || ''; });
       local.forEach(function (x) { dev[x.hash] = x; });
       srv.forEach(function (f) { if (f && f.ref_id) us[f.ref_id] = f; });
       docs.forEach(function (d) {
         if (d.pdf && d.pdf.h) {
-          var h = d.pdf.h;
+          var h = d.pdf.h, dv = d.pdf.dv && d.pdf.dv !== me ? d.pdf.dv : '';
           seen[h] = 1;
-          files.push({ kind: 'pdf', name: d.pdf.n || d.t, note: d.id, nt: d.t, bytes: (dev[h] && dev[h].size) || d.pdf.sz || 0,
-                       dev: !!dev[h], us: !!us['pdf_' + String(h).slice(0, 40)], gd: !!d.pdf.gd });
+          files.push({ kind: 'pdf', h: h, name: d.pdf.n || d.t, note: d.id, nt: d.t, tr: d.tr, bytes: (dev[h] && dev[h].size) || d.pdf.sz || 0,
+                       dev: !!dev[h], us: !!us['pdf_' + String(h).slice(0, 40)], gd: !!d.pdf.gd,
+                       other: dv ? (devN[dv] || L('جهازٌ آخر', 'Another device')) : '' });
         }
         (d.aud || []).forEach(function (a) {
           if (!a || !a.i) return;
           seen[a.i] = 1;
-          files.push({ kind: 'aud', name: a.n || L('تسجيل', 'Recording'), note: d.id, nt: d.t, bytes: (dev[a.i] && dev[a.i].size) || a.b || 0,
-                       dev: !!dev[a.i], us: !!a.aup, gd: !!a.gd });
+          files.push({ kind: 'aud', h: a.i, name: a.n || L('تسجيل', 'Recording'), note: d.id, nt: d.t, tr: d.tr, bytes: (dev[a.i] && dev[a.i].size) || a.b || 0,
+                       dev: !!dev[a.i], us: !!a.aup, gd: !!a.gd, other: '' });
         });
+      });
+      var free = { n: 0, bytes: 0, list: [] };
+      files.forEach(function (f) {
+        if (!f.dev || !f.us || f.note === edId) return;
+        free.n++; free.bytes += f.bytes; free.list.push(f.h);
       });
       var pdfB = 0, audB = 0, orph = { n: 0, bytes: 0, safe: 0, safeB: 0, list: [] }, young = Date.now() - 600000;
       /*@3.NOAJ.472*/
@@ -9379,7 +9437,7 @@
       if (used - known > 1048576) cats.push({ k: 'other', label: L('أخرى', 'Other'), bytes: used - known });
       files.sort(function (a, b) { return b.bytes - a.bytes; });
       return { used: used, quota: e.quota || 0, cats: cats.filter(function (c) { return c.bytes > 0; }), files: files, orph: orph,
-               pages: r[7], vault: !!(Fl && Fl.list) };
+               pages: r[7], vault: !!(Fl && Fl.list), free: free };
     });
   }
   /*@3.NOAJ.470*/
@@ -9431,6 +9489,9 @@
         });
       });
     }
+    if (k === 'free') {
+      return spaceInfo().then(function (s) { return spaceFree(s.free.list); });
+    }
     if (k === 'orph') {
       var PD = window.GardenPdfDoc;
       if (!PD || !PD.drop) return Promise.resolve({ n: 0, bytes: 0 });
@@ -9443,6 +9504,66 @@
       });
     }
     return Promise.resolve({ n: 0, bytes: 0 });
+  }
+
+  /*@3.NOAJ.476*/
+  function spaceFree(hs) {
+    var PD = window.GardenPdfDoc;
+    if (!PD || !PD.drop || !hs || !hs.length) return Promise.resolve({ n: 0, bytes: 0 });
+    return spaceInfo().then(function (s) {
+      var want = {}, go = [];
+      hs.forEach(function (h) { want[h] = 1; });
+      s.files.forEach(function (f) { if (want[f.h] && f.dev && f.us && f.note !== edId) { want[f.h] = 0; go.push(f); } });
+      return Promise.all(go.map(function (f) { return Promise.resolve(PD.drop(f.h)).catch(function () {}); }))
+        .then(function () { return { n: go.length, bytes: go.reduce(function (a, f) { return a + f.bytes; }, 0) }; });
+    });
+  }
+  function spaceErase(ids, label) {
+    var recs = (ids || []).map(idxFind).filter(Boolean);
+    if (!recs.length) return;
+    if (recs.length === 1) confirmDelete(recs[0].id, label || notPh(recs[0].t));
+    else { resetConfirm(); confirmDeleteMany(recs); }
+    confirmTitle('احذفْه من كلِّ مكان؟', 'Delete it everywhere?');
+    if (recs.length > 1) confirmTitle('احذفْها من كلِّ مكان؟', 'Delete them everywhere?');
+    confirmSub('تُحذف الملاحظةُ وملفُّها من هذا الجهاز ومن نسختك عندنا، ويتحرّر من أجهزتك الأخرى حين تفتح الموقعَ عليها. نسخةُ درايف تبقى في درايفك. ولا يمكن التراجع.',
+               'The note and its file are removed from this device and from your copy with us, and freed from your other devices when you next open the site there. A Drive copy stays in your Drive. This cannot be undone.');
+    confirmOkLabel('احذفْ من كلِّ مكان', 'Delete everywhere');
+  }
+  var _erQ = null;
+  function freeErased(d) {
+    if (!d || !d.files || !d.files.length) return;
+    if (!_erQ) { _erQ = { ids: [], files: [], own: {} }; setTimeout(freeRun, 1200); }
+    (d.ids || []).forEach(function (id) { _erQ.ids.push(id); });
+    d.files.forEach(function (f) { _erQ.files.push(f); if (d.own) _erQ.own[f.h] = 1; });
+  }
+  function freeRun() {
+    var q = _erQ; _erQ = null;
+    if (!q) return;
+    var PD = window.GardenPdfDoc, K = window.GardenPdfInk, F = window.GardenFiles, sh = sharedMap();
+    spaceDocs().then(function (docs) {
+      var refs = {}, done = {}, jobs = [];
+      docs.forEach(function (x) {
+        if (x.pdf && x.pdf.h) refs[x.pdf.h] = 1;
+        (x.aud || []).forEach(function (a) { if (a && a.i) refs[a.i] = 1; });
+      });
+      q.files.forEach(function (f) {
+        if (!f || !f.h || refs[f.h] || done[f.h]) return;
+        done[f.h] = 1;
+        if (PD && PD.drop) jobs.push(Promise.resolve(PD.drop(f.h)).catch(function () {}));
+        if (q.own[f.h] && !sh[f.note] && F && F.remove && (f.k === 'pdf' || f.up)) {
+          jobs.push(F.remove(f.k === 'pdf' ? 'pdf_' + String(f.h).slice(0, 40) : f.h).catch(function () {}));
+        }
+      });
+      if (K && K.inkRows && K.dropKeys) {
+        jobs.push(Promise.resolve(K.inkRows()).then(function (rows) {
+          var ks = (rows || []).filter(function (x) { return x && x.note && q.ids.indexOf(x.note) >= 0; }).map(function (x) { return x.k; });
+          return ks.length ? K.dropKeys(ks) : null;
+        }).catch(function () {}));
+      }
+      return Promise.all(jobs);
+    }).then(function () {
+      if (S.view && S.view.k === 'space' && window.GardenNotesExplorer && GardenNotesExplorer.spaceStale) GardenNotesExplorer.spaceStale();
+    }, function () {});
   }
 
   function exPlaceOf(v) {
@@ -9479,6 +9600,8 @@
       canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },
       spaceInfo: spaceInfo,
       spaceClean: spaceClean,
+      spaceFree: spaceFree,
+      spaceErase: spaceErase,
       openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },
       folderName: folderName,
@@ -10482,7 +10605,7 @@
           clearPicked();
           if (edId && many.indexOf(edId) > -1) {
             dropEditor(); edId = null; docEmpty();
-            history.replaceState(null, '', location.pathname);
+            navHome();
             setReading(false); showPanel('list');
           }
           reload();
@@ -10628,19 +10751,24 @@
       if (sid) { openShared(sid); return; }
       var adopt = qs.get('adopt');
       var wanted = qs.get('id');
+      window.addEventListener('popstate', navPop);
+      window.addEventListener('garden:notesErased', function (eE) { freeErased(eE.detail); });
       if (adopt) {
-        history.replaceState(null, '', location.pathname);
+        navHome();
         adoptQuick(adopt);
       } else if (wanted && idxFind(wanted)) {
         if (qs.get('p')) wantPage(wanted, qs.get('p'));
         openNote(wanted);
       }
       /*@3.NOAJ.469*/
-      else if (qs.get('view') === 'space') { history.replaceState(null, '', location.pathname); exSetView({ k: 'space' }); }
+      else if (qs.get('view') === 'space') { navHome(); exSetView({ k: 'space' }); }
       else if (qs.get('new') === '1') createNote();
       /*@3.NOAJ.202*/
       else if (!idxRead().length) createNote();
     } catch (e) {}
+    if (!history.state) navSet({ na: 'home', i: 0 }, location.pathname + location.search, false);
+    else navCur = history.state;
+    navOn = true;
 
     runReconcile(false);
     setTimeout(scanBlanks, 1500);

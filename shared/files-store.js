@@ -327,9 +327,10 @@
       try { localStorage.setItem(day, '1'); } catch (e) {}
       var G = window.Garden, ar = document.documentElement.lang !== 'en';
       var n = left === 1 ? (ar ? 'غداً' : 'tomorrow') : left === 2 ? (ar ? 'بعد يومين' : 'in 2 days') : (ar ? 'بعد ' + left + ' أيّام' : 'in ' + left + ' days');
+      /*@3.FISJ2.2*/
       var msg = ar
-        ? 'ينتهي الفصلُ ' + n + '، ومعه تُحذف من خادمنا تسجيلاتُك وصورُ ملاحظاتك المرفوعة. نزّلْ ما تحتاجه — والأصلُ باقٍ على جهازك.'
-        : 'The term ends ' + n + ', and with it your uploaded recordings and note images are removed from our server. Download what you need — the originals stay on your device.';
+        ? 'ينتهي الفصلُ ' + n + '. بعده قد نُفرغ من خادمنا التسجيلاتِ وصورَ الملاحظات المرفوعة لإفساح المساحة — والأصلُ باقٍ على جهازك، فنزّلْ ما تريد الاحتفاظَ به.'
+        : 'The term ends ' + n + '. After it we may clear uploaded recordings and note images from our server to free space — the originals stay on your device, so download what you want to keep.';
       if (G && G.toast) { try { G.toast(msg); } catch (e) {} }
       emit('garden:termWarn', { days: left, files: kept.length });
       return true;

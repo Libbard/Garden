@@ -362,8 +362,89 @@
     return h + '</div>';
   }
 
+  /*@3.NOEJ3.14*/
+  var FSEL = {}, FANCH = null, FF = 'all', FROWS = [];
+  var FILTS = [
+    { k: 'all', ar: 'الكلّ', en: 'All', f: function () { return true; } },
+    { k: 'here', ar: 'على هذا الجهاز', en: 'On this device', f: function (f) { return f.dev; } },
+    { k: 'none', ar: 'بلا نسخةٍ نراها', en: 'No copy we can see', f: function (f) { return !f.dev && !f.us && !f.gd; } },
+    { k: 'trash', ar: 'في السلّة', en: 'In trash', f: function (f) { return f.tr; } }
+  ];
+  function filtOf(k) { for (var i = 0; i < FILTS.length; i++) if (FILTS[i].k === k) return FILTS[i].f; return FILTS[0].f; }
+  function fPicked() { return FROWS.filter(function (f) { return FSEL[f.h]; }); }
+  function fselHtml() {
+    var ps = fPicked(), n = ps.length;
+    var canFree = ps.filter(function (f) { return f.dev && f.us; }).length;
+    var canErase = ps.filter(function (f) { return f.kind === 'pdf'; }).length;
+    function b(x, icon, ar, en, cls, off, tip) {
+      return '<button type="button" class="gsf-btn gsf-btn--sm nx-b ' + (cls || 'gsf-btn--ghost') + '" data-x="' + x + '"' + (off ? ' disabled' : '') +
+        (tip ? ' title="' + esc(tip) + '"' : '') + '><i class="fa-solid ' + icon + '" aria-hidden="true"></i><span class="nx-b-t">' + esc(L(ar, en)) + '</span></button>';
+    }
+    return '<div class="nx-sel" role="toolbar" aria-label="' + esc(L('أفعال المحدَّد', 'Selection actions')) + '"' + (n ? '' : ' hidden') + '>' +
+      '<b class="nx-sel-n">' + esc(L(n === 1 ? 'ملفٌّ واحد' : (n === 2 ? 'ملفّان' : n + (n <= 10 ? ' ملفّات' : ' ملفّاً')), n + (n === 1 ? ' file' : ' files'))) + '</b>' +
+      b('ffree', 'fa-cloud-arrow-down', 'حرِّرْ من هذا الجهاز' + (canFree && canFree < n ? ' (' + canFree + ')' : ''), 'Free from this device' + (canFree && canFree < n ? ' (' + canFree + ')' : ''), '', !canFree,
+        canFree ? '' : L('لا شيءَ محدَّدٌ على هذا الجهاز وله نسخةٌ عندنا', 'Nothing selected is on this device with a copy kept by us')) +
+      b('ferase', 'fa-trash', 'احذفْ من كلِّ مكان' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'Delete everywhere' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'gsf-btn--danger', !canErase,
+        canErase ? '' : L('التسجيلُ يُحذف من داخل ملاحظته', 'A recording is deleted from inside its note')) +
+      '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b nx-sel-x" data-x="funpick" aria-label="' + esc(L('ألغِ التحديد', 'Clear selection')) + '" ' +
+        'data-ar-title="ألغِ التحديد" data-en-title="Clear selection"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>';
+  }
+  function fPaint() {
+    if (!host) return;
+    var rows = host.querySelectorAll('.nx-frow[data-fk]');
+    for (var i = 0; i < rows.length; i++) {
+      var on = !!FSEL[rows[i].getAttribute('data-fk')];
+      rows[i].setAttribute('aria-selected', String(on));
+      var ck = rows[i].querySelector('.nx-ck');
+      if (ck) ck.setAttribute('aria-checked', String(on));
+    }
+    var bar = host.querySelector('.nx-sel');
+    if (bar) { bar.outerHTML = fselHtml(); A.i18n(host); }
+  }
+  function fToggle(h) { if (FSEL[h]) delete FSEL[h]; else FSEL[h] = 1; FANCH = h; fPaint(); }
+  function fRange(h) {
+    var a = -1, b = -1;
+    FROWS.forEach(function (f, i) { if (f.h === FANCH) a = i; if (f.h === h) b = i; });
+    if (a < 0 || b < 0) { fToggle(h); return; }
+    for (var i = Math.min(a, b); i <= Math.max(a, b); i++) FSEL[FROWS[i].h] = 1;
+    fPaint();
+  }
+  function fAll() { FROWS.forEach(function (f) { FSEL[f.h] = 1; }); fPaint(); }
+  function fClear() { FSEL = {}; FANCH = null; fPaint(); }
+  function fRow(h) { for (var i = 0; i < FROWS.length; i++) if (FROWS[i].h === h) return FROWS[i]; return null; }
+  function fFree(list) {
+    var hs = list.filter(function (f) { return f.dev && f.us; }).map(function (f) { return f.h; });
+    if (!hs.length || !A.spaceFree) return;
+    A.spaceFree(hs).then(function (r) {
+      CLEAN.msg = r.n ? L('حُرِّر ', 'Freed ') + fmtSize(r.bytes) + ' · ' + L('عددُها ' + r.n, r.n + ' items') : L('لم يُحذف شيء.', 'Nothing was removed.');
+    }, function () { CLEAN.msg = L('تعذّر التحرير — لم يُحذف شيء.', 'Could not free — nothing was removed.'); })
+      .then(function () { FSEL = {}; SPACE = null; render(); });
+  }
+  function fErase(list) {
+    var ids = [], seen = {};
+    list.forEach(function (f) { if (f.kind === 'pdf' && !seen[f.note]) { seen[f.note] = 1; ids.push(f.note); } });
+    if (ids.length && A.spaceErase) A.spaceErase(ids, list.length === 1 ? list[0].name : '');
+  }
+  function fileMenu(x, y, h) {
+    if (!FSEL[h]) { FSEL = {}; FSEL[h] = 1; FANCH = h; fPaint(); }
+    var ps = fPicked(), n = ps.length, pl = n > 1 ? ' (' + n + ')' : '';
+    var canFree = ps.filter(function (f) { return f.dev && f.us; }).length;
+    var canErase = ps.filter(function (f) { return f.kind === 'pdf'; }).length;
+    var html = '';
+    if (n === 1) html += A.menuItem('fopen', 'fa-up-right-from-square', L('افتحْ ملاحظتَه', 'Open its note'));
+    html += A.menuItem('ffree', 'fa-cloud-arrow-down', L('حرِّرْ من هذا الجهاز', 'Free from this device') + (canFree > 1 ? ' (' + canFree + ')' : ''), 0, !canFree);
+    html += A.menuItem('ferase', 'fa-trash', L('احذفْ من كلِّ مكان…', 'Delete everywhere…') + (canErase > 1 ? ' (' + canErase + ')' : ''), 1, !canErase);
+    if (n > 1) html += A.menuItem('funpick', 'fa-xmark', L('ألغِ التحديد', 'Clear selection') + pl);
+    A.menu(x, y, html, function (act) {
+      if (act === 'fopen' && ps[0] && A.openId) A.openId(ps[0].note);
+      else if (act === 'ffree') fFree(ps);
+      else if (act === 'ferase') fErase(ps);
+      else if (act === 'funpick') fClear();
+    });
+  }
+
   /*@3.NOEJ3.9*/
-  var SPACE = null;
+  var SPACE = null, SPACE_AT = 0, SPACE_ASK = 0;
   /*@3.NOEJ3.10*/
   var CLEAN = { msg: '' };
   function cleanHtml(s) {
@@ -375,6 +456,11 @@
         (can ? '<button type="button" class="gsf-btn gsf-btn--sm" data-x="clean" data-k="' + k + '" data-ar="' + esc(btnAr) + '" data-en="' + esc(btnEn) + '">' + esc(L(btnAr, btnEn)) + '</button>' : '') +
         '</div>';
     };
+    /*@3.NOEJ3.12*/
+    var fr = s.free || { n: 0, bytes: 0 };
+    if (fr.n) h += row('free', 'fa-cloud-arrow-down', 'ملفّاتٌ لها نسخةٌ عندنا', 'Files that have a copy with us',
+      L('عددُها ' + fr.n + ' · تُحذف من هذا الجهاز وحدَه، وتعود من نسختك عندنا حين تفتحها', fr.n + ' items · removed from this device only, and fetched back from your copy with us when you open them'),
+      fr.bytes, true, 'حرِّرْها من الجهاز', 'Free them');
     if (pg.n) h += row('pages', 'fa-globe', 'صفحاتُ الموقع المحفوظة', 'Saved site pages',
       L('عددُها ' + pg.n + ' · حُفظت لتفتحها بلا اتّصال، وتُجلب من جديد حين تزورها', pg.n + ' items kept for offline use · fetched again when you visit'),
       pg.bytes, true, 'فرِّغْها', 'Clear them');
@@ -421,15 +507,41 @@
     h += '</div>';
     h += '</section>' + cleanHtml(s) + '<section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
     if (!s.files.length) h += '<p class="nx-hint">' + esc(L('لا ملفّاتِ PDF ولا تسجيلات بعد.', 'No PDFs or recordings yet.')) + '</p>';
-    s.files.forEach(function (f) {
+    /*@3.NOEJ3.13*/
+    var cnt = {};
+    FILTS.forEach(function (fl) { cnt[fl.k] = s.files.filter(fl.f).length; });
+    if (!cnt[FF] && FF !== 'all') FF = 'all';
+    var shown = s.files.filter(filtOf(FF));
+    FROWS = shown;
+    var keepF = {};
+    shown.forEach(function (f) { if (FSEL[f.h]) keepF[f.h] = 1; });
+    FSEL = keepF;
+    if (s.files.length) {
+      h += '<div class="nx-sp-f" role="group" aria-label="' + esc(L('تصفية الملفّات', 'Filter files')) + '">';
+      FILTS.forEach(function (fl) {
+        if (fl.k !== 'all' && !cnt[fl.k]) return;
+        h += '<button type="button" class="nx-fchip" data-x="ffilt" data-k="' + fl.k + '" aria-pressed="' + (FF === fl.k) + '">' +
+          esc(L(fl.ar, fl.en)) + ' ' + lat(String(cnt[fl.k])) + '</button>';
+      });
+      h += '<button type="button" class="nx-fchip nx-fchip--all" data-x="fall">' + esc(L('حدِّدِ الكلّ', 'Select all')) + '</button></div>';
+      h += '<div class="nx-frows" role="listbox" aria-multiselectable="true" aria-label="' + esc(L('ملفّاتي', 'My files')) + '">';
+    }
+    shown.forEach(function (f) {
       var chip = function (on, ar, en) { return '<span class="nx-chip"' + (on ? ' data-on="1"' : '') + '>' + esc(L(ar, en)) + '</span>'; };
-      h += '<button type="button" class="nx-frow" data-x="opennote" data-id="' + esc(f.note) + '">' +
+      var none = !f.dev && !f.us && !f.gd;
+      var on = !!FSEL[f.h];
+      h += '<div class="nx-frow" role="option" tabindex="0" aria-selected="' + on + '" data-x="frow" data-fk="' + esc(f.h) + '" data-id="' + esc(f.note) + '">' +
+        '<span class="nx-ck" data-x="fpick" role="checkbox" aria-checked="' + on + '" aria-label="' + esc(L('حدِّد', 'Select')) + '"><i class="fa-solid fa-check" aria-hidden="true"></i></span>' +
         '<i class="fa-solid ' + (f.kind === 'pdf' ? 'fa-file-lines' : 'fa-microphone') + '" aria-hidden="true"></i>' +
         '<span class="nx-fr-n"><b dir="auto">' + esc(f.name) + '</b><small dir="auto">' + esc(f.nt) + '</small></span>' +
         '<span class="nx-fr-s">' + lat(fmtSize(f.bytes)) + '</span>' +
-        '<span class="nx-chips">' + chip(f.dev, 'الجهاز', 'Device') + chip(f.us, 'عندنا', 'Our copy') + chip(f.gd, 'درايف', 'Drive') + '</span></button>';
+        '<span class="nx-chips">' + chip(f.dev, 'الجهاز', 'Device') + chip(f.us, 'عندنا', 'Our copy') + chip(f.gd, 'درايف', 'Drive') +
+          (f.other ? '<span class="nx-chip" data-on="1" data-k="other" dir="auto">' + esc(f.other) + '</span>'
+            : (none ? '<span class="nx-chip" data-k="none">' + esc(L('لا نسخةَ نراها', 'No copy we can see')) + '</span>' : '')) +
+        '</span></div>';
     });
-    return h + '</section></div>';
+    if (s.files.length) h += '</div>';
+    return h + '</section></div>' + fselHtml();
   }
 
   function render() {
@@ -439,7 +551,13 @@
       host.innerHTML = barHtml(false).replace(/<div class="nx-tools">[\s\S]*$/, '</div>') +
         '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' + spaceHtml(SPACE) + '</div></div>';
       A.i18n(host);
-      if (!SPACE && A.spaceInfo) A.spaceInfo().then(function (s) { SPACE = s; if (A.view().k === 'space') render(); SPACE = null; });
+      /*@3.NOEJ3.15*/
+      if (SPACE && Date.now() - SPACE_AT > 15000) SPACE = null;
+      if (!SPACE && !SPACE_ASK && A.spaceInfo) {
+        SPACE_ASK = 1;
+        A.spaceInfo().then(function (s) { SPACE_ASK = 0; SPACE = s; SPACE_AT = Date.now(); if (A.view().k === 'space') render(); },
+                           function () { SPACE_ASK = 0; });
+      }
       return;
     }
     var trash = A.view().k === 'trash';
@@ -616,6 +734,19 @@
       case 'nfolder-root': if (A.view().k !== 'home') A.setView({ k: 'home' }); A.newFolder(); return;
       case 'back': if (A.back) A.back(); return;
       case 'opennote': if (A.openId) A.openId(x.getAttribute('data-id')); return;
+      case 'fpick': var fk0 = x.closest('[data-fk]'); if (fk0) fToggle(fk0.getAttribute('data-fk')); return;
+      case 'frow':
+        var fk = x.getAttribute('data-fk');
+        if (e.shiftKey && FANCH) { e.preventDefault(); fRange(fk); return; }
+        if (e.ctrlKey || e.metaKey || Object.keys(FSEL).length) { e.preventDefault(); fToggle(fk); return; }
+        FANCH = fk;
+        if (A.openId) A.openId(x.getAttribute('data-id'));
+        return;
+      case 'ffilt': FF = x.getAttribute('data-k') || 'all'; FSEL = {}; render(); return;
+      case 'fall': fAll(); return;
+      case 'funpick': fClear(); return;
+      case 'ffree': fFree(fPicked()); return;
+      case 'ferase': fErase(fPicked()); return;
       case 'clean': if (A.spaceClean) cleanGo(x); return;
       case 'import': pickFiles(); return;
       case 'empty': A.emptyTrash(); return;
@@ -646,10 +777,27 @@
   function onKey(e) {
     var it = e.target.closest && e.target.closest('.nx-it');
     var ids = pickedList();
+    if (A.view().k === 'space') {
+      var fr = e.target.closest && e.target.closest('.nx-frow[data-fk]');
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A')) { e.preventDefault(); fAll(); return; }
+      if (e.key === 'Escape' && Object.keys(FSEL).length) { e.preventDefault(); e.stopPropagation(); fClear(); return; }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && Object.keys(FSEL).length) { e.preventDefault(); fErase(fPicked()); return; }
+      if (fr && e.key === 'Enter') { e.preventDefault(); if (A.openId) A.openId(fr.getAttribute('data-id')); return; }
+      if (fr && e.key === ' ') { e.preventDefault(); fToggle(fr.getAttribute('data-fk')); return; }
+      if (fr && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        var nx = e.key === 'ArrowDown' ? fr.nextElementSibling : fr.previousElementSibling;
+        if (nx && nx.matches('.nx-frow')) { e.preventDefault(); nx.focus(); }
+        return;
+      }
+      if (e.key !== 'Escape') return;
+    }
     if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A')) {
       e.preventDefault(); selectAll(); return;
     }
     if (e.key === 'Escape' && ids.length) { e.preventDefault(); e.stopPropagation(); clear(); return; }
+    /*@3.NOEJ3.11*/
+    if (e.key === 'Escape' && !e.defaultPrevented && A.back && A.last && A.last() &&
+        !(window.GardenMenu && GardenMenu.isOpen && GardenMenu.isOpen())) { e.preventDefault(); A.back(); return; }
     if ((e.key === 'Delete' || e.key === 'Backspace') && ids.length) {
       e.preventDefault();
       if (A.view().k === 'trash') A.purge(ids); else A.trash(ids);
@@ -723,6 +871,8 @@
   }
 
   function onCtx(e) {
+    var frc = e.target.closest('.nx-frow[data-fk]');
+    if (frc) { e.preventDefault(); fileMenu(e.clientX, e.clientY, frc.getAttribute('data-fk')); return; }
     var it = e.target.closest('.nx-it');
     var fo = !it && e.target.closest('.nx-fold[data-id]');
     if (fo && A.folderCtx) { e.preventDefault(); A.folderCtx(e.clientX, e.clientY, fo.getAttribute('data-id')); return; }
@@ -772,6 +922,15 @@
       if (!di || di.getAttribute('data-ro') || e.target.closest('[data-x]')) return;
       var du = di.getAttribute('data-uid');
       D = { uid: du, it: di, x: e.clientX, y: e.clientY, pid: e.pointerId, on: false, to: null };
+      return;
+    }
+    var frp = e.target.closest('.nx-frow[data-fk]');
+    if (frp) {
+      press = { x: e.clientX, y: e.clientY, t: setTimeout(function () {
+        press = null; ate = 1;
+        fToggle(frp.getAttribute('data-fk'));
+        try { navigator.vibrate && navigator.vibrate(12); } catch (e4) {}
+      }, PRESS_MS) };
       return;
     }
     var it = e.target.closest('.nx-it');
@@ -843,6 +1002,7 @@
   window.GardenNotesExplorer = {
     mount: mount,
     paint: paint,
+    spaceStale: function () { SPACE = null; paint(); },
     active: function () { return !!(host && host.isConnected); },
     selectAll: function () { if (host && host.isConnected) selectAll(); }
   };

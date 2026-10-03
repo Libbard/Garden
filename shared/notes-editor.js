@@ -10932,6 +10932,12 @@
       if (e.key === 'Escape') {
         if (self.menu && !e.defaultPrevented) { e.preventDefault(); self.closeMenu(); return; }
         if (self.root.querySelector('.ne-img-edit:not([hidden])')) self.closeImgPanels(null);
+        /*@3.NOEJ.610*/
+        if (!e.defaultPrevented && self._selMode) { e.preventDefault(); self.setSelectMode(false, 1); return; }
+        if (!e.defaultPrevented && self.selectedBlocks().length) {
+          var aeE = document.activeElement;
+          if (!(aeE && aeE !== document.body && aeE.isContentEditable)) { e.preventDefault(); self.clearBlockSel(); }
+        }
         return;
       }
       if (e.key !== 'Delete' && e.key !== 'Backspace') return;
@@ -10939,6 +10945,7 @@
       var ae = document.activeElement;
       if (ae && ae !== document.body && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return;
       if (ae && ae !== document.body && !self.root.contains(ae)) return;
+      if (self.selectedBlocks().length) { e.preventDefault(); self.closeImgPanels(null); self.deleteBlocks(); return; }
       if (!self._actId) return;
       var nd = self.root.querySelector(':scope > [data-bid="' + self._actId + '"][data-ty="img"][data-act="1"]');
       if (!nd || !nd.getClientRects().length) return;

@@ -3076,6 +3076,10 @@
     }
     if (this._fpage !== p) return;
     this._fpage = null;
+    /*@3.NOPJ8.187*/
+    if (p.fed && (p.fed._selMode || (p.fed.selectedBlocks && p.fed.selectedBlocks().length))) {
+      try { p.fed.setSelectMode(false, 1); } catch (eS) {}
+    }
     if (this.grab) this.grab.style.pointerEvents = '';
     if (wrap) wrap.removeAttribute('data-fedit');
     this.fieldWatch(false);
