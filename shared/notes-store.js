@@ -407,11 +407,20 @@
   /*@3.NOSJ.9*/
   /*@3.NOSJ.11*/
   function imageUrlNow(id) { return URLS[id] || ''; }
+  /*@3.NOSJ.21*/
+  var GUEST = null;
+  function setGuest(fn) { GUEST = typeof fn === 'function' ? fn : null; }
+  function farImage(id) {
+    if (!GUEST) return pullImage(id);
+    return Promise.resolve(GUEST(id)).then(function (b) {
+      return b && b.size ? { id: id, blob: b, type: b.type, bytes: b.size, far: 1 } : null;
+    })['catch'](function () { return null; });
+  }
   function imageUrl(id) {
     if (URLS[id]) return Promise.resolve(URLS[id]);
     return getImage(id).then(function (row) {
       if (row && row.blob) { if (!row.up) sendSoon(id); return row; }
-      return pullImage(String(id));
+      return farImage(String(id));
     }).then(function (row) {
       if (!row || !row.blob) return '';
       if (URLS[id]) return URLS[id];
@@ -460,7 +469,7 @@
     byteLen: byteLen,
     putImage: putImage,
     getImage: function (id) {
-      return getImage(id).then(function (r) { return (r && r.blob) ? r : pullImage(String(id)); });
+      return getImage(id).then(function (r) { return (r && r.blob) ? r : farImage(String(id)); });
     },
     delImage: delImage,
     imageUrl: imageUrl,
@@ -471,6 +480,8 @@
     shrinkImage: shrink,
     ensureImageUp: ensureUp,
     pullImage: pullImage,
+    setGuest: setGuest,
+    hasImage: function (id) { return getImage(id).then(function (r) { return !!(r && r.blob); }); },
     LIMITS: {
       doc: MAX_DOC_BYTES,
       docWarn: WARN_DOC_BYTES,

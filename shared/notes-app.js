@@ -981,9 +981,27 @@
   /*@3.NOAJ.74*/
   var guestShare = null;
 
+  /*@3.NOAJ.450*/
+  var guestImgs = null;
+  function guestImg(id) {
+    var Sy = window.GardenNotesSync;
+    if (!guestShare || !Sy || !Sy.shareImages) return Promise.resolve(null);
+    var now = Date.now();
+    if (!guestImgs || now - guestImgs.at > 240000) guestImgs = { at: now, p: Sy.shareImages(guestShare.sid) };
+    var mine = guestImgs;
+    return mine.p.then(function (r) {
+      if (!r || !r.ok) { if (guestImgs === mine) guestImgs = null; return null; }
+      var u = r.imgs && r.imgs[id];
+      if (!u) return null;
+      return fetch(u).then(function (res) { return res.ok ? res.blob() : null; });
+    })['catch'](function () { return null; });
+  }
+
   function openShared(sid) {
     var Sy = window.GardenNotesSync;
     if (!Sy || !Sy.shareRead || !els.docBody) return;
+    var St0 = window.GardenNotesStore;
+    if (St0 && St0.setGuest) St0.setGuest(guestImg);
     document.documentElement.classList.add('na-guest');
     setPanel(false);
     setDocActions(false);
@@ -1125,6 +1143,20 @@
     var keep = (isPdf && guestShare.file && window.GardenPdfDoc)
       ? GardenPdfDoc.put(guestShare.doc.pdf.h, guestShare.file, { name: guestShare.file.name || '' })['catch'](function () {})
       : Promise.resolve();
+    /*@3.NOAJ.451*/
+    var ids = {}, m, re = /byte-local:([0-9a-f]{24})/g, raw = '';
+    try { raw = JSON.stringify(guestShare.doc); } catch (e0) {}
+    while ((m = re.exec(raw))) ids[m[1]] = 1;
+    var imgs = Object.keys(ids).map(function (k) {
+      if (!St || !St.putImageRow || !St.hasImage) return null;
+      return St.hasImage(k).then(function (have) {
+        if (have) return null;
+        return guestImg(k).then(function (b) {
+          return b && b.size ? St.putImageRow({ id: k, blob: b, type: b.type }) : null;
+        });
+      })['catch'](function () { return null; });
+    });
+    keep = Promise.all([keep].concat(imgs));
     if (St) keep.then(function () { return putBorn(id, guestShare.doc, now); }).then(go, go); else go();
   }
 

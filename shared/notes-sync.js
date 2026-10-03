@@ -397,6 +397,15 @@
       }, function () { return { ok: false, why: 'offline' }; });
   }
 
+  function shareImages(sid) {
+    if (!endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
+    return req('GET', endpoint() + '/v1/nshare/' + encodeURIComponent(sid) + '/imgs')
+      .then(function (r) {
+        if (!r.ok || !r.body || typeof r.body.imgs !== 'object') return { ok: false, status: r.status };
+        return { ok: true, imgs: r.body.imgs || {} };
+      }, function () { return { ok: false, why: 'offline' }; });
+  }
+
   function shareRead(sid) {
     if (!endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
     return req('GET', endpoint() + '/v1/nshare/' + encodeURIComponent(sid))
@@ -416,6 +425,7 @@
     shareDrop: shareDrop,
     shareRead: shareRead,
     shareFile: shareFile,
+    shareImages: shareImages,
     pull: pull,
     remove: remove,
     schedule: schedule,

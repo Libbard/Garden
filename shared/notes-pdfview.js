@@ -873,6 +873,7 @@
       var eoc = document.createElement('div');
       eoc.className = 'endOfContent';
       td.appendChild(eoc);
+      self.ocrInto(n, td);
       s.td = td;
       s.el.insertBefore(td, s.lay || null);
       s.tbusy = 0;
@@ -880,6 +881,85 @@
       /*@3.NOPJ3.33*/
       self.onSel();
     }).catch(function () { if (self.slots[n]) self.slots[n].tbusy = 0; });
+  };
+
+  View.prototype.setOcr = function (p) {
+    this.ocr = p && typeof p === 'object' ? p : null;
+    for (var k in this.slots) {
+      var s = this.slots[k];
+      if (s && s.td) this.ocrInto(+k, s.td);
+    }
+    this.onSel();
+  };
+
+  var _ocrPen = null, _ocrFit = {};
+  /*@3.NOPJ3.78*/
+  function ocrFit(rtl) {
+    var k = rtl ? 'r' : 'l';
+    if (_ocrFit[k]) return _ocrFit[k];
+    var fit = { k: 1, up: 0 };
+    try {
+      var sp = document.createElement('span');
+      sp.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:pre;line-height:1;' +
+        'font-size:100px;font-family:sans-serif;visibility:hidden';
+      sp.textContent = rtl ? 'مرحبا' : 'Hxgy';
+      document.body.appendChild(sp);
+      var rg = document.createRange();
+      rg.selectNodeContents(sp);
+      var a = rg.getClientRects()[0], b = sp.getBoundingClientRect();
+      sp.remove();
+      if (a && a.height > 20 && b.height > 20) fit = { k: a.height / 100, up: (b.top - a.top) / 100 };
+    } catch (e) {}
+    _ocrFit[k] = fit;
+    return fit;
+  }
+
+  View.prototype.ocrInto = function (n, td) {
+    var old = td.querySelectorAll('span.gpv-ocr');
+    for (var o = 0; o < old.length; o++) old[o].remove();
+    var L = this.ocr && this.ocr[n];
+    var W = this.pw[n] || this.defW, H = this.ph[n] || this.defH;
+    if (!L || !L.length || !(W > 0) || !(H > 0)) return 0;
+    if (!_ocrPen) { try { _ocrPen = document.createElement('canvas').getContext('2d'); } catch (e) { _ocrPen = null; } }
+    var frag = document.createDocumentFragment(), put = 0;
+    var T = window.GardenPdfText;
+    function one(t, x, y, ww, h, rtl) {
+      var fit = ocrFit(rtl), fs = h / fit.k;
+      var sp = document.createElement('span');
+      sp.className = 'gpv-ocr';
+      sp.textContent = t;
+      sp.style.left = (100 * x / W).toFixed(3) + '%';
+      sp.style.top = (100 * (y + fit.up * fs) / H).toFixed(3) + '%';
+      sp.style.fontSize = 'calc(var(--scale-factor)*' + fs.toFixed(2) + 'px)';
+      sp.style.fontFamily = 'sans-serif';
+      if (_ocrPen) {
+        _ocrPen.font = fs.toFixed(2) + 'px sans-serif';
+        var mw = _ocrPen.measureText(t).width;
+        if (mw > 0) sp.style.transform = 'scaleX(' + (ww / mw).toFixed(4) + ')';
+      }
+      frag.appendChild(sp);
+    }
+    for (var i = 0; i < L.length; i++) {
+      var line = L[i] || [], words = line[5] || [];
+      var lh = +line[3], ly = +line[1], prev = null;
+      for (var j = 0; j < words.length; j++) {
+        var w = words[j] || [], t = String(w[4] == null ? '' : w[4]);
+        var x = +w[0], ww = +w[2];
+        var h = lh > 0 ? lh : +w[3], y = lh > 0 ? ly : +w[1];
+        if (!t.trim() || !(ww > 0) || !(h > 0) || !isFinite(x) || !isFinite(y)) continue;
+        /*@3.NOPJ3.77*/
+        var rtl = !!(T && T.isRtl(t));
+        if (prev) {
+          var lo = Math.min(prev.x + prev.w, x + ww), hi = Math.max(prev.x, x);
+          one(' ', Math.min(lo, hi), y, Math.max(0.5, Math.abs(hi - lo)), h, rtl);
+        }
+        one(t, x, y, ww, h, rtl);
+        prev = { x: x, w: ww };
+        put++;
+      }
+    }
+    td.insertBefore(frag, td.querySelector('.endOfContent'));
+    return put;
   };
 
   View.prototype.untext = function (n) {

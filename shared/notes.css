@@ -1200,6 +1200,38 @@ h1.ne-text, h2.ne-text, h3.ne-text, h4.ne-text { font-family: inherit; }
   background: color-mix(in oklab, #10b981 12%, transparent);
 }
 .ne-fig .ne-img-view { cursor: zoom-in; }
+/*@3.NOTC2.183*/
+.ne-img-view { position: relative; }
+.ne-img-grips { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.ne-img-grip {
+  position: absolute; inset-block-end: -.5rem;
+  inline-size: 1rem; block-size: 1rem; border-radius: 50%;
+  background: var(--bg-elevated); border: 2px solid #10b981;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, .5);
+  cursor: ew-resize; touch-action: none;
+  opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease;
+}
+.ne-img-grip[data-grip="s"] { inset-inline-start: -.5rem; }
+.ne-img-grip[data-grip="e"] { inset-inline-end: -.5rem; }
+.ne-img-grip::after {
+  content: ""; position: absolute; inset: -.55rem; border-radius: 50%;
+}
+.ne-imgx:hover .ne-img-grip,
+.ne-imgx:focus-within .ne-img-grip,
+.ne-imgx:has(> .ne-img-edit:not([hidden])) .ne-img-grip,
+.ne-fig--sizing .ne-img-grip { opacity: 1; pointer-events: auto; }
+.ne-img-grip:hover, .ne-fig--sizing .ne-img-grip { transform: scale(1.15); }
+.ne-fig--sizing { transition: none; }
+.ne-fig--sizing .ne-img-view { outline: 2px dashed color-mix(in oklab, #10b981 60%, transparent); outline-offset: 2px; }
+.ne-img-view:not(:has(> img, > .ne-img-a)) > .ne-img-grips,
+.ne-fig[data-sh="circle"] .ne-img-grips,
+.ne-root[data-ro] .ne-img-grips { display: none; }
+@media (hover: none) {
+  .ne-imgx:hover .ne-img-grip, .ne-imgx:focus-within .ne-img-grip { opacity: 0; pointer-events: none; }
+  .ne-imgx:has(> .ne-img-edit:not([hidden])) .ne-img-grip { opacity: 1; pointer-events: auto; }
+  .ne-img-grip { inline-size: 1.3rem; block-size: 1.3rem; inset-block-end: -.65rem; }
+}
+@media print { .ne-img-grips { display: none !important; } }
 .ne-cap {
   font-size: .78rem; color: var(--text-secondary); text-align: center;
   margin-block-start: .4rem; line-height: 1.6;
@@ -2076,7 +2108,9 @@ html.nc-locked, html.nc-locked body { overflow: hidden; }
 .ne-b[data-al="justify"] .ne-text,
 .ne-b[data-al="justify"] .ne-li { text-align: justify; }
 .ne-b[data-al="center"] > .ne-body > .ne-tbl,
-.ne-b[data-al="center"] > .ne-body > .ne-img-view { margin-inline: auto; }
+.ne-b[data-al="center"] > .ne-body > .ne-img-view,
+.ne-b[data-al="center"] > .ne-body > .ne-imgx > .ne-fig > .ne-img-view { margin-inline: auto; }
+.ne-b[data-al="end"] > .ne-body > .ne-imgx > .ne-fig > .ne-img-view { margin-inline-start: auto; }
 
 .ne-b[data-ff] .ne-text,
 .ne-b[data-ff] .ne-li,

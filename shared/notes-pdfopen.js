@@ -865,6 +865,7 @@
       var C = window.GardenPdfCloud, fh = sp && sp.h, fd = st.find;
       if (C && C.ocr && fh) C.ocr(fh).then(function (r) {
         if (r && st.find === fd && !st.dead) fd.setOcr(r.data || null, r.state);
+        if (r && r.data && r.data.p && st.view && st.view.setOcr && !st.dead) st.view.setOcr(r.data.p);
       });
     }
 

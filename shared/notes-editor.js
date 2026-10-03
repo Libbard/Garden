@@ -2300,9 +2300,67 @@
     cardSrc.appendChild(hint);
 
     applyImgStyle(fig, b);
+    /*@3.NOEJ.597*/
+    if (!this.readOnly) {
+      var grips = el('div', 'ne-img-grips', { contenteditable: 'false', 'aria-hidden': 'true' });
+      grips.appendChild(el('span', 'ne-img-grip', { 'data-grip': 's' }));
+      grips.appendChild(el('span', 'ne-img-grip', { 'data-grip': 'e' }));
+      view.appendChild(grips);
+      this.gripWire(grips, fig, b.id);
+    }
     /*@3.NOEJ.249*/
     paintImg(view, b.url, b.alt, b.lk, b);
     return box;
+  };
+
+  Editor.prototype.gripWire = function (gr, fig, id) {
+    var self = this, D = null;
+    gr.addEventListener('pointerdown', function (e) {
+      if (!e.target.closest('.ne-img-grip') || e.button > 0 || self.readOnly) return;
+      var hit = self.blockAt(id);
+      if (!hit) return;
+      e.preventDefault(); e.stopPropagation();
+      var r = gr.parentNode.getBoundingClientRect();
+      var col = fig.parentNode.getBoundingClientRect();
+      var blk = fig.closest('.ne-b'), al = (blk && blk.getAttribute('data-al')) || '';
+      var rtl = getComputedStyle(fig).direction === 'rtl';
+      var right = (al === 'end') !== rtl;
+      D = { id: e.pointerId, ax: al === 'center' ? (r.left + r.right) / 2 : (right ? r.right : r.left),
+            k: al === 'center' ? 2 : 1, W: col.width || 1,
+            iw: hit.b.iw == null ? 100 : hit.b.iw, before: self.snapshot() };
+      D.iw0 = D.iw;
+      try { gr.setPointerCapture(e.pointerId); } catch (e2) {}
+      fig.classList.add('ne-fig--sizing');
+    });
+    gr.addEventListener('pointermove', function (e) {
+      if (!D || e.pointerId !== D.id) return;
+      var w = Math.abs(e.clientX - D.ax) * D.k;
+      D.iw = Math.max(10, Math.min(100, Math.round(w / D.W * 100)));
+      fig.style.inlineSize = D.iw + '%';
+    });
+    var end = function (e) {
+      if (!D || e.pointerId !== D.id) return;
+      var d = D; D = null;
+      fig.classList.remove('ne-fig--sizing');
+      var hit = self.blockAt(id);
+      if (!hit) return;
+      if (d.iw === d.iw0) { applyImgStyle(fig, hit.b); return; }
+      hit.b.iw = d.iw;
+      self.pushUndo(d.before);
+      var node = fig.closest('[data-bid]');
+      if (node) {
+        [].forEach.call(node.querySelectorAll('[data-imgq]'), function (x) {
+          x.setAttribute('aria-pressed', Number(x.getAttribute('data-imgq')) === d.iw ? 'true' : 'false');
+        });
+        var sl = node.querySelector('[data-imgk="iw"]');
+        if (sl) sl.value = String(d.iw);
+      }
+      applyImgStyle(fig, hit.b);
+      self.touch();
+    };
+    gr.addEventListener('pointerup', end);
+    gr.addEventListener('pointercancel', end);
+    gr.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); });
   };
 
   /*@3.NOEJ.23*/
@@ -2405,10 +2463,16 @@
   }
 
   /*@3.NOEJ.356*/
+  function wipeView(host) {
+    var g = host.querySelector(':scope > .ne-img-grips');
+    host.innerHTML = '';
+    if (g) host.appendChild(g);
+  }
+
   function paintLocal(host, ref, alt, lk) {
     var S = window.GardenNotesStore;
     var id = String(ref).slice(11);
-    host.innerHTML = '';
+    wipeView(host);
     if (!S || !S.imageUrl) return;
     /*@3.NOEJ.492*/
     var uNow = S.imageUrlNow ? S.imageUrlNow(id) : '';
@@ -2428,8 +2492,9 @@
         return;
       }
       var img = el('img', 'ne-img', { src: u, alt: alt || '', loading: 'lazy' });
-      var ed = host.closest ? host.closest('.ne-root') : null;
       img.addEventListener('load', function () {
+        /*@3.NOEJ.598*/
+        var ed = host.closest ? host.closest('.ne-root') : null;
         /*@3.NOEJ.480*/
         imgDims(host, img, ed);
         if (ed && ed.__ed && ed.__ed.settled) ed.__ed.settled();
@@ -2468,7 +2533,7 @@
   }
 
   function paintImg(host, url, alt, lk, blk) {
-    host.innerHTML = '';
+    wipeView(host);
     if (blk && !(blk.iar > 0 && blk.inw > 0)) {
       var dd = B().dataDims(url);
       if (dd) { blk.iar = Math.round((dd.w / dd.h) * 1000) / 1000; blk.inw = dd.w; }
@@ -2527,7 +2592,18 @@
       if (edE && edE.__ed && edE.__ed.settled) edE.__ed.settled();
       host.innerHTML = '';
       var bad = el('div', 'ne-img-bad');
-      bad.textContent = L('تعذّر تحميل الصورة من هذا الرابط.', 'Could not load the image from this link.');
+      /*@3.NOEJ.596*/
+      if (hostOf(u) === 'lh3.googleusercontent.com') {
+        bad.textContent = L('هذه الصورةُ في درايف ولم تُفتح مشاركتُها — اجعلْها «أيُّ شخصٍ معه الرابط» في درايف، ثمّ حاولْ ثانيةً.',
+                            'This Drive image is not shared — set it to "Anyone with the link" in Drive, then try again.');
+        var again = el('button', 'gsf-btn gsf-btn--ghost ne-img-again', { type: 'button' });
+        again.textContent = L('حاولْ ثانيةً', 'Try again');
+        again.addEventListener('click', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          paintImg(host, url, alt, lk, blk);
+        });
+        bad.appendChild(again);
+      } else bad.textContent = L('تعذّر تحميل الصورة من هذا الرابط.', 'Could not load the image from this link.');
       host.appendChild(bad);
     });
     if (wrapA) { wrapA.appendChild(img); host.appendChild(wrapA); }
@@ -9378,6 +9454,10 @@
     var pan = node && node.querySelector('.ne-img-edit');
     var fig = node && node.querySelector('.ne-fig');
     if (!pan || !fig) return;
+    /*@3.NOEJ.595*/
+    if (!window.GardenImgEdit && !_ieP && !this.readOnly && navigator.onLine !== false) {
+      setTimeout(function () { needImgEdit()['catch'](function () {}); }, 800);
+    }
     pan.style.top = '';
     pan.style.maxBlockSize = '';
     var fr = fig.getBoundingClientRect();

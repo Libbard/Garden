@@ -63,9 +63,150 @@
     try { return page.getRotation().angle || 0; } catch (e) { return 0; }
   }
 
+  /*@3.NOPJ13.1*/
+  function prep(P, d, k) {
+    var N = P.PDFName.of, ctx = d.context, pages = d.getPages(), at = {}, named = null, i, j;
+    for (i = 0; i < pages.length; i++) at[pages[i].ref.toString()] = i;
+    function key(o) {
+      o = ctx.lookup(o);
+      try { return o && o.decodeText ? o.decodeText() : null; } catch (e) { return null; }
+    }
+    function names() {
+      if (named) return named;
+      named = {};
+      var n = 0;
+      var put = function (a, v) { var s = key(a); if (s != null && !(s in named)) { named[s] = v; n++; } };
+      var walk = function (node, depth) {
+        node = ctx.lookup(node);
+        if (!node || !node.get || depth > 32 || n > 20000) return;
+        var ns = ctx.lookup(node.get(N('Names'))), q;
+        if (ns && ns.size) for (q = 0; q + 1 < ns.size(); q += 2) put(ns.get(q), ns.get(q + 1));
+        var kids = ctx.lookup(node.get(N('Kids')));
+        if (kids && kids.size) for (q = 0; q < kids.size(); q++) walk(kids.get(q), depth + 1);
+      };
+      var nm = ctx.lookup(d.catalog.get(N('Names')));
+      if (nm && nm.get) walk(nm.get(N('Dests')), 0);
+      var old = ctx.lookup(d.catalog.get(N('Dests')));
+      if (old && old.entries) old.entries().forEach(function (e) { put(e[0], e[1]); });
+      return named;
+    }
+    function target(dst, depth) {
+      dst = ctx.lookup(dst);
+      if (!dst || depth > 4) return null;
+      if (dst instanceof P.PDFArray) {
+        if (!dst.size()) return null;
+        var pg = dst.get(0);
+        var ix = pg instanceof P.PDFRef ? at[pg.toString()] : (pg instanceof P.PDFNumber ? pg.asNumber() : null);
+        if (ix == null || !(ix >= 0 && ix < pages.length)) return null;
+        var v = [];
+        for (var q = 1; q < dst.size(); q++) v.push(ctx.lookup(dst.get(q)));
+        return { i: ix, v: v };
+      }
+      if (dst instanceof P.PDFDict) return target(dst.get(N('D')), depth + 1);
+      var s = key(dst);
+      return s != null && names()[s] ? target(names()[s], depth + 1) : null;
+    }
+    function goTo(o) {
+      var dst = o.get(N('Dest'));
+      if (dst) return { t: target(dst, 0), a: 0 };
+      var a = ctx.lookup(o.get(N('A')));
+      if (a && a.get && String(a.get(N('S'))) === '/GoTo') return { t: target(a.get(N('D')), 0), a: 1 };
+      return null;
+    }
+    for (i = 0; i < pages.length; i++) {
+      var an = ctx.lookup(pages[i].node.get(N('Annots')));
+      if (!an || !an.size) continue;
+      for (j = 0; j < an.size(); j++) {
+        var x = ctx.lookup(an.get(j));
+        if (!x || !x.get) continue;
+        x.delete(N('P'));
+        if (String(x.get(N('Subtype'))) !== '/Link') continue;
+        var g = goTo(x);
+        if (!g) continue;
+        x.delete(N('Dest'));
+        if (g.a) x.delete(N('A'));
+        x.set(N('GDoc'), P.PDFNumber.of(k));
+        x.set(N('GTo'), P.PDFNumber.of(g.t ? g.t.i : -1));
+        if (g.t && g.t.v.length) x.set(N('GView'), ctx.obj(g.t.v));
+      }
+    }
+    var seen = 0;
+    function walkOl(first, depth) {
+      var out = [], node = first, been = {};
+      while (node && seen < 5000 && depth < 16) {
+        var id = String(node);
+        if (been[id]) break;
+        been[id] = 1;
+        var o = ctx.lookup(node);
+        if (!o || !o.get) break;
+        seen++;
+        var g = goTo(o), c = ctx.lookup(o.get(N('Count')));
+        out.push({ title: ctx.lookup(o.get(N('Title'))), t: g && g.t,
+                   closed: c instanceof P.PDFNumber && c.asNumber() < 0,
+                   kids: walkOl(o.get(N('First')), depth + 1) });
+        node = o.get(N('Next'));
+      }
+      return out;
+    }
+    var ol = ctx.lookup(d.catalog.get(N('Outlines')));
+    d.__gol = ol && ol.get ? walkOl(ol.get(N('First')), 0) : [];
+    d.__mode = d.catalog.get(N('PageMode')) || null;
+  }
+
+  function relink(P, out, got, pos) {
+    var N = P.PDFName.of, ctx = out.context;
+    var where = function (k, t) {
+      var r = t ? pos[k + ':' + t.i] : null;
+      return r ? ctx.obj([r].concat(t.v)) : null;
+    };
+    out.getPages().forEach(function (pg) {
+      var an = ctx.lookup(pg.node.get(N('Annots')));
+      if (!an || !an.size) return;
+      for (var j = an.size() - 1; j >= 0; j--) {
+        var a = ctx.lookup(an.get(j));
+        if (!a || !a.get || !a.get(N('GTo'))) continue;
+        var k = a.get(N('GDoc')).asNumber(), t = a.get(N('GTo')).asNumber();
+        var view = ctx.lookup(a.get(N('GView')));
+        a.delete(N('GDoc')); a.delete(N('GTo')); a.delete(N('GView'));
+        var r = t >= 0 ? pos[k + ':' + t] : null;
+        if (!r) { an.remove(j); continue; }
+        a.set(N('Dest'), ctx.obj([r].concat(view && view.asArray ? view.asArray() : [])));
+      }
+    });
+    function fix(n, k) {
+      var kids = [];
+      n.kids.forEach(function (c) { var x = fix(c, k); if (x) kids.push(x); });
+      var dest = where(k, n.t) || (kids.length ? kids[0].dest : null);
+      return dest ? { title: n.title, dest: dest, kids: kids, closed: n.closed } : null;
+    }
+    var tree = [];
+    got.forEach(function (d, k) {
+      if (d && d.__gol) d.__gol.forEach(function (n) { var x = fix(n, k); if (x) tree.push(x); });
+    });
+    if (!tree.length) return;
+    var root = ctx.nextRef();
+    function write(list, parent) {
+      var refs = list.map(function () { return ctx.nextRef(); }), total = 0;
+      list.forEach(function (n, i) {
+        var sub = n.kids.length ? write(n.kids, refs[i]) : null;
+        var o = { Title: n.title || P.PDFHexString.fromText(''), Parent: parent, Dest: n.dest };
+        if (i > 0) o.Prev = refs[i - 1];
+        if (i < list.length - 1) o.Next = refs[i + 1];
+        if (sub) { o.First = sub.first; o.Last = sub.last; o.Count = n.closed ? -sub.count : sub.count; }
+        ctx.assign(refs[i], ctx.obj(o));
+        total += 1 + (sub && !n.closed ? sub.count : 0);
+      });
+      return { first: refs[0], last: refs[refs.length - 1], count: total };
+    }
+    var top = write(tree, root);
+    ctx.assign(root, ctx.obj({ Type: 'Outlines', First: top.first, Last: top.last, Count: top.count }));
+    out.catalog.set(N('Outlines'), root);
+    if (got[0] && got[0].__mode) out.catalog.set(N('PageMode'), got[0].__mode);
+  }
+
   function build(srcs, items) {
     return lib().then(function (P) {
-      var docs = [];
+      var docs = [], got = [], pos = {};
       var load = function (k) {
         if (docs[k]) return docs[k];
         docs[k] = Promise.resolve(srcs[k]).then(function (b) {
@@ -74,6 +215,8 @@
           return P.PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
         }).then(function (d) {
           if (d.isEncrypted) { var e = new Error('encrypted'); e.code = 'encrypted'; throw e; }
+          try { prep(P, d, k); } catch (e2) { d.__gol = null; }
+          got[k] = d;
           return d;
         });
         return docs[k];
@@ -105,6 +248,7 @@
               }
               used[key] = 1;
               out.addPage(pg); turn(pg, it.r);
+              pos[key] = pg.ref;
             });
           }, Promise.resolve());
           function turn(pg, r) {
@@ -112,7 +256,10 @@
             var a = (((rotOf(pg) + r) % 360) + 360) % 360;
             pg.setRotation(P.degrees(a));
           }
-        }).then(function () { return out.save({ useObjectStreams: true }); });
+        }).then(function () {
+          try { relink(P, out, got, pos); } catch (e) {}
+          return out.save({ useObjectStreams: true });
+        });
       });
     });
   }
