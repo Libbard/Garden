@@ -156,15 +156,15 @@
   function initTry() {
     const run = document.getElementById('try-ai-run');
     const out = document.getElementById('try-ai-output');
-    const cached = 'https://ai.libbard.cc/ai/p2/CS231/ar/auto/56ffbd1396d19b00/1.json';
+    const sample = 'https://ai.libbard.cc/ai/p2/CS231/ar/auto/56ffbd1396d19b00/1.json';
     run.addEventListener('click', async () => {
       run.disabled = true;
-      out.replaceChildren(make('p', 'ai-hint', T('أفتح الشرحَ المحفوظ…', 'Opening the saved explanation…')));
+      out.replaceChildren(make('p', 'ai-hint', T('يصل الشرح…', 'Loading the explanation…')));
       const ctl = new AbortController();
       const timer = setTimeout(() => ctl.abort(), 9000);
       try {
-        const r = await fetch(cached, { mode: 'cors', credentials: 'omit', signal: ctl.signal });
-        if (!r.ok) throw new Error('cache');
+        const r = await fetch(sample, { mode: 'cors', credentials: 'omit', signal: ctl.signal });
+        if (!r.ok) throw new Error('status');
         const j = await r.json();
         if (typeof j.text !== 'string' || j.text.trim().length < 80) throw new Error('empty');
         out.replaceChildren(...j.text.trim().split(/\n\s*\n/).map(p => make('p', '', p.replace(/\*\*/g, '').trim())));
