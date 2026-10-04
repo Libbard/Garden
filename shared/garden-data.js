@@ -1994,9 +1994,9 @@
       title: String(task.title || '').trim(),
       type: task.type || 'other',
       due: task.due || '',
-      done: !!task.done,
+      done: task.done === undefined && i > -1 ? !!list[i].done : !!task.done,
       note: task.note || '',
-      created_at: task.created_at || Date.now()
+      created_at: task.created_at || (i > -1 && list[i].created_at) || Date.now()
     });
     if (i > -1) list[i] = rec; else list.push(rec);
     writeTasks(list);
@@ -2223,7 +2223,7 @@
       courseMeta(code).dates.forEach(function (d) {
         if (!d || !d.date) return;
         out.push({
-          id: d.id, source: 'course', editable: false,
+          id: d.id, source: 'course', editable: true,
           course: code, title: d.title || '', type: d.type || 'assignment',
           due: d.date + (d.time ? 'T' + d.time : ''), done: !!d.done, note: d.note || '',
           uid: icsDate[code + '|' + d.id] || ''
@@ -2238,7 +2238,8 @@
       var due = e.date + (e.start_time ? 'T' + e.start_time : '');
       var d = daysUntil(due);
       out.push({
-        id: e.id, source: 'exam', editable: false,
+        id: e.id, source: 'exam', editable: true,
+        completed: !!e.completed_at, all_day: !!e.all_day,
         course: e.course_code || null, title: '', type: e.exam_type || 'exam',
         /*@3.GADJ.178*/
         label: e.notes || '',

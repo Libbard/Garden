@@ -964,23 +964,28 @@
               'in ' + days + ' ' + countWord(days, DAY_FORMS_AR, DAY_FORMS_EN));
   }
 
+  function dlTitle(t) {
+    return t.title || t.label || (t.course ? t.course + ' · ' + typeLabel(t.type) : typeLabel(t.type));
+  }
+  function autoDone(t) { return t.source === 'exam' && t.done && !t.completed; }
+  function dlAttrs(t) { return ' data-id="' + esc(t.id) + '" data-src="' + esc(t.source || 'task') + '"'; }
+
   function taskRow(t) {
     var days = D.daysUntil(t.due);
     var u = urgency(days, t.done);
-    var title = t.title || (t.course ? t.course + ' · ' + typeLabel(t.type) : typeLabel(t.type));
+    var title = dlTitle(t);
     var src = t.pending_course ? SRC_LABEL.bb : (SRC_LABEL[t.source] || SRC_LABEL.task);
 
-    var check = t.editable
-      ? '<button class="tk-check" data-act="tk-toggle" data-id="' + esc(t.id) + '" ' +
-        'aria-label="' + esc(tx('إكمال', 'Complete')) + '"' + (t.done ? ' aria-pressed="true"' : '') + '>' +
+    var check = t.editable && !autoDone(t)
+      ? '<button class="tk-check" data-act="tk-toggle"' + dlAttrs(t) + ' ' +
+        'aria-label="' + esc(t.done ? tx('إلغاء الإتمام', 'Mark not done') : tx('إكمال', 'Complete')) + '"' + (t.done ? ' aria-pressed="true"' : ' aria-pressed="false"') + '>' +
         (t.done ? '<i class="fa-solid fa-check" aria-hidden="true"></i>' : '') + '</button>'
-      : '<span class="tk-check tk-check-locked" aria-hidden="true">' + (t.source === 'exam' ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-calendar-days"></i>') + '</span>';
+      : '<span class="tk-check tk-check-locked" aria-hidden="true">' + (t.done ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-calendar-days"></i>') + '</span>';
 
     var actions = t.editable
-      ? '<button class="tk-act" data-act="tk-edit" data-id="' + esc(t.id) + '" aria-label="' + esc(tx('تعديل', 'Edit')) + '"><i class="fa-solid fa-pen"></i></button>' +
-        '<button class="tk-act" data-act="tk-del" data-id="' + esc(t.id) + '" aria-label="' + esc(tx('حذف', 'Delete')) + '"><i class="fa-solid fa-trash"></i></button>'
-      : '<a class="tk-act" href="' + (t.source === 'exam' ? 'hub/schedule.html' : 'hub/course.html?code=' + encodeURIComponent(t.course || '')) + '" ' +
-        'aria-label="' + esc(tx('فتح المصدر', 'Open source')) + '"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>';
+      ? '<button class="tk-act" data-act="tk-edit"' + dlAttrs(t) + ' aria-label="' + esc(tx('تعديل', 'Edit')) + '"><i class="fa-solid fa-pen"></i></button>' +
+        '<button class="tk-act" data-act="tk-del"' + dlAttrs(t) + ' aria-label="' + esc(tx('حذف', 'Delete')) + '"><i class="fa-solid fa-trash"></i></button>'
+      : '';
 
     /*@3.DASJ.64*/
     return '<div class="tk-item ' + u.cls + '">' +
@@ -1108,8 +1113,7 @@
     el('tk-sheet-kind').innerHTML =
       '<i class="fa-solid ' + (SHEET_ICON[t.source] || SHEET_ICON.task) + '" aria-hidden="true"></i> ' +
       esc(typeLabel(t.type));
-    el('tk-sheet-title').textContent =
-      t.title || (t.course ? t.course + ' · ' + typeLabel(t.type) : typeLabel(t.type));
+    el('tk-sheet-title').textContent = dlTitle(t);
     var ce = el('tk-sheet-course');
     ce.textContent = t.course ? (t.course + (info ? ' · ' + (isAr() ? info.name_ar : info.name_en) : '')) : '';
     ce.hidden = !t.course;
@@ -1125,22 +1129,26 @@
     rows += sheetRow('fa-inbox', tx('المصدر', 'Source'), tx(srcL[0], srcL[1]));
     rows += sheetRow('fa-circle-check', tx('الحالة', 'Status'),
       t.done ? tx('مكتملة', 'Done') : tx('لم تُنجَز بعد', 'Not done yet'));
-    if (t.note) rows += '<p class="tk-sheet-note">' + esc(t.note) + '</p>';
+    if (t.source === 'exam' && t.note) rows += sheetRow('fa-location-dot', tx('القاعة', 'Room'), t.note);
+    else if (t.note) rows += '<p class="tk-sheet-note">' + esc(t.note) + '</p>';
     el('tk-sheet-body').innerHTML = rows;
 
     /*@3.DASJ.67*/
     var b = '';
     if (t.editable) {
-      b += '<button class="tk-btn tk-btn-primary" data-act="sheet-done">' +
-        '<i class="fa-solid fa-check"></i> ' + (t.done ? tx('تراجع', 'Undo') : tx('إتمام', 'Done')) + '</button>' +
-        '<button class="tk-btn" data-act="sheet-edit"><i class="fa-solid fa-pen"></i> ' + tx('تعديل', 'Edit') + '</button>' +
+      if (!autoDone(t)) {
+        b += '<button class="tk-btn tk-btn-primary" data-act="sheet-done">' +
+          '<i class="fa-solid fa-check"></i> ' + (t.done ? tx('تراجع', 'Undo') : tx('إتمام', 'Done')) + '</button>';
+      }
+      b += '<button class="tk-btn" data-act="sheet-edit"><i class="fa-solid fa-pen"></i> ' + tx('تعديل', 'Edit') + '</button>' +
         '<button class="tk-btn tk-btn-danger" data-act="sheet-del"><i class="fa-solid fa-trash"></i> ' + tx('حذف', 'Delete') + '</button>';
-    } else {
+    }
+    if (t.source === 'exam' || t.source === 'course') {
       var href = t.source === 'exam' ? 'hub/schedule.html'
                : 'hub/course.html?code=' + encodeURIComponent(t.course || '');
-      b += '<a class="tk-btn tk-btn-primary" href="' + href + '">' +
+      b += '<a class="tk-btn tk-btn-ghost" href="' + href + '">' +
         '<i class="fa-solid fa-arrow-up-right-from-square"></i> ' +
-        (t.source === 'exam' ? tx('افتح في الجدول', 'Open in schedule') : tx('افتح بطاقة المادة', 'Open the course card')) + '</a>';
+        (t.source === 'exam' ? tx('في الجدول', 'In schedule') : tx('في بطاقة المادة', 'In course card')) + '</a>';
     }
     b += '<button class="tk-btn tk-btn-ghost" data-act="sheet-close">' + tx('إغلاق', 'Close') + '</button>';
     el('tk-sheet-acts').innerHTML = b;
@@ -1151,16 +1159,44 @@
 
   /*@3.DASJ.68*/
 
-  function fillCourseSelect() {
+  function fillCourseSelect(need, keep) {
     var sel = el('tk-f-course');
     if (!sel) return;
     var p = D.semesterProgress();
-    var opts = '<option value="">' + esc(tx('بلا مادة', 'No course')) + '</option>';
+    var opts = need ? '' : '<option value="">' + esc(tx('بلا مادة', 'No course')) + '</option>';
+    var seen = {};
     p.courses.forEach(function (c) {
+      seen[c.code] = 1;
       opts += '<option value="' + esc(c.code) + '">' + esc(c.code + ' · ' + (isAr() ? c.name_ar : c.name_en)) + '</option>';
     });
+    if (keep && !seen[keep]) opts += '<option value="' + esc(keep) + '">' + esc(keep) + '</option>';
     sel.innerHTML = opts;
   }
+
+  var MODAL_TYPES = {
+    task:   ['hw', 'project', 'quiz', 'exam', 'other'],
+    course: ['assignment', 'project', 'discussion'],
+    exam:   ['quiz', 'exam', 'midterm', 'final']
+  };
+  function fillTypeSelect(src, cur) {
+    var sel = el('tk-f-type');
+    if (!sel) return;
+    var list = MODAL_TYPES[src].slice();
+    if (cur && list.indexOf(cur) === -1) list.push(cur);
+    sel.innerHTML = list.map(function (k) {
+      var lab = k === 'other' ? tx('أخرى', 'Other') : typeLabel(k);
+      return '<option value="' + esc(k) + '">' + esc(lab) + '</option>';
+    }).join('');
+    sel.value = cur && list.indexOf(cur) > -1 ? cur : list[0];
+  }
+  function setNoteLabel(room) {
+    var lab = document.querySelector('label[for="tk-f-note"]');
+    if (!lab) return;
+    var ar = room ? 'القاعة' : 'ملاحظة', en = room ? 'Room' : 'Note';
+    lab.setAttribute('data-ar', ar); lab.setAttribute('data-en', en);
+    lab.textContent = tx(ar, en);
+  }
+  var modalSrc = 'task';
 
   /*@3.DASJ.136*/
   function nowParts() {
@@ -1174,15 +1210,18 @@
     };
   }
 
-  function openTaskModal(id) {
+  function openTaskModal(id, src) {
     var m = el('tk-modal');
     if (!m) return;
-    fillCourseSelect();
-    var t = id ? D.tasks().find(function (x) { return x.id === id; }) : null;
+    var t = id ? findDeadline(id, src || 'task') : null;
+    if (id && !t) return;
+    modalSrc = t ? t.source : 'task';
+    fillCourseSelect(modalSrc !== 'task', t && t.course);
+    fillTypeSelect(modalSrc, t ? t.type : 'hw');
+    setNoteLabel(modalSrc === 'exam');
     el('tk-f-id').value = t ? t.id : '';
-    el('tk-f-title').value = t ? (t.title || '') : '';
+    el('tk-f-title').value = t ? (modalSrc === 'exam' ? (t.label || '') : (t.title || '')) : '';
     el('tk-f-course').value = t ? (t.course || '') : '';
-    el('tk-f-type').value = t ? (t.type || 'hw') : 'hw';
     /*@3.DASJ.69*/
     /*@3.DASJ.137*/
     var due = t ? String(t.due || '') : '';
@@ -1191,7 +1230,10 @@
     el('tk-f-time').value = due.indexOf('T') > -1 ? due.split('T')[1].slice(0, 5)
                           : (t ? '' : nowD.time);
     el('tk-f-note').value = t ? (t.note || '') : '';
-    el('tk-modal-title').textContent = t ? tx('تعديل المهمة', 'Edit task') : tx('مهمة جديدة', 'New task');
+    el('tk-modal-title').textContent = !t ? tx('مهمة جديدة', 'New task')
+      : modalSrc === 'exam' ? tx('تعديل الاختبار', 'Edit exam')
+      : modalSrc === 'course' ? tx('تعديل الموعد', 'Edit date')
+      : tx('تعديل المهمة', 'Edit task');
     m.hidden = false;
     setTimeout(function () { el('tk-f-title').focus(); }, 50);
   }
@@ -1333,9 +1375,17 @@
 
   function saveTask() {
     var title = el('tk-f-title').value.trim();
-    if (!title) { toast(tx('اكتب عنوان المهمة', 'Enter a task title')); el('tk-f-title').focus(); return; }
     var date = el('tk-f-date').value;
     var time = el('tk-f-time').value;
+    if (modalSrc !== 'task' && el('tk-f-id').value) {
+      if (!date) { toast(tx('التاريخ مطلوب', 'A date is required')); el('tk-f-date').focus(); return; }
+      var ok = modalSrc === 'exam' ? saveExamFromTasks(title, date, time) : saveDateFromTasks(title, date, time);
+      closeTaskModal();
+      afterTaskChange();
+      toast(ok ? tx('حُفظ ✓', 'Saved ✓') : tx('تعذّر الحفظ', 'Could not save'));
+      return;
+    }
+    if (!title) { toast(tx('اكتب عنوان المهمة', 'Enter a task title')); el('tk-f-title').focus(); return; }
     D.upsertTask({
       id: el('tk-f-id').value || null,
       title: title,
@@ -1347,6 +1397,75 @@
     closeTaskModal();
     afterTaskChange();
     toast(tx('حُفظت المهمة ✓', 'Task saved ✓'));
+  }
+
+  function saveExamFromTasks(title, date, time) {
+    var id = el('tk-f-id').value;
+    return !!D.upsertExam({
+      id: id, course_code: el('tk-f-course').value, date: date,
+      start_time: time, all_day: !time, exam_type: el('tk-f-type').value,
+      room: el('tk-f-note').value.trim(), notes: title
+    });
+  }
+
+  function saveDateFromTasks(title, date, time) {
+    var id = el('tk-f-id').value;
+    var t = findDeadline(id, 'course');
+    if (!t || !t.course) return false;
+    var from = t.course, to = el('tk-f-course').value || from;
+    var m0 = D.courseMeta(from);
+    var row = m0.dates.filter(function (x) { return x && x.id === id; })[0];
+    if (!row) return false;
+    var rec = JSON.parse(JSON.stringify(row));
+    if (title) rec.title = title;
+    rec.type = el('tk-f-type').value;
+    rec.date = date; rec.time = time;
+    rec.note = el('tk-f-note').value.trim();
+    if (to !== from) {
+      m0.dates = m0.dates.filter(function (x) { return !x || x.id !== id; });
+      D.saveCourseMeta(from, m0);
+      var m1 = D.courseMeta(to);
+      m1.dates = m1.dates.filter(function (x) { return !x || x.id !== id; });
+      m1.dates.push(rec);
+      D.saveCourseMeta(to, m1);
+      if (D.icsRelink) D.icsRelink('date', id, 'date', id, to);
+    } else {
+      m0.dates = m0.dates.map(function (x) { return x && x.id === id ? rec : x; });
+      D.saveCourseMeta(from, m0);
+    }
+    return true;
+  }
+
+  function findDeadline(id, src) {
+    return D.allDeadlines().filter(function (x) {
+      return String(x.id) === String(id) && x.source === (src || 'task');
+    })[0] || null;
+  }
+
+  function toggleDeadline(t) {
+    if (!t || !t.editable || autoDone(t)) return;
+    if (t.source === 'course') D.toggleCourseDate(t.course, t.id);
+    else if (t.source === 'exam') {
+      if (window.GardenScheduleRules && GardenScheduleRules.setDone) {
+        GardenScheduleRules.setDone({ src: 'exam', id: t.id }, !t.completed);
+      }
+    } else D.toggleTask(t.id);
+  }
+
+  function deleteDeadline(t) {
+    if (!t || !t.editable) return false;
+    var q = t.source === 'task' ? tx('حذف هذه المهمة؟', 'Delete this task?')
+          : t.source === 'exam' ? tx('حذف هذا الاختبار من جدولك؟', 'Delete this exam from your schedule?')
+          : tx('حذف هذا الموعد من بطاقة المادة؟', 'Delete this date from the course card?');
+    if (!confirm(q)) return false;
+    if (D.icsDeleted) D.icsDeleted(t.source === 'course' ? 'date' : t.source, t.id);
+    if (t.source === 'course') {
+      var m = D.courseMeta(t.course);
+      m.dates = m.dates.filter(function (x) { return !x || x.id !== t.id; });
+      D.saveCourseMeta(t.course, m);
+    } else if (t.source === 'exam') D.deleteExam(t.id);
+    else D.deleteTask(t.id);
+    return true;
   }
 
   /*@3.DASJ.79*/
@@ -1819,13 +1938,10 @@
     /*@3.DASJ.114*/
     else if (act === 'done-task') { D.toggleTask(id); afterTaskChange(); }
     else if (act === 'add-task') openTaskModal(null);
-    else if (act === 'tk-edit') openTaskModal(id);
-    else if (act === 'tk-toggle') { D.toggleTask(id); afterTaskChange(); }
+    else if (act === 'tk-edit') openTaskModal(id, t.getAttribute('data-src'));
+    else if (act === 'tk-toggle') { toggleDeadline(findDeadline(id, t.getAttribute('data-src'))); afterTaskChange(); }
     else if (act === 'tk-del') {
-      if (confirm(tx('حذف هذه المهمة؟', 'Delete this task?'))) {
-        if (D.icsDeleted) D.icsDeleted('task', id);
-        D.deleteTask(id); afterTaskChange();
-      }
+      if (deleteDeadline(findDeadline(id, t.getAttribute('data-src')))) afterTaskChange();
     }
     else if (act === 'tk-save') saveTask();
     else if (act === 'tk-cancel') closeTaskModal();
@@ -1833,19 +1949,16 @@
     else if (act === 'tk-open') openTaskSheet(id, t.getAttribute('data-src'));
     else if (act === 'sheet-close') closeTaskSheet();
     else if (act === 'sheet-done') {
-      if (sheetTask) { D.toggleTask(sheetTask.id); }
+      toggleDeadline(sheetTask);
       closeTaskSheet(); afterTaskChange();
     }
     else if (act === 'sheet-edit') {
-      var sid = sheetTask && sheetTask.id;
+      var st = sheetTask;
       closeTaskSheet();
-      if (sid) openTaskModal(sid);
+      if (st) openTaskModal(st.id, st.source);
     }
     else if (act === 'sheet-del') {
-      if (sheetTask && confirm(tx('حذف هذه المهمة؟', 'Delete this task?'))) {
-        if (D.icsDeleted) D.icsDeleted('task', sheetTask.id);
-        D.deleteTask(sheetTask.id); closeTaskSheet(); afterTaskChange();
-      }
+      if (sheetTask && deleteDeadline(sheetTask)) { closeTaskSheet(); afterTaskChange(); }
     }
   }
 
