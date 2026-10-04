@@ -609,15 +609,29 @@
   var BACK = { run: 0, msg: '', k: '', i: 0, n: 0 };
   function backHtml() {
     if (!A.backup) return '';
-    var steps = { notes: L('الملاحظات', 'Notes'), ink: L('الرسم', 'Drawings'), images: L('الصور', 'Images'), files: L('الملفّات', 'Files'), done: L('يُحفظ', 'Saving') };
+    var steps = { notes: L('الملاحظات', 'Notes'), ink: L('الرسم', 'Drawings'), images: L('الصور', 'Images'), files: L('الملفّات', 'Files'), done: L('يُحفظ', 'Saving'),
+                  up: L('يُرفع إلى درايف', 'Uploading to Drive'), down: L('يُنزَّل من درايف', 'Downloading from Drive') };
+    var gd = !!(A.driveOn && A.driveOn());
     var h = '<section class="nx-sp-card nx-back" data-run="' + (BACK.run ? 1 : 0) + '"><div class="nx-sp-h"><b>' + esc(L('نسخةٌ كاملةٌ في ملفٍّ واحد', 'A full copy in one file')) + '</b>' +
-      '<span>' + (BACK.run ? esc(steps[BACK.k] || '') + (BACK.n > 1 ? ' ' + lat(BACK.i + ' / ' + BACK.n) : '') : esc(L('على جهازك', 'On your device'))) + '</span></div>';
+      '<span>' + (BACK.run ? esc(steps[BACK.k] || '') + (BACK.pct != null ? ' ' + lat(BACK.pct + '%') : BACK.n > 1 ? ' ' + lat(BACK.i + ' / ' + BACK.n) : '') : esc(gd ? L('على جهازك أو في درايفك', 'On your device or in your Drive') : L('على جهازك', 'On your device'))) + '</span></div>';
     h += '<p class="nx-hint">' + esc(L('ملاحظاتُك ومجلّداتُها وملفّاتُ PDF وتسجيلاتُك وصورُك ورسمُك في ملفٍّ مضغوطٍ واحد — تُقرأ دون الموقع، وفيها ما تُستعاد به.',
       'Your notes with their folders, PDFs, recordings, images and drawings in one ZIP — readable without the site, and complete enough to restore.')) + '</p>';
     h += '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="backup"' + (BACK.run ? ' disabled' : '') + '>' +
       ic('fa-file-zipper') + esc(BACK.run ? L('يُجمع…', 'Collecting…') : L('نزِّلِ النسخةَ الكاملة', 'Download the full copy')) + '</button>' +
+      (gd && A.backupDrive ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="backgd"' + (BACK.run ? ' disabled' : '') + '>' +
+        ic('fa-google-drive', 1) + esc(L('إلى درايفي', 'To my Drive')) + '</button>' : '') +
       (A.restorePlan ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="rpick"' + (BACK.run || BACK.plan ? ' disabled' : '') + '>' +
-        ic('fa-clock-rotate-left') + esc(L('استعِدْ من نسخة…', 'Restore from a copy…')) + '</button>' : '') + '</div>';
+        ic('fa-clock-rotate-left') + esc(L('استعِدْ من ملفّ…', 'Restore from a file…')) + '</button>' : '') +
+      (gd && A.driveBackups ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="rgdlist"' + (BACK.run || BACK.plan ? ' disabled' : '') + '>' +
+        ic('fa-google-drive', 1) + esc(L('استعِدْ من درايف…', 'Restore from Drive…')) + '</button>' : '') + '</div>';
+    if (gd && A.gdAuto) {
+      var au = A.gdAuto(), dt = au.at ? new Date(au.at) : null;
+      h += '<label class="nx-gdauto"><input type="checkbox" data-x="gdauto"' + (au.on ? ' checked' : '') + '> <span>' +
+        esc(L('احفظْ نسخةً في درايفي كلَّ أسبوعٍ تلقائيّاً', 'Save a copy to my Drive every week, automatically')) + '</span></label>';
+      if (au.on && au.linked === false) h += '<p class="nx-hint">' + esc(L('اربطْ درايف من الإعدادات ليعمل دون أن يسألك كلَّ مرّة.', 'Link Drive in Settings so it runs without asking you each time.')) + '</p>';
+      else if (au.on) h += '<p class="nx-hint">' + esc(dt ? L('آخرُ نسخةٍ تلقائيّة: ', 'Last automatic copy: ') + dt.toLocaleDateString(L('ar', 'en'), { day: 'numeric', month: 'short' }) : L('أوّلُ نسخةٍ بعد دقيقةٍ من فتح الملاحظات.', 'The first copy runs a minute after you open your notes.')) + '</p>';
+    }
+    if (BACK.gdl && !BACK.plan) h += gdlHtml(BACK.gdl);
     if (BACK.plan) h += restHtml(BACK.plan);
     if (BACK.msg) h += '<p class="nx-hint" role="status">' + esc(BACK.msg) + '</p>';
     return h + '</section>';
@@ -675,26 +689,84 @@
     }
     return h + '</div>';
   }
+  function gdlHtml(list) {
+    var h = '<div class="nx-rest" role="group" aria-label="' + esc(L('نسخُك في درايف', 'Your copies in Drive')) + '">';
+    if (!list.length) h += '<p class="nx-hint">' + esc(L('لا نسخةَ في درايفك بعد — اضغطْ «إلى درايفي» لتحفظ أولاها.', 'No copy in your Drive yet — press “To my Drive” to save the first.')) + '</p>';
+    list.forEach(function (f) {
+      var dt = new Date(f.at || 0), p2 = function (n) { return (n < 10 ? '0' : '') + n; };
+      var w = isNaN(dt) ? '' : dt.getFullYear() + '-' + p2(dt.getMonth() + 1) + '-' + p2(dt.getDate()) + ' ' + p2(dt.getHours()) + ':' + p2(dt.getMinutes());
+      h += '<div class="nx-cl-row" data-k="gd"><span class="nx-cl-i">' + ic('fa-file-zipper') + '</span><span class="nx-cl-t"><b>' + lat(w) + '</b><small dir="auto">' + esc(f.name || '') + '</small></span>' +
+        '<span class="nx-fr-s">' + lat(fmtSize(f.size) || '0 B') + '</span>' +
+        '<button type="button" class="gsf-btn gsf-btn--sm nx-b" data-x="rgdpick" data-id="' + esc(f.id) + '" data-n="' + esc(f.name || '') + '">' + esc(L('اخترْها', 'Choose')) + '</button></div>';
+    });
+    return h + '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="rcancel">' + esc(L('إغلاق', 'Close')) + '</button></div></div>';
+  }
+  function gdBackGo() {
+    if (BACK.run || !A.backupDrive) return;
+    BACK = { run: 1, msg: '', k: 'notes', i: 0, n: 0 };
+    backPaint();
+    var last = 0, tick = function () { var t = Date.now(); if (t - last > 150) { last = t; backPaint(); } };
+    A.backupDrive(function (k, i, n) {
+      BACK.k = k === 'done' ? 'up' : k; BACK.i = i; BACK.n = n; tick();
+    }, function (at, of) {
+      BACK.k = 'up'; BACK.pct = of ? Math.floor(at / of * 100) : 0; tick();
+    }).then(function (res) {
+      var c = res.counts || {};
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: L('حُفظت في درايفك (‏مجلّد Backups): ', 'Saved in your Drive (Backups folder): ') + c.notes + L(' ملاحظة · ', ' notes · ') + c.files + L(' ملفّاً · ', ' files · ') + fmtSize(res.bytes) };
+      backPaint();
+    }, function (e) {
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: (e && e.message === 'zip_too_big') ? L('النسخةُ أكبرُ من ‎4 جيجا — لا تُجمع في ملفٍّ واحد بعد.', 'The copy is over 4 GB — it cannot be one file yet.')
+        : L('لم تُرفع النسخة: ', 'The copy was not uploaded: ') + (A.driveWhy ? A.driveWhy(e) : '') + L(' — لم يُحذف شيء.', ' — nothing was removed.') };
+      backPaint();
+    });
+  }
+  function gdListGo() {
+    if (BACK.run || !A.driveBackups) return;
+    BACK = { run: 0, msg: L('أقرأ نسخَك في درايف…', 'Reading your copies in Drive…'), k: '', i: 0, n: 0 };
+    backPaint();
+    A.driveBackups().then(function (list) {
+      BACK = { run: 0, msg: '', k: '', i: 0, n: 0, gdl: list || [] };
+      backPaint();
+    }, function (e) {
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: L('تعذّرت قراءةُ درايف: ', 'Could not read Drive: ') + (A.driveWhy ? A.driveWhy(e) : '') };
+      backPaint();
+    });
+  }
+  function gdPickGo(b) {
+    if (BACK.run || !A.driveBackupFile) return;
+    BACK = { run: 1, msg: '', k: 'down', i: 0, n: 0, pct: 0 };
+    backPaint();
+    var last = 0;
+    A.driveBackupFile(b.getAttribute('data-id'), b.getAttribute('data-n'), function (at, of) {
+      BACK.pct = of ? Math.floor(at / of * 100) : 0;
+      var t = Date.now(); if (t - last > 150) { last = t; backPaint(); }
+    }).then(function (f) { return restLoad(f); }, function (e) {
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: L('تعذّر تنزيلُ النسخة من درايف: ', 'Could not download the copy from Drive: ') + (A.driveWhy ? A.driveWhy(e) : '') };
+      backPaint();
+    });
+  }
+  function restLoad(f) {
+    BACK = { run: 0, msg: L('أقرأ النسخة…', 'Reading the copy…'), k: '', i: 0, n: 0 };
+    backPaint();
+    return A.restorePlan(f).then(function (P) {
+      BACK = { run: 0, msg: '', k: '', i: 0, n: 0, plan: P };
+      backPaint();
+    }, function (e) {
+      var m = e && e.message;
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: m === 'not_zip' || m === 'not_backup'
+        ? L('هذا الملفُّ ليس نسخةً كاملةً من الحديقة — اخترِ الملفَّ الذي نزّلتَه من «نسخةٌ كاملةٌ في ملفٍّ واحد».', 'This is not a full Garden copy — pick the file you downloaded from “A full copy in one file”.')
+        : m === 'zip_method' ? L('أُعيد ضغطُ الملفِّ بطريقةٍ لا يقرؤها متصفّحُك — استعملِ الملفَّ كما نزّلتَه.', 'The file was re-compressed in a way your browser cannot read — use the file as you downloaded it.')
+        : L('تعذّرت قراءةُ النسخة — لم يتغيّر شيء.', 'Could not read the copy — nothing changed.') };
+      backPaint();
+    });
+  }
   function restPick() {
     if (BACK.run || !A.restorePlan) return;
     var inp = document.createElement('input');
     inp.type = 'file'; inp.accept = '.zip,application/zip';
     inp.addEventListener('change', function () {
       var f = inp.files && inp.files[0];
-      if (!f) return;
-      BACK = { run: 0, msg: L('أقرأ النسخة…', 'Reading the copy…'), k: '', i: 0, n: 0 };
-      backPaint();
-      A.restorePlan(f).then(function (P) {
-        BACK = { run: 0, msg: '', k: '', i: 0, n: 0, plan: P };
-        backPaint();
-      }, function (e) {
-        var m = e && e.message;
-        BACK = { run: 0, k: '', i: 0, n: 0, msg: m === 'not_zip' || m === 'not_backup'
-          ? L('هذا الملفُّ ليس نسخةً كاملةً من الحديقة — اخترِ الملفَّ الذي نزّلتَه من «نسخةٌ كاملةٌ في ملفٍّ واحد».', 'This is not a full Garden copy — pick the file you downloaded from “A full copy in one file”.')
-          : m === 'zip_method' ? L('أُعيد ضغطُ الملفِّ بطريقةٍ لا يقرؤها متصفّحُك — استعملِ الملفَّ كما نزّلتَه.', 'The file was re-compressed in a way your browser cannot read — use the file as you downloaded it.')
-          : L('تعذّرت قراءةُ النسخة — لم يتغيّر شيء.', 'Could not read the copy — nothing changed.') };
-        backPaint();
-      });
+      if (f) restLoad(f);
     });
     inp.click();
   }
@@ -1209,6 +1281,10 @@
       /*@3.NOEJ3.25*/
       case 'backup': backGo(); return;
       case 'rpick': restPick(); return;
+      case 'backgd': gdBackGo(); return;
+      case 'rgdlist': gdListGo(); return;
+      case 'rgdpick': gdPickGo(x); return;
+      case 'gdauto': if (A.gdAutoSet) A.gdAutoSet(x.checked).then(backPaint, backPaint); return;
       case 'rgo': restGo(); return;
       case 'rcancel': BACK = { run: 0, msg: '', k: '', i: 0, n: 0 }; backPaint(); return;
       case 'keep': if (SPACE) keepGo(SPACE.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; }), x.getAttribute('data-to') === 'gd' ? 'gd' : 'us'); return;

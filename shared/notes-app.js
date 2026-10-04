@@ -5573,6 +5573,54 @@
       return Bk.build(onStep).then(function (res) { return Bk.save(res).then(function (how) { res.how = how; return res; }); });
     });
   }
+  function backupDrive(onStep, onUp) {
+    try { if (ed) ed.save(); } catch (e0) {}
+    return Promise.all([needBackup(), needDrive()]).then(function (m) {
+      var Bk = m[0], GD = m[1];
+      return GD.token(true).then(function () { return Bk.build(onStep); }).then(function (res) {
+        return GD.uploadBig(res.blob, { name: res.name, mime: 'application/zip', onProgress: onUp })
+          .then(function (f) { res.how = 'drive'; res.file = f; return res; });
+      });
+    });
+  }
+  function driveBackups() {
+    return needDrive().then(function (GD) { return GD.token(true).then(function () { return GD.backups(); }); });
+  }
+  function driveBackupFile(id, name, onProg) {
+    return needDrive().then(function (GD) { return GD.download(id, onProg); })
+      .then(function (b) { return new File([b], name || 'backup.zip', { type: 'application/zip' }); });
+  }
+  var GD_AUTO_MS = 7 * 864e5, GD_RETRY_MS = 864e5, gdAutoRun = 0;
+  function gdAutoState() {
+    var a = ui().gdAuto || {};
+    return { on: !!a.on, at: +a.at || 0, linked: window.GardenDrive && GardenDrive.linked ? GardenDrive.linked() : null };
+  }
+  function gdAutoSet(on) {
+    var a = ui().gdAuto || {};
+    a.on = on ? 1 : 0;
+    uiSet('gdAuto', a);
+    return needDrive().then(function () { return gdAutoState(); }, function () { return gdAutoState(); });
+  }
+  function gdAutoMaybe() {
+    var a = ui().gdAuto || {}, now = Date.now();
+    if (!a.on || gdAutoRun || !driveOn()) return Promise.resolve(false);
+    if (now - (+a.at || 0) < GD_AUTO_MS || now - (+a.tr || 0) < GD_RETRY_MS) return Promise.resolve(false);
+    var c = navigator.connection;
+    if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return Promise.resolve(false);
+    gdAutoRun = 1;
+    var mark = function (k) { var o = ui().gdAuto || {}; o[k] = Date.now(); if (k === 'at') o.tr = 0; uiSet('gdAuto', o); };
+    return needDrive().then(function (GD) {
+      if (!GD.linked || !GD.linked()) return false;
+      mark('tr');
+      return GD.token(false).then(function () {
+        try { if (ed) ed.save(); } catch (e0) {}
+        return needBackup().then(function (Bk) { return Bk.build(); });
+      }).then(function (res) {
+        return GD.uploadBig(res.blob, { name: res.name, mime: 'application/zip' });
+      }).then(function () { mark('at'); return true; });
+    })['catch'](function () { return false; }).then(function (r) { gdAutoRun = 0; return r; });
+  }
+  function driveWhy(e) { return (window.GardenDrive && GardenDrive.reason) ? GardenDrive.reason(e) : L('تعذّر الوصولُ إلى درايف.', 'Drive could not be reached.'); }
   function restoreHooks() {
     return {
       tombs: function () { var t = readJSON(LS_TOMB, {}); return (t && typeof t === 'object') ? t : {}; },
@@ -10032,6 +10080,13 @@
       backup: backupAll,
       restorePlan: restorePlan,
       restoreRun: restoreRun,
+      backupDrive: function (a1, a2) { return driveOn() ? backupDrive(a1, a2) : Promise.reject(new Error('no_drive')); },
+      driveBackups: driveBackups,
+      driveBackupFile: driveBackupFile,
+      driveWhy: driveWhy,
+      driveOn: driveOn,
+      gdAuto: gdAutoState,
+      gdAutoSet: gdAutoSet,
       openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },
       folderName: folderName,
@@ -10556,6 +10611,7 @@
     els.app = document.getElementById('na');
     if (!els.app) return;
     setTimeout(fzFill, 3000);
+    setTimeout(gdAutoMaybe, 45000);
     /*@3.NOAJ.98*/
     if (window.GardenTint && GardenTint.fontSheet) { try { GardenTint.fontSheet(); } catch (eF) {} }
     warmSheetFont(0);
@@ -11279,6 +11335,7 @@
       if (edId && d) persist(edId, d, !!quiet);
     },
     pdfMeta: pdfMeta,
+    gdAutoMaybe: gdAutoMaybe,
     pageTopPad: pageTopPad,
     pageBotPad: pageBotPad,
     pdfReady: pdfReady,

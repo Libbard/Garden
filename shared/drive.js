@@ -487,6 +487,80 @@
       });
     });
   }
+  var CHUNK = 8 * 1024 * 1024;
+  function backDir() {
+    return dir(FOLDER, { garden: '1', role: 'root' }).then(function (root) {
+      return dir('Backups', { garden: '1', role: 'backup' }, root);
+    });
+  }
+  function putPart(url, part, from, total, mime, onProgress, signal) {
+    return new Promise(function (ok, no) {
+      var x = new XMLHttpRequest();
+      x.open('PUT', url, true);
+      x.setRequestHeader('Content-Type', mime);
+      x.setRequestHeader('Content-Range', part ? 'bytes ' + from + '-' + (from + part.size - 1) + '/' + total : 'bytes */' + total);
+      if (part && onProgress) x.upload.onprogress = function (e) { if (e.lengthComputable) { try { onProgress(from + e.loaded, total); } catch (e2) {} } };
+      x.onload = function () {
+        if (x.status === 200 || x.status === 201) {
+          var j = null;
+          try { j = JSON.parse(x.responseText || '{}'); } catch (e) {}
+          ok({ done: 1, file: { id: j && j.id, name: j && j.name, size: Number(j && j.size) || total } });
+        } else if (x.status === 308) {
+          var rg = /bytes=0-(\d+)/.exec(x.getResponseHeader('Range') || '');
+          ok({ done: 0, next: rg ? Number(rg[1]) + 1 : (part ? from + part.size : 0) });
+        } else no(err('http_' + x.status));
+      };
+      x.onerror = function () { no(err('http_network')); };
+      x.onabort = function () { no(err('put_aborted')); };
+      if (signal) {
+        if (signal.aborted) { no(err('put_aborted')); return; }
+        signal.addEventListener('abort', function () { try { x.abort(); } catch (e) {} });
+      }
+      x.send(part || null);
+    });
+  }
+  /*@3.DRIJ.8*/
+  function uploadBig(blob, opts) {
+    var o = opts || {}, total = blob.size, mime = o.mime || blob.type || 'application/octet-stream', size = o.chunk || CHUNK;
+    return backDir().then(function (fid) {
+      return authed(function (t) {
+        return call('POST', UP + '/files?uploadType=resumable&fields=id,name,size', t,
+          { name: String(o.name || 'backup.zip'), parents: [fid], appProperties: { garden: '1', tag: String(o.tag || 'backup') } },
+          { 'X-Upload-Content-Type': mime, 'X-Upload-Content-Length': String(total) });
+      });
+    }).then(function (r) {
+      var loc = r.headers.get('location');
+      if (!loc) throw err('no_session');
+      var at = 0, tries = 0;
+      function step() {
+        var end = Math.min(total, at + size);
+        return putPart(loc, blob.slice(at, end), at, total, mime, o.onProgress, o.signal).then(function (res) {
+          if (res.done) return res.file;
+          at = res.next; tries = 0;
+          return step();
+        }, function (e) {
+          var c = (e && e.code) || '';
+          if (c === 'put_aborted' || ++tries > 5 || (/^http_4/.test(c) && c !== 'http_408' && c !== 'http_429')) throw e;
+          return new Promise(function (w) { setTimeout(w, 800 * Math.pow(2, tries)); }).then(function () {
+            return putPart(loc, null, 0, total, mime, null, o.signal);
+          }).then(function (res) {
+            if (res.done) return res.file;
+            at = res.next;
+            return step();
+          }, function (e2) { if (e2 && e2.code === 'put_aborted') throw e2; return step(); });
+        });
+      }
+      return step();
+    });
+  }
+  function backups() {
+    return backDir().then(function (fid) {
+      var cond = "trashed=false and '" + q(fid) + "' in parents";
+      return json('GET', API + '/files?q=' + encodeURIComponent(cond) + '&orderBy=createdTime%20desc&fields=files(id,name,size,createdTime)&pageSize=20&spaces=drive');
+    }).then(function (r) {
+      return (r.files || []).map(function (f) { return { id: f.id, name: f.name, size: Number(f.size) || 0, at: Date.parse(f.createdTime) || 0 }; });
+    });
+  }
   function trash(id) {
     if (!id) return Promise.resolve(false);
     return json('PATCH', API + '/files/' + encodeURIComponent(id) + '?fields=id', { trashed: true })
@@ -780,6 +854,8 @@
     meta: meta,
     download: download,
     upload: upload,
+    uploadBig: uploadBig,
+    backups: backups,
     trash: trash,
     folderName: function () { return FOLDER; },
     topBack: topBack,
