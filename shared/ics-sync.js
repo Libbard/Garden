@@ -333,17 +333,17 @@
   }
 
   /*@3.ICSJ.128*/
-  function familyPick(fams, ev, codes) {
+  function familyPick(fams, ev, codes, waiting) {
     var f = famOf(ev);
     if (!f || f.no === null) return null;
     var F = fams[f.key];
     if (!F) return null;
     var cs = Object.keys(F);
-    if (cs.length !== 1 || codes.indexOf(cs[0]) < 0) return null;
-    var e = F[cs[0]];
-    if (e.n < FAM_MIN || e.nos[f.no]) return null;
-    if (f.time && !e.times[f.time]) return null;
-    return cs[0];
+    var left = cs.filter(function (c) { return !F[c].nos[f.no] && (!f.time || F[c].times[f.time]); });
+    if (left.length !== 1 || codes.indexOf(left[0]) < 0) return null;
+    if (F[left[0]].n < FAM_MIN) return null;
+    if (cs.length > 1 && waiting && waiting[f.key] > 1) return null;
+    return left[0];
   }
 
   /*@3.ICSJ.79*/
@@ -1290,12 +1290,16 @@
 
       /*@3.ICSJ.109*/
       if (inbox.length) {
-        var evBy = {}, famDone = {};
+        var evBy = {}, famDone = {}, waiting = {};
         events.forEach(function (ev) { evBy[ev.uid] = ev; });
+        inbox.forEach(function (it) {
+          var wf = evBy[it.uid] && famOf(evBy[it.uid]);
+          if (wf) waiting[wf.key] = (waiting[wf.key] || 0) + 1;
+        });
         inbox.forEach(function (it) {
           var ev = evBy[it.uid];
           if (!ev || it.foreign || it.why === 'stale') return;
-          var fc = familyPick(fams, ev, codes);
+          var fc = familyPick(fams, ev, codes, waiting);
           if (!fc) return;
           var fo = applyOne(ev, fc);
           if (fo !== true && fo !== 'touched' && fo !== 'banner') return;
