@@ -117,8 +117,14 @@
   function progLang() {
     var p = program(); if (!p) return isAr() ? 'ar' : 'en';
     if (_langCache[p.slug]) return _langCache[p.slug];
-    var cs = p.courses || [], ar = 0;
-    cs.forEach(function (c) { if (/[\u0600-\u06FF]/.test(String(c.ta != null ? c.ta : c.title_ar || ''))) ar++; });
+    var cs = p.courses || [], ar = 0, en = 0;
+    cs.forEach(function (c) {
+      if (/[\u0600-\u06FF]/.test(String(c.ta != null ? c.ta : c.title_ar || ''))) ar++;
+      var t = String(c.t != null ? c.t : c.title || '');
+      if (t && !/[\u0600-\u06FF]/.test(t)) en++;
+    });
+    /*@3.GPSJ.181*/
+    if (cs.length && ar / cs.length >= 0.9 && en / cs.length >= 0.9) return isAr() ? 'ar' : 'en';
     return (_langCache[p.slug] = (cs.length && ar / cs.length >= 0.5) ? 'ar' : 'en');
   }
 
