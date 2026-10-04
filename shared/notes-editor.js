@@ -7674,6 +7674,8 @@
         return hit.then(function (row) {
           if (row && row.html && row.src === src) {
             self._dgmSvg[bk.id] = { src: src, html: row.html };
+            /*@3.NOEJ.618*/
+            if (St.setMeta && !(Date.now() - (row.at || 0) < 864e5)) { try { row.at = Date.now(); St.setMeta(keyOf(src), row); } catch (eT) {} }
             if (row.dh > 0 && Math.abs((bk.dh || 0) - row.dh) >= 1) { bk.dh = row.dh; grew = true; grown.push(bk.id); }
             done++;
             return next();
@@ -7685,7 +7687,9 @@
               self._dgmSvg[bk.id] = { src: src, html: html };
               var h = Math.round(host.getBoundingClientRect().height);
               if (h > 0 && Math.abs((bk.dh || 0) - h) >= 1) { bk.dh = h; grew = true; grown.push(bk.id); }
-              if (St && St.setMeta && html.length < 4 * 1024 * 1024) { try { St.setMeta(keyOf(src), { src: src, html: html, dh: h, at: Date.now() }); } catch (eS) {} }
+              if (St && St.setMeta && html.length < 4 * 1024 * 1024) {
+                try { St.setMeta(keyOf(src), { src: src, html: html, dh: h, at: Date.now() }).then(function () { if (St.sweepDgm) St.sweepDgm(); }); } catch (eS) {}
+              }
               done++;
             } else self._dgmSvg[bk.id] = { src: src, html: null, bad: 1 };
             return next();
@@ -9427,7 +9431,8 @@
       else if (act === 'cbfull' || act === 'cbtext') {
         self.pasteFromClipboard(act === 'cbtext' ? 'text' : 'full', id);
       }
-      else if (act === 'del') self.remove(id);
+      /*@3.NOEJ.620*/
+      else if (act === 'del') { if (id && self.blockSel()[id] && self.selectedBlocks().length > 1) self.deleteBlocks(); else self.remove(id); }
     }
   };
 
@@ -9720,7 +9725,8 @@
       var away = function (e) { return gate && (self.root.contains(e.target) || !gate()); };
       on('contextmenu', function (e) {
         if (self.readOnly) return;
-        if (self._selMode) return;
+        /*@3.NOEJ.619*/
+        if (self._selMode && !self.selectedBlocks().length) return;
         if (away(e)) return;
         self._ctxAt = Date.now();
         self.lpDrop();
@@ -9730,7 +9736,7 @@
       on('pointerdown', function (e) {
         if (away(e)) return;
         self.lpDrop();
-        if (e.pointerType === 'mouse' || self._selMode || self.readOnly) return;
+        if (e.pointerType === 'mouse' || (self._selMode && !self.selectedBlocks().length) || self.readOnly) return;
         if (e.isPrimary === false) return;
         var tgt = gate ? self.root : e.target, sx = e.clientX, sy = e.clientY;
         self._lpAt = { x: sx, y: sy };

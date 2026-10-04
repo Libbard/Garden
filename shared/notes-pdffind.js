@@ -2,6 +2,121 @@
   'use strict';
 
   var LOAD = 4;
+  var SEG = typeof WeakMap === 'function' ? new WeakMap() : null;
+  var RTL_RE = /[\u0590-\u08FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+
+  /*@3.NOPJ7.8*/
+  function inkWords(sp, cv) {
+    if (!sp || !cv || !sp.firstChild || sp.firstChild.nodeType !== 3) return null;
+    var memo = SEG ? SEG.get(sp) : null;
+    if (memo && memo.cv === cv && memo.w === cv.width && memo.t === sp.firstChild.data) return memo.v;
+    var v = null;
+    try { v = segment(sp, cv); } catch (e) { v = null; }
+    if (SEG) SEG.set(sp, { cv: cv, w: cv.width, t: sp.firstChild.data, v: v });
+    return v;
+  }
+
+  function segment(sp, cv) {
+    var tx = sp.firstChild.data || '';
+    var words = [], re = /\S+/g, m;
+    while ((m = re.exec(tx))) words.push({ a: m.index, b: m.index + m[0].length });
+    if (words.length < 2) return null;
+    var R = sp.getBoundingClientRect(), C = cv.getBoundingClientRect();
+    if (!(R.width > 4) || !(R.height > 2) || !(C.width > 0) || !(C.height > 0)) return null;
+    var kx = cv.width / C.width, ky = cv.height / C.height;
+    var x0 = Math.max(0, Math.floor((R.left - C.left) * kx));
+    var x1 = Math.min(cv.width, Math.ceil((R.right - C.left) * kx));
+    var y0 = Math.max(0, Math.floor((R.top - C.top + R.height * 0.15) * ky));
+    var y1 = Math.min(cv.height, Math.ceil((R.bottom - C.top - R.height * 0.12) * ky));
+    var W = x1 - x0, H = y1 - y0;
+    if (W < 8 || H < 2) return null;
+    var px = cv.getContext('2d').getImageData(x0, y0, W, H).data;
+    var hist = new Array(33).join('0').split('').map(Number), i, x, y;
+    var lum = function (k) { return (px[k] * 299 + px[k + 1] * 587 + px[k + 2] * 114) / 1000; };
+    for (i = 0; i < px.length; i += 4) hist[Math.min(31, lum(i) >> 3)]++;
+    var bg = 0;
+    for (i = 1; i < 32; i++) if (hist[i] > hist[bg]) bg = i;
+    var bgL = bg * 8 + 4, ink = new Array(W);
+    for (x = 0; x < W; x++) {
+      ink[x] = 0;
+      for (y = 0; y < H; y++) { if (Math.abs(lum((y * W + x) * 4) - bgL) > 70) { ink[x] = 1; break; } }
+    }
+    var runs = [], st = -1;
+    for (x = 0; x <= W; x++) {
+      if (x < W && ink[x]) { if (st < 0) st = x; }
+      else if (st >= 0) { runs.push({ s: st, e: x }); st = -1; }
+    }
+    /*@3.NOPJ7.9*/
+    var sliver = Math.max(2, 3 * kx);
+    while (runs.length > 1 && runs[runs.length - 1].e - runs[runs.length - 1].s <= sliver && runs[runs.length - 1].e >= W - 1 &&
+           runs[runs.length - 1].s - runs[runs.length - 2].e >= 2) runs.pop();
+    while (runs.length > 1 && runs[0].e - runs[0].s <= sliver && runs[0].s <= 1 && runs[1].s - runs[0].e >= 2) runs.shift();
+    if (runs.length < words.length) return null;
+    var gaps = [];
+    for (i = 1; i < runs.length; i++) gaps.push({ k: i, w: runs[i].s - runs[i - 1].e });
+    var need = words.length - 1;
+    var by = gaps.slice().sort(function (p, q) { return q.w - p.w; });
+    var cut = by[need - 1], next = by[need];
+    var at = {};
+    /*@3.NOPJ7.10*/
+    if (cut && cut.w >= Math.max(2, H * 0.12) && (!next || (cut.w >= next.w * 1.3 && cut.w - next.w >= 2))) {
+      for (i = 0; i < need; i++) at[by[i].k] = 1;
+    } else if (!guided(sp, words, runs, gaps, x0, kx, C, at)) return null;
+    var segs = [], from = runs[0].s;
+    for (i = 1; i < runs.length; i++) {
+      if (at[i]) { segs.push({ s: from, e: runs[i - 1].e }); from = runs[i].s; }
+    }
+    segs.push({ s: from, e: runs[runs.length - 1].e });
+    if (segs.length !== words.length) return null;
+    if (RTL_RE.test(tx)) segs.reverse();
+    for (i = 0; i < words.length; i++) {
+      words[i].l = C.left + (x0 + segs[i].s) / kx;
+      words[i].r = C.left + (x0 + segs[i].e) / kx;
+    }
+    return { w: words, top: R.top, bottom: R.bottom };
+  }
+
+  function guided(sp, words, runs, gaps, x0, kx, C, at) {
+    var node = sp.firstChild, big = 0, i, j;
+    for (i = 0; i < gaps.length; i++) big = Math.max(big, gaps[i].w);
+    var minW = Math.max(2, big * 0.6), last = 0;
+    for (i = 0; i < words.length - 1; i++) {
+      var rg = document.createRange();
+      try { rg.setStart(node, words[i].b); rg.setEnd(node, words[i + 1].a); } catch (e) { return false; }
+      var r = rg.getBoundingClientRect();
+      if (!(r.width >= 0) || !r.height) return false;
+      var want = ((r.left + r.right) / 2 - C.left) * kx - x0, tol = Math.max(6, (r.width || 4) * 1.5) * kx;
+      var best = -1, bd = 1e9;
+      for (j = 0; j < gaps.length; j++) {
+        var g = gaps[j];
+        if (g.w < minW || g.k <= last) continue;
+        var mid = (runs[g.k - 1].e + runs[g.k].s) / 2, d = Math.abs(mid - want);
+        if (d < bd) { bd = d; best = g.k; }
+      }
+      if (best < 0 || bd > tol) return false;
+      at[best] = 1;
+      last = best;
+    }
+    return true;
+  }
+
+  function xAt(ws, off, end) {
+    for (var i = 0; i < ws.length; i++) {
+      var w = ws[i];
+      if (end ? off <= w.b : off < w.b) {
+        if (off <= w.a) return end && i > 0 ? ws[i - 1].r : w.l;
+        return w.l + (off - w.a) / (w.b - w.a) * (w.r - w.l);
+      }
+    }
+    return ws[ws.length - 1].r;
+  }
+
+  function inkRect(seg, a, b) {
+    var L = xAt(seg.w, a, false), Rr = xAt(seg.w, b, true);
+    var l = Math.min(L, Rr), r = Math.max(L, Rr);
+    if (!(r - l > 0.5)) return null;
+    return { left: l, right: r, top: seg.top, bottom: seg.bottom, width: r - l, height: seg.bottom - seg.top };
+  }
 
   function create(o) {
     var h = o.handle;
@@ -191,6 +306,7 @@
       var spans = td.querySelectorAll('span');
       var list = [];
       var parts = runs(i, hit.s, hit.e);
+      var cv = view && view.slots && view.slots[i] ? view.slots[i].cv : null;
       for (var k = 0; k < parts.length; k++) {
         var sp = spans[parts[k].i];
         if (!sp || !sp.firstChild) continue;
@@ -198,6 +314,10 @@
         var a = Math.min(parts[k].a, node.length);
         var b = Math.min(parts[k].b, node.length);
         if (b <= a) continue;
+        /*@3.NOPJ7.11*/
+        var seg = cv ? inkWords(sp, cv) : null;
+        var ir = seg ? inkRect(seg, a, b) : null;
+        if (ir) { list.push(ir); continue; }
         var rg = document.createRange();
         try { rg.setStart(node, a); rg.setEnd(node, b); } catch (e) { continue; }
         var rs = rg.getClientRects();
@@ -321,5 +441,5 @@
     };
   }
 
-  window.GardenPdfFind = { create: create };
+  window.GardenPdfFind = { create: create, inkWords: inkWords, inkRect: inkRect };
 })();

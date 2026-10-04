@@ -237,6 +237,40 @@
       .catch(function () { return false; });
   }
 
+  /*@3.NOSJ.22*/
+  var DGM_CAP = 16 * 1024 * 1024, DGM_AGE = 90 * 864e5, dgmAt = 0;
+  function sweepMeta(prefix, cap, age) {
+    var res = { n: 0, bytes: 0, kept: 0, keptBytes: 0 };
+    return tx(S_META, 'readwrite', function (os) {
+      var rq = os.openCursor(IDBKeyRange.bound(prefix, prefix + '\uffff')), rows = [], now = Date.now();
+      rq.onsuccess = function () {
+        var c = rq.result;
+        if (c) {
+          var v = c.value && c.value.v;
+          rows.push({ k: c.key, at: (v && v.at) || 0, b: ((v && v.html) ? v.html.length : 0) + 64 });
+          c.continue();
+          return;
+        }
+        rows.sort(function (a, b) { return a.at - b.at; });
+        var tot = 0, i;
+        for (i = 0; i < rows.length; i++) tot += rows[i].b;
+        var goal = tot > cap ? cap * 0.75 : Infinity;
+        for (i = 0; i < rows.length; i++) {
+          var r = rows[i];
+          if (now - r.at > age || tot > goal) { os.delete(r.k); tot -= r.b; res.n++; res.bytes += r.b; }
+          else { res.kept++; res.keptBytes += r.b; }
+        }
+      };
+      return res;
+    }).catch(function () { return res; });
+  }
+  function sweepDgm(force) {
+    var now = Date.now();
+    if (!force && now - dgmAt < 600000) return Promise.resolve(null);
+    dgmAt = now;
+    return sweepMeta('dgm:', DGM_CAP, DGM_AGE);
+  }
+
   function mkErr(code, extra) {
     var e = new Error(code);
     e.code = code;
@@ -466,6 +500,8 @@
     docState: docState,
     meta: getMeta,
     setMeta: setMeta,
+    sweepMeta: sweepMeta,
+    sweepDgm: sweepDgm,
     byteLen: byteLen,
     putImage: putImage,
     getImage: function (id) {

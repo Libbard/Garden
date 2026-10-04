@@ -4590,6 +4590,21 @@
         });
       }
       if (overlay && overlay.show) { try { overlay.show(); } catch (e3) {} }
+      if (overlay && overlay.host && !overlay.host.__selCtx) {
+        overlay.host.__selCtx = 1;
+        /*@3.NOAJ.484*/
+        overlay.host.addEventListener('contextmenu', function (e) {
+          if (!ed || !ed._selMode || !ed.selectedBlocks().length || !ed.openCtx) return;
+          var hs = overlay && overlay.host, was = hs ? hs.style.pointerEvents : '';
+          if (hs) hs.style.pointerEvents = 'none';
+          var under = null;
+          try { under = document.elementFromPoint(e.clientX, e.clientY); } catch (eU) {}
+          if (hs) hs.style.pointerEvents = was;
+          if (!under || !ed.root.contains(under)) return;
+          e.preventDefault(); e.stopPropagation();
+          try { ed.openCtx(under, e.clientX, e.clientY); } catch (eC) {}
+        }, true);
+      }
       if (sheetCtxOff) { try { sheetCtxOff(); } catch (e4) {} sheetCtxOff = null; }
       if (isBoard && ed && ed.ctxOn) sheetCtxOff = ed.ctxOn(host, function () { return !!overlay && !overlay.on; });
       marksSoon();
