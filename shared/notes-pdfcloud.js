@@ -695,6 +695,7 @@
 
   window.GardenPdfCloud = {
     refIdOf: refIdOf,
+    reason: reason,
     restore: restore,
     restoreX: restoreX,
     offer: offer,

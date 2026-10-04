@@ -2987,6 +2987,7 @@
       ed = E.mount(host, deep(d), {
         noDocPaste: true,
         freeOnly: true,
+        onNote: function (m) { if (self.o.onNote) self.o.onNote(m); },
         sheetH: function () { return p.h || 0; },
         onDirty: function () { self.fieldDirty(p); },
         freeDefaults: function () {

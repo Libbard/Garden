@@ -9369,7 +9369,8 @@
         var wv = act.slice(2);
         self.setWidth(id, wv === 'auto' ? null : wv);
       } else if (act.indexOf('z:') === 0) {
-        self.setZ(id, act.slice(2));
+        /*@3.NOEJ.617*/
+        if (self.setZ(id, act.slice(2)) !== false) self.touchAct('');
       } else if (act.indexOf('fx:') === 0) {
         self.setFreeAlign(id, act.slice(3));
       } else if (act.indexOf('ls:') === 0) {
@@ -9414,7 +9415,11 @@
         }
       }
       else if (act.indexOf('lk') === 0) self.linkAct(self._ctxLink, act);
-      else if (act === 'copy') { self.toggleBlockSel(id, true); self.copyBlocks(); }
+      else if (act === 'copy') {
+        self.toggleBlockSel(id, true);
+        var nC = self.copyBlocks();
+        if (nC && self.opts.onNote) self.opts.onNote(self.opts.freeOnly ? L('نُسخ — الصقْه بالزرِّ الأيمن ⇐ «المنسوخُ هنا»', 'Copied — paste it with right-click ⇒ “Copied here”') : L('نُسخ — الصقْه بالزرِّ الأيمن ⇐ «العناصرُ المنسوخة»', 'Copied — paste it with right-click ⇒ “Copied blocks”'));
+      }
       else if (act === 'paste') {
         if (id) self.toggleBlockSel(id, true); else self.clearBlockSel();
         self.pasteBlocks();

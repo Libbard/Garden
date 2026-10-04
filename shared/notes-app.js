@@ -4798,8 +4798,7 @@
       { a: 'g:view', i: 'fa-eye', t: L('العرض', 'View'), sub: [
         { a: 'pinv', i: pdfInverted() ? 'fa-sun' : 'fa-moon', t: pdfInverted() ? L('أعِدْ ألوانَ الملفّ', 'Restore file colours') : L('اقلبْ ألوانَ الملفّ', 'Invert file colours') },
         { a: 'pink', i: inkHidden() ? 'fa-eye' : 'fa-eye-slash', t: inkHidden() ? L('أظهرِ الرسم', 'Show drawings') : L('أخفِ الرسم', 'Hide drawings') },
-        { a: 'pfit', i: 'fa-expand', t: L('لائمِ الصفحةَ كاملةً', 'Fit whole page') },
-        { a: 'pgoto', i: 'fa-hashtag', t: L('اذهبْ إلى صفحة…', 'Go to page…') }] },
+        { a: 'pfit', i: 'fa-expand', t: L('لائمِ الصفحةَ كاملةً', 'Fit whole page') }] },
       { sep: 1 },
       { a: 'porg', i: 'fa-table-cells-large', t: L('نظِّمْ صفحاتِ الملفّ…', 'Organise the file’s pages…') },
       { a: 'protpg', i: 'fa-rotate-right', t: L('دوِّرْ هذه الصفحة', 'Rotate this page') });
@@ -5247,6 +5246,7 @@
       var ns = Object.keys(pages).map(Number).filter(function (n) { return n > 0; }).sort(function (a, b) { return a - b; });
       if (!ns.length) {
         saveState('error', L('لا تظليلَ ولا تعليقَ في هذا الملفّ بعد.', 'No highlights or comments in this file yet.'));
+        toast(L('لا تظليلَ ولا تعليقَ في هذا الملفّ بعد — ظلِّلْ بالقلم أو أضِفْ نصّاً ثمّ اجمعْ.', 'No highlights or comments in this file yet — highlight with the pen or add text, then gather.'));
         setTimeout(function () { saveState('', ''); }, 2600);
         return null;
       }
@@ -5759,6 +5759,7 @@
       /*@3.NOAJ.267*/
       onInkField: function (on, bar) { return favsSwap(on, bar); },
       onInkClose: function () { pdfDraw(false); },
+      onInkNote: function (m) { toast(m); },
       /*@3.NOAJ.482*/
       onInkText: function (on) {
         if (on && pdfDial && !pdfUi.drawing()) { try { pdfDial.show(false, false); } catch (e) {} paintDrawBtn(); }
@@ -9632,6 +9633,74 @@
         .then(function () { return { n: go.length, bytes: go.reduce(function (a, f) { return a + f.bytes; }, 0) }; });
     });
   }
+  function keepWays() {
+    return { us: !!(window.GardenFiles && GardenFiles.upload && window.GardenPdfCloud && GardenPdfCloud.refIdOf), gd: driveOn() };
+  }
+  function keepGdMark(nid, gid) {
+    var cur = edId === nid ? docNow() : null;
+    if (cur && cur.pdf) { cur.pdf.gd = String(gid); persist(nid, cur, true); return Promise.resolve(); }
+    var St = window.GardenNotesStore;
+    if (!St) return Promise.resolve();
+    return St.getDoc(nid).then(function (row) {
+      var d = row && row.doc;
+      if (!d || !d.pdf) return;
+      d.pdf.gd = String(gid);
+      return putBorn(nid, d, Date.now());
+    });
+  }
+  function keepOne(f, to, hk) {
+    var PD = window.GardenPdfDoc, F = window.GardenFiles, C = window.GardenPdfCloud, Au = window.GardenNotesAudio, St = window.GardenNotesStore;
+    if (f.kind === 'aud') {
+      if (!Au || !Au.keepNow || !St) return Promise.resolve({ ok: false, why: L('التسجيلاتُ غيرُ جاهزة', 'Recordings are not ready') });
+      return St.getDoc(f.note).then(function (row) {
+        var it = ((row && row.doc && row.doc.aud) || []).filter(function (x) { return x && x.i === f.h; })[0];
+        if (!it) return { ok: false, why: L('لم نجد التسجيل', 'The recording was not found') };
+        return Au.keepNow(it, f.note, to);
+      });
+    }
+    return Promise.resolve(PD && PD.get ? PD.get(f.h) : null).then(function (blob) {
+      if (!blob) return { ok: false, why: L('الملفُّ ليس على هذا الجهاز', 'The file is not on this device') };
+      var file = blob instanceof File ? blob : new File([blob], f.name || 'file.pdf', { type: 'application/pdf' });
+      if (to === 'gd') {
+        return needDrive().then(function (GD) {
+          return GD.token(true).then(function () {
+            return GD.upload(file, { name: f.name || file.name || 'file.pdf', mime: 'application/pdf', sha: f.h, kind: 'pdf',
+              onProgress: function (at, of) { if (of && hk.prog) hk.prog(at / of); } });
+          }).then(function (r) { return keepGdMark(f.note, r.id).then(function () { return { ok: true }; }); },
+                  function (e) { return { ok: false, why: GD.reason ? GD.reason(e) : L('تعذّر الحفظُ في درايف', 'Could not save to Drive') }; });
+        });
+      }
+      var ref = C.refIdOf(f.h);
+      var on = function (e) { var d = e.detail || {}; if (d.ref_id === ref && d.stage === 'upload' && d.of && hk.prog) hk.prog(d.at / d.of); };
+      window.addEventListener('garden:fileProgress', on);
+      return F.upload(file, { refId: ref, name: f.name || file.name || 'file.pdf', mime: 'application/pdf' }).then(function (r) {
+        window.removeEventListener('garden:fileProgress', on);
+        try { window.dispatchEvent(new CustomEvent('garden:fileUploaded', { detail: { ref_id: ref, h: f.h, bytes: r && r.bytes, to: 'us' } })); } catch (eE) {}
+        return { ok: true };
+      }, function (e) {
+        window.removeEventListener('garden:fileProgress', on);
+        var code = (e && (e.error || e.message)) || '';
+        var why = C.reason ? C.reason(e) : L('تعذّر الرفع', 'The upload failed');
+        return { ok: false, why: why, halt: /too_large|over_exhausted|vault_full|not_enrolled|locked/.test(code) ? why : '' };
+      });
+    });
+  }
+  /*@3.NOAJ.483*/
+  function spaceKeep(list, to, hk) {
+    var k = 0, halt = '';
+    function next() {
+      if (k >= list.length || halt || (hk.stop && hk.stop())) return Promise.resolve({ halt: halt });
+      var f = list[k];
+      if (hk.start) hk.start(k, f);
+      return keepOne(f, to, hk).then(null, function () { return { ok: false, why: L('تعذّر الرفع', 'The upload failed') }; }).then(function (r) {
+        if (hk.done) hk.done(k, f, !!r.ok, r.why || '');
+        if (r.halt) halt = r.halt;
+        k++;
+        return next();
+      });
+    }
+    return next();
+  }
   function spaceErase(ids, label, aud) {
     var recs = (ids || []).map(idxFind).filter(Boolean);
     aud = (aud || []).filter(function (a) { return a && a.nid && a.i; });
@@ -9787,6 +9856,8 @@
       spaceInfo: spaceInfo,
       spaceClean: spaceClean,
       spaceFree: spaceFree,
+      spaceKeep: spaceKeep,
+      keepWays: keepWays,
       spaceErase: spaceErase,
       openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },

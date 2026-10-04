@@ -418,6 +418,10 @@
     var h = '<div class="nx-sel" role="toolbar" aria-label="' + esc(L('أفعال المحدَّد', 'Selection actions')) + '"' + (n ? '' : ' hidden') + '>' +
       '<b class="nx-sel-n">' + esc(L(n === 1 ? 'عنصرٌ واحد' : (n === 2 ? 'عنصران' : n + (n <= 10 ? ' عناصر' : ' عنصراً')), n + (n === 1 ? ' item' : ' items'))) + '</b>';
     function b(x, icon, ar, en, cls) { return btn(x, icon, L(ar, en), cls || 'gsf-btn--ghost'); }
+    var tot = lastList.filter(function (x) { return x.src === 'rich'; }).length;
+    /*@3.NOEJ3.26*/
+    if (n < tot) h += b('pickall', 'fa-check-double', 'حدِّدِ الكلّ (' + tot + ')', 'Select all (' + tot + ')');
+    h += b('unpick', 'fa-xmark', 'ألغِ التحديد', 'Clear selection') + '<span class="nx-sel-vr" aria-hidden="true"></span>';
     if (trash) {
       h += b('restore', 'fa-rotate-left', 'استعِدْ', 'Restore');
       h += '<span class="nx-sel-vr" aria-hidden="true"></span>' + b('purge', 'fa-trash', 'احذفْ نهائيّاً', 'Delete forever', 'gsf-btn--danger');
@@ -430,7 +434,6 @@
         : b('arch', 'fa-box-archive', 'أرشِفْ', 'Archive');
       h += '<span class="nx-sel-vr" aria-hidden="true"></span>' + b('trash', 'fa-trash', 'إلى السلّة', 'To trash', 'gsf-btn--danger');
     }
-    h += '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b nx-b--ic nx-sel-x" data-x="unpick"' + tip('ألغِ التحديد', 'Clear selection') + '>' + ic('fa-xmark') + '</button>';
     return h + '</div>';
   }
 
@@ -439,6 +442,7 @@
   var FILTS = [
     { k: 'all', ar: 'الكلّ', en: 'All', f: function () { return true; } },
     { k: 'here', ar: 'على هذا الجهاز', en: 'On this device', f: function (f) { return f.dev; } },
+    { k: 'only', ar: 'على هذا الجهاز وحدَه', en: 'Only on this device', f: function (f) { return f.dev && !f.us && !f.gd && !f.tr; } },
     { k: 'none', ar: 'بلا نسخةٍ نراها', en: 'No copy we can see', f: function (f) { return !f.dev && !f.us && !f.gd; } },
     { k: 'trash', ar: 'في السلّة', en: 'In trash', f: function (f) { return f.tr; } }
   ];
@@ -447,18 +451,25 @@
   function fselHtml() {
     var ps = fPicked(), n = ps.length;
     var canFree = ps.filter(function (f) { return f.dev && f.us; }).length;
-    var canErase = ps.length;
+    var canErase = ps.length, w = keepWays();
+    var canUs = ps.filter(function (f) { return keepable(f, 'us'); }).length, canGd = ps.filter(function (f) { return keepable(f, 'gd'); }).length;
     function b(x, icon, ar, en, cls, off, why) {
       return '<button type="button" class="gsf-btn gsf-btn--sm nx-b ' + (cls || 'gsf-btn--ghost') + '" data-x="' + x + '"' + (off ? ' disabled' : '') +
-        (why ? ' title="' + esc(why) + '"' : '') + '>' + ic(icon) + '<span class="nx-b-t">' + esc(L(ar, en)) + '</span></button>';
+        (why ? ' title="' + esc(why) + '"' : '') + '>' + ic(icon, icon === 'fa-google-drive') + '<span class="nx-b-t">' + esc(L(ar, en)) + '</span></button>';
     }
     return '<div class="nx-sel" role="toolbar" aria-label="' + esc(L('أفعال المحدَّد', 'Selection actions')) + '"' + (n ? '' : ' hidden') + '>' +
       '<b class="nx-sel-n">' + esc(L(n === 1 ? 'ملفٌّ واحد' : (n === 2 ? 'ملفّان' : n + (n <= 10 ? ' ملفّات' : ' ملفّاً')), n + (n === 1 ? ' file' : ' files'))) + '</b>' +
+      (n < FROWS.length ? b('fall', 'fa-check-double', 'حدِّدِ الكلّ (' + FROWS.length + ')', 'Select all (' + FROWS.length + ')') : '') +
+      b('funpick', 'fa-xmark', 'ألغِ التحديد', 'Clear selection') + '<span class="nx-sel-vr" aria-hidden="true"></span>' +
+      (w.us ? b('fkeepus', 'fa-cloud-arrow-up', 'ارفعْ عندنا' + (canUs && canUs < n ? ' (' + canUs + ')' : ''), 'Upload to us' + (canUs && canUs < n ? ' (' + canUs + ')' : ''), '', !canUs || KEEP.run,
+        canUs ? '' : L('كلُّ المحدَّد له نسخةٌ عندنا أو ليس على هذا الجهاز', 'Everything selected already has a copy with us or is not on this device')) : '') +
+      (w.gd ? b('fkeepgd', 'fa-google-drive', 'إلى درايف' + (canGd && canGd < n ? ' (' + canGd + ')' : ''), 'To Drive' + (canGd && canGd < n ? ' (' + canGd + ')' : ''), '', !canGd || KEEP.run,
+        canGd ? '' : L('كلُّ المحدَّد في درايف أو ليس على هذا الجهاز', 'Everything selected is in Drive or not on this device')) : '') +
       b('ffree', 'fa-cloud-arrow-down', 'حرِّرْ من هذا الجهاز' + (canFree && canFree < n ? ' (' + canFree + ')' : ''), 'Free from this device' + (canFree && canFree < n ? ' (' + canFree + ')' : ''), '', !canFree,
         canFree ? '' : L('لا شيءَ محدَّدٌ على هذا الجهاز وله نسخةٌ عندنا', 'Nothing selected is on this device with a copy kept by us')) +
       '<span class="nx-sel-vr" aria-hidden="true"></span>' +
       b('ferase', 'fa-trash', 'احذفْ من كلِّ مكان' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'Delete everywhere' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'gsf-btn--danger', !canErase) +
-      '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b nx-b--ic nx-sel-x" data-x="funpick"' + tip('ألغِ التحديد', 'Clear selection') + '>' + ic('fa-xmark') + '</button></div>';
+      '</div>';
   }
   function fPaint() {
     if (!host) return;
@@ -500,12 +511,17 @@
     if (!FSEL[h]) { FSEL = {}; FSEL[h] = 1; FANCH = h; fPaint(); }
     var ps = fPicked(), n = ps.length, pl = n > 1 ? ' (' + n + ')' : '';
     var canFree = ps.filter(function (f) { return f.dev && f.us; }).length;
-    var canErase = ps.length;
+    var canErase = ps.length, w = keepWays();
+    var canUs = ps.filter(function (f) { return keepable(f, 'us'); }).length, canGd = ps.filter(function (f) { return keepable(f, 'gd'); }).length;
     var f0 = ps[0] || {}, copies = (f0.dev ? 1 : 0) + (f0.us ? 1 : 0) + (f0.gd ? 1 : 0);
     var items = [];
     if (n === 1) items.push({ a: 'fopen', i: 'fa-up-right-from-square', t: L('افتحْ ملاحظتَه', 'Open its note') });
     items.push({ a: 'ffree', i: 'fa-cloud-arrow-down', t: L('حرِّرْ من هذا الجهاز', 'Free from this device') + (canFree > 1 ? ' (' + canFree + ')' : ''), off: !canFree,
       why: canFree ? '' : L('يُحرَّر ما له نسخةٌ عندنا وحدَه', 'Only what has a copy with us can be freed') });
+    if (w.us) items.push({ a: 'fkeepus', i: 'fa-cloud-arrow-up', t: L('ارفعْ إلى نسختي عندنا', 'Upload to my copy with us') + (canUs > 1 ? ' (' + canUs + ')' : ''), off: !canUs || KEEP.run,
+      why: canUs ? '' : L('له نسخةٌ عندنا أو ليس على هذا الجهاز', 'It already has a copy with us or is not on this device') });
+    if (w.gd) items.push({ a: 'fkeepgd', i: 'fa-google-drive', brand: 1, t: L('ارفعْ إلى درايفي', 'Upload to my Drive') + (canGd > 1 ? ' (' + canGd + ')' : ''), off: !canGd || KEEP.run,
+      why: canGd ? '' : L('في درايف أو ليس على هذا الجهاز', 'It is in Drive or not on this device') });
     if (n > 1) items.push({ a: 'funpick', i: 'fa-xmark', t: L('ألغِ التحديد', 'Clear selection') + pl });
     items.push({ sep: 1 });
     items.push({ a: 'ferase', i: 'fa-trash', t: L('احذفْ من كلِّ مكان…', 'Delete everywhere…') + (canErase > 1 ? ' (' + canErase + ')' : ''), dz: 1, off: !canErase });
@@ -516,6 +532,7 @@
     }, function (act) {
       if (act === 'fopen' && ps[0] && A.openId) A.openId(ps[0].note);
       else if (act === 'ffree') fFree(ps);
+      else if (act === 'fkeepus' || act === 'fkeepgd') keepGo(ps, act === 'fkeepgd' ? 'gd' : 'us');
       else if (act === 'ferase') fErase(ps);
       else if (act === 'funpick') fClear();
     }, MOPT);
@@ -554,6 +571,66 @@
       '<span>' + esc(L('لا يمسّ ملاحظةً ولا ملفّاً تحتاجه', 'Never touches a note or a file you need')) + '</span></div>' + h +
       '<p class="nx-hint" role="status" data-role="clean-msg">' + esc(CLEAN.msg) + '</p></section>';
   }
+  /*@3.NOEJ3.24*/
+  var KEEP = { run: 0, to: '', at: 0, of: 0, cur: null, prog: 0, ok: 0, bad: [], msg: '', stop: 0 };
+  function keepable(f, to) { return !!(f && f.dev && !f.tr && !(to === 'gd' ? f.gd : f.us)); }
+  function keepWays() { return A.keepWays ? A.keepWays() : { us: false, gd: false }; }
+  function keepPct() { return Math.round(Math.min(1, ((KEEP.at - 1) + (KEEP.prog || 0)) / Math.max(1, KEEP.of)) * 1000) / 10; }
+  function keepHtml(s) {
+    var only = s.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; });
+    if (!KEEP.run && !KEEP.msg && !only.length) return '';
+    var w = keepWays(), bytes = only.reduce(function (a, f) { return a + (f.bytes || 0); }, 0), h;
+    h = '<section class="nx-sp-card nx-keep" data-run="' + (KEEP.run ? 1 : 0) + '"><div class="nx-sp-h"><b>' + esc(L('احمِ ملفّاتك', 'Protect your files')) + '</b><span>' +
+      (KEEP.run ? esc(L('يُرفع ', 'Uploading ')) + lat(KEEP.at + ' / ' + KEEP.of) : esc(L('لا نسخةَ لها إلّا هنا', 'Their only copy is here'))) + '</span></div>';
+    if (KEEP.run) {
+      var c = KEEP.cur || {};
+      h += '<div class="nx-keep-bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + KEEP.of + '" aria-valuenow="' + KEEP.at + '"><i style="inline-size:' + keepPct() + '%"></i></div>' +
+        '<p class="nx-hint"><span dir="auto">' + esc(c.name || '') + '</span> · ' + lat(fmtSize(c.bytes) || '0 B') + '</p>' +
+        '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="kstop"' + (KEEP.stop ? ' disabled' : '') + '>' +
+        esc(KEEP.stop ? L('يقف بعد هذا الملفّ…', 'Stopping after this file…') : L('أوقِفْ بعد هذا الملفّ', 'Stop after this file')) + '</button></div>';
+    } else {
+      if (only.length) {
+        h += '<div class="nx-cl-row" data-k="keep"><span class="nx-cl-i">' + ic('fa-mobile-screen') + '</span>' +
+          '<span class="nx-cl-t"><b>' + esc(only.length === 1 ? L('ملفٌّ على هذا الجهاز وحدَه', 'One file is on this device only')
+            : only.length === 2 ? L('ملفّان على هذا الجهاز وحدَه', 'Two files are on this device only')
+            : L(only.length + (only.length <= 10 ? ' ملفّاتٍ' : ' ملفّاً') + ' على هذا الجهاز وحدَه', only.length + ' files are on this device only')) + '</b>' +
+          '<small>' + esc(L('إن مُسح المتصفّحُ ضاعت — ارفعْها لتفتحها من أيِّ جهاز', 'Clearing the browser would lose them — upload them to open them anywhere')) + '</small></span>' +
+          '<span class="nx-fr-s">' + lat(fmtSize(bytes) || '0 B') + '</span><span></span></div>';
+        h += '<div class="nx-keep-b">' +
+          (w.us ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--go nx-b" data-x="keep" data-to="us">' + ic('fa-cloud-arrow-up') + esc(L('ارفعْها إلى نسختي عندنا', 'Upload them to my copy with us')) + '</button>' : '') +
+          (w.gd ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="keep" data-to="gd">' + ic('fa-google-drive', 1) + esc(L('إلى درايفي', 'To my Drive')) + '</button>' : '') +
+          (!w.us && !w.gd ? '<span class="nx-hint">' + esc(L('افتحِ المزامنةَ أو اربطْ درايف لترفعها.', 'Turn on sync or connect Drive to upload them.')) + '</span>' : '') + '</div>';
+      }
+      if (KEEP.msg) h += '<p class="nx-hint" role="status">' + esc(KEEP.msg) + '</p>';
+    }
+    return h + '</section>';
+  }
+  function keepPaint() {
+    var c = host && host.querySelector('.nx-keep');
+    if (c && SPACE) { c.outerHTML = keepHtml(SPACE); A.i18n(host); }
+  }
+  function keepGo(list, to) {
+    if (KEEP.run || !A.spaceKeep) return;
+    var go = list.filter(function (f) { return keepable(f, to); });
+    if (!go.length) return;
+    KEEP = { run: 1, to: to, at: 0, of: go.length, cur: null, prog: 0, ok: 0, bad: [], msg: '', stop: 0 };
+    FSEL = {};
+    render();
+    A.spaceKeep(go, to, {
+      start: function (k, f) { KEEP.at = k + 1; KEEP.cur = f; KEEP.prog = 0; keepPaint(); },
+      prog: function (x) { KEEP.prog = x; var b = host && host.querySelector('.nx-keep-bar > i'); if (b) b.style.inlineSize = keepPct() + '%'; },
+      done: function (k, f, ok, why) { if (ok) KEEP.ok++; else KEEP.bad.push({ f: f, why: why || '' }); },
+      stop: function () { return !!KEEP.stop; }
+    }).then(function (r) {
+      var where = to === 'gd' ? L('إلى درايفك', 'to your Drive') : L('إلى نسختك عندنا', 'to your copy with us');
+      var m = KEEP.ok ? L('رُفع ' + KEEP.ok + ' ' + where, 'Uploaded ' + KEEP.ok + ' ' + where) : L('لم يُرفع شيء', 'Nothing was uploaded');
+      if (KEEP.bad.length) m += ' · ' + L('تعذّر ' + KEEP.bad.length + ': ', KEEP.bad.length + ' failed: ') + KEEP.bad[0].why;
+      if (r && r.halt) m += ' · ' + r.halt;
+      else if (KEEP.stop && KEEP.at < KEEP.of) m += ' · ' + L('أُوقف قبل ' + (KEEP.of - KEEP.at), 'stopped before ' + (KEEP.of - KEEP.at));
+      KEEP = { run: 0, msg: m };
+    }, function () { KEEP = { run: 0, msg: L('تعذّر الرفع — لم يتغيّر شيء.', 'The upload failed — nothing changed.') }; })
+      .then(function () { SPACE = null; STAT = {}; if (A.statusStale) A.statusStale(); render(); });
+  }
   function cleanGo(b) {
     var k = b.getAttribute('data-k'), now = Date.now();
     if (!(+b.getAttribute('data-armed') > now - 5000)) {
@@ -575,7 +652,7 @@
   }
   function spaceHtml(s) {
     if (!s) return '<div class="nx-space"><p class="nx-hint">' + esc(L('أجرد ما على هذا الجهاز…', 'Counting what is on this device…')) + '</p></div>';
-    var h = '<div class="nx-space"><section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('مساحةُ هذا الجهاز', 'This device')) + '</b>' +
+    var h = '<div class="nx-space"><div class="nx-sp-side"><section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('مساحةُ هذا الجهاز', 'This device')) + '</b>' +
       '<span>' + lat(fmtSize(s.used) || '0 B') + (s.quota ? ' ' + esc(L('من', 'of')) + ' ' + lat(fmtSize(s.quota)) : '') + '</span></div>';
     var tot = s.cats.reduce(function (a, c) { return a + c.bytes; }, 0) || 1;
     h += '<div class="nx-meter" role="img" aria-label="' + esc(s.cats.map(function (c) { return c.label + ' ' + fmtSize(c.bytes); }).join(' · ')) + '">';
@@ -583,7 +660,7 @@
     h += '</div><div class="nx-legend">';
     s.cats.forEach(function (c) { h += '<span><i data-k="' + esc(c.k) + '"></i>' + esc(c.label) + ' ' + lat(fmtSize(c.bytes)) + '</span>'; });
     h += '</div>';
-    h += '</section>' + cleanHtml(s) + '<section class="nx-sp-card"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
+    h += '</section>' + keepHtml(s) + cleanHtml(s) + '</div><section class="nx-sp-card nx-sp-files"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
     if (!s.files.length) h += '<p class="nx-hint">' + esc(L('لا ملفّاتِ PDF ولا تسجيلات بعد.', 'No PDFs or recordings yet.')) + '</p>';
     /*@3.NOEJ3.13*/
     var cnt = {};
@@ -996,11 +1073,17 @@
       case 'fall': fAll(); return;
       case 'funpick': fClear(); return;
       case 'ffree': fFree(fPicked()); return;
+      case 'fkeepus': keepGo(fPicked(), 'us'); return;
+      case 'fkeepgd': keepGo(fPicked(), 'gd'); return;
+      /*@3.NOEJ3.25*/
+      case 'keep': if (SPACE) keepGo(SPACE.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; }), x.getAttribute('data-to') === 'gd' ? 'gd' : 'us'); return;
+      case 'kstop': KEEP.stop = 1; keepPaint(); return;
       case 'ferase': fErase(fPicked()); return;
       case 'clean': if (A.spaceClean) cleanGo(x); return;
       case 'import': pickFiles(); return;
       case 'empty': A.emptyTrash(); return;
       case 'unpick': clear(); return;
+      case 'pickall': selectAll(); return;
       case 'open': openItem(itemOf(ids[0])); return;
       case 'move': A.move(ids); return;
       case 'export': A.exportIds(ids); return;
@@ -1010,6 +1093,8 @@
       case 'restore': A.restore(ids); return;
       case 'purge': A.purge(ids); return;
       case 'pick':
+        /*@3.NOEJ3.27*/
+        if (it && e.shiftKey && anchor) { e.preventDefault(); range(it.getAttribute('data-uid')); return; }
         if (it) toggle(it.getAttribute('data-uid'));
         return;
     }
@@ -1078,13 +1163,15 @@
   }
 
   function onDocKey(e) {
-    if (!host || !host.isConnected || e.defaultPrevented) return;
+    if (!host || !host.isConnected || e.defaultPrevented || !host.getClientRects().length) return;
     var t = e.target;
     if (t && host.contains(t)) return;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return;
     if (t && t.closest && t.closest('dialog[open], .na-ctx')) return;
     if (document.querySelector('dialog[open]')) return;
-    if (t && t !== document.body && t !== document.documentElement) return;
+    if (t && t !== document.body && t !== document.documentElement &&
+        /*@3.NOEJ3.28*/
+        !((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A') && t.closest && t.closest('button, a, [role="button"], [tabindex]'))) return;
     onKey(e);
   }
 

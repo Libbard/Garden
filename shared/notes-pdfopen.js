@@ -868,6 +868,7 @@
         onField: function (on, bar) { return o.onInkField ? o.onInkField(on, bar) : false; },
         onClosePen: function () { if (o.onInkClose) o.onInkClose(); },
         onTextMode: function (on) { if (o.onInkText) o.onInkText(on); },
+        onNote: function (m) { if (o.onInkNote) o.onInkNote(m); },
         onShapeBox: function (n, x, y, w, h, W, stage) { return o.onShapeBox ? o.onShapeBox(n, x, y, w, h, W, stage) : false; },
         onFileMenu: function (x, y) { if (o.onFileMenu) o.onFileMenu(x, y); },
         hearAt: function (x, y) { return o.hearAt ? o.hearAt(x, y) : null; },

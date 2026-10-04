@@ -886,7 +886,7 @@
   }
 
   var up = { q: [], busy: Object.create(null), tries: Object.create(null), seen: Object.create(null),
-             pct: Object.create(null), running: false };
+             pct: Object.create(null), wait: Object.create(null), running: false };
 
   function fileName(it) {
     var ext = /ogg/.test(it.m) ? '.ogg' : (/mp4|m4a|aac/.test(it.m) ? '.m4a' : '.webm');
@@ -924,10 +924,21 @@
     });
   }
 
-  function enqueue(it, nid) {
-    if (!it || it.aup || up.busy[it.i] || up.q.some(function (x) { return x.it.i === it.i; })) return;
-    up.q.push({ it: it, nid: nid });
+  function enqueue(it, nid, done) {
+    if (!it) { if (done) done(false, 'gone'); return; }
+    if (it.aup) { if (done) done(true); return; }
+    var q0 = up.q.filter(function (x) { return x.it.i === it.i; })[0];
+    if (q0 || up.busy[it.i]) {
+      if (done) { if (q0) q0.done = (q0.done || []).concat([done]); else (up.wait[it.i] = up.wait[it.i] || []).push(done); }
+      return;
+    }
+    up.q.push({ it: it, nid: nid, done: done ? [done] : [] });
     pump();
+  }
+  function settle(job, ok, w) {
+    var ds = (job.done || []).concat(up.wait[job.it.i] || []);
+    delete up.wait[job.it.i];
+    ds.forEach(function (d) { try { d(ok, w); } catch (e) {} });
   }
 
   function pump() {
@@ -950,6 +961,7 @@
       }).then(function () {
         it.aup = 1; delete it.upE;
         flashDone(it.i);
+        settle(job, true);
       });
     }, function (e) {
       delete up.busy[it.i];
@@ -957,8 +969,9 @@
       var n = (up.tries[it.i] = (up.tries[it.i] || 0) + 1);
       var fatal = /not_enrolled|not_configured|bad_mime|too_big|vault_full|gone|locked/.test(w);
       if (!fatal && n <= RETRY.length) {
-        setTimeout(function () { enqueue(it, job.nid); }, RETRY[n - 1]);
+        setTimeout(function () { up.q.push({ it: it, nid: job.nid, done: job.done }); pump(); }, RETRY[n - 1]);
       } else {
+        settle(job, false, w);
         return withDoc(job.nid, function (list) {
           list.forEach(function (x) { if (x.i === it.i) x.upE = w; });
         }).then(function () { it.upE = w; });
@@ -2241,6 +2254,12 @@
     checkDraft: checkDraft,
     local: local,
     eraseRecs: eraseRecs,
+    /*@3.NOAJ3.8*/
+    keepNow: function (it, nid, to) {
+      if (!it || !nid) return Promise.resolve({ ok: false, why: 'gone' });
+      if (to === 'gd') return toDrive([it], nid).then(function () { return { ok: true }; }, function (e) { return { ok: false, why: (e && (e.code || e.message)) || 'fail', e: e }; });
+      return new Promise(function (res) { enqueue(it, nid, function (ok, w) { res({ ok: ok, why: w ? upErr(w) : '', code: w || '' }); }); });
+    },
     keepCopy: function (it, nid, to) {
       if (!it || !nid) return Promise.resolve();
       if (to === 'gd') return toDrive([it], nid)['catch'](function () {});
