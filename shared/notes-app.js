@@ -6042,6 +6042,14 @@
       known: function (code) {
         try { return !!(window.GardenData && GardenData.courseInfo && GardenData.courseInfo(code)); } catch (e) { return false; }
       },
+      course: function (code) { return { label: courseLabel(code), tone: courseTone(code) || '' }; },
+      courses: function () {
+        var list = [];
+        try { list = (window.GardenData && GardenData.catalogList) ? GardenData.catalogList() : []; } catch (e) {}
+        return list.filter(function (c) { return c && c.code; }).map(function (c) {
+          return { code: c.code, name: isAr() ? (c.name_ar || c.name_en || '') : (c.name_en || c.name_ar || '') };
+        }).sort(function (a, b) { return a.code < b.code ? -1 : a.code > b.code ? 1 : 0; });
+      },
       mkFolder: function (name) {
         var id = newId('f'), now = Date.now();
         var sib = foldersRead().filter(function (f) { return !f.p; }).length;
@@ -6332,6 +6340,7 @@
       depth = 0;
       root.removeAttribute('data-drop');
       var fs = e.dataTransfer.files ? Array.prototype.slice.call(e.dataTransfer.files) : [];
+      if (fs.length && window.GardenNotesBulk && GardenNotesBulk.isOpen && GardenNotesBulk.isOpen()) { GardenNotesBulk.add(fs); return; }
       if (fs.length > 1 && window.GardenNotesBulk) { bulkOpen(fs); return; }
       if (fs[0]) intake(fs[0]);
     });
@@ -9577,8 +9586,59 @@
     return vKey(v);
   }
 
+  var stDev = null, stDevAt = 0, stSrv = null, stSrvAt = 0;
+  function exStatus(id) {
+    var St = window.GardenNotesStore, PD = window.GardenPdfDoc, Fl = window.GardenFiles, now = Date.now();
+    if (!stDev || now - stDevAt > 15000) {
+      stDevAt = now;
+      stDev = (PD && PD.list ? PD.list()['catch'](function () { return []; }) : Promise.resolve([])).then(function (l) {
+        var o = {}; (l || []).forEach(function (x) { if (x && x.hash) o[x.hash] = 1; }); return o;
+      });
+    }
+    if (!stSrv || now - stSrvAt > 120000) {
+      stSrvAt = now;
+      stSrv = (Fl && Fl.list ? Fl.list()['catch'](function () { return { files: [] }; }) : Promise.resolve({ files: [] })).then(function (r) {
+        var o = {}; ((r && r.files) || []).forEach(function (f) { if (f && f.ref_id) o[f.ref_id] = 1; }); return o;
+      });
+    }
+    return Promise.all([St && St.getDoc ? St.getDoc(id)['catch'](function () { return null; }) : null, stDev, stSrv]).then(function (r) {
+      var d = r[0] && r[0].doc, dev = r[1] || {}, us = r[2] || {}, out = { aud: 0, audUs: 0 };
+      if (!d) return out;
+      var me = (window.GardenSync && GardenSync.deviceId) ? GardenSync.deviceId() : '';
+      if (d.pdf && d.pdf.h) {
+        var h = d.pdf.h;
+        out.file = 1; out.dev = !!dev[h]; out.us = !!us['pdf_' + String(h).slice(0, 40)]; out.gd = !!d.pdf.gd;
+        out.other = !!(d.pdf.dv && d.pdf.dv !== me);
+      }
+      (d.aud || []).forEach(function (x) { if (x && x.i) { out.aud++; if (x.aup) out.audUs++; } });
+      return out;
+    });
+  }
+
   function exApi() {
     return {
+      status: exStatus,
+      statusStale: function () { stDev = null; stSrv = null; },
+      act: function (act, uid) { ctxAct(act, uid); },
+      pin: function (uids, on) {
+        var now = Date.now();
+        recsOf(uids).forEach(function (x) {
+          var r = idxFind(x.id);
+          if (!r) return;
+          r.p = on ? 1 : 0; r.updated_at = now; idxPut(r);
+          if (r.id === edId) syncPinBtn(r);
+        });
+        reload({ keepOpen: true });
+      },
+      folderAct: function (act, fid) { folderCtxAct(act, fid); },
+      folderSib: function (fid, dir) { return sibMove(fid, dir); },
+      create: function (k) {
+        if (k === 'note') createNote();
+        else if (k === 'board') createNote('board');
+        else if (k === 'pdf') createPdf();
+        else if (k === 'ai') importAi();
+        else askFile(k);
+      },
       L: L, esc: esc, isAr: isAr, i18n: i18n,
       ui: function (k) { return ui()[k]; },
       uiSet: uiSet,
