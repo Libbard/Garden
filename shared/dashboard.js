@@ -908,7 +908,6 @@
   /*@3.DASJ.61*/
 
   var tkFilter = 'all';
-  var tkGroup = false;
 
   var TYPE_LABEL = {
     hw:         ['واجب', 'Homework'],
@@ -970,41 +969,103 @@
   function autoDone(t) { return t.source === 'exam' && t.done && !t.completed; }
   function dlAttrs(t) { return ' data-id="' + esc(t.id) + '" data-src="' + esc(t.source || 'task') + '"'; }
 
-  function taskRow(t) {
+  var tkView = 'date';
+  var TK_BUCKETS = [
+    { k: 'late',  ar: 'متأخرة',      en: 'Late' },
+    { k: 'today', ar: 'اليوم',       en: 'Today' },
+    { k: 'tom',   ar: 'غداً',        en: 'Tomorrow' },
+    { k: 'week',  ar: 'هذا الأسبوع', en: 'This week' },
+    { k: 'later', ar: 'لاحقاً',      en: 'Later' },
+    { k: 'none',  ar: 'بلا تاريخ',   en: 'No date' }
+  ];
+  var SRC_ICON = { task: 'fa-list-check', course: 'fa-book-open', exam: 'fa-file-pen', bb: 'fa-calendar-days' };
+
+  function tkBucket(days) {
+    if (days === null) return 'none';
+    if (days < 0) return 'late';
+    if (days === 0) return 'today';
+    if (days === 1) return 'tom';
+    if (days <= 7) return 'week';
+    return 'later';
+  }
+
+  function tkLoc() { return isAr() ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB'; }
+  function tkTime(due) {
+    var s = String(due || '');
+    if (s.indexOf('T') < 0) return '';
+    var hm = s.split('T')[1].split(':');
+    return new Date(2000, 0, 1, +hm[0] || 0, +hm[1] || 0)
+      .toLocaleTimeString(tkLoc(), { hour: 'numeric', minute: '2-digit' });
+  }
+  function tkDay(due, opts) {
+    var p = String(due).split('T')[0].split('-');
+    var d = new Date(+p[0], (+p[1] || 1) - 1, +p[2] || 1);
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString(tkLoc(), opts);
+  }
+  function tkDue(t, days) {
+    if (days === null) return tx('بلا تاريخ', 'No date');
+    if (days < 0 && !t.done) return dueLabel(days);
+    var time = tkTime(t.due);
+    if (days === 0 || days === 1) return time || dueLabel(days);
+    if (days > 1 && days <= 7) return tkDay(t.due, { weekday: 'long' });
+    return tkDay(t.due, { day: 'numeric', month: 'long' });
+  }
+  function tkColor(code) {
+    if (!code) return '';
+    try { return D.courseColor ? D.courseColor(code) : ''; } catch (e) { return ''; }
+  }
+
+  function taskRow(t, opt) {
     var days = D.daysUntil(t.due);
     var u = urgency(days, t.done);
     var title = dlTitle(t);
-    var src = t.pending_course ? SRC_LABEL.bb : (SRC_LABEL[t.source] || SRC_LABEL.task);
+    var srcKey = t.pending_course ? 'bb' : (SRC_LABEL[t.source] ? t.source : 'task');
+    var src = SRC_LABEL[srcKey];
+    var color = tkColor(t.course);
 
     var check = t.editable && !autoDone(t)
-      ? '<button class="tk-check" data-act="tk-toggle"' + dlAttrs(t) + ' ' +
-        'aria-label="' + esc(t.done ? tx('إلغاء الإتمام', 'Mark not done') : tx('إكمال', 'Complete')) + '"' + (t.done ? ' aria-pressed="true"' : ' aria-pressed="false"') + '>' +
-        (t.done ? '<i class="fa-solid fa-check" aria-hidden="true"></i>' : '') + '</button>'
-      : '<span class="tk-check tk-check-locked" aria-hidden="true">' + (t.done ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-calendar-days"></i>') + '</span>';
+      ? '<button type="button" class="tk-check" data-act="tk-toggle"' + dlAttrs(t) +
+        ' aria-label="' + esc((t.done ? tx('إلغاء الإتمام: ', 'Mark not done: ') : tx('إتمام: ', 'Complete: ')) + title) + '"' +
+        ' aria-pressed="' + (t.done ? 'true' : 'false') + '">' +
+        '<i class="fa-solid fa-check" aria-hidden="true"></i></button>'
+      : '<span class="tk-check is-locked' + (t.done ? ' is-on' : '') + '" aria-hidden="true">' +
+        (t.done ? '<i class="fa-solid fa-check"></i>' : '') + '</span>';
 
-    var actions = t.editable
-      ? '<button class="tk-act" data-act="tk-edit"' + dlAttrs(t) + ' aria-label="' + esc(tx('تعديل', 'Edit')) + '"><i class="fa-solid fa-pen"></i></button>' +
-        '<button class="tk-act" data-act="tk-del"' + dlAttrs(t) + ' aria-label="' + esc(tx('حذف', 'Delete')) + '"><i class="fa-solid fa-trash"></i></button>'
+    var meta = '';
+    if (t.course && !(opt && opt.noCourse)) {
+      meta += '<span class="tk-course"><span class="tk-dot"></span><span class="tk-code">' + esc(t.course) + '</span></span>';
+    } else if (t.pending_course) {
+      meta += '<span class="tk-pend">' + esc(tx(PENDING_COURSE[0], PENDING_COURSE[1])) + '</span>';
+    }
+    meta += '<span class="tk-type">' + esc(typeLabel(t.type)) + '</span>';
+    meta += '<span class="tk-src"><i class="fa-solid ' + SRC_ICON[srcKey] + '" aria-hidden="true"></i>' + esc(tx(src[0], src[1])) + '</span>';
+
+    var acts = t.editable
+      ? '<span class="tk-acts">' +
+          '<button type="button" class="tk-act" data-act="tk-edit"' + dlAttrs(t) +
+            ' aria-label="' + esc(tx('تعديل: ', 'Edit: ') + title) + '" title="' + esc(tx('تعديل', 'Edit')) + '"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>' +
+          '<button type="button" class="tk-act tk-act-del" data-act="tk-del"' + dlAttrs(t) +
+            ' aria-label="' + esc(tx('حذف: ', 'Delete: ') + title) + '" title="' + esc(tx('حذف', 'Delete')) + '"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>' +
+        '</span>'
       : '';
 
     /*@3.DASJ.64*/
-    return '<div class="tk-item ' + u.cls + '">' +
+    return '<div class="tk-it ' + u.cls + '"' + (color ? ' style="--tk-c:' + esc(color) + '"' : '') + '>' +
       check +
-      '<button type="button" class="tk-main" data-act="tk-open" data-id="' + esc(t.id) + '"' +
-        ' data-src="' + esc(t.source || 'task') + '"' +
+      '<button type="button" class="tk-main" data-act="tk-open"' + dlAttrs(t) +
         ' aria-label="' + esc(tx('تفاصيل: ', 'Details: ') + title) + '">' +
-        '<div class="tk-title">' + esc(title) + '</div>' +
-        '<div class="tk-meta">' +
-          (t.course ? '<span class="tk-chip">' + esc(t.course) + '</span>'
-                    : (t.pending_course ? '<span class="tk-chip tk-chip-pend">' + esc(tx(PENDING_COURSE[0], PENDING_COURSE[1])) + '</span>' : '')) +
-          '<span class="tk-chip">' + esc(typeLabel(t.type)) + '</span>' +
-          '<span class="tk-chip tk-chip-src">' + esc(tx(src[0], src[1])) + '</span>' +
-          (t.note ? '<span class="tk-note">' + esc(t.note) + '</span>' : '') +
-        '</div>' +
+        '<span class="tk-title">' + esc(title) + '</span>' +
+        '<span class="tk-meta">' + meta + '</span>' +
       '</button>' +
-      '<div class="tk-due" style="color:' + u.color + '">' + esc(dueLabel(days)) + '</div>' +
-      '<div class="tk-actions">' + actions + '</div>' +
+      '<span class="tk-due">' + esc(tkDue(t, days)) + '</span>' +
+      acts +
     '</div>';
+  }
+
+  function tkCard(head, rows, cls, style) {
+    return '<section class="tk-card' + (cls ? ' ' + cls : '') + '"' + (style ? ' style="' + style + '"' : '') + '>' +
+      '<header class="tk-card-h">' + head + '</header>' +
+      '<div class="tk-rows">' + rows + '</div></section>';
   }
 
   function filterTasks(list) {
@@ -1019,10 +1080,28 @@
     return open;
   }
 
+  function tkCounts(all) {
+    var n = { all: 0, late: 0, week: 0, done: 0 };
+    all.forEach(function (t) {
+      if (t.done) { n.done++; return; }
+      n.all++;
+      var d = D.daysUntil(t.due);
+      if (d !== null && d < 0) n.late++;
+      else if (d !== null && d <= 7) n.week++;
+    });
+    document.querySelectorAll('#tk-filters .tk-n').forEach(function (b) {
+      var v = n[b.getAttribute('data-n')] || 0;
+      b.textContent = v ? String(v) : '';
+      b.classList.toggle('is-hot', b.getAttribute('data-n') === 'late' && v > 0);
+    });
+  }
+
   function renderTasks() {
     var box = el('dash-tasks-list');
     if (!box) return;
-    var list = filterTasks(D.allDeadlines());
+    var all = D.allDeadlines();
+    tkCounts(all);
+    var list = filterTasks(all);
 
     if (!list.length) {
       var msg = tkFilter === 'done' ? tx('لا مهام مكتملة بعد', 'No completed tasks yet')
@@ -1034,30 +1113,50 @@
       return;
     }
 
-    if (!tkGroup) {
-      box.innerHTML = '<div class="tk-list">' + list.map(taskRow).join('') + '</div>';
+    if (tkView === 'course') { box.innerHTML = '<div class="tk-grid">' + tkByCourse(list, all) + '</div>'; return; }
+
+    if (tkFilter === 'done') {
+      var done = list.slice().reverse();
+      box.innerHTML = '<div class="tk-grid">' + tkCard(
+        '<strong class="tk-card-t">' + esc(tx('مكتملة', 'Done')) + '</strong><span class="tk-card-n">' + done.length + '</span>',
+        done.map(function (t) { return taskRow(t); }).join(''), 'is-done') + '</div>';
       return;
     }
 
-    var groups = {};
-    var order = [];
+    var by = {};
+    list.forEach(function (t) {
+      var k = tkBucket(D.daysUntil(t.due));
+      (by[k] = by[k] || []).push(t);
+    });
+    box.innerHTML = '<div class="tk-grid">' + TK_BUCKETS.filter(function (b) { return by[b.k]; }).map(function (b) {
+      return tkCard(
+        '<strong class="tk-card-t">' + esc(tx(b.ar, b.en)) + '</strong><span class="tk-card-n">' + by[b.k].length + '</span>',
+        by[b.k].map(function (t) { return taskRow(t); }).join(''), 'is-' + b.k);
+    }).join('') + '</div>';
+  }
+
+  function tkByCourse(list, all) {
+    var groups = {}, order = [];
     list.forEach(function (t) {
       var k = t.course || '__none';
       if (!groups[k]) { groups[k] = []; order.push(k); }
       groups[k].push(t);
     });
-    box.innerHTML = order.map(function (k) {
-      var info = k === '__none' ? null : D.courseInfo(k);
-      var name = k === '__none' ? tx('بلا مادة', 'No course')
-               : (info ? (isAr() ? info.name_ar : info.name_en) : k);
-      var color = (info && info.brand_color) || '#a78bfa';
-      return '<div class="tk-group">' +
-        '<div class="tk-group-head" style="--g-color:' + esc(color) + '">' +
-          '<span class="tk-group-name">' + esc(name) + '</span>' +
-          '<span class="tk-group-count">' + groups[k].length + '</span>' +
-        '</div>' +
-        '<div class="tk-list">' + groups[k].map(taskRow).join('') + '</div>' +
-      '</div>';
+    return order.map(function (k) {
+      var none = k === '__none';
+      var info = none ? null : D.courseInfo(k);
+      var name = none ? tx('بلا مادة', 'No course') : (info ? (isAr() ? info.name_ar : info.name_en) : '');
+      var mine = none ? [] : all.filter(function (t) { return t.course === k; });
+      var fin = mine.filter(function (t) { return t.done; }).length;
+      var pct = mine.length ? Math.round(fin / mine.length * 100) : 0;
+      var color = tkColor(none ? '' : k);
+      var head = (none ? '' : '<span class="tk-dot"></span><span class="tk-code">' + esc(k) + '</span>') +
+        '<strong class="tk-card-t">' + esc(name) + '</strong>' +
+        (none ? '<span class="tk-card-n">' + groups[k].length + '</span>'
+              : '<span class="tk-card-n">' + esc(tx(fin + ' من ' + mine.length, fin + ' of ' + mine.length)) + '</span>');
+      var bar = none ? '' : '<div class="tk-prog" role="img" aria-label="' + esc(tx('أُنجز ' + pct + '٪', pct + '% done')) + '"><i style="inline-size:' + pct + '%"></i></div>';
+      return tkCard(head, bar + groups[k].map(function (t) { return taskRow(t, { noCourse: !none }); }).join(''),
+        'tk-cc', color ? '--tk-c:' + esc(color) : '');
     }).join('');
   }
 
@@ -1126,7 +1225,14 @@
     rows += '<div class="tk-sheet-row"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>' +
       '<span class="tk-sheet-l">' + esc(tx('المتبقّي', 'Remaining')) + '</span>' +
       '<span class="tk-sheet-v" style="color:' + u.color + ';font-weight:800">' + esc(dueLabel(days)) + '</span></div>';
-    rows += sheetRow('fa-inbox', tx('المصدر', 'Source'), tx(srcL[0], srcL[1]));
+    if (t.source === 'exam' || t.source === 'course') {
+      var href = t.source === 'exam' ? 'hub/schedule.html'
+               : 'hub/course.html?code=' + encodeURIComponent(t.course || '');
+      rows += '<div class="tk-sheet-row"><i class="fa-solid fa-inbox" aria-hidden="true"></i>' +
+        '<span class="tk-sheet-l">' + esc(tx('المصدر', 'Source')) + '</span>' +
+        '<a class="tk-sheet-v tk-sheet-link" href="' + href + '">' + esc(tx(srcL[0], srcL[1])) +
+        ' <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div>';
+    } else rows += sheetRow('fa-inbox', tx('المصدر', 'Source'), tx(srcL[0], srcL[1]));
     rows += sheetRow('fa-circle-check', tx('الحالة', 'Status'),
       t.done ? tx('مكتملة', 'Done') : tx('لم تُنجَز بعد', 'Not done yet'));
     if (t.source === 'exam' && t.note) rows += sheetRow('fa-location-dot', tx('القاعة', 'Room'), t.note);
@@ -1142,13 +1248,6 @@
       }
       b += '<button class="tk-btn" data-act="sheet-edit"><i class="fa-solid fa-pen"></i> ' + tx('تعديل', 'Edit') + '</button>' +
         '<button class="tk-btn tk-btn-danger" data-act="sheet-del"><i class="fa-solid fa-trash"></i> ' + tx('حذف', 'Delete') + '</button>';
-    }
-    if (t.source === 'exam' || t.source === 'course') {
-      var href = t.source === 'exam' ? 'hub/schedule.html'
-               : 'hub/course.html?code=' + encodeURIComponent(t.course || '');
-      b += '<a class="tk-btn tk-btn-ghost" href="' + href + '">' +
-        '<i class="fa-solid fa-arrow-up-right-from-square"></i> ' +
-        (t.source === 'exam' ? tx('في الجدول', 'In schedule') : tx('في بطاقة المادة', 'In course card')) + '</a>';
     }
     b += '<button class="tk-btn tk-btn-ghost" data-act="sheet-close">' + tx('إغلاق', 'Close') + '</button>';
     el('tk-sheet-acts').innerHTML = b;
@@ -1970,6 +2069,7 @@
     /*@3.DASJ.117*/
     e.currentTarget.querySelectorAll('.tk-filter').forEach(function (x) {
       x.classList.toggle('active', x === b);
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
     });
     renderTasks();
   }
@@ -2034,8 +2134,17 @@
     window.addEventListener('garden:notesMigrated', function () {
       renderWidgets(); renderTasks(); refreshNotesListModal();
     });
-    var tg = el('tk-group');
-    if (tg) tg.addEventListener('change', function () { tkGroup = tg.checked; renderTasks(); });
+    var tv = el('tk-view');
+    if (tv) tv.addEventListener('click', function (e) {
+      var b = e.target.closest('.tk-view');
+      if (!b) return;
+      tkView = b.getAttribute('data-tkview');
+      tv.querySelectorAll('.tk-view').forEach(function (x) {
+        x.classList.toggle('active', x === b);
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      renderTasks();
+    });
 
     /*@3.DASJ.125*/
     document.addEventListener('keydown', function (e) {
