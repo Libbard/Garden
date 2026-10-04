@@ -7,7 +7,9 @@
     atlas: null, filter: 'all', query: ''
   };
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-  const shotSrc = id => `shared/tour-media/journey/${id}-${state.theme === 'light' ? 'light' : 'dark'}.webp`;
+  const EN_SHOTS = new Set((document.body.dataset.enShots || '').split(' ').filter(Boolean));
+  const shotSrc = id => `shared/tour-media/journey/${id}-${state.theme === 'light' ? 'light' : 'dark'}${state.lang === 'en' && EN_SHOTS.has(id) ? '-en' : ''}.webp`;
+  const swapShots = () => document.querySelectorAll('img[data-shot]').forEach(img => { const s = shotSrc(img.dataset.shot); if (!img.src.endsWith(s)) img.src = s; });
   const T = (ar, en) => state.lang === 'ar' ? ar : en;
   const make = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 
@@ -20,6 +22,7 @@
     document.querySelectorAll('[data-ar-title]').forEach(n => { n.setAttribute('aria-label', n.dataset[state.lang + 'Title']); });
     const lb = document.getElementById('lang-switch');
     lb.textContent = state.lang === 'ar' ? 'EN' : 'ع';
+    swapShots();
     document.querySelectorAll('.stage').forEach(s => s._beat && paintHots(s, s._beat));
     renderAtlas();
   }
@@ -28,13 +31,13 @@
     root.dataset.theme = state.theme;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = state.theme === 'light' ? '#f6f8f4' : state.theme === 'dim' ? '#17191e' : '#10151c';
-    document.querySelectorAll('img[data-shot]').forEach(img => { img.src = shotSrc(img.dataset.shot); });
+    swapShots();
   }
 
   function paintHots(stage, beat) {
     const box = stage.querySelector('.stage-hots');
     let hots = [];
-    try { hots = JSON.parse(beat.dataset.hot || '[]'); } catch (x) {}
+    try { hots = JSON.parse((state.lang === 'en' && beat.dataset.hotEn) || beat.dataset.hot || '[]'); } catch (x) {}
     box.replaceChildren(...hots.flatMap((h, i) => {
       const pin = make('span', 'hot', String(i + 1));
       pin.style.left = h.x + '%'; pin.style.top = h.y + '%';
@@ -220,6 +223,22 @@
     try { localStorage.setItem('garden_theme', state.theme); } catch (x) {}
     applyTheme();
   });
+  const film = document.getElementById('film');
+  if (film) {
+    const v = document.getElementById('film-video');
+    const close = () => { v.pause(); if (film.open) film.close(); };
+    document.getElementById('film-open').addEventListener('click', () => {
+      const en = state.lang === 'en' && v.dataset.enSrc;
+      const src = en ? v.dataset.enSrc : v.dataset.arSrc;
+      if (v.getAttribute('src') !== src) { v.poster = en ? v.dataset.enPoster : v.dataset.arPoster; v.src = src; }
+      film.showModal();
+      v.play().catch(() => {});
+    });
+    document.getElementById('film-close').addEventListener('click', close);
+    film.addEventListener('click', e => { if (e.target === film) close(); });
+    film.addEventListener('close', () => v.pause());
+  }
+
   document.getElementById('lang-switch').addEventListener('click', () => {
     state.lang = state.lang === 'ar' ? 'en' : 'ar';
     try { localStorage.setItem('garden_lang', state.lang); } catch (x) {}
