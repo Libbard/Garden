@@ -605,6 +605,47 @@
     }
     return h + '</section>';
   }
+  /*@3.NOEJ3.30*/
+  var BACK = { run: 0, msg: '', k: '', i: 0, n: 0 };
+  function backHtml() {
+    if (!A.backup) return '';
+    var steps = { notes: L('الملاحظات', 'Notes'), ink: L('الرسم', 'Drawings'), images: L('الصور', 'Images'), files: L('الملفّات', 'Files'), done: L('يُحفظ', 'Saving') };
+    var h = '<section class="nx-sp-card nx-back" data-run="' + (BACK.run ? 1 : 0) + '"><div class="nx-sp-h"><b>' + esc(L('نسخةٌ كاملةٌ في ملفٍّ واحد', 'A full copy in one file')) + '</b>' +
+      '<span>' + (BACK.run ? esc(steps[BACK.k] || '') + (BACK.n > 1 ? ' ' + lat(BACK.i + ' / ' + BACK.n) : '') : esc(L('على جهازك', 'On your device'))) + '</span></div>';
+    h += '<p class="nx-hint">' + esc(L('ملاحظاتُك ومجلّداتُها وملفّاتُ PDF وتسجيلاتُك وصورُك ورسمُك في ملفٍّ مضغوطٍ واحد — تُقرأ دون الموقع، وفيها ما تُستعاد به.',
+      'Your notes with their folders, PDFs, recordings, images and drawings in one ZIP — readable without the site, and complete enough to restore.')) + '</p>';
+    h += '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="backup"' + (BACK.run ? ' disabled' : '') + '>' +
+      ic('fa-file-zipper') + esc(BACK.run ? L('يُجمع…', 'Collecting…') : L('نزِّلِ النسخةَ الكاملة', 'Download the full copy')) + '</button></div>';
+    if (BACK.msg) h += '<p class="nx-hint" role="status">' + esc(BACK.msg) + '</p>';
+    return h + '</section>';
+  }
+  function backPaint() {
+    var c = host && host.querySelector('.nx-back');
+    if (!c) return;
+    var t = document.createElement('div');
+    t.innerHTML = backHtml();
+    if (t.firstChild) c.parentNode.replaceChild(t.firstChild, c);
+  }
+  function backGo() {
+    if (BACK.run || !A.backup) return;
+    BACK = { run: 1, msg: '', k: 'notes', i: 0, n: 0 };
+    backPaint();
+    var last = 0;
+    A.backup(function (k, i, n) {
+      BACK.k = k; BACK.i = i; BACK.n = n;
+      var t = Date.now();
+      if (t - last > 120 || k === 'done') { last = t; backPaint(); }
+    }).then(function (res) {
+      var c = res.counts || {};
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: res.how === 'cancel' ? L('أُلغي الحفظ — لم يُكتب شيء.', 'Saving was cancelled — nothing was written.')
+        : L('حُفظت النسخة: ', 'Saved: ') + c.notes + L(' ملاحظة · ', ' notes · ') + c.files + L(' ملفّاً · ', ' files · ') + c.images + L(' صورة · ', ' images · ') + fmtSize(res.bytes) };
+      backPaint();
+    }, function (e) {
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: (e && e.message === 'zip_too_big') ? L('النسخةُ أكبرُ من ‎4 جيجا — جرِّبْ بعد نقل ملفّاتٍ إلى درايف.', 'The copy is over 4 GB — try again after moving files to Drive.')
+        : L('تعذّر جمعُ النسخة — لم يُحذف شيء.', 'Could not collect the copy — nothing was removed.') };
+      backPaint();
+    });
+  }
   function keepPaint() {
     var c = host && host.querySelector('.nx-keep');
     if (c && SPACE) { c.outerHTML = keepHtml(SPACE); A.i18n(host); }
@@ -660,7 +701,7 @@
     h += '</div><div class="nx-legend">';
     s.cats.forEach(function (c) { h += '<span><i data-k="' + esc(c.k) + '"></i>' + esc(c.label) + ' ' + lat(fmtSize(c.bytes)) + '</span>'; });
     h += '</div>';
-    h += '</section>' + keepHtml(s) + cleanHtml(s) + '</div><section class="nx-sp-card nx-sp-files"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
+    h += '</section>' + keepHtml(s) + cleanHtml(s) + backHtml() + '</div><section class="nx-sp-card nx-sp-files"><div class="nx-sp-h"><b>' + esc(L('ملفّاتي في كلِّ مكان', 'My files everywhere')) + '</b><span>' + esc(L('الأكبرُ أوّلاً', 'Largest first')) + '</span></div>';
     if (!s.files.length) h += '<p class="nx-hint">' + esc(L('لا ملفّاتِ PDF ولا تسجيلات بعد.', 'No PDFs or recordings yet.')) + '</p>';
     /*@3.NOEJ3.13*/
     var cnt = {};
@@ -1096,6 +1137,7 @@
       case 'fkeepus': keepGo(fPicked(), 'us'); return;
       case 'fkeepgd': keepGo(fPicked(), 'gd'); return;
       /*@3.NOEJ3.25*/
+      case 'backup': backGo(); return;
       case 'keep': if (SPACE) keepGo(SPACE.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; }), x.getAttribute('data-to') === 'gd' ? 'gd' : 'us'); return;
       case 'kstop': KEEP.stop = 1; keepPaint(); return;
       case 'ferase': fErase(fPicked()); return;

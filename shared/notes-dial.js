@@ -795,18 +795,25 @@
   };
 
   /*@3.NODJ.61*/
-  function favRow(act, icon, ar, en, off) {
-    return '<button type="button" class="ndl-favp-i" data-fx="' + act + '"' +
-      (off ? ' disabled' : '') + '>' +
-      '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
-      '<span>' + esc(L(ar, en)) + '</span></button>';
+  function favRow(act, icon, ar, en, off, dz) {
+    return { a: act, i: icon, t: L(ar, en), off: !!off, dz: dz ? 1 : 0 };
   }
 
   Dial.prototype.closeFavPop = function () {
-    if (!this._fvPop) return;
-    if (this._fvPop.parentNode) this._fvPop.parentNode.removeChild(this._fvPop);
+    var el = this._fvPop;
     this._fvPop = null;
-    if (this._fvOut) { document.removeEventListener('pointerdown', this._fvOut, true); this._fvOut = null; }
+    if (el && el.isConnected && window.GardenMenu) GardenMenu.close();
+  };
+
+  /*@3.NODJ.136*/
+  Dial.prototype.richPop = function (x, y, model, run) {
+    var self = this;
+    if (!window.GardenMenu || !GardenMenu.rich) return null;
+    var el = GardenMenu.rich(x, y + 6, model, function (act) { self._fvPop = null; run(act); },
+      { cls: 'ndl-favpop', attr: 'data-fx', focus: false, keepFocus: true,
+        onClose: function () { if (self._fvPop === el) self._fvPop = null; } });
+    this._fvPop = el || null;
+    return el;
   };
 
   Dial.prototype.favPop = function (chip, x, y) {
@@ -818,62 +825,36 @@
     var isRec = !!(chip && chip.hasAttribute('data-recent'));
     var ix = chip ? Number(chip.getAttribute(isRec ? 'data-recent' : 'data-fav')) : -1;
     var cur = this.current();
-    var h = '';
+    var head, quick = [], items = [];
     if (isRec) {
-      h += favRow('add', 'fa-star', 'أضِفْ إلى المفضّلة', 'Add to favourites');
+      head = { ico: 'fa-clock-rotate-left', t: L('أداةٌ استعملتَها أخيراً', 'A recent tool') };
+      quick.push(favRow('add', 'fa-star', 'أضِفْ إلى المفضّلة', 'Add to favourites'));
     } else if (ix >= 0 && list[ix]) {
-      h += '<div class="ndl-favp-h">' + esc(favName(list[ix])) + '</div>';
-      h += favRow('put', 'fa-right-left',
-                  'ضَعِ الأداةَ الحاليّةَ مكانَها', 'Replace with current tool', !cur);
-      h += favRow('back', 'fa-arrow-right-long', 'حرّكْ قبلَها', 'Move earlier', ix <= 0);
-      h += favRow('fwd', 'fa-arrow-left-long', 'حرّكْ بعدَها', 'Move later',
-                  ix >= list.length - 1);
-      h += favRow('del', 'fa-trash', 'أزِلْها', 'Remove');
-      h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
+      head = { ico: 'fa-star', t: favName(list[ix]), s: L('في المفضّلة', 'In favourites') };
+      quick.push(favRow('put', 'fa-right-left', 'ضَعِ الحاليّةَ مكانَها', 'Replace with current', !cur),
+                 favRow('back', 'fa-arrow-right-long', 'قبلَها', 'Earlier', ix <= 0),
+                 favRow('fwd', 'fa-arrow-left-long', 'بعدَها', 'Later', ix >= list.length - 1),
+                 favRow('del', 'fa-trash', 'أزِلْها', 'Remove', false, 1));
+    } else {
+      head = { ico: 'fa-star', t: L('المفضّلةُ والأشرطة', 'Favourites & bars') };
     }
     if (!isRec) {
-      h += favRow('add', 'fa-plus', 'أضِفِ الأداةَ الحاليّة', 'Add current tool', !cur);
-      h += favRow('reset', 'fa-rotate-left', 'أعِدِ المفضّلةَ الافتراضيّة', 'Reset favourites');
+      items.push(favRow('add', 'fa-plus', 'أضِفِ الأداةَ الحاليّة', 'Add current tool', !cur),
+                 favRow('reset', 'fa-rotate-left', 'أعِدِ المفضّلةَ الافتراضيّة', 'Reset favourites'));
     }
     /*@3.NODJ.91*/
-    h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
-    h += '<div class="ndl-favp-h">' + esc(L('الأشرطة', 'The bars')) + '</div>';
     var rowsNow = barRead();
     var onOf = function (k) { return !!barOf(rowsNow, k).on; };
-    h += favRow('bar:favs', 'fa-star',
-                onOf('favs') ? 'أخفِ شريطَ المفضّلة' : 'أظهرْ شريطَ المفضّلة',
-                onOf('favs') ? 'Hide the favourites bar' : 'Show the favourites bar');
-    h += favRow('bar:colors', 'fa-palette',
-                onOf('colors') ? 'أخفِ شريطَ الألوان' : 'أظهرْ شريطَ الألوان',
-                onOf('colors') ? 'Hide the colours bar' : 'Show the colours bar');
-    h += favRow('bar:tools', 'fa-pen-ruler',
-                onOf('tools') ? 'أخفِ شريطَ الأدوات' : 'أظهرْ شريطَ الأدوات',
-                onOf('tools') ? 'Hide the tools bar' : 'Show the tools bar');
-    h += favRow('bar:mine', 'fa-wand-magic-sparkles',
-                onOf('mine') ? 'أخفِ شريطي' : 'أظهرْ شريطي',
-                onOf('mine') ? 'Hide my bar' : 'Show my bar');
-    h += favRow('baredit', 'fa-sliders', 'عدّلِ الشريط…', 'Edit the bar…');
-    /*@3.NODJ.135*/
-    h += favRow('barreset', 'fa-rotate-left', 'أعِدِ الترتيبَ الافتراضيّ', 'Restore the default layout');
-    h += favRow('barwipe', 'fa-eraser', 'أعِدْ كلَّ شيءٍ إلى الافتراضيّ', 'Reset everything to default');
-    var pop = document.createElement('div');
-    pop.className = 'ndl-favpop';
-    pop.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
-    pop.innerHTML = h;
-    document.body.appendChild(pop);
-    var w = pop.offsetWidth || 210, hh = pop.offsetHeight || 120;
-    pop.style.insetBlockStart = Math.round(Math.max(8, Math.min(innerHeight - hh - 8, y + 6))) + 'px';
-    pop.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, x - w / 2))) + 'px';
-    pop.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-fx]');
-      if (!b || b.disabled) return;
-      self.favAct(b.getAttribute('data-fx'), ix, isRec);
-      self.closeFavPop();
+    items.push({ h: L('الأشرطة', 'The bars') });
+    [['favs', 'fa-star', 'شريطُ المفضّلة', 'Favourites bar'], ['colors', 'fa-palette', 'شريطُ الألوان', 'Colours bar'],
+     ['tools', 'fa-pen-ruler', 'شريطُ الأدوات', 'Tools bar'], ['mine', 'fa-wand-magic-sparkles', 'شريطي', 'My bar']].forEach(function (b) {
+      items.push({ a: 'bar:' + b[0], i: b[1], t: L(b[2], b[3]), ok: onOf(b[0]) });
     });
-    this._fvPop = pop;
-    this._fvOut = function (e) { if (pop && !pop.contains(e.target)) self.closeFavPop(); };
-    setTimeout(function () { document.addEventListener('pointerdown', self._fvOut, true); }, 0);
-    return pop;
+    items.push(favRow('baredit', 'fa-sliders', 'عدّلِ الشريط…', 'Edit the bar…'));
+    /*@3.NODJ.135*/
+    items.push({ sep: 1 }, favRow('barreset', 'fa-rotate-left', 'أعِدِ الترتيبَ الافتراضيّ', 'Restore the default layout'),
+               favRow('barwipe', 'fa-eraser', 'أعِدْ كلَّ شيءٍ إلى الافتراضيّ', 'Reset everything to default', false, 1));
+    return this.richPop(x, y, { head: head, quick: quick, items: items }, function (act) { self.favAct(act, ix, isRec); });
   };
 
   /*@3.NODJ.62*/
@@ -1294,46 +1275,31 @@
     var ix = isIx ? Number(it.getAttribute('data-ix')) : isRec ? Number(it.getAttribute('data-rec')) : -1;
     var tab = isTab ? it.getAttribute('data-pl') : '';
     var cur = cv && plOk(cv.color);
-    var h = '';
+    var head = null, quick = [], items = [];
     if (isIx) {
       var t = P.lists[P.cur].c[ix];
-      h += '<div class="ndl-favp-h">' + esc(TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t) + '</div>';
-      h += favRow('put', 'fa-right-left', 'ضَعِ اللونَ الحاليَّ مكانَه', 'Replace with current colour', !cur);
-      h += favRow('del', 'fa-trash', 'أزِلْه من القائمة', 'Remove from list');
-      h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
-      h += favRow('add', 'fa-plus', 'أضِفِ اللونَ الحاليّ', 'Add current colour', !cur);
+      head = { ico: 'fa-palette', t: TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t, s: L('قائمة ', 'List ') + (P.cur + 1) };
+      quick.push(favRow('put', 'fa-right-left', 'ضَعِ الحاليَّ مكانَه', 'Replace with current', !cur),
+                 favRow('add', 'fa-plus', 'أضِفِ الحاليّ', 'Add current', !cur),
+                 favRow('del', 'fa-trash', 'أزِلْه', 'Remove', false, 1));
     } else if (isRec) {
-      h += favRow('rec-add', 'fa-plus', 'أضِفْه إلى القائمةِ الحاليّة', 'Add to current list');
-      h += favRow('clear-rec', 'fa-trash', 'امسحْ آخرَ الألوان', 'Clear recent colours');
+      head = { ico: 'fa-clock-rotate-left', t: L('لونٌ استعملتَه أخيراً', 'A recent colour') };
+      items.push(favRow('rec-add', 'fa-plus', 'أضِفْه إلى القائمةِ الحاليّة', 'Add to current list'),
+                 favRow('clear-rec', 'fa-trash', 'امسحْ آخرَ الألوان', 'Clear recent colours', false, 1));
     } else if (isTab && tab === 'recent') {
-      h += favRow('clear-rec', 'fa-trash', 'امسحْ آخرَ الألوان', 'Clear recent colours');
+      head = { ico: 'fa-clock-rotate-left', t: L('آخرُ الألوان', 'Recent colours') };
+      items.push(favRow('clear-rec', 'fa-trash', 'امسحْ آخرَ الألوان', 'Clear recent colours', false, 1));
     } else if (isTab) {
-      h += '<div class="ndl-favp-h">' + esc(L('قائمة ', 'List ') + (Number(tab) + 1)) + '</div>';
-      h += favRow('newlist', 'fa-plus', 'قائمةٌ جديدة', 'New list', P.lists.length >= PL_LISTS_MAX);
-      h += favRow('dellist', 'fa-trash', 'احذفْ هذه القائمة', 'Delete this list', P.lists.length <= 1);
-      h += '<div class="ndl-favp-sep" aria-hidden="true"></div>';
-      h += favRow('reset', 'fa-rotate-left', 'أعِدِ القوائمَ الافتراضيّة', 'Reset lists');
+      head = { ico: 'fa-swatchbook', t: L('قائمة ', 'List ') + (Number(tab) + 1) };
+      items.push(favRow('newlist', 'fa-plus', 'قائمةٌ جديدة', 'New list', P.lists.length >= PL_LISTS_MAX),
+                 favRow('reset', 'fa-rotate-left', 'أعِدِ القوائمَ الافتراضيّة', 'Reset lists'),
+                 { sep: 1 },
+                 favRow('dellist', 'fa-trash', 'احذفْ هذه القائمة', 'Delete this list', P.lists.length <= 1, 1));
     }
-    if (!h) return null;
-    var pop = document.createElement('div');
-    pop.className = 'ndl-favpop';
-    pop.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
-    pop.innerHTML = h;
-    document.body.appendChild(pop);
-    var w = pop.offsetWidth || 210, hh = pop.offsetHeight || 120;
-    pop.style.insetBlockStart = Math.round(Math.max(8, Math.min(innerHeight - hh - 8, y + 6))) + 'px';
-    pop.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, x - w / 2))) + 'px';
-    pop.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-fx]');
-      if (!b || b.disabled) return;
-      var act = b.getAttribute('data-fx');
+    if (!head) return null;
+    return this.richPop(x, y, { head: head, quick: quick, items: items }, function (act) {
       self.plAct(act, act === 'dellist' ? Number(tab) : ix);
-      self.closeFavPop();
     });
-    this._fvPop = pop;
-    this._fvOut = function (e) { if (pop && !pop.contains(e.target)) self.closeFavPop(); };
-    setTimeout(function () { document.addEventListener('pointerdown', self._fvOut, true); }, 0);
-    return pop;
   };
 
   Dial.prototype.cyclePalette = function () {

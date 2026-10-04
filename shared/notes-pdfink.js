@@ -100,6 +100,17 @@
       };
     }).catch(function () { return []; });
   }
+  function inkDump() {
+    return idbDo('readonly', function (s, put) {
+      var out = [], rq = s.openCursor();
+      rq.onsuccess = function () {
+        var c = rq.result;
+        if (!c) { put(out); return; }
+        out.push({ k: String(c.key), v: c.value });
+        c['continue']();
+      };
+    }).catch(function () { return []; });
+  }
   function dropKeys(ks) {
     if (!ks || !ks.length) return Promise.resolve(true);
     return idbDo('readwrite', function (s) { for (var i = 0; i < ks.length; i++) s['delete'](ks[i]); })
@@ -3585,6 +3596,7 @@
     pagesOf: pagesOf,
     wipe: wipe,
     inkRows: inkRows,
+    inkDump: inkDump,
     dropKeys: dropKeys
   };
 })();

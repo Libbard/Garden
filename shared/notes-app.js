@@ -4758,6 +4758,9 @@
     if (aeD && aeD.blur && els.docBody && els.docBody.contains(aeD)) { try { aeD.blur(); } catch (eB) {} }
     if (window.GardenNotesFind) { try { GardenNotesFind.show(false); } catch (e0) {} }
     if (pdfDial) { try { pdfDial.destroy(); } catch (eD) {} pdfDial = null; }
+    if (pdfSide) { pdfSide.destroy(); pdfSide = null; }
+    if (sideRo) { sideRo.disconnect(); sideRo = null; }
+    sideFit();
     if (!pdfUi) return;
     try { pdfUi.destroy(); } catch (e) {}
     pdfUi = null;
@@ -4784,6 +4787,56 @@
   function applyPdfInkOff() {
     var wrap = document.querySelector('.gpv');
     if (wrap) wrap.setAttribute('data-inkoff', inkHidden() ? '1' : '0');
+  }
+
+  /*@3.NOAJ.488*/
+  var pdfSide = null, sideRo = null;
+  function sideMem(id, v) {
+    var m = ui().pside || {};
+    if (v === undefined) return m[id] || '';
+    if (v) m[id] = v; else delete m[id];
+    var ks = Object.keys(m);
+    if (ks.length > 60) ks.slice(0, ks.length - 60).forEach(function (k) { delete m[k]; });
+    uiSet('pside', m);
+    return v;
+  }
+  function sideFit() {
+    var host = document.querySelector('.na-doc');
+    if (!host || !els.docBody) return;
+    host.style.setProperty('--nps-top', els.docBody.offsetTop + 'px');
+    var mode = !pdfSide ? '' : (window.matchMedia('(max-width: 640px)').matches ? 'sheet' : (host.clientWidth >= 860 ? 'push' : 'over'));
+    if (mode) host.setAttribute('data-pside', mode); else host.removeAttribute('data-pside');
+  }
+  function sideOpen(on) {
+    var host = document.querySelector('.na-doc');
+    if (on === undefined) on = !pdfSide;
+    if (!on || !pdfOn() || !host || !window.GardenPdfSide || !(pdfUi.doc && pdfUi.doc())) {
+      if (pdfSide) { pdfSide.destroy(); pdfSide = null; }
+      if (sideRo) { sideRo.disconnect(); sideRo = null; }
+      if (on === false && edId) sideMem(edId, '');
+      sideFit();
+      paintPsideBtn();
+      return false;
+    }
+    if (pdfSide) return true;
+    var id = edId;
+    pdfSide = GardenPdfSide.mount({
+      api: pdfUi, host: host, body: els.docBody, tab: sideMem(id) === 't' ? 'toc' : 'pages',
+      go: function (n) { pgGoto(n); },
+      onTab: function (t) { if (edId === id) sideMem(id, t === 'toc' ? 't' : 'p'); },
+      onClose: function () { sideOpen(false); var b = document.getElementById('na-pside'); if (b) b.focus(); }
+    });
+    sideMem(id, pdfSide.tab() === 'toc' ? 't' : 'p');
+    if (window.ResizeObserver && !sideRo) { sideRo = new ResizeObserver(function () { sideFit(); }); sideRo.observe(host); }
+    sideFit();
+    paintPsideBtn();
+    return true;
+  }
+  function paintPsideBtn() {
+    var b = document.getElementById('na-pside');
+    if (!b) return;
+    b.hidden = !pdfOn();
+    b.setAttribute('aria-pressed', pdfSide ? 'true' : 'false');
   }
 
   /*@3.NOAJ.251*/
@@ -5498,6 +5551,29 @@
     if (window.GardenNotesFind) { try { GardenNotesFind.show(false); } catch (e) {} }
   }
 
+  var backP = null;
+  function needBackup() {
+    if (window.GardenNotesBackup) return Promise.resolve(window.GardenNotesBackup);
+    if (backP) return backP;
+    var me = document.querySelector('script[src*="notes-app.js"]');
+    var src = me ? me.getAttribute('src') : '../shared/notes-app.js';
+    var base = src.replace(/notes-app[.]js.*$/, ''), q = (/[?]v=[^&]+/.exec(src) || [''])[0];
+    backP = new Promise(function (ok, no) {
+      var sc = document.createElement('script');
+      sc.src = base + 'notes-backup.js' + q;
+      sc.onload = function () { if (window.GardenNotesBackup) ok(window.GardenNotesBackup); else no(new Error('backup_load')); };
+      sc.onerror = function () { backP = null; no(new Error('backup_load')); };
+      document.head.appendChild(sc);
+    });
+    return backP;
+  }
+  function backupAll(onStep) {
+    try { if (ed) ed.save(); } catch (e0) {}
+    return needBackup().then(function (Bk) {
+      return Bk.build(onStep).then(function (res) { return Bk.save(res).then(function (how) { res.how = how; return res; }); });
+    });
+  }
+
   var editP = null;
   function needEdit() {
     if (window.GardenPdfEdit) return Promise.resolve(window.GardenPdfEdit);
@@ -5844,6 +5920,8 @@
         applyFs();
         applyPdfInv();
         applyPdfInkOff();
+        if (sideMem(id)) { if (pdfSide) pdfSide.rebuild(); else sideOpen(true); }
+        paintPsideBtn();
       },
       onPos: function (p) { if (edId === id) pdfPos(id, p); },
       onRelink: function (next, was) {
@@ -7603,6 +7681,8 @@
     var cooking = !pdfOn() && !_cuts && !!(ed && ed.doc && ed.doc.kind !== 'board' && ed.doc.blocks && ed.doc.blocks.length > 1);
     els.pgnavT.textContent = cooking ? (pgCurPage() + ' / …') : (pgCurPage() + ' / ' + tot);
     els.pgnav.hidden = !on;
+    paintPsideBtn();
+    if (pdfSide) pdfSide.sync();
   }
 
   function buildPgNav() {
@@ -7614,6 +7694,10 @@
     nav.className = 'na-pgnav';
     nav.hidden = true;
     nav.innerHTML =
+      '<button type="button" class="na-pgnav-b na-pside" id="na-pside" data-go="side" hidden aria-pressed="false"' +
+        ' aria-label="لوحُ الصفحات والفهرس"' +
+        ' data-ar-title="لوحُ الصفحات والفهرس" data-en-title="Pages and contents panel">' +
+        '<i class="fa-solid fa-table-columns" aria-hidden="true"></i></button>' +
       '<button type="button" class="na-pgnav-b" data-go="first"' +
         ' aria-label="\u0623\u0648\u0651\u0644\u064f\u0020\u0627\u0644\u0645\u0644\u0641\u0651"' +
         ' data-ar-title="\u0623\u0648\u0651\u0644\u064f\u0020\u0627\u0644\u0645\u0644\u0641\u0651" data-en-title="First page">' +
@@ -7694,6 +7778,7 @@
       if (runOn) { runOn = false; return; }
       if (go) {
         var d = go.getAttribute('data-go');
+        if (d === 'side') { sideOpen(); return; }
         if (d === 'first') pgGoto(1);
         else if (d === 'last') pgGoto(pgTotal());
         /*@3.NOAJ.236*/
@@ -9917,6 +10002,7 @@
       spaceKeep: spaceKeep,
       keepWays: keepWays,
       spaceErase: spaceErase,
+      backup: backupAll,
       openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },
       folderName: folderName,
@@ -10760,6 +10846,7 @@
       renderRail();
       renderList();
       renderQuota();
+      if (pdfSide) pdfSide.labels();
       if (pdfUi && pdfUi.view() && pdfUi.view().restamp) { try { pdfUi.view().restamp(); } catch (eS) {} }
       /*@3.NOAJ.111*/
       syncTitleDir();
