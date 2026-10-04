@@ -5483,7 +5483,7 @@
       if (pdfPenBusy()) return;
       /*@3.NOAJ.301*/
       var ikC = pdfUi.ink();
-      if (ikC && (ikC.tmode || (pdfUi.view() && pdfUi.view().wrap.getAttribute('data-fedit') === '1'))) return;
+      if (ikC && e.target.closest && e.target.closest('[data-bid]')) return;
       pdfMenu(e.clientX, e.clientY);
     });
     var hold = null, hx = 0, hy = 0;
@@ -5572,6 +5572,32 @@
     return needBackup().then(function (Bk) {
       return Bk.build(onStep).then(function (res) { return Bk.save(res).then(function (how) { res.how = how; return res; }); });
     });
+  }
+  function restoreHooks() {
+    return {
+      tombs: function () { var t = readJSON(LS_TOMB, {}); return (t && typeof t === 'object') ? t : {}; },
+      idxRead: idxRead,
+      foldersRead: foldersRead,
+      folderPut: folderPut,
+      openId: function () { return edId || ''; },
+      restoreNote: function (rec, raw) {
+        return window.GardenNotesStore.putDoc(rec.id, raw, +rec.updated_at || Date.now()).then(function () {
+          var t = readJSON(LS_TOMB, {});
+          if (t && t[rec.id]) { delete t[rec.id]; writeJSON(LS_TOMB, t); }
+          idxPut(rec);
+          var Sy = window.GardenNotesSync;
+          if (Sy && Sy.push && !rec.pv) { try { Sy.push(rec.id); } catch (e) {} }
+        });
+      },
+      done: function () { reload({ keepOpen: true }); }
+    };
+  }
+  function restorePlan(file) {
+    try { if (ed) ed.save(); } catch (e0) {}
+    return needBackup().then(function (Bk) { return Bk.plan(file, restoreHooks()); });
+  }
+  function restoreRun(P, onStep) {
+    return needBackup().then(function (Bk) { return Bk.apply(P, restoreHooks(), onStep); });
   }
 
   var editP = null;
@@ -7724,6 +7750,7 @@
         ' data-ar-title="\u0622\u062e\u0631\u064f\u0020\u0627\u0644\u0645\u0644\u0641\u0651" data-en-title="Last page">' +
         '<i class="fa-solid fa-angles-down" aria-hidden="true"></i></button>';
     (railSlot || doc).appendChild(nav);
+    i18n(nav);
     els.pgnav = nav;
     els.pgnavT = nav.querySelector('#na-pgnav-t');
     var ask = nav.querySelector('#na-pgnav-ask');
@@ -10003,6 +10030,8 @@
       keepWays: keepWays,
       spaceErase: spaceErase,
       backup: backupAll,
+      restorePlan: restorePlan,
+      restoreRun: restoreRun,
       openId: function (id) { if (idxFind(id)) openNote(id); },
       paste: function () { pasteNotes(); },
       folderName: folderName,

@@ -243,5 +243,160 @@
     return 'saved';
   }
 
-  window.GardenNotesBackup = { build: build, save: save, Zip: Zip, crc: crcOf };
+  var dec = new TextDecoder();
+  function readZip(file) {
+    var tail = Math.min(file.size, 65557);
+    if (file.size < 22) return Promise.reject(new Error('not_zip'));
+    return file.slice(file.size - tail).arrayBuffer().then(function (buf) {
+      var dv = new DataView(buf), at = -1;
+      for (var i = buf.byteLength - 22; i >= 0; i--) if (dv.getUint32(i, true) === 0x06054b50) { at = i; break; }
+      if (at < 0) throw new Error('not_zip');
+      var len = dv.getUint32(at + 12, true), off = dv.getUint32(at + 16, true);
+      if (off + len > file.size) throw new Error('not_zip');
+      return file.slice(off, off + len).arrayBuffer();
+    }).then(function (cd) {
+      var dv = new DataView(cd), p = 0, out = {};
+      while (p + 46 <= cd.byteLength && dv.getUint32(p, true) === 0x02014b50) {
+        var nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+        var name = dec.decode(new Uint8Array(cd, p + 46, nl));
+        out[name] = { method: dv.getUint16(p + 10, true), crc: dv.getUint32(p + 16, true), csize: dv.getUint32(p + 20, true),
+                      size: dv.getUint32(p + 24, true), off: dv.getUint32(p + 42, true) };
+        p += 46 + nl + xl + cl;
+      }
+      return out;
+    });
+  }
+  function entryBlob(file, e, type) {
+    return file.slice(e.off, e.off + 30).arrayBuffer().then(function (b) {
+      var dv = new DataView(b);
+      if (b.byteLength < 30 || dv.getUint32(0, true) !== 0x04034b50) throw new Error('bad_entry');
+      var start = e.off + 30 + dv.getUint16(26, true) + dv.getUint16(28, true);
+      var raw = file.slice(start, start + e.csize);
+      if (e.method === 0) return new Blob([raw], { type: type || '' });
+      if (e.method === 8 && window.DecompressionStream) {
+        return new Response(raw.stream().pipeThrough(new DecompressionStream('deflate-raw'))).blob()
+          .then(function (x) { return new Blob([x], { type: type || '' }); });
+      }
+      throw new Error('zip_method');
+    });
+  }
+  function arr(v) { return Array.isArray(v) ? v : []; }
+  function jsonOf(s, f) { try { var v = JSON.parse(s); return v == null ? f : v; } catch (e) { return f; } }
+
+  function plan(file, H) {
+    return readZip(file).then(function (ents) {
+      var mk = Object.keys(ents).filter(function (n) { return /(^|\/)manifest\.json$/.test(n); })
+        .sort(function (a, b) { return a.length - b.length; })[0];
+      if (!mk) throw new Error('not_backup');
+      var root = mk.slice(0, mk.length - 'manifest.json'.length);
+      var txt = function (p) { var e = ents[root + p]; return e ? entryBlob(file, e).then(function (b) { return b.text(); }) : Promise.resolve(''); };
+      return Promise.all([txt('manifest.json'), txt('data/local-storage.json')]).then(function (r) {
+        var man = jsonOf(r[0], null);
+        if (!man || man.format !== 'garden-backup') throw new Error('not_backup');
+        var ls = jsonOf(r[1], {}) || {};
+        var P = { file: file, ents: ents, root: root, man: man, ls: ls, notes: [], add: 0, newer: 0, keep: 0, gone: 0,
+                  folders: [], files: [], images: [], ink: 0, keys: [], bytes: 0 };
+        var bIdx = {}, loc = {}, tomb = H.tombs() || {}, open = H.openId ? H.openId() : '';
+        arr(jsonOf(ls.notes_index, [])).forEach(function (x) { if (x && x.id) bIdx[x.id] = x; });
+        H.idxRead().forEach(function (x) { if (x && x.id) loc[x.id] = x; });
+        arr(man.notes).forEach(function (n) {
+          if (!n || !n.id || !ents[root + 'data/notes/' + n.id + '.json']) return;
+          var b = bIdx[n.id] || { id: n.id, t: n.t || '', k: n.k || 'rich', o: {}, g: [], c: null, f: n.f || null, p: 0, a: 0,
+                                  d: n.deleted ? 1 : 0, ca: Date.parse(man.at) || 0, updated_at: Date.parse(man.at) || 0, sz: 0 };
+          var l = loc[n.id], bt = +b.updated_at || 0;
+          if (!l) {
+            if (tomb[n.id] > bt) { P.gone++; return; }
+            P.add++; P.notes.push(b);
+          } else if (bt > (+l.updated_at || 0) && n.id !== open) { P.newer++; P.notes.push(b); }
+          else P.keep++;
+        });
+        var lf = {};
+        H.foldersRead().forEach(function (f) { if (f && f.id) lf[f.id] = f; });
+        arr(jsonOf(ls.notes_folders, [])).forEach(function (f) {
+          if (!f || !f.id) return;
+          if (!lf[f.id] || (+f.updated_at || 0) > (+lf[f.id].updated_at || 0)) P.folders.push(f);
+        });
+        var skip = /^(notes_index|notes_folders)$|^__tomb_/;
+        Object.keys(ls).forEach(function (k) {
+          if (skip.test(k) || SKIP_LS.test(k) || !KEEP_LS.test(k)) return;
+          var has = null;
+          try { has = localStorage.getItem(k); } catch (e) {}
+          if (has == null) P.keys.push(k);
+        });
+        var PD = window.GardenPdfDoc, St = window.GardenNotesStore, Ink = window.GardenPdfInk;
+        var inkP = (man.ink && Ink && Ink.inkRestore && Ink.inkRows && ents[root + 'data/pdf-ink.json'])
+          ? Promise.all([txt('data/pdf-ink.json'), Ink.inkRows()]).then(function (q) {
+              var have = {};
+              arr(q[1]).forEach(function (x) { if (x && x.k) have[x.k] = 1; });
+              P.inkRows = arr(jsonOf(q[0], [])).filter(function (x) { return x && x.k && x.v && !have[x.k]; });
+              P.ink = P.inkRows.length;
+            }, function () {})
+          : Promise.resolve();
+        var haveImg = St && St.allImages ? St.allImages().then(function (rows) { var m = {}; rows.forEach(function (x) { if (x && x.id) m[x.id] = 1; }); return m; }, function () { return {}; }) : Promise.resolve({});
+        return inkP.then(function () { return haveImg; }).then(function (hi) {
+          arr(man.images).forEach(function (x) { if (x && x.id && !hi[x.id] && ents[root + x.path]) { P.images.push(x); P.bytes += x.bytes || 0; } });
+          return arr(man.files).reduce(function (c, x) {
+            return c.then(function () {
+              if (!x || !x.hash || !ents[root + x.path]) return;
+              return Promise.resolve(PD && PD.has ? PD.has(x.hash) : false).then(function (h) {
+                if (!h) { P.files.push(x); P.bytes += x.bytes || 0; }
+              }, function () {});
+            });
+          }, Promise.resolve());
+        }).then(function () { return P; });
+      });
+    });
+  }
+
+  function apply(P, H, onStep) {
+    var step = function (k, i, n) { if (onStep) { try { onStep(k, i, n); } catch (e) {} } };
+    var PD = window.GardenPdfDoc, St = window.GardenNotesStore, Ink = window.GardenPdfInk;
+    var got = { notes: 0, files: 0, images: 0, ink: 0, keys: 0, folders: 0, bad: 0 };
+    var blob = function (p, type) { var e = P.ents[P.root + p]; return e ? entryBlob(P.file, e, type) : Promise.reject(new Error('bad_entry')); };
+    P.folders.forEach(function (f) { H.folderPut(f); got.folders++; });
+    var chain = P.notes.reduce(function (c, rec, i) {
+      return c.then(function () {
+        step('notes', i + 1, P.notes.length);
+        return blob('data/notes/' + rec.id + '.json').then(function (b) { return b.text(); }).then(function (raw) {
+          if (!jsonOf(raw, null)) throw new Error('bad_note');
+          return H.restoreNote(rec, raw);
+        }).then(function () { got.notes++; }, function () { got.bad++; });
+      });
+    }, Promise.resolve());
+    chain = chain.then(function () {
+      return P.files.reduce(function (c, x, i) {
+        return c.then(function () {
+          step('files', i + 1, P.files.length);
+          return blob(x.path, x.kind === 'audio' ? 'audio/webm' : 'application/pdf').then(function (b) {
+            return PD.put(x.hash, b, { name: x.name || '' });
+          }).then(function (ok) { if (ok) got.files++; else got.bad++; }, function () { got.bad++; });
+        });
+      }, Promise.resolve());
+    });
+    chain = chain.then(function () {
+      return P.images.reduce(function (c, x, i) {
+        return c.then(function () {
+          step('images', i + 1, P.images.length);
+          return blob(x.path, x.type || 'image/png').then(function (b) {
+            return St.putImageRow({ id: x.id, blob: b, type: x.type, name: x.name || '' });
+          }).then(function () { got.images++; }, function () { got.bad++; });
+        });
+      }, Promise.resolve());
+    });
+    chain = chain.then(function () {
+      if (!P.ink || !P.inkRows || !Ink || !Ink.inkRestore) return;
+      step('ink', 1, 1);
+      return Ink.inkRestore(P.inkRows).then(function (n) { got.ink = n || 0; }, function () { got.bad++; });
+    });
+    return chain.then(function () {
+      P.keys.forEach(function (k) {
+        try { if (localStorage.getItem(k) == null) { localStorage.setItem(k, P.ls[k]); got.keys++; } } catch (e) {}
+      });
+      step('done', 1, 1);
+      if (H.done) { try { H.done(got); } catch (e) {} }
+      return got;
+    });
+  }
+
+  window.GardenNotesBackup = { build: build, save: save, Zip: Zip, crc: crcOf, readZip: readZip, entryBlob: entryBlob, plan: plan, apply: apply };
 })();

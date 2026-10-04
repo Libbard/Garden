@@ -111,6 +111,21 @@
       };
     }).catch(function () { return []; });
   }
+  function inkRestore(rows) {
+    if (!rows || !rows.length) return Promise.resolve(0);
+    return idbDo('readwrite', function (s, put) {
+      var n = 0, i = 0;
+      function next() {
+        if (i >= rows.length) { put(n); return; }
+        var r = rows[i++];
+        if (!r || !r.k || !r.v) { next(); return; }
+        var q = s.count(String(r.k));
+        q.onsuccess = function () { if (!q.result) { s.put(r.v, String(r.k)); n++; } next(); };
+        q.onerror = function (e) { if (e && e.preventDefault) e.preventDefault(); next(); };
+      }
+      next();
+    }).catch(function () { return 0; });
+  }
   function dropKeys(ks) {
     if (!ks || !ks.length) return Promise.resolve(true);
     return idbDo('readwrite', function (s) { for (var i = 0; i < ks.length; i++) s['delete'](ks[i]); })
@@ -797,7 +812,7 @@
   /*@3.NOPJ8.148*/
   Ink.prototype.paperMenu = function (p, cx, cy, eat, add) {
     /*@3.NOPJ8.191*/
-    if (!add && !eat && this.o.onFileMenu && !this.textTool()) {
+    if (!add && !eat && this.o.onFileMenu) {
       try { this.o.onFileMenu(cx, cy); } catch (eF) { return false; }
       return true;
     }
@@ -3597,6 +3612,7 @@
     wipe: wipe,
     inkRows: inkRows,
     inkDump: inkDump,
+    inkRestore: inkRestore,
     dropKeys: dropKeys
   };
 })();

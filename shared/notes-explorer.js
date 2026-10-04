@@ -615,7 +615,10 @@
     h += '<p class="nx-hint">' + esc(L('ملاحظاتُك ومجلّداتُها وملفّاتُ PDF وتسجيلاتُك وصورُك ورسمُك في ملفٍّ مضغوطٍ واحد — تُقرأ دون الموقع، وفيها ما تُستعاد به.',
       'Your notes with their folders, PDFs, recordings, images and drawings in one ZIP — readable without the site, and complete enough to restore.')) + '</p>';
     h += '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="backup"' + (BACK.run ? ' disabled' : '') + '>' +
-      ic('fa-file-zipper') + esc(BACK.run ? L('يُجمع…', 'Collecting…') : L('نزِّلِ النسخةَ الكاملة', 'Download the full copy')) + '</button></div>';
+      ic('fa-file-zipper') + esc(BACK.run ? L('يُجمع…', 'Collecting…') : L('نزِّلِ النسخةَ الكاملة', 'Download the full copy')) + '</button>' +
+      (A.restorePlan ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="rpick"' + (BACK.run || BACK.plan ? ' disabled' : '') + '>' +
+        ic('fa-clock-rotate-left') + esc(L('استعِدْ من نسخة…', 'Restore from a copy…')) + '</button>' : '') + '</div>';
+    if (BACK.plan) h += restHtml(BACK.plan);
     if (BACK.msg) h += '<p class="nx-hint" role="status">' + esc(BACK.msg) + '</p>';
     return h + '</section>';
   }
@@ -645,6 +648,73 @@
         : L('تعذّر جمعُ النسخة — لم يُحذف شيء.', 'Could not collect the copy — nothing was removed.') };
       backPaint();
     });
+  }
+  function restHtml(P) {
+    var row = function (n, ar, en) { return n ? '<li>' + esc(L(ar, en)) + ' <b>' + lat(String(n)) + '</b></li>' : ''; };
+    var fresh = P.add + P.newer + P.folders.length + P.files.length + P.images.length + P.keys.length + P.ink;
+    var dt = new Date(P.man.at || 0), p2 = function (n) { return (n < 10 ? '0' : '') + n; };
+    var when = isNaN(dt) ? '' : dt.getFullYear() + '-' + p2(dt.getMonth() + 1) + '-' + p2(dt.getDate()) + ' ' + p2(dt.getHours()) + ':' + p2(dt.getMinutes());
+    var h = '<div class="nx-rest" role="group" aria-label="' + esc(L('ما ستُضيفه النسخة', 'What the copy will add')) + '">' +
+      '<p class="nx-hint">' + esc(L('نسخةُ ', 'Copy from ')) + lat(when) + esc(L(' — تُضاف ولا تمحو: ما على جهازك أحدثَ يبقى.', ' — it adds and never erases: anything newer on this device stays.')) + '</p><ul class="nx-rest-l">' +
+      row(P.add, 'ملاحظاتٌ ليست على جهازك:', 'Notes not on this device:') +
+      row(P.newer, 'ملاحظاتٌ نسختُها في الملفّ أحدث:', 'Notes whose copy in the file is newer:') +
+      row(P.files.length, 'ملفّاتُ PDF وتسجيلات:', 'PDFs and recordings:') +
+      row(P.images.length, 'صور:', 'Images:') +
+      row(P.ink, 'صفحاتٌ عليها رسمُك:', 'Pages with your drawing:') +
+      row(P.folders.length, 'مجلّدات:', 'Folders:') +
+      row(P.keys.length, 'من إعداداتك ومهامّك المحفوظة:', 'Of your saved settings and tasks:') +
+      row(P.keep, 'ملاحظاتٌ على جهازك مثلُها أو أحدثُ منها فتبقى:', 'Notes already here, the same or newer — they stay:') +
+      row(P.gone, 'ملاحظاتٌ حذفتَها بعد النسخة فلا تعود:', 'Notes you deleted after the copy, so they stay deleted:') + '</ul>';
+    if (!fresh) {
+      h += '<p class="nx-hint">' + esc(L('كلُّ ما في النسخة على جهازك — لا شيءَ يُستعاد.', 'Everything in the copy is already here — nothing to restore.')) + '</p>' +
+        '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="rcancel">' + esc(L('حسناً', 'OK')) + '</button></div>';
+    } else {
+      h += '<div class="nx-keep-b"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--go nx-b" data-x="rgo"' + (BACK.run ? ' disabled' : '') + '>' + ic('fa-clock-rotate-left') +
+        esc(BACK.run ? L('يُستعاد…', 'Restoring…') : L('استعِدْها', 'Restore')) + (P.bytes ? ' · ' + lat(fmtSize(P.bytes)) : '') + '</button>' +
+        (BACK.run ? '' : '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="rcancel">' + esc(L('إلغاء', 'Cancel')) + '</button>') + '</div>';
+    }
+    return h + '</div>';
+  }
+  function restPick() {
+    if (BACK.run || !A.restorePlan) return;
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.zip,application/zip';
+    inp.addEventListener('change', function () {
+      var f = inp.files && inp.files[0];
+      if (!f) return;
+      BACK = { run: 0, msg: L('أقرأ النسخة…', 'Reading the copy…'), k: '', i: 0, n: 0 };
+      backPaint();
+      A.restorePlan(f).then(function (P) {
+        BACK = { run: 0, msg: '', k: '', i: 0, n: 0, plan: P };
+        backPaint();
+      }, function (e) {
+        var m = e && e.message;
+        BACK = { run: 0, k: '', i: 0, n: 0, msg: m === 'not_zip' || m === 'not_backup'
+          ? L('هذا الملفُّ ليس نسخةً كاملةً من الحديقة — اخترِ الملفَّ الذي نزّلتَه من «نسخةٌ كاملةٌ في ملفٍّ واحد».', 'This is not a full Garden copy — pick the file you downloaded from “A full copy in one file”.')
+          : m === 'zip_method' ? L('أُعيد ضغطُ الملفِّ بطريقةٍ لا يقرؤها متصفّحُك — استعملِ الملفَّ كما نزّلتَه.', 'The file was re-compressed in a way your browser cannot read — use the file as you downloaded it.')
+          : L('تعذّرت قراءةُ النسخة — لم يتغيّر شيء.', 'Could not read the copy — nothing changed.') };
+        backPaint();
+      });
+    });
+    inp.click();
+  }
+  function restGo() {
+    var P = BACK.plan;
+    if (!P || BACK.run || !A.restoreRun) return;
+    BACK.run = 1; BACK.k = 'notes';
+    backPaint();
+    var last = 0;
+    A.restoreRun(P, function (k, i, n) {
+      BACK.k = k; BACK.i = i; BACK.n = n;
+      var t = Date.now();
+      if (t - last > 120 || k === 'done') { last = t; backPaint(); }
+    }).then(function (g) {
+      var m = L('استُعيد: ', 'Restored: ') + g.notes + L(' ملاحظة · ', ' notes · ') + g.files + L(' ملفّاً · ', ' files · ') + g.images + L(' صورة', ' images');
+      if (g.bad) m += ' · ' + L('تعذّر ' + g.bad + ' — بقي ما على جهازك كما هو', g.bad + ' failed — what was on this device is unchanged');
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: m };
+    }, function () {
+      BACK = { run: 0, k: '', i: 0, n: 0, msg: L('توقّفت الاستعادة — ما استُعيد قبلها باقٍ، ولم يُمحَ شيء.', 'Restoring stopped — what came back before it stays, and nothing was erased.') };
+    }).then(function () { SPACE = null; STAT = {}; if (A.statusStale) A.statusStale(); render(); });
   }
   function keepPaint() {
     var c = host && host.querySelector('.nx-keep');
@@ -1138,6 +1208,9 @@
       case 'fkeepgd': keepGo(fPicked(), 'gd'); return;
       /*@3.NOEJ3.25*/
       case 'backup': backGo(); return;
+      case 'rpick': restPick(); return;
+      case 'rgo': restGo(); return;
+      case 'rcancel': BACK = { run: 0, msg: '', k: '', i: 0, n: 0 }; backPaint(); return;
       case 'keep': if (SPACE) keepGo(SPACE.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; }), x.getAttribute('data-to') === 'gd' ? 'gd' : 'us'); return;
       case 'kstop': KEEP.stop = 1; keepPaint(); return;
       case 'ferase': fErase(fPicked()); return;
