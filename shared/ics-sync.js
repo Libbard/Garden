@@ -35,6 +35,9 @@
       props: [],
       /*@3.ICSJ.95*/
       bb: { courses: {}, items: {}, cl: {}, term: '', at: 0 },
+      past: {},
+      past_keep: {},
+      bar_ack: {},
       over: {},
       over_sig: '',
       count: 0              /*@3.ICSJ.15*/
@@ -86,6 +89,9 @@
     if (!s.bb.cl || typeof s.bb.cl !== 'object') s.bb.cl = {};
     if (typeof s.bb.term !== 'string') s.bb.term = '';
     if (typeof s.bb.at !== 'number') s.bb.at = 0;
+    ['past', 'past_keep', 'bar_ack'].forEach(function (k) {
+      if (!s[k] || typeof s[k] !== 'object' || Array.isArray(s[k])) s[k] = {};
+    });
     if (typeof s.lead_days !== 'number' || s.lead_days < 0 || s.lead_days > 14) s.lead_days = 2;
     s.v = VERSION;
     return s;
@@ -297,6 +303,49 @@
                             .map(function (g) { return { lo: g.lo, hi: g.hi }; });
   }
 
+  var FAM_MIN = 2;
+  var FAM_WEAK = { family: 1, elim: 1, cluster: 1 };
+
+  function famOf(ev) {
+    var t = String(ev.raw || '').replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 0x660); });
+    t = norm(t.replace(CODE_G, ' '));
+    var m = /(\d{1,3})/.exec(t);
+    var stem = t.replace(/[0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (stem.replace(/[^a-z؀-ۿ]/g, '').length < 4) return null;
+    return { key: ev.kind + '|' + stem, no: m ? +m[1] : null, time: (ev.dtstart && ev.dtstart.time) || '' };
+  }
+
+  function famAdd(fams, ev, code) {
+    var f = famOf(ev);
+    if (!f || !code) return;
+    var F = fams[f.key] || (fams[f.key] = {});
+    var e = F[code] || (F[code] = { n: 0, nos: {}, times: {} });
+    e.n++;
+    if (f.no !== null) e.nos[f.no] = 1;
+    if (f.time) e.times[f.time] = 1;
+  }
+
+  function famTrusted(s, ev, r) {
+    if (r.why === 'cluster' || r.why === 'topic') return false;
+    if (r.why !== 'bb') return true;
+    var br = s.bb.items[bbKey(ev.uid)];
+    return !(br && FAM_WEAK[br.src]);
+  }
+
+  /*@3.ICSJ.128*/
+  function familyPick(fams, ev, codes) {
+    var f = famOf(ev);
+    if (!f || f.no === null) return null;
+    var F = fams[f.key];
+    if (!F) return null;
+    var cs = Object.keys(F);
+    if (cs.length !== 1 || codes.indexOf(cs[0]) < 0) return null;
+    var e = F[cs[0]];
+    if (e.n < FAM_MIN || e.nos[f.no]) return null;
+    if (f.time && !e.times[f.time]) return null;
+    return cs[0];
+  }
+
   /*@3.ICSJ.79*/
   function addRange(s, lo, hi, code) {
     var list = (s.ranges || []).filter(function (r) {
@@ -474,6 +523,70 @@
     /*@3.ICSJ.110*/
     var due = String(rec.due || '');
     return [rec.date || due.slice(0, 10), rec.time || rec.start_time || due.slice(11, 16), rec.title || ''].join('|');
+  }
+
+  function termStart() {
+    var w = null;
+    try { w = window.GardenData && GardenData.termWindow ? GardenData.termWindow() : null; } catch (e) {}
+    var a = w && w.start;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(a || '')) return '';
+    var t = new Date(), today = t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2);
+    return a <= today ? a : '';
+  }
+
+  function pastPut(s, uid, o) {
+    var cur = s.past[uid];
+    if (cur && cur.t === o.t && cur.d === o.d && cur.h === o.h && cur.c === o.c && cur.k === o.k && !!cur.g === !!o.g) return;
+    s.past[uid] = o;
+  }
+
+  function pastList() {
+    var s = load();
+    return Object.keys(s.past).filter(function (u) { return s.past[u] && !s.skip[u] && !s.past_keep[u]; })
+      .map(function (u) { var o = s.past[u]; return { uid: u, title: o.t, kind: o.k, date: o.d, time: o.h, code: o.c || '', gone: !!o.g }; })
+      .sort(function (a, b) {
+        if (!a.code !== !b.code) return a.code ? -1 : 1;
+        return (a.code < b.code ? -1 : a.code > b.code ? 1 : 0) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+      });
+  }
+
+  function pastEv(uid, o) {
+    var head = readSummary(o.t);
+    return { uid: uid, raw: o.t, kind: o.k || head.kind, code: head.code, topic: head.topic, num: head.num,
+             no: itemNo(uid), dtstart: { date: o.d, time: o.h || '' }, dtend: null };
+  }
+
+  function keepPast(uid) {
+    var s = load(), o = s.past[uid];
+    if (!o) return false;
+    s.past_keep[uid] = 1;
+    if (s.skip[uid]) s.skip[uid] = 0;
+    s.past[uid] = 0;
+    if (o.g) {
+      var codes = myCourses();
+      applyOne(pastEv(uid, o), o.c && codes.indexOf(o.c) > -1 ? o.c : null);
+      announceWrites();
+    }
+    save();
+    return true;
+  }
+
+  function dropPast(uids) {
+    var s = load();
+    (Array.isArray(uids) ? uids : [uids]).forEach(function (u) {
+      if (!s.past[u]) return;
+      s.skip[u] = 1;
+      s.past[u] = 0;
+    });
+    save();
+    return true;
+  }
+
+  function ackBar(uids) {
+    var s = load(), n = 0;
+    (uids || []).forEach(function (u) { if (!s.bar_ack[u]) { s.bar_ack[u] = 1; n++; } });
+    if (n) save();
+    return n;
   }
 
   function myCourses() {
@@ -1115,8 +1228,8 @@
 
       var codes = myCourses();
       var rep = { ok: true, added: 0, updated: 0, touched: 0, pending: 0, gone: 0,
-                  blocked: 0, ignored: 0, foreign: 0, stale: 0, named: 0, elim: 0, unchanged: same, total: events.length };
-      var seen = {}, inbox = [];
+                  blocked: 0, ignored: 0, foreign: 0, stale: 0, named: 0, elim: 0, past: 0, unchanged: same, total: events.length };
+      var seen = {}, inbox = [], fams = {}, tw = termStart();
 
       /*@3.ICSJ.125*/
       events.forEach(function (ev) {
@@ -1131,7 +1244,24 @@
         if (s.skip[ev.uid] || bandSkipped(s, ev)) { rep.ignored++; dropPending(ev.uid); return; }
 
         var r2 = resolve(ev, codes);
+        var kept = !!s.past_keep[ev.uid];
+        if (!kept && !s.over[ev.uid] && (r2.why === 'stale' || (tw && ev.dtstart.date < tw))) {
+          rep.ignored++; rep.past++;
+          if (r2.why === 'stale') rep.stale++;
+          pastPut(s, ev.uid, { t: ev.raw, k: ev.kind, d: ev.dtstart.date, h: ev.dtstart.time || '',
+                               c: r2.foreign || r2.code || ev.code || '' });
+          if (s.links[ev.uid]) removeLink(ev.uid);
+          return;
+        }
+        if (s.past[ev.uid]) s.past[ev.uid] = 0;
+        if (kept && (!r2.sure || !r2.code)) {
+          var ko = applyOne(ev, null);
+          if (ko === true) rep.added++;
+          return;
+        }
         if (r2.why === 'stale') { rep.ignored++; rep.stale++; dropPending(ev.uid); return; }
+        if (r2.sure && r2.code && famTrusted(s, ev, r2)) famAdd(fams, ev, r2.code);
+        else if (r2.why === 'foreign') famAdd(fams, ev, r2.foreign);
         if (!r2.sure || !r2.code) {
           rep.pending++;
           var shown = false;
@@ -1159,6 +1289,26 @@
       });
 
       /*@3.ICSJ.109*/
+      if (inbox.length) {
+        var evBy = {}, famDone = {};
+        events.forEach(function (ev) { evBy[ev.uid] = ev; });
+        inbox.forEach(function (it) {
+          var ev = evBy[it.uid];
+          if (!ev || it.foreign || it.why === 'stale') return;
+          var fc = familyPick(fams, ev, codes);
+          if (!fc) return;
+          var fo = applyOne(ev, fc);
+          if (fo !== true && fo !== 'touched' && fo !== 'banner') return;
+          var fk = bbKey(ev.uid);
+          if (fk) s.bb.items[fk] = { code: fc, crn: '', term: s.bb.term || '', pk: '',
+                                     t: /GradableItem/i.test(ev.uid) ? 'GradebookColumn' : 'Course', src: 'family' };
+          famDone[it.uid] = 1;
+          rep.pending--; rep.family = (rep.family || 0) + 1;
+          if (fo === true) rep.added++;
+        });
+        inbox = inbox.filter(function (it) { return !famDone[it.uid]; });
+      }
+
       var pend = inbox.filter(function (it) { return !it.foreign && it.why !== 'stale'; });
       if (pend.length && codes.length) {
         var linked = {};
@@ -1187,6 +1337,16 @@
       }
 
       /*@3.ICSJ.56*/
+      if (tw) Object.keys(s.links).forEach(function (uid) {
+        if (seen[uid] || s.past_keep[uid] || s.over[uid]) return;
+        var Lk = s.links[uid], b = Lk.bb || {}, sp = String(Lk.snap || '').split('|');
+        var d = b.date || sp[0] || '';
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d >= tw) return;
+        pastPut(s, uid, { t: b.title || sp.slice(2).join('|') || '', k: b.kind || '', d: d,
+                          h: b.time || sp[1] || '', c: Lk.code || b.code || '', g: 1 });
+        removeLink(uid);
+        rep.past++;
+      });
       Object.keys(s.links).forEach(function (uid) { if (!seen[uid]) rep.gone++; });
       rep.changed = changes().filter(function (c) { return seen[c.uid]; }).length;
       rep.deleted = deletedCount();
@@ -1484,6 +1644,10 @@
     myCourses: myCourses,
     myCoursesFull: myCoursesFull,
     teach: teach,
+    pastList: pastList,
+    keepPast: keepPast,
+    dropPast: dropPast,
+    ackBar: ackBar,
     askMap: askMap,
     _nameAnchor: nameAnchor,
     teachUrl: teachUrl,
