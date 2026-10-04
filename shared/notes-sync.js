@@ -239,7 +239,7 @@
         /*@3.NOSJ2.3*/
         if (isQuota(r.status, r.body)) {
           markPending(noteId, r.body.error);
-          lastQuota = r.body;
+          lastQuota = Object.assign({}, lastQuota || {}, r.body);
           rememberMax(r.body.max);
           quotaEvent(r.body.error, { id: noteId, bytes: r.body.bytes, max: r.body.max });
           emit('garden:notesPushFailed', { id: noteId, reason: r.body.error, quota: true });
@@ -251,7 +251,8 @@
           return { ok: false, reason: 'http-' + r.status };
         }
         clearPending(noteId);
-        if (r.body && r.body.note_bytes != null) lastQuota = r.body;
+        /*@3.NOSJ2.21*/
+        if (r.body && r.body.note_bytes != null) lastQuota = Object.assign({}, lastQuota || {}, r.body);
         /*@3.NOSJ2.12*/
         if (r.body && r.body.applied === 0) {
           return pull(noteId).then(function (pr) { return { ok: false, reason: 'stale', pulled: !!(pr && pr.ok) }; });
@@ -378,7 +379,7 @@
         if (!vid) return { ok: true, remote: false };
         return authed('DELETE', base(vid) + '/' + encodeURIComponent(noteId), vid)
           .then(function (r) {
-            if (r.body && r.body.note_bytes != null) lastQuota = r.body;
+            if (r.body && r.body.note_bytes != null) lastQuota = Object.assign({}, lastQuota || {}, r.body);
             clearPending(noteId);
             return { ok: true, remote: r.ok };
           })

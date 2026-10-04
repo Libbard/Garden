@@ -147,7 +147,7 @@
     if (!path && model.quick && model.quick.length) {
       h += '<div class="gsf-rm-q" style="--rm-n:' + model.quick.length + '">';
       model.quick.forEach(function (q) {
-        h += '<button type="button" role="menuitem" class="gsf-rm-qb" ' + attr + '="' + esc(q.a) + '"' + (q.off ? ' disabled' : '') +
+        h += '<button type="button" role="menuitem" class="gsf-rm-qb' + (q.dz ? ' gsf-rm-qb--danger' : '') + '" ' + attr + '="' + esc(q.a) + '"' + (q.off ? ' disabled' : '') +
           (q.why ? ' title="' + esc(q.why) + '"' : '') + '>' + ricon(q) + '<span>' + esc(q.t) + '</span></button>';
       });
       h += '</div>';

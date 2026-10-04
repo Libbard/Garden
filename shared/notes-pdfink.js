@@ -784,7 +784,12 @@
   };
 
   /*@3.NOPJ8.148*/
-  Ink.prototype.paperMenu = function (p, cx, cy, eat) {
+  Ink.prototype.paperMenu = function (p, cx, cy, eat, add) {
+    /*@3.NOPJ8.191*/
+    if (!add && !eat && this.o.onFileMenu && !this.textTool()) {
+      try { this.o.onFileMenu(cx, cy); } catch (eF) { return false; }
+      return true;
+    }
     var ed = this.fieldEd(p, true);
     var trT = '', trR = null;
     if (window.GardenTr && this.view && this.view.selText) {
@@ -797,8 +802,13 @@
     try { ok = !!ed.openCtx(ed.root, cx, cy); } catch (e) { return false; }
     /*@3.NOPJ8.165*/
     if (ok && eat) ed._eatClick = 1;
-    if (ok) this.menuFile(ed, cx, cy, trT, trR, 0);
+    if (ok && !add) this.menuFile(ed, cx, cy, trT, trR, 0);
     return ok;
+  };
+
+  Ink.prototype.addMenuAt = function (n, cx, cy) {
+    var p = this.pages[n];
+    return p ? this.paperMenu(p, cx, cy, 0, 1) : false;
   };
 
   /*@3.NOPJ8.189*/
@@ -813,6 +823,21 @@
     var b = null;
     try { b = ed.addFree('p', lp.x, Math.max(0, lp.y)); } catch (e) { return null; }
     if (b) this.fieldFocus(p, true);
+    return b;
+  };
+
+  /*@3.NOPJ8.192*/
+  Ink.prototype.tapText = function (p, cx, cy) {
+    var ed = this.fieldEd(p, true);
+    if (!ed || !ed.addFree || !ed.localPoint) return null;
+    var lp = ed.localPoint(cx, cy);
+    var b = null;
+    try { b = ed.addFree('p', lp.x, Math.max(0, lp.y)); } catch (e) { return null; }
+    if (!b) return null;
+    if (b.id && ed.touchAct) { try { ed.touchAct(b.id); } catch (eA) {} }
+    this.fieldFocus(p, true);
+    ed._eatClick = 1;
+    setTimeout(function () { ed._eatClick = 0; }, 400);
     return b;
   };
 
@@ -2865,7 +2890,8 @@
     /*@3.NOPJ8.134*/
     h.addEventListener('pointerdown', function (e) {
       if (e.button != null && e.button !== 0) return;
-      if (e.target.closest && e.target.closest('[data-bid]')) return;
+      /*@3.NOPJ8.193*/
+      if (e.target.closest && e.target.closest('[data-bid], .ne-selhint')) return;
       if (self._fpage) { e.preventDefault(); self.fieldExit(self._fpage); return; }
       if (!self.textTool()) return;
       /*@3.NOPJ8.147*/
@@ -2873,7 +2899,13 @@
       self.holdHost(p, e.clientX, e.clientY);
     });
     h.addEventListener('pointermove', function (e) { self.holdHostMove(e.clientX, e.clientY); });
-    h.addEventListener('pointerup', function () { self.holdDrop(); });
+    h.addEventListener('pointerup', function (e) {
+      var hd = self._hold;
+      self.holdDrop();
+      if (!hd || hd.cx == null || hd.n !== p.n || self._fpage || !self.textTool()) return;
+      if (e.button != null && e.button !== 0) return;
+      self.tapText(p, hd.cx, hd.cy);
+    });
     h.addEventListener('pointercancel', function () { self.holdDrop(); });
     /*@3.NOPJ8.156*/
     var pgEl = (p.el && p.el.closest) ? p.el.closest('.gpv-page') : null;
@@ -2947,6 +2979,23 @@
       var p = this.pages[k];
       if (p && p.fed) { try { p.fed.touchAct(''); } catch (e) {} }
     }
+  };
+
+  /*@3.NOPJ8.194*/
+  Ink.prototype.fieldSelAll = function () {
+    var hit = null;
+    for (var k in this.pages) {
+      var p = this.pages[k], ed = p && p.fed;
+      if (ed && (ed._selMode || (ed.selectedBlocks && ed.selectedBlocks().length))) { hit = p; break; }
+    }
+    if (!hit) return 0;
+    var e2 = hit.fed;
+    try {
+      if (!e2._selMode) e2.setSelectMode(true, 1);
+      e2.selectAllBlocks();
+      window.getSelection().removeAllRanges();
+    } catch (e) {}
+    return e2.selectedBlocks().length || -1;
   };
 
   Ink.prototype.fieldWatch = function (on) {

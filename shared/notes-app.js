@@ -1278,29 +1278,39 @@
   function serverQuota() {
     var Sy = window.GardenNotesSync;
     var q = (Sy && Sy.quota) ? Sy.quota() : null;
-    if (!q || q.note_bytes == null || !q.max) return null;
-    return { bytes: q.note_bytes, max: q.max, remote: 1 };
+    var max = q ? Number(q.max_bytes) || 0 : 0;
+    if (!q || q.note_bytes == null || !max) return null;
+    return { bytes: Number(q.note_bytes) || 0, max: max, remote: 1 };
+  }
+
+  /*@3.NOAJ.486*/
+  function deviceQuota() {
+    var Sg = navigator.storage;
+    if (!Sg || !Sg.estimate) return Promise.resolve(null);
+    return Sg.estimate().then(function (e) {
+      return (e && e.quota) ? { bytes: e.usage || 0, max: e.quota, remote: 0 } : null;
+    }, function () { return null; });
   }
 
   function renderQuota() {
     if (!els.quota) return;
-    var St = window.GardenNotesStore;
-    if (!St || !St.quota) { els.quota.hidden = true; return; }
     var srv = serverQuota();
-    (srv ? Promise.resolve(srv) : St.quota()).then(function (q) {
+    (srv ? Promise.resolve(srv) : deviceQuota()).then(function (q) {
       if (!q || !q.max) { els.quota.hidden = true; return; }
       var pct = Math.min(100, Math.round((q.bytes / q.max) * 100));
-      var mb = function (b) { return (b / 1048576).toFixed(1); };
+      var sz = function (b) {
+        return b >= 1073741824 ? (b / 1073741824).toFixed(1) + ' GB' : (b / 1048576).toFixed(1) + ' MB';
+      };
       els.quota.hidden = false;
       els.quota.setAttribute('data-warn', pct >= 92 ? '2' : (pct >= 78 ? '1' : '0'));
-      var full = mb(q.bytes) + ' / ' + mb(q.max) + ' MB';
+      var full = sz(q.bytes) + ' / ' + sz(q.max);
+      var who = q.remote ? L('ملاحظاتُك في حسابك', 'Your notes in your account')
+                         : L('هذا الجهاز — كلُّ ما يحفظه الموقع', 'This device — everything the site keeps');
       els.quota.setAttribute('data-src', q.remote ? 'srv' : 'loc');
-      els.quota.setAttribute('aria-label',
-        (q.remote ? L('المزامَنُ إلى حسابك: ', 'Synced to your account: ')
-                  : L('على هذا الجهاز — لم يُزامَن بعد: ', 'On this device — not synced yet: ')) + full);
-      els.quota.setAttribute('title', full);
+      els.quota.setAttribute('aria-label', who + ': ' + full);
+      els.quota.setAttribute('title', who + ': ' + full);
       els.quota.innerHTML =
-        '<div style="unicode-bidi:isolate;direction:ltr">' + mb(q.bytes) + ' MB</div>' +
+        '<div style="unicode-bidi:isolate;direction:ltr">' + esc(sz(q.bytes)) + '</div>' +
         '<div class="na-quota-bar"><div class="na-quota-fill" style="inline-size:' + pct + '%"></div></div>';
     }).catch(function () { els.quota.hidden = true; });
   }
@@ -3963,8 +3973,8 @@
   }
 
   function richInView() {
-    if (S.expIds) return S.expIds.map(richOf).filter(Boolean);
-    return inView(S.view).filter(function (n) { return n.src === 'rich'; });
+    if (S.expIds) return S.expIds.map(anyOf).filter(Boolean);
+    return inView(S.view);
   }
 
   /*@3.NOAJ.14*/
@@ -3974,6 +3984,11 @@
     var out = [];
     return list.reduce(function (chain, n) {
       return chain.then(function () {
+        if (n.src !== 'rich') {
+          var lg = lessonDoc(n);
+          if (lg) out.push(lg);
+          return null;
+        }
         return St.getDoc(n.id).then(function (row) {
           if (row && row.doc) out.push({ doc: row.doc, meta: metaOf(idxFind(n.id)) });
         })['catch'](function () {});
@@ -4792,17 +4807,19 @@
     var quick, items = [];
     if (nSel) {
       quick = [{ a: 'psdup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') }, { a: 'pscopy', i: 'fa-copy', t: L('انسخْ', 'Copy') },
-               { a: 'psrot', i: 'fa-rotate-right', t: L('أدِرْ ١٥°', 'Rotate 15°') }, { a: 'psdel', i: 'fa-trash', t: L('احذفْ', 'Delete') }];
+               { a: 'psrot', i: 'fa-rotate-right', t: L('أدِرْ ١٥°', 'Rotate 15°') }, { a: 'psdel', i: 'fa-trash', t: L('احذفْ', 'Delete'), dz: 1 }];
     } else if (sel) {
       var cut = sel.length > 28 ? sel.slice(0, 28) + '…' : sel;
       quick = [{ a: 'pcopy', i: 'fa-copy', t: L('انسخْ', 'Copy') }, { a: 'pfind', i: 'fa-magnifying-glass', t: L('ابحثْ', 'Search'), why: L('ابحثْ عن «' + cut + '»', 'Search for “' + cut + '”') },
                /*@3.NOAJ.255*/
                { a: 'pcover', i: 'fa-pen-to-square', t: L('غطِّ واكتبْ', 'Cover & rewrite'), why: L('غطِّ النصَّ واكتبْ مكانَه', 'Cover the text and rewrite it') }];
+      if (window.GardenTr) quick.push({ a: 'ptr', i: 'fa-language', t: L('ترجمْ', 'Translate') });
     } else {
       quick = tools;
     }
     pdfHear = pdfMoment(x, y);
     if (pdfHear) items.push({ a: 'phear', i: 'fa-play', t: hearLabel(pdfHear) }, { sep: 1 });
+    if (!nSel && pn && ik && ik.addMenuAt) items.push({ a: 'padd', i: 'fa-plus', t: L('أضِفْ هنا…', 'Add here…'), eg: L('قائمة · صندوق · جدول · معادلة · صورة', 'List · box · table · equation · image') });
     if (!nSel && ik && ik.armed && ik.canPaste && ik.canPaste()) items.push({ a: 'pspaste', i: 'fa-paste', t: L('ألصِقْ رسماً منسوخاً', 'Paste drawing'), kb: 'Ctrl V' });
     if (quick !== tools) {
       items.push({ a: 'g:tools', i: 'fa-pen-nib', t: L('أدواتُ الكتابة', 'Writing tools'), sub: tools.map(function (q) { return { a: q.a, i: q.i, t: q.t }; }) });
@@ -5065,6 +5082,18 @@
       var hm = pdfHear;
       pdfHear = null;
       hearGo(hm);
+      return;
+    }
+    if (act === 'padd') {
+      var pgA = snapPage(snapAt);
+      var pnA = pgA ? (Number(pgA.getAttribute('data-p')) || 0) : 0;
+      if (ik && pnA && snapAt) ik.addMenuAt(pnA, snapAt.x, snapAt.y);
+      return;
+    }
+    if (act === 'ptr') {
+      var trS = '';
+      try { trS = String(window.getSelection() || '').trim(); } catch (eTr) { trS = ''; }
+      if (trS && window.GardenTr) GardenTr.open(trS, GardenTr.selRect ? GardenTr.selRect() : null);
       return;
     }
     if (act === 'psdup') { if (ik) ik.dupPick(); return; }
@@ -7833,8 +7862,8 @@
   var TOP_TOOLS = [
     { id: 'na-draw-top',  tool: 'pen',   ar: 'القلم — ارسم فوق الصفحة',
       en: 'Pen — draw on the page' },
-    { id: 'na-text-top',  tool: 'text',  ar: 'حقلُ نصّ — اضغطْ مطوّلاً حيث تريده',
-      en: 'Text field — long-press where you want it' },
+    { id: 'na-text-top',  tool: 'text',  ar: 'حقلُ نصّ — انقرْ حيث تريده',
+      en: 'Text field — click where you want it' },
     { id: 'na-shape-top', tool: 'rect',  ar: 'الأشكال — مستطيلٌ ودائرةٌ وخطٌّ وسهم',
       en: 'Shapes — box, circle, line, arrow' }
   ];
@@ -8488,6 +8517,18 @@
     if (sc && h1 !== h0) sc.scrollTop += (h1 - h0);
   }
 
+  /*@3.NOAJ.485*/
+  function fbOver(on, bar) {
+    var wrap = document.querySelector('.gpv'), sc = els.docBody;
+    if (wrap) { if (on) wrap.setAttribute('data-fbover', '1'); else wrap.removeAttribute('data-fbover'); }
+    if (sc) sc.style.paddingBlockStart = '';
+    if (!on || !bar || !sc) return;
+    var blk = document.querySelector('.gpi-fed .ne-root > [data-bid][data-act="1"]');
+    if (!blk) return;
+    var under = bar.getBoundingClientRect().bottom + 8 - blk.getBoundingClientRect().top;
+    if (under > 0) sc.style.paddingBlockStart = Math.ceil(under) + 'px';
+  }
+
   function favsSwap(on, bar) {
     var favs = document.getElementById('na-favs');
     if (!favs) return false;
@@ -8502,8 +8543,9 @@
             try { pdfDial.show(false, false, dockUp); } catch (e0) {}
           }
           favs.classList.add('na-favs--ghost');
-          bar.classList.add('gpi-fbar--float', 'gpi-fbar--bottom');
-          document.body.appendChild(bar);
+          bar.classList.add('gpi-fbar--over');
+          favs.appendChild(bar);
+          fbOver(true, bar);
           return;
         }
         if (pdfDial) { try { pdfDial.show(false, false, false); } catch (e1) {} }
@@ -8513,6 +8555,7 @@
       if (bar && bar.parentNode === favs) favs.removeChild(bar);
       if (bar && bar.parentNode === document.body) document.body.removeChild(bar);
       favs.classList.remove('na-favs--ghost');
+      fbOver(false);
       var arm = !!(pdfUi && pdfUi.drawing && pdfUi.drawing());
       if (pdfDial) { try { pdfDial.show(arm, arm); } catch (e2) {} }
     });
@@ -9894,12 +9937,14 @@
       newFolder: function () { newFolder(S.view.k === 'folder' ? S.view.id : ''); },
       move: function (uids) {
         var r = recsOf(uids);
+        lessonSkip(uids, r.length);
         if (!r.length) return;
         S.moveMany = r.map(function (x) { return x.id; });
         moveMany();
       },
       archive: function (uids, on) {
         var now = Date.now();
+        lessonSkip(uids, recsOf(uids).length);
         recsOf(uids).forEach(function (x) {
           var r = idxFind(x.id);
           if (!r) return;
@@ -9925,13 +9970,13 @@
         saveState('', L(n === 1 ? 'نُقلت' : 'نُقلت ' + n, n === 1 ? 'Moved' : n + ' moved'));
         reload({ keepOpen: true });
       },
-      trash: function (uids) { trashIds(recsOf(uids).map(function (x) { return x.id; })); },
+      trash: function (uids) { var r = recsOf(uids); lessonSkip(uids, r.length); if (r.length) trashIds(r.map(function (x) { return x.id; })); },
       restore: function (uids) { restoreIds(recsOf(uids).map(function (x) { return x.id; })); },
       purge: function (uids) { purgeRecs(recsOf(uids)); },
       emptyTrash: function () { purgeRecs((S.trash || []).slice()); },
       bulk: bulkOpen,
       exportIds: function (uids) {
-        var r = recsOf(uids);
+        var r = (uids || []).map(anyOf).filter(Boolean);
         if (!r.length) return;
         S.expNext = r.map(function (x) { return x.uid; });
         openExport();
@@ -9998,6 +10043,51 @@
     if (S.picked[uid]) delete S.picked[uid]; else S.picked[uid] = 1;
     paintPicked();
   }
+
+  function anyOf(uid) {
+    var pools = [S.list || [], S.all || []];
+    for (var p = 0; p < pools.length; p++) {
+      for (var i = 0; i < pools[p].length; i++) if (pools[p][i].uid === uid) return pools[p][i];
+    }
+    return null;
+  }
+
+  function lessonSkip(uids, nRich) {
+    var n = (uids || []).length - nRich;
+    if (n > 0) toast(L(n === 1 ? 'ملاحظةُ الدرس تبقى في درسها — تُعدَّل وتُحذف من صفحتها.' : n + ' من ملاحظات الدروس تبقى في دروسها — تُعدَّل وتُحذف من صفحاتها.',
+                       n === 1 ? 'The lesson note stays in its lesson — edit or delete it on its page.' : n + ' lesson notes stay in their lessons — edit or delete them on their pages.'));
+  }
+
+  function lessonBody(n) {
+    var rd = function (k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+    var find = function (arr) {
+      if (!Array.isArray(arr)) return null;
+      for (var i = 0; i < arr.length; i++) if (arr[i] && String(arr[i].id) === String(n.id)) return arr[i];
+      return null;
+    };
+    var o = n.origin || {}, x = null;
+    if (n.src === 'quick') x = find(rd('quick_notes'));
+    else if (n.src === 'module') x = find(rd('garden_' + o.course + '_m' + o.module + '_notes'));
+    else if (n.src === 'course') { var m = rd('course_meta_' + o.course); x = find(m && m.notes); }
+    if (!x) return n.excerpt || '';
+    return String(x.body != null ? x.body : (x.note || ''));
+  }
+
+  /*@3.NOAJ.487*/
+  function lessonDoc(n) {
+    var B = window.GardenNotesBlocks;
+    if (!B) return null;
+    var txt = lessonBody(n), blocks = [];
+    if (n.highlight) blocks.push(B.blank('quote', { rt: [{ s: String(n.highlight) }] }));
+    var md = null;
+    try { md = txt ? B.fromMarkdown(txt) : null; } catch (e) { md = null; }
+    if (md && md.length) blocks = blocks.concat(md);
+    else if (txt) blocks.push(B.blank('p', { rt: [{ s: txt }] }));
+    if (!blocks.length) return null;
+    return { doc: { v: 1, blocks: blocks },
+             meta: { title: n.title || L('ملاحظة', 'Note'), course: o2c(n), date: new Date().toLocaleDateString(isAr() ? 'ar-SA' : 'en-GB') } };
+  }
+  function o2c(n) { return (n.origin && n.origin.label) || ''; }
 
   function richOf(uid) {
     var pools = [S.list || [], S.all || [], S.trash || []];
@@ -10191,6 +10281,8 @@
       return true;
     }
     if (mod && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA')) {
+      var ikA = pdfUi.ink ? pdfUi.ink() : null;
+      if (ikA && ikA.fieldSelAll && ikA.fieldSelAll()) { e.preventDefault(); return true; }
       if (pdfUi.selectPage && pdfUi.selectPage()) { e.preventDefault(); return true; }
       return false;
     }

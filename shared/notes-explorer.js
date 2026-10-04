@@ -285,7 +285,7 @@
     var th = sel ? TH[n.id] : null;
     return '<div class="nx-it" role="option" tabindex="0" data-uid="' + esc(n.uid) + '" data-k="' + esc(k) + '"' + (sel ? ' data-id="' + esc(n.id) + '"' : ' data-ro="1"') +
         ' aria-selected="' + on + '" aria-label="' + esc(lbl) + '"' + (tone ? ' style="--nx-tone:' + esc(tone) + '"' : '') + '>' +
-      (sel ? '<button type="button" class="nx-ck" data-x="pick" tabindex="-1" aria-label="' + esc(L('حدِّد', 'Select')) + '">' + ic('fa-check') + '</button>' : '') +
+      '<button type="button" class="nx-ck" data-x="pick" tabindex="-1" aria-label="' + esc(L('حدِّد', 'Select')) + '">' + ic('fa-check') + '</button>' +
       /*@3.NOEJ3.5*/
       '<div class="nx-th" aria-hidden="true"' + (sel ? ' data-th="' + esc(n.id) + '"' : '') + '>' +
         (th ? '<img class="nx-th-img" src="' + esc(th) + '" alt="" decoding="async">'
@@ -418,7 +418,7 @@
     var h = '<div class="nx-sel" role="toolbar" aria-label="' + esc(L('أفعال المحدَّد', 'Selection actions')) + '"' + (n ? '' : ' hidden') + '>' +
       '<b class="nx-sel-n">' + esc(L(n === 1 ? 'عنصرٌ واحد' : (n === 2 ? 'عنصران' : n + (n <= 10 ? ' عناصر' : ' عنصراً')), n + (n === 1 ? ' item' : ' items'))) + '</b>';
     function b(x, icon, ar, en, cls) { return btn(x, icon, L(ar, en), cls || 'gsf-btn--ghost'); }
-    var tot = lastList.filter(function (x) { return x.src === 'rich'; }).length;
+    var tot = lastList.length;
     /*@3.NOEJ3.26*/
     if (n < tot) h += b('pickall', 'fa-check-double', 'حدِّدِ الكلّ (' + tot + ')', 'Select all (' + tot + ')');
     h += b('unpick', 'fa-xmark', 'ألغِ التحديد', 'Clear selection') + '<span class="nx-sel-vr" aria-hidden="true"></span>';
@@ -858,13 +858,13 @@
     if (a < 0) { toggle(uid); return; }
     var p = Object.assign({}, pickedSet());
     var lo = Math.min(a, b), hi = Math.max(a, b);
-    for (var i = lo; i <= hi; i++) if (lastList[i].src === 'rich') p[lastList[i].uid] = 1;
+    for (var i = lo; i <= hi; i++) p[lastList[i].uid] = 1;
     A.setPicked(p);
     paint();
   }
   function selectAll() {
     var p = {};
-    for (var i = 0; i < lastList.length; i++) if (lastList[i].src === 'rich') p[lastList[i].uid] = 1;
+    for (var i = 0; i < lastList.length; i++) p[lastList[i].uid] = 1;
     A.setPicked(p);
     paint();
   }
@@ -988,6 +988,26 @@
       else if (act === 'trash') A.trash(ids);
     }, MOPT);
   }
+  /*@3.NOEJ3.29*/
+  function lessonMenu(x, y, uid) {
+    var p0 = pickedSet();
+    if (!p0[uid]) { A.setPicked({}); paint(); }
+    var ids = pickedList();
+    if (!ids.length) ids = [uid];
+    var it = itemOf(uid);
+    if (!it) return;
+    var k = kindOf(it);
+    GM().rich(x, y, {
+      head: { ico: kindIcon(k), tone: it.origin && it.origin.course ? A.tone(it.origin.course) : '', t: it.title || L('بلا عنوان', 'Untitled'),
+              s: [kindName(k), it.origin && it.origin.label ? it.origin.label : ''].filter(Boolean).join(' · ') },
+      quick: [{ a: 'open', i: 'fa-arrow-up-right-from-square', t: k === 'quick' ? L('افتحْها', 'Open') : L('في درسها', 'In its lesson') },
+              { a: 'export', i: 'fa-file-export', t: ids.length > 1 ? L('صدِّرِ المحدَّد', 'Export selected') : L('صدِّرْ', 'Export') }],
+      items: [{ h: L('تُعدَّل وتُحذف من صفحتها — والمستكشفُ يعرضها ويصدّرها.', 'Edit or delete it on its own page — the explorer shows and exports it.') }]
+    }, function (act) {
+      if (act === 'open') openItem(it);
+      else if (act === 'export') A.exportIds(ids);
+    }, MOPT);
+  }
   function folderMenu(x, y, fid, el) {
     var name = el ? (el.querySelector('.nx-fold-n, .nx-place-n') || el).textContent : '';
     var cnt = el ? (el.querySelector('.nx-fold-c, .nx-place-c') || {}).textContent || '' : '';
@@ -1101,9 +1121,8 @@
     if (!it) return;
     var uid = it.getAttribute('data-uid'), n = itemOf(uid);
     if (!n) return;
-    var ro = n.src !== 'rich';
-    if (!ro && e.shiftKey && anchor) { e.preventDefault(); range(uid); return; }
-    if (!ro && (e.ctrlKey || e.metaKey || ids.length)) { e.preventDefault(); toggle(uid); return; }
+    if (e.shiftKey && anchor) { e.preventDefault(); range(uid); return; }
+    if (e.ctrlKey || e.metaKey || ids.length) { e.preventDefault(); toggle(uid); return; }
     if (A.view().k === 'trash') { toggle(uid); return; }
     anchor = uid;
     openItem(n);
@@ -1114,7 +1133,7 @@
     var ids = pickedList();
     if (A.view().k === 'space') {
       var fr = e.target.closest && e.target.closest('.nx-frow[data-fk]');
-      if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A')) { e.preventDefault(); fAll(); return; }
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA')) { e.preventDefault(); fAll(); return; }
       if (e.key === 'Escape' && Object.keys(FSEL).length) { e.preventDefault(); e.stopPropagation(); fClear(); return; }
       if ((e.key === 'Delete' || e.key === 'Backspace') && Object.keys(FSEL).length) { e.preventDefault(); fErase(fPicked()); return; }
       if (fr && e.key === 'Enter') { e.preventDefault(); if (A.openId) A.openId(fr.getAttribute('data-id')); return; }
@@ -1126,7 +1145,7 @@
       }
       if (e.key !== 'Escape') return;
     }
-    if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A')) {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA')) {
       e.preventDefault(); selectAll(); return;
     }
     if (e.key === 'Escape' && ids.length) { e.preventDefault(); e.stopPropagation(); clear(); return; }
@@ -1142,11 +1161,11 @@
     var uid = it.getAttribute('data-uid');
     if (e.key === 'Enter' && e.altKey) { e.preventDefault(); if (itemOf(uid) && itemOf(uid).src === 'rich') propsOpen(itemOf(uid)); return; }
     if (e.key === 'Enter') { e.preventDefault(); openItem(itemOf(uid)); return; }
-    if (e.key === ' ') { e.preventDefault(); if (itemOf(uid) && itemOf(uid).src === 'rich') toggle(uid); return; }
+    if (e.key === ' ') { e.preventDefault(); if (itemOf(uid)) toggle(uid); return; }
     if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
       e.preventDefault();
       var r = it.getBoundingClientRect();
-      if (itemOf(uid) && itemOf(uid).src === 'rich') (A.view().k === 'trash' ? trashMenu : itemMenu)(A.isAr() ? r.right - 12 : r.left + 12, r.top + 24, uid);
+      if (itemOf(uid)) (itemOf(uid).src !== 'rich' ? lessonMenu : A.view().k === 'trash' ? trashMenu : itemMenu)(A.isAr() ? r.right - 12 : r.left + 12, r.top + 24, uid);
       return;
     }
     var dirs = { ArrowDown: 1, ArrowUp: -1, ArrowLeft: A.isAr() ? 1 : -1, ArrowRight: A.isAr() ? -1 : 1 };
@@ -1171,7 +1190,7 @@
     if (document.querySelector('dialog[open]')) return;
     if (t && t !== document.body && t !== document.documentElement &&
         /*@3.NOEJ3.28*/
-        !((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A') && t.closest && t.closest('button, a, [role="button"], [tabindex]'))) return;
+        !((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA') && t.closest && t.closest('button, a, [role="button"], [tabindex]'))) return;
     onKey(e);
   }
 
@@ -1226,9 +1245,10 @@
       spaceMenu(e.clientX, e.clientY);
       return;
     }
-    if (!it || it.getAttribute('data-ro')) return;
+    if (!it) return;
     e.preventDefault();
     var uid = it.getAttribute('data-uid');
+    if (it.getAttribute('data-ro')) { lessonMenu(e.clientX, e.clientY, uid); return; }
     if (A.view().k === 'trash') trashMenu(e.clientX, e.clientY, uid);
     else itemMenu(e.clientX, e.clientY, uid);
   }

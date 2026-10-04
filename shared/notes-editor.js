@@ -4845,8 +4845,12 @@
   };
 
   Editor.prototype.selectAllBlocks = function () {
-    var sel = this.blockSel();
-    for (var i = 0; i < this.doc.blocks.length; i++) sel[this.doc.blocks[i].id] = 1;
+    /*@3.NOEJ.621*/
+    var sel = this.blockSel(), fo = !!this.opts.freeOnly;
+    for (var i = 0; i < this.doc.blocks.length; i++) {
+      if (fo && !this.doc.blocks[i].fp) continue;
+      sel[this.doc.blocks[i].id] = 1;
+    }
     this.paintBlockSel();
     this.emitState();
   };
@@ -9222,7 +9226,7 @@
                { a: 'down', i: 'fa-arrow-down', t: L('لأسفل', 'Down'), off: i >= last }];
       quick.push({ a: 'dup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') },
                  { a: 'copy', i: 'fa-copy', t: L('انسخْ', 'Copy') });
-      if (fo) quick.push({ a: 'del', i: 'fa-trash', t: L('احذفْ', 'Delete') });
+      if (fo) quick.push({ a: 'del', i: 'fa-trash', t: L('احذفْ', 'Delete'), dz: 1 });
       items = items.concat(this.selRows(), this.lkRows());
       if (items.length) items.push({ h: L('هذا العنصر', 'This element') });
       items.push({ a: 'g:turn', i: 'fa-shuffle', t: L('حوِّلْه إلى', 'Turn into'), sub: TURN.map(function (it, k) {
@@ -10811,7 +10815,7 @@
     root.addEventListener('focusin', unfold);
     root.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && self._pasteBar) { e.stopPropagation(); self.hidePasteOpts(); }
-      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && String(e.key).toLowerCase() === 'a') {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (String(e.key).toLowerCase() === 'a' || e.code === 'KeyA')) {
         var edA = self.currentEditable();
         var bA = edA ? self.selBounds(edA) : null;
         var lenA = edA ? (edA.textContent || '').length : 0;
