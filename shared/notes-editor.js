@@ -1533,7 +1533,8 @@
         for (k = 0; k < row.length && !hit; k++) hit = scanRt(row[k] && row[k].rt, out);
       }
     }
-    if (!hit) out.d = (!out.n && out.m) ? 'ltr' : (out.r >= out.l * 2) ? 'rtl' : ((out.l >= out.r * 2) ? 'ltr' : '');
+    /*@3.NOEJ.613*/
+    if (!hit) out.d = !out.n ? (out.m ? 'ltr' : '') : (out.r >= out.l * 2) ? 'rtl' : ((out.l >= out.r * 2) ? 'ltr' : '');
     return out.d;
   }
 
@@ -4820,10 +4821,15 @@
                   'Tap blocks to select them — the same button exits, or press Esc.')) +
         '</span>' +
         '<button type="button" class="ne-selhint-b" data-selall="1">' +
-        B().esc(L('حدّدِ الكلّ', 'Select all')) + '</button>';
+        B().esc(L('حدّدِ الكلّ', 'Select all')) + '</button>' +
+        '<button type="button" class="ne-selhint-b ne-selhint-x" data-selx="1">' +
+        '<i class="fa-solid fa-xmark" aria-hidden="true"></i> ' +
+        B().esc(L('إلغاء', 'Cancel')) + '</button>';
       host.insertBefore(bar, this.root);
       var self = this;
       bar.addEventListener('click', function (e) {
+        /*@3.NOEJ.612*/
+        if (e.target.closest('[data-selx]')) { self.setSelectMode(false, 1); return; }
         if (!e.target.closest('[data-selall]')) return;
         /*@3.NOEJ.92*/
         if (self.opts.onSelectAll) self.opts.onSelectAll();
@@ -4844,6 +4850,8 @@
     this.paintBlockSel();
     this.emitState();
   };
+
+  var FLOW_ONLY = { hr: 1, gap: 1, pb: 1 };
 
   /*@3.NOEJ.34*/
   /*@3.NOEJ.132*/
@@ -4910,6 +4918,46 @@
     this.touch();
     this.emitState();
     return made.length;
+  };
+
+  Editor.prototype.idSet = function () {
+    var o = {};
+    for (var i = 0; i < this.doc.blocks.length; i++) o[this.doc.blocks[i].id] = 1;
+    return o;
+  };
+
+  /*@3.NOEJ.616*/
+  Editor.prototype.freeNew = function (had, pt) {
+    this.readAll();
+    var W = this.sheetW() || 1, bs = this.doc.blocks, k = 0, moved = 0, base = null, i, b;
+    for (i = 0; i < bs.length; i++) {
+      b = bs[i];
+      if (had[b.id] || b.ty === 'pb' || (FLOW_ONLY[b.ty] && !b.fp)) continue;
+      if (b.fp && !base) base = { x: b.fp.x, y: b.fp.y };
+    }
+    for (i = 0; i < bs.length; i++) {
+      b = bs[i];
+      if (had[b.id] || b.ty === 'pb') continue;
+      if (!b.fp) {
+        if (FLOW_ONLY[b.ty]) continue;
+        b.fp = pt ? { x: Math.max(0, Math.min(0.96, (pt.x - 6) / W)), y: Math.max(0, Math.round(pt.y - 12 + k * 30)) }
+                  : { x: 0.05, y: 40 + k * 30 };
+        if (b.wm == null) b.wm = WIDE[b.ty] ? 'full' : 'fit';
+        k++;
+      } else if (pt && base) {
+        b.fp = { x: Math.max(0, Math.min(0.96, (pt.x - 6) / W + (b.fp.x - base.x))), y: Math.max(0, Math.round(pt.y - 12 + (b.fp.y - base.y))) };
+      } else {
+        b.fp = { x: Math.min(0.96, b.fp.x + 16 / W), y: b.fp.y + 16 };
+      }
+      b.z = this.topZ() + 1;
+      moved++;
+    }
+    if (!moved) return 0;
+    this.render();
+    this.layoutFree();
+    this.touch();
+    this.emitState();
+    return moved;
   };
 
   Editor.prototype.deleteBlocks = function () {
@@ -9149,10 +9197,13 @@
     this._ctxHear = null;
     if (!window.GardenMenu || !GardenMenu.rich) return;
     var m = null, head = null, quick = null, items = [];
+    /*@3.NOEJ.614*/
+    var fo = !!this.opts.freeOnly;
     var adds = function (pre) {
       return INSERT.map(function (it, k) {
+        if (fo && FLOW_ONLY[it.ty]) return null;
         return { a: pre + k, i: it.icon, t: L(it.ar, it.en), eg: it.eg ? L(it.eg.ar, it.eg.en) : '' };
-      });
+      }).filter(Boolean);
     };
     if (mode === 'block') {
       var hit = this.blockAt(id);
@@ -9162,11 +9213,12 @@
       var many = this.selectedBlocks().length > 1;
       var tk = turnOf(bb);
       head = { ico: tk ? tk.t.icon : 'fa-shapes', t: tk ? L(tk.t.ar, tk.t.en) : L('عنصر', 'Element'),
-               s: L('العنصرُ ' + (i + 1) + ' من ' + (last + 1), 'Element ' + (i + 1) + ' of ' + (last + 1)) };
-      quick = [{ a: 'up', i: 'fa-arrow-up', t: L('لأعلى', 'Up'), off: i <= 0 },
-               { a: 'down', i: 'fa-arrow-down', t: L('لأسفل', 'Down'), off: i >= last },
-               { a: 'dup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') },
-               { a: 'copy', i: 'fa-copy', t: L('انسخْ', 'Copy') }];
+               s: fo ? '' : L('العنصرُ ' + (i + 1) + ' من ' + (last + 1), 'Element ' + (i + 1) + ' of ' + (last + 1)) };
+      quick = fo ? [] : [{ a: 'up', i: 'fa-arrow-up', t: L('لأعلى', 'Up'), off: i <= 0 },
+               { a: 'down', i: 'fa-arrow-down', t: L('لأسفل', 'Down'), off: i >= last }];
+      quick.push({ a: 'dup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') },
+                 { a: 'copy', i: 'fa-copy', t: L('انسخْ', 'Copy') });
+      if (fo) quick.push({ a: 'del', i: 'fa-trash', t: L('احذفْ', 'Delete') });
       items = items.concat(this.selRows(), this.lkRows());
       if (items.length) items.push({ h: L('هذا العنصر', 'This element') });
       items.push({ a: 'g:turn', i: 'fa-shuffle', t: L('حوِّلْه إلى', 'Turn into'), sub: TURN.map(function (it, k) {
@@ -9207,10 +9259,10 @@
           { a: 'z:front', i: 'fa-arrow-up-wide-short', t: L('إلى المقدّمة', 'Bring to front') },
           { a: 'z:up', i: 'fa-angle-up', t: L('خطوةً للأمام', 'Forward one step') },
           { a: 'z:down', i: 'fa-angle-down', t: L('خطوةً للخلف', 'Backward one step') },
-          { a: 'z:back', i: 'fa-arrow-down-wide-short', t: L('إلى الخلف', 'Send to back') },
+          { a: 'z:back', i: 'fa-arrow-down-wide-short', t: L('إلى الخلف', 'Send to back') }].concat(fo ? [] : [
           { sep: 1 },
-          { a: 'anchor', i: 'fa-thumbtack', t: L('أعِدْها إلى التراتب', 'Return it to the order') }] });
-      } else if (bb) {
+          { a: 'anchor', i: 'fa-thumbtack', t: L('أعِدْها إلى التراتب', 'Return it to the order') }]) });
+      } else if (bb && !fo) {
         items.push({ a: 'free', i: 'fa-arrows-up-down-left-right', t: L('اجعلها حرّةَ الموضع', 'Make it free-floating') });
       }
       /*@3.NOEJ.166*/
@@ -9239,15 +9291,18 @@
         items.push({ a: 'gfmt', i: 'fa-wand-magic-sparkles', t: many ? L('تنسيقُ Garden للمحدَّد', 'Garden format for the selection') : L('تنسيقُ Garden للوثيقة', 'Garden format for the document') });
       }
       items = items.concat(this.pasteRows());
-      items.push({ sep: 1 }, { a: 'del', i: 'fa-trash', t: L('حذف', 'Delete'), dz: 1 });
+      if (!fo) items.push({ sep: 1 }, { a: 'del', i: 'fa-trash', t: L('حذف', 'Delete'), dz: 1 });
     } else if (mode === 'paper') {
       head = { ico: 'fa-file-lines', t: L('الورقة', 'The page'), s: L('أضِفْ عنصراً في هذا الموضع', 'Add an element at this spot') };
-      quick = [{ a: 'pend', i: 'fa-arrow-down', t: L('فقرةٌ في الآخر', 'Paragraph at end') },
-               { a: 'phere', i: 'fa-cubes', t: L('المنسوخُ في الآخر', 'Copied at end'), off: !clipAny() },
-               { a: 'sel', i: 'fa-square-check', t: L('حدِّدْ', 'Select') }];
-      if (this.doc.blocks.length > 2) quick.push({ a: 'gfmt', i: 'fa-wand-magic-sparkles', t: L('تنسيقُ Garden', 'Garden format') });
+      quick = fo ? [{ a: 'here:0', i: 'fa-i-cursor', t: L('فقرةٌ هنا', 'Paragraph here') },
+               { a: 'phere', i: 'fa-cubes', t: L('المنسوخُ هنا', 'Copied here'), off: !clipAny() }]
+        : [{ a: 'pend', i: 'fa-arrow-down', t: L('فقرةٌ في الآخر', 'Paragraph at end') },
+               { a: 'phere', i: 'fa-cubes', t: L('المنسوخُ في الآخر', 'Copied at end'), off: !clipAny() }];
+      if (!fo || this.doc.blocks.some(function (x) { return !!x.fp; })) quick.push({ a: 'sel', i: 'fa-square-check', t: L('حدِّدْ', 'Select') });
+      if (!fo && this.doc.blocks.length > 2) quick.push({ a: 'gfmt', i: 'fa-wand-magic-sparkles', t: L('تنسيقُ Garden', 'Garden format') });
       /*@3.NOEJ.345*/
-      items = items.concat(this.selRows(), this.lkRows(), [{ h: L('أضِفْ هنا', 'Add here') }], adds('here:'), this.pasteRows());
+      items = items.concat(this.selRows(), this.lkRows(), [{ h: L('أضِفْ هنا', 'Add here') }], adds('here:'),
+        this.pasteRows().filter(function (r) { return !fo || r.a !== 'paste'; }));
     } else {
       head = { ico: 'fa-plus', t: L('أضِف بعدها', 'Add after') };
       items = adds('ins:');
@@ -9272,9 +9327,24 @@
     var first = m.querySelector('.ne-menu-i:not([disabled])');
     if (first) first.focus();
 
+    /*@3.NOEJ.615*/
+    var ptF = fo ? (pt || (anchor && anchor.x != null ? self.localPoint(anchor.x, anchor.y) : null)) : null;
     function run(act) {
       self.closeMenu();
       if (act === 'hear') { if (hear && hear.go) hear.go(); return; }
+      if (fo && (act === 'phere' || act === 'paste' || act === 'dup' || act === 'cbfull' || act === 'cbtext')) {
+        var had = self.idSet();
+        var settle = function () { self.freeNew(had, act === 'dup' ? null : ptF); };
+        if (act === 'dup') { self.duplicate(id); settle(); return; }
+        if (act === 'cbfull' || act === 'cbtext') {
+          Promise.resolve(self.pasteFromClipboard(act === 'cbtext' ? 'text' : 'full', id)).then(settle, settle);
+          return;
+        }
+        self.clearBlockSel();
+        self.pasteBlocks();
+        settle();
+        return;
+      }
       if (act.indexOf('here:') === 0) {
         var itH = INSERT[Number(act.slice(5))];
         if (itH && pt) {

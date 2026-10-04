@@ -737,7 +737,8 @@
         s.el.insertBefore(cv, s.el.firstChild);
         s.busy = 0;
         self.tag(n);
-        self.layer(n);
+        /*@3.NOPJ3.80*/
+        if (!self.layer(n) && s.relay) { s.relay = 0; self.tellLayer(n, s); }
         if (self.o.onPage) self.o.onPage(n);
         if (self.seen && n >= self.seen[0] && n <= self.seen[1]) self.text(n);
       });
@@ -984,6 +985,8 @@
       s.cv = null;
     }
     s.stale = 0;
+    /*@3.NOPJ3.79*/
+    if (s.hl || s.ihl) s.relay = 1;
     if (s.hl) { s.hl.remove(); s.hl = null; }
     if (s.ihl) { s.ihl.remove(); s.ihl = null; }
     if (s.sel) { s.sel.remove(); s.sel = null; }

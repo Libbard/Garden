@@ -801,6 +801,21 @@
     return ok;
   };
 
+  /*@3.NOPJ8.189*/
+  Ink.prototype.textAt = function (n, cx, cy) {
+    var p = this.pages[n];
+    if (!p) return null;
+    if (this.tmode) this.textMode(false);
+    if (this.armed) this.arm(false);
+    var ed = this.fieldEd(p, true);
+    if (!ed || !ed.addFree || !ed.localPoint) return null;
+    var lp = ed.localPoint(cx, cy);
+    var b = null;
+    try { b = ed.addFree('p', lp.x, Math.max(0, lp.y)); } catch (e) { return null; }
+    if (b) this.fieldFocus(p, true);
+    return b;
+  };
+
   /*@3.NOPJ8.184*/
   Ink.prototype.menuFile = function (ed, cx, cy, trT, trR, end) {
     var m0 = ed && ed.menu;
@@ -2971,6 +2986,7 @@
       /*@3.NOPJ8.153*/
       ed = E.mount(host, deep(d), {
         noDocPaste: true,
+        freeOnly: true,
         sheetH: function () { return p.h || 0; },
         onDirty: function () { self.fieldDirty(p); },
         freeDefaults: function () {

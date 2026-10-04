@@ -4771,7 +4771,7 @@
                  s: pn ? L('الصفحة ' + pn + ' من ' + tot, 'Page ' + pn + ' of ' + tot) : '' };
     var tools = [
       { a: 'ppen', i: 'fa-pen-nib', t: pdfUi.drawing() ? L('أغلقِ القلم', 'Close pen') : L('القلم', 'Pen') },
-      { a: 'ptext', i: 'fa-i-cursor', t: L('حقلُ نصّ', 'Text field') },
+      { a: 'ptext', i: 'fa-i-cursor', t: L('نصٌّ هنا', 'Text here') },
       { a: 'psnip', i: 'fa-crop-simple', t: L('قُصَّ منطقة', 'Cut out') },
       { a: 'pgoto', i: 'fa-hashtag', t: L('إلى صفحة', 'Go to page') }];
     var quick, items = [];
@@ -5083,10 +5083,13 @@
     if (act === 'ppen') { pdfDraw(!pdfUi.drawing()); return; }
     /*@3.NOAJ.254*/
     if (act === 'ptext') {
-      if (!pdfUi.drawing()) pdfDraw(true);
-      var ik2 = pdfUi.ink();
-      if (ik2 && ik2.bar) ik2.bar().setTool('text');
-      if (pdfDial) pdfDial.sync();
+      var ik2 = pdfUi.ink(), pgT = snapPage(snapAt);
+      var pnT = pgT ? (Number(pgT.getAttribute('data-p')) || 0) : 0;
+      if (pdfUi.drawing()) pdfDraw(false);
+      if (!(ik2 && ik2.textAt && pnT && snapAt && ik2.textAt(pnT, snapAt.x, snapAt.y))) {
+        toast(L('تعذّرت إضافةُ الفقرة هنا — جرِّبْ نقطةً على الصفحة.', 'Could not add a paragraph here — try a spot on the page.'));
+      }
+      paintTopTools();
       return;
     }
     if (act === 'pgoto') {
@@ -5756,6 +5759,11 @@
       /*@3.NOAJ.267*/
       onInkField: function (on, bar) { return favsSwap(on, bar); },
       onInkClose: function () { pdfDraw(false); },
+      /*@3.NOAJ.482*/
+      onInkText: function (on) {
+        if (on && pdfDial && !pdfUi.drawing()) { try { pdfDial.show(false, false); } catch (e) {} paintDrawBtn(); }
+        paintTopTools();
+      },
       /*@3.NOAJ.229*/
       stamp: function (n, of) { return isAr() ? (n + ' من ' + of) : (n + ' of ' + of); },
       onAsk: function () {
