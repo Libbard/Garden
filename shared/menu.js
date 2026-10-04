@@ -134,7 +134,7 @@
   function ricon(m) {
     return m.i ? '<i class="' + (m.brand ? 'fa-brands ' : 'fa-solid ') + esc(m.i) + '" aria-hidden="true"></i>' : '<i aria-hidden="true"></i>';
   }
-  function rpanel(model, path, sheet, attr, back) {
+  function rpanel(model, path, sheet, attr, back, cx) {
     var h = '';
     if (path && back) {
       h += '<div class="gsf-rm-back"><button type="button" class="gsf-rm-bk" data-rm-back="1" aria-label="' + esc(isAr() ? 'رجوع' : 'Back') + '">' +
@@ -152,17 +152,45 @@
       });
       h += '</div>';
     }
-    (path ? model.sub : model.items || []).forEach(function (m, k) {
-      if (!m) return;
-      if (m.sep) { h += '<div class="gsf-menu-sep" role="separator"></div>'; return; }
-      var tail = m.sub ? '<span class="gsf-rm-ar"><i class="fa-solid ' + (isAr() ? 'fa-chevron-left' : 'fa-chevron-right') + '" aria-hidden="true"></i></span>'
-        : m.ok ? '<span class="gsf-rm-kb gsf-rm-ok"><i class="fa-solid fa-check" aria-hidden="true"></i></span>'
-        : (m.kb && !sheet) ? '<span class="gsf-rm-kb">' + esc(m.kb) + '</span>' : '';
-      h += '<button type="button" role="menuitem" class="gsf-menu-i gsf-rm-i' + (m.dz ? ' gsf-menu-i--danger' : '') + '" ' +
-        (m.sub ? 'data-rm-sub="' + (path ? path + '.' : '') + k + '" aria-haspopup="menu"' : attr + '="' + esc(m.a) + '"') +
-        (m.off ? ' disabled' : '') + (m.why ? ' title="' + esc(m.why) + '"' : '') + '>' + ricon(m) + '<span>' + esc(m.t) + '</span>' + tail + '</button>';
-    });
+    (path ? model.sub : model.items || []).forEach(function (m, k) { h += rrow(m, k, path, sheet, attr, cx); });
     return h;
+  }
+  /*@3.MENJ.3*/
+  function rrow(m, k, path, sheet, attr, cx) {
+    cx = cx || {};
+    if (!m) return '';
+    if (m.sep) return '<div class="gsf-menu-sep" role="separator"></div>';
+    if (m.raw) return m.raw;
+    if (m.h) return '<div class="gsf-menu-h gsf-rm-sec' + (cx.hcls ? ' ' + cx.hcls : '') + '">' + esc(m.h) +
+      (m.q ? ' — <span class="gsf-rm-hq" dir="' + (m.qdir || 'auto') + '">' + esc(m.q) + '</span>' : '') + '</div>';
+    var tail = m.sub ? '<span class="gsf-rm-ar"><i class="fa-solid ' + (isAr() ? 'fa-chevron-left' : 'fa-chevron-right') + '" aria-hidden="true"></i></span>'
+      : m.ok ? '<span class="gsf-rm-kb gsf-rm-ok"><i class="fa-solid fa-check" aria-hidden="true"></i></span>'
+      : (m.kb && !sheet) ? '<span class="gsf-rm-kb">' + esc(m.kb) + '</span>' : '';
+    return '<button type="button" role="menuitem" class="gsf-menu-i gsf-rm-i' + (m.dz ? ' gsf-menu-i--danger' : '') + (m.eg ? ' gsf-rm-i--eg' : '') +
+      (cx.icls ? ' ' + cx.icls : '') + (m.cls ? ' ' + m.cls : '') + '" ' +
+      (m.sub ? 'data-rm-sub="' + (path ? path + '.' : '') + k + '" aria-haspopup="menu"' : attr + '="' + esc(m.a) + '"') +
+      (m.off ? ' disabled' : '') + (m.why ? ' title="' + esc(m.why) + '"' : '') + '>' + ricon(m) +
+      '<span>' + esc(m.t) + (m.eg ? '<em class="gsf-rm-eg">' + esc(m.eg) + '</em>' : '') + '</span>' + tail + '</button>';
+  }
+  var MARKS = /[\u064B-\u0652\u0670\u0640]/g;
+  function fold(t) {
+    return String(t || '').toLowerCase().replace(MARKS, '')
+      .replace(/[\u0622\u0623\u0625]/g, '\u0627').replace(/\u0649/g, '\u064A').replace(/\u0629/g, '\u0647');
+  }
+  function leaves(model) {
+    var out = [], seen = {};
+    function walk(list, trail) {
+      (list || []).forEach(function (m) {
+        if (!m || m.sep || m.h || m.raw) return;
+        if (m.sub) { walk(m.sub, m.t); return; }
+        if (m.a == null || seen[m.a]) return;
+        seen[m.a] = 1;
+        out.push({ m: m, trail: trail });
+      });
+    }
+    walk(model.quick, '');
+    walk(model.items, '');
+    return out;
   }
   function rnode(model, path) {
     var n = model;
@@ -172,21 +200,21 @@
   /*@3.MENJ.2*/
   function rich(x, y, model, onAct, o) {
     o = o || {};
-    var attr = o.attr || 'data-act', sheet = sheetMode(o);
-    var el = open(x, y, sheet ? '<div class="gsf-rm-sheet"><div class="gsf-rm-grip" aria-hidden="true"></div><div class="gsf-rm-track"><div class="gsf-rm-p">' + rpanel(model, '', true, attr) + '</div></div></div>'
-      : rpanel(model, '', false, attr), onAct, { cls: 'gsf-rmenu' + (sheet ? ' gsf-rmenu--sheet' : '') + (o.cls ? ' ' + o.cls : ''), id: o.id, attr: attr,
-        label: o.label || (model.head && model.head.t) || '', within: o.within, keys: false, onClose: o.onClose, anchorEnd: o.anchorEnd, focus: o.focus });
+    var attr = o.attr || 'data-act', sheet = sheetMode(o), cx = { icls: o.icls || '', hcls: o.hcls || '' };
+    var el = open(x, y, sheet ? '<div class="gsf-rm-sheet"><div class="gsf-rm-grip" aria-hidden="true"></div><div class="gsf-rm-track"><div class="gsf-rm-p">' + rpanel(model, '', true, attr, false, cx) + '</div></div></div>'
+      : rpanel(model, '', false, attr, false, cx), onAct, { cls: 'gsf-rmenu' + (sheet ? ' gsf-rmenu--sheet' : '') + (o.cls ? ' ' + o.cls : ''), id: o.id, attr: attr,
+        label: o.label || (model.head && model.head.t) || '', within: o.within, keys: false, onClose: o.onClose, anchorEnd: o.anchorEnd, focus: o.focus, keepFocus: o.keepFocus });
     if (!el) return el;
     var subs = [];
     function shut(from) { while (subs.length > from) { var s = subs.pop(); s.el.remove(); if (s.btn) s.btn.removeAttribute('data-open'); } }
     function panelOf(b) { return b.closest('.gsf-rm-sub, .gsf-rm-p') || el; }
-    function focusFirst(p) { var f = p.querySelector('[role="menuitem"]:not(:disabled)'); if (f) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } } }
+    function focusFirst(p) { var f = p.querySelector('[role^="menuitem"]:not(:disabled)'); if (f) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } } }
     function openSub(b, kb) {
       var path = b.getAttribute('data-rm-sub'), node = rnode(model, path);
       if (sheet) {
         var tr = el.querySelector('.gsf-rm-track'), p = document.createElement('div');
         p.className = 'gsf-rm-p';
-        p.innerHTML = rpanel(node, path, true, attr, true);
+        p.innerHTML = rpanel(node, path, true, attr, true, cx);
         tr.appendChild(p);
         var depth = tr.children.length - 1;
         tr.style.transform = 'translateX(' + (isAr() ? depth * 100 : -depth * 100) + '%)';
@@ -201,7 +229,7 @@
       s.setAttribute('role', 'menu');
       s.setAttribute('data-lvl', String(lvl));
       s.setAttribute('aria-label', node.t || '');
-      s.innerHTML = rpanel(node, path, false, attr, false);
+      s.innerHTML = rpanel(node, path, false, attr, false, cx);
       s.style.left = '0px'; s.style.insetBlockStart = '0px';
       el.appendChild(s);
       var pr = s.getBoundingClientRect(), ox = pr.left, oy = pr.top, br = b.getBoundingClientRect(), pb = panelOf(b).getBoundingClientRect();
@@ -226,8 +254,11 @@
       if (b.hasAttribute('data-rm-sub')) openSub(b, false);
       else hoverT = setTimeout(function () { shut(lvl); }, 120);
     });
+    /*@3.MENJ.5*/
+    var downBack = false;
+    el.addEventListener('pointerdown', function (e) { downBack = e.target === el; });
     el.addEventListener('click', function (e) {
-      if (sheet && e.target === el) { GardenMenu.close(); return; }
+      if (sheet && e.target === el) { if (downBack) GardenMenu.close(); downBack = false; return; }
       var bk = e.target.closest ? e.target.closest('[data-rm-back]') : null;
       if (bk) {
         var tr = el.querySelector('.gsf-rm-track');
@@ -246,7 +277,7 @@
       var b = document.activeElement;
       if (!b || !el.contains(b)) return;
       var pnl = panelOf(b);
-      var bs = Array.prototype.filter.call(pnl.querySelectorAll('[role="menuitem"]'), function (x) { return !x.disabled && panelOf(x) === pnl; });
+      var bs = Array.prototype.filter.call(pnl.querySelectorAll('[role^="menuitem"]'), function (x) { return !x.disabled && !x.hidden && panelOf(x) === pnl; });
       var i = bs.indexOf(b), fwd = isAr() ? 'ArrowLeft' : 'ArrowRight', bwd = isAr() ? 'ArrowRight' : 'ArrowLeft';
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
@@ -259,8 +290,37 @@
         else if (sheet) { var bb = el.querySelector('.gsf-rm-p:last-child [data-rm-back]'); if (bb) { e.preventDefault(); bb.click(); } }
       } else if (e.key === 'Home' || e.key === 'End') {
         e.preventDefault(); if (bs.length) bs[e.key === 'Home' ? 0 : bs.length - 1].focus();
+      } else if (o.filter && !e.ctrlKey && !e.metaKey && !e.altKey &&
+                 ((e.key.length === 1 && (e.key !== ' ' || fq)) || (e.key === 'Backspace' && fq))) {
+        e.preventDefault();
+        refilter(e.key === 'Backspace' ? fq.slice(0, -1) : fq + e.key);
       }
     });
+    /*@3.MENJ.4*/
+    var fq = '', home = null;
+    function refilter(q) {
+      var box = sheet ? el.querySelector('.gsf-rm-p') : el;
+      if (!box) return;
+      shut(0);
+      if (sheet) {
+        var tr = el.querySelector('.gsf-rm-track');
+        while (tr && tr.children.length > 1) tr.lastElementChild.remove();
+        if (tr) tr.style.transform = '';
+      }
+      if (home == null) home = box.innerHTML;
+      fq = q;
+      if (!q) { box.innerHTML = home; home = null; el.removeAttribute('data-q'); focusFirst(box); return; }
+      el.setAttribute('data-q', q);
+      var f = fold(q), hits = leaves(model).filter(function (x) { return fold(x.m.t).indexOf(f) >= 0 || fold(x.trail).indexOf(f) >= 0; });
+      box.innerHTML = rrow({ h: isAr() ? 'بحث' : 'Search', q: q }, 0, '', sheet, attr, cx) +
+        (hits.length ? hits.map(function (x, k) {
+          var m = {};
+          for (var key in x.m) m[key] = x.m[key];
+          if (x.trail && !m.eg) m.eg = x.trail;
+          return rrow(m, k, '', sheet, attr, cx);
+        }).join('') : '<div class="gsf-rm-none">' + esc(isAr() ? 'لا شيءَ بهذا الاسم' : 'Nothing by that name') + '</div>');
+      focusFirst(box);
+    }
     if (sheet) {
       el.setAttribute('data-sheet', '1');
       el.style.left = ''; el.style.insetBlockStart = ''; el.style.maxBlockSize = ''; el.style.overflowY = '';

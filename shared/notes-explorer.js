@@ -1235,6 +1235,7 @@
     paint: paint,
     spaceStale: function () { SPACE = null; STAT = {}; if (A && A.statusStale) A.statusStale(); paint(); },
     active: function () { return !!(host && host.isConnected); },
+    kind: { of: kindOf, name: kindName, icon: kindIcon, size: fmtSize, count: nItems },
     selectAll: function () { if (host && host.isConnected) selectAll(); }
   };
 })();

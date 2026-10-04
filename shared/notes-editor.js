@@ -9092,216 +9092,187 @@
           'Right-click to add a field here or change an element.'));
   };
 
-  Editor.prototype.selHtml = function () {
+  Editor.prototype.selRows = function () {
     var n = (this._ctxSelTxt || '').replace(/\s+/g, ' ').trim();
-    if (!n) return '';
+    if (!n) return [];
     var cut = n.length > 26 ? (n.slice(0, 26) + '…') : n;
-    return '<div class="ne-menu-h">' + B().esc(L('النصُّ المحدَّد', 'Selected text')) +
-      ' — <span class="ne-menu-q">' + B().esc(cut) + '</span></div>' +
-      mItem('selcopy', 'fa-copy', L('نسخُ النصّ', 'Copy text')) +
-      mItem('selcut', 'fa-scissors', L('قصُّ النصّ', 'Cut text')) +
-      (window.GardenTr ? mItem('seltr', 'fa-language', L('ترجمةُ النصّ', 'Translate text')) : '');
+    var rows = [{ h: L('النصُّ المحدَّد', 'Selected text'), q: cut },
+      { a: 'selcopy', i: 'fa-copy', t: L('نسخُ النصّ', 'Copy text') },
+      { a: 'selcut', i: 'fa-scissors', t: L('قصُّ النصّ', 'Cut text') }];
+    if (window.GardenTr) rows.push({ a: 'seltr', i: 'fa-language', t: L('ترجمةُ النصّ', 'Translate text') });
+    return rows;
   };
 
-  Editor.prototype.lkHtml = function () {
+  Editor.prototype.lkRows = function () {
     var a = this._ctxLink;
-    if (!a) return '';
+    if (!a) return [];
     var href = a.getAttribute('data-nl') || a.getAttribute('href') || '';
     var off = a.getAttribute('data-lu') === '0';
     var show = href.replace(/^https:\/\//i, '');
     if (show.length > 30) show = show.slice(0, 30) + '…';
-    return '<div class="ne-menu-h">' + B().esc(L('الرابط', 'Link')) +
-      ' — <span class="ne-menu-q" dir="ltr">' + B().esc(show) + '</span></div>' +
-      mItem('lkopen', 'fa-arrow-up-right-from-square',
-            L('فتحٌ في نافذةٍ جديدة', 'Open in a new tab')) +
-      mItem('lkcopy', 'fa-link', L('نسخُ العنوان', 'Copy address')) +
-      mItem('lkedit', 'fa-pen', L('تعديلُ الرابط', 'Edit the link')) +
-      mItem('lksel', 'fa-highlighter', L('حدِّدْ نصَّه لتلوينه', 'Select its text to colour it')) +
-      mItem('lkline', 'fa-underline',
-            off ? L('أعِدِ الخطَّ السفليّ', 'Bring the underline back')
-                : L('أخفِ الخطَّ السفليّ', 'Hide the underline'),
-            false, off ? '' : 'is-on') +
-      mItem('lkoff', 'fa-link-slash', L('انزعِ الرابطَ وأبقِ النصّ', 'Remove the link, keep the text'));
+    return [{ h: L('الرابط', 'Link'), q: show, qdir: 'ltr' },
+      { a: 'lkopen', i: 'fa-arrow-up-right-from-square', t: L('فتحٌ في نافذةٍ جديدة', 'Open in a new tab') },
+      { a: 'lkcopy', i: 'fa-link', t: L('نسخُ العنوان', 'Copy address') },
+      { a: 'lkedit', i: 'fa-pen', t: L('تعديلُ الرابط', 'Edit the link') },
+      { a: 'lksel', i: 'fa-highlighter', t: L('حدِّدْ نصَّه لتلوينه', 'Select its text to colour it') },
+      { a: 'lkline', i: 'fa-underline', t: off ? L('أعِدِ الخطَّ السفليّ', 'Bring the underline back') : L('أخفِ الخطَّ السفليّ', 'Hide the underline') },
+      { a: 'lkoff', i: 'fa-link-slash', t: L('انزعِ الرابطَ وأبقِ النصّ', 'Remove the link, keep the text') }];
   };
 
   /*@3.NOEJ.351*/
-  Editor.prototype.pasteHtml = function () {
+  Editor.prototype.pasteRows = function () {
     var n = (Editor.clip && Editor.clip.length) ? Editor.clip.length
           : (clipAny() ? (clipLoad().length || 0) : 0);
-    return '<div class="ne-menu-h">' + B().esc(L('اللصق', 'Paste')) + '</div>' +
-      mItem('cbfull', 'fa-paste', L('من الحافظة — بتنسيقه', 'From the clipboard — keep formatting'),
-            !CB_OK) +
-      mItem('cbtext', 'fa-font', L('من الحافظة — النصُّ فقط', 'From the clipboard — text only'),
-            !CB_OK) +
-      mItem('paste', 'fa-cubes',
-            n ? L('العناصرُ المنسوخة (' + n + ')', 'Copied blocks (' + n + ')')
-              : L('العناصرُ المنسوخة', 'Copied blocks'),
-            !clipAny());
+    return [{ h: L('اللصق', 'Paste') },
+      { a: 'cbfull', i: 'fa-paste', t: L('من الحافظة — بتنسيقه', 'From the clipboard — keep formatting'), off: !CB_OK },
+      { a: 'cbtext', i: 'fa-font', t: L('من الحافظة — النصُّ فقط', 'From the clipboard — text only'), off: !CB_OK },
+      { a: 'paste', i: 'fa-cubes', t: n ? L('العناصرُ المنسوخة (' + n + ')', 'Copied blocks (' + n + ')') : L('العناصرُ المنسوخة', 'Copied blocks'), off: !clipAny() }];
   };
 
+  function turnOf(b) {
+    if (!b) return null;
+    for (var k = 0; k < TURN.length; k++) {
+      var t = TURN[k];
+      if (t.ty !== b.ty || (t.lv || 0) !== (b.lv || 0)) continue;
+      if (t.ty === 'callout' && t.extra && t.extra.cal !== calKind(b)) continue;
+      return { k: k, t: t };
+    }
+    return null;
+  }
+
+  /*@3.NOEJ.611*/
   Editor.prototype.openMenu = function (id, anchor, kind, pt) {
     var self = this;
     this.closeMenu();
     var mode = kind || 'insert';
     var hear = (mode === 'block' || mode === 'paper') ? this._ctxHear : null;
     this._ctxHear = null;
-    var m = null;
-
-    var html = '';
+    if (!window.GardenMenu || !GardenMenu.rich) return;
+    var m = null, head = null, quick = null, items = [];
+    var adds = function (pre) {
+      return INSERT.map(function (it, k) {
+        return { a: pre + k, i: it.icon, t: L(it.ar, it.en), eg: it.eg ? L(it.eg.ar, it.eg.en) : '' };
+      });
+    };
     if (mode === 'block') {
       var hit = this.blockAt(id);
-      var bb0 = hit ? hit.b : null;
+      var bb = hit ? hit.b : null;
       var i = hit ? hit.i : 0;
       var last = this.doc.blocks.length - 1;
-      html += this.selHtml();
-      html += this.lkHtml();
-      html += '<div class="ne-menu-h">' + B().esc(L('هذه الكتلة', 'This block')) + '</div>';
-      html += mItem('up', 'fa-arrow-up', L('تحريك لأعلى', 'Move up'), i <= 0);
-      html += mItem('down', 'fa-arrow-down', L('تحريك لأسفل', 'Move down'), i >= last);
+      var many = this.selectedBlocks().length > 1;
+      var tk = turnOf(bb);
+      head = { ico: tk ? tk.t.icon : 'fa-shapes', t: tk ? L(tk.t.ar, tk.t.en) : L('عنصر', 'Element'),
+               s: L('العنصرُ ' + (i + 1) + ' من ' + (last + 1), 'Element ' + (i + 1) + ' of ' + (last + 1)) };
+      quick = [{ a: 'up', i: 'fa-arrow-up', t: L('لأعلى', 'Up'), off: i <= 0 },
+               { a: 'down', i: 'fa-arrow-down', t: L('لأسفل', 'Down'), off: i >= last },
+               { a: 'dup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') },
+               { a: 'copy', i: 'fa-copy', t: L('انسخْ', 'Copy') }];
+      items = items.concat(this.selRows(), this.lkRows());
+      if (items.length) items.push({ h: L('هذا العنصر', 'This element') });
+      items.push({ a: 'g:turn', i: 'fa-shuffle', t: L('حوِّلْه إلى', 'Turn into'), sub: TURN.map(function (it, k) {
+        return { a: 'turn:' + k, i: it.icon, t: L(it.ar, it.en), ok: !!(tk && tk.k === k) };
+      }) });
       /*@3.NOEJ.130*/
-      if (bb0 && LISTY[bb0.ty]) {
-        html += '<div class="ne-menu-h">' + B().esc(L('شكلُ العلامة', 'Marker style')) + '</div>';
-        var lsNow = bb0.ls || (bb0.ty === 'ol' ? 'num' : 'dot');
-        var lsOpts = bb0.ty === 'ol'
-          ? [['num', '1. 2. 3.'], ['arnum', '\u0661. \u0662. \u0663.'],
-             ['abjad', '\u0623- \u0628- \u062C-'], ['roman', 'i. ii. iii.']]
-          : [['dot', L('نقطة \u2022', 'Dot \u2022')], ['dash', L('شرطة \u2013', 'Dash \u2013')],
-             ['diamond', L('معيّن \u25C6', 'Diamond \u25C6')]];
-        for (var lo = 0; lo < lsOpts.length; lo++) {
-          html += mItem('ls:' + lsOpts[lo][0], 'fa-list-ol', lsOpts[lo][1],
-                        false, lsNow === lsOpts[lo][0] ? 'is-on' : '');
-        }
-        html += mItem('lsb', 'fa-bold', L('علامةٌ بارزة', 'Bold marker'),
-                      false, bb0.lsb ? 'is-on' : '');
+      if (bb && LISTY[bb.ty]) {
+        var lsNow = bb.ls || (bb.ty === 'ol' ? 'num' : 'dot');
+        var lsOpts = bb.ty === 'ol'
+          ? [['num', '1. 2. 3.'], ['arnum', '١. ٢. ٣.'],
+             ['abjad', 'أ- ب- ج-'], ['roman', 'i. ii. iii.']]
+          : [['dot', L('نقطة •', 'Dot •')], ['dash', L('شرطة –', 'Dash –')],
+             ['diamond', L('معيّن ◆', 'Diamond ◆')]];
+        items.push({ a: 'g:ls', i: 'fa-list-ol', t: L('شكلُ العلامة', 'Marker style'), sub: lsOpts.map(function (o) {
+          return { a: 'ls:' + o[0], i: 'fa-list-ol', t: o[1], ok: lsNow === o[0] };
+        }).concat([{ sep: 1 }, { a: 'lsb', i: 'fa-bold', t: L('علامةٌ بارزة', 'Bold marker'), ok: !!bb.lsb }]) });
+      }
+      if (bb && bb.ty === 'callout') {
+        items.push({ a: 'g:cal', i: CAL[calKind(bb)].icon, t: L('نوعُ الصندوق', 'Box kind'), sub: CAL_ORDER.map(function (ck) {
+          return { a: 'cal:' + ck, i: CAL[ck].icon, t: L(CAL[ck].ar, CAL[ck].en), ok: calKind(bb) === ck };
+        }) });
+      }
+      /*@3.NOEJ.79*/
+      var wm = bb ? bb.wm : null;
+      if (bb) {
+        items.push({ a: 'g:w', i: 'fa-arrows-left-right', t: L('العرض', 'Width'), sub: [
+          { a: 'w:full', i: 'fa-arrows-left-right-to-line', t: L('كامل السطر', 'Full width'), ok: wm === 'full' || (!bb.fp && wm == null) },
+          { a: 'w:fit', i: 'fa-arrows-left-right', t: L('بمقدار المحتوى', 'Fit the content'), ok: wm === 'fit' || (bb.fp && wm == null) },
+          { a: 'w:auto', i: 'fa-rotate-left', t: L('أعِدْه إلى الأصل', 'Reset the width'), off: wm == null }] });
+      }
+      if (bb && bb.fp) {
+        var arM = isAr();
+        items.push({ a: 'g:pos', i: 'fa-layer-group', t: L('الموضعُ والظهور', 'Position & stacking'), sub: [
+          { a: 'fx:start', i: arM ? 'fa-align-right' : 'fa-align-left', t: L('إلى بداية السطر', 'To the start') },
+          { a: 'fx:center', i: 'fa-align-center', t: L('في المنتصف', 'Centred') },
+          { a: 'fx:end', i: arM ? 'fa-align-left' : 'fa-align-right', t: L('إلى نهاية السطر', 'To the end') },
+          { sep: 1 },
+          { a: 'z:front', i: 'fa-arrow-up-wide-short', t: L('إلى المقدّمة', 'Bring to front') },
+          { a: 'z:up', i: 'fa-angle-up', t: L('خطوةً للأمام', 'Forward one step') },
+          { a: 'z:down', i: 'fa-angle-down', t: L('خطوةً للخلف', 'Backward one step') },
+          { a: 'z:back', i: 'fa-arrow-down-wide-short', t: L('إلى الخلف', 'Send to back') },
+          { sep: 1 },
+          { a: 'anchor', i: 'fa-thumbtack', t: L('أعِدْها إلى التراتب', 'Return it to the order') }] });
+      } else if (bb) {
+        items.push({ a: 'free', i: 'fa-arrows-up-down-left-right', t: L('اجعلها حرّةَ الموضع', 'Make it free-floating') });
       }
       /*@3.NOEJ.166*/
-      html += mItem('sel', 'fa-square-check', L('تحديدُ الكتل', 'Select blocks'));
-      if (bb0 && bb0.card) {
+      items.push({ a: 'sel', i: 'fa-square-check', t: L('تحديدُ الكتل', 'Select blocks') });
+      if (bb && bb.card) {
         /*@3.NOEJ.410*/
-        html += '<div class="ne-menu-h">' + B().esc(L('البطاقة', 'The card')) + '</div>';
-        var ctNow = cardToneOf(bb0);
+        var ctNow = cardToneOf(bb);
         var ctL = [['auto', 'تلقائيّ — يتناوب', 'Automatic — alternating'], ['white', 'أبيض', 'White'], ['grey', 'رماديّ', 'Grey'],
                    ['sky', 'سماويّ', 'Sky'], ['amber', 'كهرمانيّ', 'Amber'], ['rose', 'ورديّ', 'Rose'],
                    ['emerald', 'أخضر', 'Emerald'], ['violet', 'بنفسجيّ', 'Violet']];
-        html += '<div class="ne-menu-sw" role="group" aria-label="' + B().esc(L('لونُ البطاقة', 'Card colour')) + '">';
+        var sw = '<div class="ne-menu-sw" role="group" aria-label="' + B().esc(L('لونُ البطاقة', 'Card colour')) + '">';
         for (var ci = 0; ci < ctL.length; ci++) {
-          html += '<button type="button" class="ne-menu-i ne-menu-swb ne-menu-swb--' + ctL[ci][0] +
-                  (ctNow === ctL[ci][0] ? ' is-on' : '') + '" role="menuitemradio" aria-checked="' +
-                  (ctNow === ctL[ci][0] ? 'true' : 'false') + '" data-act="ct:' + ctL[ci][0] +
-                  '" title="' + B().esc(L(ctL[ci][1], ctL[ci][2])) + '" aria-label="' + B().esc(L(ctL[ci][1], ctL[ci][2])) + '"></button>';
+          sw += '<button type="button" class="ne-menu-i ne-menu-swb ne-menu-swb--' + ctL[ci][0] +
+                (ctNow === ctL[ci][0] ? ' is-on' : '') + '" role="menuitemradio" aria-checked="' +
+                (ctNow === ctL[ci][0] ? 'true' : 'false') + '" data-act="ct:' + ctL[ci][0] +
+                '" title="' + B().esc(L(ctL[ci][1], ctL[ci][2])) + '" aria-label="' + B().esc(L(ctL[ci][1], ctL[ci][2])) + '"></button>';
         }
-        html += '</div>';
-        html += mItem('uncard', 'fa-object-ungroup', L('فُكَّ البطاقة', 'Ungroup the card'));
-        html += mItem('delcard', 'fa-trash-can', L('احذفِ البطاقةَ بكلِّ حقولِها', 'Delete the whole card'), false, 'ne-menu-i--danger');
-      } else if (bb0 && !bb0.fp) {
-        html += mItem('card', 'fa-object-group',
-                      this.selectedBlocks().length > 1
-                        ? L('اجمعِ المحدَّدةَ في بطاقة', 'Group the selected into a card')
-                        : L('اجمعْها في بطاقة', 'Group into a card'));
+        sw += '</div>';
+        items.push({ h: L('البطاقة', 'The card') }, { raw: sw },
+          { a: 'uncard', i: 'fa-object-ungroup', t: L('فُكَّ البطاقة', 'Ungroup the card') },
+          { a: 'delcard', i: 'fa-trash-can', t: L('احذفِ البطاقةَ بكلِّ حقولِها', 'Delete the whole card'), dz: 1 });
+      } else if (bb && !bb.fp) {
+        items.push({ a: 'card', i: 'fa-object-group', t: many ? L('اجمعِ المحدَّدةَ في بطاقة', 'Group the selected into a card') : L('اجمعْها في بطاقة', 'Group into a card') });
       }
       if (this.doc.blocks.length > 2) {
-        html += mItem('gfmt', 'fa-wand-magic-sparkles',
-                      this.selectedBlocks().length > 1
-                        ? L('تنسيقُ Garden للمحدَّد', 'Garden format for the selection')
-                        : L('تنسيقُ Garden للوثيقة', 'Garden format for the document'));
+        items.push({ a: 'gfmt', i: 'fa-wand-magic-sparkles', t: many ? L('تنسيقُ Garden للمحدَّد', 'Garden format for the selection') : L('تنسيقُ Garden للوثيقة', 'Garden format for the document') });
       }
-      html += mItem('dup', 'fa-clone', L('تكرار', 'Duplicate'));
-      html += mItem('copy', 'fa-copy', L('نسخُ الكتلة', 'Copy the block'));
-      html += mItem('del', 'fa-trash', L('حذف', 'Delete'), false, 'ne-menu-i--danger');
-      html += this.pasteHtml();
-      /*@3.NOEJ.79*/
-      var bb = hit ? hit.b : null;
-      var wm = bb ? bb.wm : null;
-      html += '<div class="ne-menu-h">' + B().esc(L('العرض', 'Width')) + '</div>';
-      html += mItem('w:full', 'fa-arrows-left-right-to-line', L('كامل السطر', 'Full width'),
-                    false, wm === 'full' || (!bb.fp && wm == null) ? 'is-on' : '');
-      html += mItem('w:fit', 'fa-arrows-left-right', L('بمقدار المحتوى', 'Fit the content'),
-                    false, wm === 'fit' || (bb.fp && wm == null) ? 'is-on' : '');
-      html += mItem('w:auto', 'fa-rotate-left', L('أعِدْه إلى الأصل', 'Reset the width'),
-                    wm == null);
-      if (bb && bb.fp) {
-        var arM = isAr();
-        html += '<div class="ne-menu-h">' + B().esc(L('الموضع', 'Position')) + '</div>';
-        html += mItem('fx:start', arM ? 'fa-align-right' : 'fa-align-left',
-                      L('إلى بداية السطر', 'To the start'));
-        html += mItem('fx:center', 'fa-align-center', L('في المنتصف', 'Centred'));
-        html += mItem('fx:end', arM ? 'fa-align-left' : 'fa-align-right',
-                      L('إلى نهاية السطر', 'To the end'));
-        html += '<div class="ne-menu-h">' + B().esc(L('الظهور', 'Stacking')) + '</div>';
-        html += mItem('z:front', 'fa-arrow-up-wide-short', L('إلى المقدّمة', 'Bring to front'));
-        html += mItem('z:up', 'fa-angle-up', L('خطوةً للأمام', 'Forward one step'));
-        html += mItem('z:down', 'fa-angle-down', L('خطوةً للخلف', 'Backward one step'));
-        html += mItem('z:back', 'fa-arrow-down-wide-short', L('إلى الخلف', 'Send to back'));
-        html += mItem('anchor', 'fa-thumbtack', L('أعِدْها إلى التراتب', 'Return it to the order'));
-      } else if (bb) {
-        html += '<div class="ne-menu-h">' + B().esc(L('الموضع', 'Position')) + '</div>';
-        html += mItem('free', 'fa-arrows-up-down-left-right',
-                      L('اجعلها حرّةَ الموضع', 'Make it free-floating'));
-      }
-      if (bb && bb.ty === 'callout') {
-        html += '<div class="ne-menu-h">' + B().esc(L('نوعُ الصندوق', 'Box kind')) + '</div>';
-        for (var ci = 0; ci < CAL_ORDER.length; ci++) {
-          var ck2 = CAL_ORDER[ci];
-          html += mItem('cal:' + ck2, CAL[ck2].icon, L(CAL[ck2].ar, CAL[ck2].en),
-                        calKind(bb) === ck2);
-        }
-      }
-      html += '<div class="ne-menu-h">' + B().esc(L('حوّل إلى', 'Turn into')) + '</div>';
-      html += TURN.map(function (it, k) {
-        return mItem('turn:' + k, it.icon, L(it.ar, it.en));
-      }).join('');
+      items = items.concat(this.pasteRows());
+      items.push({ sep: 1 }, { a: 'del', i: 'fa-trash', t: L('حذف', 'Delete'), dz: 1 });
     } else if (mode === 'paper') {
-      html += '<div class="ne-menu-h">' + B().esc(L('أضِفْ هنا', 'Add here')) + '</div>';
-      html += INSERT.map(function (it, k) {
-        return mItem('here:' + k, it.icon, L(it.ar, it.en), false, '',
-                     it.eg ? L(it.eg.ar, it.eg.en) : '');
-      }).join('');
+      head = { ico: 'fa-file-lines', t: L('الورقة', 'The page'), s: L('أضِفْ عنصراً في هذا الموضع', 'Add an element at this spot') };
+      quick = [{ a: 'pend', i: 'fa-arrow-down', t: L('فقرةٌ في الآخر', 'Paragraph at end') },
+               { a: 'phere', i: 'fa-cubes', t: L('المنسوخُ في الآخر', 'Copied at end'), off: !clipAny() },
+               { a: 'sel', i: 'fa-square-check', t: L('حدِّدْ', 'Select') }];
+      if (this.doc.blocks.length > 2) quick.push({ a: 'gfmt', i: 'fa-wand-magic-sparkles', t: L('تنسيقُ Garden', 'Garden format') });
       /*@3.NOEJ.345*/
-      html = this.selHtml() + this.lkHtml() + html + this.pasteHtml();
-      html += '<div class="ne-menu-h">' + B().esc(L('الورقة', 'The page')) + '</div>';
-      html += mItem('phere', 'fa-cubes', L('العناصرُ المنسوخةُ في آخرِ الوثيقة',
-                                           'Copied blocks at the end'), !clipAny());
-      html += mItem('pend', 'fa-arrow-down', L('أضِفْ فقرةً في آخرِ الوثيقة',
-                                                    'Add a paragraph at the end'));
-      html += mItem('sel', 'fa-square-check', L('تحديدُ الكتل', 'Select blocks'));
-      if (this.doc.blocks.length > 2) html += mItem('gfmt', 'fa-wand-magic-sparkles', L('تنسيقُ Garden للوثيقة', 'Garden format for the document'));
+      items = items.concat(this.selRows(), this.lkRows(), [{ h: L('أضِفْ هنا', 'Add here') }], adds('here:'), this.pasteRows());
     } else {
-      html += '<div class="ne-menu-h">' + B().esc(L('أضِف بعدها', 'Add after')) + '</div>';
-      html += INSERT.map(function (it, k) {
-        return mItem('ins:' + k, it.icon, L(it.ar, it.en), false, '',
-                     it.eg ? L(it.eg.ar, it.eg.en) : '');
-      }).join('');
+      head = { ico: 'fa-plus', t: L('أضِف بعدها', 'Add after') };
+      items = adds('ins:');
     }
-    if (hear) html = mItem('hear', 'fa-play', hear.label) + html;
+    if (hear) items.unshift({ a: 'hear', i: 'fa-play', t: hear.label }, { sep: 1 });
     /*@3.NOEJ.609*/
-    if (window.GardenMenu && GardenMenu.open) {
-      var ar0 = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
-      m = GardenMenu.open(ar0 ? ar0.left : (anchor ? anchor.x : 0), ar0 ? ar0.bottom : (anchor ? anchor.y : 0), html, null, {
-        cls: 'ne-menu', attr: 'data-act', focus: false, keys: false, keepFocus: true,
-        label: L('خيارات', 'Options'),
+    var ar0 = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
+    m = GardenMenu.rich(ar0 ? ar0.left : (anchor ? anchor.x : 0), ar0 ? ar0.bottom : (anchor ? anchor.y : 0),
+      { head: head, quick: quick, items: items }, run, {
+        cls: 'ne-menu', attr: 'data-act', focus: false, keepFocus: true, filter: true,
+        icls: 'ne-menu-i', hcls: 'ne-menu-h', label: L('خيارات', 'Options'),
         onClose: function () { if (self.menu === m) { self.menu = null; self.menuFor = null; } }
       });
-    }
-    if (!m) {
-      m = el('div', 'ne-menu');
-      m.setAttribute('role', 'menu');
-      m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
-      m.innerHTML = html;
-      document.body.appendChild(m);
-    }
-    this.placeMenu(m, anchor);
+    if (!m) return;
+    if (!m.hasAttribute('data-sheet')) this.placeMenu(m, anchor);
     this.menu = m;
     this._menuAt = Date.now();
     /*@3.NOEJ.54*/
     this.menuFor = id;
 
+    /*@3.NOEJ.110*/
     var first = m.querySelector('.ne-menu-i:not([disabled])');
     if (first) first.focus();
 
-    m.addEventListener('click', function (e) {
-      var btn = e.target.closest('.ne-menu-i');
-      if (!btn || btn.disabled) return;
-      var act = btn.getAttribute('data-act');
+    function run(act) {
       self.closeMenu();
       if (act === 'hear') { if (hear && hear.go) hear.go(); return; }
       if (act.indexOf('here:') === 0) {
@@ -9382,65 +9353,7 @@
         self.pasteFromClipboard(act === 'cbtext' ? 'text' : 'full', id);
       }
       else if (act === 'del') self.remove(id);
-    });
-    /*@3.NOEJ.110*/
-    var items = function () {
-      return [].slice.call(m.querySelectorAll('.ne-menu-i:not([disabled])'))
-               .filter(function (b) { return !b.hidden; });
-    };
-    var step = function (dir) {
-      var list = items();
-      if (!list.length) return;
-      var at = list.indexOf(document.activeElement);
-      var next = list[(at + dir + list.length + (at < 0 ? 1 : 0)) % list.length];
-      if (next) next.focus();
-    };
-    var filter = '';
-    var applyFilter = function () {
-      var q = filter.toLowerCase();
-      var shown = 0;
-      [].forEach.call(m.querySelectorAll('.ne-menu-i'), function (b) {
-        var txt = (b.textContent || '').toLowerCase();
-        var hit = !q || txt.indexOf(q) >= 0;
-        b.hidden = !hit;
-        if (hit) shown++;
-      });
-      [].forEach.call(m.querySelectorAll('.ne-menu-h'), function (h) {
-        var nx = h.nextElementSibling, any = false;
-        while (nx && !nx.classList.contains('ne-menu-h')) {
-          if (!nx.hidden) { any = true; break; }
-          nx = nx.nextElementSibling;
-        }
-        h.hidden = !any;
-      });
-      m.setAttribute('data-q', filter);
-      var first = items()[0];
-      if (first) first.focus();
-      return shown;
-    };
-    m.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        e.preventDefault(); self.closeMenu();
-        if (id) self.focusBlock(id);
-        return;
-      }
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault(); step(e.key === 'ArrowDown' ? 1 : -1); return;
-      }
-      if (e.key === 'Home' || e.key === 'End') {
-        e.preventDefault();
-        var list = items();
-        if (list.length) list[e.key === 'Home' ? 0 : list.length - 1].focus();
-        return;
-      }
-      if (e.key === 'Backspace') {
-        if (!filter) return;
-        e.preventDefault(); filter = filter.slice(0, -1); applyFilter(); return;
-      }
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        e.preventDefault(); filter += e.key; applyFilter(); return;
-      }
-    });
+    }
   };
 
   /*@3.NOEJ.603*/
@@ -9451,16 +9364,6 @@
     if (!pan) return;
     pan.hidden = true;
     if (imgPanOpen(pan)) { try { pan.hidePopover(); } catch (e) {} }
-  }
-
-  function mItem(act, icon, label, disabled, extra, eg) {
-    return '<button type="button" class="ne-menu-i' + (extra ? ' ' + extra : '') +
-      (eg ? ' ne-menu-i--eg' : '') +
-      '" role="menuitem" data-act="' + act + '"' + (disabled ? ' disabled' : '') + '>' +
-      '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
-      '<span>' + B().esc(label) +
-      (eg ? '<em class="ne-menu-eg">' + B().esc(eg) + '</em>' : '') +
-      '</span></button>';
   }
 
   /*@3.NOEJ.237*/

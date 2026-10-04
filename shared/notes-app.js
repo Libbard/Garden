@@ -4728,61 +4728,55 @@
     if (!pdfOn()) return false;
     var sel = '';
     try { sel = String(window.getSelection() || '').trim(); } catch (e) { sel = ''; }
-    var h = '';
     var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
     var nSel = (ik && ik.pick && ik.pick.ids) ? ik.pick.ids.length : 0;
-    pdfHear = pdfMoment(x, y);
-    if (pdfHear) {
-      h += ctxItem('phear', 'fa-play', hearLabel(pdfHear));
-      h += '<div class="gsf-menu-sep" role="separator"></div>';
-    }
-    if (nSel) {
-      h += ctxItem('psdup', 'fa-clone', L('كرِّرِ المحدَّد', 'Duplicate selection'));
-      h += ctxItem('pscopy', 'fa-copy', L('انسخِ المحدَّد', 'Copy selection'));
-      h += ctxItem('psrot', 'fa-rotate-right', L('أدِرْ ١٥°', 'Rotate 15°'));
-      h += ctxItem('psdel', 'fa-trash', L('احذفِ المحدَّد', 'Delete selection'), 1);
-      h += '<div class="gsf-menu-sep" role="separator"></div>';
-    } else if (ik && ik.armed && ik.canPaste && ik.canPaste()) {
-      h += ctxItem('pspaste', 'fa-paste', L('ألصِقْ رسماً منسوخاً', 'Paste drawing'));
-      h += '<div class="gsf-menu-sep" role="separator"></div>';
-    }
-    if (sel) {
-      var cut = sel.length > 28 ? sel.slice(0, 28) + '…' : sel;
-      h += ctxItem('pcopy', 'fa-copy', L('انسخِ المحدَّد', 'Copy selection'));
-      h += ctxItem('pfind', 'fa-magnifying-glass',
-        L('ابحثْ عن «' + cut + '»', 'Search for “' + cut + '”'));
-      /*@3.NOAJ.255*/
-      h += ctxItem('pcover', 'fa-pen-to-square',
-        L('غطِّ النصَّ واكتبْ مكانَه', 'Cover the text and rewrite it'));
-      h += '<div class="gsf-menu-sep" role="separator"></div>';
-    }
-    h += ctxItem('pinv', pdfInverted() ? 'fa-sun' : 'fa-moon',
-      pdfInverted() ? L('أعِدْ ألوانَ الملفّ', 'Restore file colours')
-                    : L('اقلبْ ألوانَ الملفّ', 'Invert file colours'));
-    h += ctxItem('pink', inkHidden() ? 'fa-eye' : 'fa-eye-slash',
-      inkHidden() ? L('أظهرِ الرسم', 'Show drawings') : L('أخفِ الرسم', 'Hide drawings'));
-    h += ctxItem('ppen', 'fa-pen-nib',
-      pdfUi.drawing() ? L('أغلقِ القلم', 'Close the pen') : L('افتحِ القلم', 'Open the pen'));
-    h += ctxItem('ptext', 'fa-i-cursor', L('أضِفْ حقلَ نصّ', 'Add a text field'));
-    h += '<div class="gsf-menu-sep" role="separator"></div>';
-    h += ctxItem('pgoto', 'fa-hashtag', L('اذهبْ إلى صفحة…', 'Go to page…'));
-    h += ctxItem('pfit', 'fa-expand', L('لائمِ الصفحةَ كاملةً', 'Fit whole page'));
-    h += '<div class="gsf-menu-sep" role="separator"></div>';
-    h += ctxItem('porg', 'fa-table-cells-large', L('نظِّمْ صفحاتِ الملفّ…', 'Organise the file’s pages…'));
-    h += ctxItem('protpg', 'fa-rotate-right', L('دوِّرْ هذه الصفحة', 'Rotate this page'));
-    h += ctxItem('pdelpg', 'fa-trash-can', L('احذفْ هذه الصفحة', 'Delete this page'), 1);
-    var ec = edsCount(liveDoc);
-    if (ec.u) h += ctxItem('pundo', 'fa-rotate-left', L('تراجعْ عن آخر تعديلٍ للصفحات', 'Undo the last page edit'));
-    if (ec.r) h += ctxItem('predo', 'fa-rotate-right', L('أعِدْ تعديلَ الصفحات', 'Redo the page edit'));
-    if (ec.u > 1) h += ctxItem('porig', 'fa-clock-rotate-left', L('ارجعْ إلى الملفّ الأصليّ', 'Back to the original file'));
-    h += '<div class="gsf-menu-sep" role="separator"></div>';
-    h += ctxItem('psnip', 'fa-crop-simple', L('قُصَّ منطقةً لتنسخها أو تشرحها', 'Cut out an area to copy or explain'));
-    h += ctxItem('ppage', 'fa-image', L('انسخِ الصفحةَ صورةً', 'Copy the page as an image'));
-    h += ctxItem('ppagex', 'fa-wand-magic-sparkles', L('انسخِ الصفحةَ واشرحها', 'Copy the page and explain it'));
-    h += '<div class="gsf-menu-sep" role="separator"></div>';
-    h += pdfMarksItems();
     snapAt = { x: x, y: y };
-    openMenuAt(x, y, h, pdfMenuAct);
+    var pgE = snapPage(snapAt);
+    var pn = pgE ? (Number(pgE.getAttribute('data-p')) || 0) : (pdfUi && pdfUi.page ? pdfUi.page() : 0);
+    var tot = pgTotal();
+    var head = { ico: 'fa-file-lines', t: (els.docTitle && els.docTitle.value) || L('ملفّ PDF', 'PDF file'),
+                 s: pn ? L('الصفحة ' + pn + ' من ' + tot, 'Page ' + pn + ' of ' + tot) : '' };
+    var tools = [
+      { a: 'ppen', i: 'fa-pen-nib', t: pdfUi.drawing() ? L('أغلقِ القلم', 'Close pen') : L('القلم', 'Pen') },
+      { a: 'ptext', i: 'fa-i-cursor', t: L('حقلُ نصّ', 'Text field') },
+      { a: 'psnip', i: 'fa-crop-simple', t: L('قُصَّ منطقة', 'Cut out') },
+      { a: 'pgoto', i: 'fa-hashtag', t: L('إلى صفحة', 'Go to page') }];
+    var quick, items = [];
+    if (nSel) {
+      quick = [{ a: 'psdup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') }, { a: 'pscopy', i: 'fa-copy', t: L('انسخْ', 'Copy') },
+               { a: 'psrot', i: 'fa-rotate-right', t: L('أدِرْ ١٥°', 'Rotate 15°') }, { a: 'psdel', i: 'fa-trash', t: L('احذفْ', 'Delete') }];
+    } else if (sel) {
+      var cut = sel.length > 28 ? sel.slice(0, 28) + '…' : sel;
+      quick = [{ a: 'pcopy', i: 'fa-copy', t: L('انسخْ', 'Copy') }, { a: 'pfind', i: 'fa-magnifying-glass', t: L('ابحثْ', 'Search'), why: L('ابحثْ عن «' + cut + '»', 'Search for “' + cut + '”') },
+               /*@3.NOAJ.255*/
+               { a: 'pcover', i: 'fa-pen-to-square', t: L('غطِّ واكتبْ', 'Cover & rewrite'), why: L('غطِّ النصَّ واكتبْ مكانَه', 'Cover the text and rewrite it') }];
+    } else {
+      quick = tools;
+    }
+    pdfHear = pdfMoment(x, y);
+    if (pdfHear) items.push({ a: 'phear', i: 'fa-play', t: hearLabel(pdfHear) }, { sep: 1 });
+    if (!nSel && ik && ik.armed && ik.canPaste && ik.canPaste()) items.push({ a: 'pspaste', i: 'fa-paste', t: L('ألصِقْ رسماً منسوخاً', 'Paste drawing'), kb: 'Ctrl V' });
+    if (quick !== tools) {
+      items.push({ a: 'g:tools', i: 'fa-pen-nib', t: L('أدواتُ الكتابة', 'Writing tools'), sub: tools.map(function (q) { return { a: q.a, i: q.i, t: q.t }; }) });
+    }
+    items.push(
+      { a: 'ppage', i: 'fa-image', t: L('انسخِ الصفحةَ صورةً', 'Copy the page as an image') },
+      { a: 'ppagex', i: 'fa-wand-magic-sparkles', t: L('انسخِ الصفحةَ واشرحها', 'Copy the page and explain it') },
+      { a: 'g:view', i: 'fa-eye', t: L('العرض', 'View'), sub: [
+        { a: 'pinv', i: pdfInverted() ? 'fa-sun' : 'fa-moon', t: pdfInverted() ? L('أعِدْ ألوانَ الملفّ', 'Restore file colours') : L('اقلبْ ألوانَ الملفّ', 'Invert file colours') },
+        { a: 'pink', i: inkHidden() ? 'fa-eye' : 'fa-eye-slash', t: inkHidden() ? L('أظهرِ الرسم', 'Show drawings') : L('أخفِ الرسم', 'Hide drawings') },
+        { a: 'pfit', i: 'fa-expand', t: L('لائمِ الصفحةَ كاملةً', 'Fit whole page') },
+        { a: 'pgoto', i: 'fa-hashtag', t: L('اذهبْ إلى صفحة…', 'Go to page…') }] },
+      { sep: 1 },
+      { a: 'porg', i: 'fa-table-cells-large', t: L('نظِّمْ صفحاتِ الملفّ…', 'Organise the file’s pages…') },
+      { a: 'protpg', i: 'fa-rotate-right', t: L('دوِّرْ هذه الصفحة', 'Rotate this page') });
+    var ec = edsCount(liveDoc);
+    if (ec.u) items.push({ a: 'pundo', i: 'fa-rotate-left', t: L('تراجعْ عن آخر تعديلٍ للصفحات', 'Undo the last page edit') });
+    if (ec.r) items.push({ a: 'predo', i: 'fa-rotate-right', t: L('أعِدْ تعديلَ الصفحات', 'Redo the page edit') });
+    if (ec.u > 1) items.push({ a: 'porig', i: 'fa-clock-rotate-left', t: L('ارجعْ إلى الملفّ الأصليّ', 'Back to the original file') });
+    items.push({ a: 'pdelpg', i: 'fa-trash-can', t: L('احذفْ هذه الصفحة', 'Delete this page'), dz: 1 }, { sep: 1 });
+    items = items.concat(pdfMarksItems());
+    richMenuAt(x, y, { head: head, quick: quick, items: items }, pdfMenuAct);
     return true;
   }
 
@@ -4812,9 +4806,10 @@
 
   function snapExplain(x, y) {
     if (!window.GardenMenu) return;
-    var h = GardenMenu.head(L('الصورةُ في الحافظة — الصقْها واسألْ:', 'The image is copied — paste it and ask:'));
-    AI_APPS.forEach(function (a) { h += ctxItem(a.k, 'fa-up-right-from-square', L('افتحْ ', 'Open ') + a.n); });
-    openMenuAt(x, y, h, function (k) {
+    richMenuAt(x, y, {
+      head: { ico: 'fa-wand-magic-sparkles', t: L('الصورةُ في الحافظة', 'The image is copied'), s: L('الصقْها واسألْ:', 'Paste it and ask:') },
+      items: AI_APPS.map(function (a) { return { a: a.k, i: 'fa-up-right-from-square', t: L('افتحْ ', 'Open ') + a.n }; })
+    }, function (k) {
       for (var i = 0; i < AI_APPS.length; i++) {
         if (AI_APPS[i].k === k) { window.open(AI_APPS[i].u, '_blank', 'noopener'); return; }
       }
@@ -5139,18 +5134,16 @@
   }
 
   /*@3.NOAJ.257*/
-  function pdfMarksItems() {
-    return ctxItem('pmgather', 'fa-quote-right',
-      L('اجمعْ ما ظلّلتُه وعلّقتُ عليه في ملاحظة', 'Gather my highlights and comments into a note')) +
-      '<div class="gsf-menu-sep" role="separator"></div>' +
-      ctxItem('pmpdf', 'fa-file-export',
-      L('احفظِ الملفَّ بتعليقاته (PDF)', 'Save the file with its annotations (PDF)')) +
-      ctxItem('pmprint', 'fa-print', L('اطبعِ الملفَّ بتعليقاته', 'Print with annotations')) +
-      '<div class="gsf-menu-sep" role="separator"></div>' +
-      ctxItem('pmexp', 'fa-file-arrow-down',
-        L('صدِّرِ التعليقاتِ وحدَها (JSON)', 'Export annotations only (JSON)')) +
-      ctxItem('pmimp', 'fa-file-arrow-up',
-        L('استوردْ تعليقاتٍ (JSON)', 'Import annotations (JSON)'));
+  function pdfMarksItems(flat) {
+    var g = { a: 'pmgather', i: 'fa-quote-right', t: L('اجمعْ ما ظلّلتُه وعلّقتُ عليه في ملاحظة', 'Gather my highlights and comments into a note') };
+    var save = [
+      { a: 'pmpdf', i: 'fa-file-export', t: L('احفظِ الملفَّ بتعليقاته (PDF)', 'Save the file with its annotations (PDF)') },
+      { a: 'pmprint', i: 'fa-print', t: L('اطبعِ الملفَّ بتعليقاته', 'Print with annotations'), kb: 'Ctrl P' },
+      { sep: 1 },
+      { a: 'pmexp', i: 'fa-file-arrow-down', t: L('صدِّرِ التعليقاتِ وحدَها (JSON)', 'Export annotations only (JSON)') },
+      { a: 'pmimp', i: 'fa-file-arrow-up', t: L('استوردْ تعليقاتٍ (JSON)', 'Import annotations (JSON)') }];
+    return flat ? [g, { sep: 1 }].concat(save)
+      : [g, { a: 'g:marks', i: 'fa-file-export', t: L('احفظْ أو صدِّرْ بتعليقاته', 'Save or export with annotations'), sub: save }];
   }
 
   var _hlCtx = null;
@@ -8917,18 +8910,19 @@
     if (window.GardenMenu) GardenMenu.close();
   }
 
-  function ctxItem(act, icon, label, danger, off) {
-    return '<button type="button" role="menuitem" class="gsf-menu-i na-ctx-i' + (danger ? ' gsf-menu-i--danger' : '') +
-      '" data-cact="' + act + '"' + (off ? ' disabled' : '') +
-      '><i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
-      '<span>' + esc(label) + '</span></button>';
-  }
-
   /*@3.NOAJ.246*/
-  function openMenuAt(x, y, html, onAct) {
-    if (!window.GardenMenu) return null;
-    return GardenMenu.open(x, y, html, onAct, { cls: 'na-ctx', id: 'na-ctx', attr: 'data-cact' });
+  /*@3.NOAJ.477*/
+  var RMOPT = { cls: 'na-ctx', id: 'na-ctx', attr: 'data-cact', icls: 'na-ctx-i' };
+  function richMenuAt(x, y, model, onAct) {
+    if (!window.GardenMenu || !GardenMenu.rich) return null;
+    return GardenMenu.rich(x, y, model, onAct, RMOPT);
   }
+  function kindKit() {
+    var X = window.GardenNotesExplorer && window.GardenNotesExplorer.kind;
+    return X || { of: function (n) { return n.kind || 'rich'; }, name: function () { return L('ملاحظة', 'Note'); },
+                  icon: function () { return 'fa-note-sticky'; }, size: function () { return ''; } };
+  }
+  function noCopyWhy(can) { return can ? '' : L('لا شيءَ في الحافظة', 'The clipboard is empty'); }
 
   function openCtx(x, y, uid) {
     closeCtx();
@@ -8936,18 +8930,30 @@
     if (uid && many.indexOf(uid) < 0) { clearPicked(); many = []; }
     var n = many.length || (uid ? 1 : 0);
     if (!n) return;
-    var plural = n > 1 ? (' (' + n + ')') : '';
-    openMenuAt(x, y,
-      ctxItem('open', 'fa-up-right-from-square', L('افتحْها', 'Open')) +
-      ctxItem('pick', 'fa-square-check', L('حدِّدْ/ألغِ التحديد', 'Select / deselect')) +
-      ctxItem('copy', 'fa-copy', L('انسخْ', 'Copy') + plural) +
-      ctxItem('cut', 'fa-scissors', L('قُصَّ', 'Cut') + plural) +
-      ctxItem('paste', 'fa-paste', L('ألصِقْ هنا', 'Paste here')) +
-      ctxItem('move', 'fa-folder-open', L('انقلْ إلى مجلّد', 'Move to folder') + plural) +
-      ctxItem('dup', 'fa-clone', L('كرِّرْ', 'Duplicate') + plural) +
-      (n === 1 ? ctxItem('share', 'fa-share-nodes', L('شارِكْ', 'Share')) : '') +
-      ctxItem('del', 'fa-trash', L('احذفْ', 'Delete') + plural, 1),
-      function (act) { ctxAct(act, uid); });
+    var it = richOf(uid) || {}, K = kindKit(), k = K.of(it);
+    var recs = ctxTargets(uid).map(richOf).filter(Boolean);
+    var trash = S.view && S.view.k === 'trash';
+    var canPaste = !!(S.clip && S.clip.ids && S.clip.ids.length);
+    var course = it.origin && it.origin.course;
+    var head = n === 1
+      ? { ico: K.icon(k), tone: course ? courseTone(course) || '' : '', t: it.title || L('بلا عنوان', 'Untitled'),
+          s: [K.name(k), course || (it.folder ? folderName(it.folder) : ''), K.size(it.bytes)].filter(Boolean).join(' · ') }
+      : { ico: 'fa-square-check', t: L(n + ' ملاحظاتٍ محدَّدة', n + ' notes selected'),
+          s: K.size(recs.reduce(function (a, r) { return a + (r.bytes || 0); }, 0)) };
+    var quick = n === 1
+      ? [{ a: 'open', i: 'fa-arrow-up-right-from-square', t: L('افتحْ', 'Open') }, { a: 'share', i: 'fa-link', t: L('شارِكْ', 'Share') },
+         { a: 'dup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') }, { a: 'move', i: 'fa-folder-open', t: L('انقلْ', 'Move') }]
+      : [{ a: 'move', i: 'fa-folder-open', t: L('انقلْ', 'Move') }, { a: 'dup', i: 'fa-clone', t: L('كرِّرْ', 'Duplicate') }];
+    var items = [
+      { a: 'pick', i: 'fa-square-check', t: L('حدِّدْ أو ألغِ التحديد', 'Select or deselect') },
+      { a: 'g:clip', i: 'fa-clipboard', t: L('الحافظة', 'Clipboard'), sub: [
+        { a: 'copy', i: 'fa-copy', t: L('انسخْ', 'Copy'), kb: 'Ctrl C' },
+        { a: 'cut', i: 'fa-scissors', t: L('قُصَّ', 'Cut'), kb: 'Ctrl X' },
+        { a: 'paste', i: 'fa-paste', t: L('ألصِقْ هنا', 'Paste here'), kb: 'Ctrl V', off: !canPaste, why: noCopyWhy(canPaste) }] },
+      { sep: 1 },
+      { a: 'del', i: 'fa-trash', t: trash ? L('احذفْ نهائيّاً…', 'Delete forever…') : L('إلى السلّة', 'To trash'), dz: 1, kb: 'Del' }
+    ];
+    richMenuAt(x, y, { head: head, quick: quick, items: items }, function (act) { ctxAct(act, uid); });
   }
 
   /*@3.NOAJ.49*/
@@ -8963,19 +8969,21 @@
     var f = T.byId[fid];
     if (!f) return;
     var canPaste = !!(S.clip && S.clip.ids && S.clip.ids.length);
-    openMenuAt(x, y,
-      ctxItem('fopen', 'fa-folder-open', L('افتحْه', 'Open')) +
-      ctxItem('fnew', 'fa-folder-plus', L('مجلّدٌ بداخله', 'New folder inside')) +
-      ctxItem('frename', 'fa-pen', L('أعِدْ تسميتَه أو انقلْه', 'Rename or move')) +
-      /*@3.NOAJ.274*/
-      ctxItem('fup', 'fa-arrow-up', L('ارفعْه بين إخوتِه', 'Move up among its siblings'),
-              0, !sibMove(fid, -1)) +
-      ctxItem('fdown', 'fa-arrow-down', L('أنزلْه بين إخوتِه', 'Move down among its siblings'),
-              0, !sibMove(fid, 1)) +
-      (canPaste ? ctxItem('fpaste', 'fa-paste',
-        L('ألصِقِ الملاحظاتِ هنا', 'Paste notes here')) : '') +
-      ctxItem('fdel', 'fa-trash', L('احذفِ المجلّد', 'Delete folder'), 1),
-      function (act) { folderCtxAct(act, fid); });
+    var cnt = (S.all || []).filter(function (r) { return r.folder === fid; }).length;
+    richMenuAt(x, y, {
+      head: { ico: 'fa-folder', t: f.n || '', s: L('مجلّد · ', 'Folder · ') + (cnt ? (kindKit().count ? kindKit().count(cnt) : cnt) : L('فارغ', 'Empty')) },
+      quick: [{ a: 'fopen', i: 'fa-folder-open', t: L('افتحْ', 'Open') }, { a: 'fnew', i: 'fa-folder-plus', t: L('بداخله', 'Inside') },
+              { a: 'frename', i: 'fa-i-cursor', t: L('سمِّ', 'Rename') },
+              { a: 'fpaste', i: 'fa-paste', t: L('ألصِقْ', 'Paste'), off: !canPaste, why: noCopyWhy(canPaste) }],
+      items: [
+        /*@3.NOAJ.274*/
+        { a: 'g:ord', i: 'fa-sort', t: L('رتِّبْ بين إخوته', 'Order among siblings'), sub: [
+          { a: 'fup', i: 'fa-arrow-up', t: L('إلى أعلى', 'Move up'), off: !sibMove(fid, -1) },
+          { a: 'fdown', i: 'fa-arrow-down', t: L('إلى أسفل', 'Move down'), off: !sibMove(fid, 1) }] },
+        { a: 'frename', i: 'fa-pen', t: L('أعِدْ تسميتَه أو انقلْه…', 'Rename or move…') },
+        { sep: 1 },
+        { a: 'fdel', i: 'fa-trash', t: L('احذفِ المجلّد…', 'Delete folder…'), dz: 1 }]
+    }, function (act) { folderCtxAct(act, fid); });
   }
 
   /*@3.NOAJ.276*/
@@ -9726,8 +9734,6 @@
       },
       ctx: openCtx,
       folderCtx: openFolderCtx,
-      menu: openMenuAt,
-      menuItem: ctxItem,
       doc: function (id) {
         var St = window.GardenNotesStore;
         return (St && St.getDoc) ? St.getDoc(id) : Promise.resolve(null);
@@ -10232,7 +10238,7 @@
       /*@3.NOAJ.259*/
       if (!pdfOn()) { openExport(); return; }
       var r = e.currentTarget.getBoundingClientRect();
-      openMenuAt(r.left + r.width / 2, r.bottom, pdfMarksItems(), pdfMenuAct);
+      richMenuAt(r.left + r.width / 2, r.bottom, { items: pdfMarksItems(true) }, pdfMenuAct);
     });
     var xDlg = document.getElementById('na-exp');
     if (xDlg) xDlg.addEventListener('click', function (e) {

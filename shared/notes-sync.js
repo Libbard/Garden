@@ -9,6 +9,8 @@
   var QUOTA_LS = '__notesQuotaMax';
   /*@3.NOSJ2.2*/
   var PENDING_LS = '__notesPending';
+  /*@3.NOSJ2.16*/
+  var PARTS_LS = '__notesParts';
 
   var timers = {};
   var firstAt = {};
@@ -17,6 +19,23 @@
   var reconciling = null;
 
   function S() { return window.GardenNotesStore || null; }
+  function P() { return window.GardenNotesParts || null; }
+
+  function partsMode() {
+    if (!P()) return false;
+    var v = null;
+    try { v = localStorage.getItem(PARTS_LS); } catch (e) {}
+    return v === '1';
+  }
+  function setPartsMode(on) { try { localStorage.setItem(PARTS_LS, on ? '1' : '0'); } catch (e) {} }
+  function baseGet(id) { return (S() && S().meta) ? S().meta('sb:' + id, null) : Promise.resolve(null); }
+  function baseSet(id, b) { return (S() && S().setMeta) ? S().setMeta('sb:' + id, b) : Promise.resolve(false); }
+  function baseOfDoc(doc, t) {
+    if (!P()) return null;
+    var d = doc;
+    if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { return null; } }
+    return { t: Number(t) || 0, h: P().hashes(P().split(d)) };
+  }
 
   function endpoint() {
     var e = window.GardenEndpoints;
@@ -126,41 +145,9 @@
       return read.then(function (row) {
         if (!row) return { ok: false, reason: 'no-doc' };
         var raw = (typeof row.raw === 'string') ? row.raw : ((typeof row.doc === 'string') ? row.doc : JSON.stringify(row.doc));
-        var cap = knownMax(), bytes = row.bytes || 0;
-        if (cap > 0 && bytes > cap) {
-          markPending(noteId, 'note_too_large');
-          quotaEvent('note_too_large', { id: noteId, bytes: bytes, max: cap });
-          emit('garden:notesPushFailed', { id: noteId, reason: 'note_too_large', quota: true, skipped: true });
-          return { ok: false, reason: 'note_too_large', quota: true, skipped: true };
-        }
-        return authed('POST', base(vid) + '/' + encodeURIComponent(noteId), vid,
-                      { doc: raw, t: row.t })
-          .then(function (r) {
-            /*@3.NOSJ2.3*/
-            if (isQuota(r.status, r.body)) {
-              markPending(noteId, r.body.error);
-              lastQuota = r.body;
-              rememberMax(r.body.max);
-              quotaEvent(r.body.error, { id: noteId, bytes: r.body.bytes, max: r.body.max });
-              emit('garden:notesPushFailed', { id: noteId, reason: r.body.error, quota: true });
-              return { ok: false, reason: r.body.error, quota: true };
-            }
-            if (!r.ok) {
-              markPending(noteId, 'http-' + r.status);
-              emit('garden:notesPushFailed', { id: noteId, reason: 'http-' + r.status });
-              return { ok: false, reason: 'http-' + r.status };
-            }
-            clearPending(noteId);
-            if (r.body && r.body.note_bytes != null) lastQuota = r.body;
-            /*@3.NOSJ2.12*/
-            if (r.body && r.body.applied === 0) {
-              return pull(noteId).then(function (pr) { return { ok: false, reason: 'stale', pulled: !!(pr && pr.ok) }; });
-            }
-            return S().markClean(noteId, row.t).then(function () {
-              emit('garden:notesPushed', { id: noteId, t: row.t });
-              return { ok: true, applied: r.body && r.body.applied, t: row.t };
-            });
-          });
+        /*@3.NOSJ2.17*/
+        var viaParts = partsMode() ? pushParts(vid, noteId, row, raw) : Promise.resolve(null);
+        return viaParts.then(function (pr) { return pr || pushWhole(vid, noteId, row, raw); });
       });
     }).catch(function (e) {
       markPending(noteId, 'error');
@@ -176,28 +163,195 @@
     return p;
   }
 
+  function quotaFail(noteId, body) {
+    markPending(noteId, body.error);
+    lastQuota = Object.assign({}, lastQuota || {}, body);
+    if (body.error === 'note_too_large') rememberMax(body.max);
+    quotaEvent(body.error, { id: noteId, bytes: body.bytes, max: body.max, part: body.k });
+    emit('garden:notesPushFailed', { id: noteId, reason: body.error, quota: true });
+    return { ok: false, reason: body.error, quota: true };
+  }
+
+  /*@3.NOSJ2.18*/
+  function pushParts(vid, noteId, row, raw) {
+    var doc;
+    try { doc = JSON.parse(raw); } catch (e) { return Promise.resolve(null); }
+    var parts = P().split(doc);
+    var maxPart = (lastQuota && lastQuota.max_part) || P().MAX_PART;
+    var big = Object.keys(parts).filter(function (k) { return P().byteLen(parts[k]) > maxPart; });
+    if (big.length) return Promise.resolve(quotaFail(noteId, { error: 'part_too_large', k: big[0], bytes: P().byteLen(parts[big[0]]), max: maxPart }));
+    return baseGet(noteId).then(function (b) {
+      var d = P().diff(b && b.h, parts);
+      var cs = P().chunks(d);
+      var acc = { rejected: [], others: false, t: b ? b.t : 0, sent: 0 };
+      var i = 0;
+      function next() {
+        if (i >= cs.length) return Promise.resolve(null);
+        var c = cs[i++];
+        if (!Object.keys(c.set).length && !c.del.length) return next();
+        acc.sent++;
+        return authed('POST', base(vid) + '/' + encodeURIComponent(noteId) + '/parts', vid,
+                      { t: row.t, base: b ? b.t : null, set: c.set, del: c.del })
+          .then(function (r) {
+            if (r.status === 404 && acc.sent === 1) { setPartsMode(false); return { fallback: true }; }
+            if (r.status === 413 && r.body && r.body.error) return { quota: r.body };
+            if (!r.ok || !r.body) return { http: r.status };
+            acc.rejected = acc.rejected.concat(r.body.rejected || []);
+            acc.others = acc.others || !!r.body.others;
+            acc.t = Number(r.body.t) || acc.t;
+            if (r.body.note_bytes != null) lastQuota = Object.assign({}, lastQuota || {}, { note_bytes: r.body.note_bytes });
+            return next();
+          });
+      }
+      return next().then(function (bad) {
+        if (bad && bad.fallback) return null;
+        if (bad && bad.quota) return quotaFail(noteId, bad.quota);
+        if (bad && bad.http) {
+          markPending(noteId, 'http-' + bad.http);
+          emit('garden:notesPushFailed', { id: noteId, reason: 'http-' + bad.http });
+          return { ok: false, reason: 'http-' + bad.http };
+        }
+        clearPending(noteId);
+        var nh = P().hashes(parts);
+        acc.rejected.forEach(function (k) { if (b && b.h && b.h[k]) nh[k] = b.h[k]; else delete nh[k]; });
+        var mixed = acc.rejected.length > 0 || acc.others;
+        var nb = { t: mixed ? (b ? b.t : 0) : Math.max(acc.t, b ? b.t : 0), h: nh };
+        return baseSet(noteId, nb).then(function () {
+          emit('garden:notesPushed', { id: noteId, t: row.t, parts: acc.sent });
+          if (!mixed) return S().markClean(noteId, row.t).then(function () { return { ok: true, applied: 1, t: row.t, parts: acc.sent }; });
+          return pull(noteId).then(function (pr) { return { ok: true, applied: 1, t: row.t, merged: !!(pr && pr.ok), parts: acc.sent }; });
+        });
+      });
+    });
+  }
+
+  function pushWhole(vid, noteId, row, raw) {
+    var cap = knownMax(), bytes = row.bytes || 0;
+    if (cap > 0 && bytes > cap) {
+      markPending(noteId, 'note_too_large');
+      quotaEvent('note_too_large', { id: noteId, bytes: bytes, max: cap });
+      emit('garden:notesPushFailed', { id: noteId, reason: 'note_too_large', quota: true, skipped: true });
+      return { ok: false, reason: 'note_too_large', quota: true, skipped: true };
+    }
+    return authed('POST', base(vid) + '/' + encodeURIComponent(noteId), vid,
+                  { doc: raw, t: row.t })
+      .then(function (r) {
+        /*@3.NOSJ2.3*/
+        if (isQuota(r.status, r.body)) {
+          markPending(noteId, r.body.error);
+          lastQuota = r.body;
+          rememberMax(r.body.max);
+          quotaEvent(r.body.error, { id: noteId, bytes: r.body.bytes, max: r.body.max });
+          emit('garden:notesPushFailed', { id: noteId, reason: r.body.error, quota: true });
+          return { ok: false, reason: r.body.error, quota: true };
+        }
+        if (!r.ok) {
+          markPending(noteId, 'http-' + r.status);
+          emit('garden:notesPushFailed', { id: noteId, reason: 'http-' + r.status });
+          return { ok: false, reason: 'http-' + r.status };
+        }
+        clearPending(noteId);
+        if (r.body && r.body.note_bytes != null) lastQuota = r.body;
+        /*@3.NOSJ2.12*/
+        if (r.body && r.body.applied === 0) {
+          return pull(noteId).then(function (pr) { return { ok: false, reason: 'stale', pulled: !!(pr && pr.ok) }; });
+        }
+        return S().markClean(noteId, row.t).then(function () {
+          var nb = baseOfDoc(raw, row.t);
+          return nb ? baseSet(noteId, nb) : null;
+        }).then(function () {
+          emit('garden:notesPushed', { id: noteId, t: row.t });
+          return { ok: true, applied: r.body && r.body.applied, t: row.t };
+        });
+      });
+  }
+
   function pull(noteId) {
     if (!S() || !endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
     return vaultId().then(function (vid) {
       if (!vid) return { ok: false, reason: 'no-vault' };
-      return authed('GET', base(vid) + '/' + encodeURIComponent(noteId), vid)
-        .then(function (r) {
-          if (r.status === 404) return { ok: false, reason: 'not-found' };
-          if (!r.ok || !r.body) return { ok: false, reason: 'http-' + r.status };
-          var read = S().getRaw ? S().getRaw(noteId) : Promise.resolve(null);
-          return read.catch(function () { return null; }).then(function (row) {
-            /*@3.NOSJ2.13*/
-            var rem = (typeof r.body.doc === 'string') ? r.body.doc : JSON.stringify(r.body.doc);
-            if (row && row.dirty && row.raw && row.raw !== rem) {
-              emit('garden:notesConflict', { id: noteId, raw: row.raw, t: row.t, remoteT: r.body.t });
+      if (!partsMode()) return pullWhole(vid, noteId);
+      return baseGet(noteId).then(function (b) {
+        if (!b || !b.h) return pullWhole(vid, noteId);
+        return pullParts(vid, noteId, b).then(function (r) { return r || pullWhole(vid, noteId); });
+      });
+    }).catch(function (e) { return { ok: false, reason: String((e && e.message) || e) }; });
+  }
+
+  /*@3.NOSJ2.19*/
+  function pullParts(vid, noteId, b) {
+    return authed('GET', base(vid) + '/' + encodeURIComponent(noteId) + '/parts?since=' + encodeURIComponent(b.t || 0), vid)
+      .then(function (r) {
+        if (r.status === 404) return { ok: false, reason: 'not-found' };
+        if (!r.ok || !r.body || r.body.full || !r.body.parts) return null;
+        var rp = r.body.parts, ts = r.body.ts || {}, rt = Number(r.body.t) || 0;
+        var read = S().getRaw ? S().getRaw(noteId) : Promise.resolve(null);
+        return read.catch(function () { return null; }).then(function (row) {
+          var local = {};
+          if (row && row.raw) { try { local = P().split(JSON.parse(row.raw)); } catch (e) { return null; } }
+          var mine = {};
+          if (row && row.dirty) {
+            var dl = P().diff(b.h, local);
+            Object.keys(dl.set).forEach(function (k) { mine[k] = 1; });
+            dl.del.forEach(function (k) { mine[k] = 1; });
+          }
+          var merged = Object.assign({}, local), lost = false, moved = false, lt = row ? row.t : 0;
+          var same = function (k) { return (rp[k] == null ? null : rp[k]) === (local[k] == null ? null : local[k]); };
+          Object.keys(rp).forEach(function (k) {
+            if (same(k)) return;
+            if (mine[k]) {
+              if ((ts[k] || rt) > lt) lost = true;
+              else return;
             }
-            return S().putDoc(noteId, r.body.doc, r.body.t, { clean: true });
-          }).then(function () {
-            emit('garden:notesPulled', { id: noteId, t: r.body.t });
-            return { ok: true, t: r.body.t };
+            moved = true;
+            if (rp[k] == null) delete merged[k]; else merged[k] = rp[k];
+          });
+          var still = Object.keys(mine).some(function (k) { return !(k in rp) || (!same(k) && !((ts[k] || rt) > lt)); });
+          var nb = { t: rt, h: Object.assign({}, b.h) };
+          Object.keys(rp).forEach(function (k) { if (rp[k] == null) delete nb.h[k]; else nb.h[k] = P().hash(rp[k]); });
+          if (lost) emit('garden:notesConflict', { id: noteId, raw: row.raw, t: row.t, remoteT: rt });
+          if (!moved && row) {
+            return baseSet(noteId, nb).then(function () {
+              return still ? null : S().markClean(noteId, row.t);
+            }).then(function () { return { ok: true, t: row.t, none: true }; });
+          }
+          var doc = P().assemble(merged);
+          var t = still ? row.t : Math.max(rt, row ? row.t : 0);
+          var again2 = S().getRaw ? S().getRaw(noteId) : Promise.resolve(row);
+          return again2.then(function (now) {
+            if (row && now && Number(now.t) !== Number(row.t)) return { ok: false, reason: 'busy' };
+            return S().putDoc(noteId, doc, t, { clean: !still }).then(function () {
+              return baseSet(noteId, nb);
+            }).then(function () {
+              emit('garden:notesPulled', { id: noteId, t: t, parts: Object.keys(rp).length });
+              return { ok: true, t: t, merged: true };
+            });
           });
         });
-    }).catch(function (e) { return { ok: false, reason: String((e && e.message) || e) }; });
+      });
+  }
+
+  function pullWhole(vid, noteId) {
+    return authed('GET', base(vid) + '/' + encodeURIComponent(noteId), vid)
+      .then(function (r) {
+        if (r.status === 404) return { ok: false, reason: 'not-found' };
+        if (!r.ok || !r.body) return { ok: false, reason: 'http-' + r.status };
+        var read = S().getRaw ? S().getRaw(noteId) : Promise.resolve(null);
+        return read.catch(function () { return null; }).then(function (row) {
+          /*@3.NOSJ2.13*/
+          var rem = (typeof r.body.doc === 'string') ? r.body.doc : JSON.stringify(r.body.doc);
+          if (row && row.dirty && row.raw && row.raw !== rem) {
+            emit('garden:notesConflict', { id: noteId, raw: row.raw, t: row.t, remoteT: r.body.t });
+          }
+          return S().putDoc(noteId, r.body.doc, r.body.t, { clean: true });
+        }).then(function () {
+          var nb = baseOfDoc(r.body.doc, r.body.t);
+          return nb ? baseSet(noteId, nb) : null;
+        }).then(function () {
+          emit('garden:notesPulled', { id: noteId, t: r.body.t });
+          return { ok: true, t: r.body.t };
+        });
+      });
   }
 
   /*@3.NOSJ2.15*/
@@ -217,7 +371,7 @@
   function remove(noteId) {
     if (!S()) return Promise.resolve({ ok: false });
     var files = [];
-    return filesOf([noteId]).then(function (fs) { files = fs; return S().delDoc(noteId); }).then(function () {
+    return filesOf([noteId]).then(function (fs) { files = fs; baseSet(noteId, null); return S().delDoc(noteId); }).then(function () {
       emit('garden:notesErased', { ids: [noteId], files: files, own: true });
       if (!endpoint()) return { ok: true, remote: false };
       return vaultId().then(function (vid) {
@@ -280,6 +434,7 @@
       return authed('GET', base(vid), vid).then(function (r) {
         if (!r.ok || !r.body) return { ok: false, reason: 'http-' + r.status };
         lastQuota = r.body;
+        if (P()) setPartsMode(r.body.parts === 1);
         var remote = r.body.docs || {};
         var live = Array.isArray(o.liveIds) ? o.liveIds : null;
         var tombs = (o.tombs && typeof o.tombs === 'object') ? o.tombs : {};
@@ -287,7 +442,7 @@
 
         /*@3.NOSJ2.4*/
         return st.manifest().then(function (local) {
-          var toPull = [], toPush = [], toDropLocal = [], toDropRemote = [];
+          var toPull = [], toPush = [], toDropLocal = [], toDropRemote = [], maybe = [];
 
           function dead(id) {
             return tombs[id] != null && (!live || live.indexOf(id) === -1);
@@ -297,7 +452,8 @@
             var l = local[id];
             if (dead(id)) { if (authority) toDropRemote.push(id); return; }
             if (!l) { toPull.push(id); return; }
-            if (l.dirty) { if (l.t >= remote[id].t) toPush.push(id); else toPull.push(id); return; }
+            /*@3.NOSJ2.20*/
+            if (l.dirty) { if (l.t >= remote[id].t) toPush.push(id); else if (partsMode()) maybe.push(id); else toPull.push(id); return; }
             if (remote[id].t > l.t) toPull.push(id);
             else if (l.t > remote[id].t) toPush.push(id);
           });
@@ -311,10 +467,14 @@
           });
 
           var failedPulls = 0;
-          return chunked(toPull, function (id) {
-            return pull(id).then(function (res) {
-              if (!res || !res.ok) failedPulls++;
-              return res;
+          return Promise.all(maybe.map(function (id) {
+            return baseGet(id).then(function (b) { (b && b.h ? toPush : toPull).push(id); });
+          })).then(function () {
+            return chunked(toPull, function (id) {
+              return pull(id).then(function (res) {
+                if (!res || !res.ok) failedPulls++;
+                return res;
+              });
             });
           }).then(function () {
             return chunked(toPush, push);
@@ -451,6 +611,7 @@
     schedule: schedule,
     flush: flush,
     reconcile: reconcile,
+    partsMode: partsMode,
     retryPending: retryPending,
     pending: readPending,
     quota: function () { return lastQuota; },
