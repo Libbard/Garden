@@ -494,9 +494,9 @@
     { i: 'fa-flask', ar: 'المختبرات', partial: true,
       d_ar: 'تطبيقاتٌ تفاعليةٌ تُجرَّب فيها المفاهيم — الدوائرُ المنطقية ولغاتُ البرمجة تعملان الآن.',
       en: 'Labs', d_en: 'Hands-on apps for the concepts — logic circuits and programming languages are live.' },
-    { i: 'fa-pen-nib', ar: 'ملاحظاتٌ متطوّرة', soon: true,
-      d_ar: 'تظليلٌ على المحتوى وربطٌ بالمواد — ورسمٌ باليد على الشاشة.',
-      en: 'Advanced notes', d_en: 'Highlight, link to courses — and draw by hand.' }
+    { i: 'fa-pen-nib', ar: 'دفترُ المحاضرة',
+      d_ar: 'ملاحظاتٌ غنيّة، وسلايداتٌ تقرؤها وترسم عليها، وتسجيلٌ يعود إلى لحظة الشرح.',
+      en: 'Lecture notebook', d_en: 'Rich notes, slides you read and draw on, and recordings that jump back to the moment.' }
   ];
   function bodyWelcome() {
     return '<p class="gs-lead">' + esc(L(
