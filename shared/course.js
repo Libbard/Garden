@@ -1350,7 +1350,11 @@
     document.addEventListener('garden:languageChanged', function () { refresh(); });
     window.addEventListener('garden:syncCompleted', function () { refresh(); });
     document.addEventListener('garden:cardsReviewed', function () { refresh(); });
-    document.addEventListener('garden:gradesChanged', function () { renderStats(); renderHead(); });
+    /*@3.COUJ.65*/
+    document.addEventListener('garden:gradesChanged', function () {
+      if (!S.stats) return;
+      renderStats(); renderHead();
+    });
   }
 
   function init() {

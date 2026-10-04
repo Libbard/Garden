@@ -678,7 +678,8 @@
   function pick(opts) {
     var o = opts || {};
     if (!enabled()) return Promise.reject(err('picker_disabled'));
-    if (topPreferred() && !fresh()) return topGo('pick', o.mime).then(function (r) { return (r && r.pick) || null; });
+    var one = function (pk) { return o.multi ? (pk ? [pk] : []) : pk; };
+    if (topPreferred() && !fresh()) return topGo('pick', o.mime).then(function (r) { return one((r && r.pick) || null); });
     return token(true).then(function (t) {
       return script(GAPI, function () { return !!window.gapi; }).then(function (ok) {
         if (!ok) throw err('gapi_unavailable');
@@ -725,13 +726,17 @@
             .setCallback(function (d) {
               seen = true;
               if (!d || !d.action) return;
-              if (d.action === P.Action.CANCEL) { fin(null); return; }
+              if (d.action === P.Action.CANCEL) { fin(o.multi ? [] : null); return; }
               if (d.action !== P.Action.PICKED) return;
+              var as = function (f) { return { id: f.id, name: f.name || '', size: Number(f.sizeBytes) || 0, mime: f.mimeType || '' }; };
+              /*@3.DRIJ.7*/
+              if (o.multi) { fin((d.docs || []).filter(function (f) { return f && f.id; }).map(as)); return; }
               var f = (d.docs || [])[0];
-              fin(f ? { id: f.id, name: f.name || '', size: Number(f.sizeBytes) || 0, mime: f.mimeType || '' } : null);
+              fin(f ? as(f) : null);
             });
           try {
             if (pickerKey()) b.setDeveloperKey(pickerKey());
+            if (o.multi && P.Feature && P.Feature.MULTISELECT_ENABLED) b.enableFeature(P.Feature.MULTISELECT_ENABLED);
             pk = b.build();
             document.addEventListener('keydown', onKey, true);
             stop = wayOut(function () { fin(null); });
@@ -745,7 +750,7 @@
                 topPrefer(true);
                 var pr = topGo('pick', mimes);
                 fin(null, null, true);
-                pr.then(function (r) { res((r && r.pick) || null); }, rej);
+                pr.then(function (r) { res(one((r && r.pick) || null)); }, rej);
               });
             }, MUTE_MS);
           } catch (e) {

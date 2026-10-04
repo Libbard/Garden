@@ -447,7 +447,7 @@
   function fselHtml() {
     var ps = fPicked(), n = ps.length;
     var canFree = ps.filter(function (f) { return f.dev && f.us; }).length;
-    var canErase = ps.filter(function (f) { return f.kind === 'pdf'; }).length;
+    var canErase = ps.length;
     function b(x, icon, ar, en, cls, off, why) {
       return '<button type="button" class="gsf-btn gsf-btn--sm nx-b ' + (cls || 'gsf-btn--ghost') + '" data-x="' + x + '"' + (off ? ' disabled' : '') +
         (why ? ' title="' + esc(why) + '"' : '') + '>' + ic(icon) + '<span class="nx-b-t">' + esc(L(ar, en)) + '</span></button>';
@@ -457,8 +457,7 @@
       b('ffree', 'fa-cloud-arrow-down', 'حرِّرْ من هذا الجهاز' + (canFree && canFree < n ? ' (' + canFree + ')' : ''), 'Free from this device' + (canFree && canFree < n ? ' (' + canFree + ')' : ''), '', !canFree,
         canFree ? '' : L('لا شيءَ محدَّدٌ على هذا الجهاز وله نسخةٌ عندنا', 'Nothing selected is on this device with a copy kept by us')) +
       '<span class="nx-sel-vr" aria-hidden="true"></span>' +
-      b('ferase', 'fa-trash', 'احذفْ من كلِّ مكان' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'Delete everywhere' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'gsf-btn--danger', !canErase,
-        canErase ? '' : L('التسجيلُ يُحذف من داخل ملاحظته', 'A recording is deleted from inside its note')) +
+      b('ferase', 'fa-trash', 'احذفْ من كلِّ مكان' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'Delete everywhere' + (canErase && canErase < n ? ' (' + canErase + ')' : ''), 'gsf-btn--danger', !canErase) +
       '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b nx-b--ic nx-sel-x" data-x="funpick"' + tip('ألغِ التحديد', 'Clear selection') + '>' + ic('fa-xmark') + '</button></div>';
   }
   function fPaint() {
@@ -494,13 +493,14 @@
   function fErase(list) {
     var ids = [], seen = {};
     list.forEach(function (f) { if (f.kind === 'pdf' && !seen[f.note]) { seen[f.note] = 1; ids.push(f.note); } });
-    if (ids.length && A.spaceErase) A.spaceErase(ids, list.length === 1 ? list[0].name : '');
+    var aud = list.filter(function (f) { return f.kind === 'aud' && !seen[f.note]; }).map(function (f) { return { nid: f.note, i: f.h }; });
+    if ((ids.length || aud.length) && A.spaceErase) A.spaceErase(ids, list.length === 1 ? list[0].name : '', aud);
   }
   function fileMenu(x, y, h) {
     if (!FSEL[h]) { FSEL = {}; FSEL[h] = 1; FANCH = h; fPaint(); }
     var ps = fPicked(), n = ps.length, pl = n > 1 ? ' (' + n + ')' : '';
     var canFree = ps.filter(function (f) { return f.dev && f.us; }).length;
-    var canErase = ps.filter(function (f) { return f.kind === 'pdf'; }).length;
+    var canErase = ps.length;
     var f0 = ps[0] || {}, copies = (f0.dev ? 1 : 0) + (f0.us ? 1 : 0) + (f0.gd ? 1 : 0);
     var items = [];
     if (n === 1) items.push({ a: 'fopen', i: 'fa-up-right-from-square', t: L('افتحْ ملاحظتَه', 'Open its note') });
@@ -508,8 +508,7 @@
       why: canFree ? '' : L('يُحرَّر ما له نسخةٌ عندنا وحدَه', 'Only what has a copy with us can be freed') });
     if (n > 1) items.push({ a: 'funpick', i: 'fa-xmark', t: L('ألغِ التحديد', 'Clear selection') + pl });
     items.push({ sep: 1 });
-    items.push({ a: 'ferase', i: 'fa-trash', t: L('احذفْ من كلِّ مكان…', 'Delete everywhere…') + (canErase > 1 ? ' (' + canErase + ')' : ''), dz: 1, off: !canErase,
-      why: canErase ? '' : L('التسجيلُ يُحذف من داخل ملاحظته', 'A recording is deleted from inside its note') });
+    items.push({ a: 'ferase', i: 'fa-trash', t: L('احذفْ من كلِّ مكان…', 'Delete everywhere…') + (canErase > 1 ? ' (' + canErase + ')' : ''), dz: 1, off: !canErase });
     GM().rich(x, y, {
       head: n === 1 ? { ico: f0.kind === 'pdf' ? 'fa-file-lines' : 'fa-microphone', t: f0.name, s: fmtSize(f0.bytes) + ' · ' + (copies ? L(copies === 1 ? 'نسخةٌ واحدة' : copies + ' نسخ', copies + (copies === 1 ? ' copy' : ' copies')) : L('لا نسخةَ نراها', 'No copy we can see')) }
                     : { ico: 'fa-square-check', t: L(n + ' ملفّات محدَّدة', n + ' files selected') },
@@ -821,12 +820,14 @@
     }, Object.assign({ anchorEnd: true, label: L('ترتيب', 'Sort') }, MOPT));
   }
   function importItems() {
+    var gd = A.importDrive && A.driveOn && A.driveOn();
     return [
-      { a: 'import', i: 'fa-laptop', t: L('ملفّاتٌ من جهازي…', 'Files from my device…') },
+      { a: 'import', i: 'fa-laptop', t: L('ملفّاتٌ من جهازي…', 'Files from my device…') }].concat(gd ? [
+      { a: 'importgd', i: 'fa-cloud-arrow-down', t: L('ملفّاتٌ من درايف…', 'Files from Drive…') }] : []).concat([
       { a: 'c:ai', i: 'fa-wand-magic-sparkles', t: L('من محادثة ذكاء…', 'From an AI chat…') },
       { a: 'c:md', i: 'fa-file-code', t: L('ماركداون…', 'Markdown…') },
       { a: 'c:json', i: 'fa-file-arrow-down', t: L('ملفُّ JSON صُدِّر من هنا…', 'A JSON export from here…') }
-    ];
+    ]);
   }
   function newMenu(b) {
     var p = at(b), items = [
@@ -842,6 +843,7 @@
     if (act === 'nfolder') A.newFolder();
     else if (act === 'nnote') A.newNote();
     else if (act === 'import') pickFiles();
+    else if (act === 'importgd' && A.importDrive) A.importDrive();
     else if (act === 'paste') A.paste();
     else if (act === 'empty') A.emptyTrash();
     else if (act === 'vm') { A.uiSet('xvm', vmOf() === 'grid' ? 'rows' : 'grid'); paint(); }
@@ -910,8 +912,8 @@
     }, MOPT);
   }
   function folderMenu(x, y, fid, el) {
-    var name = el ? (el.querySelector('.nx-fold-n') || el).textContent : '';
-    var cnt = el ? (el.querySelector('.nx-fold-c') || {}).textContent || '' : '';
+    var name = el ? (el.querySelector('.nx-fold-n, .nx-place-n') || el).textContent : '';
+    var cnt = el ? (el.querySelector('.nx-fold-c, .nx-place-c') || {}).textContent || '' : '';
     var canPaste = A.canPaste && A.canPaste();
     GM().rich(x, y, {
       head: { ico: 'fa-folder', t: name, s: L('مجلّد · ', 'Folder · ') + cnt },
@@ -1101,7 +1103,32 @@
     inp.click();
   }
 
+  function railV(el) {
+    var v = null;
+    try { v = JSON.parse(el.getAttribute('data-v')); } catch (e) {}
+    return v;
+  }
+  /*@3.NOEJ3.22*/
+  function placeMenu(x, y, el) {
+    var v = railV(el);
+    if (!v) return;
+    if (v.k === 'folder') { folderMenu(x, y, v.id, el); return; }
+    var nm = (el.querySelector('.nx-place-n') || el).textContent;
+    var items = [{ a: 'open', i: 'fa-folder-open', t: L('افتحْ', 'Open') }];
+    if (v.k === 'home' && A.canFolder()) items.push({ a: 'nfolder', i: 'fa-folder-plus', t: L('مجلّدٌ جديد', 'New folder') });
+    if (v.k === 'trash') items.push({ sep: 1 }, { a: 'empty', i: 'fa-trash', t: L('أفرغِ السلّة…', 'Empty trash…'), dz: 1 });
+    var i0 = el.querySelector('i'), icn = i0 ? (String(i0.className).match(/fa-[a-z0-9-]+/g) || ['fa-folder']).pop() : 'fa-folder';
+    GM().rich(x, y, { head: { ico: icn, t: nm }, items: items }, function (act) {
+      if (act === 'open') A.setView(v);
+      else if (act === 'nfolder') { A.setView({ k: 'home' }); A.newFolder(); }
+      else if (act === 'empty') A.emptyTrash();
+    }, MOPT);
+  }
+
   function onCtx(e) {
+    /*@3.NOEJ3.23*/
+    var pl = e.target.closest('.nx-place[data-v]');
+    if (pl) { e.preventDefault(); placeMenu(e.clientX, e.clientY, pl); return; }
     var frc = e.target.closest('.nx-frow[data-fk]');
     if (frc) { e.preventDefault(); fileMenu(e.clientX, e.clientY, frc.getAttribute('data-fk')); return; }
     var it = e.target.closest('.nx-it');
@@ -1121,6 +1148,33 @@
 
   var D = null, DRAG_PX = 6;
 
+  function folderIdOf(el) {
+    if (!el) return null;
+    if (el.classList.contains('nx-fold')) return el.getAttribute('data-id');
+    var v = railV(el);
+    return v && v.k === 'folder' ? v.id : null;
+  }
+  /*@3.NOEJ3.21*/
+  function fdropAt(x, y, fid) {
+    var el = document.elementFromPoint(x, y);
+    var t = el && el.closest && el.closest('.nx-fold[data-id], .nx-place[data-v], .nx-crumb-b');
+    if (!t || !host.contains(t)) return null;
+    var id = folderIdOf(t);
+    if (!id) {
+      var v = railV(t);
+      return v && v.k === 'home' ? { el: t, ref: null, where: 'root', cls: 'nx-drop' } : null;
+    }
+    if (id === fid) return null;
+    var r = t.getBoundingClientRect(), f;
+    if (t.classList.contains('nx-place')) f = (y - r.top) / (r.height || 1);
+    else {
+      f = (x - r.left) / (r.width || 1);
+      if (getComputedStyle(t).direction === 'rtl') f = 1 - f;
+    }
+    var where = f < .28 ? 'before' : (f > .72 ? 'after' : 'into');
+    return { el: t, ref: id, where: where, cls: where === 'into' ? 'nx-drop' : 'nx-drop-' + (where === 'before' ? 'b' : 'a') };
+  }
+
   function dropAt(x, y) {
     var el = document.elementFromPoint(x, y);
     var t = el && el.closest && el.closest('.nx-fold, .nx-crumb-b');
@@ -1138,17 +1192,20 @@
     try { d.it.releasePointerCapture(d.pid); } catch (e) {}
     if (d.ghost) d.ghost.remove();
     host.removeAttribute('data-drag');
-    var old = host.querySelectorAll('.nx-drop');
-    for (var i = 0; i < old.length; i++) old[i].classList.remove('nx-drop');
+    var old = host.querySelectorAll('.nx-drop, .nx-drop-b, .nx-drop-a');
+    for (var i = 0; i < old.length; i++) old[i].classList.remove('nx-drop', 'nx-drop-b', 'nx-drop-a');
     if (!d.on) return;
     ate = 1;
     setTimeout(function () { ate = 0; }, 0);
+    if (commit && d.to && d.fid) { if (A.folderPlace) A.folderPlace(d.fid, d.to.ref, d.to.where); return; }
     if (commit && d.to) A.moveTo(d.uids, d.to.fid);
   }
 
   function onDown(e) {
     if (e.pointerType !== 'touch') {
       if (e.button !== 0 || A.view().k === 'trash') return;
+      var fe = e.target.closest('.nx-fold[data-id], .nx-place[data-v]'), ff = fe && folderIdOf(fe);
+      if (ff) { D = { fid: ff, it: fe, x: e.clientX, y: e.clientY, pid: e.pointerId, on: false, to: null }; return; }
       var di = e.target.closest('.nx-it');
       if (!di || di.getAttribute('data-ro') || e.target.closest('[data-x]')) return;
       var du = di.getAttribute('data-uid');
@@ -1180,22 +1237,26 @@
         if (Math.abs(e.clientX - D.x) < DRAG_PX && Math.abs(e.clientY - D.y) < DRAG_PX) return;
         D.on = true;
         try { D.it.setPointerCapture(D.pid); } catch (e1) {}
-        var sel = pickedList();
-        D.uids = sel.indexOf(D.uid) > -1 ? sel : [D.uid];
         host.setAttribute('data-drag', '1');
         D.ghost = document.createElement('div');
         D.ghost.className = 'nx-ghost';
-        var first = itemOf(D.uid);
-        D.ghost.textContent = D.uids.length > 1 ? String(D.uids.length) : ((first && first.title) || '');
+        if (D.fid) D.ghost.textContent = (D.it.querySelector('.nx-fold-n, .nx-place-n') || D.it).textContent;
+        else {
+          var sel = pickedList();
+          D.uids = sel.indexOf(D.uid) > -1 ? sel : [D.uid];
+          var first = itemOf(D.uid);
+          D.ghost.textContent = D.uids.length > 1 ? String(D.uids.length) : ((first && first.title) || '');
+        }
         document.body.appendChild(D.ghost);
       }
       e.preventDefault();
       D.ghost.style.left = '0';
       D.ghost.style.transform = 'translate(' + (e.clientX + 12) + 'px,' + (e.clientY + 12) + 'px)';
-      var to = dropAt(e.clientX, e.clientY);
-      if ((to && to.el) !== (D.to && D.to.el)) {
-        if (D.to) D.to.el.classList.remove('nx-drop');
-        if (to) to.el.classList.add('nx-drop');
+      var to = D.fid ? fdropAt(e.clientX, e.clientY, D.fid) : dropAt(e.clientX, e.clientY);
+      if (to && !to.cls) to.cls = 'nx-drop';
+      if ((to && to.el) !== (D.to && D.to.el) || (to && D.to && to.cls !== D.to.cls)) {
+        if (D.to) D.to.el.classList.remove('nx-drop', 'nx-drop-b', 'nx-drop-a');
+        if (to) to.el.classList.add(to.cls);
       }
       D.to = to;
       return;

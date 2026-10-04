@@ -3261,7 +3261,10 @@
     this.push({ act: 'set', n: n, before: snap, after: deep(p.els) });
     this.paint(n);
     this.touch(n);
-    var ed = this.addField(n, x0 / kx, y0 / ky, { rt: txt ? [{ s: txt }] : [], wm: Math.max(0.06, Math.min(1, w / (p.w || 1))) });
+    /*@3.NOPJ8.188*/
+    var f1 = this.frameOf(p, 1) || f;
+    var c0 = f1.toPx(a.x, a.y), c1 = f1.toPx(b.x, b.y);
+    var ed = this.addField(n, Math.min(c0.x, c1.x), Math.min(c0.y, c1.y), { rt: txt ? [{ s: txt }] : [], wm: Math.max(0.06, Math.min(1, w / (p.w || 1))) });
     return ed ? 1 : -1;
   };
 

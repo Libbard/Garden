@@ -31,10 +31,43 @@
     var d = D();
     return (d && d.courseInfo && d.courseInfo(code)) || null;
   }
+  /*@3.MYRJ.25*/
+  function pickName(o, code) {
+    if (!o) return '';
+    var n = isAr() ? (o.name_ar || o.name || o.name_en) : (o.name_en || o.name || o.name_ar);
+    return (n && n !== code) ? n : '';
+  }
+  function findIn(sems, code) {
+    var hit = null;
+    (sems || []).forEach(function (s) {
+      ((s && s.courses) || []).forEach(function (c) {
+        if (c && c.code === code && pickName(c, code)) hit = c;
+      });
+    });
+    return hit;
+  }
+  var _allIdx = null, _allIdxOf = null;
+  function fromPlans(code) {
+    if (!_all) return null;
+    if (_allIdxOf !== _all) {
+      _allIdx = {}; _allIdxOf = _all;
+      _all.forEach(function (c) { _allIdx[c.code] = c; });
+    }
+    return _allIdx[code] || null;
+  }
   function nameOf(code) {
     var i = info(code);
-    if (!i) return code;
-    return isAr() ? (i.name_ar || code) : (i.name_en || i.name_ar || code);
+    if (i) return isAr() ? (i.name_ar || code) : (i.name_en || i.name_ar || code);
+    var d = D(), n = '';
+    try { n = (d && d.courseTitle) ? d.courseTitle(code) : ''; } catch (e) { n = ''; }
+    if (n && n !== code) return n;
+    var g = null;
+    try { g = JSON.parse(localStorage.getItem('gpa_grades') || 'null'); } catch (e) { g = null; }
+    n = pickName(findIn(g && g.semesters, code), code);
+    if (n) return n;
+    try { n = pickName(findIn(d && d.archive ? d.archive() : [], code), code); } catch (e) { n = ''; }
+    if (n) return n;
+    return pickName(fromPlans(code), code) || code;
   }
   function iconOf(code) {
     var i = info(code);

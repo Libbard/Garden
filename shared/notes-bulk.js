@@ -8,6 +8,10 @@
   var ACCEPT = '.pdf,application/pdf,audio/*,video/*,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm,.flac,.md,.markdown,.txt,.json';
 
   var A = null, dlg = null, rows = [], busy = false, finished = false, stopAsk = false, seq = 0;
+  /*@3.NOBJ2.4*/
+  var KEEP_LS = 'notes_bulk_keep', keepTo = 'here';
+  function keepRead() { try { var v = localStorage.getItem(KEEP_LS); return v === 'us' || v === 'gd' ? v : 'here'; } catch (e) { return 'here'; } }
+  function keepWrite(v) { try { if (v === 'here') localStorage.removeItem(KEEP_LS); else localStorage.setItem(KEEP_LS, v); } catch (e) {} }
 
   function L(a, e) { return A.L(a, e); }
   function esc(s) { return A.esc(s); }
@@ -131,7 +135,8 @@
       '<div class="nb-main">' +
         (r.skip || lock ? '<span class="nb-name" dir="auto">' + esc(r.skip ? r.file.name : r.title) + '</span>'
           : '<input class="gsf-in nb-in" data-f="title" dir="auto" value="' + esc(r.title) + '" aria-label="' + esc(L('الاسم', 'Name')) + '">') +
-        '<div class="nb-meta"><span>' + esc(kindName(r.kind)) + '</span><span>' + lat(fmtSize(r.file.size)) + '</span>' + courseHtml(r) + '</div>' +
+        '<div class="nb-meta"><span>' + esc(kindName(r.kind)) + '</span><span>' + lat(fmtSize(r.file.size)) + '</span>' +
+          (r.file.gd ? '<span class="nb-gd">' + '<i class="fa-brands fa-google-drive" aria-hidden="true"></i>' + esc(L('من درايف', 'from Drive')) + '</span>' : '') + courseHtml(r) + '</div>' +
       '</div>' +
       '<div class="nb-d">' + (r.skip || lock ? (r.skip ? '' : '<span class="nb-to">' + ic('fa-folder') + esc(destName(r)) + '</span>')
         : '<select class="gsf-in nb-sel" data-f="dest" data-gs-name-ar="إلى مجلّد" data-gs-name-en="To folder" aria-label="' + esc(L('إلى مجلّد', 'To folder')) + '">' + destOptions(r.dest, codesSet()) + '</select>') + '</div>' +
@@ -167,14 +172,22 @@
     var lock = busy || finished;
     return '<div class="nb-hd"><span class="nb-hd-i" aria-hidden="true">' + ic('fa-file-import') + '</span>' +
       '<span class="nb-hd-t"><h2 class="gsf-title" id="nb-t">' + esc(L('استيرادُ ', 'Import ')) + lat(String(rows.length)) + esc(L(rows.length === 1 ? ' ملفّ' : (rows.length <= 10 ? ' ملفّات' : ' ملفّاً'), rows.length === 1 ? ' file' : ' files')) + '</h2>' +
-      '<p class="gsf-sub">' + lat(fmtSize(c.bytes)) + ' · ' + esc(L('تُحفظ على هذا الجهاز أوّلاً، ثمّ ترفعها حيث تشاء من كلِّ ملاحظة.',
-        'Kept on this device first; upload each one where you like from its note.')) + '</p></span>' +
-      (finished ? '' : '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nb-add" data-a="add">' + ic('fa-plus') + '<span>' + esc(L('أضِفْ ملفّات', 'Add files')) + '</span></button>') +
+      '<p class="gsf-sub">' + lat(fmtSize(c.bytes)) + ' · ' + esc(keepTo === 'us' ? L('تُحفظ على هذا الجهاز، ونسخةٌ منها عندنا.', 'Kept on this device, with a copy kept by us.')
+        : keepTo === 'gd' ? L('تُحفظ على هذا الجهاز، ونسخةٌ منها في درايفك.', 'Kept on this device, with a copy in your Drive.')
+        : L('تُحفظ على هذا الجهاز أوّلاً، ثمّ ترفعها حيث تشاء من كلِّ ملاحظة.', 'Kept on this device first; upload each one where you like from its note.')) + '</p></span>' +
+      (finished ? '' : '<span class="nb-adds"><button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nb-add" data-a="add">' + ic('fa-plus') + '<span>' + esc(L('من جهازي', 'From device')) + '</span></button>' +
+        (A.drivePick ? '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nb-add" data-a="addgd">' + '<i class="fa-brands fa-google-drive" aria-hidden="true"></i>' + '<span>' + esc(L('من درايف', 'From Drive')) + '</span></button>' : '') + '</span>') +
       '</div>' +
       (lock || !c.go ? '' :
         '<label class="nb-all">' + ic('fa-folder-tree') + '<span>' + esc(L('المجلّد للكلّ', 'Folder for all')) + '</span>' +
         '<select class="gsf-in nb-sel" data-f="all" data-gs-name-ar="المجلّد للكلّ" data-gs-name-en="Folder for all"><option value="*">' + esc(L('— كما في كلِّ ملفّ —', '— as set per file —')) + '</option>' +
-        destOptions('*', codesSet()) + '</select></label>');
+        destOptions('*', codesSet()) + '</select></label>' +
+        '<label class="nb-all">' + ic('fa-cloud-arrow-up') + '<span>' + esc(L('ونسخةٌ احتياطيّة', 'And a backup copy')) + '</span>' +
+        '<select class="gsf-in nb-sel" data-f="keep" data-gs-name-ar="ونسخةٌ احتياطيّة" data-gs-name-en="And a backup copy">' +
+          '<option value="here"' + (keepTo === 'here' ? ' selected' : '') + '>' + esc(L('لا — على هذا الجهاز وحدَه', 'No — this device only')) + '</option>' +
+          (A.canUs && A.canUs() ? '<option value="us"' + (keepTo === 'us' ? ' selected' : '') + '>' + esc(L('ارفعْها كلَّها إلى نسختي عندنا', 'Upload all to my copy with us')) + '</option>' : '') +
+          (A.drivePick ? '<option value="gd"' + (keepTo === 'gd' ? ' selected' : '') + '>' + esc(L('ارفعْها كلَّها إلى درايفي', 'Upload all to my Drive')) + '</option>' : '') +
+        '</select></label>');
   }
 
   function render() {
@@ -256,7 +269,7 @@
     r.st = 'run';
     paintRow(i);
     A.one({
-      file: r.file, kind: r.kind, title: r.title,
+      file: r.file, kind: r.kind, title: r.title, keep: keepTo,
       place: { f: r.fid || null, c: r.code || null },
       onProgress: function (at, of) {
         if (!of) return;
@@ -293,6 +306,13 @@
     });
     (dlg || document.body).appendChild(inp);
     inp.click();
+  }
+  function pickDrive() {
+    if (!A.drivePick) return;
+    A.drivePick().then(function (list) {
+      if (!list || !list.length || !dlg) return;
+      add(list.map(function (d) { return { name: d.name || 'drive', size: Number(d.size) || 0, type: d.mime || '', gd: d.id }; }));
+    }, function (e) { if (A.say) A.say(e); });
   }
   /*@3.NOBJ2.3*/
   function add(files) {
@@ -337,6 +357,7 @@
     if (a === 'go') { run(); return; }
     if (a === 'stop') { stopAsk = true; paintFoot(); return; }
     if (a === 'add') { pick(); return; }
+    if (a === 'addgd') { pickDrive(); return; }
     var li = b.closest('.nb-row'), i = li ? Number(li.getAttribute('data-i')) : -1;
     if (a === 'rm' && !busy && !finished && i >= 0) {
       rows.splice(i, 1);
@@ -357,6 +378,7 @@
     var t = e.target, f = t.getAttribute && t.getAttribute('data-f');
     if (!f || busy || finished) return;
     if (f === 'course') { commitCourse(t); return; }
+    if (f === 'keep') { keepTo = t.value; keepWrite(keepTo); render(); return; }
     if (f === 'all') {
       if (t.value === '*') return;
       rows.forEach(function (r) { if (!r.skip) r.dest = t.value; });
@@ -407,7 +429,14 @@
 
   function open(files, api) {
     A = api;
+    keepTo = keepRead();
+    if ((keepTo === 'us' && !(A.canUs && A.canUs())) || (keepTo === 'gd' && !A.drivePick)) keepTo = 'here';
     var list = Array.prototype.slice.call(files || []);
+    if (!list.length && api.fromDrive && A.drivePick) {
+      return A.drivePick().then(function (got) {
+        if (got && got.length) open(got.map(function (d) { return { name: d.name || 'drive', size: Number(d.size) || 0, type: d.mime || '', gd: d.id }; }), api);
+      }, function (e) { if (A.say) A.say(e); });
+    }
     if (!list.length) return;
     if (dlg && dlg.open && !finished) { add(list); return; }
     close();

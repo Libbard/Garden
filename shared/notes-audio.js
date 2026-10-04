@@ -1908,6 +1908,34 @@
     });
   }
 
+  /*@3.NOAJ3.7*/
+  function eraseRecs(list) {
+    var byNote = {}, gone = [], cloudIds = [], keys = {};
+    (list || []).forEach(function (x) { if (x && x.nid && x.i) (byNote[x.nid] = byNote[x.nid] || []).push(x.i); });
+    return Promise.all(Object.keys(byNote).map(function (nid) {
+      var want = byNote[nid];
+      return withDoc(nid, function (arr) {
+        var ks = {};
+        arr.forEach(function (x) { if (x && want.indexOf(x.i) >= 0) ks[x.g || x.i] = 1; });
+        for (var k = arr.length - 1; k >= 0; k--) {
+          var x = arr[k];
+          if (!x || !ks[x.g || x.i]) continue;
+          keys[x.g || x.i] = 1; gone.push(x.i);
+          if (x.aup) cloudIds.push(x.i);
+          arr.splice(k, 1);
+        }
+      });
+    })).then(function () {
+      if (pl && keys[pl.key]) stopPlay();
+      var D = PD(), f = F();
+      gone.forEach(function (id) { delete mem[id]; delete here[id]; if (D && D.drop) D.drop(id); });
+      return Promise.all(cloudIds.map(function (id) { return f && f.remove ? f.remove(id)['catch'](function () {}) : null; }));
+    }).then(function () {
+      if (curDoc()) paintRows();
+      return { n: Object.keys(keys).length, parts: gone.length };
+    });
+  }
+
   function cloudState() {
     var f = F();
     if (!f || !f.state) return Promise.resolve({ ok: false, why: 'none' });
@@ -2212,6 +2240,13 @@
     source: pickedSrc,
     checkDraft: checkDraft,
     local: local,
+    eraseRecs: eraseRecs,
+    keepCopy: function (it, nid, to) {
+      if (!it || !nid) return Promise.resolve();
+      if (to === 'gd') return toDrive([it], nid)['catch'](function () {});
+      enqueue(it, nid);
+      return Promise.resolve();
+    },
     refresh: refreshHere
   };
 })();

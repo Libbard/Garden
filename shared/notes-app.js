@@ -198,7 +198,7 @@
     var T = folderTree();
     var f = T.byId[id];
     if (!f) return false;
-    var sibs = (T.kids[(f.p && T.byId[f.p]) ? f.p : ''] || []).slice();
+    var sibs = sibsOrdered(T, (f.p && T.byId[f.p]) ? f.p : '');
     var at = -1, i;
     for (i = 0; i < sibs.length; i++) if (sibs[i].id === id) at = i;
     var to = at + (dir < 0 ? -1 : 1);
@@ -213,6 +213,38 @@
       folderPut(sibs[i]);
     }
     void base;
+    return true;
+  }
+
+  function sibsOrdered(T, p) {
+    return (T.kids[p] || []).map(function (f, i) { return { f: f, i: i }; })
+      .sort(function (a, b) { return ((a.f.ord || 0) - (b.f.ord || 0)) || (a.i - b.i); })
+      .map(function (x) { return x.f; });
+  }
+  /*@3.NOAJ.478*/
+  function folderPlace(id, ref, where) {
+    var T = folderTree(), f = T.byId[id];
+    if (!f || id === ref) return false;
+    if (where === 'root') return folderReparent(id, '');
+    var r = T.byId[ref];
+    if (!r) return false;
+    if (where === 'into') return folderReparent(id, ref);
+    var p = (r.p && T.byId[r.p]) ? r.p : '';
+    var cur = (f.p && T.byId[f.p]) ? f.p : '';
+    if (cur !== p) {
+      if (!folderReparent(id, p)) return false;
+      T = folderTree(); f = T.byId[id];
+    }
+    var sibs = sibsOrdered(T, p).filter(function (x) { return x.id !== id; });
+    var at = -1, i;
+    for (i = 0; i < sibs.length; i++) if (sibs[i].id === ref) at = i;
+    if (at < 0) return false;
+    sibs.splice(where === 'after' ? at + 1 : at, 0, f);
+    var now = Date.now();
+    for (i = 0; i < sibs.length; i++) {
+      if (sibs[i].ord === i && sibs[i].id !== id) continue;
+      sibs[i].ord = i; sibs[i].updated_at = now; folderPut(sibs[i]);
+    }
     return true;
   }
 
@@ -4068,9 +4100,10 @@
         var t = (n.title || '').trim() ||
                 deriveTitle(n.doc) ||
                 L('ملاحظة مستورَدة', 'Imported note');
-        var rec = { id: id, t: t.slice(0, 80), k: 'rich', o: {}, g: [], c: null,
+        var rec = { id: id, t: t.slice(0, 80), k: 'rich', o: bornOrigin(), g: [], c: null,
                     f: (S.view.k === 'folder') ? S.view.id : null,
                     p: 0, a: 0, ca: now + k, updated_at: now + k, sz: 0 };
+        if (S.view.k === 'tag') rec.g = [S.view.tag];
         idxPut(rec);
         made.push({ id: id, doc: n.doc });
       });
@@ -5972,13 +6005,51 @@
     else if (window.GardenNotesStore) window.GardenNotesStore.delDoc(id);
   }
 
+  /*@3.NOAJ.481*/
+  function bulkFetch(item) {
+    var f = item.file;
+    if (!f || !f.gd || typeof f.slice === 'function') return Promise.resolve(f);
+    return needDrive().then(function (GD) {
+      return GD.download(f.gd, function (at, of) { if (of && item.onProgress) item.onProgress(at * 0.5, of); });
+    }).then(function (blob) {
+      var out = new File([blob], f.name || 'drive', { type: f.type || blob.type || '' });
+      out.gd = f.gd;
+      return out;
+    });
+  }
+  function bulkKeep(item, file, id, h) {
+    var to = item.keep, F = window.GardenFiles, C = window.GardenPdfCloud;
+    if (to === 'us' && item.kind === 'pdf' && F && F.upload && C && C.refIdOf && h) {
+      return F.upload(file, { refId: C.refIdOf(h), name: file.name || 'file.pdf', mime: 'application/pdf' })['catch'](function () {});
+    }
+    if (to === 'gd' && item.kind === 'pdf' && !file.gd && driveOn() && h) {
+      return needDrive().then(function (GD) {
+        return GD.upload(file, { name: file.name || 'file.pdf', mime: 'application/pdf', sha: h, kind: 'pdf', course: (item.place && item.place.c) || '' });
+      }).then(function (r) {
+          var St = window.GardenNotesStore;
+          if (!r || !r.id || !St) return;
+          return St.getDoc(id).then(function (row) {
+            var d = row && row.doc;
+            if (!d || !d.pdf) return;
+            d.pdf.gd = r.id;
+            return putBorn(id, d, Date.now());
+          });
+        })['catch'](function () {});
+    }
+    return Promise.resolve();
+  }
   function bulkOne(item) {
+    return bulkFetch(item).then(function (file) { return bulkOneFile(Object.assign({}, item, { file: file })); });
+  }
+  function bulkOneFile(item) {
     var file = item.file, place = item.place, O = window.GardenPdfOpen;
     if (item.kind === 'pdf') {
       if (!O) return Promise.reject(new Error('no-pdf'));
       return O.adopt(file, item.onProgress).then(function (res) {
         try { O.drop(res.pre); } catch (e) {}
-        return pdfNote(res, file, place, null, item.title).then(function (id) { return [id]; });
+        return pdfNote(res, file, place, file.gd || null, item.title).then(function (id) {
+          return bulkKeep(item, file, id, res.spec && res.spec.h).then(function () { return [id]; });
+        });
       });
     }
     if (item.kind === 'audio') {
@@ -5990,6 +6061,7 @@
         return Au.importFile(file, aid, { quiet: 1 });
       }).then(function (it) {
         if (!it) throw new Error('readfail');
+        if ((item.keep === 'us' || item.keep === 'gd') && Au.keepCopy) { try { Au.keepCopy(it, aid, item.keep); } catch (eK) {} }
         var Sy = window.GardenNotesSync;
         if (Sy && Sy.push) { try { Sy.push(aid); } catch (e) {} }
         return [aid];
@@ -6018,10 +6090,17 @@
     return Promise.reject(new Error('badfile'));
   }
 
-  function bulkOpen(files) {
+  function bulkOpen(files, fromDrive) {
     var B = window.GardenNotesBulk;
-    if (!B || !files || !files.length) return;
+    if (!B || !files || (!files.length && !fromDrive)) return;
     B.open(files, {
+      fromDrive: !!fromDrive,
+      drivePick: driveOn() ? function () {
+        return needDrive().then(function (GDb) { return GDb.pick({ mime: 'application/pdf,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/webm,audio/ogg,audio/aac,text/markdown,text/plain',
+                          multi: 1, title: L('اخترْ ملفّاتٍ من درايف (‏واحداً أو أكثر)', 'Pick files from Drive (one or more)') }); });
+      } : null,
+      canUs: function () { return !!(window.GardenFiles && GardenFiles.upload); },
+      say: function (e) { var G = window.GardenDrive; toast(G && G.reason ? G.reason(e) : L('تعذّر الوصولُ إلى درايف.', 'Could not reach Drive.')); },
       L: L, esc: esc, isAr: isAr, i18n: i18n,
       folders: function () {
         var T = folderTree(), out = [];
@@ -6168,10 +6247,9 @@
       var id = newId('rn');
       var base = String(file.name || '').replace(/\.[a-z]+$/i, '').trim();
       var rec = { id: id, t: (base || deriveTitle(doc) || L('ملاحظة مستورَدة', 'Imported note')).slice(0, 80),
-                  k: 'rich', o: {}, g: [], c: null,
+                  k: 'rich', o: bornOrigin(), g: [], c: null,
                   f: (S.view.k === 'folder') ? S.view.id : null,
                   p: 0, a: 0, ca: now, updated_at: now, sz: 0 };
-      if (S.view.k === 'course') rec.o.c = S.view.code;
       if (S.view.k === 'tag') rec.g = [S.view.tag];
       idxPut(rec);
       var go = function () {
@@ -6339,11 +6417,8 @@
     });
   }
 
-  function createNote(kind) {
-    /*@3.NOAJ.70*/
-    var board = kind === 'board';
-    var id = newId(board ? 'rb' : 'rn');
-    var now = Date.now();
+  /*@3.NOAJ.480*/
+  function bornOrigin() {
     var origin = {};
     try {
       var q = new URLSearchParams(location.search);
@@ -6352,6 +6427,16 @@
       if (q.get('course')) origin.c = q.get('course');
       if (q.get('module')) origin.m = Number(q.get('module'));
     } catch (e) {}
+    if (S.view && S.view.k === 'course' && !origin.c) origin.c = S.view.code;
+    return origin;
+  }
+
+  function createNote(kind) {
+    /*@3.NOAJ.70*/
+    var board = kind === 'board';
+    var id = newId(board ? 'rb' : 'rn');
+    var now = Date.now();
+    var origin = bornOrigin();
 
     var rec = { id: id, t: '', k: board ? 'board' : 'rich', o: origin, g: [], c: null, f: null,
                 p: 0, a: 0, ca: now, updated_at: now, sz: 0, pv: 1 };
@@ -6414,7 +6499,7 @@
   function askMakeNote(title) {
     var dlg = document.getElementById('na-confirm');
     if (!dlg) { createNamed(title); return; }
-    pendDelete = null; pendMany = null; pendFolder = null;
+    pendDelete = null; pendMany = null; pendFolder = null; pendAud = null;
     pendMake = String(title).slice(0, 80);
     confirmTitle('لا توجد ملاحظةٌ بهذا العنوان', 'No note with that title');
     confirmSub('أتُنشئها الآن بهذا العنوان؟ ويبقى الرابطُ عاملاً بعدها.',
@@ -6528,6 +6613,7 @@
   var pendDelete = null;
   var pendMany = null;
   var pendFolder = null;
+  var pendAud = null;
   var pendMake = null;
 
   function confirmDelete(id, title) {
@@ -6536,6 +6622,7 @@
     resetConfirm();
     pendDelete = id;
     pendFolder = null;
+    pendAud = null;
     var t = dlg.querySelector('[data-role="what"]');
     if (t) t.textContent = title || L('هذه الملاحظة', 'this note');
     try { dlg.showModal(); } catch (e) {}
@@ -8897,6 +8984,7 @@
     if (!dlg) return;
     pendMany = recs.map(function (r) { return r.id; });
     pendDelete = null;
+    pendAud = null;
     var t = dlg.querySelector('[data-role="what"]');
     if (t) {
       t.textContent = L(recs.length + ' ملاحظةً محدَّدة',
@@ -8991,7 +9079,7 @@
     var T = folderTree();
     var f = T.byId[id];
     if (!f) return false;
-    var sibs = T.kids[(f.p && T.byId[f.p]) ? f.p : ''] || [];
+    var sibs = sibsOrdered(T, (f.p && T.byId[f.p]) ? f.p : '');
     var at = -1;
     for (var i = 0; i < sibs.length; i++) if (sibs[i].id === id) at = i;
     var to = at + (dir < 0 ? -1 : 1);
@@ -9059,6 +9147,7 @@
     pendFolder = fid;
     pendDelete = null;
     pendMany = null;
+    pendAud = null;
     confirmTitle(FOLD_T_AR, FOLD_T_EN);
     confirmSub(FOLD_SUB_AR + (kids ? FOLD_KIDS_AR : ''),
                FOLD_SUB_EN + (kids ? FOLD_KIDS_EN : ''));
@@ -9535,13 +9624,31 @@
         .then(function () { return { n: go.length, bytes: go.reduce(function (a, f) { return a + f.bytes; }, 0) }; });
     });
   }
-  function spaceErase(ids, label) {
+  function spaceErase(ids, label, aud) {
     var recs = (ids || []).map(idxFind).filter(Boolean);
-    if (!recs.length) return;
+    aud = (aud || []).filter(function (a) { return a && a.nid && a.i; });
+    if (!recs.length && !aud.length) return;
+    var dlg = document.getElementById('na-confirm');
+    if (!dlg) return;
+    if (!recs.length) {
+      /*@3.NOAJ.479*/
+      resetConfirm();
+      pendDelete = null; pendMany = null; pendFolder = null; pendMake = null;
+      var w = dlg.querySelector('[data-role="what"]');
+      if (w) w.textContent = label || L(aud.length === 1 ? 'تسجيلٌ واحد' : aud.length + ' تسجيلات', aud.length === 1 ? 'one recording' : aud.length + ' recordings');
+      confirmTitle(aud.length === 1 ? 'احذفْه من كلِّ مكان؟' : 'احذفْها من كلِّ مكان؟', aud.length === 1 ? 'Delete it everywhere?' : 'Delete them everywhere?');
+      confirmSub('يُحذف التسجيلُ من هذا الجهاز ومن نسختك عندنا، وتبقى ملاحظتُه كما هي. نسخةُ درايف تبقى في درايفك. ولا يمكن التراجع.',
+                 'The recording is removed from this device and from your copy with us; its note stays as it is. A Drive copy stays in your Drive. This cannot be undone.');
+      confirmOkLabel('احذفْ من كلِّ مكان', 'Delete everywhere');
+      pendAud = aud;
+      try { dlg.showModal(); } catch (e) {}
+      return;
+    }
     if (recs.length === 1) confirmDelete(recs[0].id, label || notPh(recs[0].t));
     else { resetConfirm(); confirmDeleteMany(recs); }
+    pendAud = aud.length ? aud : null;
     confirmTitle('احذفْه من كلِّ مكان؟', 'Delete it everywhere?');
-    if (recs.length > 1) confirmTitle('احذفْها من كلِّ مكان؟', 'Delete them everywhere?');
+    if (recs.length > 1 || aud.length) confirmTitle('احذفْها من كلِّ مكان؟', 'Delete them everywhere?');
     confirmSub('تُحذف الملاحظةُ وملفُّها من هذا الجهاز ومن نسختك عندنا، ويتحرّر من أجهزتك الأخرى حين تفتح الموقعَ عليها. نسخةُ درايف تبقى في درايفك. ولا يمكن التراجع.',
                'The note and its file are removed from this device and from your copy with us, and freed from your other devices when you next open the site there. A Drive copy stays in your Drive. This cannot be undone.');
     confirmOkLabel('احذفْ من كلِّ مكان', 'Delete everywhere');
@@ -9640,6 +9747,9 @@
       },
       folderAct: function (act, fid) { folderCtxAct(act, fid); },
       folderSib: function (fid, dir) { return sibMove(fid, dir); },
+      driveOn: driveOn,
+      importDrive: function () { bulkOpen([], true); },
+      folderPlace: function (fid, ref, where) { if (folderPlace(fid, ref, where)) reload({ keepOpen: true }); },
       create: function (k) {
         if (k === 'note') createNote();
         else if (k === 'board') createNote('board');
@@ -10644,11 +10754,19 @@
         var many = pendMany;
         var fid = pendFolder;
         var mk = pendMake;
+        var aud = pendAud;
         pendDelete = null;
         pendMany = null;
         pendFolder = null;
         pendMake = null;
+        pendAud = null;
         try { cDlg.close(); } catch (e) {}
+        if (aud && aud.length && window.GardenNotesAudio && GardenNotesAudio.eraseRecs) {
+          GardenNotesAudio.eraseRecs(aud).then(function () {
+            if (S.view && S.view.k === 'space' && window.GardenNotesExplorer && GardenNotesExplorer.spaceStale) GardenNotesExplorer.spaceStale();
+          }, function () {});
+          if (!id && !(many && many.length) && !fid && !mk) return;
+        }
         /*@3.NOAJ.151*/
         if (mk) { resetConfirm(); createNamed(mk); return; }
         if (fid) {
@@ -10679,9 +10797,9 @@
         }
         if (id) doDelete(id);
       });
-      cDlg.addEventListener('cancel', function () { pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; resetConfirm(); });
+      cDlg.addEventListener('cancel', function () { pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; pendAud = null; resetConfirm(); });
       cDlg.addEventListener('click', function (e) {
-        if (e.target.closest('form[method="dialog"]')) { pendDelete = null; pendMany = null; }
+        if (e.target.closest('form[method="dialog"]')) { pendDelete = null; pendMany = null; pendAud = null; }
       });
     }
     var fDlg = document.getElementById('na-folder');
