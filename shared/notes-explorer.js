@@ -607,6 +607,7 @@
           (!w.us && !w.gd ? '<span class="nx-hint">' + esc(L('افتحِ المزامنةَ أو اربطْ درايف لترفعها.', 'Turn on sync or connect Drive to upload them.')) + '</span>' : '') + '</div>';
       }
       if (KEEP.msg) h += '<p class="nx-hint" role="status">' + esc(KEEP.msg) + '</p>';
+      h += keepBigHtml(w);
     }
     return h + '</section>';
   }
@@ -793,29 +794,55 @@
       BACK = { run: 0, k: '', i: 0, n: 0, msg: L('توقّفت الاستعادة — ما استُعيد قبلها باقٍ، ولم يُمحَ شيء.', 'Restoring stopped — what came back before it stays, and nothing was erased.') };
     }).then(function () { SPACE = null; STAT = {}; if (A.statusStale) A.statusStale(); render(); });
   }
+  function keepBigOver() {
+    var b = KEEP.big || [], left = b.reduce(function (m, x) { return Math.min(m, x.e.left); }, Infinity);
+    var fit = b.filter(function (x) { return x.e.over_max && x.e.bytes <= x.e.over_max; });
+    return { fit: isFinite(left) ? fit.slice(0, Math.max(0, left)) : [], left: isFinite(left) ? left : 0, of: (b[0] && b[0].e.of) || 0 };
+  }
+  function keepBigHtml(w) {
+    var b = KEEP.big || [];
+    if (!b.length) return '';
+    var o = keepBigOver(), n = b.length;
+    var h = '<div class="nx-cl-row" data-k="big"><span class="nx-cl-i">' + ic('fa-weight-hanging') + '</span>' +
+      '<span class="nx-cl-t"><b>' + esc(n === 1 ? L('ملفٌّ أكبرُ من حدِّ الرفع لم يُرفع', 'One file over the upload limit was skipped')
+        : L(n + (n <= 10 ? ' ملفّاتٍ أكبرُ' : ' ملفّاً أكبرُ') + ' من حدِّ الرفع لم تُرفع', n + ' files over the upload limit were skipped')) + '</b>' +
+      '<small>' + esc(b.slice(0, 3).map(function (x) { return (x.f.name || '') + ' (' + fmtSize(x.e.bytes) + ')'; }).join(' · ') + (n > 3 ? ' …' : '')) + '</small></span>' +
+      '<span class="nx-fr-s">' + lat(fmtSize(b[0].e.max) || '') + '</span><span></span></div><div class="nx-keep-b">';
+    if (o.fit.length) h += '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--go nx-b" data-x="kover">' + ic('fa-cloud-arrow-up') +
+      esc(L('ارفعْ ' + o.fit.length + ' بتجاوزات الفصل (بقي لك ' + o.left + ' من ' + o.of + ')',
+            'Upload ' + o.fit.length + ' using this term’s exceptions (' + o.left + ' of ' + o.of + ' left)')) + '</button>';
+    if (w.gd) h += '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="kbiggd">' + ic('fa-google-drive', 1) +
+      esc(L('أرسلْها إلى درايفي', 'Send them to my Drive')) + '</button>';
+    return h + '</div>';
+  }
   function keepPaint() {
     var c = host && host.querySelector('.nx-keep');
     if (c && SPACE) { c.outerHTML = keepHtml(SPACE); A.i18n(host); }
   }
-  function keepGo(list, to) {
+  function keepGo(list, to, over) {
     if (KEEP.run || !A.spaceKeep) return;
     var go = list.filter(function (f) { return keepable(f, to); });
     if (!go.length) return;
-    KEEP = { run: 1, to: to, at: 0, of: go.length, cur: null, prog: 0, ok: 0, bad: [], msg: '', stop: 0 };
+    KEEP = { run: 1, to: to, at: 0, of: go.length, cur: null, prog: 0, ok: 0, bad: [], big: [], msg: '', stop: 0 };
     FSEL = {};
     render();
     A.spaceKeep(go, to, {
       start: function (k, f) { KEEP.at = k + 1; KEEP.cur = f; KEEP.prog = 0; keepPaint(); },
       prog: function (x) { KEEP.prog = x; var b = host && host.querySelector('.nx-keep-bar > i'); if (b) b.style.inlineSize = keepPct() + '%'; },
-      done: function (k, f, ok, why) { if (ok) KEEP.ok++; else KEEP.bad.push({ f: f, why: why || '' }); },
-      stop: function () { return !!KEEP.stop; }
+      done: function (k, f, ok, why, r) {
+        if (ok) KEEP.ok++;
+        else if (r && r.big && to === 'us') KEEP.big.push({ f: f, e: r.big });
+        else KEEP.bad.push({ f: f, why: why || '' });
+      },
+      stop: function () { return !!KEEP.stop; },
+      over: !!over
     }).then(function (r) {
       var where = to === 'gd' ? L('إلى درايفك', 'to your Drive') : L('إلى نسختك عندنا', 'to your copy with us');
       var m = KEEP.ok ? L('رُفع ' + KEEP.ok + ' ' + where, 'Uploaded ' + KEEP.ok + ' ' + where) : L('لم يُرفع شيء', 'Nothing was uploaded');
       if (KEEP.bad.length) m += ' · ' + L('تعذّر ' + KEEP.bad.length + ': ', KEEP.bad.length + ' failed: ') + KEEP.bad[0].why;
       if (r && r.halt) m += ' · ' + r.halt;
       else if (KEEP.stop && KEEP.at < KEEP.of) m += ' · ' + L('أُوقف قبل ' + (KEEP.of - KEEP.at), 'stopped before ' + (KEEP.of - KEEP.at));
-      KEEP = { run: 0, msg: m };
+      KEEP = { run: 0, msg: m, big: KEEP.big };
     }, function () { KEEP = { run: 0, msg: L('تعذّر الرفع — لم يتغيّر شيء.', 'The upload failed — nothing changed.') }; })
       .then(function () { SPACE = null; STAT = {}; if (A.statusStale) A.statusStale(); render(); });
   }
@@ -1330,6 +1357,8 @@
       case 'rcancel': BACK = { run: 0, msg: '', k: '', i: 0, n: 0 }; backPaint(); return;
       case 'keep': if (SPACE) keepGo(SPACE.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; }), x.getAttribute('data-to') === 'gd' ? 'gd' : 'us'); return;
       case 'kstop': KEEP.stop = 1; keepPaint(); return;
+      case 'kover': keepGo(keepBigOver().fit.map(function (x) { return x.f; }), 'us', true); return;
+      case 'kbiggd': keepGo((KEEP.big || []).map(function (x) { return x.f; }), 'gd'); return;
       case 'ferase': fErase(fPicked()); return;
       case 'clean': if (A.spaceClean) cleanGo(x); return;
       case 'import': pickFiles(); return;

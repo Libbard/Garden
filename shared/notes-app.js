@@ -1521,6 +1521,8 @@
     if (window.GardenNotesExplorer) {
       els.docBody.innerHTML = '<div class="nx"></div>';
       GardenNotesExplorer.mount(els.docBody.firstChild, exApi());
+      if (els.app) els.app.removeAttribute('data-expanel');
+      syncIcons();
     } else els.docBody.innerHTML =
       '<button type="button" class="na-empty na-empty-new" style="min-block-size:60vh">' +
       '<i class="fa-solid fa-book-open"></i>' +
@@ -4421,6 +4423,7 @@
     if (overlay) { try { overlay.destroy(); } catch (e3) {} overlay = null; }
     dropEditor();
     edId = id;
+    syncIcons();
     /*@3.NOAJ.425*/
     var tok = ++_openTok;
 
@@ -4804,6 +4807,7 @@
     setReading(false);
     /*@3.NOAJ.453*/
     if (phoneEx()) setMob('doc');
+    else if (window.GardenNotesExplorer) { setMob('list'); syncIcons(); }
     else { setMob('list'); showPanel('list'); }
     renderList();
   }
@@ -9386,9 +9390,13 @@
     return WIDTHS[(i + 1) % WIDTHS.length];
   }
 
+  function exShown() {
+    return !isPhone() && !edId && !!(els.docBody && els.docBody.querySelector(':scope > .nx'));
+  }
   function syncIcons() {
     var l = document.getElementById('na-go-list');
-    if (l) l.setAttribute('aria-pressed', S.panel ? 'true' : 'false');
+    var on = S.panel && (!exShown() || (els.app && els.app.getAttribute('data-expanel') === '1'));
+    if (l) l.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
   function showPanel(which) {
@@ -9398,6 +9406,14 @@
       var openNow = els.app && els.app.getAttribute('data-mob') === 'list';
       if (openNow && (edId || pdfOn() || phoneEx())) { setMob('doc'); return; }
       setMob('list'); setAcc(which); setPanel(true);
+      return;
+    }
+    if (exShown() && els.app) {
+      if (S.panel && S.acc === which && els.app.getAttribute('data-expanel') === '1') {
+        els.app.removeAttribute('data-expanel'); setPanel(false); return;
+      }
+      els.app.setAttribute('data-expanel', '1');
+      setAcc(which); setPanel(true);
       return;
     }
     if (S.panel && S.acc === which) { setPanel(false); return; }
@@ -10679,7 +10695,7 @@
       var ref = C.refIdOf(f.h);
       var on = function (e) { var d = e.detail || {}; if (d.ref_id === ref && d.stage === 'upload' && d.of && hk.prog) hk.prog(d.at / d.of); };
       window.addEventListener('garden:fileProgress', on);
-      return F.upload(file, { refId: ref, name: f.name || file.name || 'file.pdf', mime: 'application/pdf' }).then(function (r) {
+      return F.upload(file, { refId: ref, name: f.name || file.name || 'file.pdf', mime: 'application/pdf', over: !!hk.over }).then(function (r) {
         window.removeEventListener('garden:fileProgress', on);
         try { window.dispatchEvent(new CustomEvent('garden:fileUploaded', { detail: { ref_id: ref, h: f.h, bytes: r && r.bytes, to: 'us' } })); } catch (eE) {}
         return { ok: true };
@@ -10687,7 +10703,11 @@
         window.removeEventListener('garden:fileProgress', on);
         var code = (e && (e.error || e.message)) || '';
         var why = C.reason ? C.reason(e) : L('تعذّر الرفع', 'The upload failed');
-        return { ok: false, why: why, halt: /too_large|over_exhausted|vault_full|not_enrolled|locked/.test(code) ? why : '' };
+        if (/too_large|over_exhausted/.test(code)) {
+          return { ok: false, why: why, big: { bytes: e.bytes || file.size, max: e.max || 0, over_max: e.over_max || 0,
+                                                left: e.over_left | 0, of: e.over_of | 0 } };
+        }
+        return { ok: false, why: why, halt: /vault_full|not_enrolled|locked/.test(code) ? why : '' };
       });
     });
   }
@@ -10699,7 +10719,7 @@
       var f = list[k];
       if (hk.start) hk.start(k, f);
       return keepOne(f, to, hk).then(null, function () { return { ok: false, why: L('تعذّر الرفع', 'The upload failed') }; }).then(function (r) {
-        if (hk.done) hk.done(k, f, !!r.ok, r.why || '');
+        if (hk.done) hk.done(k, f, !!r.ok, r.why || '', r);
         if (r.halt) halt = r.halt;
         k++;
         return next();
