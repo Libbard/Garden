@@ -4397,6 +4397,26 @@
     selectRange(edn, at + want.length, at + want.length);
   };
 
+  /*@3.NOEJ.622*/
+  Editor.prototype.railClamp = function () {
+    var c = this._chrome, rail = c && c.rail;
+    if (!rail || !c.host || !rail.parentNode) return 0;
+    if (rail.style.translate) rail.style.translate = '';
+    rail.removeAttribute('data-clamp');
+    var sc = this.root && this.root.closest ? this.root.closest('.na-doc-body') : null;
+    if (!sc) return 0;
+    var r = rail.getBoundingClientRect(), v = sc.getBoundingClientRect();
+    if (!r.width) return 0;
+    var lo = v.left + (sc.clientLeft || 0) + 2, hi = v.left + (sc.clientLeft || 0) + sc.clientWidth - 2, dx = 0;
+    if (r.right > hi) dx = hi - r.right;
+    if (r.left + dx < lo) dx = lo - r.left;
+    if (Math.abs(dx) < 0.5) return 0;
+    var z = rail.offsetWidth ? r.width / rail.offsetWidth : 1;
+    rail.style.translate = Math.round(dx / (z || 1) * 100) / 100 + 'px 0';
+    rail.setAttribute('data-clamp', '1');
+    return dx;
+  };
+
   Editor.prototype.chromeTo = function (node) {
     /*@3.NOEJ.513*/
     if (node && node.getAttribute('data-ty') === 'pb') node = null;
@@ -4419,6 +4439,7 @@
     node.appendChild(c.spin);
     for (var k = 0; k < c.edges.length; k++) node.appendChild(c.edges[k]);
     this.paintTick(node);
+    this.railClamp();
     if (node.getAttribute('data-ty') === 'shape') {
       var hitB = this.blockAt(node.getAttribute('data-bid'));
       if (hitB) {

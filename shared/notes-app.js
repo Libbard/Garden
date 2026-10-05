@@ -8106,7 +8106,7 @@
     els.docBody.addEventListener('scroll', function () {
       rememberPos();
       if (tk) return;
-      tk = requestAnimationFrame(function () { tk = 0; updatePgNav(); });
+      tk = requestAnimationFrame(function () { tk = 0; updatePgNav(); if (ed && ed.railClamp) ed.railClamp(); });
     }, { passive: true });
     updatePgNav();
   }
