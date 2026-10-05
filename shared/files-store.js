@@ -165,7 +165,7 @@
         .then(function (h) {
           stage('probe');
           return jreq('POST', base(id) + '/probe', id, {
-            h: h.hash, bytes: blob.size, mime: mime, over: !!o.over
+            h: h.hash, bytes: blob.size, mime: mime, over: !!o.over, big: !!o.big
           }).then(function (r) {
             if (!r.ok) throw Object.assign(new Error(r.body.error || 'probe_failed'), r.body);
             return { h: h.hash, probe: r.body };
@@ -189,7 +189,7 @@
           stage('commit');
           return jreq('POST', base(id) + '/commit', id, {
             h: st.h, ref_id: refId, name: name, mime: mime,
-            course: o.course || null, over: !!o.over,
+            course: o.course || null, over: !!o.over, big: !!o.big,
             join: (o.join && o.join.g) ? { g: String(o.join.g), k: o.join.k | 0, last: !!o.join.last } : undefined
           }).then(function (r) {
             if (!r.ok) throw Object.assign(new Error(r.body.error || 'commit_failed'), r.body);

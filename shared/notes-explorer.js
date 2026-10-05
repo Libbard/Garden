@@ -797,7 +797,11 @@
   function keepBigOver() {
     var b = KEEP.big || [], left = b.reduce(function (m, x) { return Math.min(m, x.e.left); }, Infinity);
     var fit = b.filter(function (x) { return x.e.over_max && x.e.bytes <= x.e.over_max; });
-    return { fit: isFinite(left) ? fit.slice(0, Math.max(0, left)) : [], left: isFinite(left) ? left : 0, of: (b[0] && b[0].e.of) || 0 };
+    var ob = b.filter(function (x) { return x.e.big_max && x.e.bytes <= x.e.big_max && !(x.e.over_max && x.e.bytes <= x.e.over_max); });
+    var bl = ob.reduce(function (m, x) { return Math.min(m, x.e.big_left); }, Infinity);
+    return { fit: isFinite(left) ? fit.slice(0, Math.max(0, left)) : [], left: isFinite(left) ? left : 0, of: (b[0] && b[0].e.of) || 0,
+             big: isFinite(bl) ? ob.slice(0, Math.max(0, bl)) : [], bigLeft: isFinite(bl) ? bl : 0, bigOf: (ob[0] && ob[0].e.big_of) || 0,
+             bigMax: (ob[0] && ob[0].e.big_max) || 0 };
   }
   function keepBigHtml(w) {
     var b = KEEP.big || [];
@@ -811,6 +815,9 @@
     if (o.fit.length) h += '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--go nx-b" data-x="kover">' + ic('fa-cloud-arrow-up') +
       esc(L('ارفعْ ' + o.fit.length + ' بتجاوزات الفصل (بقي لك ' + o.left + ' من ' + o.of + ')',
             'Upload ' + o.fit.length + ' using this term’s exceptions (' + o.left + ' of ' + o.of + ' left)')) + '</button>';
+    if (o.big.length) h += '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--go nx-b" data-x="kbig">' + ic('fa-cloud-arrow-up') +
+      esc(L('ارفعْ «' + (o.big[0].f.name || '') + '» بخانة الفصل الكبيرة (‏حتى ' + fmtSize(o.bigMax) + ' · بقي لك ' + o.bigLeft + ')',
+            'Upload “' + (o.big[0].f.name || '') + '” with the term’s large slot (up to ' + fmtSize(o.bigMax) + ' · ' + o.bigLeft + ' left)')) + '</button>';
     if (w.gd) h += '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost nx-b" data-x="kbiggd">' + ic('fa-google-drive', 1) +
       esc(L('أرسلْها إلى درايفي', 'Send them to my Drive')) + '</button>';
     return h + '</div>';
@@ -819,7 +826,7 @@
     var c = host && host.querySelector('.nx-keep');
     if (c && SPACE) { c.outerHTML = keepHtml(SPACE); A.i18n(host); }
   }
-  function keepGo(list, to, over) {
+  function keepGo(list, to, over, big) {
     if (KEEP.run || !A.spaceKeep) return;
     var go = list.filter(function (f) { return keepable(f, to); });
     if (!go.length) return;
@@ -835,7 +842,8 @@
         else KEEP.bad.push({ f: f, why: why || '' });
       },
       stop: function () { return !!KEEP.stop; },
-      over: !!over
+      over: !!over,
+      big: !!big
     }).then(function (r) {
       var where = to === 'gd' ? L('إلى درايفك', 'to your Drive') : L('إلى نسختك عندنا', 'to your copy with us');
       var m = KEEP.ok ? L('رُفع ' + KEEP.ok + ' ' + where, 'Uploaded ' + KEEP.ok + ' ' + where) : L('لم يُرفع شيء', 'Nothing was uploaded');
@@ -919,6 +927,20 @@
     return k === 'trash' ? 'trash' : k === 'space' ? 'space' : 'home';
   }
 
+  function termHtml() {
+    var n = A.termNotice ? A.termNotice() : null;
+    if (!n || !n.armed || !(n.refs > 0)) return '';
+    var d = '';
+    try { d = new Date(n.purge_at).toLocaleDateString(A.isAr() ? 'ar-u-ca-gregory-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) {}
+    var cnt = n.refs === 1 ? L('ملفٌّ واحد', 'one file') : n.refs === 2 ? L('ملفّان', 'two files') : L(n.refs + (n.refs <= 10 ? ' ملفّات' : ' ملفّاً'), n.refs + ' files');
+    return '<div class="nx-trashnote nx-term" role="status">' + ic('fa-hourglass-half') + '<span><b>' + esc(L('بدأ فصلٌ جديد', 'A new term has started')) + '</b> — ' +
+      esc(L('ملفّاتُ الفصل الماضي (' + cnt + ' · ' + fmtSize(n.bytes) + ') تُحذف من نسختك عندنا يومَ ' + d + '. رسوماتُك وتعليقاتُك ونصوصُك تبقى، ونسخةُ جهازك ودرايف لا تُمسّ.',
+            'Last term’s files (' + cnt + ' · ' + fmtSize(n.bytes) + ') will be removed from your copy with us on ' + d + '. Your drawings, comments and text stay, and your device and Drive copies are untouched.')) + '</span>' +
+      '<span class="nx-term-b">' + btn('tnzip', 'fa-file-zipper', L('نزِّلِ النسخةَ الكاملة', 'Download a full copy'), 'gsf-btn--sm gsf-btn--go', '') +
+      '<button type="button" class="gsf-btn gsf-btn--sm nx-b gsf-btn--ghost" data-x="tngd">' + ic('fa-google-drive', 1) + '<span class="nx-b-t">' + esc(L('إلى درايفي', 'To my Drive')) + '</span></button>' +
+      '</span></div>';
+  }
+
   function render() {
     if (!host || !host.isConnected || !A) return;
     askEst();
@@ -930,7 +952,7 @@
       host.setAttribute('data-trash', '0');
       host.setAttribute('data-place', 'space');
       host.innerHTML = barHtml('space') +
-        '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' + spaceHtml(SPACE) + '</div></div>';
+        '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' + termHtml() + spaceHtml(SPACE) + '</div></div>';
       A.i18n(host);
       /*@3.NOEJ3.15*/
       if (SPACE && Date.now() - SPACE_AT > 15000) SPACE = null;
@@ -963,7 +985,7 @@
     host.setAttribute('data-trash', trash ? '1' : '0');
     host.setAttribute('data-place', placeOf());
     host.innerHTML = barHtml(placeOf()) +
-      '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' +
+      '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' + termHtml() +
         (trash ? '<div class="nx-trashnote">' + ic('fa-circle-info') + '<span>' + esc(L('ما في السلّة يُمحى بعد ٣٠ يوماً من حذفه، من كلِّ أجهزتك.', 'What is in the trash is erased 30 days after you delete it, from all your devices.')) + '</span>' +
           btn('empty', 'fa-trash', L('أفرغِ السلّة', 'Empty trash'), 'gsf-btn--danger', list.length ? '' : ' disabled') + '</div>' : '') +
         (fs.length && list.length ? '<div class="nx-lbl">' + esc(L('المجلّدات', 'Folders')) + '</div>' : '') +
@@ -1352,6 +1374,10 @@
       case 'fkeepgd': keepGo(fPicked(), 'gd'); return;
       /*@3.NOEJ3.25*/
       case 'backup': backGo(); return;
+      case 'tnzip': case 'tngd':
+        if (A.view().k !== 'space') A.setView({ k: 'space' });
+        setTimeout(function () { if (x.getAttribute('data-x') === 'tngd') gdBackGo(); else backGo(); }, 350);
+        return;
       case 'rpick': restPick(); return;
       case 'backgd': gdBackGo(); return;
       case 'rgdlist': gdListGo(); return;
@@ -1362,6 +1388,7 @@
       case 'keep': if (SPACE) keepGo(SPACE.files.filter(function (f) { return f.dev && !f.us && !f.gd && !f.tr; }), x.getAttribute('data-to') === 'gd' ? 'gd' : 'us'); return;
       case 'kstop': KEEP.stop = 1; keepPaint(); return;
       case 'kover': keepGo(keepBigOver().fit.map(function (x) { return x.f; }), 'us', true); return;
+      case 'kbig': keepGo(keepBigOver().big.slice(0, 1).map(function (x) { return x.f; }), 'us', false, true); return;
       case 'kbiggd': keepGo((KEEP.big || []).map(function (x) { return x.f; }), 'gd'); return;
       case 'ferase': fErase(fPicked()); return;
       case 'clean': if (A.spaceClean) cleanGo(x); return;

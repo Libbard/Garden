@@ -338,6 +338,28 @@
   }
 
   function big(e, file) {
+    if (e.error === 'big_exhausted') {
+      bad(L('حجمُ الملفِّ ' + size(e.bytes) + ' — وقد استعملتَ خانةَ الفصل الكبيرة (‏حتى ' + size(e.big_max) + ') هذا الفصل.',
+            'The file is ' + size(e.bytes) + ' — and you have used this term’s large slot (up to ' + size(e.big_max) + ').'));
+      return;
+    }
+    if (e.error === 'too_large' && e.big_max && e.bytes <= e.big_max) {
+      if (!(e.big_left > 0)) {
+        bad(L('حجمُ الملفِّ ' + size(e.bytes) + ' — وقد استعملتَ خانةَ الفصل الكبيرة هذا الفصل.',
+              'The file is ' + size(e.bytes) + ' — and you have used this term’s large slot.'));
+        return;
+      }
+      cur.over = file;
+      cur.overBig = 1;
+      view('big', L('الملفُّ أكبرُ من الحدّ', 'The file is over the limit'),
+        '<p>' + esc(L('حجمُه ', 'It is ')) + num(size(e.bytes)) + esc(L(' والحدُّ ', ' and the limit is ')) + num(size(e.max)) + '.</p><p>' +
+        esc(L('ولك في كلِّ فصلٍ ملفٌّ واحدٌ حتى ' + size(e.big_max) + ' — بقي لك ' + e.big_left + '. يُحفظ كما هو بلا ضغط.',
+              'Each term you may upload one file up to ' + size(e.big_max) + ' — ' + e.big_left + ' left. It is kept as it is, uncompressed.')) + '</p>',
+        button('later', L('ليس الآن', 'Not now'), 'ghost') +
+        button('over', L('ارفعْه بخانة الفصل', 'Use the term’s slot'), 'go'));
+      return;
+    }
+    cur.overBig = 0;
     if (e.error === 'too_large' && !e.over_max) {
       bad(L('حجمُ الملفِّ ' + size(e.bytes) + ' ويتجاوز الحدَّ الأقصى ' + size(e.max) + '.',
             'The file is ' + size(e.bytes) + ', over the hard limit of ' + size(e.max) + '.'));
@@ -532,7 +554,7 @@
     window.addEventListener('garden:fileProgress', on);
     F().upload(file, { refId: refId, name: mine.name || file.name || 'file.pdf',
                        mime: 'application/pdf',
-                       over: !!over, signal: ac ? ac.signal : null })
+                       over: !!over && !mine.overBig, big: !!over && !!mine.overBig, signal: ac ? ac.signal : null })
       .then(function (r) {
         window.removeEventListener('garden:fileProgress', on);
         busy = false;
@@ -555,7 +577,7 @@
           if (gone) return;
           open();
         }
-        if (e && (e.error === 'too_large' || e.error === 'over_exhausted')) { big(e, file); return; }
+        if (e && (e.error === 'too_large' || e.error === 'over_exhausted' || e.error === 'big_exhausted')) { big(e, file); return; }
         if (gone) { sayHere(); return; }
         bad(reason(e));
       });

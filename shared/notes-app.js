@@ -9877,6 +9877,17 @@
     while (q.length && g++ < 2000) { var id = q.shift(); if (set[id]) continue; set[id] = 1; (T.kids[id] || []).forEach(function (k) { q.push(k.id); }); }
     return idxRead().filter(function (r) { return r && !r.d && r.f && set[r.f]; }).map(function (r) { return r.id; });
   }
+  function termNoticeAsk() {
+    var F = window.GardenFiles;
+    if (!F || !F.list) return;
+    Promise.resolve(F.list()).then(function (r) {
+      var n = r && r.notice && r.notice.armed ? r.notice : null;
+      if (JSON.stringify(n) === JSON.stringify(S.termNotice || null)) return;
+      S.termNotice = n;
+      if (window.GardenNotesExplorer) GardenNotesExplorer.paint();
+    }, function () {});
+  }
+
   var _recTxt = {};
   function recText(id) {
     if (_recTxt[id] != null) return Promise.resolve(_recTxt[id]);
@@ -10798,7 +10809,7 @@
       var ref = C.refIdOf(f.h);
       var on = function (e) { var d = e.detail || {}; if (d.ref_id === ref && d.stage === 'upload' && d.of && hk.prog) hk.prog(d.at / d.of); };
       window.addEventListener('garden:fileProgress', on);
-      return F.upload(file, { refId: ref, name: f.name || file.name || 'file.pdf', mime: 'application/pdf', over: !!hk.over }).then(function (r) {
+      return F.upload(file, { refId: ref, name: f.name || file.name || 'file.pdf', mime: 'application/pdf', over: !!hk.over, big: !!hk.big }).then(function (r) {
         window.removeEventListener('garden:fileProgress', on);
         try { window.dispatchEvent(new CustomEvent('garden:fileUploaded', { detail: { ref_id: ref, h: f.h, bytes: r && r.bytes, to: 'us' } })); } catch (eE) {}
         return { ok: true };
@@ -10806,9 +10817,10 @@
         window.removeEventListener('garden:fileProgress', on);
         var code = (e && (e.error || e.message)) || '';
         var why = C.reason ? C.reason(e) : L('تعذّر الرفع', 'The upload failed');
-        if (/too_large|over_exhausted/.test(code)) {
+        if (/too_large|over_exhausted|big_exhausted/.test(code)) {
           return { ok: false, why: why, big: { bytes: e.bytes || file.size, max: e.max || 0, over_max: e.over_max || 0,
-                                                left: e.over_left | 0, of: e.over_of | 0 } };
+                                                left: e.over_left | 0, of: e.over_of | 0,
+                                                big_max: e.big_max || 0, big_left: e.big_left | 0, big_of: e.big_of | 0 } };
         }
         return { ok: false, why: why, halt: /vault_full|not_enrolled|locked/.test(code) ? why : '' };
       });
@@ -11011,6 +11023,7 @@
       tone: courseTone,
       courseLabel: courseLabel,
       courseArchived: courseArchived,
+      termNotice: function () { return S.termNotice || null; },
       courseMods: function (code) {
         var ids = idxRead().filter(function (r) { return r && !r.d && r.o && r.o.c === code && r.k !== 'folder'; }).map(function (r) { return r.id; });
         courseAsk(ids, code);
@@ -11925,6 +11938,7 @@
     }
 
     setMob(edId ? 'doc' : homeMob());
+    setTimeout(termNoticeAsk, 4000);
 
     var scrim = document.getElementById('na-scrim');
     if (scrim) scrim.addEventListener('click', function () { setPanel(false); });
