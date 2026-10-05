@@ -208,7 +208,9 @@
       : (busy ? (stopAsk ? L('يُكمل الملفَّ الجاريَ ثمّ يقف…', 'Finishing the current file, then stopping…') : L('يُستورد… ', 'Importing… ') + c.done + ' / ' + c.go)
               : c.go + L(' سيُستورد', ' to import') + (c.skip ? L(' · ', ' · ') + c.skip + L(' مستبعَد', ' skipped') : ''));
     var pct = c.go ? Math.round(c.done * 100 / c.go) : 0;
-    foot.innerHTML = '<span class="nb-msg" role="status">' + esc(msg) +
+    var full = finished && !c.bad && !c.stop;
+    if (full) msg = L('اكتمل — استُورد ', 'Complete — imported ') + c.ok + L(' من ', ' of ') + c.go;
+    foot.innerHTML = '<span class="nb-msg" role="status"' + (full ? ' data-done="1"' : '') + '><span>' + (full ? ic('fa-circle-check') + ' ' : '') + esc(msg) + '</span>' +
         (busy || finished ? '<span class="nb-tot" aria-hidden="true"><i style="inline-size:' + pct + '%"></i></span>' : '') + '</span>' +
       (finished
         ? '<button type="button" class="gsf-btn gsf-btn--go" data-a="close">' + esc(L('تمّ', 'Done')) + '</button>'

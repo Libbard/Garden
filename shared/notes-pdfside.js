@@ -14,12 +14,12 @@
   function num(n) { return '<span class="nps-lat">' + esc(String(n)) + '</span>'; }
 
   function mount(o) {
-    var api = o.api, host = o.host, body = o.body;
+    var api = o.api, host = o.host, body = o.body, src = o.src || null;
     var st = { tab: o.tab === 'toc' ? 'toc' : 'pages', cur: 0, dead: false, cache: {}, order: [], q: [], busy: 0,
-               outline: null, toc: [], userScroll: 0 };
+               outline: null, toc: [], userScroll: 0, n: 0 };
     var el = document.createElement('aside');
     el.className = 'nps';
-    el.setAttribute('aria-label', L('صفحاتُ الملفّ وفهرسُه', 'File pages and contents'));
+    if (src) el.setAttribute('data-src', 'note');
     el.innerHTML =
       '<div class="nps-head">' +
         '<div class="nps-tabs" role="tablist">' +
@@ -39,7 +39,9 @@
     function labels() {
       var t = el.querySelectorAll('.nps-tab');
       t[0].querySelector('span').textContent = L('الصفحات', 'Pages');
-      t[1].querySelector('span').textContent = L('الفهرس', 'Contents');
+      t[1].querySelector('span').textContent = src ? L('العناوين', 'Headings') : L('الفهرس', 'Contents');
+      el.setAttribute('aria-label', src ? L('صفحاتُ الملاحظة وعناوينُها', 'Note pages and headings')
+                                        : L('صفحاتُ الملفّ وفهرسُه', 'File pages and contents'));
       var x = el.querySelector('.nps-x');
       x.setAttribute('aria-label', L('أغلقِ اللوح', 'Close the panel'));
       x.setAttribute('title', L('أغلقِ اللوح', 'Close the panel'));
@@ -52,6 +54,7 @@
 
     function build() {
       var n = total(), h = '';
+      st.n = n;
       for (var i = 1; i <= n; i++) {
         h += '<button type="button" role="listitem" class="nps-th" data-p="' + i + '" aria-label="' + esc(L('الصفحة ', 'Page ') + i) + '">' +
           '<span class="nps-mini"></span>' + num(i) + '</button>';
@@ -76,7 +79,7 @@
     }
 
     function pump() {
-      var doc = api.doc && api.doc();
+      var doc = src || (api.doc && api.doc());
       while (!st.dead && doc && st.busy < BUSY && st.q.length) {
         var p = st.q.shift();
         st.busy++;
@@ -85,7 +88,28 @@
       function done() { st.busy--; if (!st.dead) pump(); }
     }
 
+    function keep(p, v) {
+      st.cache[p] = v;
+      st.order.push(p);
+      while (st.order.length > LRU) {
+        var old = st.order.shift();
+        if (Math.abs(old - st.cur) < 8) { st.order.push(old); continue; }
+        delete st.cache[old];
+        var oe = list.querySelector('[data-p="' + old + '"] .nps-mini');
+        if (oe) { oe.innerHTML = ''; oe.removeAttribute('data-ok'); }
+        var ot = list.querySelector('[data-p="' + old + '"]');
+        if (ot && st.io) st.io.observe(ot);
+      }
+      put(p);
+    }
+
     function render(doc, p) {
+      if (src) {
+        var v = null;
+        try { v = src.thumb(p); } catch (e) { v = null; }
+        if (v && !st.dead) keep(p, v);
+        return Promise.resolve();
+      }
       return doc.getPage(p).then(function (pg) {
         var v1 = pg.getViewport({ scale: 1 });
         var s = THUMB_W / v1.width * Math.min(2, window.devicePixelRatio || 1);
@@ -94,18 +118,7 @@
         cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height);
         return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise.then(function () {
           if (st.dead) return;
-          st.cache[p] = cv;
-          st.order.push(p);
-          while (st.order.length > LRU) {
-            var old = st.order.shift();
-            if (Math.abs(old - st.cur) < 8) { st.order.push(old); continue; }
-            delete st.cache[old];
-            var oe = list.querySelector('[data-p="' + old + '"] .nps-mini');
-            if (oe) { oe.innerHTML = ''; oe.removeAttribute('data-ok'); }
-            var ot = list.querySelector('[data-p="' + old + '"]');
-            if (ot && st.io) st.io.observe(ot);
-          }
-          put(p);
+          keep(p, cv);
         });
       });
     }
@@ -114,6 +127,13 @@
       var cv = st.cache[p];
       var box = list.querySelector('[data-p="' + p + '"] .nps-mini');
       if (!cv || !box || box.getAttribute('data-ok')) return;
+      if (cv.svg) {
+        box.innerHTML = cv.svg;
+        box.style.aspectRatio = cv.w + ' / ' + cv.h;
+        box.setAttribute('data-ok', '1');
+        if (st.io && box.parentNode) st.io.unobserve(box.parentNode);
+        return;
+      }
       var c = document.createElement('canvas');
       c.width = cv.width; c.height = cv.height;
       c.getContext('2d').drawImage(cv, 0, 0);
@@ -138,6 +158,12 @@
 
     function loadToc() {
       if (st.outline) return st.outline;
+      if (src) {
+        var rows = [];
+        try { rows = src.toc() || []; } catch (e) { rows = []; }
+        st.outline = Promise.resolve(rows);
+        return st.outline;
+      }
       var doc = api.doc && api.doc();
       if (!doc || !doc.getOutline) { st.outline = Promise.resolve([]); return st.outline; }
       st.outline = doc.getOutline().then(function (items) {
@@ -157,14 +183,15 @@
       return st.outline;
     }
 
-    function paintToc() {
-      tocEl.innerHTML = '<p class="nps-empty">' + esc(L('يُقرأ الفهرس…', 'Reading the contents…')) + '</p>';
+    function paintToc(ty) {
+      if (!src) tocEl.innerHTML = '<p class="nps-empty">' + esc(L('يُقرأ الفهرس…', 'Reading the contents…')) + '</p>';
       loadToc().then(function (rows) {
         if (st.dead) return;
         st.toc = rows;
         if (!rows.length) {
-          tocEl.innerHTML = '<p class="nps-empty">' + esc(L('لا فهرسَ في هذا الملفّ — صفحاتُه كلُّها في «الصفحات».',
-            'This file has no contents list — all its pages are under “Pages”.')) + '</p>';
+          tocEl.innerHTML = '<p class="nps-empty">' + esc(src
+            ? L('لا عناوينَ في هذه الملاحظة بعد — كلُّ عنوانٍ تكتبه يظهر هنا.', 'No headings in this note yet — every heading you write shows up here.')
+            : L('لا فهرسَ في هذا الملفّ — صفحاتُه كلُّها في «الصفحات».', 'This file has no contents list — all its pages are under “Pages”.')) + '</p>';
           return;
         }
         var h = '';
@@ -176,6 +203,7 @@
             (r.p ? num(r.p) : '') + '</button>';
         });
         tocEl.innerHTML = h;
+        if (ty) tocEl.scrollTop = ty;
         mark();
       });
     }
@@ -202,8 +230,11 @@
       var th = list.querySelector('[data-p="' + p + '"]');
       if (th) th.setAttribute('aria-current', 'page');
       if (th && !list.hidden && (moved || scroll) && Date.now() - st.userScroll > 1200) keepIn(list, th);
-      var best = -1;
-      for (var i = 0; i < st.toc.length; i++) if (st.toc[i].p && st.toc[i].p <= p) best = i;
+      var best = -1, y = src && src.y ? src.y() : null;
+      for (var i = 0; i < st.toc.length; i++) {
+        if (y != null && st.toc[i].y != null) { if (st.toc[i].y <= y) best = i; }
+        else if (st.toc[i].p && st.toc[i].p <= p) best = i;
+      }
       var tOld = tocEl.querySelector('.nps-tr[aria-current]');
       if (tOld) tOld.removeAttribute('aria-current');
       var tr = best >= 0 ? tocEl.querySelector('[data-ti="' + best + '"]') : null;
@@ -256,7 +287,8 @@
         var f = e.target.closest('[data-fold]');
         if (f) { fold(Number(f.getAttribute('data-fold'))); return; }
         var r = st.toc[Number(b.getAttribute('data-ti'))];
-        if (r && r.p) go(r.p);
+        if (r && src && src.at && r.y != null) { src.at(r); setTimeout(function () { mark(); }, 60); if (o.onGo) o.onGo(r.p); }
+        else if (r && r.p) go(r.p);
       }
     });
     goIn.addEventListener('keydown', function (e) {
@@ -282,6 +314,22 @@
       sync: function () { if (!st.dead) mark(); },
       labels: function () { if (st.dead) return; labels(); build(); if (st.tab === 'toc') paintToc(); mark(true); },
       rebuild: function () { if (st.dead) return; st.cache = {}; st.order = []; st.q = []; st.outline = null; st.toc = []; build(); if (st.tab === 'toc') paintToc(); mark(true); },
+      /*@3.NOPJ16.3*/
+      refresh: function () {
+        if (st.dead) return;
+        var y = list.scrollTop, ty = tocEl.scrollTop;
+        st.cache = {}; st.order = []; st.q = []; st.outline = null;
+        if (total() !== st.n) { st.cur = 0; build(); list.scrollTop = y; }
+        else {
+          var ths = list.children;
+          for (var i = 0; i < ths.length; i++) {
+            var m = ths[i].firstChild;
+            if (m && m.getAttribute('data-ok')) { m.removeAttribute('data-ok'); if (st.io) st.io.observe(ths[i]); else want(i + 1); }
+          }
+        }
+        if (st.tab === 'toc') paintToc(ty); else st.toc = [];
+        mark();
+      },
       tab: function () { return st.tab; },
       destroy: function () {
         st.dead = true;

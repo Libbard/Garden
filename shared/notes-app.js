@@ -1537,6 +1537,26 @@
     _docActsBound = true;
     var fb = document.getElementById('na-full');
     if (fb) fb.addEventListener('click', toggleFull);
+    var bb = document.getElementById('na-browse');
+    if (bb) bb.addEventListener('click', function () { browseSet(!browseOn()); });
+    /*@3.NOAJ.490*/
+    document.addEventListener('keydown', function (e) {
+      var mod = e.ctrlKey || e.metaKey;
+      if (mod && e.shiftKey && !e.altKey && (e.code === 'KeyF' || e.key === 'F' || e.key === 'f')) {
+        if (!els.docBody || !edId) return;
+        e.preventDefault();
+        browseSet(!browseOn());
+        return;
+      }
+      if (e.key !== 'Escape' || mod || !browseOn()) return;
+      if (document.querySelector('dialog[open]')) return;
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return;
+      if (t && t.closest && t.closest('.nps')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      browseSet(false);
+    }, true);
     var hb = document.getElementById('na-inkhide');
     if (hb) hb.addEventListener('click', toggleInkHidden);
     document.addEventListener('fullscreenchange', paintFull);
@@ -1551,6 +1571,52 @@
       if (b2) b2.setAttribute('aria-pressed', 'false');
       applyWidth();
     });
+  }
+
+  function browseOn() { return document.documentElement.getAttribute('data-browse') === '1'; }
+  function browseSet(on) {
+    on = !!on;
+    if (on === browseOn()) return;
+    var de = document.documentElement;
+    if (on) de.setAttribute('data-browse', '1'); else de.removeAttribute('data-browse');
+    var b = document.getElementById('na-browse');
+    if (b) b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    browsePill();
+    applyWidth();
+    sideFit();
+    pgNavSoon();
+    if (!on && b && document.activeElement && document.activeElement.closest && document.activeElement.closest('.na-bx')) b.focus();
+  }
+  function browsePill() {
+    var host = document.querySelector('.na-doc'), el = document.getElementById('na-bx');
+    if (!host) return;
+    if (!browseOn()) { if (el) el.hidden = true; return; }
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'na-bx';
+      el.className = 'na-bx';
+      el.setAttribute('role', 'toolbar');
+      el.innerHTML =
+        '<button type="button" class="na-bx-b" data-bx="side" aria-pressed="false"><i class="fa-solid fa-table-columns" aria-hidden="true"></i></button>' +
+        '<span class="na-bx-t" id="na-bx-t"></span>' +
+        '<button type="button" class="na-bx-b na-bx-x" data-bx="exit"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span></span><kbd>Esc</kbd></button>';
+      el.addEventListener('click', function (e) {
+        var x = e.target.closest('[data-bx]');
+        if (!x) return;
+        if (x.getAttribute('data-bx') === 'side') sideOpen(); else browseSet(false);
+      });
+      host.appendChild(el);
+    }
+    var sb = el.querySelector('[data-bx="side"]'), xb = el.querySelector('[data-bx="exit"]');
+    var st = ['لوحُ الصفحات', 'Pages panel'], xt = ['أنهِ التصفّح', 'Exit browsing'];
+    sb.setAttribute('data-ar-title', st[0]); sb.setAttribute('data-en-title', st[1]);
+    sb.setAttribute('aria-label', L(st[0], st[1])); sb.setAttribute('title', L(st[0], st[1]));
+    xb.setAttribute('data-ar-title', xt[0] + ' (Esc)'); xb.setAttribute('data-en-title', xt[1] + ' (Esc)');
+    xb.setAttribute('title', L(xt[0], xt[1]) + ' (Esc)');
+    xb.querySelector('span').textContent = L(xt[0], xt[1]);
+    el.setAttribute('aria-label', L('وضعُ التصفّح', 'Browse mode'));
+    el.hidden = false;
+    paintPsideBtn();
   }
 
   function setDocActions(on) {
@@ -3361,6 +3427,7 @@
       seamMig();
       paintCuts();
       pgNavSoon();
+      sideNoteSoon();
       return cutsV;
     }
     _cutMasks = null;
@@ -3394,6 +3461,7 @@
     seamMig();
     paintCuts();
     pgNavSoon();
+    sideNoteSoon();
     return cuts;
   }
   function paintCuts() {
@@ -4807,10 +4875,17 @@
     var mode = !pdfSide ? '' : (window.matchMedia('(max-width: 640px)').matches ? 'sheet' : (host.clientWidth >= 860 ? 'push' : 'over'));
     if (mode) host.setAttribute('data-pside', mode); else host.removeAttribute('data-pside');
   }
+  function sideKind() {
+    if (pdfOn()) return (pdfUi.doc && pdfUi.doc()) ? 'pdf' : '';
+    if (!ed || !ed.doc || ed.doc.kind === 'board' || !document.getElementById('na-sheet')) return '';
+    return 'note';
+  }
   function sideOpen(on) {
     var host = document.querySelector('.na-doc');
     if (on === undefined) on = !pdfSide;
-    if (!on || !pdfOn() || !host || !window.GardenPdfSide || !(pdfUi.doc && pdfUi.doc())) {
+    var kind = on ? sideKind() : '';
+    if (pdfSide && pdfSide.kind !== kind) { pdfSide.destroy(); pdfSide = null; }
+    if (!on || !kind || !host || !window.GardenPdfSide) {
       if (pdfSide) { pdfSide.destroy(); pdfSide = null; }
       if (sideRo) { sideRo.disconnect(); sideRo = null; }
       if (on === false && edId) sideMem(edId, '');
@@ -4820,12 +4895,16 @@
     }
     if (pdfSide) return true;
     var id = edId;
+    _ngeo = null;
     pdfSide = GardenPdfSide.mount({
-      api: pdfUi, host: host, body: els.docBody, tab: sideMem(id) === 't' ? 'toc' : 'pages',
+      api: kind === 'pdf' ? pdfUi : { pages: pgTotal, page: pgCurPage, goTo: pgGoto },
+      src: kind === 'note' ? { thumb: noteThumb, toc: noteToc, y: noteY, at: noteAt } : null,
+      host: host, body: els.docBody, tab: sideMem(id) === 't' ? 'toc' : 'pages',
       go: function (n) { pgGoto(n); },
       onTab: function (t) { if (edId === id) sideMem(id, t === 'toc' ? 't' : 'p'); },
       onClose: function () { sideOpen(false); var b = document.getElementById('na-pside'); if (b) b.focus(); }
     });
+    pdfSide.kind = kind;
     sideMem(id, pdfSide.tab() === 'toc' ? 't' : 'p');
     if (window.ResizeObserver && !sideRo) { sideRo = new ResizeObserver(function () { sideFit(); }); sideRo.observe(host); }
     sideFit();
@@ -4835,8 +4914,134 @@
   function paintPsideBtn() {
     var b = document.getElementById('na-pside');
     if (!b) return;
-    b.hidden = !pdfOn();
+    var k = sideKind();
+    b.hidden = !k;
     b.setAttribute('aria-pressed', pdfSide ? 'true' : 'false');
+    var bs = document.querySelector('#na-bx [data-bx="side"]');
+    if (bs) { bs.hidden = !k; bs.setAttribute('aria-pressed', pdfSide ? 'true' : 'false'); }
+    if (k && b.getAttribute('data-k') !== k) {
+      b.setAttribute('data-k', k);
+      var t = k === 'pdf' ? ['لوحُ الصفحات والفهرس', 'Pages and contents panel'] : ['لوحُ الصفحات والعناوين', 'Pages and headings panel'];
+      b.setAttribute('data-ar-title', t[0]); b.setAttribute('data-en-title', t[1]);
+      b.setAttribute('aria-label', L(t[0], t[1])); b.setAttribute('title', L(t[0], t[1]));
+    }
+  }
+
+  /*@3.NOAJ.489*/
+  var _ngeo = null, _sideQ = 0;
+  function noteGeo() {
+    var sheet = document.getElementById('na-sheet');
+    if (!ed || !ed.doc || !ed.root || !sheet) return null;
+    var eng = ed.doc.eng, a = eng && eng.a, bs = ed.doc.blocks || [];
+    var key = (_cuts ? _cuts.join(',') : 'n' + pages) + '|' + (eng ? eng.h : 0) + '|' + bs.length;
+    if (_ngeo && _ngeo.key === key) return _ngeo;
+    var z = stageZoom() || 1, sR = sheet.getBoundingClientRect(), rR = ed.root.getBoundingClientRect();
+    var off = (rR.top - sR.top) / z, x0 = Math.max(0, (rR.left - sR.left) / z), w = Math.max(80, rR.width / z);
+    var nat = ed._nat && ed._nat.hgt && ed._nat.hgt.length === bs.length ? ed._nat.hgt : null;
+    var B = window.GardenNotesBlocks, rows = [], i, j, y, h, b;
+    for (i = 0; i < bs.length; i++) {
+      b = bs[i];
+      if (!b || b.fp || b.ty === 'pb' || b.ty === 'gap' || !a || a[i] == null) continue;
+      y = a[i] + off;
+      h = nat && nat[i] > 0 ? nat[i] : 0;
+      if (!h) { for (j = i + 1; j < bs.length && (a[j] == null); j++) {} h = j < bs.length ? Math.max(12, a[j] - a[i] - 8) : 28; }
+      var r = { ty: b.ty, y: y, h: h };
+      if (b.ty === 'h') { r.lv = b.lv || 2; r.t = B ? B.runsToText(b.rt || []).trim() : ''; }
+      if (b.ty === 'ul' || b.ty === 'ol' || b.ty === 'dl' || b.ty === 'todo') r.li = 1;
+      rows.push(r);
+    }
+    var rtl = (ed.doc.bd || (isAr() ? 'rtl' : 'ltr')) === 'rtl';
+    _ngeo = { key: key, rows: rows, x0: x0, w: w, W: pageWpx(), rtl: rtl };
+    return _ngeo;
+  }
+  function notePageBox(p) {
+    var H = pageH(), y0, y1;
+    if (_cuts && _cutPages > 0) {
+      y0 = p <= 1 ? 0 : (_cuts[p - 2] || 0);
+      y1 = p - 1 < _cuts.length ? _cuts[p - 1] : y0 + H;
+    } else { y0 = (p - 1) * H; y1 = p * H; }
+    return { y0: y0, y1: Math.max(y0 + 40, y1) };
+  }
+  function svgEsc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function noteThumb(p) {
+    var g = noteGeo();
+    if (!g) return null;
+    var H = Math.round(pageH()), W = Math.round(g.W), bx = notePageBox(p);
+    var dy = (p > 1 ? pageTopPad() : 0) - bx.y0, out = '', i, r, y, x, w;
+    var xs = g.x0, xe = Math.min(W, g.x0 + g.w);
+    for (i = 0; i < g.rows.length; i++) {
+      r = g.rows[i];
+      if (r.y >= bx.y1 || r.y + r.h <= bx.y0) continue;
+      y = Math.round(r.y + dy); var h = Math.max(6, Math.round(Math.min(r.h, bx.y1 - r.y)));
+      x = xs; w = xe - xs;
+      if (r.ty === 'h') {
+        var fs = r.lv <= 1 ? 46 : (r.lv === 2 ? 38 : 32), t = (r.t || '').slice(0, 42);
+        var tr = /^[^A-Za-z]*[\u0590-\u08FF]/.test(t) || (!/[A-Za-z]/.test(t) && g.rtl);
+        out += '<text class="t-h" x="' + Math.round(tr ? xe : xs) + '" y="' + Math.round(y + Math.min(h, fs * 1.25) * 0.82) + '" font-size="' + fs +
+          '" text-anchor="start" direction="' + (tr ? 'rtl' : 'ltr') + '">' + svgEsc(t || '—') + '</text>';
+        continue;
+      }
+      if (r.ty === 'hr') { out += '<rect class="t-ln" x="' + x + '" y="' + (y + h / 2 - 2) + '" width="' + w + '" height="4"/>'; continue; }
+      if (r.ty === 'img' || r.ty === 'ink' || r.ty === 'shape' || r.ty === 'sticky' || r.ty === 'card') {
+        var iw = r.ty === 'img' ? Math.min(w, Math.max(120, h * 1.5)) : w, ix = g.rtl ? xe - iw : xs;
+        out += '<rect class="t-' + (r.ty === 'img' ? 'img' : 'box') + '" x="' + Math.round(ix) + '" y="' + y + '" width="' + Math.round(iw) + '" height="' + h + '" rx="10"/>';
+        continue;
+      }
+      if (r.ty === 'code' || r.ty === 'tbl' || r.ty === 'math' || r.ty === 'callout' || r.ty === 'quote') {
+        var cls = r.ty === 'tbl' ? 'tbl' : (r.ty === 'code' ? 'code' : (r.ty === 'math' ? 'math' : 'box'));
+        if (r.ty === 'math') { x = xs + w * 0.3; w = w * 0.4; }
+        out += '<rect class="t-' + cls + '" x="' + Math.round(x) + '" y="' + y + '" width="' + Math.round(w) + '" height="' + h + '" rx="8"/>';
+        if (r.ty === 'tbl') for (var k = 1; k < 3; k++) out += '<rect class="t-ln" x="' + Math.round(x + w * k / 3) + '" y="' + y + '" width="3" height="' + h + '"/>';
+        if (r.ty === 'callout' || r.ty === 'quote') out += '<rect class="t-st" x="' + Math.round(g.rtl ? xe - 8 : xs) + '" y="' + y + '" width="8" height="' + h + '"/>';
+        if (r.ty !== 'tbl' && r.ty !== 'math' && h < 30) continue;
+        if (r.ty === 'tbl' || r.ty === 'math') continue;
+        x = xs + 30; w = w - 60;
+      }
+      var lh = 30, n = Math.max(1, Math.round(h / lh)), ind = r.li ? 34 : 0;
+      for (var l = 0; l < n && l < 60; l++) {
+        var lw = (w - ind) * (l === n - 1 && n > 1 ? 0.62 : 1), ly = y + l * lh + 10;
+        if (ly > bx.y1 + dy) break;
+        var lx = g.rtl ? x + w - ind - lw : x + ind;
+        out += '<rect class="t-p" x="' + Math.round(lx) + '" y="' + Math.round(ly) + '" width="' + Math.round(lw) + '" height="11" rx="5"/>';
+        if (r.li) out += '<circle class="t-p" cx="' + Math.round(g.rtl ? x + w - 12 : x + 12) + '" cy="' + Math.round(ly + 5) + '" r="6"/>';
+      }
+    }
+    return { svg: '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMin slice" aria-hidden="true">' + out + '</svg>', w: W, h: H };
+  }
+  function noteToc() {
+    var g = noteGeo();
+    if (!g) return [];
+    var hs = [], i, min = 9;
+    for (i = 0; i < g.rows.length; i++) if (g.rows[i].ty === 'h') { hs.push(g.rows[i]); if (g.rows[i].lv < min) min = g.rows[i].lv; }
+    var out = hs.map(function (r) {
+      var p = 1;
+      if (_cuts && _cutPages > 0) p = cutPageOf(r.y + 1) + 1;
+      else p = Math.floor(r.y / Math.max(40, pageH())) + 1;
+      return { t: r.t, lv: Math.max(0, r.lv - min), p: Math.max(1, Math.min(pgTotal(), p)), kids: 0, y: r.y };
+    });
+    for (i = 0; i < out.length; i++) { for (var k = i + 1; k < out.length && out[k].lv > out[i].lv; k++) out[i].kids++; }
+    return out;
+  }
+  function noteY() {
+    var sheet = document.getElementById('na-sheet');
+    if (!sheet || !els.docBody) return 0;
+    return (els.docBody.getBoundingClientRect().top - sheet.getBoundingClientRect().top) / (stageZoom() || 1) + 60;
+  }
+  function noteAt(r) {
+    var sheet = document.getElementById('na-sheet');
+    if (!sheet || !els.docBody) return;
+    els.docBody.scrollTop += (sheet.getBoundingClientRect().top - els.docBody.getBoundingClientRect().top) + r.y * (stageZoom() || 1) - 8;
+    updatePgNav();
+  }
+  function sideNoteSoon() {
+    if (_sideQ) clearTimeout(_sideQ);
+    _sideQ = setTimeout(function () {
+      _sideQ = 0;
+      if (pdfOn() || !ed) return;
+      if (pdfSide && pdfSide.kind === 'note') { _ngeo = null; pdfSide.refresh(); paintPsideBtn(); return; }
+      if (!pdfSide && edId && sideMem(edId) && sideKind() === 'note' && pgTotal() > 1) sideOpen(true);
+      paintPsideBtn();
+    }, 450);
   }
 
   /*@3.NOAJ.251*/
@@ -7040,6 +7245,7 @@
         var r2 = idxFind(id);
         if (!r2) return;
         r2.f = to;
+        if (to && !(r2.o && r2.o.c)) { var fc2 = folderCode(to); if (fc2) { r2.o = r2.o || {}; r2.o.c = fc2; } }
         r2.updated_at = Date.now();
         idxPut(r2);
       });
@@ -7755,6 +7961,8 @@
     var cooking = !pdfOn() && !_cuts && !!(ed && ed.doc && ed.doc.kind !== 'board' && ed.doc.blocks && ed.doc.blocks.length > 1);
     els.pgnavT.textContent = cooking ? (pgCurPage() + ' / …') : (pgCurPage() + ' / ' + tot);
     els.pgnav.hidden = !on;
+    var bxT = document.getElementById('na-bx-t');
+    if (bxT) bxT.textContent = els.pgnavT.textContent;
     paintPsideBtn();
     if (pdfSide) pdfSide.sync();
   }
@@ -9295,9 +9503,9 @@
         { a: 'g:ord', i: 'fa-sort', t: L('رتِّبْ بين إخوته', 'Order among siblings'), sub: [
           { a: 'fup', i: 'fa-arrow-up', t: L('إلى أعلى', 'Move up'), off: !sibMove(fid, -1) },
           { a: 'fdown', i: 'fa-arrow-down', t: L('إلى أسفل', 'Move down'), off: !sibMove(fid, 1) }] },
-        { a: 'frename', i: 'fa-pen', t: L('أعِدْ تسميتَه أو انقلْه…', 'Rename or move…') },
+        { a: 'frename', i: 'fa-pen', t: L('أعِدْ تسميتَه أو انقلْه…', 'Rename or move…') }].concat(folderCourseItems(fid), [
         { sep: 1 },
-        { a: 'fdel', i: 'fa-trash', t: L('احذفِ المجلّد…', 'Delete folder…'), dz: 1 }]
+        { a: 'fdel', i: 'fa-trash', t: L('احذفِ المجلّد…', 'Delete folder…'), dz: 1 }])
     }, function (act) { folderCtxAct(act, fid); });
   }
 
@@ -9313,7 +9521,126 @@
     return at >= 0 && to >= 0 && to < sibs.length;
   }
 
+  /*@3.NOAJ.491*/
+  function codeFrom(v, strict) {
+    var s = String(v || '').trim();
+    var m = (strict ? /^\s*([A-Za-z]{2,5})\s*-?\s*(\d{3}[A-Za-z]?)(?![0-9])/ : /([A-Za-z]{2,5})\s*-?\s*(\d{3}[A-Za-z]?)(?![0-9])/).exec(s);
+    if (m) { var c = (m[1] + m[2]).toUpperCase(); if (info(c)) return c; }
+    if (strict || s.length < 3) return '';
+    var low = s.toLowerCase(), list = [];
+    try { list = (window.GardenData && GardenData.catalogList) ? GardenData.catalogList() : []; } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var c2 = list[i];
+      if (c2 && c2.code && ((c2.name_ar || '').toLowerCase() === low || (c2.name_en || '').toLowerCase() === low)) return c2.code;
+    }
+    return '';
+  }
+  function folderCode(fid) {
+    var T = folderTree(), f = fid && T.byId[fid];
+    return f ? codeFrom(f.n, true) : '';
+  }
+  function folderCourseItems(fid) {
+    var fc = folderCode(fid);
+    return fc ? [{ a: 'fcourse', i: 'fa-graduation-cap', t: L('اربطْ كلَّ ما فيه بـ', 'Link everything in it to ') + fc, eg: courseLabel(fc) }]
+              : [{ a: 'fcourseask', i: 'fa-graduation-cap', t: L('اربطْ كلَّ ما فيه بمادّة…', 'Link everything in it to a course…') }];
+  }
+  function folderIds(fid) {
+    var T = folderTree(), set = {}, q = [fid], g = 0;
+    while (q.length && g++ < 2000) { var id = q.shift(); if (set[id]) continue; set[id] = 1; (T.kids[id] || []).forEach(function (k) { q.push(k.id); }); }
+    return idxRead().filter(function (r) { return r && !r.d && r.f && set[r.f]; }).map(function (r) { return r.id; });
+  }
+  function linkCourse(ids, code) {
+    var now = Date.now(), n = 0;
+    (ids || []).forEach(function (id) {
+      var r = idxFind(id);
+      if (!r) return;
+      r.o = r.o || {};
+      if ((r.o.c || '') === (code || '')) return;
+      if (code) r.o.c = code; else delete r.o.c;
+      r.updated_at = now;
+      idxPut(r);
+      n++;
+    });
+    if (n) {
+      reload({ keepOpen: true });
+      toast(code ? L('رُبط ' + n + ' بـ' + code, 'Linked ' + n + ' to ' + code) : L('فُصل ' + n + ' عن مادّته', 'Unlinked ' + n + ' from its course'));
+    } else toast(L('مربوطةٌ بهذه المادّة أصلاً', 'Already linked to this course'));
+    return n;
+  }
+  function courseAsk(ids, hint) {
+    ids = (ids || []).filter(function (id) { return !!idxFind(id); });
+    if (!ids.length) { toast(L('لا ملفّاتَ هنا تُربط', 'No files here to link')); return; }
+    var dlg = document.getElementById('na-course');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'na-course';
+      dlg.className = 'gsf gsf--snug gsf--flat na-dlg na-cdlg';
+      dlg.setAttribute('aria-labelledby', 'na-course-t');
+      document.body.appendChild(dlg);
+      dlg.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-cc], [data-ca]');
+        if (!b || !dlg.contains(b)) return;
+        var inp = dlg.querySelector('#na-course-in');
+        if (b.hasAttribute('data-cc')) { inp.value = b.getAttribute('data-cc'); inp.setCustomValidity(''); inp.focus(); return; }
+        var a = b.getAttribute('data-ca');
+        if (a === 'x') { dlg.close(); return; }
+        if (a === 'un') { dlg.close(); linkCourse(dlg.__ids, ''); return; }
+        if (a === 'go') {
+          var c = codeFrom(inp.value);
+          if (!c) { inp.setCustomValidity(L('لا نعرف مادّةً بهذا الرمز أو الاسم', 'No course with this code or name')); inp.reportValidity(); return; }
+          dlg.close();
+          linkCourse(dlg.__ids, c);
+        }
+      });
+      dlg.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && e.target && e.target.id === 'na-course-in') { e.preventDefault(); var g = dlg.querySelector('[data-ca="go"]'); if (g) g.click(); }
+      });
+    }
+    var recs = ids.map(idxFind).filter(Boolean), used = {}, sug = [];
+    var cur = recs.length === 1 ? ((recs[0].o && recs[0].o.c) || '') : '';
+    var anyLinked = recs.some(function (r) { return r.o && r.o.c; });
+    function add(c) { if (c && !used[c] && info(c)) { used[c] = 1; sug.push(c); } }
+    add(hint);
+    recs.forEach(function (r) { add(r.f ? folderCode(r.f) : ''); });
+    idxRead().forEach(function (r) { if (sug.length < 8 && r && !r.d && r.o && r.o.c) add(r.o.c); });
+    var opts = '';
+    try {
+      ((window.GardenData && GardenData.catalogList) ? GardenData.catalogList() : []).forEach(function (c) {
+        if (c && c.code) opts += '<option value="' + esc(c.code + ' · ' + (isAr() ? (c.name_ar || c.name_en || '') : (c.name_en || c.name_ar || ''))) + '"></option>';
+      });
+    } catch (e0) {}
+    var what = recs.length === 1 ? (notPh(recs[0].t) || L('بلا عنوان', 'Untitled')) : L(recs.length + ' عناصر', recs.length + ' items');
+    dlg.__ids = ids;
+    dlg.innerHTML =
+      '<div class="gsf-grip" aria-hidden="true"></div>' +
+      '<form method="dialog" class="gsf-x"><button class="gsf-close" type="submit" aria-label="' + esc(L('إغلاق', 'Close')) + '" title="' + esc(L('إغلاق', 'Close')) + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
+      '<div class="gsf-body"><div class="gsf-head">' +
+        '<h2 class="gsf-title" id="na-course-t">' + esc(L('اربطْ بمادّة', 'Link to a course')) + '</h2>' +
+        '<p class="gsf-sub"><strong dir="auto">' + esc(what) + '</strong> — ' + esc(L('تظهر في «المواد» تحت مادّتها، ويُقترح لونُها في كلِّ مكان.', 'shows under its course in “Courses”, with the course colour everywhere.')) + '</p>' +
+        (cur ? '<p class="gsf-sub na-cdlg-cur">' + esc(L('مربوطةٌ الآن بـ', 'Linked now to ')) + '<span class="gsf-code">' + esc(courseLabel(cur)) + '</span></p>' : '') +
+      '</div>' +
+      '<label class="na-cdlg-l" for="na-course-in">' + esc(L('رمزُ المادّة أو اسمُها', 'Course code or name')) + '</label>' +
+      '<input class="gsf-in" id="na-course-in" list="na-course-dl" autocomplete="off" dir="auto" placeholder="CS362" value="' + esc(cur || sug[0] || '') + '">' +
+      '<datalist id="na-course-dl">' + opts + '</datalist>' +
+      (sug.length ? '<div class="gsf-chips na-cdlg-sug" aria-label="' + esc(L('مقترحة', 'Suggested')) + '">' + sug.map(function (c) {
+        return '<button type="button" class="gsf-chip" data-cc="' + esc(c) + '"><span class="gsf-code">' + esc(c) + '</span></button>';
+      }).join('') + '</div>' : '') +
+      '</div>' +
+      '<div class="gsf-foot"><div class="gsf-acts">' +
+        (anyLinked ? '<button type="button" class="gsf-btn gsf-btn--ghost" data-ca="un">' + esc(L('افصلْ عن المادّة', 'Unlink')) + '</button>' : '') +
+        '<button type="button" class="gsf-btn gsf-btn--ghost" data-ca="x">' + esc(L('إلغاء', 'Cancel')) + '</button>' +
+        '<button type="button" class="gsf-btn gsf-btn--go" data-ca="go"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> ' + esc(L('اربطْ', 'Link')) + '</button>' +
+      '</div></div>';
+    dlg.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    try { dlg.showModal(); } catch (e1) { dlg.setAttribute('open', ''); }
+    var inp = dlg.querySelector('#na-course-in');
+    inp.addEventListener('input', function () { inp.setCustomValidity(''); });
+    try { inp.focus(); inp.select(); } catch (e2) {}
+  }
+
   function folderCtxAct(act, fid) {
+    if (act === 'fcourse') { var fc = folderCode(fid); if (fc) linkCourse(folderIds(fid), fc); return; }
+    if (act === 'fcourseask') { courseAsk(folderIds(fid), folderCode(fid)); return; }
     if (act === 'fopen') { goView({ k: 'folder', id: fid }); return; }
     if (act === 'fnew') { newFolder(fid); return; }
     if (act === 'frename') { editFolder(fid); return; }
@@ -10041,6 +10368,8 @@
         reload({ keepOpen: true });
       },
       folderAct: function (act, fid) { folderCtxAct(act, fid); },
+      folderCourseItems: folderCourseItems,
+      linkCourse: function (uids) { courseAsk(recsOf(uids).map(function (x) { return x.id; })); },
       folderSib: function (fid, dir) { return sibMove(fid, dir); },
       driveOn: driveOn,
       importDrive: function () { bulkOpen([], true); },
@@ -10131,6 +10460,7 @@
           var r = idxFind(x.id);
           if (!r || (r.f || null) === (fid || null)) return;
           r.f = fid || null;
+          if (fid && !(r.o && r.o.c)) { var fc = folderCode(fid); if (fc) { r.o = r.o || {}; r.o.c = fc; } }
           r.updated_at = now;
           idxPut(r);
           n++;

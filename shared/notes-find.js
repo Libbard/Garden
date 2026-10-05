@@ -684,7 +684,7 @@
     /*@3.NOFJ.4*/
     this._keys = function (e) {
       var mod = e.ctrlKey || e.metaKey;
-      if (mod && (e.code === 'KeyF' || e.code === 'KeyH')) {
+      if (mod && ((e.code === 'KeyF' && !e.shiftKey) || e.code === 'KeyH')) {
         sync();
         if (!self.pdf() && (!self.ed || !self.ed.root || !self.ed.root.isConnected)) return;
         if (e.code === 'KeyH' && self.pdf()) return;

@@ -1152,6 +1152,7 @@
         { a: 'copy', i: 'fa-copy', t: L('انسخْ', 'Copy'), kb: 'Ctrl C' },
         { a: 'cut', i: 'fa-scissors', t: L('قُصَّ', 'Cut'), kb: 'Ctrl X' },
         { a: 'paste', i: 'fa-paste', t: L('ألصِقْ هنا', 'Paste here'), kb: 'Ctrl V', off: !canPaste, why: canPaste ? '' : L('لا شيءَ في الحافظة', 'The clipboard is empty') }] },
+      { a: 'course', i: 'fa-graduation-cap', t: (n === 1 && it.origin && it.origin.course) ? L('المادّة: ', 'Course: ') + it.origin.course + L(' — غيِّرْ…', ' — change…') : L('اربطْ بمادّة…', 'Link to a course…') },
       { a: 'export', i: 'fa-file-export', t: L('صدِّرْ…', 'Export…') }
     ];
     if (n === 1) items.push({ a: 'props', i: 'fa-circle-info', t: L('الخصائص', 'Properties'), kb: 'Alt ⏎' });
@@ -1168,6 +1169,7 @@
       else if (act === 'copy' || act === 'cut') A.act(act, uid);
       else if (act === 'paste') A.paste();
       else if (act === 'props') propsOpen(it);
+      else if (act === 'course' && A.linkCourse) A.linkCourse(ids);
       else if (act === 'trash') A.trash(ids);
     }, MOPT);
   }
@@ -1195,6 +1197,7 @@
     var name = el ? (el.querySelector('.nx-fold-n, .nx-place-n') || el).textContent : '';
     var cnt = el ? (el.querySelector('.nx-fold-c, .nx-place-c') || {}).textContent || '' : '';
     var canPaste = A.canPaste && A.canPaste();
+    var cItems = A.folderCourseItems ? A.folderCourseItems(fid) : [];
     GM().rich(x, y, {
       head: { ico: 'fa-folder', t: name, s: L('مجلّد · ', 'Folder · ') + cnt },
       quick: [{ a: 'fopen', i: 'fa-folder-open', t: L('افتحْ', 'Open') }, { a: 'fnew', i: 'fa-folder-plus', t: L('بداخله', 'Inside') },
@@ -1203,9 +1206,9 @@
         { a: 'g:ord', i: 'fa-sort', t: L('رتِّبْ بين إخوته', 'Order among siblings'), sub: [
           { a: 'fup', i: 'fa-arrow-up', t: L('إلى أعلى', 'Move up'), off: !A.folderSib(fid, -1) },
           { a: 'fdown', i: 'fa-arrow-down', t: L('إلى أسفل', 'Move down'), off: !A.folderSib(fid, 1) }] },
-        { a: 'frename', i: 'fa-pen', t: L('أعِدْ تسميتَه أو انقلْه…', 'Rename or move…') },
+        { a: 'frename', i: 'fa-pen', t: L('أعِدْ تسميتَه أو انقلْه…', 'Rename or move…') }].concat(cItems, [
         { sep: 1 },
-        { a: 'fdel', i: 'fa-trash', t: L('احذفِ المجلّد…', 'Delete folder…'), dz: 1 }]
+        { a: 'fdel', i: 'fa-trash', t: L('احذفِ المجلّد…', 'Delete folder…'), dz: 1 }])
     }, function (act) { A.folderAct(act, fid); }, MOPT);
   }
 
