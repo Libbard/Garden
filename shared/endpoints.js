@@ -22,7 +22,7 @@ window.GardenEndpoints = {
   unsplash: 'https://garden-unsplash.xxli50xx.workers.dev',
 
   /*@3.ENDJ.8*/
-  telemetry: 'https://byte-telemetry.xxli50xx.workers.dev/t/b',
+  telemetry: 'https://api.libbard.cc/v1/t/b',
   
   googleClientId: '838935058358-3qst06d1o6acoocb4l2e9nk2d9ggk68i.apps.googleusercontent.com',
 
