@@ -11,6 +11,7 @@
   var LS_IDX = 'notes_index';
   var LS_TOMB = '__tomb_notes_index';
   var LS_FOLDERS = 'notes_folders';
+  var LS_CARCH = 'notes_course_arch';
   var LS_UI = 'notes_ui';
 
   var els = {};
@@ -125,6 +126,18 @@
     var a = foldersRead();
     for (var i = 0; i < a.length; i++) if (a[i].id === id) return a[i].n || '';
     return '';
+  }
+  /*@3.NOAJ.493*/
+  function courseArchMap() {
+    var o = readJSON(LS_CARCH, {});
+    return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+  }
+  function courseArchived(code) { return !!code && +courseArchMap()[code] > 0; }
+  function courseArchSet(code, on) {
+    if (!code) return;
+    var m = courseArchMap();
+    m[code] = on ? Date.now() : 0;
+    writeJSON(LS_CARCH, m);
   }
 
   var MAX_DEPTH = 4;
@@ -384,7 +397,7 @@
       case 'archive': return !!n.archived;
       case 'general': return !n.archived && !(n.origin && n.origin.course);
       case 'course':  return !n.archived && n.origin && n.origin.course === v.code;
-      case 'level':   return !n.archived && n.origin && n.origin.course &&
+      case 'level':   return !n.archived && n.origin && n.origin.course && !courseArchived(n.origin.course) &&
                              (levelOf(n.origin.course) || '~') === v.lv;
       case 'module':  return !n.archived && n.origin && n.origin.course === v.code &&
                              n.origin.module != null &&
@@ -473,7 +486,7 @@
       var x = S.all[i];
       if (x.archived) continue;
       var code = x.origin && x.origin.course;
-      if (!code) continue;
+      if (!code || courseArchived(code)) continue;
       var lv = levelOf(code) || '~';
       var LO = out[lv] || (out[lv] = { n: 0, codes: {} });
       var CO = LO.codes[code] || (LO.codes[code] = { n: 0, mods: {} });
@@ -7668,7 +7681,7 @@
     var body = els.docBody;
     if (!body) return;
     var pts = {};
-    var prev = null;
+    var prev = null, seq = 0;
     function overInk(e) {
       /*@3.NOAJ.220*/
       if (pdfOn()) return true;
@@ -7676,7 +7689,7 @@
     }
     body.addEventListener('pointerdown', function (e) {
       if (e.pointerType !== 'touch' || overInk(e)) return;
-      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY, n: ++seq };
       /*@3.NOAJ.316*/
       var ids0 = Object.keys(pts);
       if (ids0.length === 2 && !prev) {
@@ -7688,7 +7701,7 @@
     });
     body.addEventListener('pointermove', function (e) {
       if (!pts[e.pointerId]) return;
-      pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      pts[e.pointerId] = { x: e.clientX, y: e.clientY, n: pts[e.pointerId].n };
       var ids = Object.keys(pts);
       if (ids.length < 2) return;
       var a = pts[ids[0]], b = pts[ids[1]];
@@ -7705,6 +7718,16 @@
     }
     body.addEventListener('pointerup', clearPt);
     body.addEventListener('pointercancel', clearPt);
+    /*@3.NOAJ.492*/
+    window.addEventListener('pointerup', clearPt, true);
+    window.addEventListener('pointercancel', clearPt, true);
+    window.addEventListener('touchstart', function (e) {
+      var ids = Object.keys(pts), live = e.touches ? e.touches.length : 0;
+      if (ids.length <= live) return;
+      ids.sort(function (a, b) { return pts[b].n - pts[a].n; });
+      for (var i = live; i < ids.length; i++) delete pts[ids[i]];
+      if (Object.keys(pts).length < 2 && prev) { prev = null; pinchEnd(); }
+    }, { capture: true, passive: true });
     function twoFingerBlock(e) {
       if (e.touches && e.touches.length >= 2) e.preventDefault();
     }
@@ -8106,7 +8129,7 @@
     els.docBody.addEventListener('scroll', function () {
       rememberPos();
       if (tk) return;
-      tk = requestAnimationFrame(function () { tk = 0; updatePgNav(); if (ed && ed.railClamp) ed.railClamp(); });
+      tk = requestAnimationFrame(function () { tk = 0; updatePgNav(); });
     }, { passive: true });
     updatePgNav();
   }
@@ -9932,6 +9955,7 @@
     if (v.k === 'home') return out;
     var cs = { v: { k: 'courses' }, label: L('المواد', 'Courses') };
     if (v.k === 'courses') return out.concat([cs]);
+    if ((v.k === 'course' || v.k === 'module') && courseArchived(v.code)) cs = { v: { k: 'archive' }, label: L('الأرشيف', 'Archive') };
     if (v.k === 'space') return out.concat([{ v: v, label: vName(v) }]);
     if (v.k === 'course') return out.concat([cs, { v: v, label: vName(v) }]);
     if (v.k === 'module') return out.concat([cs, { v: { k: 'course', code: v.code }, label: courseLabel(v.code) }, { v: v, label: vName(v) }]);
@@ -9949,21 +9973,22 @@
   }
 
   /*@3.NOAJ.462*/
-  function courseCounts() {
-    var c = {}, i, n;
+  function courseCounts(arch) {
+    var c = {}, i, n, m = courseArchMap();
     for (i = 0; i < S.all.length; i++) {
       n = S.all[i];
       if (n.archived || !n.origin || !n.origin.course) continue;
+      if ((+m[n.origin.course] > 0) !== !!arch) continue;
       c[n.origin.course] = (c[n.origin.course] || 0) + 1;
     }
     return c;
   }
   function exFolders() {
     var v = S.view, par;
-    if (v.k === 'courses') {
-      var cc = courseCounts();
+    if (v.k === 'courses' || v.k === 'archive') {
+      var cc = courseCounts(v.k === 'archive');
       return Object.keys(cc).sort().map(function (code) {
-        return { v: { k: 'course', code: code }, name: courseLabel(code), count: cc[code], icon: 'fa-graduation-cap', tone: courseTone(code) };
+        return { v: { k: 'course', code: code }, name: courseLabel(code), count: cc[code], icon: 'fa-graduation-cap', tone: courseTone(code), course: code };
       });
     }
     if (v.k === 'folder') par = v.id;
@@ -10314,7 +10339,7 @@
 
   function exPlaceOf(v) {
     if (!v) return 'home';
-    if (v.k === 'course' || v.k === 'module') return vKey({ k: 'courses' });
+    if (v.k === 'course' || v.k === 'module') return vKey({ k: courseArchived(v.code) ? 'archive' : 'courses' });
     if (v.k === 'folder') {
       var T = folderTree(), cur = T.byId[v.id], g = 0;
       while (cur && cur.p && T.byId[cur.p] && cur.p !== cur.id && g++ < MAX_DEPTH + 2) cur = T.byId[cur.p];
@@ -10424,6 +10449,14 @@
       ago: function (t) { return when(t); },
       tone: courseTone,
       courseLabel: courseLabel,
+      courseArchived: courseArchived,
+      courseArch: function (code, on) {
+        if (!code) return;
+        courseArchSet(code, on);
+        reload({ keepOpen: true });
+        toast(on ? L('أُرشفت ' + code + ' — تجدها في «الأرشيف» بملاحظاتها كلِّها.', code + ' archived — find it, with all its notes, in Archive.')
+                 : L('عادت ' + code + ' إلى «المواد».', code + ' is back in Courses.'));
+      },
       picked: function () { return S.picked || {}; },
       setPicked: function (m) { S.picked = m || {}; paintPickedPanel(); },
       open: function (n) {

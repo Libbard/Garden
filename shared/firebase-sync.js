@@ -92,6 +92,8 @@
     /*@3.FISJ.237*/
     /^notes_index$/,
     /^notes_folders$/,
+    /*@3.FISJ.251*/
+    /^notes_course_arch$/,
     /*@3.FISJ.20*/
     /^__tomb_[A-Za-z0-9_.:-]+$/,
     /*@3.FISJ.21*/
@@ -364,6 +366,7 @@
     'student_profile',
     'garden_ics',
     'garden_notify_arch',
+    'notes_course_arch',
   ]);
   const MERGE_DEEP_PATTERNS = [
     /^course_meta_[A-Z0-9_]+$/,

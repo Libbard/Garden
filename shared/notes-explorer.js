@@ -264,7 +264,7 @@
     var h = '<section class="nx-folders" aria-label="' + esc(L('المجلّدات', 'Folders')) + '">';
     for (var i = 0; i < fs.length; i++) {
       var f = fs[i];
-      var tgt = f.v ? ' data-x="view" data-v="' + esc(JSON.stringify(f.v)) + '"' : ' data-x="folder" data-id="' + esc(f.id) + '"';
+      var tgt = f.v ? ' data-x="view" data-v="' + esc(JSON.stringify(f.v)) + '"' + (f.course ? ' data-course="' + esc(f.course) + '"' : '') : ' data-x="folder" data-id="' + esc(f.id) + '"';
       h += '<button type="button" class="nx-fold"' + tgt + (f.tone ? ' style="--nx-tone:' + esc(f.tone) + '"' : '') + '>' +
         '<span class="nx-fold-i" aria-hidden="true">' + ic(f.icon || 'fa-folder') + '</span>' +
         '<span class="nx-ft"><span class="nx-fold-n" dir="auto">' + esc(f.name) + '</span>' +
@@ -1100,6 +1100,7 @@
     GM().rich(p.x, p.y, { items: items }, doSpaceAct, Object.assign({ anchorEnd: true, label: L('جديد', 'New') }, MOPT));
   }
   function doSpaceAct(act) {
+    if (act === 'carch' || act === 'cunarch') { A.courseArch(A.view().code, act === 'carch'); return; }
     if (act === 'nfolder') A.newFolder();
     else if (act === 'nnote') A.newNote();
     else if (act === 'import') pickFiles();
@@ -1212,6 +1213,26 @@
     }, function (act) { A.folderAct(act, fid); }, MOPT);
   }
 
+  /*@3.NOEJ3.31*/
+  function courseMenu(x, y, code, el) {
+    var name = el ? (el.querySelector('.nx-fold-n') || el).textContent : A.courseLabel(code);
+    var cnt = el ? (el.querySelector('.nx-fold-c') || {}).textContent || '' : '';
+    var arch = A.courseArchived(code);
+    GM().rich(x, y, {
+      head: { ico: 'fa-graduation-cap', tone: A.tone(code), t: name, s: L('مادّة · ', 'Course · ') + cnt },
+      items: [
+        { a: 'open', i: 'fa-folder-open', t: L('افتحْ', 'Open') },
+        { sep: 1 },
+        arch ? { a: 'unarch', i: 'fa-box-archive', t: L('أعِدْها إلى «المواد»', 'Back to Courses') }
+             : { a: 'arch', i: 'fa-box-archive', t: L('أرشِفْ المادّة', 'Archive course'), why: L('تختفي من «المواد» وتبقى ملاحظاتُها في «الأرشيف»', 'Leaves Courses; its notes stay in Archive') }
+      ]
+    }, function (act) {
+      if (act === 'open') A.setView({ k: 'course', code: code });
+      else if (act === 'arch') A.courseArch(code, true);
+      else if (act === 'unarch') A.courseArch(code, false);
+    }, MOPT);
+  }
+
   /*@3.NOEJ3.7*/
   function spaceMenu(x, y) {
     var trash = A.view().k === 'trash', cs = A.crumbs(), here = cs.length ? cs[cs.length - 1].label : '';
@@ -1227,6 +1248,12 @@
         { a: 'g:imp', i: 'fa-file-import', t: L('استوردْ من…', 'Import from…'), sub: importItems() },
         { a: 'paste', i: 'fa-paste', t: L('ألصِقْ هنا', 'Paste here'), kb: 'Ctrl V', off: !canPaste, why: canPaste ? '' : L('لا شيءَ في الحافظة', 'The clipboard is empty') }
       ];
+      var vc = A.view();
+      if (vc.k === 'course' && A.courseArch) {
+        model.items.push(A.courseArchived(vc.code)
+          ? { a: 'cunarch', i: 'fa-box-archive', t: L('أعِدْ المادّةَ إلى «المواد»', 'Move course back to Courses') }
+          : { a: 'carch', i: 'fa-box-archive', t: L('أرشِفْ هذه المادّة', 'Archive this course') });
+      }
     }
     model.items.push({ sep: 1 });
     model.items.push({ a: 'sort', i: 'fa-arrow-down-wide-short', t: L('رتِّبْ حسب…', 'Sort by…') });
@@ -1434,6 +1461,8 @@
     var it = e.target.closest('.nx-it');
     var fo = !it && e.target.closest('.nx-fold[data-id]');
     if (fo) { e.preventDefault(); folderMenu(e.clientX, e.clientY, fo.getAttribute('data-id'), fo); return; }
+    var fc = !it && A.courseArch && e.target.closest('.nx-fold[data-course]');
+    if (fc) { e.preventDefault(); courseMenu(e.clientX, e.clientY, fc.getAttribute('data-course'), fc); return; }
     if (!it && e.target.closest('.nx-scroll') && !e.target.closest('.nx-fold, button, a')) {
       e.preventDefault();
       spaceMenu(e.clientX, e.clientY);

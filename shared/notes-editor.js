@@ -4397,26 +4397,6 @@
     selectRange(edn, at + want.length, at + want.length);
   };
 
-  /*@3.NOEJ.622*/
-  Editor.prototype.railClamp = function () {
-    var c = this._chrome, rail = c && c.rail;
-    if (!rail || !c.host || !rail.parentNode) return 0;
-    if (rail.style.translate) rail.style.translate = '';
-    rail.removeAttribute('data-clamp');
-    var sc = this.root && this.root.closest ? this.root.closest('.na-doc-body') : null;
-    if (!sc) return 0;
-    var r = rail.getBoundingClientRect(), v = sc.getBoundingClientRect();
-    if (!r.width) return 0;
-    var lo = v.left + (sc.clientLeft || 0) + 2, hi = v.left + (sc.clientLeft || 0) + sc.clientWidth - 2, dx = 0;
-    if (r.right > hi) dx = hi - r.right;
-    if (r.left + dx < lo) dx = lo - r.left;
-    if (Math.abs(dx) < 0.5) return 0;
-    var z = rail.offsetWidth ? r.width / rail.offsetWidth : 1;
-    rail.style.translate = Math.round(dx / (z || 1) * 100) / 100 + 'px 0';
-    rail.setAttribute('data-clamp', '1');
-    return dx;
-  };
-
   Editor.prototype.chromeTo = function (node) {
     /*@3.NOEJ.513*/
     if (node && node.getAttribute('data-ty') === 'pb') node = null;
@@ -4439,7 +4419,6 @@
     node.appendChild(c.spin);
     for (var k = 0; k < c.edges.length; k++) node.appendChild(c.edges[k]);
     this.paintTick(node);
-    this.railClamp();
     if (node.getAttribute('data-ty') === 'shape') {
       var hitB = this.blockAt(node.getAttribute('data-bid'));
       if (hitB) {
@@ -11086,7 +11065,8 @@
       if (!rhit) return;
       var rr = rnode.getBoundingClientRect();
       var cx = rr.left + rr.width / 2, cy = rr.top + rr.height / 2;
-      D = { spin: 1, b: rhit.b, node: rnode, cx: cx, cy: cy,
+      D = { spin: 1, b: rhit.b, node: rnode, cx: cx, cy: cy, sx: e.clientX, sy: e.clientY,
+            dead: Math.max(16, 0.6 * Math.hypot(e.clientX - cx, e.clientY - cy)),
             a0: Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI,
             r0: rhit.b.rot || 0, pid: e.pointerId, snap: self.snapshot() };
       try { rg.setPointerCapture(e.pointerId); } catch (x) {}
@@ -11168,9 +11148,18 @@
       /*@3.NOEJ.78*/
       if (D.spin) {
         e.preventDefault();
-        var ang = Math.atan2(e.clientY - D.cy, e.clientX - D.cx) * 180 / Math.PI;
+        var sdx = e.clientX - D.cx, sdy = e.clientY - D.cy;
+        var ang = Math.atan2(sdy, sdx) * 180 / Math.PI;
+        /*@3.NOEJ.623*/
+        if (!D.go) {
+          if (Math.hypot(e.clientX - D.sx, e.clientY - D.sy) < 6) return;
+          D.go = 1;
+        }
+        if (Math.hypot(sdx, sdy) < D.dead) { D.hold = 1; return; }
+        if (D.hold) { D.hold = 0; D.a0 = ang; D.r0 = D.b.rot || 0; return; }
         var next = D.r0 + (ang - D.a0);
         if (e.shiftKey) next = Math.round(next / 15) * 15;
+        else { var q90 = Math.round(next / 90) * 90; if (Math.abs(next - q90) < 4) next = q90; }
         D.b.rot = Math.round(next * 10) / 10;
         D.node.style.transform = 'rotate(' + D.b.rot + 'deg)';
         D.node.style.transformOrigin = 'center center';
