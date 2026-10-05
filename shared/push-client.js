@@ -170,6 +170,7 @@
         device_id: deviceId(),
         subscription: { endpoint: j.endpoint, keys: j.keys }
       }).then(function () {
+        migrateFrom();
         /*@3.PUCJ.17*/
         try {
           if (window.GardenWatch && window.GardenWatch.ready()) {
@@ -184,6 +185,25 @@
       noteErr(why);
       return { ok: false, reason: why };
     });
+  }
+
+  /*@3.PUCJ.39*/
+  var EP_LS = 'garden_push_ep';
+  function migrateFrom() {
+    var prev = null;
+    try { prev = localStorage.getItem(EP_LS); } catch (e) {}
+    var legacy = String((window.GardenEndpoints && window.GardenEndpoints.pushLegacy) || '').replace(/\/+$/, '');
+    if (!prev && legacy && legacy !== ENDPOINT) prev = legacy;
+    try { localStorage.setItem(EP_LS, ENDPOINT); } catch (e) {}
+    if (!prev || prev === ENDPOINT) return;
+    try { localStorage.removeItem(STATE_LS); } catch (e) {}
+    try {
+      fetch(prev + '/v1/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vault_id: vaultId(), device_id: deviceId() })
+      }).catch(function () {});
+    } catch (e) {}
   }
 
   function fresh(reg, key) {

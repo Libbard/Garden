@@ -7,7 +7,9 @@ window.GardenEndpoints = {
   aiCache: 'https://ai.libbard.cc',
 
   /*@3.ENDJ.3*/
-  push: 'https://garden-push.xxli50xx.workers.dev',
+  /*@3.ENDJ.14*/
+  push: 'https://api.libbard.cc/push',
+  pushLegacy: 'https://garden-push.xxli50xx.workers.dev',
 
   /*@3.ENDJ.4*/
   sync: 'https://api.libbard.cc',
