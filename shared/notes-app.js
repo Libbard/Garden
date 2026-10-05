@@ -1533,7 +1533,7 @@
       syncTitleDir();
       syncTitleWord();
     }
-    if (els.origin) els.origin.hidden = true;
+    syncCrs(null);
     syncTrashBar(null);
     if (els.ribbonHost) els.ribbonHost.hidden = true;
     if (ribbon) ribbon.attach(null);
@@ -1663,6 +1663,8 @@
   /*@3.NOAJ.16*/
   /*@3.NOAJ.139*/
   var MORE = [
+    { id: 'na-crs',      icon: 'fa-graduation-cap', ar: 'المادّةُ والوحدة', en: 'Course & module', fold: 1 },
+    { fn: 'crsask',      icon: 'fa-graduation-cap', ar: 'اربطْ بمادّةٍ أو وحدة', en: 'Link to a course or module' },
     { id: 'na-pin',      icon: 'fa-thumbtack',   ar: 'تثبيت',        en: 'Pin' },
     { id: 'na-remind-btn', icon: 'fa-bell',      ar: 'تنبيهٌ لهذه الملاحظة', en: 'Remind me', fold: 1 },
     { id: 'na-mic',      icon: 'fa-microphone',  ar: 'التسجيلات',    en: 'Recordings', fold: 1 },
@@ -1692,17 +1694,19 @@
     m.setAttribute('role', 'menu');
     m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     m.innerHTML = MORE.filter(function (it) {
+      if (it.fn === 'crsask') return !!edId && !!idxFind(edId) && !!(els.crs && els.crs.hidden);
       var src = it.id ? document.getElementById(it.id) : null;
       if (it.fold && !(src && src.getAttribute('data-fold') === '1')) return false;
       return !(src && src.hidden);
     }).map(function (it) {
       var src = it.id ? document.getElementById(it.id) : null;
       return '<button type="button" class="ne-menu-i' + (it.danger ? ' ne-menu-i--danger' : '') +
-        '" role="menuitem" data-for="' + (it.id || '') + '"' +
+        '" role="menuitem" data-for="' + (it.id || '') + '"' + (it.fn ? ' data-fn="' + it.fn + '"' : '') +
         ((it.id && src && src.disabled) ? ' disabled' : '') + '>' +
         '<i class="fa-solid ' + it.icon + '" aria-hidden="true"></i>' +
+        (it.id === 'na-crs' && src && src.textContent ? '<span dir="auto">' + src.querySelector('.na-crs-t').innerHTML + '</span></button>' :
         '<span data-ar="' + esc(it.ar) + '" data-en="' + esc(it.en) + '">' +
-        esc(L(it.ar, it.en)) + '</span></button>';
+        esc(L(it.ar, it.en)) + '</span></button>');
     }).join('');
     document.body.appendChild(m);
 
@@ -1718,12 +1722,13 @@
       var b = e.target.closest('[data-for]');
       if (!b || b.disabled) return;
       closeMore();
+      if (b.getAttribute('data-fn') === 'crsask') { courseAsk([edId]); return; }
       var src = document.getElementById(b.getAttribute('data-for'));
       if (src) src.click();
     });
   }
 
-  var FOLD = ['na-inkhide', 'na-share-btn', 'na-page-btn', 'na-remind-btn', 'na-find-btn', 'na-mic'];
+  var FOLD = ['na-crs', 'na-inkhide', 'na-share-btn', 'na-page-btn', 'na-remind-btn', 'na-find-btn', 'na-mic'];
   var foldMq = window.matchMedia ? window.matchMedia('(max-width: 768px)') : null;
   var foldBusy = false;
   function foldTop() {
@@ -4429,18 +4434,7 @@
     syncPinBtn(rec);
     syncTrashBar(rec);
 
-    if (els.origin) {
-      var o = rec.o || {};
-      var label = o.c ? courseLabel(o.c) + (o.m != null ? ' · ' + L('الوحدة ', 'Module ') + o.m : '')
-                      : (o.t || '');
-      if (label) {
-        var href = o.p ? o.p : null;
-        els.origin.innerHTML =
-          '<i class="fa-solid fa-link" aria-hidden="true"></i><span>' + esc(L('من: ', 'From: ')) + '</span>' +
-          (href ? '<a href="' + esc(href) + '">' + esc(label) + '</a>' : '<span>' + esc(label) + '</span>');
-        els.origin.hidden = false;
-      } else { els.origin.hidden = true; }
-    }
+    syncCrs(rec);
 
     if (!els.docBody || !window.GardenNotesEditor) return;
     saveState('', L('يُقرأ…', 'Loading…'));
@@ -9572,25 +9566,154 @@
     while (q.length && g++ < 2000) { var id = q.shift(); if (set[id]) continue; set[id] = 1; (T.kids[id] || []).forEach(function (k) { q.push(k.id); }); }
     return idxRead().filter(function (r) { return r && !r.d && r.f && set[r.f]; }).map(function (r) { return r.id; });
   }
-  function linkCourse(ids, code) {
+  /*@3.NOAJ.495*/
+  function linkCourse(ids, code, mod) {
     var now = Date.now(), n = 0;
+    var keep = mod === undefined, m = (code && !keep && +mod > 0) ? +mod : null;
     (ids || []).forEach(function (id) {
       var r = idxFind(id);
       if (!r) return;
       r.o = r.o || {};
-      if ((r.o.c || '') === (code || '')) return;
+      var same = (r.o.c || '') === (code || '');
+      var m0 = (r.o.m != null && +r.o.m > 0) ? +r.o.m : null;
+      var m1 = keep ? (same ? m0 : null) : m;
+      if (same && m0 === m1) return;
+      if (!same) { delete r.o.p; delete r.o.t; }
       if (code) r.o.c = code; else delete r.o.c;
+      if (m1 != null) r.o.m = m1; else delete r.o.m;
       r.updated_at = now;
       idxPut(r);
       n++;
     });
+    var what = code ? code + (m ? ' · ' + L('الوحدة ', 'Module ') + m : '') : '';
     if (n) {
       reload({ keepOpen: true });
-      toast(code ? L('رُبط ' + n + ' بـ' + code, 'Linked ' + n + ' to ' + code) : L('فُصل ' + n + ' عن مادّته', 'Unlinked ' + n + ' from its course'));
-    } else toast(L('مربوطةٌ بهذه المادّة أصلاً', 'Already linked to this course'));
+      syncCrs(idxFind(edId));
+      toast(code ? L('رُبط ' + n + ' بـ' + what, 'Linked ' + n + ' to ' + what) : L('فُصل ' + n + ' عن مادّته', 'Unlinked ' + n + ' from its course'));
+    } else toast(code ? L('مربوطةٌ بـ' + what + ' أصلاً', 'Already linked to ' + what) : L('غيرُ مربوطةٍ أصلاً', 'Not linked'));
     return n;
   }
-  function courseAsk(ids, hint) {
+
+  /*@3.NOAJ.496*/
+  var _modT = null, _modP = null;
+  function modTitles() {
+    if (_modT) return Promise.resolve(_modT);
+    if (_modP) return _modP;
+    _modP = fetch('../shared/data/search_index.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        var o = {};
+        ((j && j.entries) || []).forEach(function (e) {
+          if (e && e.t === 'module' && e.code && +e.m > 0) (o[e.code] || (o[e.code] = {}))[+e.m] = { ar: e.ar || '', en: e.en || '' };
+        });
+        _modT = o;
+        return o;
+      })
+      .catch(function () { _modP = null; return {}; });
+    return _modP;
+  }
+  function modName(code, m) {
+    var t = _modT && _modT[code] && _modT[code][m];
+    return t ? L(t.ar || t.en, t.en || t.ar) : '';
+  }
+  function modCount(code) {
+    try { if (window.GardenData && GardenData.moduleCount) return GardenData.moduleCount(code) || 0; } catch (e) {}
+    return 13;
+  }
+
+  /*@3.NOAJ.494*/
+  function crsOf(rec) {
+    var o = (rec && rec.o) || {};
+    if (!o.c && !o.p) return null;
+    var m = (o.m != null && +o.m > 0) ? +o.m : null, c = o.c ? info(o.c) : null, href = '';
+    if (c && c.path && c.available !== false) href = '../' + c.path + (m ? 'M' + (m < 10 ? '0' : '') + m + '.html' : 'index.html');
+    else if (o.p) href = /^(https?:)?[/]/.test(o.p) ? o.p : '../' + String(o.p).replace(/^[.][/]/, '');
+    if (!href) return null;
+    return { c: o.c || '', m: m, href: href, t: o.t || '' };
+  }
+  function crsText(x) {
+    return x.c ? x.c + (x.m ? ' · ' + L('الوحدة ', 'Module ') + x.m : '') : (x.t || L('صفحةُ الدرس', 'Lesson page'));
+  }
+  function crsHtml(x) {
+    if (!x.c) return '<span dir="auto">' + esc(crsText(x)) + '</span>';
+    return '<bdi class="na-crs-c">' + esc(x.c) + '</bdi>' + (x.m ? ' · ' + esc(L('الوحدة ', 'Module ')) + x.m : '');
+  }
+  function syncCrs(rec) {
+    var b = els.crs;
+    if (!b) return;
+    closeCrs();
+    var x = crsOf(rec);
+    if (rec && rec.o && rec.o.c && !info(rec.o.c) && window.GardenData && GardenData.ready && !syncCrs._w) {
+      syncCrs._w = 1;
+      GardenData.ready().then(function () { syncCrs._w = 0; if (edId && edId === rec.id) syncCrs(idxFind(edId)); });
+    }
+    if (!x) { b.hidden = true; b.innerHTML = ''; return; }
+    var tone = x.c ? courseTone(x.c) : null, txt = crsText(x);
+    if (tone) b.style.setProperty('--c', tone); else b.style.removeProperty('--c');
+    b.innerHTML = '<span class="na-dot" aria-hidden="true"></span><span class="na-crs-t">' + crsHtml(x) + '</span>' +
+      '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i>';
+    var nm = L('المادّةُ والوحدة: ', 'Course & module: ') + txt;
+    b.setAttribute('aria-label', nm);
+    b.title = nm;
+    b.hidden = false;
+  }
+
+  var crsMenu = null;
+  function closeCrs() {
+    if (!crsMenu) return;
+    crsMenu.remove();
+    crsMenu = null;
+    if (els.crs) els.crs.setAttribute('aria-expanded', 'false');
+  }
+  function openCrs(anchor) {
+    closeCrs();
+    closeMore();
+    var id = edId, rec = idxFind(id), x = crsOf(rec);
+    if (!rec) return;
+    var row = function (act, icon, ar, en, sub, danger) {
+      return '<button type="button" class="ne-menu-i' + (danger ? ' ne-menu-i--danger' : '') + '" role="menuitem" data-crs="' + act + '">' +
+        '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' +
+        '<span class="na-crs-l"><span>' + esc(L(ar, en)) + '</span>' +
+        (sub != null ? '<small class="na-crs-sub" dir="auto">' + esc(sub) + '</small>' : '') + '</span></button>';
+    };
+    var html = '';
+    if (x) {
+      var cn = x.c ? courseLabel(x.c) : '';
+      if (x.m) html += row('go', 'fa-book-open', 'افتح الوحدة ' + x.m, 'Open module ' + x.m, modName(x.c, x.m) || cn);
+      else if (x.c) html += row('go', 'fa-graduation-cap', 'افتح صفحة المادّة', 'Open the course page', cn);
+      else html += row('go', 'fa-book-open', 'افتح صفحةَ الدرس', 'Open the lesson page', x.t || null);
+    }
+    html += row('ask', 'fa-pen', x ? 'غيّرْ المادّةَ أو الوحدة' : 'اربطْ بمادّةٍ أو وحدة', x ? 'Change course or module' : 'Link to a course or module', null);
+    if (x && x.c) html += row('un', 'fa-link-slash', 'افصلْ عن المادّة', 'Unlink from the course', null, 1);
+    var m = document.createElement('div');
+    m.className = 'ne-menu na-crs-menu';
+    m.setAttribute('role', 'menu');
+    m.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    m.innerHTML = html;
+    document.body.appendChild(m);
+    var a = anchor && anchor.getBoundingClientRect();
+    if (!a || !a.width) { var mb = document.getElementById('na-more'); a = mb ? mb.getBoundingClientRect() : null; }
+    if (!a || !a.width) a = { left: 8, right: window.innerWidth - 8, bottom: 56 };
+    var mr = m.getBoundingClientRect(), pad = 8;
+    m.style.insetBlockStart = Math.max(pad, Math.min(a.bottom + 6, window.innerHeight - mr.height - pad)) + 'px';
+    m.style.left = Math.max(pad, Math.min((isAr() ? a.right - mr.width : a.left), window.innerWidth - mr.width - pad)) + 'px';
+    crsMenu = m;
+    if (els.crs) els.crs.setAttribute('aria-expanded', 'true');
+    if (x && x.m && !_modT) modTitles().then(function () {
+      var sub = crsMenu === m && m.querySelector('[data-crs="go"] .na-crs-sub'), t = modName(x.c, x.m);
+      if (sub && t) sub.textContent = t;
+    });
+    m.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-crs]');
+      if (!b) return;
+      var act = b.getAttribute('data-crs');
+      closeCrs();
+      if (act === 'go' && x) location.href = x.href;
+      else if (act === 'ask') courseAsk([id], x && x.c, x && x.m);
+      else if (act === 'un') linkCourse([id], '');
+    });
+  }
+  function courseAsk(ids, hint, hintM) {
     ids = (ids || []).filter(function (id) { return !!idxFind(id); });
     if (!ids.length) { toast(L('لا ملفّاتَ هنا تُربط', 'No files here to link')); return; }
     var dlg = document.getElementById('na-course');
@@ -9611,8 +9734,9 @@
         if (a === 'go') {
           var c = codeFrom(inp.value);
           if (!c) { inp.setCustomValidity(L('لا نعرف مادّةً بهذا الرمز أو الاسم', 'No course with this code or name')); inp.reportValidity(); return; }
+          var ms = dlg.querySelector('#na-course-m');
           dlg.close();
-          linkCourse(dlg.__ids, c);
+          linkCourse(dlg.__ids, c, (ms && ms.value) ? +ms.value : null);
         }
       });
       dlg.addEventListener('keydown', function (e) {
@@ -9621,6 +9745,7 @@
     }
     var recs = ids.map(idxFind).filter(Boolean), used = {}, sug = [];
     var cur = recs.length === 1 ? ((recs[0].o && recs[0].o.c) || '') : '';
+    var curM = hintM || (recs.length === 1 && recs[0].o && +recs[0].o.m > 0 ? +recs[0].o.m : 0);
     var anyLinked = recs.some(function (r) { return r.o && r.o.c; });
     function add(c) { if (c && !used[c] && info(c)) { used[c] = 1; sug.push(c); } }
     add(hint);
@@ -9638,9 +9763,10 @@
       '<div class="gsf-grip" aria-hidden="true"></div>' +
       '<form method="dialog" class="gsf-x"><button class="gsf-close" type="submit" aria-label="' + esc(L('إغلاق', 'Close')) + '" title="' + esc(L('إغلاق', 'Close')) + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
       '<div class="gsf-body"><div class="gsf-head">' +
-        '<h2 class="gsf-title" id="na-course-t">' + esc(L('اربطْ بمادّة', 'Link to a course')) + '</h2>' +
+        '<h2 class="gsf-title" id="na-course-t">' + esc(L('اربطْ بمادّةٍ أو وحدة', 'Link to a course or module')) + '</h2>' +
         '<p class="gsf-sub"><strong dir="auto">' + esc(what) + '</strong> — ' + esc(L('تظهر في «المواد» تحت مادّتها، ويُقترح لونُها في كلِّ مكان.', 'shows under its course in “Courses”, with the course colour everywhere.')) + '</p>' +
-        (cur ? '<p class="gsf-sub na-cdlg-cur">' + esc(L('مربوطةٌ الآن بـ', 'Linked now to ')) + '<span class="gsf-code">' + esc(courseLabel(cur)) + '</span></p>' : '') +
+        (cur ? '<p class="gsf-sub na-cdlg-cur">' + esc(L('مربوطةٌ الآن بـ', 'Linked now to ')) + '<span class="gsf-code">' + esc(cur) + '</span>' +
+          esc((info(cur) ? ' · ' + L(info(cur).name_ar || '', info(cur).name_en || '') : '') + (curM ? ' · ' + L('الوحدة ', 'Module ') + curM : '')) + '</p>' : '') +
       '</div>' +
       '<label class="na-cdlg-l" for="na-course-in">' + esc(L('رمزُ المادّة أو اسمُها', 'Course code or name')) + '</label>' +
       '<input class="gsf-in" id="na-course-in" list="na-course-dl" autocomplete="off" dir="auto" placeholder="CS362" value="' + esc(cur || sug[0] || '') + '">' +
@@ -9648,6 +9774,8 @@
       (sug.length ? '<div class="gsf-chips na-cdlg-sug" aria-label="' + esc(L('مقترحة', 'Suggested')) + '">' + sug.map(function (c) {
         return '<button type="button" class="gsf-chip" data-cc="' + esc(c) + '"><span class="gsf-code">' + esc(c) + '</span></button>';
       }).join('') + '</div>' : '') +
+      '<label class="na-cdlg-l" for="na-course-m">' + esc(L('الوحدة', 'Module')) + '</label>' +
+      '<select class="gsf-in" id="na-course-m" data-gs data-gs-name-ar="الوحدة" data-gs-name-en="Module"></select>' +
       '</div>' +
       '<div class="gsf-foot"><div class="gsf-acts">' +
         (anyLinked ? '<button type="button" class="gsf-btn gsf-btn--ghost" data-ca="un">' + esc(L('افصلْ عن المادّة', 'Unlink')) + '</button>' : '') +
@@ -9656,8 +9784,26 @@
       '</div></div>';
     dlg.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     try { dlg.showModal(); } catch (e1) { dlg.setAttribute('open', ''); }
-    var inp = dlg.querySelector('#na-course-in');
-    inp.addEventListener('input', function () { inp.setCustomValidity(''); });
+    var inp = dlg.querySelector('#na-course-in'), msel = dlg.querySelector('#na-course-m'), mFor = null;
+    function fillMods(keepVal) {
+      var c = codeFrom(inp.value), v = keepVal != null ? String(keepVal) : msel.value;
+      if (c !== mFor) v = (c && c === cur && curM) ? String(curM) : (keepVal != null ? String(keepVal) : '');
+      mFor = c;
+      var n = c ? modCount(c) : 0, h = '<option value="" data-gs-name-ar="المادّة كلّها" data-gs-name-en="The whole course">' +
+        esc(L('المادّة كلّها', 'The whole course')) + '</option>';
+      for (var i = 1; i <= n; i++) {
+        var t = modName(c, i), ar = 'الوحدة ' + i + (t ? ' · ' + t : ''), en = 'Module ' + i + (t ? ' · ' + t : '');
+        h += '<option value="' + i + '" data-gs-name-ar="' + esc(ar) + '" data-gs-name-en="' + esc(en) + '">' + esc(L(ar, en)) + '</option>';
+      }
+      msel.innerHTML = h;
+      msel.value = (+v > 0 && +v <= n) ? v : '';
+      msel.disabled = !c;
+      if (window.GardenSelect) { try { GardenSelect.enhance(dlg); GardenSelect.sync(dlg); } catch (eG) {} }
+    }
+    fillMods(curM || '');
+    modTitles().then(function () { if (dlg.open && dlg.__ids === ids) fillMods(msel.value); });
+    dlg.querySelectorAll('[data-cc]').forEach(function (b) { b.addEventListener('click', function () { setTimeout(function () { fillMods(); }, 0); }); });
+    inp.addEventListener('input', function () { inp.setCustomValidity(''); fillMods(); });
     try { inp.focus(); inp.select(); } catch (e2) {}
   }
 
@@ -11000,7 +11146,8 @@
     els.count = document.getElementById('na-count');
     els.docTitle = document.getElementById('na-doc-title');
     els.docBody = document.getElementById('na-doc-body');
-    els.origin = document.getElementById('na-doc-origin');
+    els.crs = document.getElementById('na-crs');
+    if (els.crs) els.crs.addEventListener('click', function (e) { e.stopPropagation(); if (crsMenu) closeCrs(); else openCrs(els.crs); });
     els.save = document.getElementById('na-save');
     els.saveDot = document.getElementById('na-savedot');
     els.naDel = document.getElementById('na-del');
@@ -11291,6 +11438,7 @@
 
     /*@3.NOAJ.13*/
     document.addEventListener('garden:languageChanged', function () {
+      syncCrs(edId ? idxFind(edId) : null);
       renderRail();
       renderList();
       renderQuota();
@@ -11438,9 +11586,11 @@
     });
     document.addEventListener('click', function (e) {
       if (moreMenu && !e.target.closest('.ne-menu') && !e.target.closest('#na-more')) closeMore();
+      if (crsMenu && !e.target.closest('.ne-menu') && !e.target.closest('#na-crs')) closeCrs();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && moreMenu) closeMore();
+      if (e.key === 'Escape' && crsMenu) { closeCrs(); if (els.crs && !els.crs.hidden) els.crs.focus(); }
     });
 
     var panel = document.getElementById('na-panel');
@@ -11717,6 +11867,7 @@
     overlay: function () { return overlay; },
     needDrive: needDrive,
     course: function () { var r = idxFind(edId); return (r && r.o && r.o.c) || ''; },
+    crsHref: function () { var x = crsOf(edId ? idxFind(edId) : null); return x ? x.href : null; },
     toast: function (m) { toast(m); }
   };
 
