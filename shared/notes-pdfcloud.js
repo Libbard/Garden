@@ -353,8 +353,8 @@
       cur.overBig = 1;
       view('big', L('الملفُّ أكبرُ من الحدّ', 'The file is over the limit'),
         '<p>' + esc(L('حجمُه ', 'It is ')) + num(size(e.bytes)) + esc(L(' والحدُّ ', ' and the limit is ')) + num(size(e.max)) + '.</p><p>' +
-        esc(L('ولك في كلِّ فصلٍ ملفٌّ واحدٌ حتى ' + size(e.big_max) + ' — بقي لك ' + e.big_left + '. يُحفظ كما هو بلا ضغط.',
-              'Each term you may upload one file up to ' + size(e.big_max) + ' — ' + e.big_left + ' left. It is kept as it is, uncompressed.')) + '</p>',
+        esc(L('ولك في كلِّ فصلٍ ملفٌّ واحدٌ حتى ' + size(e.big_max) + ' — بقي لك ' + e.big_left + '.',
+              'Each term you may upload one file up to ' + size(e.big_max) + ' — ' + e.big_left + ' left.')) + '</p>',
         button('later', L('ليس الآن', 'Not now'), 'ghost') +
         button('over', L('ارفعْه بخانة الفصل', 'Use the term’s slot'), 'go'));
       return;
