@@ -79,10 +79,42 @@
       else if (!f.size) why = L('ملفٌّ فارغ', 'Empty file');
       if ((from || 0) + i >= MAX_FILES && !why) why = L('أكثرُ من ', 'More than ') + MAX_FILES + L(' ملفّاً في المرّة', ' files at once');
       var code = codeOf(f.name);
-      out.push({ id: ++seq, file: f, kind: k, title: baseName(f.name), code: code, auto: 1, dest: why ? '' : folderFor(code),
-                 skip: !!why, why: why, st: why ? 'skip' : 'wait', pct: 0, err: '' });
+      var row = { id: ++seq, file: f, kind: k, title: baseName(f.name), code: code, auto: 1, dest: why ? '' : folderFor(code),
+                 skip: !!why, why: why, st: why ? 'skip' : 'wait', pct: 0, err: '' };
+      row.mod = guessMod(row, '');
+      out.push(row);
     }
     return out;
+  }
+
+  function guessMod(r, text) {
+    var G = window.GardenModGuess;
+    if (!G || !r.code || r.kind === 'text') return null;
+    return G.pick({ name: r.file.name, code: r.code, text: text || '',
+                    count: A.modCount ? A.modCount(r.code) : 0, titles: A.modTitles ? A.modTitles(r.code) : null });
+  }
+  function modRefine() {
+    var G = window.GardenModGuess, todo = rows.filter(function (r) {
+      return r.code && !r.skip && r.kind === 'pdf' && r.file instanceof Blob && !(r.mod && /^(name|you)$/.test(r.mod.why)) && !r.modRead;
+    });
+    if (!G || !todo.length) return;
+    var go = function (k) {
+      if (k >= todo.length || !dlg || busy || finished) return;
+      var r = todo[k];
+      r.modRead = 1;
+      G.firstText(r.file).then(function (t) {
+        r.text = t || '';
+        if (!(r.mod && r.mod.why === 'you')) {
+          var g = guessMod(r, r.text);
+          if (g && (!r.mod || g.m !== r.mod.m || g.why !== r.mod.why)) { r.mod = g; var i = rows.indexOf(r); if (i >= 0) paintRow(i); }
+        }
+        go(k + 1);
+      });
+    };
+    (A.modLoad ? A.modLoad() : Promise.resolve()).then(function () {
+      rows.forEach(function (r, i) { if (r.code && !(r.mod && r.mod.why === 'you')) { var g = guessMod(r, r.text || ''); if (g && (!r.mod || g.m !== r.mod.m)) { r.mod = g; paintRow(i); } } });
+      go(0);
+    });
   }
 
   function codesSet() {
@@ -128,6 +160,29 @@
       (r.auto ? '<small>' + esc(L('من الاسم', 'from name')) + '</small>' : '') + (lock ? '' : ic('fa-pen')) + '</button>';
   }
 
+  function modHtml(r) {
+    var lock = busy || finished || r.skip;
+    if (!r.code || r.kind === 'text') return '';
+    var n = A.modCount ? A.modCount(r.code) : 0;
+    if (r.med && !lock) {
+      var h = '<select class="gsf-in nb-msel" data-f="mod" aria-label="' + esc(L('الوحدة', 'Module')) + '" data-gs-name-ar="الوحدة" data-gs-name-en="Module">' +
+        '<option value="">' + esc(L('المادّة كلّها', 'The whole course')) + '</option>';
+      for (var k = 1; k <= n; k++) {
+        var t = A.modName ? A.modName(r.code, k) : '';
+        h += '<option value="' + k + '"' + (r.mod && r.mod.m === k ? ' selected' : '') + '>' + esc(L('الوحدة ', 'Module ') + k + (t ? ' · ' + t : '')) + '</option>';
+      }
+      return '<span class="nb-cin">' + h + '</select></span>';
+    }
+    if (!r.mod) return lock ? '' : '<button type="button" class="nb-chip nb-chip--add" data-a="medit">' + ic('fa-plus') + esc(L('وحدة', 'Module')) + '</button>';
+    var G = window.GardenModGuess, src = r.mod.why === 'you' ? '' : (G ? G.label(r.mod, L) : '');
+    var c = A.course ? A.course(r.code) : { tone: '' };
+    return '<button type="button" class="nb-chip nb-chip--m"' + (r.mod.why === 'guess' ? ' data-guess="1"' : '') + ' data-a="medit"' +
+      (c.tone ? ' style="--nb-tone:' + esc(c.tone) + '"' : '') + (lock ? ' disabled' : '') +
+      ' title="' + esc(src ? L('اقترحناها ' + src + ' — اضغطْ لتغييرها', 'Suggested ' + src + ' — press to change') : L('اضغطْ لتغييرها', 'Press to change')) + '">' +
+      '<i class="nb-dot" aria-hidden="true"></i><span>' + esc(L('الوحدة ', 'Module ') + r.mod.m) + '</span>' +
+      (src ? '<small>' + esc(src) + '</small>' : '') + (lock ? '' : ic('fa-pen')) + '</button>';
+  }
+
   function rowHtml(r, i) {
     var lock = busy || finished;
     return '<li class="nb-row" data-i="' + i + '" data-st="' + r.st + '" data-k="' + esc(r.kind) + '">' +
@@ -136,7 +191,7 @@
         (r.skip || lock ? '<span class="nb-name" dir="auto">' + esc(r.skip ? r.file.name : r.title) + '</span>'
           : '<input class="gsf-in nb-in" data-f="title" dir="auto" value="' + esc(r.title) + '" aria-label="' + esc(L('الاسم', 'Name')) + '">') +
         '<div class="nb-meta"><span>' + esc(kindName(r.kind)) + '</span><span>' + lat(fmtSize(r.file.size)) + '</span>' +
-          (r.file.gd ? '<span class="nb-gd">' + '<i class="fa-brands fa-google-drive" aria-hidden="true"></i>' + esc(L('من درايف', 'from Drive')) + '</span>' : '') + courseHtml(r) + '</div>' +
+          (r.file.gd ? '<span class="nb-gd">' + '<i class="fa-brands fa-google-drive" aria-hidden="true"></i>' + esc(L('من درايف', 'from Drive')) + '</span>' : '') + courseHtml(r) + modHtml(r) + '</div>' +
       '</div>' +
       '<div class="nb-d">' + (r.skip || lock ? (r.skip ? '' : '<span class="nb-to">' + ic('fa-folder') + esc(destName(r)) + '</span>')
         : '<select class="gsf-in nb-sel" data-f="dest" data-gs-name-ar="إلى مجلّد" data-gs-name-en="To folder" aria-label="' + esc(L('إلى مجلّد', 'To folder')) + '">' + destOptions(r.dest, codesSet()) + '</select>') + '</div>' +
@@ -272,7 +327,7 @@
     paintRow(i);
     A.one({
       file: r.file, kind: r.kind, title: r.title, keep: keepTo,
-      place: { f: r.fid || null, c: r.code || null },
+      place: { f: r.fid || null, c: r.code || null, m: (r.code && r.mod && r.mod.m) || null },
       onProgress: function (at, of) {
         if (!of) return;
         var p = Math.round(at * 100 / of);
@@ -333,6 +388,7 @@
       A.i18n(dlg);
       paintFoot();
     } else render();
+    modRefine();
     return true;
   }
 
@@ -347,8 +403,11 @@
       var wasAuto = r.dest === folderFor(r.code);
       r.code = code; r.auto = 0;
       if (wasAuto) r.dest = folderFor(code);
+      r.mod = guessMod(r, r.text || '');
+      r.modRead = 0;
     }
     render();
+    modRefine();
   }
 
   function onClick(e) {
@@ -365,6 +424,14 @@
       rows.splice(i, 1);
       if (!rows.length) { close(); return; }
       render();
+      return;
+    }
+    if (a === 'medit' && !busy && !finished && rows[i]) {
+      rows.forEach(function (r) { r.med = 0; });
+      rows[i].med = 1;
+      render();
+      var ms = dlg.querySelector('.nb-row[data-i="' + i + '"] .nb-msel');
+      if (ms) { try { ms.focus(); } catch (e3) {} }
       return;
     }
     if (a === 'cedit' && !busy && !finished && rows[i]) {
@@ -391,6 +458,14 @@
     if (!li) return;
     var r = rows[Number(li.getAttribute('data-i'))];
     if (!r) return;
+    if (f === 'mod') {
+      var m = +t.value || 0, G = window.GardenModGuess;
+      r.med = 0;
+      r.mod = m ? { m: m, why: 'you' } : null;
+      if (m && G) G.learn(r.code, G.hitOf(r.file.name, r.code, r.text || ''), m);
+      render();
+      return;
+    }
     if (f === 'title') r.title = t.value.trim() || baseName(r.file.name);
     if (f === 'dest') r.dest = t.value;
   }
@@ -468,6 +543,7 @@
     (document.getElementById('na') || document.body).appendChild(dlg);
     render();
     try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); }
+    modRefine();
   }
 
   window.GardenNotesBulk = {

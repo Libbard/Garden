@@ -1133,6 +1133,7 @@
   }
   function doSpaceAct(act) {
     if (act === 'carch' || act === 'cunarch') { A.courseArch(A.view().code, act === 'carch'); return; }
+    if (act === 'cmods' && A.courseMods) { A.courseMods(A.view().code); return; }
     if (act === 'nfolder') A.newFolder();
     else if (act === 'nnote') A.newNote();
     else if (act === 'import') pickFiles();
@@ -1260,12 +1261,14 @@
       head: { ico: 'fa-graduation-cap', tone: A.tone(code), t: name, s: L('مادّة · ', 'Course · ') + cnt },
       items: [
         { a: 'open', i: 'fa-folder-open', t: L('افتحْ', 'Open') },
+        { a: 'mods', i: 'fa-layer-group', t: L('اقترحْ وحداتِ ملفّاتها…', 'Suggest modules for its files…') },
         { sep: 1 },
         arch ? { a: 'unarch', i: 'fa-box-archive', t: L('أعِدْها إلى «المواد»', 'Back to Courses') }
              : { a: 'arch', i: 'fa-box-archive', t: L('أرشِفْ المادّة', 'Archive course'), why: L('تختفي من «المواد» وتبقى ملاحظاتُها في «الأرشيف»', 'Leaves Courses; its notes stay in Archive') }
       ]
     }, function (act) {
       if (act === 'open') A.setView({ k: 'course', code: code });
+      else if (act === 'mods' && A.courseMods) A.courseMods(code);
       else if (act === 'arch') A.courseArch(code, true);
       else if (act === 'unarch') A.courseArch(code, false);
     }, MOPT);
@@ -1287,6 +1290,7 @@
         { a: 'paste', i: 'fa-paste', t: L('ألصِقْ هنا', 'Paste here'), kb: 'Ctrl V', off: !canPaste, why: canPaste ? '' : L('لا شيءَ في الحافظة', 'The clipboard is empty') }
       ];
       var vc = A.view();
+      if (vc.k === 'course' && A.courseMods) model.items.push({ a: 'cmods', i: 'fa-layer-group', t: L('اقترحْ وحداتِ ملفّاتها…', 'Suggest modules for its files…') });
       if (vc.k === 'course' && A.courseArch) {
         model.items.push(A.courseArchived(vc.code)
           ? { a: 'cunarch', i: 'fa-box-archive', t: L('أعِدْ المادّةَ إلى «المواد»', 'Move course back to Courses') }

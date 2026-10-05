@@ -6691,6 +6691,7 @@
                 c: null, f: null, p: 0, a: 0, ca: now, updated_at: now, sz: 0 };
     if (place && place.f) rec.f = place.f;
     if (place && place.c) rec.o.c = place.c;
+    if (place && place.c && +place.m > 0) rec.o.m = +place.m;
     if (place && place.g) rec.g = [place.g];
     idxPut(rec);
     return rec;
@@ -6826,6 +6827,10 @@
         try { return !!(window.GardenData && GardenData.courseInfo && GardenData.courseInfo(code)); } catch (e) { return false; }
       },
       course: function (code) { return { label: courseLabel(code), tone: courseTone(code) || '' }; },
+      modCount: modCount,
+      modName: modName,
+      modTitles: function (code) { return (_modT && _modT[code]) || null; },
+      modLoad: modTitles,
       courses: function () {
         var list = [];
         try { list = (window.GardenData && GardenData.catalogList) ? GardenData.catalogList() : []; } catch (e) {}
@@ -9872,17 +9877,30 @@
     while (q.length && g++ < 2000) { var id = q.shift(); if (set[id]) continue; set[id] = 1; (T.kids[id] || []).forEach(function (k) { q.push(k.id); }); }
     return idxRead().filter(function (r) { return r && !r.d && r.f && set[r.f]; }).map(function (r) { return r.id; });
   }
+  var _recTxt = {};
+  function recText(id) {
+    if (_recTxt[id] != null) return Promise.resolve(_recTxt[id]);
+    var St = window.GardenNotesStore, PD = window.GardenPdfDoc, G = window.GardenModGuess;
+    if (!St || !PD || !PD.get || !G) return Promise.resolve('');
+    return St.getDoc(id).then(function (row) {
+      var h = row && row.doc && row.doc.pdf && row.doc.pdf.h;
+      return h ? PD.get(h) : null;
+    }).then(function (blob) { return blob ? G.firstText(blob) : ''; })
+      .then(function (t) { _recTxt[id] = t || ''; return _recTxt[id]; }, function () { return ''; });
+  }
+
   /*@3.NOAJ.495*/
   function linkCourse(ids, code, mod) {
-    var now = Date.now(), n = 0;
-    var keep = mod === undefined, m = (code && !keep && +mod > 0) ? +mod : null;
+    var now = Date.now(), n = 0, fn = typeof mod === 'function' ? mod : null;
+    var keep = !fn && mod === undefined, m = (!fn && code && !keep && +mod > 0) ? +mod : null;
     (ids || []).forEach(function (id) {
       var r = idxFind(id);
       if (!r) return;
       r.o = r.o || {};
       var same = (r.o.c || '') === (code || '');
       var m0 = (r.o.m != null && +r.o.m > 0) ? +r.o.m : null;
-      var m1 = keep ? (same ? m0 : null) : m;
+      var f1 = fn && code ? +fn(r.id) : 0;
+      var m1 = fn ? (f1 > 0 ? f1 : (f1 < 0 || !same ? null : m0)) : (keep ? (same ? m0 : null) : m);
       if (same && m0 === m1) return;
       if (!same) { delete r.o.p; delete r.o.t; }
       if (code) r.o.c = code; else delete r.o.c;
@@ -10040,9 +10058,11 @@
         if (a === 'go') {
           var c = codeFrom(inp.value);
           if (!c) { inp.setCustomValidity(L('لا نعرف مادّةً بهذا الرمز أو الاسم', 'No course with this code or name')); inp.reportValidity(); return; }
-          var ms = dlg.querySelector('#na-course-m');
+          var ms = dlg.querySelector('#na-course-m'), mg = dlg.__mg || {}, mv = (ms && ms.value) ? +ms.value : null;
           dlg.close();
-          linkCourse(dlg.__ids, c, (ms && ms.value) ? +ms.value : null);
+          if (!mv && mg.perOn && mg.perOn()) { linkCourse(dlg.__ids, c, function (id) { return mg.per(id, c); }); return; }
+          if (mv && mg.learn) mg.learn(c, mv);
+          linkCourse(dlg.__ids, c, mv);
         }
       });
       dlg.addEventListener('keydown', function (e) {
@@ -10082,6 +10102,9 @@
       }).join('') + '</div>' : '') +
       '<label class="na-cdlg-l" for="na-course-m">' + esc(L('الوحدة', 'Module')) + '</label>' +
       '<select class="gsf-in" id="na-course-m" data-gs data-gs-name-ar="الوحدة" data-gs-name-en="Module"></select>' +
+      '<p class="gsf-sub na-cdlg-mh" id="na-course-mh" role="status" hidden></p>' +
+      (recs.length > 1 ? '<label class="na-cdlg-per" hidden><input type="checkbox" id="na-course-per" checked> <span></span></label>' +
+        '<ul class="na-cdlg-list" id="na-course-list" aria-label="' + esc(L('وحدةُ كلِّ ملفّ', 'Each file’s module')) + '" hidden></ul>' : '') +
       '</div>' +
       '<div class="gsf-foot"><div class="gsf-acts">' +
         (anyLinked ? '<button type="button" class="gsf-btn gsf-btn--ghost" data-ca="un">' + esc(L('افصلْ عن المادّة', 'Unlink')) + '</button>' : '') +
@@ -10107,9 +10130,89 @@
       if (window.GardenSelect) { try { GardenSelect.enhance(dlg); GardenSelect.sync(dlg); } catch (eG) {} }
     }
     fillMods(curM || '');
-    modTitles().then(function () { if (dlg.open && dlg.__ids === ids) fillMods(msel.value); });
-    dlg.querySelectorAll('[data-cc]').forEach(function (b) { b.addEventListener('click', function () { setTimeout(function () { fillMods(); }, 0); }); });
-    inp.addEventListener('input', function () { inp.setCustomValidity(''); fillMods(); });
+    var mh = dlg.querySelector('#na-course-mh'), per = dlg.querySelector('#na-course-per'), perL = per ? per.closest('.na-cdlg-per') : null;
+    var mg = dlg.__mg = { touched: 0, g: null, txt: {}, pick: {} }, lst = dlg.querySelector('#na-course-list');
+    function paintList(c) {
+      if (!lst) return;
+      var on = !!(c && per && per.checked && perL && !perL.hidden);
+      lst.hidden = !on;
+      if (!on) return;
+      var n = modCount(c), G = window.GardenModGuess, h = '';
+      recs.slice(0, 80).forEach(function (r) {
+        var g = guessFor(r, c), cm = curOf(r, c), v = mg.pick[r.id] != null ? mg.pick[r.id] : (cm || (g ? g.m : 0));
+        var o = '<option value="0">' + esc(L('المادّة كلّها', 'The whole course')) + '</option>';
+        for (var k = 1; k <= n; k++) {
+          var t = modName(c, k);
+          o += '<option value="' + k + '"' + (v === k ? ' selected' : '') + '>' + esc(L('الوحدة ', 'Module ') + k + (t ? ' · ' + t : '')) + '</option>';
+        }
+        var src = mg.pick[r.id] != null ? '' : cm ? L('وحدتُه الآن', 'its module now') : (g && G) ? G.label(g, L) : '';
+        var isG = !cm && mg.pick[r.id] == null && !!g && g.why === 'guess';
+        var nm = notPh(r.t) || L('بلا عنوان', 'Untitled');
+        h += '<li' + (isG ? ' data-guess="1"' : '') + '><span class="na-cdlg-ln" dir="auto">' + esc(nm) + '</span>' +
+          '<select class="gsf-in" data-pm="' + esc(r.id) + '" data-gs-name-ar="وحدةُ الملفّ" data-gs-name-en="File module" aria-label="' + esc(L('وحدةُ ', 'Module of ') + nm) + '">' + o + '</select>' +
+          '<small>' + esc(src) + '</small></li>';
+      });
+      lst.innerHTML = h;
+    }
+    if (lst) lst.addEventListener('change', function (e) {
+      var s = e.target.closest('[data-pm]');
+      if (!s) return;
+      var id = s.getAttribute('data-pm'), v = +s.value || 0, c = codeFrom(inp.value), G = window.GardenModGuess, r = idxFind(id);
+      mg.pick[id] = v;
+      if (G && r && v) G.learn(c, G.hitOf(r.t || '', c, mg.txt[id] || ''), v);
+      var sm = s.parentNode.querySelector('small');
+      if (sm) sm.textContent = '';
+      s.parentNode.removeAttribute('data-guess');
+    });
+    if (per) per.addEventListener('change', function () { paintList(codeFrom(inp.value)); });
+    function guessFor(r, c) {
+      var G = window.GardenModGuess;
+      if (!G || !r || !c) return null;
+      return G.pick({ name: r.t || '', code: c, count: modCount(c), titles: (_modT && _modT[c]) || null, text: mg.txt[r.id] || '' });
+    }
+    function suggest() {
+      var c = codeFrom(inp.value), G = window.GardenModGuess;
+      mg.g = (recs.length === 1 && !(c === cur && curM)) ? guessFor(recs[0], c) : null;
+      if (mg.g && !mg.touched && !msel.value) {
+        msel.value = String(mg.g.m);
+        if (window.GardenSelect) { try { GardenSelect.sync(dlg); } catch (eS) {} }
+      }
+      if (mh) {
+        mh.hidden = !(mg.g && msel.value === String(mg.g.m));
+        if (!mh.hidden) mh.textContent = L('اقترحناها ' + G.label(mg.g, L) + ' — غيِّرْها إن لم تُصب', 'Suggested ' + G.label(mg.g, L) + ' — change it if it is wrong');
+      }
+      if (perL) {
+        var n = 0;
+        if (c) recs.forEach(function (r) { if (guessFor(r, c)) n++; });
+        perL.hidden = !n;
+        perL.querySelector('span').textContent = L('لكلِّ ملفٍّ وحدتُه المقترحة (' + n + ' من ' + recs.length + ') — راجِعْها أدناه',
+          'Give each file its suggested module (' + n + ' of ' + recs.length + ') — review them below');
+        paintList(c);
+      }
+    }
+    mg.per = function (id, c) {
+      if (mg.pick[id] != null) return mg.pick[id] || -1;
+      var r = idxFind(id), cm = curOf(r, c);
+      if (cm) return cm;
+      var g = guessFor(r, c); return g ? g.m : 0;
+    };
+    function curOf(r, c) { return (r && r.o && r.o.c === c && +r.o.m > 0) ? +r.o.m : 0; }
+    mg.perOn = function () { return !!(per && per.checked && perL && !perL.hidden); };
+    mg.learn = function (c, m) {
+      var G = window.GardenModGuess;
+      if (!G || !mg.touched || recs.length !== 1) return;
+      G.learn(c, G.hitOf(recs[0].t || '', c, mg.txt[recs[0].id] || ''), m);
+    };
+    msel.addEventListener('change', function () { mg.touched = 1; suggest(); });
+    modTitles().then(function () { if (dlg.open && dlg.__ids === ids) { fillMods(msel.value); suggest(); } });
+    (function readTexts(k) {
+      var pd = recs.filter(function (r) { return r.k === 'pdf'; }).slice(0, 40);
+      if (k >= pd.length || !dlg.open || dlg.__ids !== ids) return;
+      recText(pd[k].id).then(function (t) { mg.txt[pd[k].id] = t; if (dlg.open && dlg.__ids === ids) suggest(); readTexts(k + 1); });
+    })(0);
+    suggest();
+    dlg.querySelectorAll('[data-cc]').forEach(function (b) { b.addEventListener('click', function () { setTimeout(function () { fillMods(); suggest(); }, 0); }); });
+    inp.addEventListener('input', function () { inp.setCustomValidity(''); fillMods(); suggest(); });
     try { inp.focus(); inp.select(); } catch (e2) {}
   }
 
@@ -10908,6 +11011,10 @@
       tone: courseTone,
       courseLabel: courseLabel,
       courseArchived: courseArchived,
+      courseMods: function (code) {
+        var ids = idxRead().filter(function (r) { return r && !r.d && r.o && r.o.c === code && r.k !== 'folder'; }).map(function (r) { return r.id; });
+        courseAsk(ids, code);
+      },
       courseArch: function (code, on) {
         if (!code) return;
         courseArchSet(code, on);
