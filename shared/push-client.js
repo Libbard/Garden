@@ -363,10 +363,34 @@
   }
 
   /*@3.PUCJ.32*/
-  function status() {
-    return post('/v1/status', { vault_id: vaultId(), device_id: deviceId() })
-      .catch(function (e) { return { ok: false, reason: String(e && e.message || e) }; });
+  /*@3.PUCJ.40*/
+  function migrationPending() {
+    var cur = null;
+    try { cur = localStorage.getItem(EP_LS); } catch (e) {}
+    if (cur === ENDPOINT || !supported()) return Promise.resolve(false);
+    if (!('Notification' in window) || Notification.permission !== 'granted') return Promise.resolve(false);
+    return swReg().then(function (reg) { return reg.pushManager.getSubscription(); })
+      .then(function (s) { return !!s; }, function () { return false; });
   }
+  function migrate() {
+    return migrationPending().then(function (yes) {
+      return yes ? subscribe().then(function (r) { return !!(r && r.ok); }) : false;
+    });
+  }
+  function rawStatus() {
+    return post('/v1/status', { vault_id: vaultId(), device_id: deviceId() });
+  }
+  function status() {
+    return rawStatus().catch(function (e) {
+      var why = String(e && e.message || e);
+      if (why !== 'device_not_subscribed') return { ok: false, reason: why };
+      return migrate().then(function (moved) {
+        if (!moved) return { ok: false, reason: why };
+        return rawStatus();
+      }).catch(function (e2) { return { ok: false, reason: String(e2 && e2.message || e2) }; });
+    });
+  }
+  setTimeout(function () { try { migrate().catch(function () {}); } catch (e) {} }, 3000);
 
   /*@3.PUCJ.35*/
   function awaitShown(sinceMs, opts) {
