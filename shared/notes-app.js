@@ -6046,6 +6046,296 @@
     });
   }
 
+  /*@3.NOAJ.497*/
+  function pdfBytesAny(spec) {
+    var D = window.GardenPdfDoc, C = window.GardenPdfCloud;
+    var none = function () { var e = new Error('no_bytes'); e.code = 'no_bytes'; throw e; };
+    if (!spec || !spec.h) return Promise.resolve().then(none);
+    return Promise.resolve(D && D.get ? D.get(spec.h) : null)['catch'](function () { return null; }).then(function (f) {
+      if (f) return f;
+      return Promise.resolve(C && C.restore ? C.restore(spec.h, spec.n || 'file.pdf') : null)['catch'](function () { return null; });
+    }).then(function (f) {
+      if (f) return f;
+      if (!spec.gd || !driveOn()) return none();
+      return needDrive().then(function (GD) { return GD.download(spec.gd); }).then(function (blob) {
+        return new File([blob], spec.n || 'drive.pdf', { type: 'application/pdf' });
+      }, none);
+    });
+  }
+  function inkInto(fromNs, toNs, map) {
+    var Ik = window.GardenPdfInk;
+    if (!Ik || !Ik.read || !Ik.write) return Promise.resolve(0);
+    return Promise.all(Object.keys(map).map(function (j) {
+      return Ik.read(fromNs, map[j]).then(function (row) { return (row && !row.x) ? Ik.write(toNs, +j, row) : null; });
+    }));
+  }
+  function pdfSrcs(ids) {
+    var St = window.GardenNotesStore;
+    return Promise.all(ids.map(function (id) {
+      return (St ? St.getDoc(id) : Promise.resolve(null)).then(function (row) {
+        var d = row && row.doc, r = idxFind(id) || {};
+        if (!d || d.kind !== 'pdf' || !d.pdf || !d.pdf.h) return null;
+        return { id: id, spec: d.pdf, marks: d.marks || null, t: notPh(r.t) || String(d.pdf.n || '').replace(/[.]pdf$/i, '') || L('ملفّ', 'File'),
+                 pg: +d.pdf.pg || 0, place: { f: r.f || null, c: (r.o && r.o.c) || null, g: null } };
+      });
+    })).then(function (list) { return list.filter(Boolean); });
+  }
+  function ptWhy(e, t) {
+    var c = e && e.code;
+    return c === 'no_bytes' ? L('«' + t + '» ليس على هذا الجهاز ولا في نسختنا ولا في درايف — افتحْه مرّةً ثمّ أعِدْ.', '“' + t + '” is not on this device, in our copy or in Drive — open it once, then try again.')
+      : c === 'encrypted' ? L('«' + t + '» محميٌّ بكلمة مرور، ولا يُدمج ولا يُقسَّم.', '“' + t + '” is password-protected and cannot be merged or split.')
+      : /edit_|pdflib_/.test(String(e && e.message)) ? L('تعذّر تحميلُ أداة الصفحات — تحقّقْ من الاتّصال.', 'Could not load the page tool — check your connection.')
+      : L('تعذّر إنشاءُ الملفّ — لم يتغيّر شيء.', 'Could not make the file — nothing was changed.');
+  }
+  function ptBorn(res, name, place, title, parts) {
+    return editBorn(res, name).then(function (nb) {
+      return pdfNote({ spec: nb.spec }, nb.file, place, null, title).then(function (nid) {
+        var to = nid + '|' + nb.spec.h, mk = null;
+        return parts.reduce(function (ch, p) {
+          return ch.then(function () { return inkInto(p.src.id + '|' + p.src.spec.h, to, p.map); }).then(function () {
+            var m = remapMarks(p.src.marks, p.map);
+            if (!m || !m.pages) return;
+            if (!mk) mk = m;
+            else Object.keys(m.pages).forEach(function (j) { mk.pages[j] = m.pages[j]; });
+          });
+        }, Promise.resolve()).then(function () {
+          var St = window.GardenNotesStore;
+          if (!mk || !St) return nid;
+          return St.getDoc(nid).then(function (row) {
+            var d = row && row.doc;
+            if (d) { d.marks = mk; persist(nid, d, true); }
+            return nid;
+          });
+        });
+      });
+    });
+  }
+  function ptDlg(id, title, sub, body, goTxt) {
+    var dlg = document.getElementById(id);
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = id;
+      dlg.className = 'gsf gsf--snug gsf--flat na-dlg na-cdlg na-pt';
+      dlg.setAttribute('aria-labelledby', id + '-t');
+      document.body.appendChild(dlg);
+      dlg.addEventListener('cancel', function (e) { if (dlg.__busy) e.preventDefault(); });
+    }
+    dlg.__busy = 0;
+    dlg.innerHTML =
+      '<div class="gsf-grip" aria-hidden="true"></div>' +
+      '<form method="dialog" class="gsf-x"><button class="gsf-close" type="submit" aria-label="' + esc(L('إغلاق', 'Close')) + '" title="' + esc(L('إغلاق', 'Close')) + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
+      '<div class="gsf-body"><div class="gsf-head"><h2 class="gsf-title" id="' + id + '-t" dir="auto">' + esc(title) + '</h2>' +
+      '<p class="gsf-sub">' + esc(sub) + '</p></div>' + body +
+      '<p class="na-pt-st" role="status" aria-live="polite"></p></div>' +
+      '<div class="gsf-foot"><div class="gsf-acts">' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost" data-pt="x">' + esc(L('إلغاء', 'Cancel')) + '</button>' +
+        '<button type="button" class="gsf-btn gsf-btn--go" data-pt="go">' + goTxt + '</button>' +
+      '</div></div>';
+    dlg.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    return dlg;
+  }
+  function ptBusy(dlg, on, msg) {
+    dlg.__busy = on ? 1 : 0;
+    dlg.querySelectorAll('button, input').forEach(function (b) { b.disabled = !!on; });
+    var st = dlg.querySelector('.na-pt-st');
+    if (st) { st.textContent = msg || ''; st.removeAttribute('data-bad'); }
+  }
+  function ptBad(dlg, msg) {
+    ptBusy(dlg, false);
+    var st = dlg.querySelector('.na-pt-st');
+    if (st) { st.textContent = msg; st.setAttribute('data-bad', '1'); }
+  }
+  function ptShow(dlg) {
+    try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); }
+    dlg.querySelector('[data-pt="x"]').onclick = function () { if (!dlg.__busy) dlg.close(); };
+  }
+  function pgTxt(n) { return L(n === 1 ? 'صفحة' : (n === 2 ? 'صفحتان' : n + (n <= 10 ? ' صفحات' : ' صفحة')), n + (n === 1 ? ' page' : ' pages')); }
+
+  /*@3.NOAJ.498*/
+  function pdfMerge(ids) {
+    pdfSrcs(ids || []).then(function (src) {
+      if (src.length < 2) { toast(L('اخترْ ملفَّي PDF فأكثر لتدمجها.', 'Pick two or more PDF files to merge.')); return; }
+      var order = src.slice();
+      var tot = function () { return order.reduce(function (a, s) { return a + (s.pg || 0); }, 0); };
+      var goTxt = function () { var t = tot(); return '<i class="fa-solid fa-object-group" aria-hidden="true"></i> ' + esc(t ? L('ادمجْ — ', 'Merge — ') + pgTxt(t) : L('ادمجْ', 'Merge')); };
+      var dlg = ptDlg('na-pmerge', L('ادمجْها في ملفٍّ واحد', 'Merge into one file'),
+        L('ملفٌّ جديدٌ بهذا الترتيب، بحبرها وتظليلها وفهارسها. الأصولُ تبقى كما هي.', 'A new file in this order, with their ink, highlights and contents. The originals stay as they are.'),
+        '<ol class="na-pt-list"></ol>' +
+        '<label class="na-cdlg-l" for="na-pt-name">' + esc(L('اسمُ الملفّ الجديد', 'Name of the new file')) + '</label>' +
+        '<input class="gsf-in" id="na-pt-name" type="text" dir="auto" autocomplete="off">', goTxt());
+      var list = dlg.querySelector('.na-pt-list'), name = dlg.querySelector('#na-pt-name');
+      name.value = order[0].t + ' — ' + L('مدموج', 'merged');
+      function paintList() {
+        list.innerHTML = order.map(function (s, i) {
+          return '<li class="na-pt-row"><span class="na-pt-i">' + (i + 1) + '</span>' +
+            '<span class="na-pt-t" dir="auto">' + esc(s.t) + '</span>' +
+            '<span class="na-pt-pg">' + esc(s.pg ? pgTxt(s.pg) : '') + '</span>' +
+            '<button type="button" class="na-icb" data-mv="-1" data-i="' + i + '"' + (i ? '' : ' disabled') + ' aria-label="' + esc(L('إلى أعلى', 'Move up')) + '" title="' + esc(L('إلى أعلى', 'Move up')) + '"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>' +
+            '<button type="button" class="na-icb" data-mv="1" data-i="' + i + '"' + (i < order.length - 1 ? '' : ' disabled') + ' aria-label="' + esc(L('إلى أسفل', 'Move down')) + '" title="' + esc(L('إلى أسفل', 'Move down')) + '"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button></li>';
+        }).join('');
+      }
+      paintList();
+      list.onclick = function (e) {
+        var b = e.target.closest('[data-mv]');
+        if (!b || b.disabled) return;
+        var i = +b.getAttribute('data-i'), j = i + +b.getAttribute('data-mv');
+        if (j < 0 || j >= order.length) return;
+        var x = order[i]; order[i] = order[j]; order[j] = x;
+        paintList();
+        var nb = list.querySelector('[data-mv="' + b.getAttribute('data-mv') + '"][data-i="' + j + '"]');
+        if (nb && !nb.disabled) nb.focus();
+      };
+      dlg.querySelector('[data-pt="go"]').onclick = function () {
+        var title = String(name.value || '').trim() || order[0].t;
+        var files = [], at = 0;
+        ptBusy(dlg, true, L('أجمع الملفّات…', 'Gathering the files…'));
+        order.reduce(function (ch, s, k) {
+          return ch.then(function () {
+            ptBusy(dlg, true, L('أجلب «' + s.t + '» (‏' + (k + 1) + ' من ' + order.length + ')…', 'Fetching “' + s.t + '” (' + (k + 1) + ' of ' + order.length + ')…'));
+            return pdfBytesAny(s.spec)['catch'](function (e) { e.t = s.t; throw e; }).then(function (f) { files[k] = f; });
+          });
+        }, Promise.resolve()).then(function () { return needEdit(); }).then(function (E) {
+          ptBusy(dlg, true, L('أكتب الملفَّ الجديد…', 'Writing the new file…'));
+          var items = [], parts = order.map(function (s) { return { src: s, map: {} }; });
+          return Promise.all(files.map(function (f, k) {
+            if (order[k].pg > 0) return order[k].pg;
+            return E.lib().then(function (P) { return f.arrayBuffer().then(function (b) { return P.PDFDocument.load(b, { ignoreEncryption: true, updateMetadata: false }); }); })
+              .then(function (d) { return d.getPageCount(); }, function () { return 0; });
+          })).then(function (counts) {
+            counts.forEach(function (c, k) {
+              var n = c || order[k].pg || 0;
+              for (var i = 1; i <= n; i++) { items.push({ f: k, i: i, r: 0 }); parts[k].map[items.length] = i; }
+            });
+            if (items.length > E.MAX_PAGES) { var e = new Error('too_big'); e.code = 'too_big'; throw e; }
+            return E.build(files, items);
+          }).then(function (bytes) {
+            at = items.length;
+            var res = { blob: new Blob([bytes], { type: 'application/pdf' }), pages: items.length };
+            return ptBorn(res, title + '.pdf', order[0].place, title, parts);
+          });
+        }).then(function (nid) {
+          dlg.__busy = 0;
+          dlg.close();
+          clearPicked();
+          reload({ keepOpen: true });
+          toast(L('صُنع «' + title + '» — ' + pgTxt(at) + '.', 'Made “' + title + '” — ' + pgTxt(at) + '.'));
+          return nid;
+        })['catch'](function (e) {
+          ptBad(dlg, e && e.code === 'too_big' ? L('المجموعُ أكثرُ من ' + E_MAX() + ' صفحة — قسِّمْه على ملفّين.', 'Over ' + E_MAX() + ' pages in total — split it into two files.') : ptWhy(e, (e && e.t) || ''));
+        });
+      };
+      ptShow(dlg);
+      try { name.focus(); name.select(); } catch (e0) {}
+    });
+  }
+  function E_MAX() { return (window.GardenPdfEdit && window.GardenPdfEdit.MAX_PAGES) || 9000; }
+
+  /*@3.NOAJ.499*/
+  var SPLIT_MAX = 60;
+  function splitGroups(str, n) {
+    var DIG = '٠١٢٣٤٥٦٧٨٩', DIG2 = '۰۱۲۳۴۵۶۷۸۹';
+    var s = String(str || '').replace(/[٠-٩]/g, function (c) { return String(DIG.indexOf(c)); })
+      .replace(/[۰-۹]/g, function (c) { return String(DIG2.indexOf(c)); })
+      .replace(/\s*[-–—ـ~:]\s*/g, '-');
+    var out = [], bad = [];
+    s.split(/[,،;؛\n]+/).forEach(function (g) {
+      g = g.trim();
+      if (!g) return;
+      var m = /^(\d+)(?:-(\d*))?$/.exec(g);
+      if (!m) { bad.push(g); return; }
+      var a = +m[1], b = m[2] === undefined ? a : (m[2] === '' ? n : +m[2]);
+      if (a > b) { var x = a; a = b; b = x; }
+      if (a < 1 || b > n) { bad.push(g); return; }
+      out.push({ a: a, b: b });
+    });
+    return { groups: out, bad: bad };
+  }
+  function everyN(n, k) {
+    var g = [];
+    for (var a = 1; a <= n; a += k) g.push(a + (Math.min(n, a + k - 1) > a ? '-' + Math.min(n, a + k - 1) : ''));
+    return g.join(', ');
+  }
+  function pgCount(src) {
+    return Promise.all([pdfBytesAny(src.spec), needEdit()]).then(function (r) {
+      return r[1].lib().then(function (P) { return r[0].arrayBuffer().then(function (b) { return P.PDFDocument.load(b, { ignoreEncryption: true, updateMetadata: false }); }); });
+    }).then(function (d) { return d.getPageCount(); }, function () { return 0; });
+  }
+  function pdfSplit(id) {
+    pdfSrcs([id]).then(function (src) {
+      var s0 = src[0];
+      return (s0 && !(s0.pg > 0)) ? pgCount(s0).then(function (n) { s0.pg = n; return src; }) : src;
+    }).then(function (src) {
+      var s = src[0];
+      if (!s) { toast(L('اخترْ ملفَّ PDF واحداً لتقسِّمه.', 'Pick one PDF file to split.')); return; }
+      var n = s.pg;
+      var goTxt = function (k) { return '<i class="fa-solid fa-scissors" aria-hidden="true"></i> ' + esc(k ? L('قسِّمْ إلى ' + k + (k === 1 ? ' ملفّ' : (k === 2 ? ' ملفّين' : (k <= 10 ? ' ملفّات' : ' ملفّاً'))), 'Split into ' + k + (k === 1 ? ' file' : ' files')) : L('قسِّمْ', 'Split')); };
+      var chips = [];
+      if (n >= 4) chips.push({ v: everyN(n, Math.ceil(n / 2)), t: L('نصفان', 'Two halves') });
+      [5, 10, 20].forEach(function (k) { if (n > k && Math.ceil(n / k) <= SPLIT_MAX) chips.push({ v: everyN(n, k), t: L('كلَّ ' + k + ' صفحات', 'Every ' + k + ' pages') }); });
+      if (n > 1 && n <= SPLIT_MAX) chips.push({ v: everyN(n, 1), t: L('كلُّ صفحةٍ ملفّ', 'One file per page') });
+      var dlg = ptDlg('na-psplit', L('قسِّمْ «', 'Split “') + s.t + L('»', '”') + (n ? ' · ' + pgTxt(n) : ''),
+        L('كلُّ مجموعةٍ تصير ملفّاً جديداً بجانبه، بحبرها وتظليلها. الأصلُ يبقى كما هو.', 'Each group becomes a new file beside it, with its ink and highlights. The original stays as it is.'),
+        (chips.length ? '<div class="gsf-chips na-pt-quick">' + chips.map(function (c, i) {
+          return '<button type="button" class="gsf-chip" data-q="' + i + '">' + esc(c.t) + '</button>';
+        }).join('') + '</div>' : '') +
+        '<label class="na-cdlg-l" for="na-pt-groups">' + esc(L('المجموعات — افصلْ بينها بفاصلة', 'Groups — separate them with commas')) + '</label>' +
+        '<input class="gsf-in" id="na-pt-groups" type="text" dir="ltr" inputmode="text" autocomplete="off" spellcheck="false" placeholder="1-5, 6-12, 13-">' +
+        '<div class="na-pt-prev" aria-live="polite"></div>', goTxt(0));
+      var inp = dlg.querySelector('#na-pt-groups'), prev = dlg.querySelector('.na-pt-prev'), go = dlg.querySelector('[data-pt="go"]');
+      var cur = { groups: [], bad: [] };
+      function paintPrev() {
+        cur = splitGroups(inp.value, n);
+        var many = cur.groups.length > SPLIT_MAX;
+        prev.innerHTML = cur.groups.slice(0, 24).map(function (g) {
+          return '<span class="na-pt-g">' + esc(L('ص ', 'pp ')) + '<bdi dir="ltr">' + g.a + (g.b > g.a ? '–' + g.b : '') + '</bdi></span>';
+        }).join('') + (cur.groups.length > 24 ? '<span class="na-pt-g na-pt-g--more">+' + (cur.groups.length - 24) + '</span>' : '') +
+          (cur.bad.length ? '<p class="na-pt-bad">' + esc(L('لا أفهم: ', 'Not understood: ') + cur.bad.join('، ') + L(' — الصفحاتُ من 1 إلى ' + n, ' — pages run 1 to ' + n)) + '</p>' : '') +
+          (many ? '<p class="na-pt-bad">' + esc(L('أكثرُ من ' + SPLIT_MAX + ' ملفّاً — اجمعْ صفحاتٍ أكثر في كلِّ مجموعة.', 'More than ' + SPLIT_MAX + ' files — put more pages in each group.')) + '</p>' : '');
+        go.innerHTML = goTxt(cur.groups.length);
+        go.disabled = !cur.groups.length || !!cur.bad.length || many;
+        dlg.querySelectorAll('[data-q]').forEach(function (c) { c.classList.toggle('on', chips[+c.getAttribute('data-q')].v === inp.value); });
+      }
+      inp.value = chips.length ? chips[0].v : '';
+      paintPrev();
+      inp.addEventListener('input', paintPrev);
+      dlg.querySelectorAll('[data-q]').forEach(function (c) {
+        c.onclick = function () { inp.value = chips[+c.getAttribute('data-q')].v; paintPrev(); };
+      });
+      go.onclick = function () {
+        var groups = cur.groups.slice();
+        if (!groups.length || cur.bad.length) return;
+        ptBusy(dlg, true, L('أجلب الملفّ…', 'Fetching the file…'));
+        var made = 0;
+        Promise.all([pdfBytesAny(s.spec), needEdit()]).then(function (r) {
+          var f = r[0], E = r[1];
+          return groups.reduce(function (ch, g, k) {
+            return ch.then(function () {
+              ptBusy(dlg, true, L('أكتب الملفّ ' + (k + 1) + ' من ' + groups.length + '…', 'Writing file ' + (k + 1) + ' of ' + groups.length + '…'));
+              var items = [], map = {};
+              for (var i = g.a; i <= g.b; i++) { items.push({ f: 0, i: i, r: 0 }); map[items.length] = i; }
+              var lbl = g.a + (g.b > g.a ? '–' + g.b : '');
+              var title = s.t + L(' — ص ', ' — pp ') + lbl;
+              return E.build([f], items).then(function (bytes) {
+                return ptBorn({ blob: new Blob([bytes], { type: 'application/pdf' }), pages: items.length }, title + '.pdf', s.place, title, [{ src: s, map: map }]);
+              }).then(function () { made++; });
+            });
+          }, Promise.resolve());
+        }).then(function () {
+          dlg.__busy = 0;
+          dlg.close();
+          clearPicked();
+          reload({ keepOpen: true });
+          toast(L('صُنع ' + made + (made === 1 ? ' ملفّ' : (made === 2 ? ' ملفّان' : ' ملفّات')) + ' بجانب «' + s.t + '».', 'Made ' + made + ' files beside “' + s.t + '”.'));
+        })['catch'](function (e) {
+          if (made) reload({ keepOpen: true });
+          ptBad(dlg, (made ? L('صُنع ' + made + ' ثمّ توقّف: ', 'Made ' + made + ', then stopped: ') : '') + ptWhy(e, s.t));
+        });
+      };
+      ptShow(dlg);
+      try { inp.focus(); } catch (e0) {}
+    });
+  }
+
   /*@3.NOAJ.458*/
   var EDS_MAX = 10;
   var inkHist = {};
@@ -10541,6 +10831,8 @@
       folderAct: function (act, fid) { folderCtxAct(act, fid); },
       folderCourseItems: folderCourseItems,
       linkCourse: function (uids) { courseAsk(recsOf(uids).map(function (x) { return x.id; })); },
+      pdfMerge: function (uids) { pdfMerge(recsOf(uids).filter(function (x) { return x.kind === 'pdf'; }).map(function (x) { return x.id; })); },
+      pdfSplit: function (uid) { var r = recsOf([uid])[0]; if (r && r.kind === 'pdf') pdfSplit(r.id); },
       folderSib: function (fid, dir) { return sibMove(fid, dir); },
       driveOn: driveOn,
       importDrive: function () { bulkOpen([], true); },

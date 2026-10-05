@@ -429,6 +429,11 @@
       if (n === 1) h += b('open', 'fa-up-right-from-square', 'افتحْ', 'Open');
       h += b('move', 'fa-folder-open', 'انقلْ', 'Move');
       h += b('export', 'fa-file-export', 'صدِّرْ', 'Export');
+      /*@3.NOEJ3.32*/
+      var pk = pickedList().map(itemOf).filter(Boolean);
+      var allPdf = pk.length === n && pk.every(function (x) { return kindOf(x) === 'pdf'; });
+      if (allPdf && n >= 2 && A.pdfMerge) h += b('pmerge', 'fa-object-group', 'ادمجْ', 'Merge');
+      if (allPdf && n === 1 && A.pdfSplit) h += b('psplit', 'fa-scissors', 'قسِّمْ', 'Split');
       h += A.view().k === 'archive'
         ? b('unarch', 'fa-box-archive', 'أعِدْ من الأرشيف', 'Unarchive')
         : b('arch', 'fa-box-archive', 'أرشِفْ', 'Archive');
@@ -1156,6 +1161,10 @@
       { a: 'course', i: 'fa-graduation-cap', t: (n === 1 && it.origin && it.origin.course) ? L('المادّة: ', 'Course: ') + it.origin.course + L(' — غيِّرْ…', ' — change…') : L('اربطْ بمادّة…', 'Link to a course…') },
       { a: 'export', i: 'fa-file-export', t: L('صدِّرْ…', 'Export…') }
     ];
+    if (recs.length === n && recs.every(function (r) { return kindOf(r) === 'pdf'; })) {
+      if (n >= 2 && A.pdfMerge) items.push({ a: 'pmerge', i: 'fa-object-group', t: L('ادمجْها في ملفٍّ واحد…', 'Merge into one file…') });
+      if (n === 1 && A.pdfSplit) items.push({ a: 'psplit', i: 'fa-scissors', t: L('قسِّمْه إلى ملفّات…', 'Split into files…') });
+    }
     if (n === 1) items.push({ a: 'props', i: 'fa-circle-info', t: L('الخصائص', 'Properties'), kb: 'Alt ⏎' });
     items.push({ sep: 1 });
     items.push({ a: 'trash', i: 'fa-trash', t: L('إلى السلّة', 'To trash'), dz: 1, kb: 'Del' });
@@ -1165,6 +1174,8 @@
       else if (act === 'dup') A.dup(ids);
       else if (act === 'move') A.move(ids);
       else if (act === 'export') A.exportIds(ids);
+      else if (act === 'pmerge') A.pdfMerge(ids);
+      else if (act === 'psplit') A.pdfSplit(ids[0]);
       else if (act === 'pin' || act === 'unpin') A.pin(ids, act === 'pin');
       else if (act === 'arch' || act === 'unarch') A.archive(ids, act === 'arch');
       else if (act === 'copy' || act === 'cut') A.act(act, uid);
@@ -1328,6 +1339,8 @@
       case 'open': openItem(itemOf(ids[0])); return;
       case 'move': A.move(ids); return;
       case 'export': A.exportIds(ids); return;
+      case 'pmerge': A.pdfMerge(ids); return;
+      case 'psplit': A.pdfSplit(ids[0]); return;
       case 'arch': A.archive(ids, true); return;
       case 'unarch': A.archive(ids, false); return;
       case 'trash': A.trash(ids); return;
