@@ -9126,7 +9126,9 @@
     { id: 'na-text-top',  tool: 'text',  ar: 'حقلُ نصّ — انقرْ حيث تريده',
       en: 'Text field — click where you want it' },
     { id: 'na-shape-top', tool: 'rect',  ar: 'الأشكال — مستطيلٌ ودائرةٌ وخطٌّ وسهم',
-      en: 'Shapes — box, circle, line, arrow' }
+      en: 'Shapes — box, circle, line, arrow' },
+    { id: 'na-lib-top', tool: 'lib', ar: 'المرسم — ملصقاتٌ وصفحاتُ تلوينٍ ودروسُ رسم',
+      en: 'Studio — stickers, coloring pages and drawing lessons' }
   ];
 
   /*@3.NOAJ.278*/
@@ -9461,6 +9463,37 @@
   }
 
   /*@3.NOAJ.290*/
+  function insertImageBlob(blob, o) {
+    o = o || {};
+    var St = window.GardenNotesStore;
+    if (!St || !St.putImage) return Promise.reject(new Error('no_store'));
+    return St.putImage(blob, { name: o.name || 'mirsam.webp' }).then(function (rid) {
+      var ex = { url: 'byte-local:' + rid, alt: o.alt || '', cap: 0, loc: 1, wm: o.wm || 0.3 };
+      if (o.iar > 0 && o.inw > 0) { ex.iar = o.iar; ex.inw = o.inw; }
+      if (pdfOn() && pdfUi.ink()) {
+        var K = pdfUi.ink(), n = pdfUi.page() || 1;
+        var pEl = document.querySelector('.gpv-page[data-p="' + n + '"]');
+        var pg = K.pages ? K.pages[n] : null;
+        if (!pEl || !pg || !K.fieldEd) return false;
+        var edP = K.fieldEd(pg, true);
+        if (!edP) return false;
+        var rr = pEl.getBoundingClientRect();
+        var lpP = edP.localPoint(rr.left + rr.width * 0.5, rr.top + rr.height * 0.3);
+        var bP = edP.addFree('img', Math.max(0, lpP.x), Math.max(0, lpP.y), ex);
+        if (bP && bP.id && edP.touchAct) { try { edP.touchAct(bP.id); } catch (eP) {} }
+        K.fieldFocus(pg, true);
+        return true;
+      }
+      if (!ed) return false;
+      var host = els.docBody;
+      var bx = host ? host.getBoundingClientRect() : { left: 0, top: 0, width: 600, height: 400 };
+      var lp = ed.localPoint(bx.left + bx.width * 0.5, bx.top + bx.height * 0.3);
+      var bN = ed.addFree('img', lp.x, Math.max(0, lp.y), ex);
+      if (bN && bN.id && ed.touchAct) { try { ed.touchAct(bN.id); } catch (eN) {} }
+      return true;
+    });
+  }
+
   function insertShape() {
     var B2 = window.GardenNotesBlocks;
     var wmD = shapeKit.sh === 'sticker' ? 0.12 : (shapeKit.sh === 'sticky' ? 0.3 : 0.28);
@@ -12592,6 +12625,8 @@
     if (tb) tb.addEventListener('click', function () { onTextBtn(); });
     var sb2 = document.getElementById('na-shape-top');
     if (sb2) sb2.addEventListener('click', function () { shapeTray(sb2); });
+    var lb2 = document.getElementById('na-lib-top');
+    if (lb2) lb2.addEventListener('click', function () { if (window.GardenNotesLibrary) window.GardenNotesLibrary.open(lb2); });
     var ps = document.getElementById('na-pdf-side');
     if (ps) ps.addEventListener('click', function () {
       if (!pdfOn()) return;
@@ -12877,6 +12912,7 @@
 
   window.GardenNotesApp = {
     editor: function () { return ed; },
+    insertImage: insertImageBlob,
     doc: docNow,
     noteId: function () { return edId; },
     save: function (quiet) {
