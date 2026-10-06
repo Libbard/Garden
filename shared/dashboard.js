@@ -728,57 +728,6 @@
     ov.setAttribute('data-code', code);
   }
 
-  /*@3.DASJ.48*/
-  function bindSettingsAcc() {
-    var accs = document.querySelectorAll('.dash-settings .dash-acc');
-    if (!accs.length) return;
-    Array.prototype.forEach.call(accs, function (a) {
-      var head = a.querySelector('.dash-acc-head');
-      if (!head) return;
-      head.addEventListener('click', function () {
-        var open = a.classList.contains('is-open');
-        Array.prototype.forEach.call(accs, function (x) { x.classList.remove('is-open'); });
-        if (!open) a.classList.add('is-open');
-        syncAccSummaries();
-      });
-    });
-    syncAccSummaries();
-  }
-  function syncAccSummaries() {
-    var s = el('acc-sum-profile');
-    if (s) {
-      var nm = (el('set-name') && el('set-name').value) ||
-               (el('set-name-en') && el('set-name-en').value) || '';
-      var lv = (el('set-level') && el('set-level').value) || '';
-      s.textContent = [nm, lv ? tx('المستوى ' + lv, 'Level ' + lv) : ''].filter(Boolean).join(' · ');
-    }
-    var r = el('acc-sum-rem');
-    if (r) {
-      /*@3.DASJ.49*/
-      var on = !!(window.Reminders && Reminders.settings && Reminders.settings().enabled);
-      var okPerm = !(window.Reminders && Reminders.capability
-        && Reminders.capability().permission !== 'granted');
-      r.textContent = on
-        ? (okPerm ? tx('مفعّلة', 'On') : tx('مفعّلة — الإذن ناقص', 'On — permission missing'))
-        : tx('مطفأة', 'Off');
-    }
-    var y = el('acc-sum-sync');
-    if (y) {
-      var t = el('sync-state-text');
-      y.textContent = (t && t.textContent !== '—') ? t.textContent : tx('غير مضبوطة', 'Not set up');
-    }
-    var g = el('acc-sum-legacy');
-    if (g && window.ByteLegacy) {
-      var ls = window.ByteLegacy.summary();
-      g.textContent = !ls.exists ? ''
-        : window.ByteLegacy.hasContent(ls)
-          ? tx('فيها عملٌ محفوظ', 'Contains saved work')
-          : tx('بقايا فارغة', 'Empty leftovers');
-    }
-  }
-  /*@3.DASJ.50*/
-  document.addEventListener('reminders:synced', syncAccSummaries);
-  document.addEventListener('garden:languageChanged', syncAccSummaries);
 
   function bindStyleModal() {
     var ov = el('dash-style-modal');
@@ -1617,6 +1566,8 @@
   }
 
   function showView(name) {
+    /*@3.DASJ.152*/
+    if (name === 'settings') { location.href = 'hub/settings.html'; return; }
     /*@3.DASJ.83*/
     if (name !== 'overview' && document.body.classList.contains('dash-customizing')) {
       document.body.classList.remove('dash-customizing');
@@ -1635,221 +1586,7 @@
     try { localStorage.setItem('dash_view', name); } catch (e) {}
     if (name === 'courses') renderCourses();
     if (name === 'tasks') renderTasks();
-    if (name === 'settings') fillSettings();
     window.scrollTo(0, 0);
-  }
-
-  /*@3.DASJ.84*/
-
-  function fillSettings() {
-    var p = D.profile();
-    var pn = window.GardenBiName ? window.GardenBiName.read(p) : { ar: (p && p.name) || '', en: '' };
-    if (el('set-name')) el('set-name').value = pn.ar;
-    if (el('set-name-en')) el('set-name-en').value = pn.en;
-    if (window.GardenBiName && el('set-name') && el('set-name-en') && !el('set-name').dataset.biBound) {
-      el('set-name').dataset.biBound = '1';
-      window.GardenBiName.attach({ ar: el('set-name'), en: el('set-name-en'), suggest: false });
-    }
-    if (el('set-level')) el('set-level').value = (p && p.level) || '';
-    if (el('set-theme')) el('set-theme').value = localStorage.getItem('garden_theme') || 'dark';
-    /*@3.DASJ.85*/
-    ['set-name', 'set-name-en'].forEach(function (id) {
-      var f = el(id);
-      if (f && !f.dataset.autoSave) {
-        f.dataset.autoSave = '1';
-        f.addEventListener('change', saveSettings);
-      }
-    });
-    fillFontSeg();
-    initSetRail();
-    fillSyncSection();
-    fillLegacySection();
-  }
-
-  /*@3.DASJ.86*/
-  function initSetRail() {
-    var rail = el('dash-set-rail');
-    if (!rail || rail.dataset.bound) return;
-    rail.dataset.bound = '1';
-
-    function cards() {
-      return Array.prototype.slice.call(document.querySelectorAll('.dash-settings .set-card[data-dsec]'));
-    }
-    function mark(sec) {
-      Array.prototype.forEach.call(rail.querySelectorAll('[data-dgo]'), function (b) {
-        b.classList.toggle('is-on', b.getAttribute('data-dgo') === sec);
-      });
-    }
-
-    rail.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-dgo]');
-      if (!b) return;
-      var sec = b.getAttribute('data-dgo');
-      var card = document.querySelector('.dash-settings .set-card[data-dsec="' + sec + '"]');
-      if (!card) return;
-      mark(sec);
-      var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-      card.scrollIntoView({ behavior: calm ? 'instant' : 'smooth', block: 'start' });
-    });
-
-    /*@3.DASJ.87*/
-    var tick = 0;
-    window.addEventListener('scroll', function () {
-      if (tick) return;
-      tick = requestAnimationFrame(function () {
-        tick = 0;
-        var view = document.querySelector('.dash-view[data-view="settings"]');
-        if (!view || !view.classList.contains('active')) return;
-        var best = null, bestD = Infinity, y = window.innerHeight * 0.28;
-        cards().forEach(function (c) {
-          var d = Math.abs(c.getBoundingClientRect().top - y);
-          if (d < bestD) { bestD = d; best = c; }
-        });
-        if (best) mark(best.getAttribute('data-dsec'));
-      });
-    }, { passive: true });
-  }
-
-  /*@3.DASJ.88*/
-  var FS_PREVIEW = { xs: '.85rem', sm: '.92rem', md: '1rem', lg: '1.12rem', xl: '1.26rem' };
-  function fillFontSeg() {
-    var seg = el('set-font');
-    if (!seg || seg.tagName === 'SELECT') return;   /*@3.DASJ.89*/
-    var cur = localStorage.getItem('garden_font_size') || 'md';
-    if (!FS_PREVIEW[cur]) cur = 'md';
-    Array.prototype.forEach.call(seg.querySelectorAll('[data-fs]'), function (b) {
-      var on = b.getAttribute('data-fs') === cur;
-      b.classList.toggle('is-on', on);
-      b.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
-    var sample = el('set-fsample');
-    if (sample) sample.style.setProperty('--fs-preview', FS_PREVIEW[cur]);
-    if (!seg.dataset.bound) {
-      seg.dataset.bound = '1';
-      seg.addEventListener('click', function (e) {
-        var b = e.target.closest('[data-fs]');
-        if (!b) return;
-        var v = b.getAttribute('data-fs');
-        if (window.Garden && Garden.setFontSize) Garden.setFontSize(v);
-        else {
-          try { localStorage.setItem('garden_font_size', v); } catch (x) {}
-          document.documentElement.setAttribute('data-font-size', v);
-        }
-        fillFontSeg();
-      });
-    }
-  }
-
-  /*@3.DASJ.90*/
-  function fillLegacySection() {
-    var box = el('dash-legacy'), acc = el('acc-legacy');
-    if (!box || !window.ByteLegacy) return;
-    window.ByteLegacy.mount(box, {
-      hideHost: acc,
-      toast: toast,
-      onWipe: function () { syncAccSummaries(); }
-    });
-    syncAccSummaries();
-  }
-
-  /*@3.DASJ.91*/
-  function fillSyncSection() {
-    var box = el('dash-sync');
-    if (!box) return;
-    var S = window.GardenSync;
-    var key = (S && S.getKey && S.getKey()) || null;
-    var dot = el('sync-state-dot'), txt = el('sync-state-text'), last = el('sync-last-text');
-
-    if (!S) {
-      if (txt) txt.textContent = tx('غير متاحة على هذه الصفحة', 'Unavailable here');
-      return;
-    }
-    /*@3.DASJ.132*/
-    var lk = (S.lockInfo && S.lockInfo()) || null;
-    if (key) {
-      if (dot) dot.className = 'dash-sync-dot is-on';
-      if (txt) txt.textContent = (lk && lk.locked)
-        ? tx('محميّة — تحتاج فتحاً على هذا الجهاز', 'Protected — needs unlocking on this device')
-        : tx('مفعّلة', 'Enabled');
-      var lastTs = localStorage.getItem('garden_sync_last');
-      if (last && lastTs) {
-        var d = D.daysUntil(new Date(parseInt(lastTs, 10)).toISOString().slice(0, 10));
-        last.textContent = tx('آخر مزامنة: ', 'Last sync: ') +
-          (d === 0 ? tx('اليوم', 'today') : dueLabel(d));
-      } else if (last) last.textContent = '';
-    } else {
-      if (dot) dot.className = 'dash-sync-dot';
-      if (txt) txt.textContent = tx('غير مفعّلة — بياناتك على هذا الجهاز فقط',
-                                    'Off — your data lives on this device only');
-      if (last) last.textContent = '';
-    }
-  }
-
-  function saveSettings() {
-    var p = D.profile() || {};
-    /*@3.DASJ.92*/
-    var v = window.GardenBiName
-      ? window.GardenBiName.resolve(el('set-name') ? el('set-name').value : '',
-                                    el('set-name-en') ? el('set-name-en').value : '')
-      : null;
-    if (v) { p.name = v.name; p.name_ar = v.name_ar; p.name_en = v.name_en; }
-    else { p.name = ''; p.name_ar = ''; p.name_en = ''; }
-    /*@3.DASJ.93*/
-    if (el('set-level')) {
-      p.level = el('set-level').value;
-      /*@3.DASJ.94*/
-      if (p.level) p.levels = [String(p.level)]; else delete p.levels;
-    }
-    try { localStorage.setItem('student_profile', JSON.stringify(p)); } catch (e) {}
-    var th = el('set-theme') ? el('set-theme').value : null;
-    if (th) { localStorage.setItem('garden_theme', th); document.documentElement.setAttribute('data-theme', th); }
-    /*@3.DASJ.95*/
-    var fsEl = el('set-font');
-    var fs = (fsEl && fsEl.tagName === 'SELECT') ? fsEl.value : null;
-    if (fs) {
-      if (fs === 'md') { localStorage.removeItem('garden_font_size'); document.documentElement.removeAttribute('data-font-size'); }
-      else { localStorage.setItem('garden_font_size', fs); document.documentElement.setAttribute('data-font-size', fs); }
-    }
-    renderWidgets();
-    toast(tx('حُفظ', 'Saved'));
-  }
-
-  /*@3.DASJ.96*/
-  var SYNC_TS_PREFIX = '__syncT_';
-  function exportData() {
-    var out = {};
-    for (var i = 0; i < localStorage.length; i++) {
-      var k = localStorage.key(i);
-      if (k && k.indexOf(SYNC_TS_PREFIX) === 0) continue;
-      out[k] = localStorage.getItem(k);
-    }
-    var blob = new Blob([JSON.stringify({ _byte_backup: 1, at: new Date().toISOString(), data: out }, null, 2)],
-                        { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'digital-garden-backup-' + D.todayStr() + '.json';
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-  }
-
-  function importData(file) {
-    var r = new FileReader();
-    r.onload = function () {
-      try {
-        var j = JSON.parse(r.result);
-        if (!j || !j._byte_backup || !j.data) throw new Error('bad');
-        var n = 0;
-        Object.keys(j.data).forEach(function (k) {
-          if (k.indexOf(SYNC_TS_PREFIX) === 0) return;   /*@3.DASJ.97*/
-          localStorage.setItem(k, j.data[k]); n++;
-        });
-        toast(tx('استُورد ' + n + ' مفتاحاً — يُعاد التحميل…', 'Imported ' + n + ' keys — reloading…'));
-        setTimeout(function () { location.reload(); }, 900);
-      } catch (e) {
-        toast(tx('ملف غير صالح', 'Invalid file'));
-      }
-    };
-    r.readAsText(file);
   }
 
   /*@3.DASJ.98*/
@@ -1957,15 +1694,6 @@
       else location.hash = 'setup';
       return;
     }
-    if (act === 'sync-open') { if (window.GardenSync) window.GardenSync.showModal(); return; }
-    if (act === 'sync-now') {
-      if (window.GardenSync && window.GardenSync.syncNow) {
-        window.GardenSync.syncNow();
-        toast(tx('جارٍ المزامنة…', 'Syncing…'));
-        setTimeout(fillSyncSection, 1500);
-      }
-      return;
-    }
     /*@3.DASJ.133*/
     if (act === 'course-style') { openCourseStyle(id); return; }
     if (act === 'go-hub') location.href = 'hub/index.html';
@@ -2031,9 +1759,6 @@
     else if (act === 'new-course') location.href = 'hub/index.html?add=course';
     else if (act === 'new-event') location.href = 'hub/schedule.html?add=event';
     else if (act === 'new-semester') location.href = 'hub/index.html?add=semester';
-    else if (act === 'export') exportData();
-    else if (act === 'import') el('import-file').click();
-    else if (act === 'save-settings') saveSettings();
     /*@3.DASJ.114*/
     else if (act === 'done-task') { D.toggleTask(id); afterTaskChange(); }
     else if (act === 'add-task') openTaskModal(null);
@@ -2103,6 +1828,8 @@
       /*@3.DASJ.122*/
       /*@3.DASJ.134*/
       var hashView = (location.hash || '').replace('#', '');
+      /*@3.DASJ.153*/
+      if (hashView === 'settings') { location.replace('hub/settings.html'); return; }
       var v = hashView || 'overview';
       if (!document.querySelector('.dash-view[data-view="' + v + '"]')) v = 'overview';
       /*@3.DASJ.123*/
@@ -2114,7 +1841,6 @@
     document.addEventListener('click', onCardNav);
     document.addEventListener('keydown', onCardKey);
     bindStyleModal();
-    bindSettingsAcc();
 
     document.querySelectorAll('.dash-side-item[data-view]').forEach(function (b) {
       b.addEventListener('click', function () { showView(b.getAttribute('data-view')); });
@@ -2170,8 +1896,6 @@
 
     /*@3.DASJ.128*/
 
-    var imp = el('import-file');
-    if (imp) imp.addEventListener('change', function () { if (imp.files[0]) importData(imp.files[0]); });
 
     /*@3.DASJ.142*/
     document.addEventListener('click', function (e) {
@@ -2188,8 +1912,6 @@
 
     document.addEventListener('garden:languageChanged', function () {
       renderWidgets(); renderCourses(); renderLevels(); renderTasks();
-      /*@3.DASJ.129*/
-      fillSyncSection();
       applyTitles();
     });
     /*@3.DASJ.130*/

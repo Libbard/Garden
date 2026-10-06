@@ -526,6 +526,8 @@
     themeBtn.innerHTML = '<span id="theme-icon"><i class="fa-solid fa-moon" aria-hidden="true"></i></span>';
     themeBtn.addEventListener('click', function () { if (window.Garden && Garden.cycleTheme) Garden.cycleTheme(); });
     inline.appendChild(themeBtn);
+    /*@3.GAHJ.104*/
+    if (!isSubjectVariant && !document.body.hasAttribute('data-notes-app')) inline.appendChild(_themeBtn());
 
     /*@3.GAHJ.99*/
     if (document.body.hasAttribute('data-no-notes') &&
@@ -683,7 +685,7 @@
       ] },
       { label: null, items: [
         { key: 'tour', href: ROOT + 'tour.html', icon: 'fa-seedling', ar: 'اكتشف الحديقة', en: 'Explore the Garden' },
-        { key: 'settings', href: ROOT + 'index.html#settings', icon: 'fa-gear', ar: 'الإعدادات', en: 'Settings' }
+        { key: 'settings', href: ROOT + 'hub/settings.html', icon: 'fa-gear', ar: 'الإعدادات', en: 'Settings' }
       ] }
     ];
     /*@3.GAHJ.72*/

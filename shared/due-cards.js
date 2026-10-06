@@ -29,6 +29,8 @@
     return /^\[[A-Z][A-Z_]*\]$/.test(t) || t === 'null' || t === 'undefined';
   }
   function txt(s) { return placeholder(s) ? '' : String(s == null ? '' : s); }
+  /*@3.DUCJ.41*/
+  function htm(s) { return window.GardenText ? GardenText.html(s) : esc(s); }
 
   /*@3.DUCJ.5*/
   var GRADES = [
@@ -107,7 +109,7 @@
         out += '<i class="fc-ghost fc-ghost--next" aria-hidden="true">' +
           '<span class="fc-g-pill">' + esc(nextRow.code + ' · M' +
             String(nextRow.module).padStart(2, '0')) + '</span>' +
-          '<span class="fc-g-term">' + esc(t) + '</span></i>';
+          '<span class="fc-g-term">' + htm(t) + '</span></i>';
         continue;
       }
       out += '<i class="fc-ghost" aria-hidden="true"></i>';
@@ -400,8 +402,8 @@
               '<span class="dcx-ret"' + (ret == null ? ' hidden' : ' data-tone="' + retTone + '"') + '>' +
                 (ret == null ? '' : esc(L('تذكّر', 'Recall')) + ' <span class="n">' +
                   esc(isAr() ? ret + '٪' : ret + '%') + '</span>') + '</span>' +
-              '<div class="fc-term">' + esc(front) + '</div>' +
-              '<div class="fc-term-en">' + esc(isAr() ? enTerm : '') + '</div>' +
+              '<div class="fc-term">' + htm(front) + '</div>' +
+              '<div class="fc-term-en">' + htm(isAr() ? enTerm : '') + '</div>' +
             '</div>' +
             RULE +
             (tapSeen() ? '' :
@@ -410,9 +412,9 @@
           '</div>' +
           '<div class="flashcard-face flashcard-back">' +
             faceTop(true) +
-            '<div class="fc-body"><div class="fc-definition">' + esc(def) + '</div></div>' +
+            '<div class="fc-body"><div class="fc-definition">' + htm(def) + '</div></div>' +
             RULE +
-            (exm ? '<div class="fc-example">' + esc(exm) + '</div>' : '') +
+            (exm ? '<div class="fc-example">' + htm(exm) + '</div>' : '') +
           '</div>' +
         '</div>' +
       '</div>' +

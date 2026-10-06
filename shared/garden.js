@@ -650,6 +650,29 @@
     return /^\[[A-Z][A-Z_]*\]$/.test(t) || t === 'null' || t === 'undefined';
   }
   function _fcTxt(s) { return _fcIsPlaceholder(s) ? '' : (s || ''); }
+
+  /*@3.GARJ.666*/
+  function _escTxt(t) {
+    return t.replace(/&(?!(?:lt|gt|amp|quot|apos|nbsp|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function safeHtml(s) {
+    s = String(s == null ? '' : s);
+    if (!/[<>&]/.test(s)) return s;
+    const re = /<code>([\s\S]*?)<\/code>/g;
+    let out = '', i = 0, m;
+    while ((m = re.exec(s))) { out += _escTxt(s.slice(i, m.index)) + '<code>' + _escTxt(m[1]) + '</code>'; i = re.lastIndex; }
+    return out + _escTxt(s.slice(i));
+  }
+  function safeDeep(o) {
+    if (Array.isArray(o)) { for (let i = 0; i < o.length; i++) o[i] = safeDeep(o[i]); return o; }
+    if (o && typeof o === 'object') { for (const k in o) if (Object.prototype.hasOwnProperty.call(o, k)) o[k] = safeDeep(o[k]); return o; }
+    return typeof o === 'string' ? safeHtml(o) : o;
+  }
+  window.GardenText = { html: safeHtml, deep: safeDeep };
+  /*@3.GARJ.667*/
+  try { if (typeof mcqBank !== 'undefined' && Array.isArray(mcqBank)) safeDeep(mcqBank); } catch (e) { }
+  try { if (typeof essayBank !== 'undefined' && Array.isArray(essayBank)) safeDeep(essayBank); } catch (e) { }
   function _fcHasExample(card) {
     const e = card && card.back && card.back.example;
     return !!e && !!(_fcTxt(e.ar) || _fcTxt(e.en));
@@ -767,7 +790,7 @@
   function initFlashcards() {
     const el = document.getElementById('flashcard-data');
     if (!el) return;
-    try { window._gardenFC.cards = JSON.parse(el.textContent); } catch (e) { return; }
+    try { window._gardenFC.cards = safeDeep(JSON.parse(el.textContent)); } catch (e) { return; }
     window._gardenFC.sm2 = loadSM2();
     buildQueue();
     renderFlashcard();
@@ -836,7 +859,7 @@
         const t = _fcTxt(nextCard.front?.[L] || nextCard.front?.ar || nextCard.front?.en || '');
         out += `<i class="fc-ghost fc-ghost--next" aria-hidden="true">` +
           (label ? `<span class="fc-g-pill">${escHtml(label)}</span>` : '') +
-          `<span class="fc-g-term">${escHtml(t)}</span></i>`;
+          `<span class="fc-g-term">${t}</span></i>`;
         continue;
       }
       out += '<i class="fc-ghost" aria-hidden="true"></i>';
@@ -895,19 +918,25 @@
       if (el.dataset.mathDone === '1') return;
       if (el.querySelector('.content-target')) return;   /*@3.GARJ.50*/
       const raw = el.textContent || '';
-      const html = mathText(raw);
-      if (html !== raw) el.innerHTML = html;
+      const esc = _escTxt(raw), html = mathText(esc);   /*@3.GARJ.669*/
+      if (html !== esc) el.innerHTML = html;
       el.dataset.mathDone = '1';
     });
   }
 
   /*@3.GARJ.660*/
   const AR_TXT = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  const _TEXT_CMD = /\\(text|textrm|textbf|textit|textsf|texttt|mbox|textnormal)\{([^{}]*)\}/g;
+  function texTextFix(s) {
+    return s.indexOf('\\') < 0 ? s : s.replace(_TEXT_CMD, (m, c, b) => '\\' + c + '{' + b.replace(/\\([_&%#])/g, '$1') + '}');
+  }
   function mathArabic() {
     const doc = window.MathJax && MathJax.startup && MathJax.startup.document;
     if (!doc || doc.__gArText) return;
     doc.__gArText = 1;
     (doc.inputJax || []).forEach((jax) => {
+      /*@3.GARJ.670*/
+      if (jax.preFilters) jax.preFilters.add((arg) => { if (arg && arg.math && typeof arg.math.math === 'string') arg.math.math = texTextFix(arg.math.math); });
       if (!jax.postFilters) return;
       jax.postFilters.add((arg) => {
         const d = arg.data;
@@ -2082,7 +2111,7 @@
   function initQuiz() {
     const el = document.getElementById('quiz-data');
     if (!el) return;
-    try { window._gardenQuiz.questions = JSON.parse(el.textContent); } catch (e) { return; }
+    try { window._gardenQuiz.questions = safeDeep(JSON.parse(el.textContent)); } catch (e) { return; }
     window._gardenQuiz.current = 0;
     window._gardenQuiz.score = 0;
     window._gardenQuiz.answered = false;
@@ -2117,7 +2146,7 @@
 
     if (counter) counter.textContent = `${q.current + 1} / ${total}`;
     if (prog) prog.style.width = `${(q.current / total) * 100}%`;
-    if (qText) qText.textContent = item.question?.[L] || '';
+    if (qText) qText.innerHTML = item.question?.[L] || '';   /*@3.GARJ.668*/
     if (fb) { fb.className = 'quiz-feedback hidden'; fb.textContent = ''; }
     if (nextBtn) nextBtn.classList.add('hidden');
     if (hintBtn) { hintBtn.classList.remove('hidden'); hintBtn.onclick = () => showHint(); }
@@ -2153,7 +2182,7 @@
     else { btns[idx]?.classList.add('wrong'); btns[item.correctIndex]?.classList.add('correct'); }
     liveScore();
     const fb = document.getElementById('quiz-feedback');
-    if (fb) { fb.textContent = item.explanation?.[currentLang] || ''; fb.className = `quiz-feedback ${ok ? 'quiz-feedback--correct' : 'quiz-feedback--wrong'}`; }
+    if (fb) { fb.innerHTML = item.explanation?.[currentLang] || ''; fb.className = `quiz-feedback ${ok ? 'quiz-feedback--correct' : 'quiz-feedback--wrong'}`; }
     document.getElementById('quiz-next-btn')?.classList.remove('hidden');
     document.getElementById('quiz-hint-btn')?.classList.add('hidden');
   }
@@ -2163,7 +2192,7 @@
   function showHint() {
     const q = window._gardenQuiz; if (q.answered) return;
     const fb = document.getElementById('quiz-feedback');
-    if (fb) { fb.textContent = q.questions[q.current].hint?.[currentLang] || ''; fb.className = 'quiz-feedback'; fb.style.cssText = 'background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border-color)'; }
+    if (fb) { fb.innerHTML = q.questions[q.current].hint?.[currentLang] || ''; fb.className = 'quiz-feedback'; fb.style.cssText = 'background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border-color)'; }
   }
 
   /*@3.GARJ.122*/
@@ -7078,7 +7107,7 @@ ${baseRules}`) + regenSuffix;
       if (!el) return;
 
       let questions;
-      try { questions = JSON.parse(el.textContent); }
+      try { questions = safeDeep(JSON.parse(el.textContent)); }
       catch (e) { console.warn('[Garden Essay] Failed to parse essay-data:', e); return; }
 
       if (!Array.isArray(questions) || questions.length === 0) return;
