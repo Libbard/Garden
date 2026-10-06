@@ -497,6 +497,7 @@
     var _prevTheme = localStorage.getItem('garden_theme');
     localStorage.setItem('garden_theme', theme);
     if (_prevTheme && _prevTheme !== theme) window.GardenEv('theme_switch', { t: theme });
+    if (window.GardenTint && GardenTint.siteSync) { try { GardenTint.siteSync(_prevTheme !== theme); } catch (e) { } }   /*@3.GARJ.665*/
     updateThemeColorMeta(theme);
     const icon = document.getElementById('theme-icon');
     if (icon) icon.innerHTML = '<i class="'
@@ -813,7 +814,7 @@
       }))
       .filter(({ i, state, _isOriginallyNew }) => {
         if (state.buriedUntil && state.buriedUntil > now) return false;
-        const isDue = state.nextReview <= now;
+        const isDue = !fc.sm2[i] || state.nextReview <= now;   /*@3.GARJ.664*/
         if (!isDue) return false;
         if (filterMode === 'new') return _isOriginallyNew;
         if (filterMode === 'learning') return fc.sm2[i] && fc.sm2[i].n > 0 && fc.sm2[i].interval < 21;

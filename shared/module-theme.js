@@ -47,16 +47,33 @@
       return (p && typeof p === 'object') ? p : {};
     } catch (e) { return {}; }
   }
-  function current() {
-    var v = prefs().moduleTheme;
-    return (typeof v === 'string' && v) ? v : 'garden';
+  /*@3.MOTJ.31*/
+  var _scope = null;
+  function onCourse() { return document.documentElement.hasAttribute('data-subject'); }
+  function scope() { return _scope || (onCourse() ? 'module' : 'site'); }
+  function baseOf(id) { for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i].base; return null; }
+
+  function current(sc) {
+    sc = sc || scope();
+    var v = prefs()[sc === 'site' ? 'siteTheme' : 'moduleTheme'];
+    if (typeof v !== 'string' || !v || !baseOf(v)) return 'garden';
+    /*@3.MOTJ.32*/
+    return sc === 'site' && baseOf(v) !== siteTheme() ? 'garden' : v;
   }
 
   /*@3.MOTJ.4*/
-  function choose(id) {
+  function choose(id, sc) {
+    sc = sc || scope();
+    if (sc === 'site') {
+      if (window.GardenTint && GardenTint.setSiteTheme) GardenTint.setSiteTheme(id === 'garden' ? '' : id);
+      try {
+        document.dispatchEvent(new CustomEvent('garden:moduleThemeChanged', { detail: { theme: current('site'), scope: 'site' } }));
+      } catch (e) {}
+      return;
+    }
     /*@3.MOTJ.5*/
     if (!id || id === 'garden') {
-      if (window.GardenTint && GardenTint.clearTheme) GardenTint.clearTheme();
+      if (window.GardenTint && GardenTint.clearTheme) GardenTint.clearTheme('module');
       try {
         document.dispatchEvent(new CustomEvent('garden:moduleThemeChanged', { detail: { theme: 'garden' } }));
       } catch (e) {}
@@ -110,21 +127,24 @@
     { id: 'geist',       css: 'Geist',                          ar: 'غايست',       en: 'Geist' }
   ];
 
-  function fontKey(kind) { return (kind ? kind === 'ar' : isAr()) ? 'moduleFont' : 'moduleFontLat'; }
+  function fontKey(kind, sc) {
+    return ((sc || scope()) === 'site' ? 'site' : 'module') + ((kind ? kind === 'ar' : isAr()) ? 'Font' : 'FontLat');
+  }
 
-  function currentFont(kind) {
-    var v = prefs()[fontKey(kind)];
+  function currentFont(kind, sc) {
+    var v = prefs()[fontKey(kind, sc)];
     return (typeof v === 'string' && v) ? v : 'garden';
   }
 
-  function chooseFont(id, kind) {
+  function chooseFont(id, kind, sc) {
     kind = kind || (isAr() ? 'ar' : 'lat');
+    sc = sc || scope();
     if (!id || id === 'garden') {
-      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont(kind);
+      if (window.GardenTint && GardenTint.clearFont) GardenTint.clearFont(kind, sc);
       return;
     }
     var p = prefs();
-    p[fontKey(kind)] = id;
+    p[fontKey(kind, sc)] = id;
     try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch (e) {}
     if (window.GardenTint && GardenTint.applyFont) GardenTint.applyFont();
   }
@@ -200,14 +220,17 @@
     try { return localStorage.getItem('garden_theme') || 'dark'; } catch (e) { return 'dark'; }
   }
   function chooseSite(t) {
-    if (window.GardenTint && GardenTint.clearTheme) GardenTint.clearTheme();
-    if (window.Garden && Garden.applyTheme) Garden.applyTheme(t);
+    if (window.GardenTint && GardenTint.setSiteTheme) GardenTint.setSiteTheme('');
+    /*@3.MOTJ.33*/
+    if (document.documentElement.getAttribute('data-mod-scope') === 'module') {
+      try { localStorage.setItem('garden_theme', t); } catch (e) {}
+    } else if (window.Garden && Garden.applyTheme) Garden.applyTheme(t);
     else {
       try { localStorage.setItem('garden_theme', t); } catch (e) {}
       document.documentElement.setAttribute('data-theme', t);
     }
     try {
-      document.dispatchEvent(new CustomEvent('garden:moduleThemeChanged', { detail: { theme: 'garden' } }));
+      document.dispatchEvent(new CustomEvent('garden:moduleThemeChanged', { detail: { theme: 'garden', scope: 'site' } }));
     } catch (e) {}
   }
 
@@ -306,13 +329,23 @@
       return b;
     }
 
-    grid.appendChild(el('div', 'mt-fam', L('ألوانُ الموقع', 'Site colours')));
-    SITE.forEach(function (s) {
-      var b = tile('', L(s.ar, s.en), function () { chooseSite(s.id); }, 'site:' + s.id);
-      var c = siteCols(s.id), p = b.querySelector('.mt-prev'), bars = p.children;
+    var sc = scope();
+    function paintSite(b, t) {
+      var c = siteCols(t), p = b.querySelector('.mt-prev'), bars = p.children;
       p.style.background = c.panel;
       for (var i = 0; i < bars.length; i++) bars[i].style.background = c.bars[i] || 'currentColor';
-    });
+    }
+    if (sc === 'site') {
+      grid.appendChild(el('div', 'mt-fam', L('ألوانُ الموقع الأصليّة', 'Original site colours')));
+      SITE.forEach(function (s) {
+        paintSite(tile('', L(s.ar, s.en), function () { chooseSite(s.id); }, 'site:' + s.id), s.id);
+      });
+    } else {
+      /*@3.MOTJ.34*/
+      var sp = current('site');
+      var fb = tile(sp !== 'garden' ? 'mt-pal-' + sp : '', L('كالموقع', 'Same as site'), function () { choose('garden', 'module'); }, 'follow');
+      if (sp === 'garden') paintSite(fb, siteTheme());
+    }
 
     var group = null;
     THEMES.forEach(function (th) {
@@ -322,13 +355,14 @@
         group = th.base;
         grid.appendChild(el('div', 'mt-fam', L(FAMILY[group].ar, FAMILY[group].en)));
       }
-      tile('mt-pal-' + th.id, isAr() ? th.ar : th.en, function () { choose(th.id); }, th.id);
+      tile('mt-pal-' + th.id, isAr() ? th.ar : th.en, function () { choose(th.id, sc); }, th.id);
     });
 
     function mark() {
-      var cur = current(), st = siteTheme();
+      var cur = current(sc), st = siteTheme();
       tiles.forEach(function (b) {
-        var on = cur === 'garden' ? b.__id === 'site:' + st : b.__id === cur;
+        var none = sc === 'site' ? b.__id === 'site:' + st : b.__id === 'follow';
+        var on = cur === 'garden' ? none : b.__id === cur;
         b.classList.toggle('is-on', on);
         b.setAttribute('aria-checked', on ? 'true' : 'false');
       });
@@ -380,7 +414,9 @@
         var gl = el('span', 'mt-glyph', ar ? 'أبجد' : 'Aa');
         gl.style.fontFamily = fo.css ? '"' + fo.css + '", sans-serif' : (ar ? '"Cairo", sans-serif' : '"Inter", sans-serif');
         b.appendChild(gl);
-        b.appendChild(el('small', 'mt-fname', fo.id === 'garden' ? L('خطُّ الموقع', 'Site font') : (isAr() ? fo.ar : fo.en)));
+        b.appendChild(el('small', 'mt-fname', fo.id === 'garden'
+          ? (scope() === 'site' ? L('خطُّ الموقع', 'Site font') : L('كالموقع', 'Same as site'))
+          : (isAr() ? fo.ar : fo.en)));
         b.addEventListener('click', function () { chooseFont(fo.id, _fontKind); mark(); });
         b.__id = fo.id;
         rows.push(b);
@@ -402,9 +438,21 @@
   }
 
   /*@3.MOTJ.9*/
-  function open(button) {
+  /*@3.MOTJ.35*/
+  function needTint(cb) {
+    if (window.GardenTint) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = _base + 'shared/subject-tint.js';
+    s.onload = s.onerror = function () { cb(); };
+    document.head.appendChild(s);
+  }
+
+  function open(button, o) {
     if (_dlg) { close(); return; }
+    o = o || {};
+    if (!window.GardenTint) { needTint(function () { if (window.GardenTint) open(button, o); }); return; }
     _opener = button || null;
+    _scope = (o.scope === 'site' || o.scope === 'module') ? o.scope : null;
     surfaceSheet();
 
     var d = document.createElement('dialog');
@@ -423,17 +471,26 @@
 
     var head = el('div', 'gsf-head');
     head.appendChild(el('h2', 'gsf-title', L('المظهر', 'Appearance')));
-    head.appendChild(el('p', 'gsf-sub',
-      L('يُطبَّق فوراً — الصفحةُ خلفك هي المعاينة، ويُحفظ لكلِّ المواد.',
-        'Applies at once — the page behind is the preview, kept for every course.')));
+    /*@3.MOTJ.36*/
+    var seg = el('div', 'mt-seg mt-seg--scope');
+    seg.setAttribute('role', 'group');
+    seg.setAttribute('aria-label', L('لأيِّ الصفحات', 'Which pages'));
+    [['site', 'fa-house', 'الموقعُ كلُّه', 'Whole site'], ['module', 'fa-book-open-reader', 'صفحاتُ المواد', 'Course pages']].forEach(function (k) {
+      var b = el('button');
+      b.type = 'button';
+      b.__k = k[0];
+      b.appendChild(el('i', 'fa-solid ' + k[1]));
+      b.appendChild(el('span', null, L(k[2], k[3])));
+      b.addEventListener('click', function () { if (scope() !== k[0]) { _scope = k[0]; build(); } });
+      seg.appendChild(b);
+    });
+    head.appendChild(seg);
+    var sub = el('p', 'gsf-sub');
+    head.appendChild(sub);
     d.appendChild(head);
 
     /*@3.MOTJ.12*/
     var body = el('div', 'gsf-body mt-body');
-    var sd = designSection(), st = themeSection(), sf = fontSection();
-    body.appendChild(sd);
-    body.appendChild(st);
-    body.appendChild(sf);
     d.appendChild(body);
 
     /*@3.MOTJ.23*/
@@ -442,25 +499,46 @@
     var reset = el('button', 'gsf-btn gsf-btn--ghost');
     reset.type = 'button';
     reset.appendChild(el('i', 'fa-solid fa-rotate-left'));
-    reset.appendChild(el('span', null, L('أعِدْ مظهرَ الموقع', 'Back to site look')));
+    var resetT = el('span');
+    reset.appendChild(resetT);
+    var secs = [];
     reset.addEventListener('click', function () {
-      chooseDesign('garden');
-      choose('garden');
-      chooseFont('garden', 'ar');
-      chooseFont('garden', 'lat');
-      sd.__mark();
-      st.__mark();
-      sf.__mark();
+      var sc = scope();
+      if (sc === 'module') chooseDesign('garden');
+      choose('garden', sc);
+      chooseFont('garden', 'ar', sc);
+      chooseFont('garden', 'lat', sc);
+      secs.forEach(function (s) { s.__mark(); });
     });
     acts.appendChild(reset);
     foot.appendChild(acts);
     d.appendChild(foot);
 
+    function build() {
+      var sc = scope();
+      Array.prototype.forEach.call(seg.children, function (b) {
+        b.setAttribute('aria-pressed', b.__k === sc ? 'true' : 'false');
+      });
+      sub.textContent = sc === 'site'
+        ? L('لكلِّ صفحات الموقع — يُطبَّق فوراً، والصفحةُ خلفك هي المعاينة.',
+            'For every page of the site — applies at once; the page behind is the preview.')
+        : (onCourse()
+          ? L('لصفحات المواد والوحدات — وما لم تختره يتبع مظهرَ الموقع.',
+              'For course and module pages — anything you leave follows the site look.')
+          : L('لصفحات المواد والوحدات — تراه حين تفتح مادّة، وما لم تختره يتبع مظهرَ الموقع.',
+              'For course and module pages — you’ll see it when you open a course; anything you leave follows the site look.'));
+      resetT.textContent = sc === 'site' ? L('أعِدِ المظهرَ الأصليّ', 'Back to the original look') : L('أعِدْها كالموقع', 'Back to the site look');
+      body.textContent = '';
+      secs = sc === 'module' ? [designSection(), themeSection(), fontSection()] : [themeSection(), fontSection()];
+      secs.forEach(function (s) { body.appendChild(s); });
+    }
+    build();
+
     document.body.appendChild(d);
     _dlg = d;
     d.addEventListener('close', close);
     try { d.showModal(); } catch (e) { d.setAttribute('open', ''); }
-    var on = body.querySelector('.mt-dtile.is-on');
+    var on = body.querySelector('.mt-dtile.is-on') || seg.querySelector('[aria-pressed="true"]');
     if (on && on.focus) try { on.focus({ preventScroll: true }); } catch (e) {}
   }
 

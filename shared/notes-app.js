@@ -12227,6 +12227,10 @@
       setAcc('list'); setPanel(true);
       setTimeout(function () { if (els.find) els.find.focus(); }, 60);
     });
+    var lk = document.getElementById('na-look');
+    if (lk) lk.addEventListener('click', function () {
+      if (window.GardenModuleTheme) GardenModuleTheme.open(lk, { scope: 'site' });
+    });
     var pv = document.getElementById('na-pdf-view');
     if (pv) pv.addEventListener('click', function () {
       if (!pdfOn()) return;

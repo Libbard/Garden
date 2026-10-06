@@ -397,6 +397,7 @@
 
   function fillLook() {
     var th = localStorage.getItem('garden_theme') || 'dark';
+    if (document.documentElement.getAttribute('data-mod-scope') === 'site') th = '';   /*@3.SETJ.45*/
     $$('.set-theme', $('#p-themes')).forEach(function (b) {
       b.classList.toggle('is-on', b.getAttribute('data-v') === th);
       b.setAttribute('aria-pressed', b.getAttribute('data-v') === th ? 'true' : 'false');
@@ -416,6 +417,8 @@
     $('#p-themes').addEventListener('click', function (e) {
       var b = e.target.closest('.set-theme');
       if (!b) return;
+      /*@3.SETJ.44*/
+      if (window.GardenTint && GardenTint.setSiteTheme) GardenTint.setSiteTheme('');
       if (window.Garden && Garden.applyTheme) Garden.applyTheme(b.getAttribute('data-v'));
       else {
         localStorage.setItem('garden_theme', b.getAttribute('data-v'));
@@ -423,6 +426,18 @@
       }
       fillLook();
     });
+
+    /*@3.SETJ.46*/
+    var look = $('#p-look');
+    if (look) look.addEventListener('click', function () {
+      function go() { if (window.GardenModuleTheme) GardenModuleTheme.open(look, { scope: 'site' }); }
+      if (window.GardenModuleTheme) return go();
+      var s = document.createElement('script');
+      s.src = '../shared/module-theme.js';
+      s.onload = go;
+      document.head.appendChild(s);
+    });
+    document.addEventListener('garden:moduleThemeChanged', fillLook);
 
     $('#p-font').addEventListener('click', function (e) {
       var b = e.target.closest('button');

@@ -2,6 +2,7 @@
 
 ;(function () {
   'use strict';
+  if (window.GardenTint) return;   /*@3.SUTJ.35*/
 
   /*@3.SUTJ.2*/
   var LADDER = [
@@ -112,24 +113,72 @@
     try { return localStorage.getItem('garden_theme') || 'dark'; } catch (e) { return 'dark'; }
   }
 
-  function modTheme() {
-    var root = document.documentElement, raw;
-    try { raw = localStorage.getItem('dashboard_prefs'); } catch (e) { return; }
-    var id = '';
+  /*@3.SUTJ.30*/
+  function isCourse() { return document.documentElement.hasAttribute('data-subject'); }
+  function quickPrefs() {
+    var raw;
+    try { raw = localStorage.getItem('dashboard_prefs'); } catch (e) { return null; }
     /*@3.SUTJ.14*/
-    if (raw && raw.indexOf('moduleTheme') > -1) {
-      var p = null;
-      try { p = JSON.parse(raw); } catch (e) {}
-      id = (p && typeof p.moduleTheme === 'string') ? p.moduleTheme : '';
-    }
-    var base = MT_BASE[id];
-    if (!base) {
-      /*@3.SUTJ.15*/
-      root.removeAttribute('data-mod-theme');
+    if (!raw || (raw.indexOf('module') < 0 && raw.indexOf('site') < 0)) return {};
+    try { return JSON.parse(raw) || {}; } catch (e) { return {}; }
+  }
+  function savePrefs(p) { try { localStorage.setItem('dashboard_prefs', JSON.stringify(p)); } catch (e) {} }
+
+  function modTheme() {
+    var root = document.documentElement, p = quickPrefs();
+    if (!p) return;
+    var mid = isCourse() && typeof p.moduleTheme === 'string' && MT_BASE[p.moduleTheme] ? p.moduleTheme : '';
+    if (mid) {
+      root.setAttribute('data-mod-theme', mid);
+      root.setAttribute('data-mod-scope', 'module');
+      if (root.getAttribute('data-theme') !== MT_BASE[mid]) root.setAttribute('data-theme', MT_BASE[mid]);
       return;
     }
-    root.setAttribute('data-mod-theme', id);
-    if (root.getAttribute('data-theme') !== base) root.setAttribute('data-theme', base);
+    /*@3.SUTJ.31*/
+    if (root.getAttribute('data-mod-scope') === 'module') root.setAttribute('data-theme', siteTheme());
+    var sid = typeof p.siteTheme === 'string' && MT_BASE[p.siteTheme] && MT_BASE[p.siteTheme] === siteTheme() ? p.siteTheme : '';
+    if (sid) {
+      root.setAttribute('data-mod-theme', sid);
+      root.setAttribute('data-mod-scope', 'site');
+      return;
+    }
+    /*@3.SUTJ.15*/
+    root.removeAttribute('data-mod-theme');
+    root.removeAttribute('data-mod-scope');
+  }
+
+  /*@3.SUTJ.32*/
+  function siteSync(changed) {
+    var p = readPrefs();
+    if (changed && typeof p.siteTheme === 'string' && MT_BASE[p.siteTheme] !== siteTheme()) {
+      delete p.siteTheme;
+      savePrefs(p);
+    }
+    if (document.documentElement.getAttribute('data-mod-scope') === 'module') return;
+    modTheme();
+  }
+
+  /*@3.SUTJ.33*/
+  function setSiteTheme(id) {
+    var p = readPrefs(), b = MT_BASE[id], root = document.documentElement;
+    if (!b) {
+      if (p.siteTheme !== undefined) { delete p.siteTheme; savePrefs(p); }
+      modTheme();
+      return;
+    }
+    p.siteTheme = id;
+    savePrefs(p);
+    if (siteTheme() !== b) {
+      if (root.getAttribute('data-mod-scope') === 'module') {
+        try { localStorage.setItem('garden_theme', b); } catch (e) {}
+      } else if (window.Garden && Garden.applyTheme) {
+        Garden.applyTheme(b);
+      } else {
+        try { localStorage.setItem('garden_theme', b); } catch (e) {}
+        root.setAttribute('data-theme', b);
+      }
+    }
+    modTheme();
   }
 
   /*@3.SUTJ.20*/
@@ -164,14 +213,14 @@
   }
 
   function modFont() {
-    var root = document.documentElement, raw;
-    try { raw = localStorage.getItem('dashboard_prefs'); } catch (e) { return; }
-    var p = null;
-    if (raw && raw.indexOf('moduleFont') > -1) {
-      try { p = JSON.parse(raw); } catch (e) {}
-    }
-    var ar = (p && MF_AR[p.moduleFont]) || '';
-    var lat = (p && MF_LAT[p.moduleFontLat]) || '';
+    var root = document.documentElement, p = quickPrefs();
+    if (!p) return;
+    /*@3.SUTJ.34*/
+    var c = isCourse();
+    var arId = c && MF_AR[p.moduleFont] ? p.moduleFont : (MF_AR[p.siteFont] ? p.siteFont : '');
+    var latId = c && MF_LAT[p.moduleFontLat] ? p.moduleFontLat : (MF_LAT[p.siteFontLat] ? p.siteFontLat : '');
+    var ar = MF_AR[arId] || '';
+    var lat = MF_LAT[latId] || '';
     if (!ar && !lat) {
       root.removeAttribute('data-mod-font');
       root.style.removeProperty('--mt-font');
@@ -182,28 +231,31 @@
     if (ar) stack.push('"' + ar + '"');
     /*@3.SUTJ.22*/
     root.style.setProperty('--mt-font', stack.join(', '));
-    root.setAttribute('data-mod-font', (lat ? p.moduleFontLat : '-') + '.' + (ar ? p.moduleFont : '-'));
+    root.setAttribute('data-mod-font', (lat ? latId : '-') + '.' + (ar ? arId : '-'));
     fontSheet();
   }
 
-  function clearFont(which) {
+  function clearFont(which, scope) {
     var p = readPrefs();
-    var k = which === 'lat' ? 'moduleFontLat' : 'moduleFont';
+    var site = scope ? scope === 'site' : !isCourse();
+    var k = (site ? 'site' : 'module') + (which === 'lat' ? 'FontLat' : 'Font');
     if (p[k] === undefined) return false;
     delete p[k];
-    try { localStorage.setItem('dashboard_prefs', JSON.stringify(p)); } catch (e) {}
+    savePrefs(p);
     modFont();
     return true;
   }
 
   /*@3.SUTJ.16*/
-  function clearTheme() {
-    var p = readPrefs();
-    if (p.moduleTheme === undefined) return false;
-    delete p.moduleTheme;
-    try { localStorage.setItem('dashboard_prefs', JSON.stringify(p)); } catch (e) {}
-    document.documentElement.removeAttribute('data-mod-theme');
-    document.documentElement.setAttribute('data-theme', siteTheme());
+  function clearTheme(scope) {
+    var p = readPrefs(), root = document.documentElement;
+    scope = scope || root.getAttribute('data-mod-scope') || (isCourse() ? 'module' : 'site');
+    var k = scope === 'site' ? 'siteTheme' : 'moduleTheme';
+    if (p[k] === undefined) return false;
+    delete p[k];
+    savePrefs(p);
+    root.setAttribute('data-theme', siteTheme());
+    modTheme();
     return true;
   }
 
@@ -344,6 +396,7 @@
   window.GardenTint = {
     scale: scale, apply: apply, chosen: chosen, refresh: run,
     THEMES: MT_IDS, THEME_BASE: MT_BASE, applyTheme: modTheme, clearTheme: clearTheme,
+    siteSync: siteSync, setSiteTheme: setSiteTheme, isCourse: isCourse,
     FONTS: MF_AR, FONTS_LAT: MF_LAT, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont,
     DESIGNS: MD_IDS, design: function () { return _design || 'garden'; }, setDesign: setDesign
   };
