@@ -367,7 +367,6 @@
       case 'remind':  return L('لها تنبيه', 'With reminder');
       case 'myshares': return L('شاركتُها', 'I shared');
       case 'withme':  return L('شُورِكت معي', 'Shared with me');
-      case 'mydata':  return L('مهامّي وجدولي', 'Tasks and schedule');
       case 'general': return L('ملاحظات عامّة', 'General notes');
       case 'archive': return L('الأرشيف', 'Archive');
       case 'trash':   return L('السلّة', 'Trash');
@@ -401,7 +400,6 @@
       case 'remind':  return !n.archived && !!n.remind_at && !cArch(n, am);
       case 'myshares': return n.src === 'rich' && !!sharedMap()[n.id];
       case 'withme':  return false;
-      case 'mydata':  return false;
       case 'archive': return !!n.archived;
       case 'general': return !n.archived && !(n.origin && n.origin.course);
       case 'course':  return !n.archived && n.origin && n.origin.course === v.code;
@@ -420,7 +418,6 @@
   function inView(v) {
     if (v.k === 'trash') return (S.trash || []).slice();
     if (v.k === 'withme') return withmeItems();
-    if (v.k === 'mydata') return dataItems();
     var out = [];
     var am = courseArchMap();
     for (var i = 0; i < S.all.length; i++) if (matches(S.all[i], v, am)) out.push(S.all[i]);
@@ -577,8 +574,6 @@
     var nsh = inView({ k: 'myshares' }).length, nwm = withmeRead().length;
     if (nsh) h += itemHtml({ k: 'myshares' }, L('شاركتُها', 'I shared'), 'fa-link', nsh);
     if (nwm) h += itemHtml({ k: 'withme' }, L('شُورِكت معي', 'Shared with me'), 'fa-inbox', nwm);
-    var ndt = dataItems().length;
-    if (ndt) h += itemHtml({ k: 'mydata' }, L('مهامّي وجدولي', 'Tasks and schedule'), 'fa-list-check', ndt);
 
     var fb = folderBranch('', 0, folderTree(), folderCounts());
     if (!fb) {
@@ -1152,6 +1147,66 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
     toast(L('صُدِّر ملفُّ ' + name, 'Exported ' + name));
+  }
+  /*@3.NOAJ.511*/
+  var DATA_TYPE = { my_tasks: 'array', weekly_schedule: 'object', my_semester: 'object', semester_archive: 'array' };
+  var DATA_UNDO = 'garden_data_undo';
+  function dataPlan(file) {
+    return file.text().then(function (txt) {
+      var j = null;
+      try { j = JSON.parse(txt); } catch (e) {}
+      if (!j || j.format !== 'garden-data' || !j.keys || typeof j.keys !== 'object') throw new Error('not_data');
+      var P = { name: file.name || '', tasks: null, repl: [], put: {} };
+      Object.keys(DATA_TYPE).forEach(function (key) {
+        if (!(key in j.keys)) return;
+        var v = j.keys[key], want = DATA_TYPE[key];
+        if (want === 'array' ? !Array.isArray(v) : (!v || typeof v !== 'object' || Array.isArray(v))) return;
+        if (key === 'my_tasks') {
+          var cur = dataJson('my_tasks');
+          cur = Array.isArray(cur) ? cur : [];
+          var seen = {};
+          cur.forEach(function (t) { if (t) seen[t.id != null ? 'i:' + t.id : 'j:' + JSON.stringify(t)] = 1; });
+          var add = v.filter(function (t) { return t && !seen[t.id != null ? 'i:' + t.id : 'j:' + JSON.stringify(t)]; });
+          P.tasks = { add: add.length, keep: cur.length };
+          if (add.length) P.put.my_tasks = JSON.stringify(cur.concat(add));
+          return;
+        }
+        var raw = JSON.stringify(v);
+        if (raw === dataRaw(key)) return;
+        P.repl.push(key);
+        P.put[key] = raw;
+      });
+      P.any = Object.keys(P.put).length > 0;
+      if (P.repl.length) {
+        var s = j.keys.weekly_schedule || {}, m = j.keys.my_semester || {};
+        P.sched = { courses: (m.courses || []).length, lectures: (s.lectures || []).length, exams: (s.exams || []).length };
+      }
+      return P;
+    });
+  }
+  function dataApply(P) {
+    if (!P || !P.any) return 0;
+    var old = {}, now = Date.now(), n = 0;
+    Object.keys(P.put).forEach(function (key) { old[key] = dataRaw(key); });
+    try { localStorage.setItem(DATA_UNDO, JSON.stringify({ at: now, keys: old })); } catch (e) { return 0; }
+    Object.keys(P.put).forEach(function (key) {
+      try { localStorage.setItem(key, P.put[key]); localStorage.setItem('__syncT_' + key, String(now)); n++; } catch (e) {}
+    });
+    return n;
+  }
+  function dataUndoAt() { var u = dataJson(DATA_UNDO); return u && u.at ? u.at : 0; }
+  function dataUndoRun() {
+    var u = dataJson(DATA_UNDO), now = Date.now();
+    if (!u || !u.keys) return false;
+    Object.keys(u.keys).forEach(function (key) {
+      if (!DATA_TYPE[key]) return;
+      try {
+        if (u.keys[key] == null) localStorage.removeItem(key); else localStorage.setItem(key, u.keys[key]);
+        localStorage.setItem('__syncT_' + key, String(now));
+      } catch (e) {}
+    });
+    try { localStorage.removeItem(DATA_UNDO); } catch (e) {}
+    return true;
   }
   function withmeItems() {
     return withmeRead().map(function (x) {
@@ -11107,7 +11162,6 @@
     shareSrvSoon();
     add({ k: 'myshares' }, 'fa-link', 'شاركتُها', 'I shared', inView({ k: 'myshares' }).length);
     add({ k: 'withme' }, 'fa-inbox', 'شُورِكت معي', 'Shared with me', withmeRead().length);
-    add({ k: 'mydata' }, 'fa-list-check', 'مهامّي وجدولي', 'Tasks and schedule', dataItems().length);
     var cc = courseCounts(), nc = 0;
     for (var k in cc) nc += cc[k];
     add({ k: 'courses' }, 'fa-graduation-cap', 'المواد', 'Courses', nc);
@@ -11529,6 +11583,11 @@
       withmeDrop: function (sids) { withmeDrop(sids); if (S.view.k === 'withme' && !withmeRead().length) exSetView({ k: 'home' }); else { renderRail(); if (window.GardenNotesExplorer) GardenNotesExplorer.paint(); } },
       copyText: copyText,
       dataExport: dataExport,
+      dataSets: dataItems,
+      dataPlan: dataPlan,
+      dataApply: dataApply,
+      dataUndo: dataUndoAt,
+      dataUndoRun: dataUndoRun,
       share: function (uid) { var r = richOf(uid); if (r) shareNoteId(r.id); },
       dup: function (uids) { dupNotes(recsOf(uids).map(function (x) { return x.id; })); },
       canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },
@@ -12338,7 +12397,7 @@
     }
 
     var u = ui();
-    if (u.view && u.view.k) S.view = u.view;
+    if (u.view && u.view.k && u.view.k !== 'mydata') S.view = u.view;
     docEmpty();
     S.width = (WIDTHS.indexOf(u.width) >= 0) ? u.width : 'a4';
     applyWidth();
