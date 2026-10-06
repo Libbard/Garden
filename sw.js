@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.6.91'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.6.93'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -70,6 +70,7 @@ var PRECACHE_URLS = [
   'shared/notes-overlay.js',
   'shared/notes-find.js',
   'shared/notes-app.js',
+  'shared/notes-library.js',
   'shared/notes-ribbon.js',
   'shared/notes-mathlib.js',
   'shared/notes-serialize.js',
@@ -794,6 +795,7 @@ self.addEventListener('fetch', function(event) {
   if (url.origin !== self.location.origin) return;
   /*@0.SWJ.106*/
   if (url.pathname.indexOf('/v1/') === 0) return;
+  if (url.pathname.indexOf('/library/') >= 0) return;
 
   /*@0.SWJ.107*/
   event.respondWith(
