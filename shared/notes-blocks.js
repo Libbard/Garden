@@ -675,11 +675,11 @@
   /*@3.NOBJ.13*/
   /*@3.NOBJ.52*/
   var FONT_HEAD = [
-    { id: 'frutiger', css: 'Frutiger LT Arabic', star: 1, ar: 'فروتيجر', en: 'Frutiger' },
     { id: 'thmanyah', css: 'Thmanyah Sans', star: 1, ar: 'ثمانية',  en: 'Thmanyah Sans' },
-    { id: 'cairo',    css: 'Cairo',         star: 1, ar: 'خطُّ الموقع', en: 'Site font' }
+    { id: 'frutiger', css: 'Frutiger LT Arabic', star: 1, ar: 'فروتيجر', en: 'Frutiger' },
+    { id: 'cairo',    css: 'Cairo',         star: 1, ar: 'القاهرة', en: 'Cairo' }
   ];
-  var FONT_DEFAULT = 'frutiger';
+  var FONT_DEFAULT = 'thmanyah';
 
   function fontCatalog() {
     var out = FONT_HEAD.slice();

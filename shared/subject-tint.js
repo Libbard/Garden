@@ -140,7 +140,7 @@
     alexandria: 'Alexandria', vazir: 'Vazirmatn', kufi: 'Noto Kufi Arabic',
     messiri: 'El Messiri', zain: 'Zain', rubik: 'Rubik',
     /*@3.SUTJ.24*/
-    thmanyah: 'Thmanyah Sans', thmanyahserif: 'Thmanyah Serif Text'
+    thmanyah: 'Thmanyah Sans', thmanyahserif: 'Thmanyah Serif Text', frutiger: 'Frutiger LT Arabic'
   };
   var MF_LAT = {
     sourceserif: 'Source Serif 4', newsreader: 'Newsreader', literata: 'Literata',

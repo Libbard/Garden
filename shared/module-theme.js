@@ -73,9 +73,10 @@
 
   /*@3.MOTJ.11*/
   var FONTS = [
-    { id: 'garden',   css: null,                   star: 1, ar: 'خطُّ الموقع (فروتيجر)', en: 'Site font (Frutiger)' },
+    { id: 'garden',   css: null,                   star: 1, ar: 'خطُّ الموقع (القاهرة)', en: 'Site font (Cairo)' },
     /*@3.MOTJ.27*/
     { id: 'thmanyah', css: 'Thmanyah Sans',         star: 1, ar: 'ثمانية',        en: 'Thmanyah Sans' },
+    { id: 'frutiger', css: 'Frutiger LT Arabic',    star: 1, ar: 'فروتيجر',       en: 'Frutiger' },
     { id: 'plex',     css: 'IBM Plex Sans Arabic', star: 1, ar: 'بلكس عربي',    en: 'IBM Plex Sans Arabic' },
     { id: 'readex',   css: 'Readex Pro',           star: 1, ar: 'ريدكس برو',    en: 'Readex Pro' },
     { id: 'notosans', css: 'Noto Sans Arabic',     star: 1, ar: 'نوتو سانس',    en: 'Noto Sans Arabic' },

@@ -102,7 +102,7 @@
 
   /*@3.NOPJ2.4*/
   /*@3.NOPJ2.21*/
-  var FIDX = null, FBYFAM = {}, FBYID = {}, FRUT = 'frutiger lt arabic';
+  var FIDX = null, FBYFAM = {}, FBYID = {};
   /*@3.NOPJ2.46*/
   var FALLBACK = { a: 'cairo-400', b: 'cairo-700' };
 
@@ -156,16 +156,10 @@
     })['catch'](function () { FIDX = []; FBYFAM = {}; return FIDX; });
   }
 
-  /*@3.NOPJ2.135*/
   function famList(css) {
-    var out = [];
-    String(css || '').split(',').forEach(function (t) {
-      var f = t.trim().replace(/^["']|["']$/g, '').toLowerCase();
-      if (!f) return;
-      if (f === 'cairo' && FBYFAM[FRUT] && out.indexOf(FRUT) < 0) out.push(FRUT);
-      out.push(f);
-    });
-    return out;
+    return String(css || '').split(',').map(function (t) {
+      return t.trim().replace(/^["']|["']$/g, '').toLowerCase();
+    }).filter(Boolean);
   }
 
   function pickWeight(rec, weight) {
@@ -204,7 +198,7 @@
         if (hit && !want) return hit.id;
       }
     }
-    var base = FBYFAM[FRUT] ? pickWeight(FBYFAM[FRUT], weight) : (FBYFAM['cairo'] ? pickWeight(FBYFAM['cairo'], weight) : null);
+    var base = FBYFAM['cairo'] ? pickWeight(FBYFAM['cairo'], weight) : null;
     if (base) return base.id;
     return fallback || ((parseInt(weight, 10) || 400) >= 600 ? 'cairo-700' : 'cairo-400');
   }

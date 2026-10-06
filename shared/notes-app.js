@@ -1256,7 +1256,7 @@
   }
 
   /*@3.NOAJ.112*/
-  var SHEET_FACE = 'Frutiger LT Arabic';
+  var SHEET_FACE = 'Thmanyah Sans';
   function warmSheetFont(tries) {
     if (!document.fonts || !document.fonts.load) return;
     var has = false;
