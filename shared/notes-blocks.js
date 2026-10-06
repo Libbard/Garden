@@ -673,11 +673,13 @@
   var TBL_STYLES = ['head', 'lines', 'stripe', 'plain', 'cmp'];
 
   /*@3.NOBJ.13*/
+  /*@3.NOBJ.52*/
   var FONT_HEAD = [
+    { id: 'frutiger', css: 'Frutiger LT Arabic', star: 1, ar: 'فروتيجر', en: 'Frutiger' },
     { id: 'thmanyah', css: 'Thmanyah Sans', star: 1, ar: 'ثمانية',  en: 'Thmanyah Sans' },
-    { id: 'cairo',    css: 'Cairo',         star: 1, ar: 'القاهرة', en: 'Cairo' }
+    { id: 'cairo',    css: 'Cairo',         star: 1, ar: 'خطُّ الموقع', en: 'Site font' }
   ];
-  var FONT_DEFAULT = 'thmanyah';
+  var FONT_DEFAULT = 'frutiger';
 
   function fontCatalog() {
     var out = FONT_HEAD.slice();

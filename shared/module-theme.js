@@ -73,7 +73,7 @@
 
   /*@3.MOTJ.11*/
   var FONTS = [
-    { id: 'garden',   css: null,                   star: 1, ar: 'خطُّ الموقع (القاهرة)', en: 'Site font (Cairo)' },
+    { id: 'garden',   css: null,                   star: 1, ar: 'خطُّ الموقع (فروتيجر)', en: 'Site font (Frutiger)' },
     /*@3.MOTJ.27*/
     { id: 'thmanyah', css: 'Thmanyah Sans',         star: 1, ar: 'ثمانية',        en: 'Thmanyah Sans' },
     { id: 'plex',     css: 'IBM Plex Sans Arabic', star: 1, ar: 'بلكس عربي',    en: 'IBM Plex Sans Arabic' },

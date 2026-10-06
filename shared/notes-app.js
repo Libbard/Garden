@@ -1256,7 +1256,7 @@
   }
 
   /*@3.NOAJ.112*/
-  var SHEET_FACE = 'Thmanyah Sans';
+  var SHEET_FACE = 'Frutiger LT Arabic';
   function warmSheetFont(tries) {
     if (!document.fonts || !document.fonts.load) return;
     var has = false;
@@ -6635,24 +6635,78 @@
     });
   }
 
+  /*@3.NOAJ.505*/
+  var OFFICE_RE = /\.(ppt|pptx|pps|ppsx|pot|potx|odp|doc|docx|dot|dotx|odt|rtf|xls|xlsx|ods)$/i;
+  var OFFICE_ACCEPT = '.ppt,.pptx,.pps,.ppsx,.pot,.potx,.odp,.doc,.docx,.dot,.dotx,.odt,.rtf,.xls,.xlsx,.ods';
+  var OFFICE_MIMES = 'application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,' +
+    'application/vnd.openxmlformats-officedocument.presentationml.slideshow,application/vnd.oasis.opendocument.presentation,' +
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.oasis.opendocument.text,application/rtf,' +
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.oasis.opendocument.spreadsheet';
+  /*@3.NOAJ.504*/
+  function pickOne(accept) {
+    return new Promise(function (ok) {
+      var inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = accept;
+      inp.className = 'npo-file';
+      document.body.appendChild(inp);
+      inp.addEventListener('change', function () {
+        var f = inp.files && inp.files[0];
+        if (inp.parentNode) inp.parentNode.removeChild(inp);
+        ok(f || null);
+      });
+      inp.click();
+    });
+  }
+  function driveAny(mimes, title) {
+    needDrive().then(function (GD) {
+      return GD.pick({ mime: mimes, title: title }).then(function (pk) {
+        if (!pk || !pk.id) return;
+        saveState('saving', L('يُجلب من درايف…', 'Fetching from Drive…'));
+        return GD.download(pk.id).then(function (blob) {
+          saveState('', '');
+          intake(new File([blob], pk.name || 'drive-file', { type: pk.mime || blob.type || '' }));
+        });
+      });
+    })['catch'](function (e) {
+      saveState('', '');
+      toast(window.GardenDrive && GardenDrive.reason ? GardenDrive.reason(e) : L('تعذّر الوصولُ إلى درايف.', 'Drive could not be reached.'));
+    });
+  }
+  var SRC_DRIVE = {
+    office: OFFICE_MIMES,
+    md: 'text/markdown,text/x-markdown,text/plain',
+    json: 'application/json'
+  };
+  function srcTitle(kind) {
+    if (kind === 'office') return L('افتحْ باوربوينت أو وورد أو إكسل', 'Open PowerPoint, Word or Excel');
+    if (kind === 'md') return L('استوردْ ماركداون', 'Import Markdown');
+    if (kind === 'json') return L('استوردْ JSON', 'Import JSON');
+    return L('افتحْ ملفَّ PDF', 'Open a PDF file');
+  }
   function createPdf(only) {
     var O = window.GardenPdfOpen;
     if (!O) return;
+    var office = only === 'office';
     var fromDevice = function () {
-      O.pickFile(pdfAccept(only === 'office')).then(function (file) {
+      pickOne(pdfAccept(office)).then(function (file) {
         if (!file) return;
         adoptPdf(file);
       });
     };
-    if (!driveOn() || only === 'office') { fromDevice(); return; }
+    srcAsk(office ? 'office' : 'pdf', fromDevice);
+  }
+  function srcAsk(kind, fromDevice) {
+    if (!driveOn()) { fromDevice(); return; }
     needDrive().then(function (GD) { GD.warm(); }, function () {});
+    var title = srcTitle(kind);
     var dlg = document.createElement('dialog');
     dlg.className = 'gsf gsf--snug na-pdfsrc';
-    dlg.setAttribute('aria-label', L('افتحْ ملفَّ PDF', 'Open a PDF file'));
+    dlg.setAttribute('aria-label', title);
     dlg.innerHTML =
       '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' + esc(L('إغلاق', 'Close')) + '">' +
         '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
-      '<div class="gsf-body"><div class="gsf-head"><h2 class="gsf-title">' + esc(L('افتحْ ملفَّ PDF', 'Open a PDF file')) + '</h2></div>' +
+      '<div class="gsf-body"><div class="gsf-head"><h2 class="gsf-title">' + esc(title) + '</h2></div>' +
       '<div class="na-pdfsrc-tiles">' +
         '<button type="button" class="na-pdfsrc-t" data-a="dev"><i class="fa-solid fa-laptop" aria-hidden="true"></i>' +
           '<b>' + esc(L('من جهازي', 'From my device')) + '</b></button>' +
@@ -6667,7 +6721,8 @@
       if (!b) return;
       shut();
       if (b.getAttribute('data-a') === 'dev') { fromDevice(); return; }
-      pdfFromDrive();
+      if (kind === 'pdf') pdfFromDrive();
+      else driveAny(SRC_DRIVE[kind], title);
     });
     try { dlg.showModal(); } catch (e) { shut(); fromDevice(); }
   }
@@ -6949,12 +7004,8 @@
     });
   }
 
-  function isOfficeFile(f) { return !!(window.GardenFiles && GardenFiles.isOffice && GardenFiles.isOffice(f)); }
-  function pdfAccept(only) {
-    var off = (window.GardenFiles && GardenFiles.officeAccept) || '';
-    if (only) return off;
-    return 'application/pdf,.pdf' + (off ? ',' + off : '');
-  }
+  function isOfficeFile(f) { return !!f && OFFICE_RE.test(String(f.name || '')); }
+  function pdfAccept(only) { return only ? OFFICE_ACCEPT : 'application/pdf,.pdf,' + OFFICE_ACCEPT; }
   function convPct(x) { return x && x.of ? Math.min(100, Math.round(x.at * 100 / x.of)) + '%' : ''; }
   function convertSay(s, x) {
     if (s === 'hash') return L('تُقرأ بصمةُ الملفّ… ', 'Reading the file fingerprint… ') + convPct(x);
@@ -6973,6 +7024,7 @@
                                    'Conversion runs on our server and needs sync across your devices — turn it on and try again. Or save the file as PDF from PowerPoint or Word and open it here.');
     if (k === 'too_large') return L('الملفُّ أكبرُ من ' + (F ? Math.round(F.officeMax / 1048576) : 100) + ' م.ب — احفظْه PDF من برنامجه وافتحْه هنا.',
                                     'The file is over ' + (F ? Math.round(F.officeMax / 1048576) : 100) + ' MB — save it as PDF from its app and open it here.');
+    if (k === 'stale' || k === 'bad_ext') return L('الصفحةُ تعمل بنسخةٍ أقدمَ من ميزة التحويل — أعِدْ تحميلَها ثمّ جرّبْ ثانية.', 'This page is running a version older than conversion — reload it and try again.');
     if (k === 'rate_limited') return L('حوّلتَ ملفّاتٍ كثيرةً في هذه الساعة — أعدِ المحاولةَ بعد قليل.', 'You converted many files this hour — try again shortly.');
     if (k === 'unreadable') return L('تعذّر فتحُ الملفّ — قد يكون محميّاً بكلمة مرورٍ أو تالفاً.', 'The file could not be opened — it may be password protected or damaged.');
     if (k === 'timeout') return L('طال التحويلُ أكثرَ من المسموح — أعدِ المحاولة، أو احفظِ الملفَّ PDF من برنامجه.', 'Conversion took too long — try again, or save the file as PDF from its app.');
@@ -6983,7 +7035,7 @@
   /*@3.NOAJ.502*/
   function officeToPdf(file, say, prog) {
     var F = window.GardenFiles;
-    if (!F || !F.convert) return Promise.reject(new Error('no_vault'));
+    if (!F || !F.convert) return Promise.reject(Object.assign(new Error('stale'), { error: 'stale' }));
     return F.convert(file, { onStage: function (s, x) {
       var m = convertSay(s, x);
       if (m && say) say(m);
@@ -7233,17 +7285,11 @@
 
   /*@3.NOAJ.241*/
   function askFile(kind) {
-    var inp = document.createElement('input');
-    inp.type = 'file';
-    inp.accept = kind === 'json' ? 'application/json,.json' : '.md,.markdown,.txt,text/markdown';
-    inp.className = 'npo-file';
-    document.body.appendChild(inp);
-    inp.addEventListener('change', function () {
-      var f = inp.files && inp.files[0];
-      if (inp.parentNode) inp.parentNode.removeChild(inp);
-      if (f) intake(f);
+    srcAsk(kind === 'json' ? 'json' : 'md', function () {
+      pickOne(kind === 'json' ? 'application/json,.json' : '.md,.markdown,.txt,text/markdown').then(function (f) {
+        if (f) intake(f);
+      });
     });
-    inp.click();
   }
 
   /*@3.NOAJ.242*/

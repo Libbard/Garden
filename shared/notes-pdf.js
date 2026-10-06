@@ -102,7 +102,7 @@
 
   /*@3.NOPJ2.4*/
   /*@3.NOPJ2.21*/
-  var FIDX = null, FBYFAM = {};
+  var FIDX = null, FBYFAM = {}, FBYID = {}, FRUT = 'frutiger lt arabic';
   /*@3.NOPJ2.46*/
   var FALLBACK = { a: 'cairo-400', b: 'cairo-700' };
 
@@ -144,8 +144,10 @@
     }).then(function (list) {
       FIDX = list || [];
       FBYFAM = {};
+      FBYID = {};
       for (var i = 0; i < FIDX.length; i++) {
         var e = FIDX[i];
+        FBYID[e.id] = e;
         var key = String(e.family).toLowerCase();
         if (!FBYFAM[key]) FBYFAM[key] = {};
         FBYFAM[key][e.weight] = e;
@@ -154,10 +156,16 @@
     })['catch'](function () { FIDX = []; FBYFAM = {}; return FIDX; });
   }
 
+  /*@3.NOPJ2.135*/
   function famList(css) {
-    return String(css || '').split(',').map(function (t) {
-      return t.trim().replace(/^["']|["']$/g, '').toLowerCase();
-    }).filter(Boolean);
+    var out = [];
+    String(css || '').split(',').forEach(function (t) {
+      var f = t.trim().replace(/^["']|["']$/g, '').toLowerCase();
+      if (!f) return;
+      if (f === 'cairo' && FBYFAM[FRUT] && out.indexOf(FRUT) < 0) out.push(FRUT);
+      out.push(f);
+    });
+    return out;
   }
 
   function pickWeight(rec, weight) {
@@ -196,11 +204,16 @@
         if (hit && !want) return hit.id;
       }
     }
-    var base = FBYFAM['cairo'] ? pickWeight(FBYFAM['cairo'], weight) : null;
+    var base = FBYFAM[FRUT] ? pickWeight(FBYFAM[FRUT], weight) : (FBYFAM['cairo'] ? pickWeight(FBYFAM['cairo'], weight) : null);
     if (base) return base.id;
     return fallback || ((parseInt(weight, 10) || 400) >= 600 ? 'cairo-700' : 'cairo-400');
   }
 
+  /*@3.NOPJ2.136*/
+  function faceBase(id) {
+    var e = FBYID && FBYID[id];
+    return (e && e.base) ? e.base : BASE + 'vendor/fonts/pdf/';
+  }
   function faceAlt(id) {
     var m = /-(\d+)$/.exec(id || '');
     var w = m ? (parseInt(m[1], 10) || 400) : 400;
@@ -209,10 +222,10 @@
   function loadFace(id) {
     if (FACES[id]) return FACES[id];
     FACES[id] = Promise.all([
-      fetchTry(BASE + 'vendor/fonts/pdf/' + id + '.ttf', 'ttf').then(function (r) {
+      fetchTry(faceBase(id) + id + '.ttf', 'ttf').then(function (r) {
         return r.arrayBuffer();
       }),
-      fetchTry(BASE + 'vendor/fonts/pdf/' + id + '.json', 'meta').then(function (r) {
+      fetchTry(faceBase(id) + id + '.json', 'meta').then(function (r) {
         return r.json();
       })
     ])['catch'](function (eF) {

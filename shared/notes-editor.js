@@ -5697,7 +5697,7 @@
     var faceOk = true;
     try {
       faceOk = document.fonts.status === 'loaded' &&
-               document.fonts.check('16px "Thmanyah Sans"');
+               document.fonts.check('16px "Frutiger LT Arabic"');
     } catch (eF) {}
     /*@3.NOEJ.422*/
     if (!faceOk) { this._engRecap = full ? 'full' : true; return; }
