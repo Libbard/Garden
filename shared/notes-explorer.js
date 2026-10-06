@@ -31,7 +31,7 @@
   function vmOf() { return A.ui('xvm') === 'rows' ? 'rows' : 'grid'; }
 
   function kindOf(n) {
-    if (n.src === 'guest') return n.kind || 'rich';
+    if (n.src === 'guest' || n.src === 'data') return n.kind || 'rich';
     if (n.src !== 'rich') return n.src;
     return n.kind || 'rich';
   }
@@ -43,6 +43,8 @@
       case 'quick':  return L('ملاحظة سريعة', 'Quick note');
       case 'module': return L('من درس', 'From a lesson');
       case 'course': return L('من مادّة', 'From a course');
+      case 'tasks':  return L('مهامّ', 'Tasks');
+      case 'schedule': return L('جدولٌ وفصل', 'Schedule and term');
     }
     return L('ملاحظة', 'Note');
   }
@@ -54,6 +56,8 @@
       case 'quick':  return 'fa-bolt';
       case 'module': return 'fa-graduation-cap';
       case 'course': return 'fa-folder-open';
+      case 'tasks':  return 'fa-list-check';
+      case 'schedule': return 'fa-calendar-week';
     }
     return 'fa-note-sticky';
   }
@@ -310,7 +314,7 @@
       '<div class="nx-c nx-c-w">' + (where ? '<span dir="auto">' + esc(where) + '</span>' : '<span class="nx-dim">—</span>') + '</div>' +
       '<div class="nx-c nx-c-m">' + esc(trashT || when) + '</div>' +
       '<div class="nx-l2 nx-meta"><span class="nx-m-w">' + esc(trashT || when) + '</span>' + stHtml(n) +
-        (sel || n.src === 'guest' ? '<button type="button" class="nx-more" data-x="imore" tabindex="-1"' + tip('المزيد', 'More') + '>' + ic('fa-ellipsis') + '</button>' : '') + '</div>' +
+        (sel || n.src === 'guest' || n.src === 'data' ? '<button type="button" class="nx-more" data-x="imore" tabindex="-1"' + tip('المزيد', 'More') + '>' + ic('fa-ellipsis') + '</button>' : '') + '</div>' +
     '</div>';
   }
 
@@ -431,7 +435,10 @@
     /*@3.NOEJ3.26*/
     if (n < tot) h += b('pickall', 'fa-check-double', 'حدِّدِ الكلّ (' + tot + ')', 'Select all (' + tot + ')');
     h += b('unpick', 'fa-xmark', 'ألغِ التحديد', 'Clear selection') + '<span class="nx-sel-vr" aria-hidden="true"></span>';
-    if (A.view().k === 'withme') {
+    if (A.view().k === 'mydata') {
+      if (n === 1) h += b('open', 'fa-up-right-from-square', 'افتحْ', 'Open');
+      h += b('dexport', 'fa-file-arrow-down', 'صدِّرْ JSON', 'Export JSON');
+    } else if (A.view().k === 'withme') {
       if (n === 1) h += b('open', 'fa-up-right-from-square', 'افتحْ', 'Open');
       h += b('wdrop', 'fa-xmark', 'أزِلْ من القائمة', 'Remove from list', 'gsf-btn--danger');
     } else if (trash) {
@@ -1258,8 +1265,27 @@
     var n = itemOf(uid);
     if (!n) return null;
     if (n.src === 'guest') return guestMenu;
+    if (n.src === 'data') return dataMenu;
     if (n.src !== 'rich') return lessonMenu;
     return A.view().k === 'trash' ? trashMenu : itemMenu;
+  }
+  function dataMenu(x, y, uid) {
+    var p0 = pickedSet();
+    if (!p0[uid]) { A.setPicked({}); paint(); }
+    var ids = pickedList();
+    if (!ids.length) ids = [uid];
+    var it = itemOf(uid);
+    if (!it) return;
+    var kinds = ids.map(itemOf).filter(function (r) { return r && r.src === 'data'; }).map(function (r) { return r.kind; });
+    GM().rich(x, y, {
+      head: { ico: kindIcon(it.kind), t: it.title, s: [it.via, fmtSize(it.bytes)].filter(Boolean).join(' · ') },
+      quick: [{ a: 'open', i: 'fa-arrow-up-right-from-square', t: L('في صفحتها', 'On its page') },
+              { a: 'dexport', i: 'fa-file-arrow-down', t: kinds.length > 1 ? L('صدِّرِ المحدَّد', 'Export selected') : L('صدِّرْ JSON', 'Export JSON') }],
+      items: [{ h: L('تُعدَّل وتُحذف من صفحتها — هنا تراها وتصدّرها.', 'Edit or delete it on its page — here you see and export it.') }]
+    }, function (act) {
+      if (act === 'open') openItem(it);
+      else if (act === 'dexport' && A.dataExport) A.dataExport(kinds);
+    }, MOPT);
   }
   function guestMenu(x, y, uid) {
     var p0 = pickedSet();
@@ -1456,6 +1482,9 @@
       case 'trash': A.trash(ids); return;
       case 'restore': A.restore(ids); return;
       case 'purge': A.purge(ids); return;
+      case 'dexport':
+        if (A.dataExport) A.dataExport(ids.map(itemOf).filter(function (r) { return r && r.src === 'data'; }).map(function (r) { return r.kind; }));
+        return;
       case 'wdrop':
         if (A.withmeDrop) { var ws = ids.map(itemOf).filter(function (r) { return r && r.src === 'guest'; }).map(function (r) { return r.sid; }); A.setPicked({}); A.withmeDrop(ws); }
         return;

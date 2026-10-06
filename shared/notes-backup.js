@@ -84,7 +84,7 @@
     return 'bin';
   }
 
-  var KEEP_LS = /^(garden_|notes_|quick_notes$|course_meta_|my_tasks$|weekly_schedule$|dashboard_prefs$|student_profile$|gpa_)/;
+  var KEEP_LS = /^(garden_|notes_|quick_notes$|course_meta_|my_tasks$|weekly_schedule$|my_semester$|semester_archive$|dashboard_prefs$|student_profile$|gpa_)/;
   /*@3.NOBJ3.2*/
   var SKIP_LS = /token|auth|secret|session|password|vault_key|_cred|refresh/i;
 

@@ -367,6 +367,7 @@
       case 'remind':  return L('لها تنبيه', 'With reminder');
       case 'myshares': return L('شاركتُها', 'I shared');
       case 'withme':  return L('شُورِكت معي', 'Shared with me');
+      case 'mydata':  return L('مهامّي وجدولي', 'Tasks and schedule');
       case 'general': return L('ملاحظات عامّة', 'General notes');
       case 'archive': return L('الأرشيف', 'Archive');
       case 'trash':   return L('السلّة', 'Trash');
@@ -398,6 +399,7 @@
       case 'remind':  return !n.archived && !!n.remind_at;
       case 'myshares': return n.src === 'rich' && !!sharedMap()[n.id];
       case 'withme':  return false;
+      case 'mydata':  return false;
       case 'archive': return !!n.archived;
       case 'general': return !n.archived && !(n.origin && n.origin.course);
       case 'course':  return !n.archived && n.origin && n.origin.course === v.code;
@@ -416,6 +418,7 @@
   function inView(v) {
     if (v.k === 'trash') return (S.trash || []).slice();
     if (v.k === 'withme') return withmeItems();
+    if (v.k === 'mydata') return dataItems();
     var out = [];
     for (var i = 0; i < S.all.length; i++) if (matches(S.all[i], v)) out.push(S.all[i]);
     return out;
@@ -571,6 +574,8 @@
     var nsh = inView({ k: 'myshares' }).length, nwm = withmeRead().length;
     if (nsh) h += itemHtml({ k: 'myshares' }, L('شاركتُها', 'I shared'), 'fa-link', nsh);
     if (nwm) h += itemHtml({ k: 'withme' }, L('شُورِكت معي', 'Shared with me'), 'fa-inbox', nwm);
+    var ndt = dataItems().length;
+    if (ndt) h += itemHtml({ k: 'mydata' }, L('مهامّي وجدولي', 'Tasks and schedule'), 'fa-list-check', ndt);
 
     var fb = folderBranch('', 0, folderTree(), folderCounts());
     if (!fb) {
@@ -1091,6 +1096,59 @@
     var o = {};
     (sids || []).forEach(function (s) { o[s] = 1; });
     withmeWrite(withmeRead().filter(function (x) { return !o[x.sid]; }));
+  }
+  /*@3.NOAJ.508*/
+  var DATA_SETS = [
+    { k: 'tasks', keys: ['my_tasks'], href: '../index.html#tasks', ar: 'مهامّي', en: 'My tasks' },
+    { k: 'schedule', keys: ['weekly_schedule', 'my_semester', 'semester_archive'], href: 'schedule.html', ar: 'جدولي وفصلي', en: 'My schedule and term' }
+  ];
+  function dataRaw(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function dataJson(key) { var r = dataRaw(key); if (r == null) return null; try { return JSON.parse(r); } catch (e) { return null; } }
+  function dataVia(k) {
+    if (k === 'tasks') {
+      var t = dataJson('my_tasks');
+      t = Array.isArray(t) ? t.filter(Boolean) : [];
+      var open = t.filter(function (x) { return !x.done; }).length;
+      return isAr() ? (t.length + ' مهمّة · ' + open + ' مفتوحة') : (t.length + ' tasks · ' + open + ' open');
+    }
+    var s = dataJson('weekly_schedule') || {}, m = dataJson('my_semester') || {};
+    var nl = (s.lectures || []).length, ne = (s.exams || []).length, nc = (m.courses || []).length;
+    return isAr() ? (nc + ' مادّة · ' + nl + ' محاضرة · ' + ne + ' اختبار') : (nc + ' courses · ' + nl + ' lectures · ' + ne + ' exams');
+  }
+  function dataItems() {
+    var out = [];
+    DATA_SETS.forEach(function (d) {
+      var bytes = 0, at = 0, has = false;
+      d.keys.forEach(function (key) {
+        var r = dataRaw(key);
+        if (r == null) return;
+        has = true;
+        bytes += new Blob([r]).size;
+        at = Math.max(at, +(dataRaw('__syncT_' + key) || 0) || 0);
+      });
+      if (!has) return;
+      var href = d.href;
+      try { href = new URL(d.href, location.href).pathname + (d.href.indexOf('#') >= 0 ? d.href.slice(d.href.indexOf('#')) : ''); } catch (e) {}
+      out.push({ uid: 'd:' + d.k, src: 'data', kind: d.k, title: L(d.ar, d.en), via: dataVia(d.k), bytes: bytes,
+                 updated_at: at, created_at: 0, href: href });
+    });
+    return out;
+  }
+  function dataExport(kinds) {
+    var want = {}, keys = {}, n = 0;
+    (kinds || []).forEach(function (k) { want[k] = 1; });
+    DATA_SETS.forEach(function (d) {
+      if (!want[d.k]) return;
+      d.keys.forEach(function (key) { var v = dataJson(key); if (v != null) { keys[key] = v; n++; } });
+    });
+    if (!n) { toast(L('لا بياناتٍ لتُصدَّر.', 'Nothing to export.')); return; }
+    var name = 'garden-' + Object.keys(want).sort().join('-') + '-' + new Date().toISOString().slice(0, 10) + '.json';
+    var blob = new Blob([JSON.stringify({ format: 'garden-data', v: 1, at: Date.now(), keys: keys }, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    toast(L('صُدِّر ملفُّ ' + name, 'Exported ' + name));
   }
   function withmeItems() {
     return withmeRead().map(function (x) {
@@ -10954,6 +11012,7 @@
     shareSrvSoon();
     add({ k: 'myshares' }, 'fa-link', 'شاركتُها', 'I shared', inView({ k: 'myshares' }).length);
     add({ k: 'withme' }, 'fa-inbox', 'شُورِكت معي', 'Shared with me', withmeRead().length);
+    add({ k: 'mydata' }, 'fa-list-check', 'مهامّي وجدولي', 'Tasks and schedule', dataItems().length);
     var cc = courseCounts(), nc = 0;
     for (var k in cc) nc += cc[k];
     add({ k: 'courses' }, 'fa-graduation-cap', 'المواد', 'Courses', nc);
@@ -11372,6 +11431,7 @@
       shareViews: function (id) { var x = shareSrv[id]; return x ? x.views : null; },
       withmeDrop: function (sids) { withmeDrop(sids); if (S.view.k === 'withme' && !withmeRead().length) exSetView({ k: 'home' }); else { renderRail(); if (window.GardenNotesExplorer) GardenNotesExplorer.paint(); } },
       copyText: copyText,
+      dataExport: dataExport,
       share: function (uid) { var r = richOf(uid); if (r) shareNoteId(r.id); },
       dup: function (uids) { dupNotes(recsOf(uids).map(function (x) { return x.id; })); },
       canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },
