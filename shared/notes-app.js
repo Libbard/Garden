@@ -365,6 +365,8 @@
       case 'space':   return L('مساحتي', 'My storage');
       case 'pinned':  return L('المثبَّتة', 'Pinned');
       case 'remind':  return L('لها تنبيه', 'With reminder');
+      case 'myshares': return L('شاركتُها', 'I shared');
+      case 'withme':  return L('شُورِكت معي', 'Shared with me');
       case 'general': return L('ملاحظات عامّة', 'General notes');
       case 'archive': return L('الأرشيف', 'Archive');
       case 'trash':   return L('السلّة', 'Trash');
@@ -394,6 +396,8 @@
       case 'space':   return false;
       case 'pinned':  return !n.archived && !!n.pinned;
       case 'remind':  return !n.archived && !!n.remind_at;
+      case 'myshares': return n.src === 'rich' && !!sharedMap()[n.id];
+      case 'withme':  return false;
       case 'archive': return !!n.archived;
       case 'general': return !n.archived && !(n.origin && n.origin.course);
       case 'course':  return !n.archived && n.origin && n.origin.course === v.code;
@@ -411,6 +415,7 @@
 
   function inView(v) {
     if (v.k === 'trash') return (S.trash || []).slice();
+    if (v.k === 'withme') return withmeItems();
     var out = [];
     for (var i = 0; i < S.all.length; i++) if (matches(S.all[i], v)) out.push(S.all[i]);
     return out;
@@ -563,6 +568,9 @@
     h += itemHtml({ k: 'pinned' }, L('المثبَّتة', 'Pinned'), 'fa-thumbtack', inView({ k: 'pinned' }).length);
     var nr = inView({ k: 'remind' }).length;
     if (nr) h += itemHtml({ k: 'remind' }, L('لها تنبيه', 'With reminder'), 'fa-bell', nr);
+    var nsh = inView({ k: 'myshares' }).length, nwm = withmeRead().length;
+    if (nsh) h += itemHtml({ k: 'myshares' }, L('شاركتُها', 'I shared'), 'fa-link', nsh);
+    if (nwm) h += itemHtml({ k: 'withme' }, L('شُورِكت معي', 'Shared with me'), 'fa-inbox', nwm);
 
     var fb = folderBranch('', 0, folderTree(), folderCounts());
     if (!fb) {
@@ -1002,6 +1010,95 @@
       if (on) m[noteId] = mode || 'view'; else delete m[noteId];
       localStorage.setItem('notes_shared', JSON.stringify(m));
     } catch (e) {}
+    if (!on) { if (shareSrv[noteId]) { delete shareSrv[noteId]; shareSrvSave(); } }
+    else if (!shareSrv[noteId]) shareSrvAt = 0;
+  }
+  /*@3.NOAJ.506*/
+  var shareSrv = shareSrvLoad(), shareSrvAt = 0, shareSrvAsk = 0;
+  function shareSrvLoad() {
+    try { var o = JSON.parse(localStorage.getItem('notes_share_srv') || '{}'); return o && typeof o === 'object' ? o : {}; }
+    catch (e) { return {}; }
+  }
+  function shareSrvSave() { try { localStorage.setItem('notes_share_srv', JSON.stringify(shareSrv)); } catch (e) {} }
+  function shareSrvSoon() {
+    var Sy = window.GardenNotesSync;
+    if (!Sy || !Sy.shareList || shareSrvAsk || Date.now() - shareSrvAt < 120000) return;
+    shareSrvAsk = 1; shareSrvAt = Date.now();
+    Sy.shareList().then(function (r) {
+      shareSrvAsk = 0;
+      if (!r || !r.ok) return;
+      var o = {}, nm = {}, was = sharedMap(), diff = false, k;
+      r.shares.forEach(function (x) {
+        if (!x || !x.id || !x.sid) return;
+        o[x.id] = { sid: x.sid, mode: x.mode === 'copy' ? 'copy' : 'view', views: +x.views || 0, t: +x.t || 0 };
+        nm[x.id] = o[x.id].mode;
+      });
+      for (k in nm) if (was[k] !== nm[k]) diff = true;
+      for (k in was) if (!nm[k]) diff = true;
+      shareSrv = o;
+      shareSrvSave();
+      var mine = {};
+      for (k in o) mine[o[k].sid] = 1;
+      var wm = withmeRead(), wk = wm.filter(function (x) { return !mine[x.sid]; });
+      if (wk.length !== wm.length) { withmeWrite(wk); diff = true; }
+      if (!diff) return;
+      try { localStorage.setItem('notes_shared', JSON.stringify(nm)); } catch (e) {}
+      renderRail();
+      if (window.GardenNotesExplorer) GardenNotesExplorer.paint();
+    }, function () { shareSrvAsk = 0; });
+  }
+  function shareLinkOf(id) {
+    var x = shareSrv[id];
+    return x && x.sid ? location.origin + location.pathname + '?s=' + encodeURIComponent(x.sid) : '';
+  }
+  function copyText(t, okMsg) {
+    if (!t) return;
+    var said = function () { toast(okMsg || L('نُسخ الرابط.', 'Link copied.')); };
+    var old = function () {
+      var ta = document.createElement('textarea');
+      ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { if (document.execCommand('copy')) said(); } catch (e) {}
+      ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(said, old);
+    else old();
+  }
+
+  /*@3.NOAJ.507*/
+  var WITHME_MAX = 200;
+  function withmeRead() {
+    try { var a = JSON.parse(localStorage.getItem('notes_withme') || '[]'); return Array.isArray(a) ? a.filter(function (x) { return x && typeof x.sid === 'string'; }) : []; }
+    catch (e) { return []; }
+  }
+  function withmeWrite(a) { try { localStorage.setItem('notes_withme', JSON.stringify(a.slice(0, WITHME_MAX))); } catch (e) {} }
+  function withmeKeep(sid, r) {
+    for (var k in shareSrv) if (shareSrv[k] && shareSrv[k].sid === sid) return;
+    var a = withmeRead(), old = null;
+    a = a.filter(function (x) { if (x.sid === sid) { old = x; return false; } return true; });
+    var d = r.doc || {}, now = Date.now();
+    a.unshift({ sid: sid, t: String(r.title || '').slice(0, 200), k: d.kind === 'pdf' ? 'pdf' : d.kind === 'board' ? 'board' : 'rich',
+                m: r.mode === 'copy' ? 'copy' : 'view', at: now, t0: (old && old.t0) || now });
+    withmeWrite(a);
+  }
+  function withmeGone(sid) {
+    var a = withmeRead(), hit = false;
+    a.forEach(function (x) { if (x.sid === sid && !x.gone) { x.gone = Date.now(); hit = true; } });
+    if (hit) withmeWrite(a);
+    return hit;
+  }
+  function withmeDrop(sids) {
+    var o = {};
+    (sids || []).forEach(function (s) { o[s] = 1; });
+    withmeWrite(withmeRead().filter(function (x) { return !o[x.sid]; }));
+  }
+  function withmeItems() {
+    return withmeRead().map(function (x) {
+      return { uid: 'w:' + x.sid, src: 'guest', sid: x.sid, kind: x.k || 'rich', mode: x.m, gone: !!x.gone,
+               title: x.t || L('ملاحظةٌ مشارَكة', 'Shared note'), updated_at: x.at || 0, created_at: x.t0 || x.at || 0,
+               via: x.gone ? L('أبطله صاحبُه', 'Revoked by its owner') : L('شاركها معك أحدُهم', 'Shared with you'),
+               href: location.pathname + '?s=' + encodeURIComponent(x.sid) };
+    });
   }
   function sharedMap() {
     try { var m = JSON.parse(localStorage.getItem('notes_shared') || '{}'); return m && typeof m === 'object' ? m : {}; }
@@ -1106,6 +1203,7 @@
 
     Sy.shareRead(sid).then(function (r) {
       if (!r.ok || !r.doc) {
+        if (r.status === 404) withmeGone(sid);
         els.docBody.innerHTML = '<div class="na-guest-miss">' +
           esc(L('هذا الرابطُ لم يعد يعمل — ربّما أبطله صاحبُه.',
                 'This link no longer works — its owner may have revoked it.')) + '</div>';
@@ -1113,6 +1211,7 @@
         return;
       }
       guestShare = { sid: sid, mode: r.mode, title: r.title, doc: r.doc };
+      withmeKeep(sid, r);
       setMob('doc');
       if (els.docTitle) els.docTitle.value = r.title || '';
       if (r.doc.kind === 'pdf' && r.doc.pdf && window.GardenPdfOpen) { openSharedPdf(sid, r); return; }
@@ -1365,6 +1464,7 @@
     var org = (n.origin && n.origin.label) ? n.origin.label : '';
     if (n.kind === 'board') org = L('لوح رسم', 'Drawing board');
     if (n.kind === 'pdf') org = L('ملفُّ PDF', 'PDF file');
+    if (n.src === 'guest') org = n.via;
     var tone = (n.origin && n.origin.course) ? courseTone(n.origin.course) : null;
 
     return '<button type="button" class="na-row" data-uid="' + esc(n.uid) + '"' +
@@ -10851,6 +10951,9 @@
     add({ k: 'recent' }, 'fa-clock', 'الأحدث', 'Recent', inView({ k: 'recent' }).length, 1);
     add({ k: 'pinned' }, 'fa-thumbtack', 'المثبَّتة', 'Pinned', inView({ k: 'pinned' }).length);
     add({ k: 'remind' }, 'fa-bell', 'لها تنبيه', 'With reminder', inView({ k: 'remind' }).length);
+    shareSrvSoon();
+    add({ k: 'myshares' }, 'fa-link', 'شاركتُها', 'I shared', inView({ k: 'myshares' }).length);
+    add({ k: 'withme' }, 'fa-inbox', 'شُورِكت معي', 'Shared with me', withmeRead().length);
     var cc = courseCounts(), nc = 0;
     for (var k in cc) nc += cc[k];
     add({ k: 'courses' }, 'fa-graduation-cap', 'المواد', 'Courses', nc);
@@ -11265,6 +11368,10 @@
       thumb: thumbGet,
       thumbMake: thumbMake,
       shared: function (id) { return !!sharedMap()[id]; },
+      shareLink: shareLinkOf,
+      shareViews: function (id) { var x = shareSrv[id]; return x ? x.views : null; },
+      withmeDrop: function (sids) { withmeDrop(sids); if (S.view.k === 'withme' && !withmeRead().length) exSetView({ k: 'home' }); else { renderRail(); if (window.GardenNotesExplorer) GardenNotesExplorer.paint(); } },
+      copyText: copyText,
       share: function (uid) { var r = richOf(uid); if (r) shareNoteId(r.id); },
       dup: function (uids) { dupNotes(recsOf(uids).map(function (x) { return x.id; })); },
       canPaste: function () { return !!(S.clip && S.clip.ids && S.clip.ids.length); },

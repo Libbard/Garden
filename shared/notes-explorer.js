@@ -31,6 +31,7 @@
   function vmOf() { return A.ui('xvm') === 'rows' ? 'rows' : 'grid'; }
 
   function kindOf(n) {
+    if (n.src === 'guest') return n.kind || 'rich';
     if (n.src !== 'rich') return n.src;
     return n.kind || 'rich';
   }
@@ -277,13 +278,13 @@
     var k = kindOf(n), sel = n.src === 'rich';
     var on = !!picked[n.uid];
     var tone = n.origin && n.origin.course ? A.tone(n.origin.course) : null;
-    var where = n.origin && n.origin.course ? n.origin.course : (n.folder ? A.folderName(n.folder) : '');
+    var where = n.via || (n.origin && n.origin.course ? n.origin.course : (n.folder ? A.folderName(n.folder) : ''));
     var size = fmtSize(n.bytes);
     var when = A.when(n);
     var trashT = n.deleted ? L('حُذفت ', 'Deleted ') + A.ago(n.deleted) : '';
     var lbl = (n.title || '') + ' · ' + kindName(k) + (when ? ' · ' + when : '');
     var th = sel ? TH[n.id] : null;
-    return '<div class="nx-it" role="option" tabindex="0" data-uid="' + esc(n.uid) + '" data-k="' + esc(k) + '"' + (sel ? ' data-id="' + esc(n.id) + '"' : ' data-ro="1"') +
+    return '<div class="nx-it" role="option" tabindex="0" data-uid="' + esc(n.uid) + '" data-k="' + esc(k) + '"' + (sel ? ' data-id="' + esc(n.id) + '"' : ' data-ro="1"') + (n.gone ? ' data-gone="1"' : '') +
         ' aria-selected="' + on + '" aria-label="' + esc(lbl) + '"' + (tone ? ' style="--nx-tone:' + esc(tone) + '"' : '') + '>' +
       '<button type="button" class="nx-ck" data-x="pick" tabindex="-1" aria-label="' + esc(L('حدِّد', 'Select')) + '">' + ic('fa-check') + '</button>' +
       /*@3.NOEJ3.5*/
@@ -309,7 +310,7 @@
       '<div class="nx-c nx-c-w">' + (where ? '<span dir="auto">' + esc(where) + '</span>' : '<span class="nx-dim">—</span>') + '</div>' +
       '<div class="nx-c nx-c-m">' + esc(trashT || when) + '</div>' +
       '<div class="nx-l2 nx-meta"><span class="nx-m-w">' + esc(trashT || when) + '</span>' + stHtml(n) +
-        (sel ? '<button type="button" class="nx-more" data-x="imore" tabindex="-1"' + tip('المزيد', 'More') + '>' + ic('fa-ellipsis') + '</button>' : '') + '</div>' +
+        (sel || n.src === 'guest' ? '<button type="button" class="nx-more" data-x="imore" tabindex="-1"' + tip('المزيد', 'More') + '>' + ic('fa-ellipsis') + '</button>' : '') + '</div>' +
     '</div>';
   }
 
@@ -334,6 +335,14 @@
   }
 
   function emptyHtml(trash) {
+    var vk = A.view().k;
+    if (vk === 'myshares' || vk === 'withme') {
+      return '<div class="nx-empty"><span class="nx-empty-i">' + ic(vk === 'withme' ? 'fa-inbox' : 'fa-link') + '</span>' +
+        '<b>' + esc(vk === 'withme' ? L('لم يشاركك أحدٌ بعد', 'Nothing shared with you yet') : L('لم تشارك شيئاً بعد', 'You have not shared anything yet')) + '</b>' +
+        '<p class="nx-hint">' + esc(vk === 'withme'
+          ? L('حين تفتح رابطَ ملاحظةٍ أرسله لك أحدُهم، تجدها هنا لتعود إليها — على هذا الجهاز وحدَه.', 'When you open a note link someone sent you, you will find it here to come back to — on this device only.')
+          : L('اختَرْ «شارِكْ» من أيِّ ملاحظةٍ لتصنع لها رابطاً يقرؤها به غيرُك.', 'Choose “Share” on any note to make a link others can read it with.')) + '</p></div>';
+    }
     if (trash) {
       return '<div class="nx-empty"><span class="nx-empty-i">' + ic('fa-trash-can') + '</span>' +
         '<b>' + esc(L('السلّة فارغة', 'Trash is empty')) + '</b>' +
@@ -422,7 +431,10 @@
     /*@3.NOEJ3.26*/
     if (n < tot) h += b('pickall', 'fa-check-double', 'حدِّدِ الكلّ (' + tot + ')', 'Select all (' + tot + ')');
     h += b('unpick', 'fa-xmark', 'ألغِ التحديد', 'Clear selection') + '<span class="nx-sel-vr" aria-hidden="true"></span>';
-    if (trash) {
+    if (A.view().k === 'withme') {
+      if (n === 1) h += b('open', 'fa-up-right-from-square', 'افتحْ', 'Open');
+      h += b('wdrop', 'fa-xmark', 'أزِلْ من القائمة', 'Remove from list', 'gsf-btn--danger');
+    } else if (trash) {
       h += b('restore', 'fa-rotate-left', 'استعِدْ', 'Restore');
       h += '<span class="nx-sel-vr" aria-hidden="true"></span>' + b('purge', 'fa-trash', 'احذفْ نهائيّاً', 'Delete forever', 'gsf-btn--danger');
     } else {
@@ -1216,12 +1228,18 @@
       if (n >= 2 && A.pdfMerge) items.push({ a: 'pmerge', i: 'fa-object-group', t: L('ادمجْها في ملفٍّ واحد…', 'Merge into one file…') });
       if (n === 1 && A.pdfSplit) items.push({ a: 'psplit', i: 'fa-scissors', t: L('قسِّمْه إلى ملفّات…', 'Split into files…') });
     }
+    var link = n === 1 && A.shareLink ? A.shareLink(it.id) : '';
+    if (link) {
+      var rv = A.shareViews ? A.shareViews(it.id) : null;
+      items.push({ a: 'scopy', i: 'fa-link', t: L('انسخْ رابطَ المشاركة', 'Copy share link') + (rv ? L(' · قُرئت ' + rv, ' · ' + rv + ' reads') : '') });
+    }
     if (n === 1) items.push({ a: 'props', i: 'fa-circle-info', t: L('الخصائص', 'Properties'), kb: 'Alt ⏎' });
     items.push({ sep: 1 });
     items.push({ a: 'trash', i: 'fa-trash', t: L('إلى السلّة', 'To trash'), dz: 1, kb: 'Del' });
     GM().rich(x, y, { head: head, quick: quick, items: items }, function (act) {
       if (act === 'open') openItem(it);
       else if (act === 'share') A.share(uid);
+      else if (act === 'scopy' && A.copyText) A.copyText(link);
       else if (act === 'dup') A.dup(ids);
       else if (act === 'move') A.move(ids);
       else if (act === 'export') A.exportIds(ids);
@@ -1234,6 +1252,36 @@
       else if (act === 'props') propsOpen(it);
       else if (act === 'course' && A.linkCourse) A.linkCourse(ids);
       else if (act === 'trash') A.trash(ids);
+    }, MOPT);
+  }
+  function menuOf(uid) {
+    var n = itemOf(uid);
+    if (!n) return null;
+    if (n.src === 'guest') return guestMenu;
+    if (n.src !== 'rich') return lessonMenu;
+    return A.view().k === 'trash' ? trashMenu : itemMenu;
+  }
+  function guestMenu(x, y, uid) {
+    var p0 = pickedSet();
+    if (!p0[uid]) { A.setPicked({}); paint(); }
+    var ids = pickedList();
+    if (!ids.length) ids = [uid];
+    var it = itemOf(uid);
+    if (!it) return;
+    var sids = ids.map(itemOf).filter(function (r) { return r && r.src === 'guest'; }).map(function (r) { return r.sid; });
+    var k = kindOf(it), link = location.origin + it.href;
+    GM().rich(x, y, {
+      head: { ico: kindIcon(k), t: it.title || L('بلا عنوان', 'Untitled'), s: [kindName(k), it.via].filter(Boolean).join(' · ') },
+      quick: [{ a: 'open', i: 'fa-arrow-up-right-from-square', t: L('افتحْ', 'Open'), off: it.gone, why: it.gone ? L('أبطل صاحبُه الرابط', 'Its owner revoked the link') : '' },
+              { a: 'wcopy', i: 'fa-link', t: L('انسخِ الرابط', 'Copy link'), off: it.gone }],
+      items: [{ h: it.gone ? L('أبطل صاحبُها الرابط فلم تعد تُقرأ.', 'Its owner revoked the link.')
+                           : L('تقرؤها ولا تعدّلها.', 'You can read it, not edit it.') },
+              { sep: 1 },
+              { a: 'wdrop', i: 'fa-xmark', t: sids.length > 1 ? L('أزِلِ المحدَّدَ من القائمة', 'Remove selected from list') : L('أزِلْها من القائمة', 'Remove from list'), dz: 1 }]
+    }, function (act) {
+      if (act === 'open') openItem(it);
+      else if (act === 'wcopy' && A.copyText) A.copyText(link);
+      else if (act === 'wdrop' && A.withmeDrop) { A.setPicked({}); A.withmeDrop(sids); }
     }, MOPT);
   }
   /*@3.NOEJ3.29*/
@@ -1357,7 +1405,7 @@
       case 'iopen': if (it) openItem(itemOf(it.getAttribute('data-uid'))); return;
       case 'ishare': if (it) A.share(it.getAttribute('data-uid')); return;
       case 'imore':
-        if (it) { var p = at(x); if (A.view().k === 'trash') trashMenu(p.x, p.y, it.getAttribute('data-uid')); else itemMenu(p.x, p.y, it.getAttribute('data-uid')); }
+        if (it) { var p = at(x), mu = it.getAttribute('data-uid'); if (menuOf(mu)) menuOf(mu)(p.x, p.y, mu); }
         return;
       case 'opennote': if (A.openId) A.openId(x.getAttribute('data-id')); return;
       case 'fpick': var fk0 = x.closest('[data-fk]'); if (fk0) fToggle(fk0.getAttribute('data-fk')); return;
@@ -1408,6 +1456,9 @@
       case 'trash': A.trash(ids); return;
       case 'restore': A.restore(ids); return;
       case 'purge': A.purge(ids); return;
+      case 'wdrop':
+        if (A.withmeDrop) { var ws = ids.map(itemOf).filter(function (r) { return r && r.src === 'guest'; }).map(function (r) { return r.sid; }); A.setPicked({}); A.withmeDrop(ws); }
+        return;
       case 'pick':
         /*@3.NOEJ3.27*/
         if (it && e.shiftKey && anchor) { e.preventDefault(); range(it.getAttribute('data-uid')); return; }
@@ -1461,7 +1512,7 @@
     if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
       e.preventDefault();
       var r = it.getBoundingClientRect();
-      if (itemOf(uid)) (itemOf(uid).src !== 'rich' ? lessonMenu : A.view().k === 'trash' ? trashMenu : itemMenu)(A.isAr() ? r.right - 12 : r.left + 12, r.top + 24, uid);
+      if (menuOf(uid)) menuOf(uid)(A.isAr() ? r.right - 12 : r.left + 12, r.top + 24, uid);
       return;
     }
     var dirs = { ArrowDown: 1, ArrowUp: -1, ArrowLeft: A.isAr() ? 1 : -1, ArrowRight: A.isAr() ? -1 : 1 };
@@ -1546,9 +1597,7 @@
     if (!it) return;
     e.preventDefault();
     var uid = it.getAttribute('data-uid');
-    if (it.getAttribute('data-ro')) { lessonMenu(e.clientX, e.clientY, uid); return; }
-    if (A.view().k === 'trash') trashMenu(e.clientX, e.clientY, uid);
-    else itemMenu(e.clientX, e.clientY, uid);
+    if (menuOf(uid)) menuOf(uid)(e.clientX, e.clientY, uid);
   }
 
   var D = null, DRAG_PX = 6;

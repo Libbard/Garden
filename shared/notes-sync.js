@@ -568,6 +568,17 @@
     });
   }
 
+  function shareList() {
+    if (!endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
+    return vaultId().then(function (vid) {
+      if (!vid) return { ok: false, reason: 'no-vault' };
+      return authed('GET', base(vid) + '/_shares', vid).then(function (r) {
+        if (!r.ok || !r.body || !Array.isArray(r.body.shares)) return { ok: false, status: r.status };
+        return { ok: true, shares: r.body.shares };
+      });
+    })['catch'](function () { return { ok: false, why: 'offline' }; });
+  }
+
   /*@3.NOSJ2.14*/
   function shareFile(sid) {
     if (!endpoint()) return Promise.resolve({ ok: false, reason: 'no-endpoint' });
@@ -604,6 +615,7 @@
     shareState: shareState,
     shareSet: shareSet,
     shareDrop: shareDrop,
+    shareList: shareList,
     shareRead: shareRead,
     shareFile: shareFile,
     shareImages: shareImages,
