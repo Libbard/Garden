@@ -6504,6 +6504,77 @@
       return r[1].lib().then(function (P) { return r[0].arrayBuffer().then(function (b) { return P.PDFDocument.load(b, { ignoreEncryption: true, updateMetadata: false }); }); });
     }).then(function (d) { return d.getPageCount(); }, function () { return 0; });
   }
+  /*@3.NOAJ.509*/
+  var STRIP_MAX = 600, STRIP_W = 84;
+  function cutsOf(groups, n) {
+    var g = groups.slice().sort(function (x, y) { return x.a - y.a; }), at = 1, cuts = {};
+    for (var i = 0; i < g.length; i++) {
+      if (g[i].a !== at) return null;
+      if (i) cuts[g[i].a] = 1;
+      at = g[i].b + 1;
+    }
+    return at === n + 1 ? cuts : null;
+  }
+  function cutsText(cuts, n) {
+    var starts = [1].concat(Object.keys(cuts).map(Number).filter(function (p) { return p > 1 && p <= n; }).sort(function (a, b) { return a - b; }));
+    return starts.map(function (a, i) { var b = i + 1 < starts.length ? starts[i + 1] - 1 : n; return a + (b > a ? '-' + b : ''); }).join(', ');
+  }
+  function stripHtml(n) {
+    var h = '<div class="na-pt-strip" role="group" aria-label="' + esc(L('الصفحات — اضغطِ المقصَّ بين صفحتين لتقطع هناك', 'Pages — press the scissors between two pages to cut there')) + '">';
+    for (var p = 1; p <= n; p++) {
+      if (p > 1) h += '<button type="button" class="na-pt-cut" data-cut="' + p + '" aria-pressed="false" aria-label="' + esc(L('اقطعْ قبل الصفحة ' + p, 'Cut before page ' + p)) + '" title="' + esc(L('اقطعْ هنا', 'Cut here')) + '"><i class="fa-solid fa-scissors" aria-hidden="true"></i></button>';
+      h += '<figure class="na-pt-pp" data-p="' + p + '"><span class="na-pt-th" aria-hidden="true"></span><figcaption>' + p + '</figcaption></figure>';
+    }
+    return h + '</div>';
+  }
+  function stripThumbs(dlg, src) {
+    var box = dlg.querySelector('.na-pt-strip');
+    if (!box || !window.GardenPdfView) return;
+    var doc = null, q = [], busy = false, io = null, dead = false;
+    function stop() {
+      dead = true;
+      if (io) io.disconnect();
+      if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
+    }
+    dlg.addEventListener('close', stop, { once: true });
+    function pump() {
+      if (busy || dead || !doc || !q.length) return;
+      var p = q.shift(), fig = box.querySelector('.na-pt-pp[data-p="' + p + '"]');
+      if (!fig || fig.getAttribute('data-th')) { pump(); return; }
+      busy = true;
+      fig.setAttribute('data-th', '1');
+      doc.getPage(p).then(function (pg) {
+        var v1 = pg.getViewport({ scale: 1 }), r = Math.min(2, window.devicePixelRatio || 1);
+        var vp = pg.getViewport({ scale: STRIP_W * r / v1.width });
+        var c = document.createElement('canvas');
+        c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+        return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () {
+          if (dead) return;
+          var th = fig.querySelector('.na-pt-th');
+          th.innerHTML = '';
+          th.appendChild(c);
+        });
+      })['catch'](function () {}).then(function () { busy = false; pump(); });
+    }
+    pdfBytesAny(src.spec).then(function (f) { return f.arrayBuffer(); }).then(function (buf) {
+      if (dead) return null;
+      return GardenPdfView.load(new Uint8Array(buf));
+    }).then(function (o) {
+      if (!o || dead) { if (o && o.doc) try { o.doc.destroy(); } catch (e) {} return; }
+      doc = o.doc;
+      var want = function (p) { if (q.indexOf(p) < 0) q.push(p); };
+      if ('IntersectionObserver' in window) {
+        io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) { if (e.isIntersecting) { want(+e.target.getAttribute('data-p')); io.unobserve(e.target); } });
+          pump();
+        }, { root: box, rootMargin: '0px 240px' });
+        box.querySelectorAll('.na-pt-pp').forEach(function (f) { io.observe(f); });
+      } else {
+        for (var p = 1; p <= Math.min(40, o.pages); p++) want(p);
+        pump();
+      }
+    })['catch'](function () {});
+  }
   function pdfSplit(id) {
     pdfSrcs([id]).then(function (src) {
       var s0 = src[0];
@@ -6522,6 +6593,7 @@
         (chips.length ? '<div class="gsf-chips na-pt-quick">' + chips.map(function (c, i) {
           return '<button type="button" class="gsf-chip" data-q="' + i + '">' + esc(c.t) + '</button>';
         }).join('') + '</div>' : '') +
+        (n > 1 && n <= STRIP_MAX ? stripHtml(n) : '') +
         '<label class="na-cdlg-l" for="na-pt-groups">' + esc(L('المجموعات — افصلْ بينها بفاصلة', 'Groups — separate them with commas')) + '</label>' +
         '<input class="gsf-in" id="na-pt-groups" type="text" dir="ltr" inputmode="text" autocomplete="off" spellcheck="false" placeholder="1-5, 6-12, 13-">' +
         '<div class="na-pt-prev" aria-live="polite"></div>', goTxt(0));
@@ -6538,6 +6610,14 @@
         go.innerHTML = goTxt(cur.groups.length);
         go.disabled = !cur.groups.length || !!cur.bad.length || many;
         dlg.querySelectorAll('[data-q]').forEach(function (c) { c.classList.toggle('on', chips[+c.getAttribute('data-q')].v === inp.value); });
+        var cuts = cutsOf(cur.groups, n), inG = {};
+        cur.groups.forEach(function (g) { for (var p = g.a; p <= g.b; p++) inG[p] = 1; });
+        dlg.querySelectorAll('.na-pt-cut').forEach(function (b) {
+          b.setAttribute('aria-pressed', cuts && cuts[+b.getAttribute('data-cut')] ? 'true' : 'false');
+        });
+        dlg.querySelectorAll('.na-pt-pp').forEach(function (f) {
+          if (inG[+f.getAttribute('data-p')]) f.removeAttribute('data-out'); else f.setAttribute('data-out', '1');
+        });
       }
       inp.value = chips.length ? chips[0].v : '';
       paintPrev();
@@ -6545,6 +6625,18 @@
       dlg.querySelectorAll('[data-q]').forEach(function (c) {
         c.onclick = function () { inp.value = chips[+c.getAttribute('data-q')].v; paintPrev(); };
       });
+      var strip = dlg.querySelector('.na-pt-strip');
+      if (strip) {
+        strip.onclick = function (e) {
+          var b = e.target.closest('.na-pt-cut');
+          if (!b || b.disabled) return;
+          var cuts = cutsOf(cur.groups, n) || {}, p = +b.getAttribute('data-cut');
+          if (cuts[p]) delete cuts[p]; else cuts[p] = 1;
+          inp.value = cutsText(cuts, n);
+          paintPrev();
+        };
+        stripThumbs(dlg, s);
+      }
       go.onclick = function () {
         var groups = cur.groups.slice();
         if (!groups.length || cur.bad.length) return;
