@@ -177,10 +177,10 @@
 
   /*@3.NOAJ.9*/
   function folderCounts() {
-    var T = folderTree(), own = {}, i;
+    var T = folderTree(), own = {}, i, am = courseArchMap();
     for (i = 0; i < S.all.length; i++) {
       var n = S.all[i];
-      if (n.archived || !n.folder) continue;
+      if (n.archived || !n.folder || cArch(n, am)) continue;
       own[n.folder] = (own[n.folder] || 0) + 1;
     }
     var total = {};
@@ -389,14 +389,16 @@
     return s;
   }
 
-  function matches(n, v) {
+  /*@3.NOAJ.510*/
+  function cArch(n, am) { var c = n.origin && n.origin.course; return !!c && +(am || courseArchMap())[c] > 0; }
+  function matches(n, v, am) {
     switch (v.k) {
-      case 'recent':  return !n.archived;
+      case 'recent':  return !n.archived && !cArch(n, am);
       case 'home':    return !n.archived && !n.folder && !(n.origin && n.origin.course);
       case 'courses': return false;
       case 'space':   return false;
-      case 'pinned':  return !n.archived && !!n.pinned;
-      case 'remind':  return !n.archived && !!n.remind_at;
+      case 'pinned':  return !n.archived && !!n.pinned && !cArch(n, am);
+      case 'remind':  return !n.archived && !!n.remind_at && !cArch(n, am);
       case 'myshares': return n.src === 'rich' && !!sharedMap()[n.id];
       case 'withme':  return false;
       case 'mydata':  return false;
@@ -408,9 +410,9 @@
       case 'module':  return !n.archived && n.origin && n.origin.course === v.code &&
                              n.origin.module != null &&
                              String(n.origin.module) === String(v.m);
-      case 'folder':  return !n.archived && n.folder === v.id;
-      case 'tag':     return !n.archived && (n.tags || []).indexOf(v.tag) !== -1;
-      case 'src':     return !n.archived && n.src === v.src;
+      case 'folder':  return !n.archived && !cArch(n, am) && n.folder === v.id;
+      case 'tag':     return !n.archived && !cArch(n, am) && (n.tags || []).indexOf(v.tag) !== -1;
+      case 'src':     return !n.archived && !cArch(n, am) && n.src === v.src;
     }
     return !n.archived;
   }
@@ -420,7 +422,8 @@
     if (v.k === 'withme') return withmeItems();
     if (v.k === 'mydata') return dataItems();
     var out = [];
-    for (var i = 0; i < S.all.length; i++) if (matches(S.all[i], v)) out.push(S.all[i]);
+    var am = courseArchMap();
+    for (var i = 0; i < S.all.length; i++) if (matches(S.all[i], v, am)) out.push(S.all[i]);
     return out;
   }
 
@@ -11113,7 +11116,9 @@
     roots.forEach(function (f) { out.push({ v: { k: 'folder', id: f.id }, icon: 'fa-folder', label: f.n || L('مجلّد', 'Folder'), n: C.total[f.id] || 0 }); });
     out.push({ head: '' });
     add({ k: 'space' }, 'fa-hard-drive', 'مساحتي', 'My storage', 0, 1);
-    add({ k: 'archive' }, 'fa-box-archive', 'الأرشيف', 'Archive', inView({ k: 'archive' }).length, 1);
+    var ca = courseCounts(true), nca = 0;
+    for (var ck in ca) nca += ca[ck];
+    add({ k: 'archive' }, 'fa-box-archive', 'الأرشيف', 'Archive', inView({ k: 'archive' }).length + nca, 1);
     add({ k: 'trash' }, 'fa-trash-can', 'السلّة', 'Trash', (S.trash || []).length, 1);
     return out;
   }
