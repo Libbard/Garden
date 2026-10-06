@@ -6,7 +6,7 @@
   var API = 'https://www.googleapis.com/drive/v3';
   var UP = 'https://www.googleapis.com/upload/drive/v3';
   var FOLDER = 'Digital Garden';
-  var KINDS = { pdf: 'PDF', aud: 'Recordings' };
+  var KINDS = { pdf: 'PDF', aud: 'Recordings', img: 'Images' };
   var GSI = 'https://accounts.google.com/gsi/client';
   var GAPI = 'https://apis.google.com/js/api.js';
   var SLACK_MS = 60 * 1000;
@@ -425,7 +425,7 @@
   }
   function course(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12); }
   /*@3.DRIJ.3*/
-  var NAMES = { GENERAL: ['عامّ', 'General'], pdf: ['PDF', 'PDF'], aud: ['تسجيلات', 'Recordings'], file: ['ملفّات', 'Files'] };
+  var NAMES = { GENERAL: ['عامّ', 'General'], pdf: ['PDF', 'PDF'], aud: ['تسجيلات', 'Recordings'], img: ['صور', 'Images'], file: ['ملفّات', 'Files'] };
   /*@3.DRIJ.6*/
   function named(k) { var n = NAMES[k]; return n ? { name: n[1], also: [n[1]] } : null; }
   function place(c, kind) {
@@ -439,8 +439,11 @@
     });
   }
   function bySha(sha) {
-    if (!sha) return Promise.resolve(null);
-    var cond = "trashed=false and appProperties has { key='sha256' and value='" + q(String(sha).slice(0, 64)) + "' }";
+    return byProp('sha256', sha ? String(sha).slice(0, 64) : '');
+  }
+  function byProp(k, v) {
+    if (!v) return Promise.resolve(null);
+    var cond = "trashed=false and appProperties has { key='" + q(k) + "' and value='" + q(String(v)) + "' }";
     return json('GET', API + '/files?q=' + encodeURIComponent(cond) + '&fields=files(id,name,size)&pageSize=1&spaces=drive')
       .then(function (r) { return (r.files && r.files[0]) || null; }, function () { return null; });
   }
@@ -475,6 +478,7 @@
         var props = { garden: '1' };
         if (o.sha) props.sha256 = String(o.sha).slice(0, 64);
         if (o.kind) props.tag = String(o.kind);
+        if (o.props) Object.keys(o.props).forEach(function (k) { props[k] = String(o.props[k]).slice(0, 100); });
         return authed(function (t) {
           return call('POST', UP + '/files?uploadType=resumable&fields=id,name,size', t,
             { name: String(o.name || 'file'), parents: [fid], appProperties: props },
@@ -855,6 +859,7 @@
     download: download,
     upload: upload,
     uploadBig: uploadBig,
+    findImage: function (id) { return /^[0-9a-f]{24}$/.test(String(id)) ? byProp('img', String(id)) : Promise.resolve(null); },
     backups: backups,
     trash: trash,
     folderName: function () { return FOLDER; },

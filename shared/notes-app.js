@@ -705,8 +705,8 @@
     if (link && on) link.value = shareUrl(shareCur.sid);
     if (mk) {
       var up0 = sharePdf() && !on && shareUp !== true;
-      var ar = on ? 'حدِّثِ اللقطة' : (up0 ? 'ارفعِ الملفَّ وأنشئ الرابط' : 'أنشئ الرابط');
-      var en = on ? 'Refresh snapshot' : (up0 ? 'Upload the file and create the link' : 'Create link');
+      var ar = on ? 'حدِّثِ اللقطة' : (up0 ? 'أوافق: ارفعِ الملفَّ وأنشئ الرابط' : 'أنشئ الرابط');
+      var en = on ? 'Refresh snapshot' : (up0 ? 'I agree: upload the file and create the link' : 'Create link');
       mk.textContent = L(ar, en);
       mk.setAttribute('data-ar', ar);
       mk.setAttribute('data-en', en);
@@ -772,7 +772,7 @@
   }
   function shareUpWhy(e) {
     var c = (e && (e.error || e.message)) || '';
-    if (c === 'no_local') return L('الملفُّ ليس على هذا الجهاز — افتحْه هنا أوّلاً ثمّ شارِكْه.', 'The file is not on this device — open it here first, then share it.');
+    if (c === 'no_local') return L('الملفُّ ليس على هذا الجهاز ولا في درايفك — افتحْه هنا أوّلاً ثمّ شارِكْه.', 'The file is not on this device or in your Drive — open it here first, then share it.');
     if (c === 'too_large' || c === 'over_exhausted') return L('الملفُّ أكبرُ من حدِّ الرفع إلى خادمنا — احفظْه في درايفك وشارِكه من هناك.', 'The file is over our upload limit — save it to your Drive and share it from there.');
     if (c === 'vault_full') return L('مساحتُك عندنا ممتلئةٌ بملفّاتٍ لم تُكمل ثلاثةَ أيّام — احذفْ ما لا تحتاجه من «المزامنة ⇐ ملفّاتُك عندنا» ثمّ أعِدِ المحاولة.', 'Your space with us is full of files under three days old — delete what you do not need in “Sync ⇒ Your files with us”, then try again.');
     if (c === 'not_found' || c === 'files_not_configured') return L('رفعُ الملفّات إلى خادمنا لم يُفتح لحسابك بعد — فلا رابطَ لهذا الملفّ الآن.', 'Uploading files to our server is not open for your account yet, so this file cannot get a link now.');
@@ -829,7 +829,15 @@
       shareSay('', L('يُرفع الملفّ…', 'Uploading the file…'));
       shareBar(0);
       return GardenPdfDoc.get(p.h).then(function (file) {
+        if (file) return file;
+        if (!p.gd || !driveOn()) throw { error: 'no_local' };
+        shareSay('', L('يُجلب الملفُّ من درايفك…', 'Fetching the file from your Drive…'));
+        return needDrive().then(function (GD) { return GD.download(p.gd); }).then(function (blob) {
+          return new File([blob], p.n || 'file.pdf', { type: 'application/pdf' });
+        });
+      }).then(function (file) {
         if (!file) throw { error: 'no_local' };
+        shareSay('', L('يُرفع الملفّ…', 'Uploading the file…'));
         var ref = sharePdfRef();
         var on = function (e) {
           var d = e.detail || {};
@@ -1403,7 +1411,7 @@
         ? (isAr() ? list.length + ' ملاحظة' : list.length + ' notes') : '';
     }
     syncVm();
-    els.items.innerHTML = blanksBar() + (list.length
+    els.items.innerHTML = blanksBar() + slidesBar() + (list.length
       ? list.map(rowHtml).join('')
       : emptyHtml());
     /*@3.NOAJ.57*/
@@ -1942,6 +1950,54 @@
       '<button type="button" class="na-sweep-x" data-role="sweep-x" aria-label="إخفاء" ' +
       'data-ar-title="إخفاء" data-en-title="Dismiss">' +
       '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>';
+  }
+
+  var SL_HID = 'notes_slides_hid';
+  function slidesHid() {
+    try { var o = JSON.parse(localStorage.getItem(SL_HID) || '{}'); return o && typeof o === 'object' ? o : {}; }
+    catch (e) { return {}; }
+  }
+  function slidesBar() {
+    var v = S.view || {};
+    if ((v.k !== 'course' && v.k !== 'module') || !v.code) return '';
+    var G = window.Garden, total = (G && G.slidesOf) ? G.slidesOf(v.code) : 0;
+    if (!total || slidesHid()[v.code]) return '';
+    var have = {};
+    idxRead().forEach(function (r) {
+      if (r && r.o && typeof r.o.sl === 'string' && typeof r.d !== 'number') have[r.o.sl] = 1;
+    });
+    var want = [], i;
+    if (v.k === 'module') { if (+v.m >= 1 && +v.m <= total && !have[v.code + '-' + v.m]) want.push(+v.m); }
+    else for (i = 1; i <= total; i++) if (!have[v.code + '-' + i]) want.push(i);
+    if (!want.length) return '';
+    var chips = want.map(function (m) {
+      return '<button type="button" class="na-sweep-go" data-role="slide" data-m="' + m + '">' +
+        esc(v.k === 'module' ? L('أضِفْها وافتحْها', 'Add and open') : ('M' + (m < 10 ? '0' : '') + m)) + '</button>';
+    }).join('');
+    return '<div class="na-sweep na-sweep--offer" role="group" aria-label="' +
+      esc(L('السلايدات الأصليّة', 'Original slides')) + '">' +
+      '<i class="fa-solid fa-chalkboard" aria-hidden="true"></i>' +
+      '<span>' + esc(v.k === 'module'
+        ? L('ملفُّ الجامعة الأصليّ لهذه الوحدة متاحٌ لك.', 'The university’s original file for this module is available.')
+        : L('ملفّاتُ الجامعة الأصليّة متاحةٌ لهذه المادّة — اختر وحدة:', 'The university’s original files are available for this course — pick a module:')) +
+      '</span>' + chips +
+      '<button type="button" class="na-sweep-x" data-role="slides-x" aria-label="إخفاء" ' +
+      'data-ar-title="إخفاء" data-en-title="Dismiss">' +
+      '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>';
+  }
+
+  function slidesClick(e) {
+    var sl = e.target.closest && e.target.closest('[data-role="slide"],[data-role="slides-x"]');
+    if (!sl || !S.view || !S.view.code) return false;
+    e.preventDefault();
+    if (sl.getAttribute('data-role') === 'slide') openSlides(S.view.code + '-' + sl.getAttribute('data-m'));
+    else {
+      var hid = slidesHid();
+      hid[S.view.code] = 1;
+      try { localStorage.setItem(SL_HID, JSON.stringify(hid)); } catch (eH) {}
+      renderList();
+    }
+    return true;
   }
 
   function sweepBlanks() {
@@ -4282,8 +4338,34 @@
       });
       return;
     }
+    if (FILE_IMP[kind]) { pickImport(kind); return; }
     if (!inp) return;
     inp.accept = kind === 'md' ? '.md,.markdown,.txt,text/markdown,text/plain' : 'application/json,.json';
+    inp.click();
+  }
+  /*@3.NOAJ.503*/
+  var FILE_IMP = {
+    pdf: 'application/pdf,.pdf',
+    ppt: '.ppt,.pptx,.pps,.ppsx,.pot,.potx,.odp',
+    doc: '.doc,.docx,.dot,.dotx,.odt,.rtf',
+    xls: '.xls,.xlsx,.ods',
+    audio: 'audio/*,video/*,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm,.flac,.amr,.caf'
+  };
+  function pickImport(kind) {
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.multiple = true;
+    inp.accept = FILE_IMP[kind];
+    inp.className = 'npo-file';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', function () {
+      var fs = inp.files ? Array.prototype.slice.call(inp.files) : [];
+      if (inp.parentNode) inp.parentNode.removeChild(inp);
+      if (!fs.length) return;
+      closeExport(0);
+      if (fs.length > 1 || kind === 'audio') { bulkOpen(fs); return; }
+      intake(fs[0]);
+    });
     inp.click();
   }
 
@@ -6553,16 +6635,16 @@
     });
   }
 
-  function createPdf() {
+  function createPdf(only) {
     var O = window.GardenPdfOpen;
     if (!O) return;
     var fromDevice = function () {
-      O.pickFile().then(function (file) {
+      O.pickFile(pdfAccept(only === 'office')).then(function (file) {
         if (!file) return;
         adoptPdf(file);
       });
     };
-    if (!driveOn()) { fromDevice(); return; }
+    if (!driveOn() || only === 'office') { fromDevice(); return; }
     needDrive().then(function (GD) { GD.warm(); }, function () {});
     var dlg = document.createElement('dialog');
     dlg.className = 'gsf gsf--snug na-pdfsrc';
@@ -6755,6 +6837,11 @@
   }
   function bulkOneFile(item) {
     var file = item.file, place = item.place, O = window.GardenPdfOpen;
+    if (item.kind === 'office') {
+      return officeToPdf(file, null, item.onProgress).then(function (r) {
+        return bulkOneFile(Object.assign({}, item, { kind: 'pdf', file: r.file, keep: item.keep === 'us' ? 'here' : item.keep }));
+      }, function (e) { var x = new Error('convert'); x.why = convertWhy(e); throw x; });
+    }
     if (item.kind === 'pdf') {
       if (!O) return Promise.reject(new Error('no-pdf'));
       return O.adopt(file, item.onProgress).then(function (res) {
@@ -6808,7 +6895,10 @@
     B.open(files, {
       fromDrive: !!fromDrive,
       drivePick: driveOn() ? function () {
-        return needDrive().then(function (GDb) { return GDb.pick({ mime: 'application/pdf,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/webm,audio/ogg,audio/aac,text/markdown,text/plain',
+        return needDrive().then(function (GDb) { return GDb.pick({ mime: 'application/pdf,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/webm,audio/ogg,audio/aac,text/markdown,text/plain,' +
+                          'application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,' +
+                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,' +
+                          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel',
                           multi: 1, title: L('اخترْ ملفّاتٍ من درايف (‏واحداً أو أكثر)', 'Pick files from Drive (one or more)') }); });
       } : null,
       canUs: function () { return !!(window.GardenFiles && GardenFiles.upload); },
@@ -6851,6 +6941,7 @@
       },
       limits: {
         pdf: (window.GardenPdfOpen && GardenPdfOpen.HARD_BYTES) || 0,
+        office: (window.GardenFiles && GardenFiles.officeMax) || 0,
         audio: (window.GardenNotesAudio && GardenNotesAudio.maxBytes) || 0,
         text: 5 * 1024 * 1024
       },
@@ -6858,9 +6949,75 @@
     });
   }
 
+  function isOfficeFile(f) { return !!(window.GardenFiles && GardenFiles.isOffice && GardenFiles.isOffice(f)); }
+  function pdfAccept(only) {
+    var off = (window.GardenFiles && GardenFiles.officeAccept) || '';
+    if (only) return off;
+    return 'application/pdf,.pdf' + (off ? ',' + off : '');
+  }
+  function convPct(x) { return x && x.of ? Math.min(100, Math.round(x.at * 100 / x.of)) + '%' : ''; }
+  function convertSay(s, x) {
+    if (s === 'hash') return L('تُقرأ بصمةُ الملفّ… ', 'Reading the file fingerprint… ') + convPct(x);
+    if (s === 'ask') return L('نبحث عن نسخةٍ جاهزةٍ منه…', 'Looking for a ready copy…');
+    if (s === 'upload') return L('يُرفع للتحويل… ', 'Uploading for conversion… ') + convPct(x);
+    if (s === 'queue') return x && x.ahead ? L('ينتظر دورَه — قبله ' + x.ahead, 'Waiting its turn — ' + x.ahead + ' ahead') : L('ينتظر دورَه…', 'Waiting its turn…');
+    if (s === 'convert') return L('يُحوَّل إلى PDF…', 'Converting to PDF…');
+    if (s === 'download') return L('يُجلب الـPDF… ', 'Fetching the PDF… ') + convPct(x);
+    return '';
+  }
+  /*@3.NOAJ.501*/
+  function convertWhy(e) {
+    var k = String((e && (e.error || e.message)) || '');
+    var F = window.GardenFiles;
+    if (k === 'no_vault') return L('التحويلُ يجري على خادمنا ويحتاج المزامنةَ بين أجهزتك — فعّلْها ثمّ أعدِ المحاولة. أو احفظِ الملفَّ PDF من باوربوينت أو وورد وافتحْه هنا.',
+                                   'Conversion runs on our server and needs sync across your devices — turn it on and try again. Or save the file as PDF from PowerPoint or Word and open it here.');
+    if (k === 'too_large') return L('الملفُّ أكبرُ من ' + (F ? Math.round(F.officeMax / 1048576) : 100) + ' م.ب — احفظْه PDF من برنامجه وافتحْه هنا.',
+                                    'The file is over ' + (F ? Math.round(F.officeMax / 1048576) : 100) + ' MB — save it as PDF from its app and open it here.');
+    if (k === 'rate_limited') return L('حوّلتَ ملفّاتٍ كثيرةً في هذه الساعة — أعدِ المحاولةَ بعد قليل.', 'You converted many files this hour — try again shortly.');
+    if (k === 'unreadable') return L('تعذّر فتحُ الملفّ — قد يكون محميّاً بكلمة مرورٍ أو تالفاً.', 'The file could not be opened — it may be password protected or damaged.');
+    if (k === 'timeout') return L('طال التحويلُ أكثرَ من المسموح — أعدِ المحاولة، أو احفظِ الملفَّ PDF من برنامجه.', 'Conversion took too long — try again, or save the file as PDF from its app.');
+    if (k === 'vault_locked') return L('خزنةُ ملفّاتك مقفلة — افتحْها ثمّ أعدِ المحاولة.', 'Your file vault is locked — unlock it and try again.');
+    if (/network|offline|fetch|abort|put_/i.test(k)) return L('تعذّر الاتّصالُ بالخادم — تحقّقْ من الاتّصال وأعدِ المحاولة.', 'Could not reach the server — check your connection and try again.');
+    return L('تعذّر تحويلُ الملفّ — أعدِ المحاولة.', 'The file could not be converted — try again.');
+  }
+  /*@3.NOAJ.502*/
+  function officeToPdf(file, say, prog) {
+    var F = window.GardenFiles;
+    if (!F || !F.convert) return Promise.reject(new Error('no_vault'));
+    return F.convert(file, { onStage: function (s, x) {
+      var m = convertSay(s, x);
+      if (m && say) say(m);
+      if (prog && x && x.of && (s === 'upload' || s === 'download')) prog(s === 'upload' ? x.at * 0.5 : x.of * 0.5 + x.at * 0.5, x.of);
+    } }).then(function (r) {
+      var C = window.GardenPdfCloud;
+      if (F.upload && C && C.refIdOf) {
+        F.upload(r.file, { refId: C.refIdOf(r.hash), name: r.file.name, mime: 'application/pdf', hash: r.hash })['catch'](function () {});
+      }
+      return r;
+    });
+  }
+  function adoptOffice(file, after) {
+    setMob('doc');
+    setReading(true);
+    renderOpening('pdf');
+    var say = function (m) { saveState('saving', m); openingSay(m); };
+    say(L('يُجهَّز الملفّ…', 'Preparing the file…'));
+    officeToPdf(file, say).then(function (r) {
+      saveState('', '');
+      adoptPdf(r.file, null, after);
+    }, function (e) {
+      docEmpty(); setReading(false); setMob(homeMob());
+      var why = convertWhy(e);
+      saveState('error', why);
+      toast(why);
+      setTimeout(function () { if (els.save && els.save.getAttribute('data-s') === 'error') saveState('', ''); }, 7000);
+    });
+  }
+
   function adoptPdf(file, gd, after) {
     var O = window.GardenPdfOpen;
     if (!O || !file) return;
+    if (isOfficeFile(file)) { adoptOffice(file, after); return; }
     (function (file) {
       setMob('doc');
       setReading(true);
@@ -6921,14 +7078,14 @@
     if (!file) return false;
     var name = String(file.name || '').toLowerCase();
     var type = String(file.type || '').toLowerCase();
-    if (type === 'application/pdf' || /\.pdf$/.test(name)) { adoptPdf(file); return true; }
+    if (type === 'application/pdf' || /\.pdf$/.test(name) || isOfficeFile(file)) { adoptPdf(file); return true; }
     if (type === 'application/json' || /\.json$/.test(name)) { runImport(file); return true; }
     if (/\.(md|markdown|mdown|txt|text)$/.test(name) || type.indexOf('text/') === 0) {
       needImport().then(function () { runImport(file); }, function () { takeText(file); });
       return true;
     }
-    saveState('error', L('هذا النوعُ غيرُ مدعوم — الملفّاتُ المقبولة: PDF وMarkdown وJSON.',
-                         'Unsupported file — accepted types are PDF, Markdown and JSON.'));
+    saveState('error', L('هذا النوعُ غيرُ مدعوم — الملفّاتُ المقبولة: PDF وباوربوينت ووورد وإكسل وMarkdown وJSON.',
+                         'Unsupported file — accepted types are PDF, PowerPoint, Word, Excel, Markdown and JSON.'));
     setTimeout(function () { saveState('', ''); }, 2600);
     return false;
   }
@@ -6983,6 +7140,7 @@
     { k: 'note',  icon: 'fa-file-lines', ar: 'ملاحظةٌ جديدة', en: 'New note' },
     { k: 'board', icon: 'fa-pen-to-square', ar: 'لوحُ رسم', en: 'Whiteboard' },
     { k: 'pdf',   icon: 'fa-file-import', ar: 'افتحْ ملفَّ PDF', en: 'Open a PDF' },
+    { k: 'office', icon: 'fa-file-powerpoint', ar: 'باوربوينت · وورد · إكسل', en: 'PowerPoint · Word · Excel' },
     { k: 'ai',    icon: 'fa-wand-magic-sparkles', ar: 'استوردْ من الذكاء', en: 'Import from AI' },
     { k: 'md',    icon: 'fa-file-code', ar: 'استوردْ ماركداون', en: 'Import Markdown' },
     { k: 'json',  icon: 'fa-file-arrow-down', ar: 'استوردْ JSON', en: 'Import JSON' }
@@ -7030,6 +7188,7 @@
       if (k === 'note') createNote();
       else if (k === 'board') createNote('board');
       else if (k === 'pdf') createPdf();
+      else if (k === 'office') createPdf('office');
       else if (k === 'ai') importAi();
       else askFile(k);
     });
@@ -7268,6 +7427,70 @@
   }
 
   /*@3.NOAJ.113*/
+  /*@3.NOAJ.500*/
+  function openSlides(want) {
+    var mm = /^([A-Za-z]{2,8}[0-9]{3})-([0-9]{1,2})$/.exec(String(want || ''));
+    if (!mm) return;
+    var code = mm[1].toUpperCase(), m = Number(mm[2]), tag = code + '-' + m;
+    var had = idxRead().filter(function (r) {
+      return r && r.k === 'pdf' && r.o && r.o.sl === tag && typeof r.d !== 'number';
+    })[0];
+    if (had) { openNote(had.id); return; }
+    var O = window.GardenPdfOpen, E = window.GardenEndpoints;
+    var api = (E && E.sync) || '';
+    if (!O || !api) { toast(L('تعذّر فتحُ السلايدات الآن', 'Could not open the slides right now')); return; }
+    var say = function (msg) { saveState('saving', msg); openingSay(msg); };
+    say(L('يُجلب ملفُّ الجامعة الأصليّ…', 'Fetching the original university file…'));
+    fetch(api + '/v1/slides/' + encodeURIComponent(code) + '/' + m).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok || !j.url) throw new Error(j.error || ('http_' + r.status));
+        return j;
+      });
+    }).then(function (j) {
+      return fetch(j.url).then(function (r) {
+        if (!r.ok) throw new Error('download_' + r.status);
+        var total = Number(r.headers.get('content-length') || j.bytes || 0);
+        if (!r.body || !total) return r.blob();
+        var reader = r.body.getReader(), parts = [], got = 0;
+        var pump = function () {
+          return reader.read().then(function (s) {
+            if (s.done) return new Blob(parts, { type: 'application/pdf' });
+            parts.push(s.value); got += s.value.length;
+            say(L('يُجلب ملفُّ الجامعة الأصليّ… ', 'Fetching the original university file… ') + Math.round(got * 100 / total) + '%');
+            return pump();
+          });
+        };
+        return pump();
+      }).then(function (blob) {
+        var file = new File([blob], j.name || (tag + '.pdf'), { type: 'application/pdf' });
+        var D = window.GardenPdfDoc;
+        var pre = (j.sha256 && D && D.hash) ? D.hash(file).then(function (r) {
+          if (r && r.hash && r.hash !== j.sha256) throw new Error('hash_mismatch');
+        }) : Promise.resolve();
+        return pre.then(function () { return O.adopt(file); }).then(function (res) {
+          var title = L(code + ' · الوحدة ' + m + ' — السلايدات الأصليّة', code + ' · Module ' + m + ' — original slides');
+          return pdfNote(res, file, { c: code, m: m }, null, title).then(function (id) {
+            var rec = idxFind(id);
+            if (rec) { rec.o = Object.assign({}, rec.o, { sl: tag }); idxPut(rec); }
+            var F = window.GardenFiles;
+            if (F && F.addSlides) F.addSlides(code, m)['catch'](function () {});
+            return id;
+          });
+        });
+      });
+    }).then(function (id) {
+      saveState('', '');
+      reload();
+      openNote(id);
+    }, function (e) {
+      saveState('', '');
+      var why = String((e && e.message) || '');
+      toast(why === 'no_slides'
+        ? L('لا ملفَّ أصليّاً لهذه الوحدة بعد', 'No original file for this module yet')
+        : L('تعذّر جلبُ السلايدات — تحقّقْ من الاتّصال وأعِدِ المحاولة', 'Could not fetch the slides — check your connection and try again'));
+    });
+  }
+
   function adoptQuick(qid) {
     var arr = [];
     try {
@@ -10976,6 +11199,7 @@
         if (k === 'note') createNote();
         else if (k === 'board') createNote('board');
         else if (k === 'pdf') createPdf();
+        else if (k === 'office') createPdf('office');
         else if (k === 'ai') importAi();
         else askFile(k);
       },
@@ -11024,6 +11248,8 @@
       courseLabel: courseLabel,
       courseArchived: courseArchived,
       termNotice: function () { return S.termNotice || null; },
+      slidesBar: slidesBar,
+      slidesClick: slidesClick,
       courseMods: function (code) {
         var ids = idxRead().filter(function (r) { return r && !r.d && r.o && r.o.c === code && r.k !== 'folder'; }).map(function (r) { return r.id; });
         courseAsk(ids, code);
@@ -11213,6 +11439,7 @@
   function onListClick(e) {
     /*@3.NOAJ.127*/
     if (swipeAte) { swipeAte = 0; e.preventDefault(); return; }
+    if (slidesClick(e)) return;
     var sw = e.target.closest('[data-role="sweep"],[data-role="sweep-x"]');
     if (sw) {
       e.preventDefault();
@@ -12244,6 +12471,9 @@
       if (adopt) {
         navHome();
         adoptQuick(adopt);
+      } else if (qs.get('slides')) {
+        navHome();
+        openSlides(qs.get('slides'));
       } else if (wanted && idxFind(wanted)) {
         if (qs.get('p')) wantPage(wanted, qs.get('p'));
         openNote(wanted);
@@ -12281,6 +12511,7 @@
       if (edId && d) persist(edId, d, !!quiet);
     },
     pdfMeta: pdfMeta,
+    openSlides: openSlides,
     gdAutoMaybe: gdAutoMaybe,
     pageTopPad: pageTopPad,
     pageBotPad: pageBotPad,

@@ -986,6 +986,7 @@
     host.setAttribute('data-place', placeOf());
     host.innerHTML = barHtml(placeOf()) +
       '<div class="nx-main">' + railHtml() + '<div class="nx-scroll">' + termHtml() +
+        (!trash && A.slidesBar ? A.slidesBar() : '') +
         (trash ? '<div class="nx-trashnote">' + ic('fa-circle-info') + '<span>' + esc(L('ما في السلّة يُمحى بعد ٣٠ يوماً من حذفه، من كلِّ أجهزتك.', 'What is in the trash is erased 30 days after you delete it, from all your devices.')) + '</span>' +
           btn('empty', 'fa-trash', L('أفرغِ السلّة', 'Empty trash'), 'gsf-btn--danger', list.length ? '' : ' disabled') + '</div>' : '') +
         (fs.length && list.length ? '<div class="nx-lbl">' + esc(L('المجلّدات', 'Folders')) + '</div>' : '') +
@@ -1327,6 +1328,7 @@
 
   function onClick(e) {
     if (ate) { ate = 0; e.preventDefault(); return; }
+    if (A.slidesClick && A.slidesClick(e)) return;
     var x = e.target.closest('[data-x]');
     var it = e.target.closest('.nx-it');
     var act = x && host.contains(x) ? x.getAttribute('data-x') : '';
@@ -1492,7 +1494,7 @@
     var inp = document.createElement('input');
     inp.type = 'file';
     inp.multiple = true;
-    inp.accept = '.pdf,application/pdf,audio/*,video/*,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm,.flac,.md,.markdown,.txt,.json';
+    inp.accept = '.pdf,application/pdf,.ppt,.pptx,.pps,.ppsx,.pot,.potx,.odp,.doc,.docx,.dot,.dotx,.odt,.rtf,.xls,.xlsx,.ods,audio/*,video/*,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm,.flac,.md,.markdown,.txt,.json';
     inp.style.display = 'none';
     inp.addEventListener('change', function () {
       var fs = inp.files ? Array.prototype.slice.call(inp.files) : [];

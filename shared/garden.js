@@ -3187,6 +3187,32 @@
     } catch (e) { notesToast(nL('تعذّر النسخ', 'Copy failed')); }
   }
 
+  /*@3.GARJ.663*/
+  const SLIDES = { CS230: 13, CS231: 13, CS240: 13, CS241: 13, CS242: 13, CS243: 13, CS350: 13, CS351: 13,
+    CS352: 13, CS353: 13, CS360: 12, CS361: 13, CS362: 13, CS363: 13, CS364: 10, CS470: 12, CS471: 13, CS475: 13,
+    CS476: 13, CS477: 13, CS478: 13, CS479: 12, CS480: 12, CS481: 13, ENG103: 10, ISLAM101: 12, ISLAM102: 12,
+    ISLAM103: 10, ISLAM104: 14, MATH150: 12, MATH251: 12, SCI101: 10, SCI201: 11, STAT101: 12 };
+  function slidesLink() {
+    const html = document.documentElement;
+    const code = String(html.getAttribute('data-subject') || '').toUpperCase();
+    const m = Number(html.getAttribute('data-module'));
+    if (!SLIDES[code] || !(m >= 1 && m <= SLIDES[code])) return null;
+    const a = document.createElement('a');
+    a.className = 'sidebar-notes-btn';
+    a.id = 'sidebar-slides-btn';
+    a.href = ROOT + 'hub/notes.html?slides=' + encodeURIComponent(code + '-' + m);
+    const tipAr = 'يفتح ملفَّ الجامعة الأصليّ لهذه الوحدة في ملاحظاتك — للمراجعة متى شئت';
+    const tipEn = 'Opens the university’s original file for this module in your notes';
+    a.setAttribute('data-ar-title', tipAr);
+    a.setAttribute('data-en-title', tipEn);
+    a.title = nL(tipAr, tipEn);
+    a.setAttribute('aria-label', a.title);
+    a.innerHTML = '<i class="fa-solid fa-chalkboard" aria-hidden="true"></i> ' +
+      '<span data-ar="ادرسِ السلايداتِ الأصليّة" data-en="Study the original slides"></span>';
+    a.lastChild.textContent = nL('ادرسِ السلايداتِ الأصليّة', 'Study the original slides');
+    return a;
+  }
+
   /*@3.GARJ.169*/
   function initNotes() {
     /*@3.GARJ.170*/
@@ -3205,6 +3231,8 @@
       notesBtn.innerHTML = `<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> <span data-i18n="notes.btn">${nL('ملاحظاتي', 'My Notes')}</span> <span class="notes-count" id="notes-count">${notes.length}</span>`;
       notesBtn.addEventListener('click', openNotesPanel);
       widget.parentNode.insertBefore(notesBtn, widget.nextSibling);
+      const slidesBtn = slidesLink();
+      if (slidesBtn) notesBtn.parentNode.insertBefore(slidesBtn, notesBtn.nextSibling);
     }
 
     let selectionTimeout;
@@ -6950,6 +6978,7 @@ ${baseRules}`) + regenSuffix;
   }
 
   window.Garden = {
+    slidesOf: function (code) { return SLIDES[String(code || '').toUpperCase()] || 0; },
     fcGradeAt: fcGradeAt,
     fcState: function () { return { sm2: loadSM2(), review: isReviewPage() }; },
 

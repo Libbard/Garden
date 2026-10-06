@@ -261,6 +261,116 @@
     });
   }
 
+  /*@3.FISJ2.3*/
+  var OFFICE_EXT = ['ppt', 'pptx', 'pps', 'ppsx', 'pot', 'potx', 'odp',
+                    'doc', 'docx', 'dot', 'dotx', 'odt', 'rtf', 'xls', 'xlsx', 'ods'];
+  var OFFICE_ACCEPT = OFFICE_EXT.map(function (x) { return '.' + x; }).join(',');
+  var OFFICE_MAX = 100 * 1024 * 1024;
+  function extOf(name) {
+    var m = /\.([a-z0-9]{2,5})$/i.exec(String(name || ''));
+    return m ? m[1].toLowerCase() : '';
+  }
+  function isOffice(f) { return !!f && OFFICE_EXT.indexOf(extOf(f.name)) >= 0; }
+  function officeKind(f) {
+    var x = extOf(f && f.name);
+    if (/^(ppt|pptx|pps|ppsx|pot|potx|odp)$/.test(x)) return 'slides';
+    if (/^(xls|xlsx|ods)$/.test(x)) return 'sheet';
+    return x ? 'doc' : '';
+  }
+
+  function sleep(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+
+  function pull(url, onProgress) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('download_' + r.status);
+      var total = Number(r.headers.get('content-length') || 0);
+      if (!r.body || !onProgress) return r.blob();
+      var reader = r.body.getReader(), parts = [], got = 0;
+      var pump = function () {
+        return reader.read().then(function (s) {
+          if (s.done) return new Blob(parts, { type: 'application/pdf' });
+          parts.push(s.value); got += s.value.length;
+          onProgress(got, total);
+          return pump();
+        });
+      };
+      return pump();
+    });
+  }
+
+  /*@3.FISJ2.4*/
+  function convert(file, opts) {
+    var o = opts || {};
+    var stage = function (s, extra) { if (o.onStage) { try { o.onStage(s, extra || {}); } catch (e) {} } };
+    var ext = extOf(file && file.name);
+    if (!isOffice(file)) return Promise.reject(Object.assign(new Error('bad_ext'), { error: 'bad_ext' }));
+    if (file.size > OFFICE_MAX) return Promise.reject(Object.assign(new Error('too_large'), { error: 'too_large', bytes: file.size, max: OFFICE_MAX }));
+    return vaultId().then(function (id) {
+      if (!id) throw Object.assign(new Error('no_vault'), { error: 'no_vault' });
+      stage('hash', { at: 0, of: file.size });
+      return hashOf(file, function (at, of) { stage('hash', { at: at, of: of }); }).then(function (hr) {
+        var h = hr.hash;
+        var body = { h: h, bytes: file.size, ext: ext, name: String(file.name || '').slice(0, 200) };
+        var fail = function (r) { return Object.assign(new Error((r.body && r.body.error) || ('http_' + r.status)), r.body || {}, { status: r.status }); };
+        var t0 = Date.now(), wait = 1200, nones = 0;
+        var poll = function (st) {
+          if (st.state === 'done') return st;
+          if (st.state === 'failed') throw Object.assign(new Error(st.err || 'convert_failed'), { error: st.err || 'convert_failed' });
+          if (st.state === 'none' && ++nones > 2) throw Object.assign(new Error('lost'), { error: 'lost' });
+          if (Date.now() - t0 > 9 * 60 * 1000) throw Object.assign(new Error('timeout'), { error: 'timeout' });
+          stage(st.state === 'working' ? 'convert' : 'queue', { ahead: st.ahead || 0 });
+          return sleep(wait).then(function () {
+            wait = Math.min(3000, wait + 300);
+            return jreq('GET', base(id) + '/convert/' + h, id).then(function (r) {
+              if (!r.ok) throw fail(r);
+              return poll(r.body);
+            });
+          });
+        };
+        stage('ask');
+        return jreq('POST', base(id) + '/convert', id, body).then(function (r) {
+          if (!r.ok) throw fail(r);
+          if (r.body.state !== 'upload') return r.body;
+          stage('upload', { at: 0, of: file.size });
+          return xhrPut(r.body.put, file, function (at, of) { stage('upload', { at: at, of: of }); }, o.signal)
+            .then(function () { return jreq('POST', base(id) + '/convert/start', id, body); })
+            .then(function (r2) { if (!r2.ok) throw fail(r2); return r2.body; });
+        }).then(poll).then(function (done) {
+          var fetchIt = function (d, again) {
+            stage('download', { at: 0, of: d.bytes || 0 });
+            return pull(d.url, function (at, of) { stage('download', { at: at, of: of || d.bytes || 0 }); }).then(function (blob) {
+              return hashOf(blob).then(function (got) {
+                if (got.hash === d.sha256) return { blob: blob, h: got.hash, pages: d.pages || 0 };
+                if (again) throw Object.assign(new Error('hash_mismatch'), { error: 'hash_mismatch' });
+                return jreq('GET', base(id) + '/convert/' + h, id).then(function (r) {
+                  if (!r.ok || r.body.state !== 'done') throw fail(r);
+                  return fetchIt(r.body, true);
+                });
+              });
+            });
+          };
+          return fetchIt(done, false);
+        }).then(function (res) {
+          var base0 = String(file.name || 'file').replace(/\.[a-z0-9]{2,5}$/i, '') || 'file';
+          var pdf = new File([res.blob], base0 + '.pdf', { type: 'application/pdf' });
+          stage('done', { pages: res.pages });
+          return { file: pdf, hash: res.h, pages: res.pages, src: h, ms: Date.now() - t0 };
+        });
+      });
+    });
+  }
+
+  function addSlides(code, m) {
+    return vaultId().then(function (id) {
+      if (!id) return null;
+      return jreq('POST', base(id) + '/slides/' + encodeURIComponent(code) + '/' + Number(m), id)
+        .then(function (r) {
+          if (r.ok) emit('garden:fileStored', { ref_id: r.body.ref_id, bytes: r.body.bytes, name: r.body.name, mime: 'application/pdf' });
+          return r.ok ? r.body : null;
+        });
+    });
+  }
+
   function remove(refId) {
     return vaultId().then(function (id) {
       if (!id) throw new Error('no_vault');
@@ -350,6 +460,12 @@
     fetchBytes: fetchBytes,
     ocrState: ocrState,
     remove: remove,
+    addSlides: addSlides,
+    convert: convert,
+    isOffice: isOffice,
+    officeKind: officeKind,
+    officeAccept: OFFICE_ACCEPT,
+    officeMax: OFFICE_MAX,
     available: available,
     termWarn: termWarn,
     termEnds: termEnds

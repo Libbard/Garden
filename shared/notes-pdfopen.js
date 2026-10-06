@@ -27,11 +27,11 @@
     return '<span class="npo-num">' + esc(txt) + '</span>';
   }
 
-  function pickFile() {
+  function pickFile(accept) {
     return new Promise(function (ok) {
       var inp = document.createElement('input');
       inp.type = 'file';
-      inp.accept = 'application/pdf,.pdf';
+      inp.accept = accept || 'application/pdf,.pdf';
       inp.className = 'npo-file';
       document.body.appendChild(inp);
       var done = false;

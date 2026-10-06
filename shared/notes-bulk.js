@@ -5,7 +5,7 @@
   var AUDIO_EXT = /\.(m4a|m4b|mp3|wav|aac|amr|3gpp?|ogg|oga|opus|webm|flac|caf|mp4|mov|mkv)$/i;
   var TEXT_EXT = /\.(md|markdown|txt|json)$/i;
   var CODE_RE = /(?:^|[^A-Za-z])([A-Za-z]{2,4})[\s_-]?(\d{3})(?!\d)/;
-  var ACCEPT = '.pdf,application/pdf,audio/*,video/*,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm,.flac,.md,.markdown,.txt,.json';
+  var ACCEPT = '.pdf,application/pdf,.ppt,.pptx,.pps,.ppsx,.pot,.potx,.odp,.doc,.docx,.dot,.dotx,.odt,.rtf,.xls,.xlsx,.ods,audio/*,video/*,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm,.flac,.md,.markdown,.txt,.json';
 
   var A = null, dlg = null, rows = [], busy = false, finished = false, stopAsk = false, seq = 0;
   /*@3.NOBJ2.4*/
@@ -28,18 +28,21 @@
   function kindOf(f) {
     var n = f.name || '', t = (f.type || '').toLowerCase();
     if (t === 'application/pdf' || /\.pdf$/i.test(n)) return 'pdf';
+    if (window.GardenFiles && GardenFiles.isOffice && GardenFiles.isOffice(f)) return 'office';
     if (/^(audio|video)\//.test(t) || AUDIO_EXT.test(n) || A.isMedia(f)) return 'audio';
     if (/^text\//.test(t) || t === 'application/json' || TEXT_EXT.test(n)) return 'text';
     return '';
   }
   function kindName(k) {
     if (k === 'pdf') return 'PDF';
+    if (k === 'office') return L('مكتبيٌّ ⇐ PDF', 'Office ⇒ PDF');
     if (k === 'audio') return L('تسجيل', 'Recording');
     if (k === 'text') return L('ملاحظة', 'Note');
     return L('غير مدعوم', 'Not supported');
   }
   function kindIcon(k) {
     if (k === 'pdf') return 'fa-file-lines';
+    if (k === 'office') return 'fa-file-powerpoint';
     if (k === 'audio') return 'fa-microphone';
     if (k === 'text') return 'fa-note-sticky';
     return 'fa-circle-xmark';
@@ -293,6 +296,7 @@
     if (m === 'toobig') return L('أكبرُ من الحدّ', 'Too large');
     if (m === 'badfile') return L('صيغةٌ لا تُقرأ', 'Unreadable format');
     if (m === 'empty') return L('لا نصَّ فيه', 'No text in it');
+    if (e && e.why) return e.why;
     if (e && e.cancelled) return L('أُلغي', 'Cancelled');
     return L('تعذّرت قراءتُه', 'Could not read it');
   }

@@ -393,7 +393,7 @@
                                    mime: mime, hash: h }).then(function (r) {
             row.up = 1; row.cb = r.bytes || small.size;
             return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); });
-          });
+          }).then(function () { return toDrive(row); });
         });
       });
     }).then(fin, function (e) {
@@ -404,6 +404,36 @@
       fin();
     });
   }
+  /*@3.NOSJ.23*/
+  function driveOn() {
+    var D = window.GardenDrive;
+    return !!(D && D.enabled && D.enabled() && D.linked && D.linked() && D.upload);
+  }
+  function toDrive(row) {
+    if (!row || row.gd || !row.blob || !driveOn()) return null;
+    return sha256(row.blob).then(function (full) {
+      var ext = String(row.type || 'image/png').split('/')[1] || 'png';
+      return window.GardenDrive.upload(row.blob, { kind: 'img', mime: row.type || 'image/png', sha: full,
+        name: (row.name || ('image-' + row.id.slice(0, 8))) + (/[.][a-z0-9]{2,5}$/i.test(row.name || '') ? '' : '.' + ext),
+        props: { img: row.id } });
+    }).then(function (r) {
+      if (!r || !r.id) return null;
+      row.gd = r.id;
+      return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); });
+    })['catch'](function () { return null; });
+  }
+  function fromDrive(id) {
+    var D = window.GardenDrive;
+    if (!driveOn() || !D.findImage || !D.download) return Promise.resolve(null);
+    return D.findImage(id).then(function (f) {
+      if (!f || !f.id) return null;
+      return D.download(f.id).then(function (b) {
+        if (!b || !b.size) return null;
+        return { blob: b, mime: b.type || '', gd: f.id };
+      });
+    })['catch'](function () { return null; });
+  }
+
   function ensureUp(id) {
     return getImage(id).then(function (row) { if (row && row.blob && !row.up) sendSoon(id); });
   }
@@ -414,10 +444,14 @@
     var F = window.GardenFiles;
     if (!F || !F.fetchBytes) return Promise.resolve(null);
     if (PULL[id]) return PULL[id];
-    PULL[id] = F.fetchBytes(refOf(id)).then(function (got) {
+    PULL[id] = F.fetchBytes(refOf(id))['catch'](function () { return null; }).then(function (got) {
+      if (got && got.blob && got.blob.size) return got;
+      return fromDrive(id);
+    }).then(function (got) {
       if (!got || !got.blob || !got.blob.size) return null;
       var blob = got.blob.type ? got.blob : new Blob([got.blob], { type: got.mime || 'image/webp' });
       var row = { id: id, blob: blob, type: blob.type, bytes: blob.size, at: Date.now(), name: '', up: 1, far: 1 };
+      if (got.gd) row.gd = got.gd;
       return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); }).then(function () { return row; });
     }).catch(function () { return null; }).then(function (r) {
       if (!r) delete PULL[id];
