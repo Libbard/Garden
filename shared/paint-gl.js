@@ -933,7 +933,31 @@
     var ext = this.gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext();
   };
 
+  function bench(vw, vh) {
+    vw = Math.max(64, vw | 0); vh = Math.max(64, vh | 0);
+    var c = document.createElement('canvas'); c.width = vw; c.height = vh;
+    var S = null;
+    try { S = new Surface(c, { W: 1024, H: 1024, paper: 'draw' }); } catch (e) { return null; }
+    var gl = S.gl, px = new Uint8Array(4);
+    var sync = function () { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); };
+    var P = function (x, y) { return { x: x, y: y, p: .6, tz: 0 }; };
+    try {
+      S.resize(vw, vh); S.setView(Math.min(vw, vh) / 1024, 0, 0);
+      var st = S.stroke('pencil', '#3366cc', 4, {}); S.startStroke(st, P(60, 60)); S.dab(st, P(60, 60), P(64, 62)); S.endStroke(st);
+      S.render(); sync();
+      var n = 120, t0 = performance.now(), a = P(80, 300);
+      st = S.stroke('pencil', '#3366cc', 4, {});
+      for (var i = 1; i <= n; i++) { var b = P(80 + i * 6, 300 + Math.sin(i * .2) * 60); S.dab(st, a, b); a = b; }
+      S.endStroke(st); sync();
+      var dab = (performance.now() - t0) / n;
+      t0 = performance.now();
+      for (var k = 0; k < 3; k++) { S.full = true; S.render(); sync(); }
+      return { dab: dab, comp: (performance.now() - t0) / 3, gpu: (function () { try { var x = gl.getExtension('WEBGL_debug_renderer_info'); return String(x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : ''); } catch (e) { return ''; } })() };
+    } catch (e) { return null; } finally { try { S.destroy(); } catch (e2) {} }
+  }
+
   window.GardenPaintGL = {
+    bench: bench,
     supported: function () { try { var c = document.createElement('canvas'); return !!c.getContext('webgl2'); } catch (e) { return false; } },
     create: function (canvas, opts) { return new Surface(canvas, opts); },
     hexToRgb: hexToRgb,

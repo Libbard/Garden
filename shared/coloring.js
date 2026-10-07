@@ -141,6 +141,23 @@
     ['skin', 'بشرة', 'Skin', 60, .32], ['brown', 'بنّيّ', 'Brown', 50, .45], ['olive', 'زيتيّ', 'Olive', 110, .42], ['grey', 'رماديّ', 'Grey', 250, .03]
   ];
   var LIGHTS = [.95, .87, .78, .69, .6, .51, .42, .33, .24];
+  var TIERS = { high: { doc: 2048, cap: 2.5 }, mid: { doc: 1600, cap: 1.5 }, low: { doc: 1200, cap: 1 } };
+  var PERF_KEY = 'garden_mirsam_perf', QUALS = [['auto', 'تلقائيّة', 'Auto'], ['high', 'عالية', 'High'], ['mid', 'متوسّطة', 'Medium'], ['low', 'خفيفة', 'Light']];
+  function perfKey() { var d = window.devicePixelRatio || 1; return [Math.round(screen.width * d), Math.round(screen.height * d), d].join('x'); }
+  function autoTier() {
+    var c = store(PERF_KEY);
+    if (c && c.v === 1 && c.key === perfKey() && TIERS[c.tier]) return c;
+    var d = Math.min(2.5, window.devicePixelRatio || 1);
+    var b = window.GardenPaintGL && GardenPaintGL.bench ? GardenPaintGL.bench(innerWidth * d, innerHeight * d) : null;
+    var tier = !b ? 'mid' : b.dab <= .6 ? 'high' : b.dab <= 1.6 ? 'mid' : 'low';
+    var cap = TIERS[tier].cap;
+    if (b) { cap = Math.min(cap, d); while (cap > 1 && b.comp * Math.pow(cap / d, 2) > 14) cap = Math.max(1, cap - .25); }
+    c = { v: 1, key: perfKey(), tier: tier, cap: cap, dab: b ? +b.dab.toFixed(2) : null, comp: b ? +b.comp.toFixed(1) : null, gpu: b ? b.gpu : '', at: Date.now() };
+    store(PERF_KEY, c);
+    return c;
+  }
+  function stepDown(c) { var o = ['high', 'mid', 'low'], i = o.indexOf(c.tier); if (i < 2) { c.tier = o[i + 1]; c.cap = Math.min(c.cap, TIERS[c.tier].cap); c.down = (c.down || 0) + 1; store(PERF_KEY, c); return true; } return false; }
+
   var PAPERS = [['smooth', 'ناعم', 'Smooth'], ['draw', 'ورقُ رسم', 'Drawing'], ['cold', 'ورقٌ مائيّ', 'Watercolor'], ['canvas', 'قماش', 'Canvas']];
   var RECENT_KEY = 'garden_mirsam_recent', PREF_KEY = 'garden_mirsam_prefs';
 
@@ -434,6 +451,7 @@
     this.grade = pref.grade || .62;
     this.lock = true; this.shade = !!pref.shade;
     this.paperKind = pref.paper || 'draw';
+    this.quality = QUALS.some(function (q) { return q[0] === pref.quality; }) ? pref.quality : 'auto';
     this.help = pref.help == null ? true : !!pref.help;
     this.cat = pref.cat || 'orig';
     this.recent = (store(RECENT_KEY) || []).filter(function (h) { return /^#[0-9a-f]{6}$/i.test(h); }).slice(0, 14);
@@ -477,7 +495,7 @@
           '<button type="button" class="mrs-chip mrs-shade" aria-pressed="false"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><span></span></button>' +
           '<button type="button" class="mrs-ib mrs-more" aria-expanded="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>' +
           '<button type="button" class="mrs-ib mrs-fold" aria-expanded="true"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button></div>' +
-        '<div class="mrs-opts" hidden><span class="mrs-olbl"></span><div class="mrs-papers"></div></div>' +
+        '<div class="mrs-opts" hidden><span class="mrs-olbl"></span><div class="mrs-papers"></div><span class="mrs-olbl mrs-qlbl"></span><div class="mrs-quals"></div></div>' +
         '<div class="mrs-tabs" role="tablist"></div>' +
         '<div class="mrs-shades" aria-label=""></div>' +
         '<div class="mrs-sw"></div>' +
@@ -494,6 +512,17 @@
       b.innerHTML = art(t.id) + '<span class="mrs-tl"></span>';
       b.addEventListener('click', function () { self.setTool(t.id); });
       rack.appendChild(b);
+    });
+    var quals = this.$('.mrs-quals');
+    QUALS.forEach(function (q) {
+      var b = el('button', 'mrs-chip'); b.type = 'button'; b.dataset.q = q[0];
+      b.addEventListener('click', function () {
+        self.quality = q[0]; self.savePrefs();
+        var t = q[0] === 'auto' ? autoTier() : { tier: q[0], cap: TIERS[q[0]].cap };
+        self.perf = t; self.dprCap = t.cap; self.layout(); self.paintChrome();
+        self.toast(T('تُطبَّق حدّةُ العرض الآن، وحجمُ الرسمة من الرسمة التالية.', 'Display sharpness applies now; drawing size applies from the next drawing.'));
+      });
+      quals.appendChild(b);
     });
     var papers = this.$('.mrs-papers');
     PAPERS.forEach(function (p) {
@@ -547,6 +576,7 @@
     var g = this.gpuInfo(); this.gpu = g;
     if (g.soft) {
       this.dprCap = 1; this.layout();
+      if (this.quality === 'auto' && this.perf && this.perf.tier !== 'low') { this.perf.tier = 'low'; this.perf.cap = 1; store(PERF_KEY, this.perf); }
       this.toast(T('متصفّحُك يرسم بلا بطاقة الرسوم فيبطؤ الرسم — فعّلْ «استخدام تسريع الرسومات» من إعداداته ثمّ أعِدْ تشغيله.', 'Your browser is drawing without the graphics card, so drawing is slow — turn on "Use graphics acceleration" in its settings, then restart it.'));
     }
     if (store('garden_mrsdiag')) this.diag();
@@ -570,13 +600,13 @@
         '\ndpr: ' + (window.devicePixelRatio || 1) + ' -> ' + self.dpr() + '   view: ' + (c ? c.width + 'x' + c.height : '?') + '   doc: ' + self.W + 'x' + self.H +
         '\nfps: ' + fr + '   worst frame: ' + Math.round(worst) + 'ms   input/s: ' + ev + (mx ? ' (pen)' : '') +
         '\nredraw: ' + (self.S.stat && self.S.stat.n ? Math.round(self.S.stat.px / self.S.stat.n / 1000) + 'k px/frame, full ' + self.S.stat.full + '/' + self.S.stat.n : '-') + '   dabs/s: ' + (self.S.nDab || 0) +
-        '\nua: ' + navigator.userAgent.replace(/^.*?\) /, '').slice(0, 60);
+        '\ntier: ' + (self.perf ? self.perf.tier + ' · doc ' + self.W + ' · cap ' + self.dprCap + (self.perf.dab != null ? ' · bench dab ' + self.perf.dab + 'ms comp ' + self.perf.comp + 'ms' : '') : '-') + '\nua: ' + navigator.userAgent.replace(/^.*?\) /, '').slice(0, 60);
       fr = 0; worst = 0; ev = 0; self.S.stat = null; self.S.nDab = 0;
     }, 1000);
   };
   Studio.prototype.sizeKey = function () { return this.tool === 'fill' || this.tool === 'pick' ? this.medium : this.tool; };
   Studio.prototype.savePrefs = function () {
-    store(PREF_KEY, { sizes: this.sizes, tool: this.tool, color: this.color, strength: this.strength, grade: this.grade, shade: this.shade, paper: this.paperKind, cat: this.cat, help: !!this.help });
+    store(PREF_KEY, { sizes: this.sizes, tool: this.tool, color: this.color, strength: this.strength, grade: this.grade, shade: this.shade, paper: this.paperKind, cat: this.cat, help: !!this.help, quality: this.quality });
   };
 
   Studio.prototype.paintChrome = function () {
@@ -618,6 +648,12 @@
     this.$('.mrs-shade').title = T('الدلوُ يترك ضوءاً وظلّاً كما يفعل الرسّام', 'The bucket leaves light and shadow like an artist');
     this.$('.mrs-shade').hidden = this.tool !== 'fill';
     this.$('.mrs-olbl').textContent = T('الورق', 'Paper');
+    this.$('.mrs-qlbl').textContent = T('الجودة', 'Quality');
+    this.root.querySelectorAll('.mrs-quals .mrs-chip').forEach(function (b) {
+      var q = QUALS.filter(function (x) { return x[0] === b.dataset.q; })[0];
+      b.textContent = (en ? q[2] : q[1]) + (q[0] === 'auto' && self.perf && self.quality === 'auto' ? ' · ' + (QUALS.filter(function (x) { return x[0] === self.perf.tier; })[0] || q)[en ? 2 : 1] : '');
+      b.setAttribute('aria-pressed', String(q[0] === self.quality));
+    });
     this.root.querySelectorAll('.mrs-papers .mrs-chip').forEach(function (b) {
       var p = PAPERS.filter(function (x) { return x[0] === b.dataset.paper; })[0];
       b.textContent = en ? p[2] : p[1]; b.setAttribute('aria-pressed', String(p[0] === self.paperKind));
@@ -805,8 +841,10 @@
     this.item = item;
     this.title = item.title || '';
     this.root.classList.add('is-busy');
-    var mobile = Math.min(screen.width, screen.height) < 900 && matchMedia('(pointer: coarse)').matches;
-    var side = item.side || (mobile ? 1600 : 2048);
+    var perf = this.quality === 'auto' ? autoTier() : { tier: this.quality, cap: TIERS[this.quality].cap };
+    this.perf = perf; this.dprCap = perf.cap;
+    var side = item.side || TIERS[perf.tier].doc;
+    if (item.W && item.H && Math.max(item.W, item.H) > side) { var k0 = side / Math.max(item.W, item.H); item = Object.assign({}, item, { W: Math.round(item.W * k0), H: Math.round(item.H * k0) }); }
     var lineP, refP;
     if (item.svg) {
       this.refSvg = withStyle(item.svg, HIDE_GUIDE);
@@ -1077,6 +1115,14 @@
       var wet = self.S.wet ? self.S.tick(dt) : false;
       if (self.live && self.live.dwell) self.dwell(dt);
       if (self.S.dirty) self.S.render();
+      if (self.live && !self.live.pend && self.quality === 'auto' && self.perf) {
+        var w = self._slow = self._slow || { n: 0, sum: 0 };
+        var dtm = w.t ? now - w.t : 16; if (dtm < 1000) { w.n++; w.sum += dtm; } w.t = now;
+        if (w.n >= 40) {
+          if (w.sum / w.n > 45 && stepDown(self.perf)) { self.dprCap = self.perf.cap; self.layout(); self.toast(T('خفّفنا الجودةَ ليجري الرسمُ بسلاسة على هذا الجهاز — غيّرْها من «الإعدادات» إن شئت.', 'We lowered the quality so drawing stays smooth on this device — change it in Settings if you like.')); }
+          self._slow = null;
+        }
+      } else if (self._slow) self._slow.t = 0;
       if (wet || self.S.wet || (self.live && self.live.dwell)) self._raf = requestAnimationFrame(loop);
     };
     this._raf = requestAnimationFrame(loop);
