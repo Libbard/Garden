@@ -93,8 +93,8 @@
     rows.forEach(function (r) { mods += r.modules || 0; });
     var maj = DATA.majors[MAJOR];
     setBi(document.querySelector('.dash-hero-level [data-bilingual]'),
-      'المستوى ' + LV_AR[LEVEL] + ' · ' + rows.length + ' مواد · ' + mods + ' وحدة',
-      'Level ' + LEVEL + ' · ' + rows.length + ' Subjects · ' + mods + ' Modules');
+      rows.length + ' مواد · ' + mods + ' وحدة',
+      rows.length + ' Subjects · ' + mods + ' Modules');
     setBi(document.querySelector('.dash-hero-sub'),
       'مساحتك الشخصية لإتقان ' + maj.ar + ' — تعلّم، راجع، اختبر',
       'Your personal space to master ' + maj.en + ' — learn, review, test');
@@ -184,9 +184,11 @@
     if (!DATA || !DATA.majors) return;
     MINE = profileMajor();
     MAJOR = pick();
-    var anchor = document.getElementById('overall-progress') || document.querySelector('.dash-hero');
+    var slot = document.getElementById('mj-slot');
+    var anchor = slot || document.getElementById('overall-progress') || document.querySelector('.dash-hero');
     if (!anchor) return;
-    anchor.insertAdjacentHTML(LEVEL ? 'beforebegin' : 'afterend', switchHTML());
+    if (slot) slot.innerHTML = switchHTML();
+    else anchor.insertAdjacentHTML(LEVEL ? 'beforebegin' : 'afterend', switchHTML());
     document.querySelector('.mj-switch').addEventListener('click', function (e) {
       var b = e.target.closest('.mj-opt');
       if (!b) return;

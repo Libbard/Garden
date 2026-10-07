@@ -3215,10 +3215,13 @@
   }
 
   /*@3.GARJ.663*/
-  const SLIDES = { CS230: 13, CS231: 13, CS240: 13, CS241: 13, CS242: 13, CS243: 13, CS350: 13, CS351: 13,
-    CS352: 13, CS353: 13, CS360: 12, CS361: 13, CS362: 13, CS363: 13, CS364: 10, CS470: 12, CS471: 13, CS475: 13,
-    CS476: 13, CS477: 13, CS478: 13, CS479: 12, CS480: 12, CS481: 13, ENG103: 10, ISLAM101: 12, ISLAM102: 12,
-    ISLAM103: 10, ISLAM104: 14, MATH150: 12, MATH251: 12, SCI101: 10, SCI201: 11, STAT101: 12 };
+  const SLIDES = { CS230: 13, CS231: 13, CS240: 13, CS241: 13, CS242: 13, CS243: 13, CS350: 13, CS351: 13, CS352: 13,
+    CS353: 13, CS360: 12, CS361: 13, CS362: 13, CS363: 13, CS364: 10, CS470: 12, CS471: 13, CS475: 13, CS476: 13,
+    CS477: 13, CS478: 13, CS479: 12, CS480: 12, CS481: 13, DS230: 13, DS240: 13, DS243: 13, DS350: 13, DS351: 13,
+    DS352: 13, DS353: 12, DS360: 12, DS361: 13, DS362: 13, DS363: 13, DS479: 12, DS481: 13, ENG103: 10, ISLAM101: 12,
+    ISLAM102: 12, ISLAM103: 10, ISLAM104: 14, IT232: 13, IT241: 13, IT244: 13, IT245: 13, IT351: 12, IT352: 12,
+    IT353: 13, IT354: 12, IT361: 13, IT362: 12, IT364: 10, IT479: 12, IT485: 13, MATH150: 12, MATH241: 13,
+    MATH251: 12, SCI101: 10, SCI201: 11, STAT101: 12 };
   function slidesLink() {
     const html = document.documentElement;
     const code = String(html.getAttribute('data-subject') || '').toUpperCase();
@@ -5308,11 +5311,17 @@
   }
 
   /*@3.GARJ.328*/
+  /*@3.GARJ.671*/
+  function aiSubject() {
+    const code = document.documentElement.getAttribute('data-subject') || '';
+    const row = AI_CATALOG && AI_CATALOG[code];
+    return (row && row.ai_of) || code;
+  }
   function buildPrompt(cardData, opts) {
     opts = opts || {};
     const regenVariant = opts.regen || false;
     const prevText = opts.prevText || '';
-    const subjectCode = document.documentElement.getAttribute('data-subject') || '';
+    const subjectCode = aiSubject();
     const L = currentLang;
 
     /*@3.GARJ.329*/
@@ -5645,7 +5654,7 @@ ${baseRules}`) + regenSuffix;
   function aiRemoteGet(prompt, style) {
     const base = (window.GardenEndpoints && window.GardenEndpoints.aiCache) || '';
     if (!base || !prompt) return Promise.resolve(null);
-    const subject = document.documentElement.getAttribute('data-subject') || '';
+    const subject = aiSubject();
     return aiHash(aiIdentityString(prompt)).then(hash => {
       const url = base.replace(/\/+$/, '') + '/' + aiKeyPath({
         subject: subject, lang: currentLang, style: style || 'auto', hash: hash, variant: '1',
@@ -6144,7 +6153,7 @@ ${baseRules}`) + regenSuffix;
         : '';
       /*@3.GARJ.612*/
       const cacheMeta = {
-        subject: document.documentElement.getAttribute('data-subject') || '',
+        subject: aiSubject(),
         lang: currentLang, style: intent.style, promptVer: AI_PROMPT_VER,
         store: !intent.question
       };

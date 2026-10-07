@@ -149,13 +149,33 @@
 
   /*@3.SEAJ.5*/
 
+  var SLUG_MAJOR = { 'bachelor-of-computer-science': 'CS', 'bachelor-of-science-in-information-technology': 'IT', 'bachelor-of-data-science': 'DS' };
+  function viewMajor() {
+    var v = null, p = null;
+    try { v = localStorage.getItem('garden_view_major'); p = JSON.parse(localStorage.getItem('student_profile')); } catch (e) {}
+    if (v === 'CS' || v === 'IT' || v === 'DS') return v;
+    return (p && SLUG_MAJOR[p.program]) || 'CS';
+  }
+  /*@3.SEAJ.60*/
+  function majorScope(list) {
+    var m = viewMajor(), mine = {};
+    list.forEach(function (e) { if (e.of && String(e.code).indexOf(m) === 0) mine[e.of] = 1; });
+    return list.filter(function (e) {
+      var pre = (String(e.code || '').match(/^(CS|IT|DS)\d/) || [])[1];
+      if (!pre) return true;
+      if (pre !== m && pre !== 'CS') return false;
+      if (pre === 'CS' && m !== 'CS' && mine[e.code]) return false;
+      return pre === m || pre === 'CS';
+    });
+  }
+
   function loadIndex() {
     if (index) return Promise.resolve(index);
     if (loading) return loading;
     loading = fetch(INDEX_URL)
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) {
-        var list = (j && j.entries) || [];
+        var list = majorScope((j && j.entries) || []);
         /*@3.SEAJ.6*/
         index = list.map(function (e) {
           var kw = (e.kw || []).join(' ');
