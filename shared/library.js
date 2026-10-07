@@ -55,6 +55,27 @@
     return fetch(item.svgUrl || item.url).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); });
   }
   function release() { cache.cats = {}; cache.all = null; cache.index = null; }
+  var pre = {};
+  function preload(urls) {
+    urls.forEach(function (u) {
+      if (!u || pre[u]) return;
+      var im = new Image(); im.decoding = 'async'; im.src = u; pre[u] = im;
+    });
+    var k = Object.keys(pre); if (k.length > 160) k.slice(0, k.length - 160).forEach(function (u) { delete pre[u]; });
+  }
+  var FLAG_OF = { sticker: 1, coloring: 2, lesson: 4 };
+  function firstThumbs(items, f, n) {
+    var out = [];
+    for (var i = 0; i < items.length && out.length < n; i++) if (items[i].flags & f) out.push(items[i].sticker || items[i].thumb || items[i].svgUrl);
+    return out;
+  }
+  function warm(kind) {
+    var f = FLAG_OF[kind || 'sticker'] || 1;
+    return index().then(function (ix) {
+      var c = ix.cats.filter(function (x) { return (x.f & f) && x.n[f]; })[0];
+      return c ? category(c.id).then(function (items) { preload(firstThumbs(items, f, 12)); }) : null;
+    }).catch(function () {});
+  }
 
   function picture(item, kind) {
     if (item.sticker) return '<span class="glib-pic glib-pic--st"><img src="' + item.sticker + '" alt="" loading="lazy" decoding="async"></span>';
@@ -99,6 +120,8 @@
       b.type = 'button'; b.className = 'gsf-chip'; b.dataset.kind = k[0]; b.setAttribute('role', 'tab');
       b.innerHTML = '<i class="fa-solid ' + k[2] + '" aria-hidden="true"></i> <span></span>';
       b.addEventListener('click', function () { self.setKind(k[0]); });
+      var intent = function () { warm(k[0]); };
+      b.addEventListener('pointerenter', intent); b.addEventListener('touchstart', intent, { passive: true }); b.addEventListener('focus', intent);
       kinds.appendChild(b);
     });
     var ages = this.$('.glib-ages');
@@ -120,10 +143,8 @@
       self.choose(self.list[+b.dataset.i]);
     });
     var peek = function (e) {
-      var b = e.target.closest && e.target.closest('.glib-t'), r = b && b.querySelector('.glib-ref[data-src]');
-      if (!r) return;
-      r.onload = function () { r.classList.add('ok'); };
-      r.src = r.dataset.src; r.removeAttribute('data-src');
+      var b = e.target && e.target.closest && e.target.closest('.glib-t');
+      if (b) self.peekOne(b, 'high');
     };
     grid.addEventListener('pointerover', peek);
     grid.addEventListener('focusin', peek);
@@ -201,6 +222,8 @@
         '<img src="' + BASE + 'art/' + c.icon + '" alt="" loading="lazy">' + esc(e ? c.en : c.ar) + ' <small>' + c.n[f] + '</small></button>';
     }).join('');
     box.querySelectorAll('.glib-cat').forEach(function (b) {
+      var intent = function () { category(b.dataset.cat).then(function (items) { preload(firstThumbs(items, self.flag(), 12)); }).catch(function () {}); };
+      b.addEventListener('pointerenter', intent); b.addEventListener('touchstart', intent, { passive: true }); b.addEventListener('focus', intent);
       b.addEventListener('click', function () { self.cat = b.dataset.cat; self.q = ''; self.$('.glib-search input').value = ''; self.paintCats(); self.refresh(); });
     });
   };
@@ -229,6 +252,30 @@
     });
   };
 
+  Picker.prototype.peekOne = function (b, pri) {
+    var r = b.querySelector('.glib-ref[data-src]');
+    if (!r) return;
+    r.onload = function () { r.classList.add('ok'); };
+    try { r.fetchPriority = pri || 'low'; } catch (e) {}
+    r.src = r.dataset.src; r.removeAttribute('data-src');
+  };
+  Picker.prototype.peekSoon = function () {
+    var self = this, g = this.$('.glib-grid');
+    if (!this.io && window.IntersectionObserver) {
+      this.io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { self.io.unobserve(e.target); if (self.peekReady) self.peekOne(e.target); else (self.peekQ = self.peekQ || []).push(e.target); } });
+      }, { root: g, rootMargin: '0px 0px 200px 0px' });
+    }
+    var outs = [].slice.call(g.querySelectorAll('.glib-t img.glib-out')).slice(0, 18);
+    var wait = outs.map(function (im) { return im.complete ? null : new Promise(function (k) { im.addEventListener('load', k, { once: true }); im.addEventListener('error', k, { once: true }); }); }).filter(Boolean);
+    Promise.race([Promise.all(wait), new Promise(function (k) { setTimeout(k, 6000); })]).then(function () {
+      if (self.gone) return;
+      self.peekReady = true;
+      (self.peekQ || []).splice(0).forEach(function (b) { self.peekOne(b); });
+    });
+    if (this.io) g.querySelectorAll('.glib-t:not([data-io])').forEach(function (b) { b.dataset.io = '1'; self.io.observe(b); });
+  };
+
   Picker.prototype.grid = function (html) { var g = this.$('.glib-grid'); g.innerHTML = html; g.scrollTop = 0; };
 
   Picker.prototype.render = function () {
@@ -252,12 +299,14 @@
     }
     this.$('.glib-grid').insertAdjacentHTML('beforeend', html);
     this.shown = end;
+    if (kind !== 'sticker') this.peekSoon();
   };
 
   Picker.prototype.choose = function (item) {
     if (!item) return;
     if (this.kind === 'sticker') { this.sel = item; this.pick('sticker'); return; }
     this.sel = item;
+    preload([item.line, item.color]);
     this.$('.glib-grid').querySelectorAll('.glib-t').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('aria-label') === (en() ? item.en : item.ar) && +b.dataset.i >= 0 && this.list[+b.dataset.i] === item)); }, this);
     this.paintSel();
   };
@@ -287,6 +336,7 @@
   Picker.prototype.destroy = function () {
     if (this.gone) return; this.gone = true;
     if (live === this) live = null;
+    if (this.io) { this.io.disconnect(); this.io = null; }
     document.removeEventListener('garden:lang', this._onLang);
     this.$('.glib-grid').textContent = '';
     this.d.remove();
@@ -302,6 +352,7 @@
     category: category,
     search: function (q) { q = norm(q); return all().then(function (l) { return l.filter(function (i) { return i.key.indexOf(q) >= 0; }); }); },
     release: release,
+    warm: warm,
     FLAGS: { STICKER: F_STICKER, COLOR: F_COLOR, LESSON: F_LESSON }
   };
 })();

@@ -347,7 +347,7 @@
 
   function Surface(canvas, opts) {
     opts = opts || {};
-    var gl = canvas.getContext('webgl2', { premultipliedAlpha: false, preserveDrawingBuffer: true, antialias: false, alpha: true });
+    var gl = canvas.getContext('webgl2', { premultipliedAlpha: false, preserveDrawingBuffer: true, antialias: false, alpha: true, powerPreference: 'high-performance' });
     if (!gl) throw new Error('webgl2');
     this.gl = gl; this.canvas = canvas;
     var f32 = !!gl.getExtension('EXT_color_buffer_float'), f16 = f32 || !!gl.getExtension('EXT_color_buffer_half_float');
@@ -499,7 +499,7 @@
   };
   Surface.prototype.saveTile = function (tx, ty) {
     var slot = this.page();
-    while (slot < 0 && this.undo.length > 1) { this.dropRec(this.undo.shift()); slot = this.page(); }
+    while (slot < 0 && this.undo.length && this.undo[0] !== this.wetRec) { this.dropRec(this.undo.shift()); slot = this.page(); }
     if (slot < 0) return -1;
     var s = this.slotAt(slot), x = tx * TILE, y = ty * TILE, w = Math.min(TILE, this.W - x), h = Math.min(TILE, this.H - y);
     this.copyRect(this.fbMain, s.fb, x, y, w, h, s.x, s.y, 2);
@@ -717,12 +717,29 @@
     return rect;
   };
 
+  var REF_PASSES = { pencil: 6, graphite: 6, crayon: 5, pastel: 5, oil: 3, marker: 2, wash: 3, gel: 2, ink: 1, airbrush: 3 };
+  var REF_AMT = { pencil: .62, graphite: .6, crayon: .7, pastel: .72, oil: .85, marker: .8, wash: .75, gel: .85, ink: 1, airbrush: .6 };
+  Surface.prototype.refPasses = function (tool) { return REF_PASSES[tool] || 3; };
+  Surface.prototype.refPass = function (mask, tool, k, passes) {
+    if (!this.hasRef || !mask) return;
+    var self = this, id = tool === 'wash' ? 11 : (TOOLS[tool] == null ? 7 : TOOLS[tool]), amt = REF_AMT[tool] || .7;
+    this.setMask(mask);
+    this.pass('fill', [mask.x, mask.y, mask.w, mask.h], function (p, g) {
+      self.bindTex(p, 'uBlur', self.blurT, 5); self.bindTex(p, 'uRefT', self.refT, 6); self.bindTex(p, 'uLineT', self.lineT, 7);
+      g.uniform3fv(p.u.uColor, [0, 0, 0]); g.uniform1i(p.u.uTool, id); g.uniform1f(p.u.uSeed, k * 7.31 + 1.7);
+      g.uniform1f(p.u.uShade, 0); g.uniform1f(p.u.uAmt, amt); g.uniform1f(p.u.uGrade, .9); g.uniform1f(p.u.uUseRef, 1);
+      g.uniform1f(p.u.uDepth, .35 * k / Math.max(1, passes - 1)); g.uniform1f(p.u.uFinish, 0); g.uniform3fv(p.u.uTint, self.tint);
+    }, true);
+    this.useMask = 0;
+    this.dirty = true;
+  };
+
   Surface.prototype.paintRef = function (tool, opt) {
     opt = opt || {};
     if (!this.hasRef) return false;
     var self = this, id = tool === 'wash' ? 11 : (TOOLS[tool] == null ? 7 : TOOLS[tool]);
-    var passes = opt.passes || ({ pencil: 6, graphite: 6, crayon: 5, pastel: 5, oil: 3, marker: 2, wash: 3, gel: 2, ink: 1, airbrush: 3 }[tool] || 3);
-    var amt = opt.amt || ({ pencil: .62, graphite: .6, crayon: .7, pastel: .72, oil: .85, marker: .8, wash: .75, gel: .85, ink: 1, airbrush: .6 }[tool] || .7);
+    var passes = opt.passes || REF_PASSES[tool] || 3;
+    var amt = opt.amt || REF_AMT[tool] || .7;
     this.begin(); this.useMask = 0;
     for (var k = 0; k < passes; k++) {
       this.pass('fill', [0, 0, this.W, this.H], function (p, g) {

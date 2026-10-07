@@ -2124,7 +2124,7 @@
     edit.hidden = !this._imgOpen[b.id];
     if (!hasSrc0) this._imgOpen[b.id] = 0;
     /*@3.NOEJ.606*/
-    if (this.floatsImg()) {
+    if (this.floatsImg(b)) {
       edit.setAttribute('popover', 'manual');
       if (!edit.hidden) {
         var edF = this;
@@ -9582,9 +9582,9 @@
   };
 
   /*@3.NOEJ.602*/
-  Editor.prototype.floatsImg = function () {
-    return !!(this.root && this.root.closest && this.root.closest('.gpi-fed') &&
-              window.HTMLElement && HTMLElement.prototype.showPopover);
+  Editor.prototype.floatsImg = function (b) {
+    if (!(window.HTMLElement && HTMLElement.prototype.showPopover)) return false;
+    return !!((this.root && this.root.closest && this.root.closest('.gpi-fed')) || (b && b.stk));
   };
   Editor.prototype.floatImgPanel = function (node, pan, fig) {
     if (!imgPanOpen(pan)) { try { pan.showPopover(); } catch (eS) { return false; } }
@@ -10339,6 +10339,8 @@
         return;
       }
       if (imf && !e.target.closest('.ne-cap')) {
+        var hitS = self.blockAt(id);
+        if (hitS && hitS.b.stk) return;
         var pan = node.querySelector('.ne-img-edit');
         if (pan) {
           if (pan.hidden) pan.hidden = false; else imgPanShut(pan);

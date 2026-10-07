@@ -9471,6 +9471,7 @@
       var ex = { url: 'byte-local:' + rid, alt: o.alt || '', cap: 0, loc: 1, wm: o.wm || 0.3 };
       if (o.iar > 0 && o.inw > 0) { ex.iar = o.iar; ex.inw = o.inw; }
       if (o.ms) ex.ms = o.ms;
+      if (o.stk) ex.stk = 1;
       if (pdfOn() && pdfUi.ink()) {
         var K = pdfUi.ink(), n = pdfUi.page() || 1;
         var pEl = document.querySelector('.gpv-page[data-p="' + n + '"]');

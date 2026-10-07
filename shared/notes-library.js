@@ -54,11 +54,11 @@
     });
   }
 
-  function insert(blob, wm, alt, ms) {
+  function insert(blob, wm, alt, ms, stk) {
     var app = window.GardenNotesApp;
     if (!app || !app.insertImage) { toast(T('افتحْ ملاحظةً أوّلاً ثمّ أدرجْ فيها.', 'Open a note first, then insert.')); return Promise.resolve(false); }
     return dims(blob).then(function (d) {
-      return app.insertImage(blob, { wm: wm, alt: alt || '', iar: d ? Math.round(d.w / d.h * 1000) / 1000 : 0, inw: d ? Math.min(d.w, 900) : 0, name: 'mirsam.webp', ms: ms || null });
+      return app.insertImage(blob, { wm: wm, alt: alt || '', iar: d ? Math.round(d.w / d.h * 1000) / 1000 : 0, inw: d ? Math.min(d.w, 900) : 0, name: 'mirsam.webp', ms: ms || null, stk: !!stk });
     }).then(function (ok) {
       if (!ok) toast(T('تعذّر الإدراجُ هنا. افتحْ صفحةً من الملاحظة ثمّ أعدِ المحاولة.', 'Could not insert here. Open a page of the note and try again.'));
       return ok;
@@ -115,8 +115,10 @@
     function doInsert() {
       if (busy || !st.S) return; busy = true;
       var b = d.querySelector('.mrs-insert'); if (b) b.disabled = true;
+      if (st.S.wet) st.S.dryNow();
+      var layerP = saveLayer(st);
       st.toBlob('image/webp', .92).then(function (blob) {
-        return saveLayer(st).then(function (ms) {
+        return layerP.then(function (ms) {
           if (ms) { ms.it = item.id || ms.it; ms.ln = item.line || ms.ln; ms.cr = item.color || ms.cr; }
           if (edit) return edit.onSave(blob, ms).then(function (ok) { return ok !== false; });
           return insert(blob, .6, name, ms);
@@ -158,7 +160,7 @@
       GardenLibrary.open({
         kind: 'sticker',
         onPick: function (item, how) {
-          if (how === 'sticker') return fetchBlob(item.sticker).then(function (b) { return insert(b, .2, ''); });
+          if (how === 'sticker') return fetchBlob(item.sticker).then(function (b) { return insert(b, .2, '', null, true); });
           if (how === 'color-done') return fetchBlob(item.color).then(function (b) { return insert(b, .6, (en() ? item.en : item.ar) || '', { v: 1, it: item.id, ln: item.line, cr: item.color, done: 1 }); });
           deps().then(function () { studio(item, how === 'lesson' ? 'lesson' : 'color'); }, function () { toast(T('تعذّر تحميلُ المرسم. تحقّقْ من الاتصال.', 'Could not load the studio. Check your connection.')); });
         }
@@ -185,6 +187,16 @@
   }
 
   function color(item, how) { return deps().then(function () { return studio(item, how === 'lesson' ? 'lesson' : 'color'); }); }
+
+  var warmed = false;
+  function warm(e) {
+    if (warmed || !e.target || !e.target.closest || !e.target.closest('#na-lib-top')) return;
+    warmed = true;
+    pickerDeps().then(function () { if (GardenLibrary.warm) GardenLibrary.warm('sticker'); }).catch(function () { warmed = false; });
+  }
+  document.addEventListener('pointerover', warm, { passive: true });
+  document.addEventListener('touchstart', warm, { passive: true });
+  document.addEventListener('focusin', warm);
 
   window.GardenNotesLibrary = { open: open, deps: deps, edit: edit, color: color, current: function () { return live; } };
 })();

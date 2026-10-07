@@ -20,6 +20,79 @@
   ];
   var BYID = {}; TOOLS.forEach(function (t) { BYID[t.id] = t; });
 
+  var GUIDE = {
+    pencil: { i: 'fa-pencil', w: ['لونٌ جافٌّ رفيع يترك أثراً خفيفاً يظهر فيه نسيجُ الورق.', 'A thin, dry color that leaves a light mark showing the paper grain.'],
+      p: [['يتراكم', 'Builds up'], ['شبهُ شفّاف', 'Semi-transparent'], ['دقيق', 'Precise']],
+      u: ['التفاصيلُ الصغيرة، والتدرّجُ الهادئ، والتلوينُ المتأنّي طبقةً فوق طبقة.', 'Small details, gentle gradients, and patient layer-over-layer coloring.'],
+      h: ['اضغطْ خفيفاً أوّلاً ثمّ زِدِ الضغطَ تدريجيّاً؛ كلُّ مرورٍ يُغمق اللون. حرّكه في اتّجاهٍ واحدٍ أو دوائرَ صغيرة.', 'Press lightly first, then gradually harder; each pass darkens the color. Move in one direction or small circles.'],
+      t: ['لا تضغطْ بقوّةٍ من البداية: ابدأْ فاتحاً، فالداكنُ يُضاف بسهولةٍ ولا يُزال بسهولة.', 'Don\'t press hard at first: start light — dark is easy to add and hard to remove.'] },
+    graphite: { i: 'fa-pencil', w: ['رماديٌّ من الفاتح إلى الأسود — أداةُ الرسم الأولى.', 'Greys from light to black — the first drawing tool.'],
+      p: [['درجاتٌ من 2H إلى 8B', 'Grades 2H to 8B'], ['يُمحى بسهولة', 'Erases easily']],
+      u: ['التخطيطُ قبل التلوين، والظلال، ورسمُ الأشكال في الدروس.', 'Sketching before coloring, shading, and drawing shapes in lessons.'],
+      h: ['اخترِ الدرجةَ من اللوحة: ما فيه الحرف H فاتحٌ صلب، وما فيه الحرف B داكنٌ ليّن. أمِلِ القلمَ لخطٍّ عريضٍ ناعم.', 'Pick a grade from the palette: H is light and hard, B is dark and soft. Tilt the pen for a broad soft line.'],
+      t: ['ارسمِ الخطوطَ الأولى خفيفةً جدّاً لتُمحى أو تُغطّى بسهولة.', 'Draw your first lines very lightly so they are easy to erase or cover.'] },
+    marker: { i: 'fa-marker', w: ['حبرٌ لامعٌ برأسٍ مشطوف يغطّي بسرعةٍ وبلونٍ مشبع.', 'Bright ink with a chisel tip that covers fast with saturated color.'],
+      p: [['مشبع', 'Saturated'], ['يتجمّع عند الحوافّ', 'Pools at edges']],
+      u: ['المساحاتُ المتوسّطة والألوانُ الزاهية والرسومُ الكرتونيّة.', 'Medium areas, bright colors, and cartoon-style art.'],
+      h: ['لوّنْ بحركاتٍ متّصلةٍ دون توقّف؛ المرورُ الثاني يُغمق اللون.', 'Color with continuous strokes without stopping; a second pass darkens.'],
+      t: ['لوّنِ المنطقةَ كلَّها دفعةً واحدةً لتتجنّبَ الخطوطَ المتداخلة.', 'Fill the whole area in one go to avoid overlapping streaks.'] },
+    wash: { i: 'fa-droplet', w: ['صبغةٌ شفّافةٌ تنتشر مع الماء وتجفّ بحوافَّ داكنةٍ رقيقة.', 'Transparent pigment that spreads with water and dries with soft dark edges.'],
+      p: [['شفّاف', 'Transparent'], ['يمتزج مبلّلاً', 'Blends while wet'], ['يجفّ مع الوقت', 'Dries over time']],
+      u: ['السماءُ والماءُ والخلفيّاتُ والانتقالُ الناعم بين لونين.', 'Skies, water, backgrounds, and soft transitions between two colors.'],
+      h: ['الشريحةُ الثانية هي كمّيّةُ الماء. ضربةٌ على لونٍ مبلّلٍ تمتزج معه، وعلى لونٍ جافٍّ تضيف طبقة.', 'The second slider is the amount of water. A stroke on wet paint blends; on dry paint it adds a layer.'],
+      t: ['ابدأْ بالألوان الفاتحة وانتظرِ الجفافَ قبل الداكنة؛ المائيُّ لا يغطّي ما تحته.', 'Start with light colors and let them dry before dark ones; watercolor doesn\'t cover what\'s under it.'] },
+    crayon: { i: 'fa-pencil', w: ['شمعٌ ملوّنٌ خشنٌ يترك فراغاتٍ بيضاءَ في حبيبات الورق.', 'Rough colored wax that leaves white specks in the paper grain.'],
+      p: [['ملمسٌ يدويّ', 'Hand-made texture'], ['دافئ', 'Warm']],
+      u: ['رسومُ الأطفال والمساحاتُ الكبيرة بطابعٍ دافئ.', 'Children\'s drawings and large areas with a warm feel.'],
+      h: ['الضغطُ الخفيف يُظهر الملمس، والقويُّ يملأ الفراغات.', 'Light pressure shows the texture; heavy pressure fills the gaps.'],
+      t: ['جرّبْ ورقاً خشناً من الإعدادات ليظهرَ الملمسُ أجمل.', 'Try a rough paper in the settings to make the texture shine.'] },
+    pastel: { i: 'fa-paintbrush', w: ['مسحوقُ لونٍ ناعمٌ معتمٌ يغطّي ويمتزج بسهولة.', 'Soft, opaque powdered color that covers and blends easily.'],
+      p: [['معتم', 'Opaque'], ['يمتزج', 'Blends']],
+      u: ['الغيومُ والبشرةُ والسماءُ والانتقالاتُ الناعمة.', 'Clouds, skin, skies, and soft transitions.'],
+      h: ['لوّنْ ثمّ مرّرْ «ممسحةَ الدمج» على الحدّ بين اللونين.', 'Color, then run the blending stump over the border between colors.'],
+      t: ['الباستيلُ الفاتحُ يغطّي الداكن، فتستطيع إضافةَ الإضاءة في النهاية.', 'Light pastel covers dark, so you can add highlights at the end.'] },
+    oil: { i: 'fa-paintbrush', w: ['لونٌ كثيفٌ معتمٌ يحمل أثرَ شعر الفرشاة ويقلّ مع طول الضربة.', 'Thick, opaque paint that shows the bristles and runs out along the stroke.'],
+      p: [['كثيف', 'Thick'], ['معتم', 'Opaque'], ['أثرُ الفرشاة', 'Brush marks']],
+      u: ['اللوحاتُ الغنيّة والمساحاتُ العريضة والتعبيرُ بالضربات.', 'Rich paintings, broad areas, and expressive strokes.'],
+      h: ['الضربةُ الطويلة تُفرغ الفرشاة؛ ارفعِ القلمَ وابدأْ ضربةً جديدةً لتعيدَ تحميلها.', 'Long strokes empty the brush; lift and start a new stroke to reload it.'],
+      t: ['اتّبعْ شكلَ الجسم بضرباتك: مستديرةٌ للتفّاحة، وطويلةٌ للعشب.', 'Follow the shape with your strokes: round for an apple, long for grass.'] },
+    airbrush: { i: 'fa-spray-can', w: ['رذاذٌ ناعمٌ بلا حوافّ يتراكم كلّما بقيتَ في مكانك.', 'A soft, edgeless spray that builds up the longer you stay.'],
+      p: [['ناعم', 'Soft'], ['يتراكم بالتوقّف', 'Builds while still']],
+      u: ['الظلالُ الناعمة والتوهّجُ والتدرّجاتُ الواسعة.', 'Soft shadows, glows, and wide gradients.'],
+      h: ['كلّما توقّفتَ ازداد اللون؛ حرّكْ يدك بسرعةٍ لطبقةٍ خفيفة.', 'Pause to deepen the color; move quickly for a light layer.'],
+      t: ['استعمله مع «داخل الخطوط» ليبقى الرذاذُ داخل الشكل.', 'Use it with "Inside the lines" to keep the spray in the shape.'] },
+    ink: { i: 'fa-pen-nib', w: ['خطٌّ دقيقٌ ثابتُ العرض.', 'A fine line with steady width.'],
+      p: [['دقيق', 'Fine'], ['ثابت', 'Steady']],
+      u: ['تحبيرُ الخطوط والتفاصيلُ الدقيقة والكتابة.', 'Inking lines, fine details, and lettering.'],
+      h: ['الحركةُ الواثقة تعطي خطّاً أنظف من الحركة البطيئة.', 'A confident movement gives a cleaner line than a slow one.'],
+      t: ['ارسمْ خطوطاً قصيرةً متتابعةً بدل خطٍّ طويلٍ مرتجف.', 'Draw short connected lines instead of one long shaky line.'] },
+    gel: { i: 'fa-pen', w: ['حبرٌ معتمٌ لامعٌ يظهر حتّى فوق الألوان الداكنة.', 'Opaque, glossy ink that shows even on dark colors.'],
+      p: [['معتم', 'Opaque'], ['لامع', 'Glossy']],
+      u: ['اللمعاتُ البيضاء والنقاطُ الزخرفيّة واللمساتُ الأخيرة.', 'White highlights, decorative dots, and finishing touches.'],
+      h: ['اخترِ الأبيضَ وضعْ نقطةً صغيرةً في العين أو على سطحٍ لامع.', 'Pick white and add a small dot in an eye or on a shiny surface.'],
+      t: ['لمعةٌ صغيرةٌ واحدة تجعل الرسمةَ حيّة — لا تُكثرْ منها.', 'One small highlight brings a drawing to life — don\'t overdo it.'] },
+    blend: { i: 'fa-hand', w: ['أداةٌ بلا لونٍ تسحب الألوانَ الموجودة وتمزجها.', 'A colorless tool that pulls existing colors and mixes them.'],
+      p: [['بلا لون', 'No color'], ['ينعّم', 'Softens']],
+      u: ['تنعيمُ الانتقال بين لونين وتليينُ الظلال.', 'Smoothing the transition between colors and softening shadows.'],
+      h: ['مرّرها على الحدّ بين اللونين بحركاتٍ صغيرة.', 'Run it over the border between two colors with small motions.'],
+      t: ['تعمل أفضلَ مع الباستيل والرصاص والخشبيّ.', 'Works best with pastel, graphite, and colored pencil.'] },
+    eraser: { i: 'fa-eraser', w: ['تُزيل اللونَ وتعيد الورقَ أبيض، ولا تمسّ خطوطَ الرسمة.', 'Removes color back to white paper, without touching the drawing\'s lines.'],
+      p: [['لا تمسّ الخطوط', 'Keeps the lines'], ['الاختصار E', 'Shortcut E']],
+      u: ['تصحيحُ الأخطاء، وصنعُ إضاءةٍ بإزالة جزءٍ من اللون.', 'Fixing mistakes, and making highlights by lifting some color.'],
+      h: ['الحجمُ من الشريحة. مع «داخل الخطوط» تمحو داخل الشكل وحدَه. وزرُّ القلم الجانبيّ يمحو أيضاً.', 'Set the size with the slider. With "Inside the lines" it erases only inside the shape. Your pen\'s side button erases too.'],
+      t: ['امحُ بخفّةٍ لتفتيح اللون بدل إزالته كلِّه.', 'Erase lightly to lighten a color instead of removing it all.'] },
+    fill: { i: 'fa-fill-drip', w: ['يملأ الشكلَ المغلقَ كلَّه بضغطةٍ واحدة، بخامة أداتك الحاليّة.', 'Fills a whole closed shape in one tap, with your current tool\'s texture.'],
+      p: [['سريع', 'Fast'], ['بخامة الأداة', 'Tool texture']],
+      u: ['البدءُ السريع بالألوان الأساسيّة قبل التفاصيل.', 'A quick start with base colors before details.'],
+      h: ['اخترْ أداةً (خشبيّ أو مائيّ…) ثمّ الدلوَ ثمّ اضغطْ داخل الشكل. و«تظليل» يضيف ضوءاً وظلّاً.', 'Pick a tool (pencil, watercolor…), then the bucket, then tap inside a shape. "Shading" adds light and shadow.'],
+      t: ['املأِ الأساسَ بالدلو ثمّ أضفِ الظلالَ بيدك لنتيجةٍ احترافيّة.', 'Fill the base with the bucket, then add shadows by hand for a pro result.'] },
+    pick: { i: 'fa-eye-dropper', w: ['تأخذ اللونَ من أيّ نقطةٍ في الرسمة.', 'Takes the color from any point of the drawing.'],
+      p: [['الاختصار I', 'Shortcut I']],
+      u: ['إعادةُ استعمال لونٍ وضعتَه سابقاً.', 'Reusing a color you already placed.'],
+      h: ['اضغطْ على النقطة فيصير لونُها لونَك الحاليّ.', 'Tap a point and its color becomes your current color.'],
+      t: ['مع «الأصل» ظاهراً تأخذ ألوانَ الصورة الأصليّة مباشرةً.', 'With "Original" shown, you pick colors straight from the original.'] }
+  };
+
   var SETS = {
     pencil: { ar: 'علبةُ الخشبيّة', en: 'Pencil tin', c: [
       ['#fff36b', 'أصفرُ فاتح', 'Canary'], ['#ffd21f', 'أصفر', 'Yellow'], ['#ffad1f', 'ذهبيّ', 'Golden'], ['#ff7a1a', 'برتقاليّ', 'Orange'],
@@ -361,6 +434,7 @@
     this.grade = pref.grade || .62;
     this.lock = true; this.shade = !!pref.shade;
     this.paperKind = pref.paper || 'draw';
+    this.help = pref.help == null ? true : !!pref.help;
     this.cat = pref.cat || 'orig';
     this.recent = (store(RECENT_KEY) || []).filter(function (h) { return /^#[0-9a-f]{6}$/i.test(h); }).slice(0, 14);
     this.view = { s: 1, x: 0, y: 0, fit: true };
@@ -395,6 +469,9 @@
         '<input class="mrs-size" type="range" min="0" max="1" step="0.005">' +
         '<input class="mrs-str" type="range" min="0" max="1" step="0.01"><i class="fa-solid fa-droplet mrs-str-i" aria-hidden="true"></i></div>' +
       '<section class="mrs-dock">' +
+        '<div class="mrs-now"><span class="mrs-now-i" aria-hidden="true"></span><b class="mrs-now-n"></b><kbd class="mrs-now-k"></kbd><span class="mrs-sp"></span>' +
+          '<button type="button" class="mrs-chip mrs-help" aria-pressed="false"><i class="fa-solid fa-circle-question" aria-hidden="true"></i><span></span></button></div>' +
+        '<div class="mrs-guide" hidden></div>' +
         '<div class="mrs-dhead"><span class="mrs-cur" aria-hidden="true"></span><span class="mrs-cname"></span><span class="mrs-sp"></span>' +
           '<button type="button" class="mrs-chip mrs-lock" aria-pressed="true"><i class="fa-solid fa-shapes" aria-hidden="true"></i><span></span></button>' +
           '<button type="button" class="mrs-chip mrs-shade" aria-pressed="false"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><span></span></button>' +
@@ -426,6 +503,7 @@
     });
     this.$('.mrs-close').addEventListener('click', function () { if (self.opts.onClose) self.opts.onClose(self); });
     this.$('.mrs-insert').addEventListener('click', function () { if (self.opts.onInsert) self.opts.onInsert(self); });
+    this.$('.mrs-help').addEventListener('click', function () { self.help = !self.help; self.savePrefs(); self.paintGuide(); });
     this.$('.mrs-undo').addEventListener('click', function () { self.step(-1); });
     this.$('.mrs-redo').addEventListener('click', function () { self.step(1); });
     this.$('.mrs-zin').addEventListener('click', function () { self.zoomBy(1.5); });
@@ -458,10 +536,46 @@
     this.paintChrome();
   };
 
-  Studio.prototype.dpr = function () { return Math.min(2.5, window.devicePixelRatio || 1); };
+  Studio.prototype.dpr = function () { return Math.min(this.dprCap || 2.5, window.devicePixelRatio || 1); };
+  Studio.prototype.gpuInfo = function () {
+    var gl = this.S && this.S.gl, r = '';
+    try { var x = gl && gl.getExtension('WEBGL_debug_renderer_info'); r = x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : (gl ? gl.getParameter(gl.RENDERER) : ''); } catch (e) {}
+    return { renderer: String(r || ''), soft: /swiftshader|llvmpipe|basic render|software|microsoft basic/i.test(String(r || '')) };
+  };
+  Studio.prototype.checkGpu = function () {
+    if (this._gpuChecked || !this.S) return; this._gpuChecked = true;
+    var g = this.gpuInfo(); this.gpu = g;
+    if (g.soft) {
+      this.dprCap = 1; this.layout();
+      this.toast(T('متصفّحُك يرسم بلا بطاقة الرسوم فيبطؤ الرسم — فعّلْ «استخدام تسريع الرسومات» من إعداداته ثمّ أعِدْ تشغيله.', 'Your browser is drawing without the graphics card, so drawing is slow — turn on "Use graphics acceleration" in its settings, then restart it.'));
+    }
+    if (store('garden_mrsdiag')) this.diag();
+  };
+  Studio.prototype.diag = function () {
+    var self = this, box = el('pre', 'mrs-diag'), ev = 0, fr = 0, worst = 0, last = performance.now(), mx = 0;
+    box.setAttribute('dir', 'ltr');
+    box.style.cssText = 'position:absolute;z-index:9;inset-block-start:3.6rem;inset-inline-end:11rem;margin:0;padding:.5rem .7rem;font:11px/1.5 ui-monospace,monospace;background:rgba(0,0,0,.78);color:#9effc9;border-radius:10px;pointer-events:none;white-space:pre';
+    this.root.appendChild(box);
+    this.root.addEventListener('pointermove', function (e) { ev += (e.getCoalescedEvents ? Math.max(1, e.getCoalescedEvents().length) : 1); mx = Math.max(mx, e.pointerType === 'pen' ? 1 : 0); }, true);
+    var tick = function (now) {
+      if (!self.S) return;
+      fr++; worst = Math.max(worst, now - last); last = now;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    this._diagT = setInterval(function () {
+      if (!self.S || !box.isConnected) return;
+      var c = self.gl;
+      box.textContent = 'gpu: ' + (self.gpu ? self.gpu.renderer : '?') + (self.gpu && self.gpu.soft ? '  [SOFTWARE]' : '') +
+        '\ndpr: ' + (window.devicePixelRatio || 1) + ' -> ' + self.dpr() + '   view: ' + (c ? c.width + 'x' + c.height : '?') + '   doc: ' + self.W + 'x' + self.H +
+        '\nfps: ' + fr + '   worst frame: ' + Math.round(worst) + 'ms   input/s: ' + ev + (mx ? ' (pen)' : '') +
+        '\nua: ' + navigator.userAgent.replace(/^.*?\) /, '').slice(0, 60);
+      fr = 0; worst = 0; ev = 0;
+    }, 1000);
+  };
   Studio.prototype.sizeKey = function () { return this.tool === 'fill' || this.tool === 'pick' ? this.medium : this.tool; };
   Studio.prototype.savePrefs = function () {
-    store(PREF_KEY, { sizes: this.sizes, tool: this.tool, color: this.color, strength: this.strength, grade: this.grade, shade: this.shade, paper: this.paperKind, cat: this.cat });
+    store(PREF_KEY, { sizes: this.sizes, tool: this.tool, color: this.color, strength: this.strength, grade: this.grade, shade: this.shade, paper: this.paperKind, cat: this.cat, help: !!this.help });
   };
 
   Studio.prototype.paintChrome = function () {
@@ -474,7 +588,9 @@
     lbl('.mrs-more', 'نوعُ الورق', 'Paper type');
     lbl('.mrs-hand', 'اليد: اسحبِ الرسمةَ لتتنقّل فيها (‏أو اضغطْ المسافة)', 'Hand: drag to move around (or hold Space)');
     this.$('.mrs-hand').setAttribute('aria-pressed', String(!!this.hand));
-    this.$('.mrs-auto span').textContent = T('لوّنْها تلقائيّاً', 'Auto-color');
+    this.$('.mrs-auto span').textContent = this._auto ? T('أوقِفِ التلوين', 'Stop coloring') : T('لوّنْها تلقائيّاً', 'Auto-color');
+    this.$('.mrs-auto').setAttribute('aria-pressed', String(!!this._auto));
+    this.paintGuide();
     lbl('.mrs-auto', 'لوّنْها تلقائيّاً بالأداة المختارة', 'Auto-color with the chosen tool');
     this.$('.mrs-auto').title = T('يلوّن الرسمةَ كالأصل بالأداة المختارة ثمّ يقيس المطابقة — ويمكن التراجع عنه', 'Colors the page like the original with the chosen tool, then measures the match — undoable');
     this.$('.mrs-auto').hidden = !this.hasRef || !!this.steps;
@@ -515,6 +631,27 @@
     this.$('.mrs-undo').disabled = !(this.S && this.S.canUndo());
     this.$('.mrs-redo').disabled = !(this.S && this.S.canRedo());
     this.paintZoom();
+  };
+
+  Studio.prototype.paintGuide = function () {
+    var t = BYID[this.tool]; if (!t || !this.$('.mrs-now')) return;
+    var e = lang() === 'en', g = GUIDE[t.id] || {}, k = (t.key || '').toUpperCase();
+    this.$('.mrs-now-i').innerHTML = '<i class="fa-solid ' + (g.i || 'fa-pen') + '"></i>';
+    this.$('.mrs-now-n').textContent = e ? t.en : t.ar;
+    this.$('.mrs-now-k').textContent = k; this.$('.mrs-now-k').hidden = !k;
+    var hb = this.$('.mrs-help');
+    hb.querySelector('span').textContent = this.help ? T('أخفِ الشرح', 'Hide guide') : T('اشرحْ لي', 'Explain');
+    hb.setAttribute('aria-pressed', String(!!this.help));
+    var box = this.$('.mrs-guide');
+    box.hidden = !this.help || !g.w;
+    if (box.hidden) return;
+    var L = function (x) { return x ? (e ? x[1] : x[0]) : ''; };
+    var row = function (ic, h, x) { return x ? '<p><i class="fa-solid ' + ic + '" aria-hidden="true"></i><b>' + h + '</b> ' + L(x).replace(/[<>&]/g, '') + '</p>' : ''; };
+    box.innerHTML = '<p class="mrs-g-what">' + L(g.w).replace(/[<>&]/g, '') + '</p>' +
+      (g.p ? '<div class="mrs-g-tags">' + g.p.map(function (x) { return '<span>' + L(x) + '</span>'; }).join('') + '</div>' : '') +
+      row('fa-bullseye', T('متى تستعملها:', 'Use it for:'), g.u) +
+      row('fa-hand-pointer', T('كيف:', 'How:'), g.h) +
+      row('fa-lightbulb', T('نصيحةُ رسّام:', 'Artist tip:'), g.t);
   };
 
   Studio.prototype.toast = function (msg) {
@@ -702,6 +839,7 @@
       self.cat = cat;
       self.layout(true);
       self.kick();
+      self.checkGpu();
       if (self.opts.onReady) self.opts.onReady(self);
       self.refP = refP.then(function (ref) {
         if (self._tok !== tok || !self.S) return null;
@@ -807,25 +945,53 @@
     return { pct: Math.round(ok / n * 1000) / 10, mean: Math.round(sum / n * 1000) / 1000 };
   };
 
-  Studio.prototype.autoPaint = function () {
-    if (!this.S || !this.hasRef || this._auto) return Promise.resolve(null);
-    var self = this, med = BYID[this.medium] && BYID[this.medium].eng || 'pencil';
+  Studio.prototype.autoPaint = function (opt) {
+    opt = opt || {};
+    if (this._auto) { this._autoStop = true; return this._autoP; }
+    if (!this.S || !this.hasRef) return Promise.resolve(null);
+    var self = this, S = this.S, med = BYID[this.medium] && BYID[this.medium].eng || 'pencil';
     if (med === 'eraser' || med === 'blend') med = 'pencil';
-    this._auto = true;
-    this.root.classList.add('is-busy');
-    return new Promise(function (res) {
-      requestAnimationFrame(function () {
-        setTimeout(function () {
+    var passes = S.refPasses ? S.refPasses(med) : 1, dur = opt.ms == null ? 5200 : opt.ms;
+    this._auto = true; this._autoStop = false;
+    this.root.classList.add('is-auto');
+    this.paintChrome();
+    this._autoP = (this.regions ? Promise.resolve(this.regions) : (this.regionsP || Promise.resolve(null))).then(function (R) {
+      return new Promise(function (res) {
+        var jobs = [], i = 0, t0 = 0;
+        if (R && S.refPass) {
+          var labs = []; for (var L = 1; L <= R.n; L++) labs.push(L);
+          labs.sort(function (a, b) { return R.boxes[b].area - R.boxes[a].area; });
+          labs.forEach(function (L) { jobs.push([L, 0]); });
+          labs.forEach(function (L) { for (var k = 1; k < passes; k++) jobs.push([L, k]); });
+        }
+        S.begin();
+        var done = function () {
           var m = null;
-          try { self.S.paintRef(med); self.changed++; self.S.render(); m = self.match(); } catch (e) {}
+          if (self.S === S) {
+            if (!jobs.length) { try { S.paintRef(med); } catch (e) {} }
+            S.end(); self.changed++; S.render();
+            try { m = self._autoStop ? null : self.match(); } catch (e) {}
+          }
           self._auto = false; self.lastMatch = m;
-          self.root.classList.remove('is-busy');
-          self.paintChrome(); self.kick();
+          self.root.classList.remove('is-auto'); self.root.style.removeProperty('--auto');
+          if (self.S === S) { self.paintChrome(); self.kick(); }
           if (m) self.toast(T('لُوّنت ب', 'Colored with ') + (lang() === 'en' ? BYID[self.medium].en : BYID[self.medium].ar) + T(' — مطابقةُ الأصل: ', ' — match with the original: ') + m.pct + '%');
           res(m);
-        }, 30);
+        };
+        if (!jobs.length) { done(); return; }
+        var step = function (now) {
+          if (self.S !== S || self._autoStop) { done(); return; }
+          if (!t0) t0 = now;
+          var want = dur ? Math.ceil(jobs.length * Math.min(1, (now - t0) / dur)) : jobs.length, f0 = performance.now();
+          while (i < jobs.length && (i < want || i === 0) && performance.now() - f0 < 28) { S.refPass(R.mask(jobs[i][0]), med, jobs[i][1], passes); i++; }
+          self.root.style.setProperty('--auto', (i / jobs.length).toFixed(3));
+          self.kick();
+          if (i < jobs.length) requestAnimationFrame(step); else done();
+        };
+        requestAnimationFrame(step);
       });
     });
+    return this._autoP;
   };
 
   Studio.prototype.setOrig = function (on) {
@@ -1015,6 +1181,7 @@
       var k = window.GardenInkInput ? GardenInkInput.keyOf(e) : String(e.key || '').toLowerCase();
       var mod = e.ctrlKey || e.metaKey;
       if (mod && k === 'z') { e.preventDefault(); self.step(e.shiftKey ? 1 : -1); return; }
+      if (mod && e.shiftKey && k === 'd') { e.preventDefault(); var on = !self.$('.mrs-diag'); store('garden_mrsdiag', on ? 1 : 0); if (on) self.diag(); else { self.$('.mrs-diag').remove(); clearInterval(self._diagT); } return; }
       if (mod && k === 'y') { e.preventDefault(); self.step(1); return; }
       if (mod && (k === '0')) { e.preventDefault(); self.fit(); return; }
       if (mod || e.altKey) return;
@@ -1078,7 +1245,7 @@
   };
 
   Studio.prototype.begin = function (p, override, ptype) {
-    if (!this.S) return null;
+    if (!this.S || this._auto) return null;
     var tool = override || this.tool;
     if (tool === 'pick') { this.pickAt(p.x, p.y); return { done: 1 }; }
     if (tool === 'fill') return { tap: p, ptype: ptype };
