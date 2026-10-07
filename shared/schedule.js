@@ -1938,7 +1938,7 @@
     }
 
     if (scheduleIsEmpty()) {
-      return { color: 'var(--st-accent, #a78bfa)', icon: 'fa-wand-magic-sparkles',
+      return { color: 'var(--st-action, #a78bfa)', icon: 'fa-wand-magic-sparkles',
                kick: A ? 'ابدأْ من هنا' : 'START HERE',
                title: A ? 'جدولُك فارغ' : 'Your schedule is empty',
                sub: line(A ? 'اضغطْ على أيِّ فراغٍ في الشبكةِ لتضيفَ أوّلَ حدث'
@@ -3279,7 +3279,7 @@
   }
 
   var ADD_TYPES = [
-    { k: 'add-lec',   i: 'fa-chalkboard-user', tone: 'var(--st-accent, #a78bfa)',
+    { k: 'add-lec',   i: 'fa-chalkboard-user', tone: 'var(--st-action, #a78bfa)',
       ar: 'محاضرة', en: 'Lecture' },
     { k: 'add-study', i: 'fa-book-open',       tone: 'var(--st-ok, #10b981)',
       ar: 'مذاكرة', en: 'Study' },

@@ -635,7 +635,7 @@
     var tk = openTasksOf(entry.code);
 
     var isDone = GardenData.courseDone(entry);
-    var h = '<article class="sem-c' + (isDone ? ' is-done sem-c-done' : '') + '"' +
+    var h = '<article class="sem-c gcard' + (isDone ? ' is-done sem-c-done' : '') + '"' +
       ' style="' + (i.color ? '--course-color:' + esc(i.color) + ';' : '') +
         '--fill:' + esc(GardenData.qualityColor01(pct / 100)) + '"' +
       ' data-code="' + esc(entry.code) + '">';
@@ -647,30 +647,30 @@
     }
 
     /*@3.SEMJ.41*/
-    h += '<div class="sem-c-h">' +
-      '<span class="sem-c-ic"><i class="' + esc(i.icon) + '" aria-hidden="true"></i></span>' +
-      '<span class="sem-c-ht">' +
-        '<span class="sem-c-n">' + esc(i.name) + '</span>' +
-        '<span class="sem-c-m">' +
-          /*@3.SEMJ.42*/
-          (shownCode(entry.code) && i.name !== entry.code
-            ? '<span class="sem-code">' + esc(shownCode(entry.code)) + '</span>' : '') +
-          '<span class="sem-badge">' + esc(nOf(i.credits, ['ساعة', 'ساعتان', 'ساعات'], ['hr', 'hrs'])) + '</span>' +
-          (isDone ? '<span class="sem-badge" data-tone="ok"><i class="fa-solid fa-check" aria-hidden="true"></i>' +
-            esc(L('اكتملت', 'Done')) + '</span>' : '') +
-          (entry.external ? '<span class="sem-badge">' + esc(L('خارج المحتوى', 'External')) + '</span>' : '') +
-        '</span>' +
+    var facts = [esc(nOf(i.credits, ['ساعة', 'ساعتان', 'ساعات'], ['hr', 'hrs']))];
+    if (isDone) facts.push('<span class="is-done">' + esc(L('اكتملت ✓', 'Done ✓')) + '</span>');
+    else if (pct > 0) facts.push(esc(L('أنهيتَ ' + pct + '٪', pct + '% done')));
+    if (entry.external) facts.push(esc(L('خارج المحتوى', 'External')));
+    h += '<div class="gcard-top">' +
+      '<span class="gcard-ic"><i class="' + esc(i.icon) + '" aria-hidden="true"></i></span>' +
+      '<span class="gcard-id">' +
+        /*@3.SEMJ.42*/
+        (shownCode(entry.code) && i.name !== entry.code
+          ? '<span class="gcard-code">' + esc(shownCode(entry.code)) + '</span>' : '') +
+        '<span class="gcard-sub">' + facts.join(' · ') + '</span>' +
       '</span>' +
-      '<span class="sem-c-more"><button class="sem-ico" type="button" data-more="' + esc(entry.code) + '" ' +
-        'aria-label="' + esc(L('خيارات المادة', 'Course options')) + '" title="' + esc(L('خيارات', 'Options')) + '">' +
-        '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button></span>' +
-    '</div>';
+    '</div>' +
+    '<button class="gcard-corner" type="button" data-more="' + esc(entry.code) + '" ' +
+      'aria-label="' + esc(L('خيارات المادة', 'Course options') + ' — ' + i.name) + '" title="' + esc(L('خيارات', 'Options')) + '" ' +
+      'data-ar-title="خيارات" data-en-title="Options">' +
+      '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>' +
+    '<div class="gcard-name">' + esc(i.name) + '</div>';
 
     /*@3.SEMJ.43*/
-    h += '<div class="sem-c-prog">' +
-      '<span class="sem-c-pv">' + pct + '<small style="font-size:.6em">%</small></span>' +
-      '<span class="sem-c-pb"><i style="inline-size:' + pct + '%"></i></span>' +
-    '</div>';
+    var thread = (pct > 0 && !isDone)
+      ? '<span class="gcard-thread" aria-hidden="true"><i style="inline-size:' + pct + '%"></i></span>' : '';
+    /*@3.SEMJ.220*/
+    var miss = [];
 
     /*@3.SEMJ.44*/
     if (st && st.hasData) {
@@ -682,8 +682,6 @@
             'title="' + esc(L('راجِع بطاقاتِ هذه المادة', 'Review this course’s cards')) + '">' +
             esc(L(st.due + ' مستحقّة', st.due + ' due')) + '</button>'
           : '');
-    } else {
-      h += row('fa-layer-group', esc(L('لم تبدأ بطاقاتها بعد', 'No flashcards started')), '', '', true);
     }
 
     /*@3.SEMJ.46*/
@@ -704,9 +702,8 @@
         '<button class="sem-linkish" type="button" data-ins-card="' + esc(entry.code) + '">' +
           esc(ins.name) + '</button>', '', rt);
     } else {
-      h += row('fa-chalkboard-user', esc(L('لم تُضِف دكتور المادة', 'No instructor added')), '',
-        '<button class="sem-badge" type="button" data-ins-open="' + esc(entry.code) + '">' +
-        esc(L('أضِفه', 'Add')) + '</button>', true);
+      miss.push('<button class="sem-miss-chip" type="button" data-ins-open="' + esc(entry.code) + '">＋ ' +
+        esc(L('الدكتور', 'Instructor')) + '</button>');
     }
 
     /*@3.SEMJ.47*/
@@ -731,10 +728,9 @@
         !!sec.empty);
     } else {
       /*@3.SEMJ.140*/
-      h += row('fa-clock', esc(L('لا شعبة في جدولك', 'No section in your schedule')), '',
-        '<button class="sem-badge" type="button" data-crn-open="' + esc(entry.code) + '" title="' +
-        esc(L('اربطها برقم الشعبة من البانر', 'Link it with its Banner CRN')) + '">' +
-        esc(L('اربطها', 'Link')) + '</button>', true);
+      miss.push('<button class="sem-miss-chip" type="button" data-crn-open="' + esc(entry.code) + '" title="' +
+        esc(L('اربطها برقم الشعبة من البانر', 'Link it with its Banner CRN')) + '">＋ ' +
+        esc(L('الشعبة', 'Section')) + '</button>');
     }
 
     /*@3.SEMJ.48*/
@@ -742,8 +738,6 @@
       h += row(nx.src === 'exam' ? 'fa-file-pen' : 'fa-flag', esc(nx.title), '',
         '<span class="sem-badge"' + (nx.days <= 2 ? ' data-tone="warn"' : '') + '>' +
         esc(relWord(nx.days)) + '</span>');
-    } else {
-      h += row('fa-flag', esc(L('لا موعد قادم', 'No upcoming deadline')), '', '', true);
     }
 
     /*@3.SEMJ.49*/
@@ -754,10 +748,15 @@
       : '<a class="sem-grade is-empty" href="gpa.html" title="' +
           esc(L('لا درجة بعد — تُدخَل في صفحة المعدل', 'No grade yet — entered on the GPA page')) + '">—</a>';
     /*@3.SEMJ.50*/
-    h += row('fa-list-check',
-      tk ? esc(nOf(tk, ['مهمة مفتوحة', 'مهمتان مفتوحتان', 'مهام مفتوحة'], ['open task', 'open tasks']))
-         : esc(L('لا مهام مفتوحة', 'No open tasks')),
-      '', gradeChip, !tk && !entry.grade);
+    if (tk || entry.grade) {
+      h += row('fa-list-check',
+        tk ? esc(nOf(tk, ['مهمة مفتوحة', 'مهمتان مفتوحتان', 'مهام مفتوحة'], ['open task', 'open tasks']))
+           : esc(L('لا مهام مفتوحة', 'No open tasks')),
+        '', gradeChip, false);
+    }
+    if (miss.length) {
+      h += '<div class="sem-miss"><span>' + esc(L('أكمِلْها:', 'Add:')) + '</span>' + miss.join('') + '</div>';
+    }
 
     /*@3.SEMJ.51*/
     function act(on, href, icon, label) {
@@ -775,7 +774,7 @@
           'fa-layer-group', L('الشعب', 'Sections')) +
     '</div>';
 
-    h += '</article>';
+    h += thread + '</article>';
     return h;
   }
 
@@ -855,10 +854,10 @@
       try { return courseCard(entry); }
       catch (err) {
         try { console.error('semester: courseCard failed for', entry && entry.code, err); } catch (e) {}
-        return '<article class="sem-c sem-c-broken"><div class="sem-c-h">' +
-          '<span class="sem-c-ic"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>' +
-          '<span class="sem-c-ht"><span class="sem-c-n">' + esc((entry && entry.code) || '—') + '</span>' +
-          '<span class="sem-c-m">' + esc(L('تعذّر عرضُ هذه البطاقة', 'This card failed to render')) +
+        return '<article class="sem-c gcard sem-c-broken"><div class="gcard-top">' +
+          '<span class="gcard-ic"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>' +
+          '<span class="gcard-id"><span class="gcard-code">' + esc((entry && entry.code) || '—') + '</span>' +
+          '<span class="gcard-sub">' + esc(L('تعذّر عرضُ هذه البطاقة', 'This card failed to render')) +
           '</span></span></div></article>';
       }
     }).join('');

@@ -77,17 +77,16 @@
 
   /*@3.DASJ.9*/
 
+  /*@3.DASJ.156*/
   function emptyState(icon, text, ctaText, ctaAction) {
-    return '<div class="widget-empty">' +
-      '<div class="widget-empty-icon">' + icon + '</div>' +
-      '<div class="widget-empty-text">' + esc(text) + '</div>' +
-      (ctaText ? '<button class="widget-empty-cta" data-act="' + ctaAction + '">' + esc(ctaText) + '</button>' : '') +
-      '</div>';
+    return '<div class="widget-body widget-empty"><p class="widget-empty-text">' + esc(text) + '</p></div>' +
+      (ctaText ? '<div class="widget-foot"><button type="button" class="widget-btn widget-empty-cta" data-act="' +
+        ctaAction + '">' + esc(ctaText) + '</button></div>' : '');
   }
 
   function head(icon, title, linkHref, linkText) {
     return '<div class="widget-head"><span class="widget-icon">' + icon + '</span>' +
-      '<span>' + esc(title) + '</span>' +
+      '<span class="widget-title">' + esc(title) + '</span>' +
       (linkHref ? '<a class="widget-link" href="' + linkHref + '">' + esc(linkText || tx('عرض', 'View')) + ' ›</a>' : '') +
       '</div>';
   }
@@ -160,7 +159,7 @@
           '<div class="widget-body">' +
             '<div class="widget-metric">' + p.pct + '%</div>' +
             /*@3.DASJ.17*/
-            '<div class="widget-sub">' + esc(p.name || tx('فصلي', 'My semester')) + ' · ' +
+            '<div class="widget-sub">' + esc(termWeekText()) +
               esc(tx('أكملت ' + p.done + ' من ' + smartCount(p.total, ['مادة', 'مادتين', 'مواد'], ['course', 'courses']),
                      p.done + ' of ' + smartCount(p.total, ['مادة', 'مادتين', 'مواد'], ['course', 'courses']) + ' completed')) + '</div>' +
             '<div class="widget-bar"><div class="widget-bar-fill" data-bar="' + p.pct + '"></div></div>' +
@@ -228,6 +227,7 @@
         }
         if (pastN) bits.push(pastN + ' ' + tx('مضت', 'passed'));
         if (doneN) bits.push(doneN + ' ' + tx('أُتمّت', 'done'));
+        if (!bits.length) bits.push(tx('لا شيء بعدها اليوم', 'Nothing else today'));
         var foot = '<div class="dash-today-foot">' +
           '<span class="dash-today-cnt">' + esc(bits.join(' · ')) + '</span>' +
           '<button type="button" class="dash-today-more" data-act="day-open">' +
@@ -291,25 +291,48 @@
       render: function () {
         var t = D.tasks();
         var open = (t || []).filter(function (x) { return x && !x.done; });
+        var ADD = '<button type="button" class="widget-btn" data-act="new-task">＋ ' + esc(tx('مهمّة', 'Task')) + '</button>';
         if (!open.length) {
           return head('<i class="fa-solid fa-clock"></i>', tx('القادم', 'Upcoming')) +
-            emptyState('<i class="fa-solid fa-clock"></i>', tx('لا مهام قادمة', 'No upcoming tasks'), tx('أضف مهمة', 'Add task'), 'new-task');
+            emptyState('<i class="fa-solid fa-clock"></i>',
+                       tx('لا مهامَّ قادمة — سجّلْ واجباً أو تسليماً قبل أن يفوتك', 'Nothing upcoming — add an assignment before it slips'),
+                       '＋ ' + tx('مهمّة', 'Task'), 'new-task');
         }
         open.sort(function (a, b) { return String(a.due || '').localeCompare(String(b.due || '')); });
         /*@3.DASJ.27*/
-        var list = open.slice(0, 5).map(function (x) {
+        var shown = open.slice(0, 5);
+        /*@3.DASJ.157*/
+        var GROUP = { late: ['متأخرة', 'Late'], today: ['اليوم', 'Today'], tomorrow: ['غداً', 'Tomorrow'],
+                      week: ['هذا الأسبوع', 'This week'], later: ['لاحقاً', 'Later'] };
+        function groupOf(days) {
+          return days === null ? 'later' : days < 0 ? 'late' : days === 0 ? 'today'
+               : days === 1 ? 'tomorrow' : days <= 7 ? 'week' : 'later';
+        }
+        var seen = {};
+        shown.forEach(function (x) { seen[groupOf(D.daysUntil(x.due))] = 1; });
+        var many = Object.keys(seen).length > 1, last = '';
+        var list = shown.map(function (x) {
           var days = D.daysUntil(x.due);
           var u = urgency(days, false);
-          var label = dueLabel(days);
-          return '<div class="widget-item">' +
-            '<button data-act="done-task" data-id="' + esc(x.id) + '" ' +
-              'style="background:none;border:1px solid var(--border-color);border-radius:4px;width:15px;height:15px;cursor:pointer;flex-shrink:0" ' +
-              'aria-label="' + esc(tx('إكمال', 'Complete')) + '"></button>' +
-            '<span class="widget-item-name">' + esc(x.title || '') + '</span>' +
-            '<span style="color:' + u.color + ';font-size:.66rem;font-weight:800">' + esc(label) + '</span></div>';
+          var g = groupOf(days);
+          var code = String(x.course || x.course_code || '');
+          var hd = (many && g !== last) ? '<div class="wt-g">' + esc(tx(GROUP[g][0], GROUP[g][1])) + '</div>' : '';
+          last = g;
+          var lbl = tx('إكمال', 'Complete') + ' — ' + (x.title || '');
+          return hd + '<div class="wt-r">' +
+            '<button type="button" class="wt-ck" data-act="done-task" data-id="' + esc(x.id) + '" ' +
+              'aria-label="' + esc(lbl) + '" title="' + esc(lbl) + '"></button>' +
+            '<span class="wt-n">' + esc(x.title || '') + '</span>' +
+            (code && code.indexOf('__') !== 0 ? '<span class="wt-code">' + esc(code) + '</span>' : '') +
+            ((many && (g === 'today' || g === 'tomorrow')) ? '' :
+              '<span class="wt-due"' + (u.cls === 'is-late' ? ' data-tone="danger"' : u.cls === 'is-soon' ? ' data-tone="warn"' : '') + '>' +
+              esc(dueLabel(days)) + '</span>') + '</div>';
         }).join('');
+        var more = open.length > shown.length
+          ? '<span class="widget-cnt">+' + (open.length - shown.length) + ' ' + esc(tx('أخرى', 'more')) + '</span>' : '';
         return head('<i class="fa-solid fa-clock"></i>', tx('القادم', 'Upcoming')) +
-          '<div class="widget-body"><div class="widget-list">' + list + '</div></div>';
+          '<div class="widget-body"><div class="wt-list">' + list + '</div></div>' +
+          '<div class="widget-foot">' + ADD + more + '</div>';
       }
     },
 
@@ -322,20 +345,31 @@
         var all = everything.filter(function (x) { return !x.archived; });
         all.sort(function (a, b) { return (b.updated_at || 0) - (a.updated_at || 0); });
         var recent = all.slice(0, 3);
-        var list = recent.length ? recent.map(function (n) {
+        var allBtn = total > recent.length
+          ? '<button type="button" class="widget-btn wn-all" data-act="notes-all">' + esc(tx('الكل', 'All')) + ' (' + total + ')</button>' : '';
+        var HD = head('<i class="fa-solid fa-note-sticky"></i>', tx('ملاحظات سريعة', 'Quick notes'));
+        if (!recent.length) {
+          return HD + '<div class="widget-body">' +
+              '<p class="widget-empty-text">' + esc(tx('اكتبْ فكرةً قبل أن تهرب — تجدها هنا وفي ملاحظاتك.',
+                                                     'Catch a thought before it slips — it stays here and in your notes.')) + '</p>' +
+              '<button type="button" class="wn-capture" data-act="note-add"><i class="fa-solid fa-plus" aria-hidden="true"></i>' +
+                esc(tx('اكتبْ ملاحظة…', 'Write a note…')) + '</button>' +
+            '</div>' + (allBtn ? '<div class="widget-foot">' + allBtn + '</div>' : '');
+        }
+        var list = recent.map(function (n) {
           var body = (n.body || '').trim() || tx('(فارغة)', '(empty)');
           /*@3.DASJ.30*/
-    var rem = n.remind_at ? '<span class="wn-rem"><i class="fa-solid fa-clock" aria-hidden="true"></i> ' + esc(String(n.remind_at).replace('T', ' ')) + '</span>' : '';
-          return '<button class="wn-item" data-act="note-edit" data-id="' + esc(n.id) + '">' +
-            '<span class="wn-body">' + esc(body.slice(0, 90)) + '</span>' + rem + '</button>';
-        }).join('') : '<div class="widget-sub">' + esc(tx('لا ملاحظات بعد — أضِف واحدة', 'No notes yet — add one')) + '</div>';
-        return head('<i class="fa-solid fa-note-sticky"></i>', tx('ملاحظات سريعة', 'Quick notes')) +
-          '<div class="widget-body">' +
-            '<div class="wn-list">' + list + '</div>' +
-            '<div class="wn-foot">' +
-              '<button class="wn-add" data-act="note-add">＋ ' + esc(tx('ملاحظة', 'Note')) + '</button>' +
-              (total > recent.length ? '<button class="wn-all" data-act="notes-all">' + esc(tx('الكل', 'All')) + ' (' + total + ')</button>' : '') +
-            '</div>' +
+          var meta = n.remind_at
+            ? '<span class="wn-rem"><i class="fa-solid fa-clock" aria-hidden="true"></i> ' + esc(String(n.remind_at).replace('T', ' ')) + '</span>'
+            : '<span class="wn-when">' + esc(noteWhen(n.updated_at)) + '</span>';
+          return '<button type="button" class="wn-item" data-act="note-edit" data-id="' + esc(n.id) + '">' +
+            '<span class="wn-body">' + esc(body.split('\n')[0].slice(0, 90)) + '</span>' + meta + '</button>';
+        }).join('');
+        return HD +
+          '<div class="widget-body"><div class="wn-list">' + list + '</div></div>' +
+          '<div class="widget-foot">' +
+            '<button type="button" class="widget-btn" data-act="note-add">＋ ' + esc(tx('ملاحظة', 'Note')) + '</button>' +
+            allBtn +
           '</div>';
       }
     },
@@ -376,8 +410,8 @@
 
   var TODAY_ROWS = 3;
   var TODAY_COLOUR = {
-    exam: 'var(--st-danger)', lecture: 'var(--st-accent)', study: 'var(--st-ok)',
-    intensive: 'var(--st-accent)', general: 'var(--st-warn)', task: 'var(--st-warn)'
+    exam: 'var(--st-danger)', lecture: 'var(--st-action)', study: 'var(--st-ok)',
+    intensive: 'var(--st-action)', general: 'var(--st-warn)', task: 'var(--st-warn)'
   };
   function todayName(e) {
     var code = e.code || '';
@@ -756,6 +790,55 @@
     return (n <= 10 ? n + ' ساعات' : n + ' ساعة');
   }
 
+  /*@3.DASJ.159*/
+  function termWeekText() {
+    var w = null;
+    try { w = D.termWindow ? D.termWindow() : null; } catch (e) {}
+    if (!w || !w.ok) return '';
+    var a = new Date(w.start + 'T00:00:00'), now = new Date(); now.setHours(0, 0, 0, 0);
+    var gone = Math.round((now - a) / 86400000);
+    var weeks = Math.max(1, Math.ceil(w.days / 7));
+    if (gone < 0) return tx('لم يبدأ الفصل بعد', 'Term has not started') + ' · ';
+    if (gone > w.days) return tx('انتهى الفصل', 'Term ended') + ' · ';
+    var wk = Math.min(weeks, Math.floor(gone / 7) + 1);
+    return tx('الأسبوع ' + wk + ' من ' + weeks, 'Week ' + wk + ' of ' + weeks) + ' · ';
+  }
+
+  /*@3.DASJ.158*/
+  function noteWhen(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return '';
+    var t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    var d0 = new Date(d); d0.setHours(0, 0, 0, 0);
+    var days = Math.round((t0 - d0) / 86400000);
+    var loc = isAr() ? 'ar' : 'en-US';
+    if (days <= 0) return tx('اليوم', 'Today');
+    if (days === 1) return tx('أمس', 'Yesterday');
+    if (days < 7) return d.toLocaleDateString(loc, { weekday: 'long' });
+    return d.toLocaleDateString(loc, { day: 'numeric', month: 'short' });
+  }
+
+  /*@3.DASJ.155*/
+  var EXAM_NAMES = { quiz: ['اختبار قصير', 'Quiz'], midterm: ['اختبار نصفيّ', 'Midterm'], final: ['اختبار نهائيّ', 'Final exam'] };
+  function courseNextLine(n) {
+    if (!n) return '';
+    var what = n.kind === 'lecture' ? tx('محاضرة', 'Lecture')
+      : n.kind === 'exam' ? tx.apply(null, EXAM_NAMES[n.type] || ['اختبار', 'Exam'])
+      : (n.label || tx('موعد', 'Deadline'));
+    var when = n.daysAway === 0 ? tx('اليوم', 'Today')
+      : n.daysAway === 1 ? tx('غداً', 'Tomorrow')
+      : n.date.toLocaleDateString(isAr() ? 'ar' : 'en-US', { weekday: 'long' });
+    var pill = '';
+    if (n.kind !== 'lecture' && n.daysAway > 1) {
+      var tone = n.daysAway <= 3 ? (n.kind === 'exam' ? 'danger' : 'warn') : '';
+      pill = '<span class="gcard-pill"' + (tone ? ' data-tone="' + tone + '"' : '') + '>' + esc(dueLabel(n.daysAway)) + '</span>';
+    }
+    return '<div class="gcard-next" data-kind="' + esc(n.kind) + '"><span class="gcard-next-dot" aria-hidden="true"></span>' +
+      '<span class="gcard-next-t">' + esc(what + ' · ' + when) + (n.time ? ' <bdi>' + esc(n.time) + '</bdi>' : '') + '</span>' +
+      pill + '</div>';
+  }
+
   function renderCourses() {
     var grids = [el('dash-courses'), el('dash-courses-full')].filter(Boolean);
     if (!grids.length) return;
@@ -768,43 +851,42 @@
       return;
     }
     /*@3.DASJ.53*/
+    var nextMap = D.courseNextMap ? D.courseNextMap(14) : {};
     var html = p.courses.map(function (c) {
       /*@3.DASJ.54*/
       var st = courseStyle(c.code, { brand_color: c.color });
       var color = st.color;
       var href = c.path || 'hub/index.html';
       var isReal = D.isRealCourse(c.code);
+      var name = isAr() ? c.name_ar : c.name_en;
       /*@3.DASJ.55*/
       var codeCell = c.custom
-        ? '<span class="dash-course-code dash-course-custom" data-ar="مخصّصة" data-en="Custom">' + esc(tx('مخصّصة', 'Custom')) + '</span>'
-        : '<a class="dash-course-code" href="' + esc(href) + '">' + esc(c.code) + '</a>';
-      return '<div class="dash-course-card" style="--course-color:' + esc(color) + '" data-course="' + esc(c.code) + '" ' +
-        'tabindex="0" role="link" aria-label="' + esc(isAr() ? c.name_ar : c.name_en) + '">' +
-        '<div class="dash-course-top">' +
+        ? '<span class="gcard-code dash-course-custom" data-ar="مخصّصة" data-en="Custom">' + esc(tx('مخصّصة', 'Custom')) + '</span>'
+        : '<a class="gcard-code" href="' + esc(href) + '">' + esc(c.code) + '</a>';
+      var facts = [esc(creditsText(c.credits))];
+      if (c.completed) facts.push('<span class="is-done">' + esc(tx('مكتملة ✓', 'Completed ✓')) + '</span>');
+      else if (c.pct > 0) facts.push(esc(tx('أنهيتَ ' + c.pct + '٪', c.pct + '% done')));
+      var corner = isReal
+        ? '<a class="gcard-corner" href="hub/course.html?code=' + encodeURIComponent(c.code) + '" ' +
+            'title="' + esc(tx('بطاقة المادة', 'Course card')) + '" aria-label="' + esc(tx('بطاقة المادة', 'Course card') + ' — ' + name) + '" ' +
+            'data-ar-title="بطاقة المادة" data-en-title="Course card"><i class="fa-solid fa-id-card" aria-hidden="true"></i></a>'
+        : '<button class="gcard-corner" type="button" data-act="course-style" data-id="' + esc(c.code) + '" ' +
+            'title="' + esc(tx('لون المادة وأيقونتها', 'Course color & icon')) + '" aria-label="' +
+            esc(tx('لون المادة وأيقونتها', 'Course color & icon') + ' — ' + name) + '" ' +
+            'data-ar-title="لون المادة وأيقونتها" data-en-title="Course color & icon"><i class="fa-solid fa-palette" aria-hidden="true"></i></button>';
+      return '<div class="dash-course-card gcard" style="--course-color:' + esc(color) + '" data-course="' + esc(c.code) + '" ' +
+        'tabindex="0" role="link" aria-label="' + esc(name) + '">' +
+        '<div class="gcard-top">' +
           /*@3.DASJ.56*/
-          '<span class="dash-course-icon"><i class="' + esc(st.icon) + '"></i></span>' +
-          codeCell +
-          (isReal ? '<a class="dash-course-info" href="hub/course.html?code=' + encodeURIComponent(c.code) + '" ' +
-            'title="' + esc(tx('بطاقة المادة', 'Course card')) + '" aria-label="' + esc(tx('بطاقة المادة', 'Course card')) + '" ' +
-            'data-ar="بطاقة المادة" data-en="Course card">' + esc(tx('بطاقة المادة', 'Course card')) + '</a>'
-            : '<button class="dash-course-style" data-act="course-style" data-id="' + esc(c.code) + '" ' +
-              'title="' + esc(tx('لون المادة وأيقونتها', 'Course color & icon')) + '" aria-label="' +
-              esc(tx('لون المادة وأيقونتها', 'Course color & icon')) + '"><i class="fa-solid fa-palette"></i></button>') +
-        '</div>' +
-        '<div class="dash-course-body">' +
-          '<a class="dash-course-name" href="' + esc(href) + '">' + esc(isAr() ? c.name_ar : c.name_en) + '</a>' +
-          /*@3.DASJ.57*/
-          '<p class="dash-course-desc">' + esc(isAr() ? c.desc_ar : c.desc_en) + '</p>' +
-          '<div class="dash-course-meta">' +
-            '<span>' + esc(creditsText(c.credits)) + '</span>' +
-            (c.completed ? '<span class="dash-course-st is-done"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>' +
-              esc(tx('مكتملة', 'Completed')) + '</span>' : '') +
-          '</div>' +
-        '</div>' +
-        '<div class="dash-course-prog">' +
-          '<span class="dash-course-bar"><span class="dash-course-fill" style="width:' + c.pct + '%"></span></span>' +
-          '<span class="dash-course-pct">' + c.pct + '%</span>' +
-        '</div></div>';
+          '<span class="gcard-ic"><i class="' + esc(st.icon) + '" aria-hidden="true"></i></span>' +
+          '<span class="gcard-id">' + codeCell + '<span class="gcard-sub">' + facts.join(' · ') + '</span></span>' +
+        '</div>' + corner +
+        '<a class="gcard-name" href="' + esc(href) + '">' + esc(name) + '</a>' +
+        /*@3.DASJ.57*/
+        ((c.completed ? '' : courseNextLine(nextMap[c.code])) ||
+          '<p class="gcard-desc">' + esc(isAr() ? c.desc_ar : c.desc_en) + '</p>') +
+        (c.pct > 0 && !c.completed ? '<span class="gcard-thread" aria-hidden="true"><i style="inline-size:' + c.pct + '%"></i></span>' : '') +
+        '</div>';
     }).join('');
     grids.forEach(function (g) { g.innerHTML = html; });
   }
@@ -1616,7 +1698,7 @@
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = actionText;
-      b.style.cssText = 'font:inherit;font-weight:800;color:#a78bfa;background:none;border:0;' +
+      b.style.cssText = 'font:inherit;font-weight:800;color:var(--st-action);background:none;border:0;' +
         'padding:0;cursor:pointer';
       b.addEventListener('click', function () { t.remove(); onUndo(); });
       t.appendChild(b);
