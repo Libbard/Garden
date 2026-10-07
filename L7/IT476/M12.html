@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT476" data-module="12" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الامتثال لمعيار أمان بيانات صناعة بطاقات الدفع (PCI DSS) للتجار · IT476 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT476" data-page-title-en="IT476">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M11.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=IT476"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#protecting-cardholder-data" class="toc-link" data-bilingual>
+        <template class="content-ar">حماية بيانات حامل البطاقة ونطاق بيئة البيانات</template>
+        <template class="content-en">Protecting Cardholder Data and CDE Scope</template>
+        <span class="content-target">حماية بيانات حامل البطاقة ونطاق بيئة البيانات</span>
+      </a>
+      <a href="#credit-card-elements" class="toc-link" data-bilingual>
+        <template class="content-ar">عناصر بطاقة الائتمان</template>
+        <template class="content-en">Credit Card Elements</template>
+        <span class="content-target">عناصر بطاقة الائتمان</span>
+      </a>
+      <a href="#pci-dss-framework-requirements" class="toc-link" data-bilingual>
+        <template class="content-ar">إطار عمل PCI DSS والمتطلبات الاثني عشر</template>
+        <template class="content-en">PCI DSS Framework and the 12 Requirements</template>
+        <span class="content-target">إطار عمل PCI DSS والمتطلبات الاثني عشر</span>
+      </a>
+      <a href="#pci-compliance-levels" class="toc-link" data-bilingual>
+        <template class="content-ar">الامتثال لمعيار PCI ومستويات التجار</template>
+        <template class="content-en">PCI Compliance and Merchant Levels</template>
+        <span class="content-target">الامتثال لمعيار PCI ومستويات التجار</span>
+      </a>
+      <a href="#compliance-assessment-roc" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم الامتثال وتقرير الامتثال (ROC)</template>
+        <template class="content-en">Compliance Assessment and ROC</template>
+        <span class="content-target">تقييم الامتثال وتقرير الامتثال (ROC)</span>
+      </a>
+      <a href="#self-assessment-questionnaire-saq" class="toc-link" data-bilingual>
+        <template class="content-ar">استبيان التقييم الذاتي (SAQ)</template>
+        <template class="content-en">Self Assessment Questionnaire (SAQ)</template>
+        <span class="content-target">استبيان التقييم الذاتي (SAQ)</span>
+      </a>
+      <a href="#penalties-for-noncompliance" class="toc-link" data-bilingual>
+        <template class="content-ar">عقوبات عدم الامتثال</template>
+        <template class="content-en">Penalties for Noncompliance</template>
+        <span class="content-target">عقوبات عدم الامتثال</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 12</template>
+      <template class="content-en">Module 12</template>
+      <span class="content-target">الوحدة 12</span>
+    </span> · IT476
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الامتثال لمعيار أمان بيانات صناعة بطاقات الدفع (PCI DSS) للتجار</h1>
+      <p class="hero-description">دراسة شاملة لإطار عمل معيار أمان بيانات صناعة بطاقات الدفع (PCI DSS)، بما في ذلك حماية بيانات حامل البطاقة، ومستويات الامتثال، وعمليات التقييم، والعقوبات المترتبة على عدم الامتثال.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">PCI Compliance for Merchants</h1>
+      <p class="hero-description">A comprehensive study of the PCI DSS framework, including protecting cardholder data, compliance levels, assessment processes, and penalties for noncompliance.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن المعلومات</span>
+      <span class="tag">بطاقات الدفع</span>
+      <span class="tag">الامتثال</span>
+      <span class="tag">إدارة المخاطر</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Information Security</span>
+      <span class="tag">Payment Cards</span>
+      <span class="tag">Compliance</span>
+      <span class="tag">Risk Management</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف إطار عمل معيار أمان بيانات صناعة بطاقات الدفع (PCI DSS).</span></li>
+      <li><span class="obj-icon">✦</span><span>التعرف على مسؤوليات التاجر تجاه حماية بيانات الدفع.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح المتطلبات الرئيسية الاثني عشر لمعيار PCI DSS.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم عملية التحقق من الامتثال لمعيار PCI DSS.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ الممارسات المتعلقة بالامتثال لمعيار PCI.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe the PCI Data Security Standard framework.</span></li>
+      <li><span class="obj-icon">✦</span><span>Recognize merchant responsibilities.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the 12 top-level requirements.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the PCI DSS validation process.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement practices related to PCI compliance.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="protecting-cardholder-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> حماية بيانات حامل البطاقة ونطاق بيئة البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Protecting Cardholder Data and CDE Scope</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ينطبق معيار PCI DSS على أي نظام يقوم بتخزين أو معالجة أو نقل بيانات الحساب، والتي تشمل بيانات حامل البطاقة وبيانات المصادقة الحساسة.</p></template>
+    <template class="content-en"><p>PCI DSS applies to any system storing, processing, or transmitting account data, which includes cardholder data and sensitive authentication data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ينطبق معيار PCI DSS على جميع مكونات النظام التي تتفاعل مع بيانات الحساب. تتكون بيانات الحساب من قسمين رئيسيين:</p><ul><li><b>بيانات حامل البطاقة (Cardholder Data):</b> تشمل رقم الحساب الأساسي (PAN)، واسم حامل البطاقة، وتاريخ الانتهاء، ورمز الخدمة.</li><li><b>بيانات المصادقة الحساسة (Sensitive Authentication Data):</b> تشمل البيانات الكاملة للشريط المغناطيسي، ورموز الأمان (CAV2/CVC2/CVV2/CID)، وأرقام التعريف الشخصية (PINs).</li></ul><p>تُعرف <span class="smart-term" data-term-en="Cardholder Data Environment (CDE)" data-ar="بيئة بيانات حامل البطاقة" data-en-def="The people, processes, and technology that handle cardholder data or sensitive authentication data.">بيئة بيانات حامل البطاقة<span class="smart-term-tooltip"></span></span> (CDE) بأنها الأشخاص والعمليات والتكنولوجيا التي تتعامل مع هذه البيانات. أي مكون شبكة أو خادم أو تطبيق متصل بهذه البيئة يعتبر جزءاً من مكونات النظام الخاضعة للمعيار.</p></template>
+    <template class="content-en"><p>PCI DSS applies to all system components where account data is stored, processed, or transmitted. Account data consists of two main parts:</p><ul><li><b>Cardholder Data:</b> Includes Primary Account Number (PAN), Cardholder name, Expiration date, and Service code.</li><li><b>Sensitive Authentication Data:</b> Includes Full magnetic stripe data, security codes (CAV2/CVC2/CVV2/CID), and PINs/PIN blocks.</li></ul><p>The <span class="smart-term" data-term-en="Cardholder Data Environment (CDE)" data-ar="بيئة بيانات حامل البطاقة" data-en-def="The people, processes, and technology that handle cardholder data or sensitive authentication data.">Cardholder Data Environment (CDE)<span class="smart-term-tooltip"></span></span> is defined as the people, processes, and technology that handle this data. Any network component, server, or application connected to the CDE is in scope.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التمييز بين بيانات حامل البطاقة وبيانات المصادقة الحساسة أمر بالغ الأهمية في الامتثال.</p><ul><li>يُسمح بتخزين <strong>بيانات حامل البطاقة (مثل PAN)</strong> إذا تم تشفيرها وحمايتها بشكل صحيح،</li><li>بينما يُحظر تماماً تخزين <strong>بيانات المصادقة الحساسة (مثل CVV2)</strong> بعد اكتمال عملية التفويض، حتى لو كانت مشفرة.</li></ul><p>تحديد نطاق بيئة بيانات حامل البطاقة (CDE) هو الخطوة الأولى والأكثر أهمية في أي تقييم للامتثال.</p><p>إذا لم يتم عزل الشبكات بشكل صحيح، فقد يمتد نطاق الامتثال ليشمل شبكة الشركة بأكملها، مما يزيد من التكلفة والجهد بشكل هائل.</p></template>
+    <template class="content-en"><p>The distinction between Cardholder Data and Sensitive Authentication Data is critical for compliance.</p><ul><li><strong>Cardholder data (like PAN)</strong> can be stored if properly encrypted and protected,</li><li>whereas <strong>Sensitive Authentication Data (like CVV2)</strong> must NEVER be stored after authorization is complete, even if encrypted.</li></ul><p>Scoping the Cardholder Data Environment (CDE) is the most crucial first step in an assessment.</p><p>If networks are not properly segmented, the scope of PCI compliance can bleed into the entire corporate network, drastically increasing compliance costs and effort.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a block diagram showing 'Account Data' splitting into two main branches: 'Cardholder Data' and 'Sensitive Authentication Data'. Under 'Cardholder Data', list PAN, Name, Expiration Date, Service Code. Under 'Sensitive Authentication Data', list Full Magnetic Stripe, CVV2/CVC2/CID, PINs. Use a dark background #0d1117, accent color #3b82f6. Include both Arabic and English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Root Node -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Diagram Title -->
+  <text class="gsvg-en" x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">PCI DSS Account Data Structure</text>
+  <text class="gsvg-ar" x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">هيكل بيانات الحساب في PCI DSS</text>
+
+  <!-- CDE Bounding Box -->
+  <rect x="50" y="140" width="700" height="360" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,8" />
+  <text class="gsvg-en" x="400" y="480" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">Cardholder Data Environment (CDE)</text>
+  <text class="gsvg-ar" x="400" y="480" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">بيئة بيانات حامل البطاقة (CDE)</text>
+
+  <!-- Connecting Lines from Root to Main Branches -->
+  <path d="M 400 120 L 400 145 L 240 145 L 240 165" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 120 L 400 145 L 580 145 L 580 165" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Root Node: Account Data -->
+  <rect x="280" y="70" width="240" height="50" rx="8" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="400" y="101" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)">Account Data</text>
+  <text class="gsvg-ar" x="400" y="101" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)">بيانات الحساب</text>
+
+  <!-- Left Branch: Cardholder Data -->
+  <rect x="120" y="170" width="240" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="240" y="201" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Cardholder Data</text>
+  <text class="gsvg-ar" x="240" y="201" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">بيانات حامل البطاقة</text>
+
+  <!-- Right Branch: Sensitive Authentication Data -->
+  <rect x="440" y="170" width="280" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="580" y="201" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Sensitive Authentication Data</text>
+  <text class="gsvg-ar" x="580" y="201" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">بيانات المصادقة الحساسة</text>
+
+  <!-- Left Sub-tree Lines -->
+  <path d="M 240 220 L 240 235 L 90 235 L 90 435" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 90 270 L 115 270" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 90 325 L 115 325" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 90 380 L 115 380" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 90 435 L 115 435" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Left Sub-tree Nodes -->
+  <rect x="120" y="250" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="240" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Primary Account Number (PAN)</text>
+  <text class="gsvg-ar" x="240" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">رقم الحساب الأساسي (PAN)</text>
+
+  <rect x="120" y="305" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="240" y="330" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Cardholder Name</text>
+  <text class="gsvg-ar" x="240" y="330" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">اسم حامل البطاقة</text>
+
+  <rect x="120" y="360" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="240" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Expiration Date</text>
+  <text class="gsvg-ar" x="240" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">تاريخ الانتهاء</text>
+
+  <rect x="120" y="415" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="240" y="440" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Service Code</text>
+  <text class="gsvg-ar" x="240" y="440" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">رمز الخدمة</text>
+
+  <!-- Right Sub-tree Lines -->
+  <path d="M 580 220 L 580 235 L 420 235 L 420 380" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 420 270 L 445 270" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 420 325 L 445 325" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 420 380 L 445 380" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Right Sub-tree Nodes -->
+  <rect x="450" y="250" width="260" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="580" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Full Magnetic Stripe Data</text>
+  <text class="gsvg-ar" x="580" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">بيانات الشريط المغناطيسي الكاملة</text>
+
+  <rect x="450" y="305" width="260" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="580" y="330" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">CAV2 / CVC2 / CVV2 / CID</text>
+  <text class="gsvg-ar" x="580" y="330" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">رموز الأمان (CAV2/CVC2/CVV2/CID)</text>
+
+  <rect x="450" y="360" width="260" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text class="gsvg-en" x="580" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">PINs &amp; PIN Blocks</text>
+  <text class="gsvg-ar" x="580" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">أرقام التعريف الشخصية (PINs)</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Cardholder Data</th><th>Sensitive Authentication Data</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المكونات</template>
+          <template class="content-en">Components</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">PAN، الاسم، تاريخ الانتهاء، رمز الخدمة</template>
+          <template class="content-en">PAN, Name, Expiration date, Service code</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الشريط المغناطيسي، CVV2/CVC2، أرقام PIN</template>
+          <template class="content-en">Mag stripe, CVV2/CVC2, PINs</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التخزين بعد التفويض</template>
+          <template class="content-en">Storage Post-Authorization</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مسموح (بشرط التشفير والحماية)</template>
+          <template class="content-en">Allowed (if encrypted/protected)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ممنوع منعاً باتاً</template>
+          <template class="content-en">Strictly Prohibited</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>QSA (Qualified Security Assessor)</th><th>ISA (Internal Security Assessor)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الانتماء المؤسسي</template>
+          <template class="content-en">Organizational Affiliation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">شركة خارجية مستقلة</template>
+          <template class="content-en">Independent external company</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">موظف داخل الشركة نفسها</template>
+          <template class="content-en">Employee within the sponsor company</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نطاق التقييم</template>
+          <template class="content-en">Assessment Scope</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يقيم امتثال شركات أخرى</template>
+          <template class="content-en">Assesses compliance of other companies</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يقيم امتثال شركته الخاصة فقط</template>
+          <template class="content-en">Assesses compliance for their own company only</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُمنع تخزين بيانات المصادقة الحساسة (مثل CVV2) بعد عملية الدفع حتى لو كانت مشفرة؟</template>
+      <template class="content-en">Why is storing Sensitive Authentication Data (like CVV2) prohibited after a transaction, even if encrypted?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن هذه البيانات تُستخدم للتحقق من وجود البطاقة فعلياً مع المستخدم. إذا تم تخزينها واختراقها، يمكن للمهاجمين إجراء عمليات شراء احتيالية عبر الإنترنت دون الحاجة للبطاقة الفعلية.</p></template>
+      <template class="content-en"><p>Because this data is used to verify the physical presence of the card. If stored and compromised, attackers can make fraudulent card-not-present (online) purchases.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="credit-card-elements" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> عناصر بطاقة الائتمان</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Credit Card Elements</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحتوي بطاقة الائتمان على عناصر مرئية ومخفية للتعريف والمصادقة، وتختلف مسميات رموز الأمان باختلاف الشركة المصدرة.</p></template>
+    <template class="content-en"><p>A credit card contains visible and hidden elements for identification and authentication, with security codes varying by brand.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون بطاقة الائتمان من عدة عناصر موزعة على الوجهين الأمامي والخلفي:</p><p><b>الوجه الأمامي:</b></p><ol><li>الشريحة المدمجة (Microchip): تحتوي على نفس معلومات الشريط المغناطيسي ولكن بشكل أكثر أماناً.</li><li><span class="smart-term" data-term-en="PAN" data-ar="رقم الحساب الأساسي" data-en-def="Primary Account Number; the unique payment card number (typically 15 or 16 digits) that identifies the issuer and the particular cardholder account.">رقم الحساب الأساسي<span class="smart-term-tooltip"></span></span> (PAN).</li><li>تاريخ الانتهاء (Expiration date).</li><li>اسم حامل البطاقة (Cardholder name).</li></ol><p><b>الوجه الخلفي:</b></p><ol><li>الشريط المغناطيسي (Magnetic stripe): يحتوي على بيانات مشفرة مطلوبة للمصادقة والتفويض.</li><li>رموز الأمان (Verification Numbers): تُستخدم للتحقق وتختلف تسميتها:<ul><li>CVV2: لبطاقات Visa.</li><li>CVC2: لبطاقات MasterCard.</li><li>CID: لبطاقات American Express.</li></ul></li></ol></template>
+    <template class="content-en"><p>A credit card consists of several elements distributed on the front and back:</p><p><b>Front of the card:</b></p><ol><li>Embedded microchip: contains the same information as the magnetic stripe but is more secure.</li><li>Primary account number (<span class="smart-term" data-term-en="PAN" data-ar="رقم الحساب الأساسي" data-en-def="Primary Account Number; the unique payment card number (typically 15 or 16 digits) that identifies the issuer and the particular cardholder account.">PAN<span class="smart-term-tooltip"></span></span>).</li><li>Expiration date.</li><li>Cardholder name.</li></ol><p><b>Back of the card:</b></p><ol><li>Magnetic stripe (mag stripe): contains encoded data required to authenticate, authorize, and process transactions.</li><li>Card security codes (Verification Numbers):<ul><li>CVV2: Visa.</li><li>CVC2: MasterCard.</li><li>CID: American Express.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعدد مسميات رموز الأمان (CVV2, CVC2, CID) يعود إلى العلامات التجارية المختلفة، ولكن الغرض الوظيفي واحد: توفير طبقة أمان إضافية للمعاملات التي تتم دون وجود البطاقة فعلياً (Card-Not-Present). الرقم '2' في CVV2 يشير إلى أنه الرمز المطبوع على البطاقة، بينما CVV1 يكون مشفراً داخل الشريط المغناطيسي.</p></template>
+    <template class="content-en"><p>The different acronyms for security codes (CVV2, CVC2, CID) are brand-specific, but their functional purpose is identical: providing an extra layer of security for Card-Not-Present (CNP) transactions. The '2' in CVV2 indicates it is the code printed on the card, whereas CVV1 is encoded within the magnetic stripe itself.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق بين البيانات الموجودة في الشريحة المدمجة وتلك الموجودة في الشريط المغناطيسي؟</template>
+      <template class="content-en">What is the difference between the data on the embedded microchip and the magnetic stripe?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تحتوي الشريحة على نفس المعلومات الأساسية ولكنها تستخدم التشفير الديناميكي لكل معاملة، مما يجعل استنساخها أصعب بكثير مقارنة بالشريط المغناطيسي الذي يحتوي على بيانات ثابتة.</p></template>
+      <template class="content-en"><p>The microchip contains the same basic info but uses dynamic encryption for each transaction, making it much harder to clone compared to the static data on a magnetic stripe.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pci-dss-framework-requirements" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> إطار عمل PCI DSS والمتطلبات الاثني عشر</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> PCI DSS Framework and the 12 Requirements</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتكون إطار عمل PCI DSS من 6 مبادئ أساسية تتفرع منها 12 متطلباً تقنياً وتشغيلياً صارماً لحماية بيانات الدفع.</p></template>
+    <template class="content-en"><p>The PCI DSS framework consists of 6 core principles that branch into 12 strict technical and operational requirements to protect payment data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتضمن إطار عمل PCI DSS شروطاً تتعلق بتخزين ونقل ومعالجة بيانات البطاقات. يعتمد على 6 مبادئ أساسية و 12 متطلباً:</p><ol><li><b>بناء وصيانة شبكة وأنظمة آمنة:</b><ul><li>1. تثبيت وصيانة جدار حماية (Firewall).</li><li>2. عدم استخدام <span class="smart-term" data-term-en="Vendor-supplied defaults" data-ar="الإعدادات الافتراضية للموردين" data-en-def="Default passwords and security settings provided by hardware/software manufacturers out-of-the-box, which must be changed.">الإعدادات الافتراضية للموردين<span class="smart-term-tooltip"></span></span> (Vendor-supplied defaults).</li></ul></li><li><b>حماية بيانات حامل البطاقة:</b><ul><li>3. حماية بيانات البطاقة المخزنة.</li><li>4. تشفير نقل البيانات عبر الشبكات العامة.</li></ul></li><li><b>الحفاظ على برنامج إدارة الثغرات:</b><ul><li>5. الحماية من البرمجيات الخبيثة وتحديث برامج مكافحة الفيروسات.</li><li>6. تطوير وصيانة أنظمة وتطبيقات آمنة.</li></ul></li><li><b>تنفيذ تدابير قوية للتحكم في الوصول:</b><ul><li>7. تقييد الوصول للبيانات بناءً على حاجة العمل (Need-to-know).</li><li>8. تحديد ومصادقة الوصول لمكونات النظام.</li><li>9. تقييد الوصول المادي (Physical access) للبيانات.</li></ul></li><li><b>مراقبة واختبار الشبكات بانتظام:</b><ul><li>10. تتبع ومراقبة جميع عمليات الوصول لموارد الشبكة.</li><li>11. اختبار أنظمة وعمليات الأمان بانتظام.</li></ul></li><li><b>الحفاظ على سياسة أمن المعلومات:</b><ul><li>12. الحفاظ على سياسة تعالج أمن المعلومات لجميع الموظفين.</li></ul></li></ol></template>
+    <template class="content-en"><p>The PCI DSS framework includes stipulations regarding storage, transmission, and processing of payment card data. It is based on 6 core principles and 12 requirements:</p><ol><li><b>Build and maintain a secure network and systems:</b><ul><li>1. Install and maintain a firewall configuration.</li><li>2. Do not use <span class="smart-term" data-term-en="Vendor-supplied defaults" data-ar="الإعدادات الافتراضية للموردين" data-en-def="Default passwords and security settings provided by hardware/software manufacturers out-of-the-box, which must be changed.">vendor-supplied defaults<span class="smart-term-tooltip"></span></span> for passwords/security parameters.</li></ul></li><li><b>Protect Cardholder Data:</b><ul><li>3. Protect stored card data.</li><li>4. Encrypt transmission of cardholder data across open, public networks.</li></ul></li><li><b>Maintain a Vulnerability Management Program:</b><ul><li>5. Protect all systems against malware and regularly update antivirus.</li><li>6. Develop and maintain secure systems and architecture.</li></ul></li><li><b>Implement Strong Access Control Measures:</b><ul><li>7. Restrict access to cardholder data by business need-to-know.</li><li>8. Identify and authenticate access to system components.</li><li>9. Restrict physical access to cardholder data.</li></ul></li><li><b>Regularly Monitor and Test Networks:</b><ul><li>10. Track and monitor all access to network resources and cardholder data.</li><li>11. Regularly test security systems and processes.</li></ul></li><li><b>Maintain an Information Security Policy:</b><ul><li>12. Maintain a policy that addresses information security for all personnel.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه المتطلبات الاثني عشر ليست مجرد إرشادات، بل هي ضوابط إلزامية. الفشل في تلبية أي متطلب فرعي ضمن هذه المتطلبات الاثني عشر يؤدي إلى عدم الامتثال الكامل.</p><p>المتطلب رقم 3 (حماية البيانات المخزنة) والمتطلب رقم 4 (التشفير أثناء النقل) هما الأكثر عرضة للانتهاك في حالات اختراق البيانات. كما أن المتطلب رقم 2 يؤكد على خطورة ترك كلمات المرور الافتراضية لأجهزة التوجيه وقواعد البيانات، وهي ثغرة شائعة جداً.</p></template>
+    <template class="content-en"><p>These 12 requirements are not mere guidelines; they are mandatory controls. Failing to meet even a single sub-requirement within these 12 leads to an overall non-compliant status.</p><p>Requirement 3 (protecting stored data) and Requirement 4 (encryption in transit) are the most frequently cited failures during data breaches. Requirement 2 highlights the severe risk of leaving default passwords on routers and databases, a notoriously common vulnerability.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر 'تقييد الوصول المادي' (المتطلب 9) جزءاً من معايير أمن البيانات الرقمية؟</template>
+      <template class="content-en">Why is 'restricting physical access' (Requirement 9) part of a digital data security standard?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الوصول المادي إلى الخوادم أو أجهزة الشبكة يسمح للمهاجم بتجاوز العديد من الضوابط الرقمية (مثل جدران الحماية)، مما يمكنه من سرقة البيانات مباشرة أو زرع أجهزة تنصت.</p></template>
+      <template class="content-en"><p>Because physical access to servers or network devices allows an attacker to bypass many digital controls (like firewalls), enabling them to steal data directly or plant skimming devices.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pci-compliance-levels" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الامتثال لمعيار PCI ومستويات التجار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> PCI Compliance and Merchant Levels</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الامتثال لمعيار PCI ليس قانوناً حكومياً بل التزام تعاقدي، ويتم تصنيف التجار إلى 4 مستويات بناءً على حجم المعاملات السنوية.</p></template>
+    <template class="content-en"><p>PCI compliance is not a government law but a contractual obligation, and merchants are categorized into 4 levels based on annual transaction volume.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الامتثال لمعايير PCI هو التزام تعاقدي يُفرض على جميع الكيانات المشاركة في قناة بطاقات الدفع (التجار، المعالجون، المؤسسات المالية، مزودو الخدمات). <span class="smart-term" data-term-en="Merchant" data-ar="التاجر" data-en-def="Any entity that accepts payment cards as payment for goods and/or services (including donations).">التاجر<span class="smart-term-tooltip"></span></span> هو أي كيان يقبل بطاقات الدفع مقابل السلع أو الخدمات (بما في ذلك التبرعات).</p><p>ينقسم التحقق من الامتثال إلى أربعة مستويات (بناءً على معاملات Visa):</p><ol><li><b>المستوى 1 (Level 1):</b> يعالج أكثر من 6 ملايين معاملة سنوياً.</li><li><b>المستوى 2 (Level 2):</b> يعالج من مليون إلى 6 ملايين معاملة سنوياً.</li><li><b>المستوى 3 (Level 3):</b> أي تاجر يعالج من 20,000 إلى مليون معاملة تجارة إلكترونية (e-commerce) سنوياً.</li><li><b>المستوى 4 (Level 4):</b> أي تاجر يعالج أقل من 20,000 معاملة تجارة إلكترونية، وجميع التجار الآخرين الذين يعالجون ما يصل إلى مليون معاملة سنوياً.</li></ol></template>
+    <template class="content-en"><p>Complying with PCI standards is a contractual obligation (not a government regulation or law) that applies to all entities involved in the payment card channel. A <span class="smart-term" data-term-en="Merchant" data-ar="التاجر" data-en-def="Any entity that accepts payment cards as payment for goods and/or services (including donations).">merchant<span class="smart-term-tooltip"></span></span> is any entity that accepts payment cards for goods/services (including donations).</p><p>PCI compliance validation is composed of four levels (based on Visa transactions):</p><ol><li><b>Level 1:</b> Processes more than 6 million transactions annually.</li><li><b>Level 2:</b> Processes 1 million to 6 million transactions per year.</li><li><b>Level 3:</b> Any merchant processing 20,000 to 1,000,000 e-commerce transactions per year.</li><li><b>Level 4:</b> Any merchant processing fewer than 20,000 e-commerce transactions, and all other merchants processing up to 1 million transactions per year.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على الرغم من أن PCI DSS ليس قانوناً فيدرالياً، إلا أن الفشل في الامتثال يمكن أن يؤدي إلى غرامات ضخمة تفرضها شركات البطاقات على البنوك المستحوذة، والتي بدورها تمررها إلى التاجر، وقد تصل إلى سحب حق قبول البطاقات تماماً.</p><p>تحديد المستوى يحدد نوع التقييم المطلوب؛ تجار المستوى الأول ملزمون بإجراء تقييم ميداني سنوي بواسطة مقيّم خارجي (QSA)، بينما يمكن للمستويات الأدنى غالباً استخدام استبيان التقييم الذاتي (SAQ).</p></template>
+    <template class="content-en"><p>Although PCI DSS is not a federal law, failure to comply results in severe fines levied by card brands against acquiring banks, who pass them down to merchants, potentially culminating in the revocation of card processing privileges.</p><p>The merchant level dictates the validation requirements; Level 1 merchants require an annual onsite assessment by an external Qualified Security Assessor (QSA), whereas lower levels can often self-validate using a Self-Assessment Questionnaire (SAQ).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان التاجر يعالج 15,000 معاملة تجارة إلكترونية و 500,000 معاملة في المتجر الفعلي، ففي أي مستوى يصنف؟</template>
+      <template class="content-en">If a merchant processes 15,000 e-commerce transactions and 500,000 physical store transactions, what level are they?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يصنف في المستوى 4 (Level 4)، لأن معاملات التجارة الإلكترونية أقل من 20,000، وإجمالي المعاملات الأخرى أقل من مليون.</p></template>
+      <template class="content-en"><p>They are classified as Level 4, because their e-commerce transactions are under 20,000, and their total other transactions are up to 1 million.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="compliance-assessment-roc" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تقييم الامتثال وتقرير الامتثال (ROC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Compliance Assessment and ROC</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقييم الامتثال هو فحص ميداني سنوي يجريه مقيّم معتمد (QSA أو ISA) وينتج عنه تقرير الامتثال (ROC).</p></template>
+    <template class="content-en"><p>A Compliance Assessment is an annual onsite evaluation conducted by a certified assessor (QSA or ISA) resulting in a Report on Compliance (ROC).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تقييم الامتثال لأمن البيانات هو تقييم ميداني (On-Site) سنوي يتم إجراؤه بواسطة:</p><ul><li><b>QSA (مقيّم أمني مؤهل):</b> شركات خارجية مؤهلة من قبل مجلس PCI لتقييم امتثال الشركات الأخرى.</li><li><b>ISA (مقيّم أمني داخلي):</b> موظفون داخليون مؤهلون من قبل المجلس لإجراء التقييم لشركتهم الخاصة.</li></ul><p><b>منهجية التقييم:</b></p><ol><li>مراقبة إعدادات النظام.</li><li>مراقبة العمليات والإجراءات.</li><li>مراجعة الوثائق.</li><li>إجراء مقابلات مع مستخدمي النظام.</li><li>تشغيل بيانات اختبار عبر النظام (أخذ العينات).</li></ol><p>ينتج عن التقييم وثيقة <b><span class="smart-term" data-term-en="Report on Compliance (ROC)" data-ar="تقرير الامتثال" data-en-def="A document detailing the findings of an onsite PCI DSS assessment, including environment details and scan results.">تقرير الامتثال<span class="smart-term-tooltip"></span></span> (ROC)</b>، والتي تتضمن ملخصاً تنفيذياً، نطاق العمل، تفاصيل البيئة، نتائج الفحص، والملاحظات، بالإضافة إلى أوراق عمل <span class="smart-term" data-term-en="Compensating Controls" data-ar="الضوابط التعويضية" data-en-def="Alternative security measures used when an organization cannot meet a specific PCI DSS requirement directly.">الضوابط التعويضية<span class="smart-term-tooltip"></span></span> (Compensating Controls) إذا لزم الأمر.</p></template>
+    <template class="content-en"><p>A Data Security Compliance Assessment is an annual onsite evaluation conducted by either:</p><ul><li><b>QSA (Qualified Security Assessor):</b> External organizations qualified by the PCI Council to assess compliance.</li><li><b>ISA (Internal Security Assessor):</b> Internal employees qualified by the council to perform assessments for their own sponsor company.</li></ul><p><b>Assessment Methodology:</b></p><ol><li>Observe system settings.</li><li>Observe processes and actions.</li><li>Review documentations.</li><li>Interview system users.</li><li>Run test data through system (Sampling).</li></ol><p>The assessment results in a <b><span class="smart-term" data-term-en="Report on Compliance (ROC)" data-ar="تقرير الامتثال" data-en-def="A document detailing the findings of an onsite PCI DSS assessment, including environment details and scan results.">Report on Compliance (ROC)<span class="smart-term-tooltip"></span></span></b> document, which includes an Executive Summary, Scope of Work, Environment Details, Scan Results, Findings, and <span class="smart-term" data-term-en="Compensating Controls" data-ar="الضوابط التعويضية" data-en-def="Alternative security measures used when an organization cannot meet a specific PCI DSS requirement directly.">Compensating Controls<span class="smart-term-tooltip"></span></span> Worksheets (if applicable).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تبدأ العملية عادةً بتقييم الفجوات (GAP assessment) لتحديد مجالات عدم الامتثال قبل التقييم النهائي. إذا لم تتمكن الشركة من تلبية متطلب أمني معين لأسباب تقنية أو تجارية مشروعة، يمكنها استخدام 'الضوابط التعويضية' (Compensating Controls)، وهي تدابير بديلة تخفف من المخاطر بنفس مستوى المتطلب الأصلي.</p></template>
+    <template class="content-en"><p>The process typically begins with a GAP assessment to identify areas of noncompliance and provide remediation recommendations before the final assessment. If an organization cannot meet a specific security requirement due to legitimate technical or business constraints, they can use 'Compensating Controls'—alternative measures that mitigate the risk to the same level as the original requirement.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يُسمح باستخدام الضوابط التعويضية (Compensating Controls)؟</template>
+      <template class="content-en">When is it permissible to use Compensating Controls?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يُسمح بها فقط عندما لا تتمكن المؤسسة من تلبية متطلب أمني لأسباب تقنية أو تجارية مشروعة، بشرط أن يوفر الضابط البديل حماية مكافئة للمتطلب الأصلي.</p></template>
+      <template class="content-en"><p>They are allowed only when an organization cannot meet a requirement due to legitimate technical or business constraints, provided the alternative control offers equivalent protection.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="self-assessment-questionnaire-saq" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> استبيان التقييم الذاتي (SAQ)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Self Assessment Questionnaire (SAQ)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استبيان التقييم الذاتي (SAQ) هو أداة تحقق للتجار الذين لا يُطلب منهم إجراء تقييم ميداني، ويتطلب إجابات بنعم أو شرح للضوابط التعويضية.</p></template>
+    <template class="content-en"><p>The Self Assessment Questionnaire (SAQ) is a validation tool for merchants not required to undergo an onsite assessment, requiring 'yes' answers or compensating control explanations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="SAQ" data-ar="استبيان التقييم الذاتي" data-en-def="Self Assessment Questionnaire; a validation tool for eligible merchants to self-evaluate their PCI DSS compliance.">استبيان التقييم الذاتي<span class="smart-term-tooltip"></span></span> (SAQ) هو أداة تحقق تُستخدم من قبل التجار الذين لا يُطلب منهم الخضوع لتقييم أمني ميداني (عادةً المستويات 2 و 3 و 4). يتكون الـ SAQ من جزأين:</p><ol><li>استبيان الضوابط (The controls questionnaire).</li><li>شهادة/تأكيد معتمد ذاتياً (Self-certified attestation).</li></ol><p>لتحقيق الامتثال، يجب أن تكون الإجابة على كل سؤال إما 'نعم' (Yes) أو تقديم شرح لضابط تعويضي. إذا لم يتمكن الكيان من تقديم إجابات إيجابية، فإنه لا يزال ملزماً بتقديم الـ SAQ مع تحديد تاريخ مستهدف للامتثال وخطة عمل (Action plan).</p></template>
+    <template class="content-en"><p>The Self Assessment Questionnaire (<span class="smart-term" data-term-en="SAQ" data-ar="استبيان التقييم الذاتي" data-en-def="Self Assessment Questionnaire; a validation tool for eligible merchants to self-evaluate their PCI DSS compliance.">SAQ<span class="smart-term-tooltip"></span></span>) is a validation tool for merchants that are not required to submit to an onsite data security assessment (typically Levels 2, 3, and 4). There are two parts to the SAQ:</p><ol><li>The controls questionnaire.</li><li>Self-certified attestation/confirmation.</li></ol><p>In order to achieve compliance, the response to each question must either be 'yes' or an explanation of a compensating control. If an entity cannot provide affirmative responses, it is still required to submit an SAQ along with a target date for compliance and an action plan.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الـ SAQ ليس مجرد نموذج روتيني؛ التوقيع عليه يعتبر إقراراً قانونياً بحالة الأمان. تقديم معلومات كاذبة في الـ SAQ يمكن أن يؤدي إلى عواقب وخيمة في حالة حدوث اختراق، حيث سيتم اعتبار التاجر مهملاً بشكل متعمد.</p></template>
+    <template class="content-en"><p>The SAQ is not just a routine form; signing the attestation is a binding declaration of the security posture. Providing false information on an SAQ can lead to severe consequences in the event of a breach, as the merchant will be deemed willfully negligent.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يجب على التاجر فعله إذا كانت إجابته 'لا' على أحد أسئلة SAQ؟</template>
+      <template class="content-en">What must a merchant do if their answer is 'no' to an SAQ question?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب عليه تقديم الاستبيان مع إرفاق خطة عمل (Action plan) وتاريخ مستهدف (Target date) لتحقيق الامتثال لهذا المتطلب.</p></template>
+      <template class="content-en"><p>They must submit the SAQ along with an action plan and a target date for achieving compliance for that specific requirement.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="penalties-for-noncompliance" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> عقوبات عدم الامتثال</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Penalties for Noncompliance</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عدم الامتثال لمعيار PCI يؤدي إلى غرامات مالية، وتحمل تكاليف الاحتيال، وإصدار البطاقات البديلة، وتُدفع الغرامات مبدئياً من قبل البنك المصدر ثم تُمرر للتاجر.</p></template>
+    <template class="content-en"><p>PCI noncompliance leads to financial fines, liability for fraud losses, and card reissuance costs, initially paid by the issuing bank and passed to the merchant.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك ثلاثة أنواع رئيسية من الغرامات لعدم الامتثال:</p><ol><li><b>غرامات عدم الامتثال لـ PCI:</b> غرامات تقديرية تختلف بشكل كبير حسب الظروف.</li><li><b>ADCR (<span class="smart-term" data-term-en="ADCR" data-ar="استرداد اختراق بيانات الحساب" data-en-def="Account Data Compromise Recovery; fines applied for compromised domestic-issued cards.">استرداد اختراق بيانات الحساب<span class="smart-term-tooltip"></span></span>):</b> للبطاقات المخترقة المصدرة محلياً.</li><li><b>DCRS (<span class="smart-term" data-term-en="DCRS" data-ar="حل استرداد اختراق البيانات" data-en-def="Data Compromise Recovery Solution; fines applied for compromised international-issued cards.">حل استرداد اختراق البيانات<span class="smart-term-tooltip"></span></span>):</b> للبطاقات المخترقة المصدرة دولياً.</li></ol><p>بالإضافة إلى الغرامات، قد يتحمل الكيان المخالف العقوبات التالية:</p><ul><li>جميع خسائر الاحتيال المرتكبة باستخدام أرقام الحسابات المخترقة.</li><li>تكلفة إعادة إصدار البطاقات المرتبطة بالاختراق.</li><li>أي تكاليف لمنع/اكتشاف الاحتيال يتكبدها مصدرو البطاقات.</li><li>زيادة رسوم المعاملات.</li></ul><p>ملاحظة هامة: يتم دفع الغرامة بواسطة البنك المصدر (Issuing bank)، والذي قد يمررها بدوره إلى التاجر.</p></template>
+    <template class="content-en"><p>There are three main types of fines for noncompliance:</p><ol><li><b>PCI noncompliance:</b> Discretionary penalties that vary greatly depending on circumstances.</li><li><b><span class="smart-term" data-term-en="ADCR" data-ar="استرداد اختراق بيانات الحساب" data-en-def="Account Data Compromise Recovery; fines applied for compromised domestic-issued cards.">ADCR<span class="smart-term-tooltip"></span></span> (Account Data Compromise Recovery):</b> For compromised domestic-issued cards.</li><li><b><span class="smart-term" data-term-en="DCRS" data-ar="حل استرداد اختراق البيانات" data-en-def="Data Compromise Recovery Solution; fines applied for compromised international-issued cards.">DCRS<span class="smart-term-tooltip"></span></span> (Data Compromise Recovery Solution):</b> For compromised international-issued cards.</li></ol><p>In addition, the entity may be liable for the following penalties:</p><ul><li>All fraud losses perpetrated using the compromised account numbers.</li><li>Cost of reissuance of cards associated with the compromise.</li><li>Any fraud prevention/detection costs incurred by credit card issuers.</li><li>Increased transaction fees.</li></ul><p>Important note: The fine is paid by the issuing bank, which may be passed on to the merchant.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الهيكل المالي لعقوبات PCI مصمم بحيث لا تتعامل شركات البطاقات (مثل Visa) مباشرة مع التاجر. بدلاً من ذلك، تفرض Visa الغرامة على البنك المستحوذ/المصدر، والذي يستخدم عقده مع التاجر لخصم هذه الغرامات من حساب التاجر. هذا يضمن لشركات البطاقات الحصول على أموالها بغض النظر عن حالة التاجر المالية.</p></template>
+    <template class="content-en"><p>The financial structure of PCI penalties is designed so that card brands (like Visa) do not deal directly with the merchant. Instead, Visa fines the acquiring/issuing bank, which then uses its merchant agreement to debit these fines directly from the merchant's accounts. This ensures the card brands are compensated regardless of the merchant's financial solvency.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تفرض شركات البطاقات (مثل Visa) الغرامات مباشرة على التاجر؟</template>
+      <template class="content-en">Why don't card brands (like Visa) fine the merchant directly?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن العقد القانوني لشركة البطاقات يكون مع البنك (المستحوذ/المصدر)، بينما عقد التاجر يكون مع البنك. لذلك يتم تمرير الغرامة عبر سلسلة العقود.</p></template>
+      <template class="content-en"><p>Because the card brand's legal contract is with the bank (acquirer/issuer), while the merchant's contract is with the bank. Fines are passed down the contractual chain.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا قادة الأمن السيبراني في المستقبل. في هذه الوحدة، ننتقل من النظريات التقنية البحتة إلى عالم الأعمال الحقيقي: كيف نحمي أموال الناس؟ معيار PCI DSS ليس مجرد قائمة تدقيق مملة، بل هو خط الدفاع الأول ضد الاحتيال المالي العالمي. تذكروا دائماً للامتحان التمييز الحاسم بين 'بيانات حامل البطاقة' (التي يمكن تخزينها بأمان) و'بيانات المصادقة الحساسة' (التي يجب التخلص منها فوراً). ركزوا على فهم المستويات الأربعة للتجار، وكيف يختلف التقييم الميداني (ROC) عن التقييم الذاتي (SAQ). وأخيراً، لا تقعوا في فخ الاعتقاد بأن PCI قانون حكومي؛ إنه عقد صارم تحكمه البنوك وشركات البطاقات. استوعبوا هذه المفاهيم، وستكونون جاهزين ليس فقط للامتحان، بل لحماية أي مؤسسة تعملون بها مستقبلاً.</template>
+    <template class="content-en">Welcome, future cybersecurity leaders. In this module, we shift from pure technical theory to the real business world: how do we protect people's money? PCI DSS is not just a boring checklist; it's the frontline defense against global financial fraud. For the exam, always remember the critical distinction between 'Cardholder Data' (which can be stored securely) and 'Sensitive Authentication Data' (which must be discarded immediately). Focus on understanding the four merchant levels and how an onsite assessment (ROC) differs from a self-assessment (SAQ). Finally, don't fall into the trap of thinking PCI is a government law; it's a strict contract enforced by banks and card brands. Master these concepts, and you'll be ready not just for the exam, but to protect any organization you work for.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى معيار PCI DSS إذا لم يكن قانوناً حكومياً؟</template>
+          <template class="content-en">Why do we need PCI DSS if it's not a government law?</template>
+          <span class="content-target">لماذا نحتاج إلى معيار PCI DSS إذا لم يكن قانوناً حكومياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه التزام تعاقدي يحمي النظام المالي العالمي. بدون هذا المعيار الموحد، ستضع كل شركة قواعدها الخاصة، مما يسهل على القراصنة استغلال الثغرات وسرقة أموال العملاء.</template>
+          <template class="content-en">Because it is a contractual obligation that protects the global financial system. Without this unified standard, every company would set its own rules, making it easier for hackers to exploit vulnerabilities and steal customer funds.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن لمتجر إلكتروني تخزين رمز CVV2 لتسهيل عمليات الشراء المستقبلية للعميل؟</template>
+          <template class="content-en">Can an online store save the CVV2 code to make future purchases easier for the customer?</template>
+          <span class="content-target">هل يمكن لمتجر إلكتروني تخزين رمز CVV2 لتسهيل عمليات الشراء المستقبلية للعميل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، يُمنع منعاً باتاً تخزين رمز CVV2 (أو أي بيانات مصادقة حساسة) بعد اكتمال عملية التفويض، حتى لو كان مشفراً. هذا انتهاك مباشر لمعيار PCI.</template>
+          <template class="content-en">No, it is strictly prohibited to store the CVV2 code (or any sensitive authentication data) after authorization is complete, even if encrypted. This is a direct violation of PCI standards.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين QSA و ISA؟</template>
+          <template class="content-en">What is the difference between a QSA and an ISA?</template>
+          <span class="content-target">ما الفرق بين QSA و ISA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">QSA هو مقيّم خارجي مستقل يعمل لشركة معتمدة، بينما ISA هو موظف داخلي في الشركة تم تدريبه واعتماده لإجراء التقييم لشركته الخاصة.</template>
+          <template class="content-en">A QSA is an independent external assessor working for a certified company, whereas an ISA is an internal employee trained and certified to conduct the assessment for their own company.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا فشلت الشركة في تلبية أحد المتطلبات الاثني عشر؟</template>
+          <template class="content-en">What happens if a company fails to meet one of the 12 requirements?</template>
+          <span class="content-target">ماذا يحدث إذا فشلت الشركة في تلبية أحد المتطلبات الاثني عشر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعتبر الشركة غير ممتثلة (Non-compliant). يجب عليها إما إصلاح الخلل، أو تقديم 'ضابط تعويضي' (Compensating Control) يثبت أنها خففت المخاطر بطريقة بديلة.</template>
+          <template class="content-en">The company is considered non-compliant. They must either remediate the issue or provide a 'Compensating Control' proving they mitigated the risk through an alternative method.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يثبت تاجر صغير (المستوى 4) امتثاله؟</template>
+          <template class="content-en">How does a small merchant (Level 4) prove compliance?</template>
+          <span class="content-target">كيف يثبت تاجر صغير (المستوى 4) امتثاله؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عادةً عن طريق ملء استبيان التقييم الذاتي (SAQ) وتوقيع شهادة الامتثال، بدلاً من دفع تكاليف فحص ميداني مكلف.</template>
+          <template class="content-en">Typically by completing a Self-Assessment Questionnaire (SAQ) and signing an attestation of compliance, rather than paying for an expensive onsite audit.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي بيئة بيانات حامل البطاقة (CDE) ولماذا هي مهمة؟</template>
+          <template class="content-en">What is the Cardholder Data Environment (CDE) and why is it important?</template>
+          <span class="content-target">ما هي بيئة بيانات حامل البطاقة (CDE) ولماذا هي مهمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي كل الأنظمة والأشخاص والعمليات التي تتعامل مع بيانات البطاقات. تحديدها بدقة مهم لأنه يحدد 'نطاق' الفحص؛ أي نظام خارج CDE لا يخضع لمتطلبات PCI الصارمة.</template>
+          <template class="content-en">It is all systems, people, and processes that handle card data. Accurately defining it is important because it determines the 'scope' of the audit; any system outside the CDE is not subject to strict PCI requirements.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا توجد أسماء مختلفة لرمز الأمان (CVV2, CVC2, CID)؟</template>
+          <template class="content-en">Why are there different names for the security code (CVV2, CVC2, CID)?</template>
+          <span class="content-target">لماذا توجد أسماء مختلفة لرمز الأمان (CVV2, CVC2, CID)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن كل علامة تجارية لبطاقات الدفع (Visa, MasterCard, Amex) أطلقت اسماً خاصاً بها على هذه التقنية، لكن الوظيفة الأمنية متطابقة في جميعها.</template>
+          <template class="content-en">Because each payment card brand (Visa, MasterCard, Amex) trademarked their own name for the technology, but the security function is identical across all of them.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل المؤسسات الخيرية التي تقبل التبرعات ملزمة بمعيار PCI؟</template>
+          <template class="content-en">Are charities that accept donations bound by PCI standards?</template>
+          <span class="content-target">هل المؤسسات الخيرية التي تقبل التبرعات ملزمة بمعيار PCI؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، أي كيان يقبل بطاقات الدفع، سواء مقابل سلع أو خدمات أو تبرعات، يُعتبر 'تاجراً' ويجب أن يمتثل لمعيار PCI.</template>
+          <template class="content-en">Yes, any entity that accepts payment cards, whether for goods, services, or donations, is considered a 'merchant' and must comply with PCI standards.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو تقييم الفجوات (GAP assessment)؟</template>
+          <template class="content-en">What is a GAP assessment?</template>
+          <span class="content-target">ما هو تقييم الفجوات (GAP assessment)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو فحص أولي غير رسمي يُجرى قبل التقييم النهائي لاكتشاف نقاط الضعف وعدم الامتثال، مما يمنح الشركة فرصة لإصلاحها قبل إصدار التقرير الرسمي (ROC).</template>
+          <template class="content-en">It is an initial, unofficial audit conducted before the final assessment to discover weaknesses and noncompliance, giving the company a chance to fix them before the official ROC is issued.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي التكاليف الخفية لعدم الامتثال بخلاف الغرامات المباشرة؟</template>
+          <template class="content-en">What are the hidden costs of noncompliance besides direct fines?</template>
+          <span class="content-target">ما هي التكاليف الخفية لعدم الامتثال بخلاف الغرامات المباشرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تشمل تحمل تكاليف الاحتيال، وتكلفة إعادة إصدار البطاقات للعملاء المتضررين، وزيادة رسوم المعاملات المستقبلية، وفقدان ثقة العملاء.</template>
+          <template class="content-en">They include bearing the costs of fraud, the cost of reissuing cards to affected customers, increased future transaction fees, and loss of customer trust.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو اختصار PCI DSS؟",
+      "en": "What does PCI DSS stand for?"
+    },
+    "back": {
+      "definition": {
+        "ar": "معيار أمان بيانات صناعة بطاقات الدفع.",
+        "en": "Payment Card Industry Data Security Standard."
+      },
+      "example": {
+        "ar": "إطار عمل لحماية بيانات البطاقات.",
+        "en": "A framework to protect card data."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي بيئة بيانات حامل البطاقة (CDE)؟",
+      "en": "What is the Cardholder Data Environment (CDE)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الأشخاص والعمليات والتكنولوجيا التي تتعامل مع بيانات حامل البطاقة أو بيانات المصادقة الحساسة.",
+        "en": "The people, processes, and technology that handle cardholder data or sensitive authentication data."
+      },
+      "example": {
+        "ar": "خوادم قواعد البيانات التي تخزن أرقام البطاقات.",
+        "en": "Database servers storing card numbers."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "مما تتكون بيانات الحساب (Account Data)؟",
+      "en": "What does Account Data consist of?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بيانات حامل البطاقة + بيانات المصادقة الحساسة.",
+        "en": "Cardholder data plus sensitive authentication data."
+      },
+      "example": {
+        "ar": "رقم البطاقة (PAN) بالإضافة إلى رمز CVV2.",
+        "en": "The PAN plus the CVV2 code."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "اذكر عناصر بيانات حامل البطاقة (Cardholder Data).",
+      "en": "List the elements of Cardholder Data."
+    },
+    "back": {
+      "definition": {
+        "ar": "رقم الحساب الأساسي (PAN)، اسم حامل البطاقة، تاريخ الانتهاء، رمز الخدمة.",
+        "en": "Primary account number (PAN), Cardholder name, Expiration date, Service code."
+      },
+      "example": {
+        "ar": "الاسم المطبوع على واجهة البطاقة.",
+        "en": "The name printed on the front of the card."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "اذكر عناصر بيانات المصادقة الحساسة (Sensitive Authentication Data).",
+      "en": "List the elements of Sensitive Authentication Data."
+    },
+    "back": {
+      "definition": {
+        "ar": "بيانات الشريط المغناطيسي الكاملة، رموز الأمان (CAV2/CVC2/CVV2/CID)، وأرقام PIN.",
+        "en": "Full magnetic stripe data, CAV2/CVC2/CVV2/CID, PINs/PIN blocks."
+      },
+      "example": {
+        "ar": "الرقم السري المكون من 3 أرقام خلف البطاقة.",
+        "en": "The 3-digit code on the back of the card."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو PAN؟",
+      "en": "What is PAN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رقم الحساب الأساسي (Primary Account Number).",
+        "en": "Primary Account Number."
+      },
+      "example": {
+        "ar": "الرقم الطويل المكون من 16 رقماً على البطاقة.",
+        "en": "The long 16-digit number on the card."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي رموز CVV2 و CVC2 و CID؟",
+      "en": "What are CVV2, CVC2, and CID?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رموز أمان البطاقة (أرقام التحقق) للعلامات التجارية المختلفة (Visa, MasterCard, Amex).",
+        "en": "Card security codes (Verification Numbers) for different payment brands."
+      },
+      "example": {
+        "ar": "CVV2 لبطاقات Visa.",
+        "en": "CVV2 is for Visa."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو تاجر المستوى الأول (Level 1 Merchant)؟",
+      "en": "What is a Level 1 Merchant?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التاجر الذي يعالج أكثر من 6 ملايين معاملة بطاقة دفع Visa سنوياً.",
+        "en": "A merchant that processes more than 6 million Visa payment card transactions annually."
+      },
+      "example": {
+        "ar": "شركات التجزئة العالمية الكبرى مثل Amazon.",
+        "en": "Large global retailers like Amazon."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو تاجر المستوى الرابع (Level 4 Merchant)؟",
+      "en": "What is a Level 4 Merchant?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التاجر الذي يعالج أقل من 20,000 معاملة تجارة إلكترونية، أو ما يصل إلى مليون معاملة أخرى سنوياً.",
+        "en": "A merchant processing fewer than 20,000 e-commerce transactions, or up to 1 million other transactions per year."
+      },
+      "example": {
+        "ar": "مقهى محلي صغير.",
+        "en": "A small local coffee shop."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو QSA؟",
+      "en": "What is a QSA?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقيّم أمني مؤهل (Qualified Security Assessor)؛ شركة خارجية معتمدة لتقييم الامتثال.",
+        "en": "Qualified Security Assessor; an external organization certified to assess compliance."
+      },
+      "example": {
+        "ar": "شركة استشارات أمنية تقوم بفحص أنظمة التاجر.",
+        "en": "A security consulting firm auditing a merchant."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو ISA؟",
+      "en": "What is an ISA?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقيّم أمني داخلي (Internal Security Assessor)؛ موظف معتمد لتقييم شركته الخاصة.",
+        "en": "Internal Security Assessor; an employee certified to assess their own company."
+      },
+      "example": {
+        "ar": "مدير أمن المعلومات في بنك يقوم بتقييم أنظمة البنك.",
+        "en": "A CISO at a bank assessing the bank's systems."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو تقييم الفجوات (GAP assessment)؟",
+      "en": "What is a GAP assessment?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقييم أولي لتحديد مجالات عدم الامتثال وتقديم توصيات للإصلاح قبل التقييم النهائي.",
+        "en": "An initial assessment to identify areas of noncompliance and provide remediation recommendations."
+      },
+      "example": {
+        "ar": "اكتشاف أن جدار الحماية غير معد بشكل صحيح قبل الفحص الرسمي.",
+        "en": "Discovering a misconfigured firewall before the official audit."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو ROC؟",
+      "en": "What is a ROC?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقرير الامتثال (Report on Compliance)؛ وثيقة تفصل نتائج التقييم الميداني.",
+        "en": "Report on Compliance; a document detailing the findings of an onsite assessment."
+      },
+      "example": {
+        "ar": "التقرير النهائي الذي يُسلم للبنك لإثبات الامتثال.",
+        "en": "The final report submitted to the bank to prove compliance."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي الضوابط التعويضية (Compensating Controls)؟",
+      "en": "What are Compensating Controls?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بدائل أمنية تُستخدم عندما لا يمكن تلبية متطلب أمني أصلي لأسباب مشروعة.",
+        "en": "Alternative security measures used when an original requirement cannot be met for legitimate reasons."
+      },
+      "example": {
+        "ar": "استخدام تشفير إضافي بدلاً من عزل الشبكة فعلياً.",
+        "en": "Using extra encryption instead of physical network isolation."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو SAQ؟",
+      "en": "What is an SAQ?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استبيان التقييم الذاتي (Self Assessment Questionnaire)؛ أداة تحقق للتجار الذين لا يحتاجون لتقييم ميداني.",
+        "en": "Self Assessment Questionnaire; a validation tool for merchants not requiring an onsite assessment."
+      },
+      "example": {
+        "ar": "نموذج يملؤه متجر صغير لتأكيد أمان أجهزته.",
+        "en": "A form a small shop fills out to confirm their devices are secure."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هو ADCR؟",
+      "en": "What is ADCR?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استرداد اختراق بيانات الحساب (Account Data Compromise Recovery)؛ غرامات للبطاقات المحلية المخترقة.",
+        "en": "Account Data Compromise Recovery; fines for compromised domestic-issued cards."
+      },
+      "example": {
+        "ar": "غرامة تُفرض عند تسريب بيانات بطاقات مصدرة داخل نفس البلد.",
+        "en": "A fine levied when domestic card data is leaked."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هو DCRS؟",
+      "en": "What is DCRS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حل استرداد اختراق البيانات (Data Compromise Recovery Solution)؛ غرامات للبطاقات الدولية المخترقة.",
+        "en": "Data Compromise Recovery Solution; fines for compromised international-issued cards."
+      },
+      "example": {
+        "ar": "غرامة تُفرض عند تسريب بيانات بطاقات مصدرة دولياً.",
+        "en": "A fine levied when international card data is leaked."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "هل الامتثال لمعيار PCI DSS يعتبر قانوناً حكومياً؟",
+      "en": "Is compliance with PCI DSS a government law?"
+    },
+    "options": {
+      "ar": [
+        "نعم، هو قانون فيدرالي.",
+        "لا، هو التزام تعاقدي تفرضه شركات البطاقات.",
+        "نعم، هو قانون دولي للأمن السيبراني.",
+        "لا، هو مجرد توصية اختيارية."
+      ],
+      "en": [
+        "Yes, it is a federal law.",
+        "No, it is a contractual obligation mandated by card brands.",
+        "Yes, it is an international cybersecurity law.",
+        "No, it is merely an optional recommendation."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الامتثال لمعيار PCI ليس تنظيماً حكومياً أو قانوناً، بل هو التزام تعاقدي ينطبق على جميع الكيانات المشاركة في قناة بطاقات الدفع.",
+      "en": "Compliance with PCI standards is not a government regulation or law; it is a contractual obligation for entities in the payment card channel."
+    },
+    "hint": {
+      "ar": "تذكر من يفرض هذه المعايير (شركات مثل Visa و MasterCard).",
+      "en": "Remember who mandates these standards (brands like Visa and MasterCard)."
+    },
+    "difficulty": "easy",
+    "conceptId": "pci-compliance-levels"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من البيانات التالية يُمنع منعاً باتاً تخزينها بعد اكتمال عملية التفويض؟",
+      "en": "Which of the following data is strictly prohibited from being stored after authorization is complete?"
+    },
+    "options": {
+      "ar": [
+        "اسم حامل البطاقة",
+        "تاريخ الانتهاء",
+        "رقم الحساب الأساسي (PAN)",
+        "رمز الأمان (CVV2)"
+      ],
+      "en": [
+        "Cardholder name",
+        "Expiration date",
+        "Primary Account Number (PAN)",
+        "Security code (CVV2)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "رموز الأمان (مثل CVV2) هي جزء من بيانات المصادقة الحساسة ولا يجوز تخزينها أبداً بعد التفويض.",
+      "en": "Security codes (like CVV2) are part of Sensitive Authentication Data and must never be stored post-authorization."
+    },
+    "hint": {
+      "ar": "ابحث عن البيانات التي تُستخدم للتحقق من وجود البطاقة فعلياً.",
+      "en": "Look for data used to verify the physical presence of the card."
+    },
+    "difficulty": "medium",
+    "conceptId": "protecting-cardholder-data"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "كم عدد المبادئ الأساسية والمتطلبات الرئيسية في إطار عمل PCI DSS؟",
+      "en": "How many core principles and top-level requirements are in the PCI DSS framework?"
+    },
+    "options": {
+      "ar": [
+        "4 مبادئ و 10 متطلبات",
+        "6 مبادئ و 12 متطلباً",
+        "5 مبادئ و 15 متطلباً",
+        "12 مبدأ و 6 متطلبات"
+      ],
+      "en": [
+        "4 principles and 10 requirements",
+        "6 principles and 12 requirements",
+        "5 principles and 15 requirements",
+        "12 principles and 6 requirements"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتكون إطار عمل PCI DSS من 6 مبادئ أساسية مصحوبة بـ 12 متطلباً رئيسياً.",
+      "en": "The PCI DSS consists of 6 core principles accompanied by 12 top-level requirements."
+    },
+    "hint": {
+      "ar": "تذكر الرقمين 6 و 12.",
+      "en": "Remember the numbers 6 and 12."
+    },
+    "difficulty": "easy",
+    "conceptId": "pci-dss-framework-requirements"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو تصنيف التاجر الذي يعالج أكثر من 6 ملايين معاملة بطاقة Visa سنوياً؟",
+      "en": "What is the classification of a merchant that processes more than 6 million Visa card transactions annually?"
+    },
+    "options": {
+      "ar": [
+        "المستوى 1 (Level 1)",
+        "المستوى 2 (Level 2)",
+        "المستوى 3 (Level 3)",
+        "المستوى 4 (Level 4)"
+      ],
+      "en": [
+        "Level 1",
+        "Level 2",
+        "Level 3",
+        "Level 4"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "تجار المستوى الأول هم الذين يعالجون أكثر من 6 ملايين معاملة سنوياً ويحتاجون إلى تقييم ميداني.",
+      "en": "Level 1 merchants process over 6 million transactions annually and require an onsite assessment."
+    },
+    "hint": {
+      "ar": "هذا هو أعلى مستوى من حجم المعاملات.",
+      "en": "This is the highest tier of transaction volume."
+    },
+    "difficulty": "easy",
+    "conceptId": "pci-compliance-levels"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "من يقوم بإجراء التقييم الأمني الميداني للامتثال لمعيار PCI؟",
+      "en": "Who conducts the onsite data security compliance assessment for PCI?"
+    },
+    "options": {
+      "ar": [
+        "الشرطة الفيدرالية",
+        "مقيّم أمني مؤهل (QSA) أو مقيّم أمني داخلي (ISA)",
+        "مدير تكنولوجيا المعلومات في الشركة فقط",
+        "شركة Visa مباشرة"
+      ],
+      "en": [
+        "Federal Police",
+        "Qualified Security Assessor (QSA) or Internal Security Assessor (ISA)",
+        "The company's IT Manager only",
+        "Visa directly"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتم إجراء التقييم الميداني السنوي بواسطة QSA (جهة خارجية) أو ISA (موظف داخلي معتمد).",
+      "en": "The annual onsite assessment is conducted by either a QSA (external) or an ISA (certified internal employee)."
+    },
+    "hint": {
+      "ar": "ابحث عن الاختصارات التي تنتهي بحرف A (Assessor).",
+      "en": "Look for the acronyms ending in A (Assessor)."
+    },
+    "difficulty": "medium",
+    "conceptId": "compliance-assessment-roc"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الغرض من 'أوراق عمل الضوابط التعويضية' في تقرير الامتثال (ROC)؟",
+      "en": "What is the purpose of 'Compensating Controls Worksheets' in the ROC?"
+    },
+    "options": {
+      "ar": [
+        "حساب الغرامات المالية للتاجر.",
+        "توفير بديل للمتطلبات الأمنية التي لا يمكن تلبيتها لأسباب مشروعة.",
+        "تسجيل أسماء الموظفين الذين فشلوا في التدريب الأمني.",
+        "طلب إعفاء كامل من معايير PCI."
+      ],
+      "en": [
+        "To calculate financial fines for the merchant.",
+        "To provide an alternative for security requirements that cannot be met for legitimate reasons.",
+        "To record names of employees who failed security training.",
+        "To request a complete exemption from PCI standards."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُعطي الضوابط التعويضية المؤسسات بديلاً للمتطلبات الأمنية التي لا يمكن تلبيتها، مع توفير اقتراحات لتخفيف المخاطر.",
+      "en": "Compensating controls give organizations an alternative to security requirements that cannot be met, providing suggestions to mitigate the risk."
+    },
+    "hint": {
+      "ar": "كلمة 'تعويضية' تعني تقديم بديل يعوض النقص.",
+      "en": "The word 'compensating' implies providing an alternative to make up for a shortfall."
+    },
+    "difficulty": "medium",
+    "conceptId": "compliance-assessment-roc"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ماذا يجب أن يفعل التاجر إذا لم يتمكن من الإجابة بـ 'نعم' على جميع أسئلة استبيان التقييم الذاتي (SAQ)؟",
+      "en": "What must a merchant do if they cannot answer 'yes' to all questions on the SAQ?"
+    },
+    "options": {
+      "ar": [
+        "تجاهل السؤال وتركه فارغاً.",
+        "تقديم الاستبيان مع تاريخ مستهدف للامتثال وخطة عمل.",
+        "التوقف عن قبول بطاقات الائتمان فوراً.",
+        "دفع غرامة فورية لشركة Visa."
+      ],
+      "en": [
+        "Ignore the question and leave it blank.",
+        "Submit the SAQ with a target date for compliance and an action plan.",
+        "Stop accepting credit cards immediately.",
+        "Pay an immediate fine to Visa."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا لم يتمكن الكيان من تقديم إجابات إيجابية، فإنه لا يزال ملزماً بتقديم الـ SAQ مع تحديد تاريخ مستهدف للامتثال وخطة عمل.",
+      "en": "If an entity cannot provide affirmative responses, it is still required to submit an SAQ along with a target date for compliance and an action plan."
+    },
+    "hint": {
+      "ar": "الشفافية مطلوبة؛ يجب إظهار نية الإصلاح.",
+      "en": "Transparency is required; intent to remediate must be shown."
+    },
+    "difficulty": "medium",
+    "conceptId": "self-assessment-questionnaire-saq"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "من يدفع الغرامة الأولية لعدم الامتثال لمعيار PCI؟",
+      "en": "Who pays the initial fine for PCI noncompliance?"
+    },
+    "options": {
+      "ar": [
+        "التاجر مباشرة لشركة Visa.",
+        "البنك المصدر (Issuing bank)، والذي قد يمررها للتاجر.",
+        "العميل (حامل البطاقة).",
+        "الحكومة الفيدرالية."
+      ],
+      "en": [
+        "The merchant directly to Visa.",
+        "The issuing bank, which may pass it on to the merchant.",
+        "The customer (cardholder).",
+        "The federal government."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُدفع الغرامة بواسطة البنك المصدر، والذي عادة ما يمرر التكلفة إلى التاجر المخالف.",
+      "en": "The fine is paid by the issuing bank, which typically passes the cost on to the noncompliant merchant."
+    },
+    "hint": {
+      "ar": "شركات البطاقات تتعامل مع البنوك، والبنوك تتعامل مع التجار.",
+      "en": "Card brands deal with banks, and banks deal with merchants."
+    },
+    "difficulty": "hard",
+    "conceptId": "penalties-for-noncompliance"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من المتطلبات التالية يندرج تحت مبدأ 'بناء وصيانة شبكة وأنظمة آمنة'؟",
+      "en": "Which of the following requirements falls under the principle 'Build and maintain a secure network and systems'?"
+    },
+    "options": {
+      "ar": [
+        "تشفير نقل بيانات حامل البطاقة.",
+        "عدم استخدام الإعدادات الافتراضية للموردين لكلمات المرور.",
+        "تقييد الوصول المادي لبيانات حامل البطاقة.",
+        "اختبار أنظمة الأمان بانتظام."
+      ],
+      "en": [
+        "Encrypt transmission of cardholder data.",
+        "Do not use vendor-supplied defaults for passwords.",
+        "Restrict physical access to cardholder data.",
+        "Regularly test security systems."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المتطلب 1 (جدار الحماية) والمتطلب 2 (عدم استخدام الإعدادات الافتراضية) يندرجان تحت المبدأ الأول لبناء شبكة آمنة.",
+      "en": "Requirement 1 (firewalls) and Requirement 2 (no vendor defaults) fall under the first principle of building a secure network."
+    },
+    "hint": {
+      "ar": "فكر في الإعدادات الأساسية للأجهزة عند تركيبها لأول مرة.",
+      "en": "Think about the basic settings of devices when first installed."
+    },
+    "difficulty": "hard",
+    "conceptId": "pci-dss-framework-requirements"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الرمز CID؟",
+      "en": "What is the CID code?"
+    },
+    "options": {
+      "ar": [
+        "رمز الأمان لبطاقات Visa.",
+        "رمز الأمان لبطاقات MasterCard.",
+        "رمز الأمان لبطاقات American Express.",
+        "رقم الحساب الأساسي للبطاقة."
+      ],
+      "en": [
+        "Security code for Visa cards.",
+        "Security code for MasterCard cards.",
+        "Security code for American Express cards.",
+        "The primary account number of the card."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "CID هو اختصار لرمز الأمان المستخدم في بطاقات American Express.",
+      "en": "CID is the acronym for the security code used on American Express cards."
+    },
+    "hint": {
+      "ar": "تذكر: CVV2 لـ Visa، CVC2 لـ MasterCard.",
+      "en": "Remember: CVV2 is Visa, CVC2 is MasterCard."
+    },
+    "difficulty": "easy",
+    "conceptId": "credit-card-elements"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">يعتقد الكثيرون أن معيار PCI DSS هو قانون حكومي يجب الالتزام به لتجنب السجن. الحقيقة أنه التزام تعاقدي تفرضه شركات البطاقات، وعقوبته مالية وتجارية (مثل سحب حق قبول البطاقات) وليست جنائية.</template>
+    <template class="content-en">Many believe PCI DSS is a government law required to avoid jail time. In reality, it is a contractual obligation mandated by card brands, and its penalties are financial and commercial (like losing the ability to process cards), not criminal.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">شركات البطاقات (مثل Visa) لا تغرم التاجر مباشرة أبداً. إنها تغرم البنك المستحوذ/المصدر، والذي يقوم بدوره بخصم الغرامة من حساب التاجر بناءً على العقد المبرم بينهما.</template>
+    <template class="content-en">Card brands (like Visa) never fine the merchant directly. They fine the acquiring/issuing bank, which in turn debits the fine from the merchant's account based on their merchant agreement.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري في التعامل مع البيانات: يُسمح بتخزين 'بيانات حامل البطاقة' (مثل رقم البطاقة PAN) إذا تم تشفيرها، بينما يُحظر تماماً تخزين 'بيانات المصادقة الحساسة' (مثل CVV2) بعد إتمام المعاملة، حتى لو كانت مشفرة.</template>
+    <template class="content-en">The fundamental difference in data handling: 'Cardholder Data' (like PAN) can be stored if encrypted, whereas 'Sensitive Authentication Data' (like CVV2) is strictly prohibited from being stored after the transaction, even if encrypted.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن التجار الصغار (المستوى 4) معفيون من الامتثال لمعيار PCI. الحقيقة أن جميع التجار ملزمون بالامتثال، ولكن طريقة التحقق تختلف (استبيان SAQ بدلاً من فحص ميداني).</template>
+    <template class="content-en">Believing that small merchants (Level 4) are exempt from PCI compliance. In truth, ALL merchants must comply, but the validation method differs (SAQ instead of an onsite audit).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M11.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>
