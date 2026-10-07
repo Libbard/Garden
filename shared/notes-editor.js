@@ -2191,8 +2191,9 @@
     };
     var acts = el('div', 'ne-img-acts');
     var edB = el('button', 'gsf-btn gsf-btn--go ne-img-ed', { type: 'button', 'data-imgedit': '1' });
-    edB.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span>' +
-      B().esc(L('تعديلُ الصورة', 'Edit image')) + '</span>';
+    edB.innerHTML = b.ms && b.ms.ln
+      ? '<i class="fa-solid fa-palette" aria-hidden="true"></i><span>' + B().esc(L('أكملِ التلوين في المرسم', 'Keep coloring in the studio')) + '</span>'
+      : '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span>' + B().esc(L('تعديلُ الصورة', 'Edit image')) + '</span>';
     acts.appendChild(edB);
     if (B().imgSrc(b.was)) {
       var orB = el('button', 'gsf-btn gsf-btn--ghost ne-img-orig', { type: 'button', 'data-imgorig': '1' });
@@ -2791,7 +2792,7 @@
     var b = hit.b;
     b.url = url;
     delete b.iar; delete b.inw;
-    if (!keep) { delete b.by; delete b.byLink; delete b.was; delete b.ie; delete b.loc; delete b.via; }
+    if (!keep) { delete b.by; delete b.byLink; delete b.was; delete b.ie; delete b.loc; delete b.via; delete b.ms; }
     if (extra) Object.assign(b, extra);
     this.pushUndo(before);
     this.renderOne(id);
@@ -2916,6 +2917,20 @@
     var hit = this.blockAt(id);
     if (!hit || hit.b.ty !== 'img' || !B().imgSrc(hit.b.url)) return;
     var b = hit.b;
+    if (b.ms && b.ms.ln && window.GardenNotesLibrary && GardenNotesLibrary.edit) {
+      GardenNotesLibrary.edit(b.ms, {
+        title: b.alt || '',
+        onSave: function (blob, ms) {
+          var S = window.GardenNotesStore;
+          if (!S || !S.putImage) return Promise.reject(new Error('no_store'));
+          return S.putImage(blob, { name: 'mirsam.webp' }).then(function (rid) {
+            if (!self.blockAt(id)) return false;
+            return self.imgSet(id, 'byte-local:' + rid, { loc: 1, ms: ms }, true);
+          });
+        }
+      });
+      return;
+    }
     var base = B().imgSrc(b.was) || b.url;
     var ie0 = b.ie || null;
     if (!ie0 && b.br != null && b.br !== 100) ie0 = { br: b.br };

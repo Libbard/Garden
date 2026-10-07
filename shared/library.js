@@ -58,9 +58,9 @@
 
   function picture(item, kind) {
     if (item.sticker) return '<span class="glib-pic glib-pic--st"><img src="' + item.sticker + '" alt="" loading="lazy" decoding="async"></span>';
-    if (item.thumb) return '<span class="glib-pic"><img class="glib-ref" src="' + item.peek + '" alt="" loading="lazy" decoding="async"><img class="glib-out" src="' + item.thumb + '" alt="" loading="lazy" decoding="async"></span>';
+    if (item.thumb) return '<span class="glib-pic"><img class="glib-ref" data-src="' + item.peek + '" alt="" decoding="async"><img class="glib-out" src="' + item.thumb + '" alt="" loading="lazy" decoding="async"></span>';
     var vb = '0 0 ' + item.vb + ' ' + item.vb;
-    return '<span class="glib-pic"><img class="glib-ref" src="' + item.svgUrl + '" alt="" loading="lazy" decoding="async">' +
+    return '<span class="glib-pic"><img class="glib-ref ok" src="' + item.svgUrl + '" alt="" loading="lazy" decoding="async">' +
       '<svg class="glib-out" viewBox="' + vb + '" aria-hidden="true" style="position:absolute;inset:6%;inline-size:88%;block-size:88%"><use href="' + item.svgUrl + '#line"/></svg></span>';
   }
 
@@ -119,8 +119,17 @@
       if (b.dataset.held) { delete b.dataset.held; return; }
       self.choose(self.list[+b.dataset.i]);
     });
+    var peek = function (e) {
+      var b = e.target.closest && e.target.closest('.glib-t'), r = b && b.querySelector('.glib-ref[data-src]');
+      if (!r) return;
+      r.onload = function () { r.classList.add('ok'); };
+      r.src = r.dataset.src; r.removeAttribute('data-src');
+    };
+    grid.addEventListener('pointerover', peek);
+    grid.addEventListener('focusin', peek);
     var hold = 0;
     grid.addEventListener('pointerdown', function (e) {
+      peek(e);
       var b = e.target.closest('.glib-t'); if (!b || e.pointerType === 'mouse') return;
       hold = setTimeout(function () { b.classList.add('is-peek'); b.dataset.held = '1'; }, 320);
     });
