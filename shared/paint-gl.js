@@ -378,11 +378,11 @@
     this.maskRect = [0, 0, 1, 1]; this.useMask = 0;
     this.k = opts.simScale || .5; this.sw = Math.ceil(W * this.k); this.sh = Math.ceil(H * this.k);
     this.wcReady = false;
-    this.view = { s: 1, x: 0, y: 0, w: canvas.width, h: canvas.height };
+    this.view = { s: 1, x: 0, y: 0, w: canvas.width, h: canvas.height }; this.full = true; this.part = null;
     this.tint = [1, .99, .965]; this.desk = [.13, .15, .19]; this.ink = [.1, .1, .12];
     this.undo = []; this.redo = []; this.rec = null; this.pages = []; this.free = [];
     this.maxPages = opts.undoPages || (Math.ceil(Math.ceil(this.W / TILE) * Math.ceil(this.H / TILE) / 64) + 2);
-    this.wet = null; this.dirty = true; this.expBox = null;
+    this.wet = null; this.dirty = this.full = true; this.expBox = null;
     this.clear(true);
     this.setPaper(opts.paper || 'draw');
   }
@@ -477,6 +477,7 @@
         this.copyRect(this.fbScr, this.fbMain, 0, 0, w, h, tx, ty, keepExp ? 2 : 3);
       }
     }
+    this.part = union(this.part, rect);
     this.dirty = true;
     return rect;
   };
@@ -549,7 +550,7 @@
       out[k] = cur;
     });
     r.t = out;
-    this.dirty = true;
+    this.dirty = this.full = true;
   };
   Surface.prototype.step = function (dir) {
     if (this.rec) this.end();
@@ -569,7 +570,7 @@
     this.draw(this.prog('init'), this.fbMain, this.W, this.H, null, function (p, g) { g.uniform4f(p.u.uV, 1, 1, 1, 0); });
     if (this.wcReady) [this.fbWA, this.fbWB].forEach(function (fb) { gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); });
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    this.wet = null; this.dirty = true;
+    this.wet = null; this.dirty = this.full = true;
     if (!silent) this.end();
   };
 
@@ -582,20 +583,20 @@
     if (this.wcReady) this.paperSim();
     this.relief = { smooth: 1.6, draw: 2.4, cold: 3.6, canvas: 3.2 }[kind];
     this.tint = { smooth: [1, .995, .985], draw: [1, .99, .965], cold: [1, .985, .955], canvas: [.985, .975, .95] }[kind];
-    this.dirty = true;
+    this.dirty = this.full = true;
   };
 
   Surface.prototype.setLines = function (src, sharp) {
-    if (!src) { this.hasLines = false; this.dirty = true; return; }
+    if (!src) { this.hasLines = false; this.dirty = this.full = true; return; }
     this.upload(this.lineT, src, [this.gl.R8, this.gl.RED, this.gl.UNSIGNED_BYTE]);
-    this.hasLines = true; this.lineSharp = sharp || (this.lineT.w / this.W); this.dirty = true;
+    this.hasLines = true; this.lineSharp = sharp || (this.lineT.w / this.W); this.dirty = this.full = true;
   };
   Surface.prototype.setGuide = function (src, a) {
     if (src) this.upload(this.guideT, src, [this.gl.RGBA8, this.gl.RGBA, this.gl.UNSIGNED_BYTE]);
-    this.guideA = src || a ? (a == null ? .5 : a) : 0; this.dirty = true;
+    this.guideA = src || a ? (a == null ? .5 : a) : 0; this.dirty = this.full = true;
   };
   Surface.prototype.setRef = function (src) { if (src) { this.upload(this.refT, src, [this.gl.RGBA8, this.gl.RGBA, this.gl.UNSIGNED_BYTE]); this.hasRef = true; } };
-  Surface.prototype.setRefMix = function (k) { this.refMix = this.hasRef ? Math.max(0, Math.min(1, k)) : 0; this.dirty = true; };
+  Surface.prototype.setRefMix = function (k) { this.refMix = this.hasRef ? Math.max(0, Math.min(1, k)) : 0; this.dirty = this.full = true; };
   Surface.prototype.setMask = function (mask) {
     var gl = this.gl;
     if (!mask) { this.useMask = 0; return; }
@@ -649,6 +650,7 @@
 
   Surface.prototype.dab = function (s, a, b, dwell) {
     var self = this;
+    this.nDab = (this.nDab || 0) + 1;
     if (s.tool === 'wash') return this.wcDab(s, a, b, dwell);
     var ra = Math.max(.5, s.r * s.rf(a)), rb = Math.max(.5, s.r * s.rf(b));
     var tz = b.tz || 0, az = b.az == null ? (s.az || 0) : b.az;
@@ -671,7 +673,7 @@
     var r = this.rec; this.rec = null; this.useMask = 0;
     if (s && s.tool === 'wash' && s.box) this.clearWet(s.box);
     if (r && Object.keys(r.t).length) { this.swapRec(r); this.dropRec(r); }
-    this.dirty = true;
+    this.dirty = this.full = true;
   };
 
   Surface.prototype.startStroke = function (s, pt) { this.dab(s, pt, pt, DWELL[s.tool] || 0); };
@@ -731,7 +733,7 @@
       g.uniform1f(p.u.uDepth, .35 * k / Math.max(1, passes - 1)); g.uniform1f(p.u.uFinish, 0); g.uniform3fv(p.u.uTint, self.tint);
     }, true);
     this.useMask = 0;
-    this.dirty = true;
+    this.dirty = this.full = true;
   };
 
   Surface.prototype.paintRef = function (tool, opt) {
@@ -791,7 +793,7 @@
     this.wetAt = this.simT || 0;
     s.box = union(s.box, full);
     s.load = Math.max(.12, s.load - .001 * Math.hypot(b.x - a.x, b.y - a.y) / Math.max(2, ra));
-    this.dirty = true;
+    this.dirty = this.full = true;
   };
 
   Surface.prototype.tick = function (dt) {
@@ -818,7 +820,7 @@
     if (finalDry) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbWA); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbWB); gl.clear(gl.COLOR_BUFFER_BIT); gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      this.wet = null; this.wetRec = null; this.dirty = true; return false;
+      this.wet = null; this.wetRec = null; this.dirty = this.full = true; return false;
     }
     return true;
   };
@@ -853,15 +855,15 @@
     w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
     if (this.canvas.width !== w) this.canvas.width = w;
     if (this.canvas.height !== h) this.canvas.height = h;
-    this.view.w = w; this.view.h = h; this.dirty = true;
+    this.view.w = w; this.view.h = h; this.dirty = this.full = true;
   };
-  Surface.prototype.setView = function (s, x, y) { this.view.s = s; this.view.x = x; this.view.y = y; this.dirty = true; };
-  Surface.prototype.setDesk = function (rgb) { this.desk = rgb; this.dirty = true; };
+  Surface.prototype.setView = function (s, x, y) { this.view.s = s; this.view.x = x; this.view.y = y; this.dirty = this.full = true; };
+  Surface.prototype.setDesk = function (rgb) { this.desk = rgb; this.dirty = this.full = true; };
 
   Surface.prototype.comp = function (fb, vw, vh, s, x, y, flip, opt) {
     var self = this;
     opt = opt || {};
-    this.draw(this.prog('comp'), fb, vw, vh, null, function (p, g) {
+    this.draw(this.prog('comp'), fb, vw, vh, fb ? null : this.compRect, function (p, g) {
       self.bindTex(p, 'uPig', self.pig, 0); self.bindTex(p, 'uAux', self.aux, 1); self.bindTex(p, 'uPaper', self.paperT, 2);
       self.bindTex(p, 'uLine', self.lineT, 3); self.bindTex(p, 'uGuide', self.guideT, 4); self.bindTex(p, 'uRef', self.refT, 5);
       if (self.wcReady) { self.bindTex(p, 'uW', self.wW[0], 6); self.bindTex(p, 'uP', self.wP[0], 7); }
@@ -875,9 +877,20 @@
     });
   };
   Surface.prototype.render = function () {
-    var v = this.view;
+    var v = this.view, r = null, P = this.part;
+    if (!this.full && P && !this.wet) {
+      var pad = Math.ceil(v.s) + 3;
+      var x0 = Math.max(0, Math.floor(v.x + P[0] * v.s) - pad), x1 = Math.min(v.w, Math.ceil(v.x + (P[0] + P[2]) * v.s) + pad);
+      var y0 = Math.max(0, Math.floor(v.y + P[1] * v.s) - pad), y1 = Math.min(v.h, Math.ceil(v.y + (P[1] + P[3]) * v.s) + pad);
+      if (x1 <= x0 || y1 <= y0) { this.part = null; this.dirty = false; return; }
+      r = [x0, v.h - y1, x1 - x0, y1 - y0];
+    }
+    this.compRect = r;
     this.comp(null, v.w, v.h, v.s, v.x, v.y, true);
-    this.dirty = false;
+    this.compRect = null;
+    this.stat = this.stat || { px: 0, n: 0, full: 0 };
+    this.stat.px += r ? r[2] * r[3] : v.w * v.h; this.stat.n++; if (!r) this.stat.full++;
+    this.part = null; this.full = false; this.dirty = false;
   };
 
   Surface.prototype.exportCanvas = function (opt) {
@@ -895,7 +908,7 @@
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.deleteFramebuffer(fb); gl.deleteTexture(t);
     var c = document.createElement('canvas'); c.width = ow; c.height = oh;
     var x = c.getContext('2d'), id = x.createImageData(ow, oh); id.data.set(px); x.putImageData(id, 0, 0);
-    this.dirty = true;
+    this.dirty = this.full = true;
     return c;
   };
 
@@ -912,7 +925,7 @@
     this.comp(fb, 1, 1, 1, -Math.floor(x) - .0, -Math.floor(y) - .0, false, { ref: 0, guide: 0, lines: false, paper: 0 });
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.deleteFramebuffer(fb); gl.deleteTexture(t);
-    this.dirty = true;
+    this.dirty = this.full = true;
     return [px[0], px[1], px[2]];
   };
 

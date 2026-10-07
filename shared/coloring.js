@@ -569,8 +569,9 @@
       box.textContent = 'gpu: ' + (self.gpu ? self.gpu.renderer : '?') + (self.gpu && self.gpu.soft ? '  [SOFTWARE]' : '') +
         '\ndpr: ' + (window.devicePixelRatio || 1) + ' -> ' + self.dpr() + '   view: ' + (c ? c.width + 'x' + c.height : '?') + '   doc: ' + self.W + 'x' + self.H +
         '\nfps: ' + fr + '   worst frame: ' + Math.round(worst) + 'ms   input/s: ' + ev + (mx ? ' (pen)' : '') +
+        '\nredraw: ' + (self.S.stat && self.S.stat.n ? Math.round(self.S.stat.px / self.S.stat.n / 1000) + 'k px/frame, full ' + self.S.stat.full + '/' + self.S.stat.n : '-') + '   dabs/s: ' + (self.S.nDab || 0) +
         '\nua: ' + navigator.userAgent.replace(/^.*?\) /, '').slice(0, 60);
-      fr = 0; worst = 0; ev = 0;
+      fr = 0; worst = 0; ev = 0; self.S.stat = null; self.S.nDab = 0;
     }, 1000);
   };
   Studio.prototype.sizeKey = function () { return this.tool === 'fill' || this.tool === 'pick' ? this.medium : this.tool; };
