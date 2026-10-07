@@ -2684,8 +2684,8 @@
     var sheet = ov.querySelector('.sch-sheet');
     sheet.style.setProperty('--event-color', ev.color);
     sheet.style.setProperty('--kind-color', ({
-      lecture:'#a78bfa', study:'#10b981', exam:'#ef4444', general:'#f59e0b', intensive:'#7c3aed'
-    })[ev.kind] || '#a78bfa');
+      lecture:'var(--g-bloom)', study:'var(--g-leaf)', exam:'var(--g-berry)', general:'var(--g-sun)', intensive:'var(--g-sky)'
+    })[ev.kind] || 'var(--g-bloom)');
 
     document.getElementById('sheet-kind').innerHTML =
       '<i class="fa-solid ' + kindIcon(ev) + '"></i> ' + escapeH(subLabel(ev));
