@@ -114,16 +114,6 @@
         <template class="content-en">Statement-Level Concurrency</template>
         <span class="content-target">التزامن على مستوى الجمل البرمجية (Statement-Level Concurrency)</span>
       </a>
-      <a href="#concurrency-design-issues" class="toc-link" data-bilingual>
-        <template class="content-ar">قضايا تصميم التزامن في لغات البرمجة</template>
-        <template class="content-en">Design Issues for Concurrency</template>
-        <span class="content-target">قضايا تصميم التزامن في لغات البرمجة</span>
-      </a>
-      <a href="#ada-protected-objects" class="toc-link" data-bilingual>
-        <template class="content-ar">الكائنات المحمية في Ada 95</template>
-        <template class="content-en">Ada 95 Protected Objects</template>
-        <span class="content-target">الكائنات المحمية في Ada 95</span>
-      </a>
 
       <div class="toc-divider"></div>
 
@@ -552,24 +542,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>ابتكرها Dijkstra عام 1965. السيمافور هو هيكل بيانات يتكون من عداد وطابور لتخزين واصفات المهام (Task descriptors).</p><p>يمتلك عمليتين فقط:</p><ul><li><strong>wait</strong> (تسمى أصلاً P)</li><li>و <strong>release</strong> (تسمى أصلاً V).</li></ul><p>يجب أن تكون هاتان العمليتان ذريتين (Atomic). يمكن استخدام السيمافورات لتوفير كل من مزامنة التنافس (باستخدام <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">سيمافور ثنائي - Binary Semaphore</span> بقيم 0 و 1) ومزامنة التعاون.</p><p>تعمل العمليتان الذريتان للسيمافور على النحو التالي:</p><ul><li><strong>عملية <code>wait(s)</code>:</strong> إذا كان عداد السيمافور أكبر من 0، يتم إنقاصه. أما إذا كان 0، توضع المهمة المستدعية في طابور انتظار السيمافور وتُحظر.</li><li><strong>عملية <code>release(s)</code>:</strong> إذا كان طابور الانتظار فارغاً، يتم زيادة العداد. أما إذا كانت هناك مهام منتظرة، يتم إخراج إحداها من الطابور ونقلها إلى حالة الاستعداد.</li></ul><p><strong>مثال عملي: مشكلة المنتج والمستهلك (Producer-Consumer)</strong></p><p>لإدارة ذاكرة مؤقتة مشتركة بأمان، نستخدم ثلاثة سيمافورات:</p><ol><li><code>emptyspots</code>: لمزامنة التعاون، يتتبع الأماكن الفارغة المتاحة (يبدأ بحجم الذاكرة المؤقتة).</li><li><code>fullspots</code>: لمزامنة التعاون، يتتبع الأماكن الممتلئة (يبدأ بـ 0).</li><li><code>access</code>: سيمافور ثنائي لمزامنة التنافس، يضمن الوصول الحصري للذاكرة المؤقتة (يبدأ بـ 1).</li></ol><p><strong>مهمة المنتج (Producer):</strong></p><pre><code>wait(emptyspots); // انتظر توفر مكان فارغ
-wait(access);     // اقفل الذاكرة المؤقتة
-DEPOSIT(VALUE);   // أضف البيانات
-release(access);  // افتح الذاكرة المؤقتة
-release(fullspots); // أشر إلى توفر عنصر جديد</code></pre><p><strong>مهمة المستهلك (Consumer):</strong></p><pre><code>wait(fullspots);  // انتظر توفر عنصر
-wait(access);     // اقفل الذاكرة المؤقتة
-FETCH(VALUE);     // اسحب البيانات
-release(access);  // افتح الذاكرة المؤقتة
-release(emptyspots); // أشر إلى توفر مكان فارغ</code></pre></template>
-    <template class="content-en"><p>Introduced by Dijkstra in 1965. A semaphore is a data structure consisting of a counter and a queue for storing task descriptors.</p><p>It has only two operations:</p><ul><li><strong>wait</strong> (originally P)</li><li>and <strong>release</strong> (originally V).</li></ul><p>These operations MUST be atomic. Semaphores can provide both competition synchronization (using a <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">binary semaphore</span> with values 0 and 1) and cooperation synchronization.</p><p>The two atomic operations of a semaphore work as follows:</p><ul><li><strong><code>wait(s)</code>:</strong> If the semaphore's counter is greater than 0, it is decremented. If it is 0, the calling task is placed in the semaphore's wait queue and blocked.</li><li><strong><code>release(s)</code>:</strong> If the wait queue is empty, the counter is incremented. If there are tasks in the queue, one is removed and transferred to the ready state.</li></ul><p><strong>Worked Example: The Producer-Consumer Problem</strong></p><p>To safely manage a shared buffer, three semaphores are used:</p><ol><li><code>emptyspots</code>: For cooperation, tracking available space (initialized to the buffer length).</li><li><code>fullspots</code>: For cooperation, tracking filled space (initialized to 0).</li><li><code>access</code>: A binary semaphore for competition, ensuring mutually exclusive access to the buffer (initialized to 1).</li></ol><p><strong>Producer Task:</strong></p><pre><code>wait(emptyspots); // Wait for an empty slot
-wait(access);     // Lock the buffer
-DEPOSIT(VALUE);   // Insert data
-release(access);  // Unlock the buffer
-release(fullspots); // Signal that a new item is available</code></pre><p><strong>Consumer Task:</strong></p><pre><code>wait(fullspots);  // Wait for an available item
-wait(access);     // Lock the buffer
-FETCH(VALUE);     // Remove data
-release(access);  // Unlock the buffer
-release(emptyspots); // Signal that a slot is now empty</code></pre></template>
+    <template class="content-ar"><p>ابتكرها Dijkstra عام 1965. السيمافور هو هيكل بيانات يتكون من عداد وطابور لتخزين واصفات المهام (Task descriptors).</p><p>يمتلك عمليتين فقط:</p><ul><li><strong>wait</strong> (تسمى أصلاً P)</li><li>و <strong>release</strong> (تسمى أصلاً V).</li></ul><p>يجب أن تكون هاتان العمليتان ذريتين (Atomic). يمكن استخدام السيمافورات لتوفير كل من مزامنة التنافس (باستخدام <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">سيمافور ثنائي - Binary Semaphore</span> بقيم 0 و 1) ومزامنة التعاون.</p></template>
+    <template class="content-en"><p>Introduced by Dijkstra in 1965. A semaphore is a data structure consisting of a counter and a queue for storing task descriptors.</p><p>It has only two operations:</p><ul><li><strong>wait</strong> (originally P)</li><li>and <strong>release</strong> (originally V).</li></ul><p>These operations MUST be atomic. Semaphores can provide both competition synchronization (using a <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">binary semaphore</span> with values 0 and 1) and cooperation synchronization.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -830,8 +804,8 @@ end</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>يتم تعليق المهمة المرسلة أثناء انتظار قبول الرسالة وأثناء فترة اللقاء (Rendezvous).</p><ul><li>المهمة التي تحتوي على جمل <code>accept</code> فقط تسمى <strong><span class="smart-term" data-term-en="Server Task" data-ar="مهمة الخادم" data-en-def="A task that has accept clauses but no other code, waiting to process messages.">مهمة خادم (Server task)</span></strong>،</li><li>بينما المهمة التي لا تحتوي عليها تسمى <strong><span class="smart-term" data-term-en="Actor Task" data-ar="مهمة الممثل" data-en-def="A task without accept clauses that sends messages to other tasks.">مهمة ممثل (Actor task)</span></strong>.</li></ul><p>لدعم نقاط دخول متعددة، تستخدم Ada جملة <code>select</code> (الانتظار الانتقائي - selective wait). لمزامنة التعاون، تستخدم Ada جمل <code>accept</code> المحروسة (Guarded accept clauses) باستخدام الكلمة المفتاحية <code>when</code>.</p><p>عندما تحتوي جملة <code>select</code> على جمل <code>accept</code> متعددة (غالباً مع حراس <code>when</code>)، تتبع لغة Ada قواعد دلالية محددة لاختيار الرسالة التي ستتم معالجتها:</p><ol><li>أولاً، تقوم جملة <code>select</code> بتقييم جميع الحراس. الجملة التي يكون حارسها صحيحاً (أو التي لا تحتوي على حارس) تعتبر <strong>مفتوحة (Open)</strong>، بينما الجملة ذات الحارس الخاطئ تعتبر <strong>مغلقة (Closed)</strong>.</li><li>إذا كانت هناك جملة مفتوحة واحدة فقط ولديها رسالة تنتظر في طابورها، يتم قبول تلك الرسالة.</li><li>إذا كان هناك <strong>أكثر من جملة مفتوحة</strong> تحتوي على رسائل منتظرة، يختار النظام إحداها <strong>بشكل غير حتمي (Nondeterministically)</strong> (لا يمكن للمبرمج التنبؤ بأيها سيتم اختياره).</li><li>إذا كانت <strong>جميع الجمل مغلقة</strong>، يتسبب ذلك في حدوث خطأ في وقت التشغيل (Runtime error).</li></ol><p>لتجنب خطأ وقت التشغيل هذا، يمكن تضمين جملة <code>else</code> داخل <code>select</code>. إذا كانت جميع الجمل مغلقة، يتم تنفيذ جملة <code>else</code>، وتتكرر الحلقة بأمان.</p></template>
-    <template class="content-en"><p>The sender is suspended while waiting for the message to be accepted and during the rendezvous.</p><ul><li>A task with <code>accept</code> clauses but no other code is a <strong><span class="smart-term" data-term-en="Server Task" data-ar="مهمة الخادم" data-en-def="A task that has accept clauses but no other code, waiting to process messages.">server task</span></strong>;</li><li>a task without <code>accept</code> clauses is an <strong><span class="smart-term" data-term-en="Actor Task" data-ar="مهمة الممثل" data-en-def="A task without accept clauses that sends messages to other tasks.">actor task</span></strong>.</li></ul><p>For multiple entries, Ada uses a <code>select</code> clause (selective wait). For cooperation synchronization, Ada uses Guarded <code>accept</code> clauses (using <code>when</code>). If all guards in a select are closed, it's a runtime error unless an <code>else</code> clause is provided.</p><p>When a <code>select</code> statement contains multiple <code>accept</code> clauses (often with <code>when</code> guards), Ada follows specific semantics to choose which message to process:</p><ol><li>First, the <code>select</code> statement evaluates all guards. A clause with a true guard (or no guard) is considered <strong>open</strong>, while one with a false guard is <strong>closed</strong>.</li><li>If exactly one open clause has a waiting message in its queue, that message is accepted.</li><li>If <strong>more than one</strong> open clause has waiting messages, the system chooses one <strong>nondeterministically</strong> (the programmer cannot predict which one will be selected).</li><li>If <strong>all clauses are closed</strong>, it results in a runtime error.</li></ol><p>To prevent this runtime error, a <code>select</code> statement can include an <code>else</code> clause. If all guards are closed, the <code>else</code> clause executes, and the loop safely repeats.</p></template>
+    <template class="content-ar"><p>يتم تعليق المهمة المرسلة أثناء انتظار قبول الرسالة وأثناء فترة اللقاء (Rendezvous).</p><ul><li>المهمة التي تحتوي على جمل <code>accept</code> فقط تسمى <strong><span class="smart-term" data-term-en="Server Task" data-ar="مهمة الخادم" data-en-def="A task that has accept clauses but no other code, waiting to process messages.">مهمة خادم (Server task)</span></strong>،</li><li>بينما المهمة التي لا تحتوي عليها تسمى <strong><span class="smart-term" data-term-en="Actor Task" data-ar="مهمة الممثل" data-en-def="A task without accept clauses that sends messages to other tasks.">مهمة ممثل (Actor task)</span></strong>.</li></ul><p>لدعم نقاط دخول متعددة، تستخدم Ada جملة <code>select</code> (الانتظار الانتقائي - selective wait). لمزامنة التعاون، تستخدم Ada جمل <code>accept</code> المحروسة (Guarded accept clauses) باستخدام الكلمة المفتاحية <code>when</code>.</p></template>
+    <template class="content-en"><p>The sender is suspended while waiting for the message to be accepted and during the rendezvous.</p><ul><li>A task with <code>accept</code> clauses but no other code is a <strong><span class="smart-term" data-term-en="Server Task" data-ar="مهمة الخادم" data-en-def="A task that has accept clauses but no other code, waiting to process messages.">server task</span></strong>;</li><li>a task without <code>accept</code> clauses is an <strong><span class="smart-term" data-term-en="Actor Task" data-ar="مهمة الممثل" data-en-def="A task without accept clauses that sends messages to other tasks.">actor task</span></strong>.</li></ul><p>For multiple entries, Ada uses a <code>select</code> clause (selective wait). For cooperation synchronization, Ada uses Guarded <code>accept</code> clauses (using <code>when</code>). If all guards in a select are closed, it's a runtime error unless an <code>else</code> clause is provided.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -1192,86 +1166,6 @@ FORALL (index = 1:1000)
     <div data-bilingual>
       <template class="content-ar"><p>BLOCK يوزع البيانات على المعالجات في كتل متجاورة (مثلاً، أول 100 عنصر للمعالج الأول، الـ 100 التالية للثاني)، بينما CYCLIC يوزعها عنصراً بعنصر بالتناوب (العنصر 1 للمعالج 1، العنصر 2 للمعالج 2، وهكذا).</p></template>
       <template class="content-en"><p>BLOCK distributes data to processors in contiguous chunks (e.g., first 100 to CPU1, next 100 to CPU2), whereas CYCLIC distributes data one element at a time in a round-robin fashion.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-<section id="concurrency-design-issues" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">10</span> قضايا تصميم التزامن في لغات البرمجة</h2></template>
-    <template class="content-en"><h2><span class="concept-number">10</span> Design Issues for Concurrency</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
-    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>أهم قضية عند تصميم لغة تدعم التزامن هي كيفية توفير مزامنة التنافس والتعاون، تليها قضايا جدولة المهام وإنشائها.</p></template>
-    <template class="content-en"><p>The most critical issue when designing concurrency in a language is providing competition and cooperation synchronization, followed by task scheduling and creation.</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>عند تصميم لغات برمجة تدعم التزامن، يواجه مصممو اللغة عدة قضايا أساسية (Design Issues) يجب معالجتها. القضية الأهم على الإطلاق هي:</p><ul><li><strong>مزامنة التنافس والتعاون (Competition and cooperation synchronization):</strong> كيف ستوفر اللغة آليات آمنة وفعالة لمنع تداخل المهام عند الوصول لبيانات مشتركة، وكيف ستسمح لها بانتظار بعضها البعض.</li></ul><p>تشمل القضايا التصميمية الأخرى ما يلي:</p><ul><li>كيفية التحكم في جدولة المهام (Task scheduling) وتوزيعها على المعالجات.</li><li>ما إذا كان بإمكان التطبيق نفسه التأثير على هذه الجدولة (مثلاً عبر تحديد أولويات).</li><li>كيف ومتى تبدأ المهام في التنفيذ وكيف تنتهي.</li><li>كيف ومتى يتم إنشاء المهام (هل يتم إنشاؤها ديناميكياً أم بشكل ثابت).</li></ul></template>
-    <template class="content-en"><p>When designing programming languages that support concurrency, designers must address several fundamental issues. The most important issue by far is:</p><ul><li><strong>Competition and cooperation synchronization:</strong> How the language will provide safe and effective mechanisms to prevent task interference over shared data, and how it will allow tasks to wait for one another.</li></ul><p>Other design issues include:</p><ul><li>How task scheduling is controlled and mapped to processors.</li><li>Whether and how an application can influence task scheduling (e.g., via priorities).</li><li>How and when tasks start and end their execution.</li><li>How and when tasks are created (statically or dynamically).</li></ul></template>
-    <div class="content-target"></div>
-  </div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">لماذا تعتبر مزامنة التنافس والتعاون القضية التصميمية الأهم؟</template>
-      <template class="content-en">Why is competition and cooperation synchronization considered the most important design issue?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>لأن الفشل في توفير آليات مزامنة صحيحة يؤدي إلى أخطاء كارثية يصعب تتبعها مثل ظروف السباق (Race conditions) والجمود (Deadlocks)، مما يفقد البرامج المتزامنة موثوقيتها تماماً.</p></template>
-      <template class="content-en"><p>Because failing to provide correct synchronization mechanisms leads to catastrophic, hard-to-debug errors like race conditions and deadlocks, completely undermining the reliability of concurrent programs.</p></template>
-      <div class="content-target"></div>
-    </div>
-  </details>
-</section>
-
-<section id="ada-protected-objects" class="concept-card glass-card fade-up">
-  <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">11</span> الكائنات المحمية في Ada 95</h2></template>
-    <template class="content-en"><h2><span class="concept-number">11</span> Ada 95 Protected Objects</h2></template>
-    <div class="content-target"></div>
-  </div>
-
-  <div class="depth-tabs">
-    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
-    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
-    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
-  </div>
-
-  <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>قدمت Ada 95 الكائنات المحمية كبديل أكثر كفاءة من تمرير الرسائل لإدارة البيانات المشتركة، حيث توفر وصولاً حصرياً للكتابة ووصولاً متزامناً للقراءة.</p></template>
-    <template class="content-en"><p>Ada 95 introduced Protected Objects as a more efficient alternative to message passing for shared data, providing mutually exclusive write access and concurrent read access.</p></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>بينما كان نموذج تمرير الرسائل (Rendezvous) في Ada 83 قوياً وعاماً، إلا أنه كان يضيف عبئاً كبيراً عند استخدامه لمجرد حماية بيانات مشتركة بسيطة. لحل هذه المشكلة، قدمت لغة Ada 95 <strong>الكائنات المحمية (Protected Objects)</strong>.</p><p>يعمل الكائن المحمي بشكل مشابه لنوع البيانات المجرد (ADT)، حيث يتم الوصول إليه إما عبر تمرير الرسائل أو من خلال برامج فرعية محمية (Protected subprograms):</p><ul><li><strong>الإجراءات المحمية (Protected Procedures):</strong> تضمن وصولاً حصرياً متبادلاً (Mutually exclusive) لعمليات القراءة والكتابة، مما يمنع أي تداخل أثناء التعديل.</li><li><strong>الدوال المحمية (Protected Functions):</strong> تسمح بوصول متزامن لعمليات القراءة فقط (Read-only access)، مما يعني أن عدة مهام يمكنها قراءة حالة الكائن في نفس الوقت بأمان طالما لا توجد مهمة تقوم بالكتابة.</li></ul></template>
-    <template class="content-en"><p>While Ada 83's message-passing (Rendezvous) model was powerful and general, it introduced significant overhead when used merely to protect simple shared data. To address this, Ada 95 introduced <strong>Protected Objects</strong>.</p><p>A protected object acts similarly to an Abstract Data Type (ADT). Access to it is managed either through message passing or through protected subprograms:</p><ul><li><strong>Protected Procedures:</strong> Guarantee mutually exclusive read-write access, preventing any interference during modifications.</li><li><strong>Protected Functions:</strong> Provide concurrent read-only access, meaning multiple tasks can safely read the object's state simultaneously as long as no task is writing to it.</li></ul></template>
-    <div class="content-target"></div>
-  </div>
-  <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p><strong>تقييم نماذج التزامن في Ada:</strong></p><ul><li>تعتبر الكائنات المحمية الطريقة الأفضل والأكثر كفاءة لتوفير بيانات مشتركة متزامنة على معالج واحد أو ذاكرة مشتركة.</li><li>في المقابل، بالنسبة للأنظمة الموزعة (Distributed systems) التي لا تتشارك نفس الذاكرة، يظل نموذج تمرير الرسائل هو النموذج الأفضل والأكثر ملاءمة للتزامن.</li></ul></template>
-    <template class="content-en"><p><strong>Evaluation of Ada's Concurrency Models:</strong></p><ul><li>Protected objects are generally a better and more efficient way to provide synchronized shared data on a single processor or shared-memory system.</li><li>Conversely, for distributed systems where processors do not share memory, message passing remains the superior model for concurrency.</li></ul></template>
-    <div class="content-target"></div>
-  </div>
-
-  <details class="thinking-question">
-    <summary data-bilingual>
-      <template class="content-ar">لماذا تميز Ada 95 بين الإجراءات المحمية والدوال المحمية؟</template>
-      <template class="content-en">Why does Ada 95 distinguish between protected procedures and protected functions?</template>
-      <span class="content-target"></span>
-    </summary>
-    <div data-bilingual>
-      <template class="content-ar"><p>لتحسين الأداء. الإجراءات تعدل البيانات لذا تتطلب قفلاً حصرياً (مهمة واحدة فقط)، بينما الدوال تقرأ البيانات فقط، لذا من الآمن السماح لعدة مهام بقراءتها في نفس الوقت لتقليل وقت الانتظار.</p></template>
-      <template class="content-en"><p>To optimize performance. Procedures modify data and require an exclusive lock (only one task), whereas functions only read data, so it is safe to allow multiple tasks to read concurrently, reducing wait times.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
