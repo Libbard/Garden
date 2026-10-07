@@ -2,7 +2,7 @@
 importScripts('shared/reminders-db.js');
 
 /*@0.SWJ.109*/
-var SW_VERSION = 'garden-1.0.7.3'; /*@0.SWJ.2*/
+var SW_VERSION = 'garden-1.0.7.9'; /*@0.SWJ.2*/
 var CACHE_NAME = 'garden-static';
 var ADOPT_PREFIX = CACHE_NAME.replace(/static$/, '');
 /*@0.SWJ.110*/
@@ -104,8 +104,6 @@ var PRECACHE_URLS = [
   /*@0.SWJ.56*/
   'shared/sync-panel.js',
   'shared/sync-panel.css',
-  'shared/hub.css',
-  'shared/hub.js',
   'shared/gpa.css',
   'shared/gpa.js',
   'shared/plan-rules.js',
