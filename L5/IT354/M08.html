@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT354" data-module="8" data-no-videos>
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تقنيات استرداد قاعدة البيانات · IT354 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+      var fs=localStorage.getItem('garden_font_size');
+      if(fs)document.documentElement.setAttribute('data-font-size',fs);
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT354" data-page-title-en="IT354">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=IT354"></header>
+
+  <div class="content-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+      <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#database-recovery-and-failures" class="toc-link" data-bilingual>
+        <template class="content-ar">استرداد قاعدة البيانات وأنواع الفشل</template>
+        <template class="content-en">Database Recovery and Types of Failure</template>
+        <span class="content-target">استرداد قاعدة البيانات وأنواع الفشل</span>
+      </a>
+      <a href="#transaction-log-and-caching" class="toc-link" data-bilingual>
+        <template class="content-ar">سجل المعاملات والتخزين المؤقت للبيانات</template>
+        <template class="content-en">Transaction Log and Data Caching</template>
+        <span class="content-target">سجل المعاملات والتخزين المؤقت للبيانات</span>
+      </a>
+      <a href="#data-update-strategies" class="toc-link" data-bilingual>
+        <template class="content-ar">استراتيجيات تحديث البيانات</template>
+        <template class="content-en">Data Update Strategies</template>
+        <span class="content-target">استراتيجيات تحديث البيانات</span>
+      </a>
+      <a href="#wal-and-undo-redo" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول الكتابة المسبقة للسجل (WAL) والتراجع/الإعادة</template>
+        <template class="content-en">Write-Ahead Logging (WAL) and Undo/Redo</template>
+        <span class="content-target">بروتوكول الكتابة المسبقة للسجل (WAL) والتراجع/الإعادة</span>
+      </a>
+      <a href="#checkpointing" class="toc-link" data-bilingual>
+        <template class="content-ar">نقاط الفحص (Checkpointing)</template>
+        <template class="content-en">Checkpointing</template>
+        <span class="content-target">نقاط الفحص (Checkpointing)</span>
+      </a>
+      <a href="#steal-force-policies" class="toc-link" data-bilingual>
+        <template class="content-ar">سياسات إدارة التخزين المؤقت (Steal/No-Steal و Force/No-Force)</template>
+        <template class="content-en">Cache Management Policies (Steal/No-Steal and Force/No-Force)</template>
+        <span class="content-target">سياسات إدارة التخزين المؤقت (Steal/No-Steal و Force/No-Force)</span>
+      </a>
+      <a href="#recovery-schemes" class="toc-link" data-bilingual>
+        <template class="content-ar">مخططات الاسترداد (التحديث المؤجل والفوري)</template>
+        <template class="content-en">Recovery Schemes (Deferred and Immediate Update)</template>
+        <span class="content-target">مخططات الاسترداد (التحديث المؤجل والفوري)</span>
+      </a>
+      <a href="#shadow-paging" class="toc-link" data-bilingual>
+        <template class="content-ar">ترقيم الصفحات الظلي (Shadow Paging)</template>
+        <template class="content-en">Shadow Paging</template>
+        <span class="content-target">ترقيم الصفحات الظلي (Shadow Paging)</span>
+      </a>
+      <a href="#aries-recovery-algorithm" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزمية الاسترداد ARIES</template>
+        <template class="content-en">The ARIES Recovery Algorithm</template>
+        <span class="content-target">خوارزمية الاسترداد ARIES</span>
+      </a>
+      <a href="#multidatabase-recovery" class="toc-link" data-bilingual>
+        <template class="content-ar">الاسترداد في أنظمة قواعد البيانات المتعددة (2PC)</template>
+        <template class="content-en">Recovery in Multidatabase Systems (2PC)</template>
+        <span class="content-target">الاسترداد في أنظمة قواعد البيانات المتعددة (2PC)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+      <div class="sidebar-widget">
+        <div class="widget-number" id="fc-due-count">0</div>
+        <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · IT354
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تقنيات استرداد قاعدة البيانات</h1>
+      <p class="hero-description">تغطي هذه الوحدة آليات استرداد قواعد البيانات بعد الفشل، بما في ذلك أنواع الفشل، سجل المعاملات، بروتوكول WAL، خوارزمية ARIES، وتقنيات التحديث الفوري والمؤجل.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Database Recovery Techniques</h1>
+      <p class="hero-description">This module covers database recovery mechanisms after failures, including failure types, transaction logs, WAL protocol, ARIES algorithm, and immediate/deferred update techniques.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">استرداد البيانات</span>
+      <span class="tag">سجل المعاملات</span>
+      <span class="tag">ARIES</span>
+      <span class="tag">WAL</span>
+      <span class="tag">التحديث المؤجل</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Database Recovery</span>
+      <span class="tag">Transaction Log</span>
+      <span class="tag">ARIES</span>
+      <span class="tag">WAL</span>
+      <span class="tag">Deferred Update</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم الغرض من استرداد قاعدة البيانات وأنواع الفشل المختلفة التي يمكن أن تحدث.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح دور سجل المعاملات (Transaction Log) وبروتوكول الكتابة المسبقة للسجل (WAL).</span></li>
+      <li><span class="obj-icon">✦</span><span>المقارنة بين استراتيجيات التحديث المختلفة (الفوري، المؤجل، الظلي، في المكان).</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل سياسات إدارة التخزين المؤقت (Steal/No-Steal و Force/No-Force).</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق خوارزمية ARIES لاسترداد قواعد البيانات وفهم مراحلها الثلاث.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the purpose of database recovery and the different types of failures that can occur.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the role of the Transaction Log and the Write-Ahead Logging (WAL) protocol.</span></li>
+      <li><span class="obj-icon">✦</span><span>Compare different update strategies (Immediate, Deferred, Shadow, In-place).</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze cache management policies (Steal/No-Steal and Force/No-Force).</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply the ARIES recovery algorithm and understand its three phases.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="database-recovery-and-failures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> استرداد قاعدة البيانات وأنواع الفشل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Database Recovery and Types of Failure</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الاسترداد هو إعادة قاعدة البيانات إلى آخر حالة متسقة قبل حدوث الفشل، للحفاظ على خصائص ACID.</p></template>
+    <template class="content-en"><p>Recovery brings the database to the last consistent state prior to a failure, preserving ACID properties.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الغرض الأساسي من الاسترداد هو الحفاظ على خصائص المعاملات (<span class="smart-term" data-term-en="Atomicity" data-ar="الذرية" data-en-def="A transaction is treated as a single, indivisible unit of work.">الذرية<span class="smart-term-tooltip"></span></span>، الاتساق، العزل، والمتانة). يمكن أن تصبح قاعدة البيانات غير متاحة بسبب ثلاثة أنواع رئيسية من الفشل:</p><ul><li><b>فشل المعاملة (Transaction failure):</b> يحدث بسبب إدخال غير صحيح، أو حالة الجمود (deadlock)، أو مزامنة غير صحيحة.</li><li><b>فشل النظام (System failure):</b> يحدث بسبب خطأ في العنونة، خطأ في التطبيق، خلل في نظام التشغيل، أو فشل في الذاكرة العشوائية (RAM).</li><li><b>فشل الوسائط (Media failure):</b> مثل تحطم رأس القرص الصلب أو انقطاع التيار الكهربائي.</li></ul></template>
+    <template class="content-en"><p>The main purpose of recovery is to preserve transaction properties (<span class="smart-term" data-term-en="Atomicity" data-ar="الذرية" data-en-def="A transaction is treated as a single, indivisible unit of work.">Atomicity<span class="smart-term-tooltip"></span></span>, Consistency, Isolation, Durability). The database may become unavailable due to three main types of failure:</p><ul><li><b>Transaction failure:</b> Fails because of incorrect input, deadlock, or incorrect synchronization.</li><li><b>System failure:</b> Fails because of addressing error, application error, OS fault, or RAM failure.</li><li><b>Media failure:</b> Disk head crash, power disruption, etc.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نصنف الفشل؟ لأن كل نوع يتطلب استراتيجية استرداد مختلفة. فشل المعاملة يتطلب التراجع (Undo) لتلك المعاملة فقط. فشل النظام يتطلب استخدام السجل لإعادة (Redo) المعاملات المكتملة والتراجع عن غير المكتملة. فشل الوسائط يتطلب استعادة نسخة احتياطية (Backup) ثم تطبيق السجل.</p><p>في حالة تعطل النظام أثناء تحويل أموال، قد يتم خصم المبلغ من حساب دون إضافته للآخر. الاسترداد يضمن إما اكتمال العمليتين أو إلغائهما معاً (الذرية).</p></template>
+    <template class="content-en"><p>Why classify failures? Because each requires a different recovery strategy. Transaction failure requires Undoing only that specific transaction. System failure requires using the log to Redo committed transactions and Undo uncommitted ones. Media failure requires restoring a backup and then applying the log.</p><p>If a system crashes during a fund transfer, money might be deducted from one account but not added to the other. Recovery ensures both operations either complete entirely or are rolled back entirely (Atomicity).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا احترق القرص الصلب بالكامل، هل يمكن لسجل المعاملات (Transaction Log) الموجود على نفس القرص أن ينقذ البيانات؟</template>
+      <template class="content-en">If the hard disk completely burns out, can the Transaction Log on the same disk save the data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، هذا فشل وسائط (Media Failure). يجب أن يُحفظ السجل في وحدة تخزين مستقرة (Stable Storage) منفصلة، ويجب الاعتماد على النسخ الاحتياطية الدورية.</p></template>
+      <template class="content-en"><p>No, this is a Media Failure. The log must be kept on separate stable storage, and periodic backups must be relied upon.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="transaction-log-and-caching" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> سجل المعاملات والتخزين المؤقت للبيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Transaction Log and Data Caching</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>السجل هو ملف متسلسل يسجل كل تغيير في قاعدة البيانات (القيم قبل وبعد التعديل) لتمكين الاسترداد.</p></template>
+    <template class="content-en"><p>The log is a sequential file that records every database change (before and after values) to enable recovery.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>للاسترداد من أي فشل، نحتاج إلى القيم قبل التعديل (BFIM - BeFore Image) والقيم بعد التعديل (AFIM - AFter Image). تُخزن هذه القيم في ملف متسلسل يُسمى <b>سجل المعاملات (Transaction Log)</b>.</p><p><b>التخزين المؤقت للبيانات (Data Caching):</b> يتم تخزين عناصر البيانات المراد تعديلها أولاً في ذاكرة التخزين المؤقت (Cache) بواسطة مدير التخزين المؤقت (CM). بعد التعديل، يتم تفريغها (Flushed) إلى القرص. يتم التحكم في التفريغ بواسطة بتات:</p><ul><li><b>Pin-Unpin:</b> يوجه نظام التشغيل بعدم تفريغ عنصر البيانات إلى القرص حالياً.</li><li><b>Modified (Dirty bit):</b> يشير إلى أن عنصر البيانات قد تم تعديله (يحتوي على AFIM) ويختلف عن النسخة الموجودة على القرص.</li></ul></template>
+    <template class="content-en"><p>For recovery from any failure, data values prior to modification (<span class="smart-term" data-term-en="BFIM" data-ar="الصورة قبل التعديل" data-en-def="BeFore Image: The value of a data item prior to modification.">BFIM<span class="smart-term-tooltip"></span></span> - BeFore Image) and the new value after modification (<span class="smart-term" data-term-en="AFIM" data-ar="الصورة بعد التعديل" data-en-def="AFter Image: The new value of a data item after modification.">AFIM<span class="smart-term-tooltip"></span></span> - AFter Image) are required. These are stored in a sequential file called the <b>Transaction Log</b>.</p><p><b>Data Caching:</b> Data items to be modified are first stored into the database cache by the Cache Manager (CM). After modification, they are flushed to the disk. Flushing is controlled by bits:</p><ul><li><b>Pin-Unpin:</b> Instructs the operating system not to flush the data item.</li><li><b>Modified:</b> Indicates the AFIM of the data item (the page is dirty).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السجل هو المصدر الوحيد للحقيقة عند انهيار النظام. استخدام المؤشرات (Back P و Next P) في السجل يسمح بربط سجلات المعاملة الواحدة معاً، مما يسرع عملية التراجع (Undo) لمعاملة محددة دون الحاجة لقراءة السجل بأكمله.</p><p>بت Pin ضروري لمنع نظام التشغيل من كتابة صفحة إلى القرص بينما لا تزال المعاملة تقوم بتحديثها بنشاط في الذاكرة، مما يمنع تلف البيانات.</p></template>
+    <template class="content-en"><p>The log is the single source of truth upon system crash. Using pointers (Back P and Next P) in the log links records of the same transaction together, speeding up the Undo process for a specific transaction without scanning the entire log.</p><p>The Pin bit is crucial to prevent the OS from writing a page to disk while a transaction is actively updating it in memory, preventing data corruption.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى الاحتفاظ بـ BFIM في السجل؟</template>
+      <template class="content-en">Why do we need to keep the BFIM in the log?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نحتاج BFIM لإجراء عملية التراجع (Undo) إذا فشلت المعاملة أو تم إجهاضها، لإعادة البيانات إلى حالتها الأصلية.</p></template>
+      <template class="content-en"><p>We need the BFIM to perform an Undo operation if a transaction fails or is aborted, restoring the data to its original state.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-update-strategies" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> استراتيجيات تحديث البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Data Update Strategies</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحدد استراتيجيات التحديث متى وكيف يتم كتابة البيانات المعدلة من الذاكرة المؤقتة إلى القرص الصلب.</p></template>
+    <template class="content-en"><p>Update strategies determine when and how modified data is written from the cache to the hard disk.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك عدة طرق لتحديث البيانات في قاعدة البيانات:</p><ol><li><b>التحديث الفوري (Immediate Update):</b> بمجرد تعديل عنصر البيانات في الذاكرة المؤقتة، يتم تحديث نسخة القرص (ليس بالضرورة فوراً، ولكن يمكن أن يحدث قبل التزام المعاملة).</li><li><b>التحديث المؤجل (Deferred Update):</b> لا تُكتب العناصر المعدلة إلى القرص إلا بعد انتهاء المعاملة (Commit) أو بعد اكتمال عدد محدد من المعاملات.</li><li><b>التحديث الظلي (Shadow Update):</b> النسخة المعدلة لا تكتب فوق النسخة الأصلية على القرص، بل تُكتب في موقع منفصل على القرص.</li><li><b>التحديث في المكان (In-place Update):</b> يتم الكتابة فوق نسخة القرص الأصلية بالنسخة الجديدة الموجودة في الذاكرة المؤقتة.</li></ol></template>
+    <template class="content-en"><p>There are several ways to update data in the database:</p><ol><li><b>Immediate Update:</b> As soon as a data item is modified in cache, the disk copy is updated (can happen before commit).</li><li><b>Deferred Update:</b> All modified data items in the cache are written either after a transaction ends its execution (commits) or after a fixed number of transactions complete.</li><li><b>Shadow update:</b> The modified version of a data item does not overwrite its disk copy but is written at a separate disk location.</li><li><b>In-place update:</b> The disk version of the data item is overwritten by the cache version.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التحديث المؤجل يبسط عملية الاسترداد لأنه لا يتطلب عملية التراجع (Undo) أبداً؛ فالبيانات غير المكتملة لا تصل للقرص أبداً. لكنه يستهلك مساحة كبيرة في الذاكرة المؤقتة.</p><p>التحديث الفوري يسمح بإدارة أفضل للذاكرة (يمكن إخلاء الصفحات قبل الالتزام) ولكنه يتطلب آليات معقدة للتراجع (Undo) إذا فشلت المعاملة بعد كتابة بياناتها على القرص.</p></template>
+    <template class="content-en"><p>Deferred update simplifies recovery because it never requires an Undo operation; uncommitted data never reaches the disk. However, it consumes significant cache memory.</p><p>Immediate update allows better memory management (pages can be evicted before commit) but requires complex Undo mechanisms if a transaction fails after its data was written to disk.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Deferred Update</th><th>Immediate Update</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">وقت كتابة البيانات على القرص</template>
+          <template class="content-en">Time of writing data to disk</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بعد الالتزام (Commit) فقط</template>
+          <template class="content-en">Only after Commit</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يمكن قبل الالتزام</template>
+          <template class="content-en">Can be before Commit</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الحاجة إلى التراجع (Undo)</template>
+          <template class="content-en">Need for Undo</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا حاجة أبداً (No Undo)</template>
+          <template class="content-en">Never needed (No Undo)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مطلوب إذا فشلت المعاملة</template>
+          <template class="content-en">Required if transaction fails</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك الذاكرة المؤقتة</template>
+          <template class="content-en">Cache memory consumption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي (يجب الاحتفاظ بكل التعديلات حتى الالتزام)</template>
+          <template class="content-en">High (must hold all updates until commit)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (يمكن تفريغ الصفحات)</template>
+          <template class="content-en">Low (pages can be flushed)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي استراتيجية تحديث تتطلب بروتوكول WAL بشكل صارم؟</template>
+      <template class="content-en">Which update strategy strictly requires the WAL protocol?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التحديث في المكان (In-place update)، سواء كان فورياً أو مؤجلاً، يتطلب WAL لضمان إمكانية التراجع أو الإعادة.</p></template>
+      <template class="content-en"><p>In-place update (whether immediate or deferred) requires WAL to ensure Undo or Redo is possible.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="wal-and-undo-redo" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> بروتوكول الكتابة المسبقة للسجل (WAL) والتراجع/الإعادة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Write-Ahead Logging (WAL) and Undo/Redo</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول WAL هو القاعدة الذهبية: يجب كتابة السجل على القرص قبل كتابة البيانات الفعلية على القرص.</p></template>
+    <template class="content-en"><p>WAL is the golden rule: the log must be written to disk before the actual data is written to disk.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>للحفاظ على الذرية (Atomicity)، يتم إعادة تنفيذ عمليات المعاملة (Redo) أو التراجع عنها (Undo):</p><ul><li><b>Undo (التراجع):</b> استعادة جميع قيم BFIM إلى القرص (إزالة قيم AFIM).</li><li><b>Redo (الإعادة):</b> استعادة جميع قيم AFIM إلى القرص.</li></ul><p>عند استخدام التحديث في المكان (In-place update)، يكون السجل ضرورياً للاسترداد. يتحقق ذلك من خلال <b>بروتوكول <span class="smart-term" data-term-en="WAL" data-ar="الكتابة المسبقة للسجل" data-en-def="Write-Ahead Logging: A protocol ensuring log records are written to stable storage before data pages are flushed.">الكتابة المسبقة للسجل<span class="smart-term-tooltip"></span></span> (WAL)</b>، والذي ينص على:</p><ol><li><b>من أجل التراجع (For Undo):</b> قبل أن يتم تفريغ AFIM لعنصر بيانات إلى القرص (والكتابة فوق BFIM)، يجب كتابة BFIM الخاص به في السجل، ويجب حفظ السجل في وحدة تخزين مستقرة.</li><li><b>من أجل الإعادة (For Redo):</b> قبل أن تنفذ المعاملة عملية الالتزام (Commit)، يجب كتابة جميع قيم AFIM الخاصة بها في السجل، ويجب حفظ السجل في وحدة تخزين مستقرة.</li></ol></template>
+    <template class="content-en"><p>To maintain atomicity, a transaction’s operations are redone or undone:</p><ul><li><b>Undo:</b> Restore all BFIMs onto disk (Remove all AFIMs).</li><li><b>Redo:</b> Restore all AFIMs onto disk.</li></ul><p>When an in-place update is used, a log is necessary for recovery. This is achieved by the <b>Write-Ahead Logging (<span class="smart-term" data-term-en="WAL" data-ar="الكتابة المسبقة للسجل" data-en-def="Write-Ahead Logging: A protocol ensuring log records are written to stable storage before data pages are flushed.">WAL<span class="smart-term-tooltip"></span></span>) protocol</b>, which states:</p><ol><li><b>For Undo:</b> Before a data item’s AFIM is flushed to the database disk (overwriting the BFIM), its BFIM must be written to the log and saved on a stable store.</li><li><b>For Redo:</b> Before a transaction executes its commit operation, all its AFIMs must be written to the log and saved on a stable store.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بدون WAL، إذا كتبنا البيانات على القرص ثم تعطل النظام قبل كتابة السجل، فلن نعرف القيمة القديمة (BFIM) للتراجع عن المعاملة غير المكتملة، مما يدمر تناسق قاعدة البيانات.</p><p>قاعدة Redo تضمن المتانة (Durability): بمجرد الالتزام، حتى لو لم تصل البيانات للقرص، فإن وجود AFIM في السجل يضمن إمكانية إعادة تطبيق التغييرات بعد إعادة التشغيل.</p></template>
+    <template class="content-en"><p>Without WAL, if we write data to disk and the system crashes before writing the log, we wouldn't know the old value (BFIM) to undo an uncommitted transaction, destroying database consistency.</p><p>The Redo rule ensures Durability: once committed, even if data hasn't reached the disk, having the AFIM in the log ensures changes can be reapplied after a reboot.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا تم الالتزام بمعاملة (Commit) ولكن النظام تعطل قبل كتابة البيانات على القرص، كيف ينقذ WAL الموقف؟</template>
+      <template class="content-en">If a transaction commits but the system crashes before data is written to disk, how does WAL save the situation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بموجب قاعدة WAL للـ Redo، لا يمكن للمعاملة أن تلتزم إلا بعد كتابة جميع قيم AFIM الخاصة بها في السجل على القرص. لذا، عند إعادة التشغيل، سيقرأ النظام السجل ويقوم بعملية Redo لتطبيق التغييرات.</p></template>
+      <template class="content-en"><p>Under WAL's Redo rule, a transaction cannot commit until all its AFIMs are written to the log on disk. Upon reboot, the system reads the log and performs a Redo to apply the changes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="checkpointing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> نقاط الفحص (Checkpointing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Checkpointing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نقطة الفحص هي علامة مرجعية في السجل تقلل من الوقت اللازم للاسترداد عن طريق حفظ حالة الذاكرة المؤقتة الحالية على القرص.</p></template>
+    <template class="content-en"><p>A checkpoint is a bookmark in the log that reduces recovery time by saving the current cache state to disk.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>من وقت لآخر، تقوم قاعدة البيانات بتفريغ الذاكرة المؤقتة (Buffer) إلى القرص لتقليل عبء الاسترداد. خطوات عملية نقطة الفحص (Checkpoint):</p><ol><li>تعليق تنفيذ المعاملات مؤقتاً.</li><li>فرض كتابة بيانات الذاكرة المؤقتة المعدلة (Dirty pages) إلى القرص.</li><li>كتابة سجل [checkpoint] في السجل (Log)، وحفظ السجل على القرص.</li><li>استئناف التنفيذ الطبيعي للمعاملات.</li></ol><p>أثناء الاسترداد، يُطلب إجراء Redo أو Undo فقط للمعاملات التي تظهر بعد سجل [checkpoint] (أو كانت نشطة أثناءه).</p></template>
+    <template class="content-en"><p>From time to time, the database flushes its buffer to the disk to minimize the task of recovery. Steps for a checkpoint operation:</p><ol><li>Suspend execution of transactions temporarily.</li><li>Force write modified buffer data to disk.</li><li>Write a [checkpoint] record to the log, and save the log to disk.</li><li>Resume normal transaction execution.</li></ol><p>During recovery, redo or undo is required only for transactions appearing after the [checkpoint] record (or active during it).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بدون نقاط الفحص، سيضطر مدير الاسترداد إلى قراءة السجل بالكامل من البداية عند كل انهيار، وهو أمر غير عملي ويستغرق وقتاً طويلاً جداً.</p><p>التعليق المؤقت للمعاملات (الخطوة 1) يسمى نقطة الفحص المتزامنة (Synchronous Checkpoint) وهو يقلل الأداء.</p><p>لذلك، تستخدم الأنظمة الحديثة مثل ARIES "نقاط الفحص الضبابية" (Fuzzy Checkpointing) التي لا توقف المعاملات.</p></template>
+    <template class="content-en"><p>Without checkpoints, the recovery manager would have to scan the entire log from the beginning upon every crash, which is highly impractical and time-consuming.</p><p>Suspending transactions (Step 1) is called a Synchronous Checkpoint and degrades performance.</p><p>Therefore, modern systems like ARIES use "Fuzzy Checkpointing" which allows transactions to continue.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A timeline diagram showing a horizontal line representing time. Mark a 'Checkpoint' point. Show transactions T1, T2, T3, T4, T5 as horizontal line segments. T1 completes before checkpoint. T2 and T3 start before checkpoint and continue after. T4 and T5 start after checkpoint. Mark a 'System Crash' point at the end. Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Timeline Axis -->
+    <line x1="40" y1="400" x2="760" y2="400" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="750" y="425" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Time</text>
+    <text x="750" y="425" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الزمن</text>
+
+    <!-- Checkpoint Line & Label -->
+    <line x1="280" y1="60" x2="280" y2="400" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+    <rect x="210" y="15" width="140" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1.5" />
+    <text x="280" y="39" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--brand-ink)" font-weight="bold" font-size="18" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Checkpoint</text>
+    <text x="280" y="39" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--brand-ink)" font-weight="bold" font-size="18" font-family="system-ui, 'Cairo', 'Inter', sans-serif">نقطة التحقق</text>
+
+    <!-- System Crash Line & Label -->
+    <line x1="620" y1="60" x2="620" y2="400" stroke="var(--text-primary)" stroke-width="3" />
+    <rect x="540" y="15" width="160" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--text-primary)" stroke-width="1.5" />
+    <text x="620" y="39" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--text-primary)" font-weight="bold" font-size="18" font-family="system-ui, 'Cairo', 'Inter', sans-serif">System Crash</text>
+    <text x="620" y="39" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--text-primary)" font-weight="bold" font-size="18" font-family="system-ui, 'Cairo', 'Inter', sans-serif">انهيار النظام</text>
+
+    <!-- Transaction T1 -->
+    <text x="50" y="91" text-anchor="middle" dominant-baseline="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">T1</text>
+    <rect x="100" y="87" width="140" height="6" rx="3" fill="var(--brand-500)" />
+    <circle cx="100" cy="90" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="240" cy="90" r="5" fill="var(--brand-500)" />
+    
+    <rect x="650" y="74" width="120" height="32" rx="16" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="1.5" />
+    <text x="710" y="91" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Ignore</text>
+    <text x="710" y="91" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">تجاهل</text>
+
+    <!-- Transaction T2 -->
+    <text x="50" y="151" text-anchor="middle" dominant-baseline="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">T2</text>
+    <rect x="150" y="147" width="330" height="6" rx="3" fill="var(--brand-500)" />
+    <circle cx="150" cy="150" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="480" cy="150" r="5" fill="var(--brand-500)" />
+
+    <rect x="650" y="134" width="120" height="32" rx="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1.5" />
+    <text x="710" y="151" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">REDO</text>
+    <text x="710" y="151" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">إعادة تنفيذ</text>
+
+    <!-- Transaction T3 -->
+    <text x="50" y="211" text-anchor="middle" dominant-baseline="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">T3</text>
+    <rect x="200" y="207" width="420" height="6" rx="3" fill="var(--brand-500)" />
+    <circle cx="200" cy="210" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <rect x="650" y="194" width="120" height="32" rx="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1.5" />
+    <text x="710" y="211" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">UNDO</text>
+    <text x="710" y="211" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">تراجع</text>
+
+    <!-- Transaction T4 -->
+    <text x="50" y="271" text-anchor="middle" dominant-baseline="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">T4</text>
+    <rect x="340" y="267" width="200" height="6" rx="3" fill="var(--brand-500)" />
+    <circle cx="340" cy="270" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="540" cy="270" r="5" fill="var(--brand-500)" />
+
+    <rect x="650" y="254" width="120" height="32" rx="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1.5" />
+    <text x="710" y="271" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">REDO</text>
+    <text x="710" y="271" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">إعادة تنفيذ</text>
+
+    <!-- Transaction T5 -->
+    <text x="50" y="331" text-anchor="middle" dominant-baseline="middle" fill="var(--text-primary)" font-weight="bold" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">T5</text>
+    <rect x="400" y="327" width="220" height="6" rx="3" fill="var(--brand-500)" />
+    <circle cx="400" cy="330" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <rect x="650" y="314" width="120" height="32" rx="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1.5" />
+    <text x="710" y="331" text-anchor="middle" dominant-baseline="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">UNDO</text>
+    <text x="710" y="331" text-anchor="middle" dominant-baseline="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">تراجع</text>
+
+    <!-- Educational Legend -->
+    <text x="400" y="445" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Note: Transactions committed after checkpoint are REDONE. Active transactions are UNDONE.</text>
+    <text x="400" y="445" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">ملاحظة: المعاملات المكتملة بعد نقطة التحقق يُعاد تنفيذها (REDO)، والنشطة يتم التراجع عنها (UNDO).</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا بدأت معاملة قبل نقطة الفحص وانتهت بعدها، هل نتجاهلها أثناء الاسترداد؟</template>
+      <template class="content-en">If a transaction started before the checkpoint and ended after it, do we ignore it during recovery?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لا نتجاهلها. يجب معالجتها (إما Redo إذا التزمت، أو Undo إذا لم تلتزم) لأن جزءاً من عملياتها حدث بعد نقطة الفحص أو لم يتم تفريغه بالكامل.</p></template>
+      <template class="content-en"><p>No, we do not ignore it. It must be processed (either Redo if committed, or Undo if not) because part of its operations occurred after the checkpoint or weren't fully flushed.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="steal-force-policies" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> سياسات إدارة التخزين المؤقت (Steal/No-Steal و Force/No-Force)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Cache Management Policies (Steal/No-Steal and Force/No-Force)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحدد هذه السياسات متى يُسمح لنظام التشغيل بكتابة البيانات إلى القرص (Steal) ومتى يُجبر على ذلك (Force).</p></template>
+    <template class="content-en"><p>These policies determine when the OS is allowed to write data to disk (Steal) and when it is forced to (Force).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الطرق الممكنة لتفريغ الذاكرة المؤقتة إلى القرص:</p><ul><li><b>Steal (سرقة):</b> يمكن تفريغ الذاكرة المؤقتة (كتابة البيانات للقرص) <i>قبل</i> أن تلتزم المعاملة. (يتطلب Undo إذا فشلت).</li><li><b>No-Steal (عدم السرقة):</b> لا يمكن تفريغ الذاكرة المؤقتة قبل التزام المعاملة. (لا يتطلب Undo).</li><li><b>Force (إجبار):</b> يتم تفريغ الذاكرة المؤقتة فوراً إلى القرص عند الالتزام. (لا يتطلب Redo).</li><li><b>No-Force (عدم الإجبار):</b> يتم تأجيل تفريغ الذاكرة المؤقتة حتى بعد الالتزام. (يتطلب Redo).</li></ul><p>ينتج عن هذا 4 طرق للتعامل مع الاسترداد:</p><ol><li>Steal/No-Force (يتطلب Undo/Redo) - الأكثر شيوعاً وكفاءة.</li><li>Steal/Force (يتطلب Undo/No-redo)</li><li>No-Steal/No-Force (يتطلب Redo/No-undo)</li><li>No-Steal/Force (لا يتطلب No-undo/No-redo)</li></ol></template>
+    <template class="content-en"><p>Possible ways for flushing database cache to disk:</p><ul><li><b>Steal:</b> Cache can be flushed <i>before</i> the transaction commits. (Requires Undo).</li><li><b>No-Steal:</b> Cache cannot be flushed before transaction commit. (No Undo needed).</li><li><b>Force:</b> Cache is immediately flushed (forced) to disk upon commit. (No Redo needed).</li><li><b>No-Force:</b> Cache flushing is deferred until after transaction commits. (Requires Redo).</li></ul><p>These give rise to four different ways of handling recovery:</p><ol><li>Steal/No-Force (Undo/Redo) - Most common and efficient.</li><li>Steal/Force (Undo/No-redo)</li><li>No-Steal/No-Force (Redo/No-undo)</li><li>No-Steal/Force (No-undo/No-redo)</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>سياسة Steal ضرورية لقواعد البيانات الكبيرة لأن الذاكرة المؤقتة محدودة؛ لا يمكننا الاحتفاظ بكل تعديلات المعاملات الطويلة في الذاكرة حتى تلتزم.</p><p>سياسة No-Force مفضلة للأداء لأنها تتجنب اختناق الإدخال/الإخراج (I/O bottleneck) عند كل عملية التزام، حيث يتم تجميع التحديثات وكتابتها لاحقاً، مع الاعتماد على السجل (Log) لضمان المتانة.</p></template>
+    <template class="content-en"><p>The Steal policy is essential for large databases because cache memory is limited; we cannot hold all modifications of long transactions in memory until they commit.</p><p>The No-Force policy is preferred for performance as it avoids I/O bottlenecks at every commit. Updates are batched and written later, relying on the Log to ensure Durability.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر سياسة Steal/No-Force هي الأكثر استخداماً في أنظمة قواعد البيانات الحديثة؟</template>
+      <template class="content-en">Why is the Steal/No-Force policy the most widely used in modern database systems?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها توفر أفضل أداء. Steal يسمح بإدارة مرنة للذاكرة، و No-Force يقلل من عمليات الكتابة البطيئة على القرص عند الالتزام. تعقيد الاسترداد (Undo/Redo) هو ثمن مقبول مقابل الأداء العالي.</p></template>
+      <template class="content-en"><p>Because it offers the best performance. Steal allows flexible memory management, and No-Force reduces slow disk writes at commit. The recovery complexity (Undo/Redo) is an acceptable trade-off for high performance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="recovery-schemes" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> مخططات الاسترداد (التحديث المؤجل والفوري)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Recovery Schemes (Deferred and Immediate Update)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التحديث المؤجل لا يحتاج إلى تراجع (No Undo)، بينما التحديث الفوري قد يحتاج إلى تراجع وإعادة (Undo/Redo).</p></template>
+    <template class="content-en"><p>Deferred update requires No Undo, while Immediate update may require both Undo and Redo.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التحديث المؤجل (No Undo/Redo):</b></p><ul><li>تسجل المعاملات تحديثاتها في السجل.</li><li>عند الالتزام (تحت بروتوكول WAL)، تُحفظ هذه التحديثات على القرص.</li><li>بعد الفشل، يُستخدم السجل لإجراء Redo للمعاملات الملتزمة. لا حاجة لـ Undo لأنه لم يتم تفريغ أي AFIM للقرص قبل الالتزام.</li><li>في بيئة متعددة المستخدمين، نستخدم جدولين: <b>جدول نشط (Active table)</b> و <b>جدول الالتزام (Commit table)</b>. يتم عمل Redo لمعاملات جدول الالتزام، وتجاهل المعاملات النشطة.</li></ul><p><b>التحديث الفوري (Undo/No-redo أو Undo/Redo):</b></p><ul><li><b>Undo/No-redo:</b> يتم تفريغ AFIM للقرص قبل الالتزام. يتم عمل Undo لجميع المعاملات أثناء الاسترداد. لا يتم عمل Redo لأي معاملة.</li><li><b>Undo/Redo:</b> في بيئة متعددة المستخدمين، يتم عمل Undo للمعاملات في الجدول النشط، وعمل Redo للمعاملات في جدول الالتزام.</li></ul></template>
+    <template class="content-en"><p><b>Deferred Update (No Undo/Redo):</b></p><ul><li>Transactions record updates in the log.</li><li>At commit point (under WAL), updates are saved on disk.</li><li>After failure, the log is used to Redo affected transactions. No Undo is required because no AFIM is flushed before commit.</li><li>In concurrent environments, two tables are used: <b>Active table</b> and <b>Commit table</b>. Commit table transactions are redone; active ones are ignored.</li></ul><p><b>Immediate Update (Undo/No-redo or Undo/Redo):</b></p><ul><li><b>Undo/No-redo:</b> AFIMs are flushed before commit. The recovery manager undoes all transactions during recovery. No transaction is redone.</li><li><b>Undo/Redo:</b> In concurrent execution, undo a transaction if it is in the active table, and redo a transaction if it is in the commit table.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عملية الـ Redo هي عملية "Idempotent" (مُحايدة الأثر عند التكرار)، مما يعني أن تنفيذ Redo لـ AFIM مرة واحدة يعادل تنفيذه عدة مرات لنفس الـ AFIM. هذا يمنع عدم الاتساق إذا تم إعادة تنفيذ معاملة مرتين بالخطأ أثناء الاسترداد.</p></template>
+    <template class="content-en"><p>The Redo operation is "<span class="smart-term" data-term-en="Idempotent" data-ar="مُحايد الأثر (عند التكرار)" data-en-def="An operation that produces the same result whether executed once or multiple times.">idempotent<span class="smart-term-tooltip"></span></span>", meaning that one redo for an AFIM is equivalent to multiple redos for the same AFIM. This prevents inconsistency if a commit table transaction is accidentally redone twice during recovery.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في خوارزمية Undo/No-redo، ماذا يحدث لمعاملة أكملت تنفيذها وجاهزة للالتزام لحظة الانهيار؟</template>
+      <template class="content-en">In the Undo/No-redo algorithm, what happens to a transaction that completed execution and is ready to commit at the moment of crash?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتم التراجع عنها (Undo) بالكامل، لأنه لم يتم تسجيل التزامها النهائي، ولا توجد آلية للإعادة (No-redo) في هذه الخوارزمية.</p></template>
+      <template class="content-en"><p>It will be completely undone, because its final commit was not recorded, and there is no Redo mechanism in this algorithm.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="shadow-paging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> ترقيم الصفحات الظلي (Shadow Paging)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Shadow Paging</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية لا تكتب التعديلات فوق البيانات الأصلية، بل تنشئ نسخة "ظلية" جديدة، مما يلغي الحاجة لعمليات التراجع (Undo).</p></template>
+    <template class="content-en"><p>A technique that doesn't overwrite original data but creates a new "shadow" copy, eliminating the need for Undo operations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في تقنية <b>Shadow Paging</b>، لا يكتب AFIM فوق BFIM الخاص به، بل يُسجل في مكان آخر على القرص. وبالتالي، في أي وقت، يكون لعنصر البيانات نسختان (AFIM و BFIM) في مكانين مختلفين.</p><p>لإدارة وصول المعاملات المتزامنة، يتم استخدام دليلين (Directories):</p><ul><li><b>الدليل الحالي (Current Directory):</b> يشير إلى أحدث الصفحات (بما في ذلك التعديلات الجديدة).</li><li><b>الدليل الظلي (Shadow Directory):</b> يشير إلى الصفحات الأصلية قبل بدء المعاملة (لم يتم تحديثه).</li></ul></template>
+    <template class="content-en"><p>In <b>Shadow Paging</b>, the AFIM does not overwrite its BFIM but is recorded at another place on the disk. Thus, at any time a data item has AFIM and BFIM (Shadow copy) at two different places.</p><p>To manage access by concurrent transactions, two directories are used:</p><ul><li><b>Current directory:</b> Points to the most recent pages (including new updates).</li><li><b>Shadow directory:</b> Points to the original pages before the transaction started (not updated).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ميزة هذه التقنية هي أن الاسترداد من الفشل سريع جداً؛ ببساطة نتخلص من الدليل الحالي ونعود لاستخدام الدليل الظلي (الذي يمثل الحالة المتسقة السابقة). لا حاجة لـ Undo أو Redo.</p><p>العيوب تشمل</p><ul><li><strong>تجزئة البيانات على القرص (Fragmentation)</strong></li><li><strong>وتكلفة صيانة دليلين</strong>،</li></ul><p>مما يجعلها أقل شيوعاً في قواعد البيانات الحديثة مقارنة بـ WAL.</p></template>
+    <template class="content-en"><p>The advantage is that crash recovery is extremely fast; simply discard the current directory and revert to the shadow directory (the last consistent state). No Undo or Redo is needed.</p><p>Disadvantages include data fragmentation on disk and the overhead of maintaining two directories, making it less common in modern databases compared to WAL.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A diagram showing two directories: 'Current directory' and 'Shadow directory'. Both have pointers (arrows) pointing to a central block labeled 'Database disk blocks (pages)'. The Shadow directory points to 'Page 5 (old)' and 'Page 2 (old)'. The Current directory points to 'Page 5 (new)' and 'Page 2 (new)'. Both point to shared unchanged pages like 'Page 1', 'Page 3', 'Page 4', 'Page 6'. Style: educational, dark background #0d1117, accent colors #58a6ff and #3fb950, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow-shadow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)" />
+        </marker>
+        <marker id="arrow-current" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Database Disk Blocks Area -->
+    <rect x="40" y="360" width="820" height="150" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8" rx="12" />
+    <text x="450" y="385" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-secondary)">Database Disk Blocks (Pages)</text>
+    <text x="450" y="385" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-secondary)">كتل قرص قاعدة البيانات (الصفحات)</text>
+
+    <!-- Legend -->
+    <rect x="350" y="60" width="200" height="90" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    
+    <rect x="365" y="72" width="16" height="16" rx="3" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="460" y="85" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Shared Page</text>
+    <text x="460" y="85" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">صفحة مشتركة</text>
+    
+    <rect x="365" y="97" width="16" height="16" rx="3" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-dasharray="3" />
+    <text x="460" y="110" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Old Page (Shadow)</text>
+    <text x="460" y="110" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">صفحة قديمة (ظل)</text>
+    
+    <rect x="365" y="122" width="16" height="16" rx="3" fill="var(--brand-500)" stroke="var(--brand-500)" />
+    <text x="460" y="135" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">New Page (Current)</text>
+    <text x="460" y="135" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">صفحة جديدة (حالية)</text>
+
+    <!-- Disk Blocks (Pages) -->
+    <!-- Page 1 (Shared) -->
+    <rect x="65" y="410" width="70" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="8" />
+    <text x="100" y="450" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Page 1</text>
+    <text x="100" y="450" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">صفحة 1</text>
+
+    <!-- Page 2 (Old) -->
+    <rect x="165" y="410" width="70" height="70" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-dasharray="4" rx="8" />
+    <text x="200" y="440" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-secondary)">Page 2</text>
+    <text x="200" y="460" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-muted)">(old)</text>
+    <text x="200" y="440" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-secondary)">صفحة 2</text>
+    <text x="200" y="460" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-muted)">(قديمة)</text>
+
+    <!-- Page 2 (New) -->
+    <rect x="265" y="410" width="70" height="70" fill="var(--brand-500)" stroke="var(--brand-500)" rx="8" />
+    <text x="300" y="440" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">Page 2</text>
+    <text x="300" y="460" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--on-brand-lo)">(new)</text>
+    <text x="300" y="440" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">صفحة 2</text>
+    <text x="300" y="460" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--on-brand-lo)">(جديدة)</text>
+
+    <!-- Page 3 (Shared) -->
+    <rect x="365" y="410" width="70" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="8" />
+    <text x="400" y="450" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Page 3</text>
+    <text x="400" y="450" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">صفحة 3</text>
+
+    <!-- Page 4 (Shared) -->
+    <rect x="465" y="410" width="70" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="8" />
+    <text x="500" y="450" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Page 4</text>
+    <text x="500" y="450" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">صفحة 4</text>
+
+    <!-- Page 5 (Old) -->
+    <rect x="565" y="410" width="70" height="70" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-dasharray="4" rx="8" />
+    <text x="600" y="440" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-secondary)">Page 5</text>
+    <text x="600" y="460" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-muted)">(old)</text>
+    <text x="600" y="440" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-secondary)">صفحة 5</text>
+    <text x="600" y="460" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-muted)">(قديمة)</text>
+
+    <!-- Page 5 (New) -->
+    <rect x="665" y="410" width="70" height="70" fill="var(--brand-500)" stroke="var(--brand-500)" rx="8" />
+    <text x="700" y="440" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">Page 5</text>
+    <text x="700" y="460" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--on-brand-lo)">(new)</text>
+    <text x="700" y="440" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">صفحة 5</text>
+    <text x="700" y="460" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--on-brand-lo)">(جديدة)</text>
+
+    <!-- Page 6 (Shared) -->
+    <rect x="765" y="410" width="70" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="8" />
+    <text x="800" y="450" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Page 6</text>
+    <text x="800" y="450" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">صفحة 6</text>
+
+    <!-- Pointers (Paths) -->
+    <!-- Shadow Pointers -->
+    <g fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-shadow)">
+        <path d="M 270 115 C 182.5 115, 95 310, 95 410" />
+        <path d="M 270 145 C 235 145, 200 310, 200 410" />
+        <path d="M 270 175 C 332.5 175, 395 310, 395 410" />
+        <path d="M 270 205 C 382.5 205, 495 310, 495 410" />
+        <path d="M 270 235 C 435 235, 600 310, 600 410" />
+        <path d="M 270 265 C 532.5 265, 795 310, 795 410" />
+    </g>
+
+    <!-- Current Pointers -->
+    <g fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-current)">
+        <path d="M 670 115 C 387.5 115, 105 310, 105 410" />
+        <path d="M 670 145 C 485 145, 300 310, 300 410" />
+        <path d="M 670 175 C 537.5 175, 405 310, 405 410" />
+        <path d="M 670 205 C 587.5 205, 505 310, 505 410" />
+        <path d="M 670 235 C 685 235, 700 310, 700 410" />
+        <path d="M 670 265 C 737.5 265, 805 310, 805 410" />
+    </g>
+
+    <!-- Directories -->
+    <!-- Shadow Directory Box -->
+    <rect x="170" y="60" width="160" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <path d="M 170 68 A 8 8 0 0 1 178 60 L 322 60 A 8 8 0 0 1 330 68 L 330 100 L 170 100 Z" fill="var(--brand-700)" />
+    <text x="250" y="85" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">Shadow Directory</text>
+    <text x="250" y="85" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">الدليل الظل</text>
+    
+    <!-- Shadow Directory Grid -->
+    <line x1="170" y1="130" x2="330" y2="130" stroke="var(--border-color)" />
+    <line x1="170" y1="160" x2="330" y2="160" stroke="var(--border-color)" />
+    <line x1="170" y1="190" x2="330" y2="190" stroke="var(--border-color)" />
+    <line x1="170" y1="220" x2="330" y2="220" stroke="var(--border-color)" />
+    <line x1="170" y1="250" x2="330" y2="250" stroke="var(--border-color)" />
+    <line x1="210" y1="100" x2="210" y2="280" stroke="var(--border-color)" />
+
+    <!-- Shadow Directory Slots & Dots -->
+    <g font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="190" y="120">1</text>
+        <text x="190" y="150">2</text>
+        <text x="190" y="180">3</text>
+        <text x="190" y="210">4</text>
+        <text x="190" y="240">5</text>
+        <text x="190" y="270">6</text>
+    </g>
+    <g fill="var(--brand-400)">
+        <circle cx="270" cy="115" r="4" />
+        <circle cx="270" cy="145" r="4" />
+        <circle cx="270" cy="175" r="4" />
+        <circle cx="270" cy="205" r="4" />
+        <circle cx="270" cy="235" r="4" />
+        <circle cx="270" cy="265" r="4" />
+    </g>
+
+    <!-- Current Directory Box -->
+    <rect x="570" y="60" width="160" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 570 68 A 8 8 0 0 1 578 60 L 722 60 A 8 8 0 0 1 730 68 L 730 100 L 570 100 Z" fill="var(--brand-700)" />
+    <text x="650" y="85" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">Current Directory</text>
+    <text x="650" y="85" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">الدليل الحالي</text>
+
+    <!-- Current Directory Grid -->
+    <line x1="570" y1="130" x2="730" y2="130" stroke="var(--border-color)" />
+    <line x1="570" y1="160" x2="730" y2="160" stroke="var(--border-color)" />
+    <line x1="570" y1="190" x2="730" y2="190" stroke="var(--border-color)" />
+    <line x1="570" y1="220" x2="730" y2="220" stroke="var(--border-color)" />
+    <line x1="570" y1="250" x2="730" y2="250" stroke="var(--border-color)" />
+    <line x1="610" y1="100" x2="610" y2="280" stroke="var(--border-color)" />
+
+    <!-- Current Directory Slots & Dots -->
+    <g font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="590" y="120">1</text>
+        <text x="590" y="150">2</text>
+        <text x="590" y="180">3</text>
+        <text x="590" y="210">4</text>
+        <text x="590" y="240">5</text>
+        <text x="590" y="270">6</text>
+    </g>
+    <g fill="var(--brand-500)">
+        <circle cx="670" cy="115" r="4" />
+        <circle cx="670" cy="145" r="4" />
+        <circle cx="670" cy="175" r="4" />
+        <circle cx="670" cy="205" r="4" />
+        <circle cx="670" cy="235" r="4" />
+        <circle cx="670" cy="265" r="4" />
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يتم الالتزام (Commit) في نظام Shadow Paging؟</template>
+      <template class="content-en">How is a Commit performed in a Shadow Paging system?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم الالتزام ببساطة عن طريق جعل الدليل الظلي يشير إلى الدليل الحالي، ثم التخلص من الصفحات القديمة التي لم يعد يُشار إليها.</p></template>
+      <template class="content-en"><p>A commit is performed simply by making the shadow directory point to the current directory, and then freeing the old pages that are no longer referenced.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="aries-recovery-algorithm" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> خوارزمية الاسترداد ARIES</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> The ARIES Recovery Algorithm</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية قياسية صناعية تعتمد على تكرار التاريخ (Redo) بالكامل ثم التراجع (Undo) عن المعاملات غير المكتملة، مع تسجيل عمليات التراجع.</p></template>
+    <template class="content-en"><p>An industry-standard algorithm based on repeating history (Redo) completely, then Undoing uncommitted transactions, while logging the undo operations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد خوارزمية ARIES على ثلاثة مبادئ:</p><ol><li><b>WAL:</b> الكتابة المسبقة للسجل.</li><li><b>تكرار التاريخ أثناء الإعادة (Repeating history during redo):</b> تعيد ARIES تتبع جميع إجراءات النظام قبل الانهيار لإعادة بناء حالة قاعدة البيانات لحظة الانهيار بالضبط.</li><li><b>تسجيل التغييرات أثناء التراجع (Logging changes during undo):</b> يمنع ARIES من تكرار عمليات التراجع المكتملة إذا حدث فشل أثناء الاسترداد نفسه (باستخدام سجلات تعويضية).</li></ol><p>تتكون ARIES من 3 مراحل:</p><ol><li><b>مرحلة التحليل (Analysis):</b> تبدأ من نقطة الفحص، تحدد الصفحات المعدلة (Dirty pages) والمعاملات النشطة لحظة الانهيار، وتحدد نقطة بدء الـ Redo.</li><li><b>مرحلة الإعادة (Redo):</b> تطبق عمليات الإعادة الضرورية للمضي قدماً حتى نهاية السجل.</li><li><b>مرحلة التراجع (Undo):</b> يُقرأ السجل للخلف ويتم التراجع عن المعاملات النشطة (غير الملتزمة) بترتيب عكسي.</li></ol></template>
+    <template class="content-en"><p>The ARIES algorithm is based on three principles:</p><ol><li><b>WAL:</b> Write-Ahead Logging.</li><li><b>Repeating history during redo:</b> ARIES retraces all actions prior to the crash to reconstruct the exact database state when the crash occurred.</li><li><b>Logging changes during undo:</b> Prevents ARIES from repeating completed undo operations if a failure occurs during recovery (using <span class="smart-term" data-term-en="Compensating Log Record" data-ar="سجل السجل التعويضي" data-en-def="A log record written during the Undo phase to record that an undo operation was performed.">compensating log record<span class="smart-term-tooltip"></span></span>s).</li></ol><p>ARIES consists of 3 steps:</p><ol><li><b>Analysis phase:</b> Starts at the checkpoint, identifies dirty pages and active transactions at crash time, and determines where Redo should start.</li><li><b>Redo phase:</b> Applies necessary redo operations moving forward to the end of the log.</li><li><b>Undo phase:</b> Scans the log backward and undoes operations of active transactions in reverse order.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تستخدم ARIES <b><span class="smart-term" data-term-en="LSN" data-ar="رقم تسلسل السجل" data-en-def="Log Sequence Number: A unique, monotonically increasing identifier associated with every log record.">رقم تسلسل السجل<span class="smart-term-tooltip"></span></span> (LSN)</b>، وهو معرف فريد يتزايد باستمرار لكل سجل. كل صفحة بيانات تخزن LSN لآخر عملية أثرت عليها، مما يساعد ARIES في معرفة ما إذا كان التحديث قد كُتب على القرص أم لا.</p><p>تستخدم ARIES أيضاً <b>نقاط الفحص الضبابية (Fuzzy Checkpointing)</b>، حيث تكتب محتويات <b>جدول المعاملات (Transaction Table)</b> و <b>جدول الصفحات المعدلة (Dirty Page Table)</b> إلى السجل دون إيقاف النظام.</p></template>
+    <template class="content-en"><p>ARIES uses a <b>Log Sequence Number (<span class="smart-term" data-term-en="LSN" data-ar="رقم تسلسل السجل" data-en-def="Log Sequence Number: A unique, monotonically increasing identifier associated with every log record.">LSN<span class="smart-term-tooltip"></span></span>)</b>, a monotonically increasing unique ID for every log record. Each data page stores the LSN of the latest log record corresponding to a change, helping ARIES know if an update made it to disk.</p><p>ARIES also uses <b>Fuzzy Checkpointing</b>, writing the contents of the <b>Transaction Table</b> and <b>Dirty Page Table</b> to the log without halting the system.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تقوم ARIES بتسجيل عمليات التراجع (Undo) في السجل؟ أليس هذا تكراراً للعمل؟</template>
+      <template class="content-en">Why does ARIES log the Undo operations? Isn't that redundant work?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم ذلك لمنع تكرار التراجع إذا تعطل النظام *أثناء* عملية الاسترداد. السجلات التعويضية تضمن أن عملية التراجع تمضي قدماً ولا تعلق في حلقة مفرغة من التراجعات المتكررة.</p></template>
+      <template class="content-en"><p>It is done to prevent repeating the undo if the system crashes *during* the recovery process. Compensating log records ensure the undo process makes forward progress and doesn't get stuck in an infinite loop of repeated undos.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multidatabase-recovery" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> الاسترداد في أنظمة قواعد البيانات المتعددة (2PC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Recovery in Multidatabase Systems (2PC)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في الأنظمة الموزعة، تلتزم المعاملة فقط إذا وافقت جميع العقد على الالتزام، باستخدام بروتوكول الالتزام ثنائي المرحلة (2PC).</p></template>
+    <template class="content-en"><p>In distributed systems, a transaction commits only if all nodes agree to commit, using the Two-Phase Commit (2PC) protocol.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>نظام قواعد البيانات المتعددة هو نظام موزع (مثلاً: عقدة تعمل بنظام علائقي تحت UNIX، وأخرى كائنية التوجه تحت Windows). قد تعمل المعاملة بشكل موزع عبر عقد متعددة.</p><p>في هذا السيناريو، تلتزم المعاملة <b>فقط</b> عندما توافق جميع هذه العقد المتعددة على حفظ الجزء الخاص بها من المعاملة بشكل فردي.</p><p>يُعرف مخطط الالتزام هذا باسم <b><span class="smart-term" data-term-en="2PC" data-ar="الالتزام ثنائي المرحلة" data-en-def="Two-Phase Commit: A distributed algorithm that coordinates all the processes that participate in a distributed atomic transaction on whether to commit or abort.">الالتزام ثنائي المرحلة<span class="smart-term-tooltip"></span></span> (Two-Phase Commit - 2PC)</b>:</p><ul><li>إذا فشلت أي عقدة من هذه العقد أو لم تتمكن من الالتزام بجزئها من المعاملة، يتم إجهاض (Abort) المعاملة بأكملها في جميع العقد.</li><li>تسترد كل عقدة المعاملة وفقاً لبروتوكول الاسترداد الخاص بها.</li></ul></template>
+    <template class="content-en"><p>A multi-database system is a distributed database system (e.g., one node relational under UNIX, another object-oriented under Windows). A transaction may run in a distributed fashion at multiple nodes.</p><p>In this scenario, the transaction commits <b>only</b> when all these multiple nodes agree to save individually the part of the transaction they were executing.</p><p>This commit scheme is a <b>“two-phase commit” (<span class="smart-term" data-term-en="2PC" data-ar="الالتزام ثنائي المرحلة" data-en-def="Two-Phase Commit: A distributed algorithm that coordinates all the processes that participate in a distributed atomic transaction on whether to commit or abort.">2PC<span class="smart-term-tooltip"></span></span>)</b>:</p><ul><li>If any one of these nodes fails or cannot commit its part, then the entire transaction is aborted across all nodes.</li><li>Each node recovers the transaction under its own recovery protocol.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المرحلة الأولى في 2PC هي مرحلة "التحضير" (Prepare)، حيث يسأل المنسق جميع العقد عما إذا كانت جاهزة للالتزام. المرحلة الثانية هي مرحلة "الالتزام/الإجهاض" (Commit/Abort) بناءً على ردود العقد.</p><p>هذا يضمن الذرية (Atomicity) على مستوى النظام الموزع بأكمله، وليس فقط على مستوى العقدة الفردية.</p></template>
+    <template class="content-en"><ol><li><strong>The first phase</strong> in 2PC is the 'Prepare' phase, where the coordinator asks all nodes if they are ready to commit.</li><li><strong>The second phase</strong> is the 'Commit/Abort' phase based on the nodes' responses.</li></ol><p>This ensures Atomicity at the global distributed system level, not just at the individual node level.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي لبروتوكول 2PC؟</template>
+      <template class="content-en">What is the main drawback of the 2PC protocol?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إنه بروتوكول حظر (Blocking protocol). إذا تعطل المنسق بعد مرحلة التحضير، تظل العقد المشاركة معلقة وتُقفل الموارد حتى يتم استرداد المنسق.</p></template>
+      <template class="content-en"><p>It is a blocking protocol. If the coordinator crashes after the prepare phase, participating nodes remain blocked and resources are locked until the coordinator recovers.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في واحدة من أهم وحدات قواعد البيانات: الاسترداد. تخيلوا أنكم تديرون بنكاً وانقطع التيار الكهربائي في منتصف تحويل مليون دولار. الكابوس، أليس كذلك؟ هنا يأتي دور ما تعلمناه اليوم. السر كله يكمن في 'سجل المعاملات' (Log). تذكروا القاعدة الذهبية WAL: اكتب في السجل قبل أن تلمس البيانات الفعلية. في الامتحان، ركزوا جيداً على الفرق بين التحديث المؤجل (الذي يحب الـ Redo ويكره الـ Undo) والتحديث الفوري. ولا تنسوا خوارزمية ARIES؛ إنها المعيار الصناعي. تذكروا مراحلها الثلاث بالترتيب: تحليل (لنعرف أين نحن)، إعادة (لنكرر التاريخ ونصل لنقطة الانهيار)، ثم تراجع (لننظف الفوضى التي تركتها المعاملات غير المكتملة). ركزوا على سياسات Steal و Force وكيف تؤثر على الأداء. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome everyone to one of the most critical database modules: Recovery. Imagine running a bank and the power goes out mid-transfer of a million dollars. Nightmare, right? That's where today's concepts save the day. The secret lies in the 'Transaction Log'. Remember the golden rule, WAL: write to the log before touching the actual data. For the exam, focus heavily on the difference between Deferred Update (loves Redo, hates Undo) and Immediate Update. And don't forget ARIES; it's the industry standard. Remember its three phases in order: Analysis (to know where we are), Redo (to repeat history to the crash point), and Undo (to clean up the mess of uncommitted transactions). Pay attention to Steal/Force policies and their performance impacts. Good luck studying!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين فشل النظام وفشل الوسائط؟</template>
+          <template class="content-en">What is the fundamental difference between a system failure and a media failure?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين فشل النظام وفشل الوسائط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">فشل النظام (مثل تعطل نظام التشغيل) يفقد محتويات الذاكرة المؤقتة (RAM) ولكن القرص يبقى سليماً، لذا نستخدم السجل للاسترداد. فشل الوسائط (مثل احتراق القرص) يدمر البيانات والسجل معاً (إذا كانا على نفس القرص)، ويتطلب استعادة من نسخ احتياطية خارجية.</template>
+          <template class="content-en">System failure (like an OS crash) loses RAM contents but the disk remains intact, so we use the log for recovery. Media failure (like a disk burn) destroys data and potentially the log, requiring restoration from external backups.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى بروتوكول WAL؟</template>
+          <template class="content-en">Why do we need the WAL protocol?</template>
+          <span class="content-target">لماذا نحتاج إلى بروتوكول WAL؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لضمان إمكانية الاسترداد. إذا كتبنا البيانات على القرص قبل السجل وتعطل النظام، فلن نتمكن من التراجع (Undo). وإذا التزمنا قبل كتابة السجل وتعطل النظام، فلن نتمكن من الإعادة (Redo). WAL يضمن وجود المعلومات اللازمة للاسترداد دائماً.</template>
+          <template class="content-en">To guarantee recoverability. If we write data to disk before the log and crash, we can't Undo. If we commit before writing the log and crash, we can't Redo. WAL ensures the necessary recovery info is always safe.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التحديث المؤجل، لماذا لا نحتاج إلى عملية Undo؟</template>
+          <template class="content-en">In Deferred Update, why don't we need an Undo operation?</template>
+          <span class="content-target">في التحديث المؤجل، لماذا لا نحتاج إلى عملية Undo؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التحديث المؤجل يمنع كتابة أي بيانات معدلة إلى القرص حتى تلتزم المعاملة بنجاح. إذا فشلت المعاملة، فإن تعديلاتها كانت في الذاكرة المؤقتة فقط وتتلاشى، لذا لا يوجد شيء على القرص يحتاج إلى تراجع.</template>
+          <template class="content-en">Because deferred update prevents writing any modified data to disk until the transaction successfully commits. If it fails, its changes were only in cache and vanish, so there's nothing on disk to undo.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي سياسة Steal ولماذا هي مهمة؟</template>
+          <template class="content-en">What is the Steal policy and why is it important?</template>
+          <span class="content-target">ما هي سياسة Steal ولماذا هي مهمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سياسة Steal تسمح لنظام التشغيل بكتابة صفحات الذاكرة المؤقتة المعدلة إلى القرص قبل التزام المعاملة. هي مهمة لأن الذاكرة المؤقتة محدودة، والمعاملات الطويلة قد تملأ الذاكرة؛ Steal يسمح بإخلاء المساحة.</template>
+          <template class="content-en">The Steal policy allows the OS to write modified cache pages to disk before the transaction commits. It's important because cache is limited, and long transactions might fill it up; Steal allows freeing up space.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل تقنية Shadow Paging؟</template>
+          <template class="content-en">How does Shadow Paging work?</template>
+          <span class="content-target">كيف تعمل تقنية Shadow Paging؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من الكتابة فوق البيانات القديمة، تكتب التعديلات في صفحات جديدة (ظلية). يتم استخدام دليلين: الدليل الحالي والدليل الظلي. عند الالتزام، يصبح الدليل الحالي هو الدليل الظلي الجديد. الاسترداد فوري بمجرد تجاهل الدليل الحالي.</template>
+          <template class="content-en">Instead of overwriting old data, updates are written to new (shadow) pages. Two directories are used: current and shadow. On commit, the current directory becomes the new shadow directory. Recovery is instant by just discarding the current directory.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مبدأ 'تكرار التاريخ' في خوارزمية ARIES؟</template>
+          <template class="content-en">What is the 'repeating history' principle in the ARIES algorithm?</template>
+          <span class="content-target">ما هو مبدأ 'تكرار التاريخ' في خوارزمية ARIES؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني أن ARIES، خلال مرحلة الإعادة (Redo)، تعيد تطبيق جميع العمليات المسجلة (بما في ذلك عمليات المعاملات التي لم تلتزم) لإعادة قاعدة البيانات بالضبط إلى الحالة التي كانت عليها لحظة الانهيار، قبل البدء في التراجع.</template>
+          <template class="content-en">It means ARIES, during the Redo phase, reapplies all logged operations (including those of uncommitted transactions) to bring the database exactly back to the state it was in at the moment of crash, before starting to undo.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة السجلات التعويضية (Compensating Log Records) في ARIES؟</template>
+          <template class="content-en">What is the function of Compensating Log Records in ARIES?</template>
+          <span class="content-target">ما هي وظيفة السجلات التعويضية (Compensating Log Records) في ARIES؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُكتب أثناء مرحلة التراجع (Undo) لتسجيل أن عملية تراجع معينة قد تمت. هذا يمنع ARIES من تكرار نفس التراجع إذا حدث انهيار آخر أثناء عملية الاسترداد نفسها.</template>
+          <template class="content-en">They are written during the Undo phase to record that a specific undo operation was performed. This prevents ARIES from repeating the same undo if another crash occurs during the recovery process itself.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو LSN وكيف يُستخدم؟</template>
+          <template class="content-en">What is an LSN and how is it used?</template>
+          <span class="content-target">ما هو LSN وكيف يُستخدم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">رقم تسلسل السجل (LSN) هو معرف فريد متزايد لكل سجل. كل صفحة بيانات تخزن LSN لآخر تحديث لها. بمقارنة LSN في السجل مع LSN في الصفحة، يعرف النظام ما إذا كان التحديث قد كُتب على القرص أم لا.</template>
+          <template class="content-en">Log Sequence Number (LSN) is a unique, increasing ID for each log record. Every data page stores the LSN of its last update. By comparing the log's LSN with the page's LSN, the system knows if an update made it to disk.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي نقطة الفحص الضبابية (Fuzzy Checkpoint)؟</template>
+          <template class="content-en">What is a Fuzzy Checkpoint?</template>
+          <span class="content-target">ما هي نقطة الفحص الضبابية (Fuzzy Checkpoint)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي نقطة فحص لا تتطلب إيقاف تنفيذ المعاملات. بدلاً من تفريغ كل الذاكرة، تقوم بتسجيل حالة الجداول النشطة (Transaction و Dirty Page) في السجل، مما يقلل من تأثير نقطة الفحص على أداء النظام.</template>
+          <template class="content-en">It is a checkpoint that doesn't require halting transaction execution. Instead of flushing all memory, it records the state of active tables (Transaction and Dirty Page) to the log, minimizing the performance impact.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يتم إجهاض المعاملة في بروتوكول 2PC؟</template>
+          <template class="content-en">When is a transaction aborted in the 2PC protocol?</template>
+          <span class="content-target">متى يتم إجهاض المعاملة في بروتوكول 2PC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يتم إجهاض المعاملة الموزعة بأكملها إذا فشلت أي عقدة واحدة مشاركة، أو إذا ردت أي عقدة بأنها غير قادرة على الالتزام خلال مرحلة التحضير (Prepare phase).</template>
+          <template class="content-en">The entire distributed transaction is aborted if even a single participating node fails, or if any node replies that it cannot commit during the prepare phase.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض من استرداد قاعدة البيانات؟",
+      "en": "What is the purpose of Database Recovery?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إعادة قاعدة البيانات إلى آخر حالة متسقة قبل الفشل، والحفاظ على خصائص ACID.",
+        "en": "To bring the database into the last consistent state prior to failure, preserving ACID properties."
+      },
+      "example": {
+        "ar": "استعادة الأموال إذا تعطل النظام أثناء تحويل بنكي.",
+        "en": "Restoring funds if the system crashes during a bank transfer."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي أنواع الفشل الثلاثة؟",
+      "en": "What are the three types of failure?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فشل المعاملة، فشل النظام، وفشل الوسائط.",
+        "en": "Transaction failure, System failure, and Media failure."
+      },
+      "example": {
+        "ar": "الجمود (معاملة)، تعطل نظام التشغيل (نظام)، احتراق القرص (وسائط).",
+        "en": "Deadlock (Transaction), OS crash (System), Disk burn (Media)."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو BFIM؟",
+      "en": "What is BFIM?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الصورة قبل التعديل (BeFore Image): قيمة عنصر البيانات قبل تعديله.",
+        "en": "BeFore Image: The value of a data item prior to modification."
+      },
+      "example": {
+        "ar": "الرصيد 100﹩ قبل سحب 20﹩.",
+        "en": "Balance $100 before withdrawing $20."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو AFIM؟",
+      "en": "What is AFIM?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الصورة بعد التعديل (AFter Image): القيمة الجديدة لعنصر البيانات بعد التعديل.",
+        "en": "AFter Image: The new value of a data item after modification."
+      },
+      "example": {
+        "ar": "الرصيد 80﹩ بعد سحب 20﹩.",
+        "en": "Balance $80 after withdrawing $20."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو التحديث الفوري (Immediate Update)؟",
+      "en": "What is Immediate Update?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديث نسخة القرص بمجرد تعديل عنصر البيانات في الذاكرة المؤقتة (حتى قبل الالتزام).",
+        "en": "Updating the disk copy as soon as a data item is modified in cache (even before commit)."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو التحديث المؤجل (Deferred Update)؟",
+      "en": "What is Deferred Update?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كتابة العناصر المعدلة إلى القرص فقط بعد انتهاء المعاملة (الالتزام).",
+        "en": "Writing modified data items to disk only after a transaction ends its execution (commits)."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو التحديث الظلي (Shadow Update)؟",
+      "en": "What is Shadow Update?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كتابة النسخة المعدلة في موقع منفصل على القرص بدلاً من الكتابة فوق النسخة الأصلية.",
+        "en": "Writing the modified version at a separate disk location instead of overwriting the original disk copy."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو التحديث في المكان (In-place Update)؟",
+      "en": "What is In-place Update?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الكتابة فوق نسخة القرص الأصلية بالنسخة الجديدة الموجودة في الذاكرة المؤقتة.",
+        "en": "Overwriting the disk version of the data item with the cache version."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي وظيفة بت Pin-Unpin؟",
+      "en": "What is the function of the Pin-Unpin bit?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يوجه نظام التشغيل بعدم تفريغ عنصر البيانات إلى القرص حالياً.",
+        "en": "Instructs the operating system not to flush the data item to disk."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي وظيفة بت التعديل (Modified bit)؟",
+      "en": "What is the function of the Modified bit?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يشير إلى أن عنصر البيانات قد تم تعديله (يحتوي على AFIM).",
+        "en": "Indicates the AFIM of the data item (shows it has been changed)."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو التراجع (Undo)؟",
+      "en": "What is Undo?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استعادة جميع قيم BFIM إلى القرص لإلغاء تأثير معاملة فاشلة.",
+        "en": "Restoring all BFIMs onto disk (removing all AFIMs) to cancel a failed transaction."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي الإعادة (Redo)؟",
+      "en": "What is Redo?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استعادة جميع قيم AFIM إلى القرص لتطبيق تأثير معاملة ملتزمة.",
+        "en": "Restoring all AFIMs onto disk to apply a committed transaction."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو بروتوكول WAL؟",
+      "en": "What is the WAL protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الكتابة المسبقة للسجل: يجب كتابة السجل على وحدة تخزين مستقرة قبل تفريغ البيانات للقرص أو قبل الالتزام.",
+        "en": "Write-Ahead Logging: Log must be saved on stable store before data is flushed to disk or before commit."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي نقطة الفحص (Checkpointing)؟",
+      "en": "What is Checkpointing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تفريغ الذاكرة المؤقتة إلى القرص وكتابة علامة في السجل لتقليل وقت الاسترداد.",
+        "en": "Flushing the buffer to disk and writing a mark in the log to minimize recovery time."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ماذا تعني سياسة Steal؟",
+      "en": "What does the Steal policy mean?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يمكن تفريغ الذاكرة المؤقتة إلى القرص قبل أن تلتزم المعاملة.",
+        "en": "Cache can be flushed before the transaction commits."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ماذا تعني سياسة Force؟",
+      "en": "What does the Force policy mean?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تفريغ الذاكرة المؤقتة فوراً إلى القرص عند التزام المعاملة.",
+        "en": "Cache is immediately flushed (forced) to disk upon commit."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هي خوارزمية ARIES؟",
+      "en": "What is the ARIES algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية استرداد تعتمد على WAL، وتكرار التاريخ أثناء الإعادة، وتسجيل التغييرات أثناء التراجع.",
+        "en": "A recovery algorithm based on WAL, repeating history during redo, and logging changes during undo."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هي مراحل ARIES الثلاث؟",
+      "en": "What are the 3 phases of ARIES?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التحليل (Analysis)، الإعادة (Redo)، والتراجع (Undo).",
+        "en": "Analysis, Redo, and Undo."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "ما هو LSN في ARIES؟",
+      "en": "What is LSN in ARIES?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رقم تسلسل السجل: معرف فريد يتزايد باستمرار مرتبط بكل سجل.",
+        "en": "Log Sequence Number: A unique, monotonically increasing ID associated with every log record."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "ما هو بروتوكول 2PC؟",
+      "en": "What is the 2PC protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الالتزام ثنائي المرحلة: مخطط يضمن التزام المعاملة في نظام موزع فقط إذا وافقت جميع العقد.",
+        "en": "Two-Phase Commit: A scheme ensuring a transaction commits in a distributed system only if all nodes agree."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+        <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <div id="quiz-content" class="quiz-card glass-card">
+          <div class="quiz-header">
+            <span id="quiz-counter">1 / 10</span>
+            <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+          </div>
+          <div class="quiz-question" id="quiz-question-text"></div>
+          <div class="quiz-options" id="quiz-options-container"></div>
+          <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+          <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+              <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+            </button>
+          </div>
+        </div>
+        <div id="quiz-results" class="quiz-results glass-card hidden">
+          <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+        </div>
+      </section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي نوع من الفشل يحدث بسبب خطأ في التطبيق أو خلل في نظام التشغيل؟",
+      "en": "Which type of failure occurs because of an application error or operating system fault?"
+    },
+    "options": {
+      "ar": [
+        "فشل المعاملة (Transaction failure)",
+        "فشل النظام (System failure)",
+        "فشل الوسائط (Media failure)",
+        "فشل الشبكة (Network failure)"
+      ],
+      "en": [
+        "Transaction failure",
+        "System failure",
+        "Media failure",
+        "Network failure"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "فشل النظام يشمل أخطاء العنونة، أخطاء التطبيقات، أعطال نظام التشغيل، وفشل الذاكرة العشوائية.",
+      "en": "System failure includes addressing errors, application errors, OS faults, and RAM failures."
+    },
+    "hint": {
+      "ar": "تذكر الفرق بين انهيار البرنامج وانهيار القرص الصلب.",
+      "en": "Remember the difference between a software crash and a hard disk crash."
+    },
+    "difficulty": "easy",
+    "conceptId": "database-recovery-and-failures"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الغرض من بت Pin-Unpin في التخزين المؤقت للبيانات؟",
+      "en": "What is the purpose of the Pin-Unpin bit in data caching?"
+    },
+    "options": {
+      "ar": [
+        "يشير إلى أن البيانات قد تم تعديلها.",
+        "يوجه نظام التشغيل بعدم تفريغ عنصر البيانات إلى القرص.",
+        "يفرض كتابة البيانات فوراً إلى القرص.",
+        "يحذف البيانات من الذاكرة المؤقتة."
+      ],
+      "en": [
+        "Indicates that the data has been modified.",
+        "Instructs the operating system not to flush the data item to disk.",
+        "Forces immediate writing of data to disk.",
+        "Deletes the data from the cache."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بت Pin-Unpin يمنع نظام التشغيل من كتابة الصفحة إلى القرص بينما لا تزال قيد الاستخدام.",
+      "en": "The Pin-Unpin bit prevents the OS from writing the page to disk while it is still in use."
+    },
+    "hint": {
+      "ar": "فكر في 'تثبيت' (Pinning) ورقة على لوحة لمنعها من الطيران.",
+      "en": "Think of 'pinning' a paper to a board to stop it from flying away."
+    },
+    "difficulty": "medium",
+    "conceptId": "transaction-log-and-caching"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "وفقاً لبروتوكول WAL، ماذا يجب أن يحدث قبل تفريغ AFIM لعنصر بيانات إلى القرص؟",
+      "en": "According to the WAL protocol, what must happen before a data item's AFIM is flushed to disk?"
+    },
+    "options": {
+      "ar": [
+        "يجب التزام المعاملة.",
+        "يجب كتابة BFIM الخاص به في السجل وحفظه على وحدة تخزين مستقرة.",
+        "يجب تنفيذ نقطة فحص (Checkpoint).",
+        "يجب تفريغ جميع الذاكرة المؤقتة."
+      ],
+      "en": [
+        "The transaction must commit.",
+        "Its BFIM must be written to the log and saved on a stable store.",
+        "A checkpoint must be executed.",
+        "The entire cache must be flushed."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "قاعدة WAL للتراجع (Undo) تنص على أنه يجب كتابة BFIM في السجل قبل الكتابة فوقه على القرص.",
+      "en": "The WAL rule for Undo states that the BFIM must be written to the log before overwriting it on disk."
+    },
+    "hint": {
+      "ar": "كيف سنتراجع عن التغيير إذا لم نحفظ القيمة القديمة أولاً؟",
+      "en": "How would we undo the change if we don't save the old value first?"
+    },
+    "difficulty": "medium",
+    "conceptId": "wal-and-undo-redo"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي سياسة تسمح بتفريغ الذاكرة المؤقتة إلى القرص قبل أن تلتزم المعاملة؟",
+      "en": "Which policy allows the cache to be flushed to disk before the transaction commits?"
+    },
+    "options": {
+      "ar": [
+        "Force",
+        "No-Force",
+        "Steal",
+        "No-Steal"
+      ],
+      "en": [
+        "Force",
+        "No-Force",
+        "Steal",
+        "No-Steal"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "سياسة Steal تسمح لنظام التشغيل بـ 'سرقة' إطار من الذاكرة المؤقتة وكتابته للقرص حتى لو لم تلتزم المعاملة بعد.",
+      "en": "The Steal policy allows the OS to 'steal' a buffer frame and write it to disk even if the transaction hasn't committed yet."
+    },
+    "hint": {
+      "ar": "الاسم يوحي بأخذ شيء قبل وقته الرسمي.",
+      "en": "The name implies taking something before its official time."
+    },
+    "difficulty": "easy",
+    "conceptId": "steal-force-policies"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في مخطط التحديث المؤجل (Deferred Update)، أي عملية غير مطلوبة أثناء الاسترداد؟",
+      "en": "In the Deferred Update scheme, which operation is NOT required during recovery?"
+    },
+    "options": {
+      "ar": [
+        "Redo",
+        "Undo",
+        "Checkpointing",
+        "Logging"
+      ],
+      "en": [
+        "Redo",
+        "Undo",
+        "Checkpointing",
+        "Logging"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التحديث المؤجل لا يكتب أي بيانات غير ملتزمة على القرص، لذلك لا توجد حاجة لعملية التراجع (Undo).",
+      "en": "Deferred update never writes uncommitted data to disk, so there is no need for an Undo operation."
+    },
+    "hint": {
+      "ar": "إذا لم يصل الخطأ إلى القرص أبداً، فلن تحتاج إلى إصلاحه.",
+      "en": "If the mistake never reached the disk, you don't need to fix it."
+    },
+    "difficulty": "medium",
+    "conceptId": "recovery-schemes"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي تقنية استرداد تستخدم دليلين (حالي وظلي) وتلغي الحاجة إلى Undo و Redo؟",
+      "en": "Which recovery technique uses two directories (current and shadow) and eliminates the need for Undo and Redo?"
+    },
+    "options": {
+      "ar": [
+        "التحديث الفوري (Immediate Update)",
+        "التحديث المؤجل (Deferred Update)",
+        "ترقيم الصفحات الظلي (Shadow Paging)",
+        "خوارزمية ARIES"
+      ],
+      "en": [
+        "Immediate Update",
+        "Deferred Update",
+        "Shadow Paging",
+        "ARIES Algorithm"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "Shadow Paging يحتفظ بنسخة قديمة (ظلية) ونسخة جديدة، مما يسمح بالاسترداد الفوري بمجرد تبديل المؤشرات.",
+      "en": "Shadow Paging keeps an old (shadow) and new copy, allowing instant recovery just by switching pointers."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على كلمة 'ظل'.",
+      "en": "The name contains the word 'shadow'."
+    },
+    "difficulty": "easy",
+    "conceptId": "shadow-paging"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي المرحلة الأولى في خوارزمية ARIES؟",
+      "en": "What is the first phase in the ARIES algorithm?"
+    },
+    "options": {
+      "ar": [
+        "مرحلة الإعادة (Redo phase)",
+        "مرحلة التراجع (Undo phase)",
+        "مرحلة التحليل (Analysis phase)",
+        "مرحلة نقطة الفحص (Checkpoint phase)"
+      ],
+      "en": [
+        "Redo phase",
+        "Undo phase",
+        "Analysis phase",
+        "Checkpoint phase"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تبدأ ARIES بمرحلة التحليل لتحديد الصفحات المعدلة والمعاملات النشطة ونقطة بدء الإعادة.",
+      "en": "ARIES starts with the Analysis phase to identify dirty pages, active transactions, and the starting point for Redo."
+    },
+    "hint": {
+      "ar": "يجب أن تفهم المشكلة أولاً قبل أن تبدأ في إصلاحها.",
+      "en": "You must understand the problem first before you start fixing it."
+    },
+    "difficulty": "easy",
+    "conceptId": "aries-recovery-algorithm"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "لماذا تقوم خوارزمية ARIES بتسجيل التغييرات أثناء مرحلة التراجع (Undo)؟",
+      "en": "Why does the ARIES algorithm log changes during the Undo phase?"
+    },
+    "options": {
+      "ar": [
+        "لتوفير مساحة على القرص.",
+        "لمنع تكرار عمليات التراجع المكتملة إذا حدث فشل أثناء الاسترداد.",
+        "لتسريع مرحلة الإعادة (Redo).",
+        "لأن بروتوكول 2PC يتطلب ذلك."
+      ],
+      "en": [
+        "To save disk space.",
+        "To prevent repeating completed undo operations if a failure occurs during recovery.",
+        "To speed up the Redo phase.",
+        "Because the 2PC protocol requires it."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تستخدم ARIES سجلات تعويضية أثناء التراجع لضمان عدم تكرار نفس التراجع إذا انهار النظام مرة أخرى أثناء الاسترداد.",
+      "en": "ARIES uses compensating log records during undo to ensure the same undo isn't repeated if the system crashes again during recovery."
+    },
+    "hint": {
+      "ar": "ماذا لو انهار النظام بينما يحاول التعافي من انهيار سابق؟",
+      "en": "What if the system crashes while trying to recover from a previous crash?"
+    },
+    "difficulty": "hard",
+    "conceptId": "aries-recovery-algorithm"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في نظام قواعد البيانات المتعددة، متى تلتزم المعاملة الموزعة؟",
+      "en": "In a multidatabase system, when does a distributed transaction commit?"
+    },
+    "options": {
+      "ar": [
+        "عندما تلتزم العقدة الرئيسية فقط.",
+        "عندما توافق أغلبية العقد على الالتزام.",
+        "فقط عندما توافق جميع العقد المتعددة على حفظ الجزء الخاص بها.",
+        "بمجرد كتابة السجل في أي عقدة."
+      ],
+      "en": [
+        "When only the master node commits.",
+        "When a majority of nodes agree to commit.",
+        "Only when all these multiple nodes agree to save their part.",
+        "As soon as the log is written in any node."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بروتوكول الالتزام ثنائي المرحلة (2PC) يتطلب إجماعاً كاملاً (100%) من جميع العقد للالتزام.",
+      "en": "The Two-Phase Commit (2PC) protocol requires full consensus (100%) from all nodes to commit."
+    },
+    "hint": {
+      "ar": "الكل أو لا شيء.",
+      "en": "All or nothing."
+    },
+    "difficulty": "medium",
+    "conceptId": "multidatabase-recovery"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي الجداول الإضافية التي تخزنها ARIES في السجل أثناء نقطة الفحص (Checkpointing)؟",
+      "en": "What additional tables does ARIES store in the log during Checkpointing?"
+    },
+    "options": {
+      "ar": [
+        "جدول المستخدمين وجدول الصلاحيات.",
+        "جدول المعاملات (Transaction table) وجدول الصفحات المعدلة (Dirty Page table).",
+        "الدليل الحالي والدليل الظلي.",
+        "جدول الالتزام (Commit table) والجدول النشط (Active table)."
+      ],
+      "en": [
+        "User table and Permissions table.",
+        "Transaction table and Dirty Page table.",
+        "Current directory and Shadow directory.",
+        "Commit table and Active table."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تستخدم ARIES نقاط فحص ضبابية تسجل حالة جدول المعاملات وجدول الصفحات المعدلة لتسريع مرحلة التحليل.",
+      "en": "ARIES uses fuzzy checkpoints that record the state of the Transaction table and Dirty Page table to speed up the Analysis phase."
+    },
+    "hint": {
+      "ar": "تحتاج ARIES لمعرفة من كان يعمل (المعاملات) وماذا تم تلويثه (الصفحات).",
+      "en": "ARIES needs to know who was working (transactions) and what was dirtied (pages)."
+    },
+    "difficulty": "hard",
+    "conceptId": "aries-recovery-algorithm"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">بروتوكول WAL (الكتابة المسبقة للسجل) هو حجر الزاوية في استرداد قواعد البيانات. تذكر دائماً: السجل يسبق البيانات. لا يمكن كتابة البيانات على القرص قبل سجل التراجع (Undo)، ولا يمكن الالتزام قبل سجل الإعادة (Redo).</template>
+    <template class="content-en">The WAL (Write-Ahead Logging) protocol is the cornerstone of database recovery. Always remember: Log precedes Data. Data cannot be written to disk before the Undo log, and commit cannot happen before the Redo log.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين التحديث المؤجل (Deferred) والفوري (Immediate). التحديث المؤجل لا يحتاج أبداً إلى Undo لأن البيانات لا تصل للقرص قبل الالتزام. إذا رأيت سؤالاً يطلب Undo في التحديث المؤجل، فالإجابة هي 'لا يوجد'.</template>
+    <template class="content-en">Confusing Deferred and Immediate Update. Deferred update NEVER needs Undo because data doesn't reach the disk before commit. If a question asks for Undo in Deferred Update, the answer is 'none'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لماذا تسمى نقاط فحص ARIES بـ 'الضبابية' (Fuzzy)؟ لأنها لا توقف النظام بالكامل لكتابة البيانات. إنها تأخذ 'لقطة' سريعة للجداول (Transaction و Dirty Page) بينما تستمر المعاملات في العمل، مما يحسن الأداء بشكل كبير.</template>
+    <template class="content-en">Why are ARIES checkpoints called 'Fuzzy'? Because they don't halt the entire system to write data. They take a quick 'snapshot' of the tables (Transaction and Dirty Page) while transactions keep running, vastly improving performance.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن عملية Redo خطيرة إذا تكررت. عملية Redo هي 'Idempotent' (محايدة الأثر). كتابة القيمة 50 في حقل الرصيد مرة واحدة أو عشر مرات سيعطي نفس النتيجة النهائية (50).</template>
+    <template class="content-en">Believing that Redo is dangerous if repeated. Redo is 'Idempotent'. Writing the value 50 to a balance field once or ten times yields the exact same final result (50).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في بروتوكول 2PC (الالتزام ثنائي المرحلة)، المنسق هو نقطة الضعف. إذا فشل المنسق، تتوقف جميع العقد المشاركة في حالة انتظار (Blocking)، مما يجعله بروتوكولاً غير مثالي للأنظمة عالية التوافر.</template>
+    <template class="content-en">In the 2PC (Two-Phase Commit) protocol, the coordinator is the weak point. If the coordinator fails, all participating nodes block and wait, making it less than ideal for highly available systems.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+  <script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT354" data-module="1" data-no-videos>
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تخزين القرص، هياكل الملفات الأساسية، والتقطيع (Hashing) · IT354 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+      var fs=localStorage.getItem('garden_font_size');
+      if(fs)document.documentElement.setAttribute('data-font-size',fs);
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT354" data-page-title-en="IT354">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="index.html" data-gh-next="M02.html" data-gh-card="../../hub/course.html?code=IT354"></header>
+
+  <div class="content-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+      <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#disk-storage-devices" class="toc-link" data-bilingual>
+        <template class="content-ar">أجهزة تخزين القرص (Disk Storage Devices)</template>
+        <template class="content-en">Disk Storage Devices</template>
+        <span class="content-target">أجهزة تخزين القرص (Disk Storage Devices)</span>
+      </a>
+      <a href="#buffering-and-blocking" class="toc-link" data-bilingual>
+        <template class="content-ar">التخزين المؤقت وتجميع السجلات (Buffering &amp; Blocking)</template>
+        <template class="content-en">Buffering and Blocking</template>
+        <span class="content-target">التخزين المؤقت وتجميع السجلات (Buffering &amp; Blocking)</span>
+      </a>
+      <a href="#unordered-heap-files" class="toc-link" data-bilingual>
+        <template class="content-ar">الملفات غير المرتبة (Heap Files)</template>
+        <template class="content-en">Unordered Files (Heap Files)</template>
+        <span class="content-target">الملفات غير المرتبة (Heap Files)</span>
+      </a>
+      <a href="#ordered-sequential-files" class="toc-link" data-bilingual>
+        <template class="content-ar">الملفات المرتبة (Ordered / Sequential Files)</template>
+        <template class="content-en">Ordered Files (Sequential Files)</template>
+        <span class="content-target">الملفات المرتبة (Ordered / Sequential Files)</span>
+      </a>
+      <a href="#hashed-files-external" class="toc-link" data-bilingual>
+        <template class="content-ar">الملفات المقطعة (Hashed Files - External Hashing)</template>
+        <template class="content-en">Hashed Files (External Hashing)</template>
+        <span class="content-target">الملفات المقطعة (Hashed Files - External Hashing)</span>
+      </a>
+      <a href="#dynamic-extendible-hashing" class="toc-link" data-bilingual>
+        <template class="content-ar">التقطيع الديناميكي والقابل للتوسعة (Dynamic &amp; Extendible Hashing)</template>
+        <template class="content-en">Dynamic and Extendible Hashing</template>
+        <span class="content-target">التقطيع الديناميكي والقابل للتوسعة (Dynamic &amp; Extendible Hashing)</span>
+      </a>
+      <a href="#raid-technology" class="toc-link" data-bilingual>
+        <template class="content-ar">تقنية مصفوفة الأقراص المستقلة (RAID Technology)</template>
+        <template class="content-en">RAID Technology</template>
+        <span class="content-target">تقنية مصفوفة الأقراص المستقلة (RAID Technology)</span>
+      </a>
+      <a href="#storage-area-networks-san" class="toc-link" data-bilingual>
+        <template class="content-ar">شبكات منطقة التخزين (SANs)</template>
+        <template class="content-en">Storage Area Networks (SANs)</template>
+        <span class="content-target">شبكات منطقة التخزين (SANs)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+      <div class="sidebar-widget">
+        <div class="widget-number" id="fc-due-count">0</div>
+        <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 1</template>
+      <template class="content-en">Module 1</template>
+      <span class="content-target">الوحدة 1</span>
+    </span> · IT354
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تخزين القرص، هياكل الملفات الأساسية، والتقطيع (Hashing)</h1>
+      <p class="hero-description">تغطي هذه الوحدة أجهزة التخزين الثانوي، وكيفية تخزين السجلات في الكتل، وتنظيمات الملفات الأساسية (غير المرتبة، المرتبة، والمقطعة)، بالإضافة إلى تقنيات RAID وشبكات التخزين (SANs).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Disk Storage, Basic File Structures, and Hashing</h1>
+      <p class="hero-description">This module covers secondary storage devices, buffering of blocks, basic file organizations (unordered, ordered, hashed), RAID technology, and Storage Area Networks (SANs).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">قواعد البيانات</span>
+      <span class="tag">التخزين الثانوي</span>
+      <span class="tag">هياكل الملفات</span>
+      <span class="tag">التقطيع</span>
+      <span class="tag">RAID</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Databases</span>
+      <span class="tag">Secondary Storage</span>
+      <span class="tag">File Structures</span>
+      <span class="tag">Hashing</span>
+      <span class="tag">RAID</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم البنية المادية لأقراص التخزين المغناطيسية وكيفية حساب أوقات الوصول.</span></li>
+      <li><span class="obj-icon">✦</span><span>المقارنة بين طرق تنظيم الملفات المختلفة (Heap, Sorted, Hashed) من حيث كفاءة البحث والإدراج.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات التقطيع الخارجي (External Hashing) وحل مشكلات التصادم.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل مستويات RAID المختلفة واختيار المستوى المناسب بناءً على متطلبات الأداء والموثوقية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the physical structure of magnetic disks and how to calculate access times.</span></li>
+      <li><span class="obj-icon">✦</span><span>Compare different file organizations (Heap, Sorted, Hashed) in terms of search and insertion efficiency.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply external hashing techniques and resolve collision issues.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze different RAID levels and select the appropriate level based on performance and reliability requirements.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="disk-storage-devices" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أجهزة تخزين القرص (Disk Storage Devices)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Disk Storage Devices</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القرص المغناطيسي هو جهاز التخزين الثانوي المفضل لسعته العالية وتكلفته المنخفضة، حيث تُخزن البيانات كمناطق ممغنطة على مسارات دائرية.</p></template>
+    <template class="content-en"><p>Magnetic disk is the preferred secondary storage device for high capacity and low cost, storing data as magnetized areas on circular tracks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون حزمة الأقراص (Disk pack) من عدة أقراص مغناطيسية متصلة بعمود دوران. ينقسم كل سطح قرص إلى مسارات دائرية متراكزة (Tracks)، وينقسم كل مسار إلى قطاعات (Sectors) أو كتل (Blocks). حجم الكتلة (B) ثابت لكل نظام (عادة من 512 إلى 4096 بايت). يتم نقل كتل كاملة بين القرص والذاكرة الرئيسية.</p><p>يتكون العنوان المادي لكتلة القرص من: رقم الأسطوانة (Cylinder)، رقم المسار/السطح، ورقم الكتلة. القراءة والكتابة تستهلك وقتاً بسبب <span class="smart-term" data-term-en="Seek Time" data-ar="وقت البحث" data-en-def="The time required to move the read-write head to the correct track.">وقت البحث<span class="smart-term-tooltip"></span></span> (Seek time - حركة الرأس) و<span class="smart-term" data-term-en="Rotational Delay (Latency)" data-ar="تأخير الدوران" data-en-def="The time required for the disk to rotate the desired block under the read-write head.">تأخير الدوران<span class="smart-term-tooltip"></span></span> (Rotational delay/Latency).</p></template>
+    <template class="content-en"><p>A disk pack contains several magnetic disks connected to a rotating spindle. Disks are divided into concentric circular tracks, which are further divided into sectors or blocks.</p><p>The block size (B) is fixed for each system (typically 512 to 4096 bytes). Whole blocks are transferred between disk and main memory.</p><p>A physical disk block address consists of:</p><ul><li><strong>cylinder number</strong>,</li><li><strong>track/surface number</strong>, and</li><li><strong>block number</strong>.</li></ul><p>Reading/writing is time-consuming due to <span class="smart-term" data-term-en="Seek Time" data-ar="وقت البحث" data-en-def="The time required to move the read-write head to the correct track.">seek time<span class="smart-term-tooltip"></span></span> (head movement) and <span class="smart-term" data-term-en="Rotational Delay (Latency)" data-ar="تأخير الدوران" data-en-def="The time required for the disk to rotate the desired block under the read-write head.">rotational delay (latency)<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم الكتل (Blocks) بدلاً من البايتات الفردية؟</p><p>لأن التكلفة الميكانيكية للوصول إلى القرص (Seek + Latency) عالية جداً مقارنة بسرعة المعالج. جلب كتلة كاملة يستفيد من مبدأ المحلية المكانية (Spatial Locality).</p><p>مفهوم الأسطوانة (Cylinder) حاسم للأداء: قراءة المسارات الموجودة في نفس الأسطوانة عبر أسطح مختلفة لا يتطلب حركة ميكانيكية لرأس القراءة/الكتابة، مما يقلل من وقت البحث (Seek time) إلى الصفر تقريباً للكتل المتتالية.</p><p>يُستخدم التخزين المؤقت المزدوج (Double buffering) لتسريع نقل الكتل المتجاورة، حيث تتم معالجة كتلة في الذاكرة بينما يتم جلب الكتلة التالية في نفس الوقت.</p></template>
+    <template class="content-en"><p>Why use blocks instead of individual bytes? The mechanical cost of disk access (Seek + Latency) is astronomically high compared to CPU speeds. Fetching a whole block amortizes this cost and leverages spatial locality.</p><p>The concept of a Cylinder is crucial for performance: reading tracks on the same cylinder across different surfaces requires no mechanical movement of the read-write head, effectively reducing seek time to zero for sequential reads.</p><p>Double buffering is used to speed up the transfer of contiguous disk blocks, allowing the CPU to process one block in memory while the disk controller fetches the next block concurrently.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG of a magnetic disk pack. Show a central spindle with 3-4 platters. Show an actuator arm with read/write heads pointing to the surfaces. Highlight a single 'Cylinder' as a vertical imaginary tube intersecting the same track on all platters. Highlight a 'Track' as a concentric circle, and a 'Sector' as a pie-slice segment. Labels in English and Arabic. Dark theme #0d1117, neon blue and green accents. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker for Pointers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+    <!-- Arrowhead Marker for Brand Pointers -->
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- LEFT SIDE: ISOMETRIC DISK PACK             -->
+  <!-- ========================================== -->
+
+  <!-- Actuator Pivot Base (Bottom Part) -->
+  <path d="M 60 190 L 60 470 A 30 10 0 0 0 120 470 L 120 190 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- BOTTOM PLATTER -->
+  <!-- Thickness -->
+  <path d="M 150 460 A 200 70 0 0 0 550 460 L 550 475 A 200 70 0 0 1 150 475 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Surface -->
+  <ellipse cx="350" cy="460" rx="200" ry="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Concentric detail rings -->
+  <ellipse cx="350" cy="460" rx="150" ry="52.5" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.4" />
+  <ellipse cx="350" cy="460" rx="90" ry="31.5" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.4" />
+
+  <!-- BOTTOM ACTUATOR ARM -->
+  <path d="M 110 440 L 250 445 L 260 448 L 250 451 L 110 456 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Read/Write Head -->
+  <path d="M 250 446 L 270 446 L 275 448 L 270 450 L 250 450 Z" fill="var(--brand-500)" />
+  <!-- Pivot Joint -->
+  <circle cx="90" cy="448" r="14" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- SPINDLE SEGMENT 1 (Between Bottom and Middle) -->
+  <path d="M 325 340 L 325 460 A 25 9 0 0 0 375 460 L 375 340 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- MIDDLE PLATTER -->
+  <!-- Thickness -->
+  <path d="M 150 340 A 200 70 0 0 0 550 340 L 550 355 A 200 70 0 0 1 150 355 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Surface -->
+  <ellipse cx="350" cy="340" rx="200" ry="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Concentric detail rings -->
+  <ellipse cx="350" cy="340" rx="150" ry="52.5" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.4" />
+  <ellipse cx="350" cy="340" rx="90" ry="31.5" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.4" />
+
+  <!-- MIDDLE ACTUATOR ARM -->
+  <path d="M 110 320 L 250 325 L 260 328 L 250 331 L 110 336 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Read/Write Head -->
+  <path d="M 250 326 L 270 326 L 275 328 L 270 330 L 250 330 Z" fill="var(--brand-500)" />
+  <!-- Pivot Joint -->
+  <circle cx="90" cy="328" r="14" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- SPINDLE SEGMENT 2 (Between Middle and Top) -->
+  <path d="M 325 220 L 325 340 A 25 9 0 0 0 375 340 L 375 220 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- TOP PLATTER -->
+  <!-- Thickness -->
+  <path d="M 150 220 A 200 70 0 0 0 550 220 L 550 235 A 200 70 0 0 1 150 235 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Surface -->
+  <ellipse cx="350" cy="220" rx="200" ry="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Concentric detail rings -->
+  <ellipse cx="350" cy="220" rx="150" ry="52.5" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.4" />
+  <ellipse cx="350" cy="220" rx="90" ry="31.5" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.4" />
+
+  <!-- TOP ACTUATOR ARM -->
+  <path d="M 110 200 L 250 205 L 260 208 L 250 211 L 110 216 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Read/Write Head -->
+  <path d="M 250 206 L 270 206 L 275 208 L 270 210 L 250 210 Z" fill="var(--brand-500)" />
+  <!-- Pivot Joint -->
+  <circle cx="90" cy="208" r="14" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- SPINDLE TOP CAP -->
+  <path d="M 325 180 L 325 220 A 25 9 0 0 0 375 220 L 375 180 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <ellipse cx="350" cy="180" rx="25" ry="9" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- ACTUATOR PIVOT TOP -->
+  <ellipse cx="90" cy="190" rx="30" ry="10" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- CYLINDER HIGHLIGHT (Imaginary vertical tube) -->
+  <!-- Back half of cylinder (faint) -->
+  <path d="M 230 220 A 120 42 0 0 1 470 220 L 470 460 A 120 42 0 0 0 230 460 Z" fill="var(--brand-500)" opacity="0.05" />
+  <!-- Front half of cylinder -->
+  <path d="M 230 220 A 120 42 0 0 0 470 220 L 470 460 A 120 42 0 0 1 230 460 Z" fill="var(--brand-500)" opacity="0.15" />
+  <!-- Cylinder Track Outlines -->
+  <ellipse cx="350" cy="220" rx="120" ry="42" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+  <ellipse cx="350" cy="340" rx="120" ry="42" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+  <ellipse cx="350" cy="460" rx="120" ry="42" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+  <!-- Cylinder Vertical Edges -->
+  <line x1="230" y1="220" x2="230" y2="460" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+  <line x1="470" y1="220" x2="470" y2="460" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SIDE: TOP-DOWN PLATTER VIEW          -->
+  <!-- ========================================== -->
+
+  <!-- Base Platter -->
+  <circle cx="800" cy="350" r="160" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  
+  <!-- Spindle Hole -->
+  <circle cx="800" cy="350" r="15" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- Standard Tracks -->
+  <circle cx="800" cy="350" r="130" fill="none" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+  <circle cx="800" cy="350" r="70" fill="none" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+  <circle cx="800" cy="350" r="40" fill="none" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+  <!-- HIGHLIGHTED SECTOR (Pie Slice from -30 to -75 degrees) -->
+  <path d="M 800 350 L 938.56 270 A 160 160 0 0 0 841.41 195.45 Z" fill="var(--brand-500)" opacity="0.15" stroke="var(--brand-500)" stroke-width="2" />
+
+  <!-- HIGHLIGHTED TRACK (r=100) -->
+  <circle cx="800" cy="350" r="100" fill="none" stroke="var(--brand-500)" stroke-width="3" />
+
+  <!-- HIGHLIGHTED BLOCK (Intersection of Track and Sector) -->
+  <!-- Outer arc r=100, Inner arc r=70 -->
+  <path d="M 886.6 300 A 100 100 0 0 0 825.88 253.41 L 818.12 282.39 A 70 70 0 0 1 860.62 315 Z" fill="var(--brand-500)" stroke="var(--bg-elevated)" stroke-width="1" />
+
+
+  <!-- ========================================== -->
+  <!-- LABELS AND POINTERS                        -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="350" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Magnetic Disk Pack Structure</text>
+  <text x="350" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">هيكل حزمة الأقراص المغناطيسية</text>
+
+  <text x="800" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Platter Surface (Top-Down View)</text>
+  <text x="800" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">سطح القرص (منظور علوي)</text>
+
+  <!-- Spindle -->
+  <line x1="350" y1="100" x2="350" y2="165" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="350" y="90" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Spindle</text>
+  <text x="350" y="90" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">محور الدوران</text>
+
+  <!-- Read/Write Head -->
+  <line x1="180" y1="120" x2="260" y2="195" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="180" y="110" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Read/Write Head</text>
+  <text x="180" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">رأس القراءة والكتابة</text>
+
+  <!-- Actuator Arm -->
+  <line x1="90" y1="550" x2="90" y2="485" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="90" y="570" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Actuator Arm</text>
+  <text x="90" y="570" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">ذراع المحرك</text>
+
+  <!-- Platter -->
+  <line x1="620" y1="280" x2="545" y2="335" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="640" y="275" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Platter</text>
+  <text x="640" y="275" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">قرص</text>
+
+  <!-- Cylinder (Highlighted Concept) -->
+  <line x1="550" y1="480" x2="475" y2="415" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+  <text x="570" y="495" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Cylinder</text>
+  <text x="570" y="495" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">أسطوانة</text>
+
+  <!-- Track (Highlighted Concept) -->
+  <line x1="700" y1="150" x2="785" y2="245" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+  <text x="680" y="140" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Track</text>
+  <text x="680" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">مسار</text>
+
+  <!-- Sector (Highlighted Concept) -->
+  <line x1="950" y1="150" x2="915" y2="215" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+  <text x="960" y="140" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Sector</text>
+  <text x="960" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">قطاع</text>
+
+  <!-- Block (Highlighted Concept) -->
+  <line x1="960" y1="350" x2="865" y2="295" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+  <text x="980" y="360" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Block</text>
+  <text x="980" y="360" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">كتلة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك ملف كبير جداً للقراءة بشكل متسلسل، كيف يجب تخزين كتل هذا الملف على القرص لتقليل وقت الوصول؟</template>
+      <template class="content-en">If you have a very large file to read sequentially, how should its blocks be stored on the disk to minimize access time?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب تخزينها على نفس الأسطوانة (Cylinder) عبر أسطح متعددة. بمجرد امتلاء الأسطوانة، ننتقل إلى الأسطوانة المجاورة. هذا يقلل من وقت البحث (Seek time) إلى الحد الأدنى.</p></template>
+      <template class="content-en"><p>They should be stored on the same cylinder across multiple surfaces. Once a cylinder is full, move to the adjacent cylinder. This minimizes mechanical seek time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="buffering-and-blocking" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> التخزين المؤقت وتجميع السجلات (Buffering &amp; Blocking)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Buffering and Blocking</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التجميع (Blocking) هو تخزين عدة سجلات داخل كتلة قرص واحدة لتقليل عدد عمليات الإدخال والإخراج (I/O).</p></template>
+    <template class="content-en"><p>Blocking refers to storing multiple records in a single disk block to minimize I/O operations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Blocking Factor (bfr)" data-ar="عامل التجميع" data-en-def="The number of records that can fit into a single block.">عامل التجميع<span class="smart-term-tooltip"></span></span> (Blocking factor - bfr) هو متوسط عدد السجلات التي يمكن تخزينها في كتلة قرص واحدة. قد توجد مساحة فارغة في الكتلة إذا كان عدد صحيح من السجلات لا يتناسب تماماً مع حجم الكتلة.</p><p>أنواع السجلات من حيث التجميع:</p><ul><li><b>غير ممتدة (Unspanned):</b> لا يمكن لأي سجل أن يمتد عبر كتلتين. إذا لم يكن هناك مساحة كافية في الكتلة الحالية، يُخزن السجل في الكتلة التالية، مما يترك مساحة مهدرة.</li><li><b>ممتدة (Spanned):</b> يمكن تخزين السجل في أكثر من كتلة واحدة. يُستخدم هذا عادةً مع السجلات متغيرة الطول أو السجلات التي يتجاوز حجمها حجم الكتلة.</li></ul></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Blocking Factor (bfr)" data-ar="عامل التجميع" data-en-def="The number of records that can fit into a single block.">blocking factor (bfr)<span class="smart-term-tooltip"></span></span> is the average number of records stored in a disk block. There may be empty space in a block if an integral number of records do not fit perfectly.</p><p>Types of record blocking:</p><ul><li><b>Unspanned:</b> No record can span two blocks. If a record doesn't fit in the remaining space of a block, it is placed in the next block, leaving wasted space.</li><li><b>Spanned:</b> A record can be stored in more than one block. This is essential for records larger than a block or to eliminate wasted space in variable-length records.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>اختيار بين Spanned و Unspanned هو مقايضة بين المساحة والأداء. Unspanned يهدر المساحة (تجزئة داخلية) ولكنه يضمن أن قراءة سجل تتطلب جلب كتلة واحدة فقط (إذا كان السجل أصغر من الكتلة). Spanned يوفر المساحة ولكنه قد يتطلب قراءة كتلتين من القرص لجلب سجل واحد إذا كان مقسماً عبر حد الكتلة.</p><p>في السجلات متغيرة الطول، يتطلب الأمر معلومات إضافية مثل أحرف الفصل (Separator characters) أو حقول الطول (Length fields) حتى يمكن تحليل (Parse) السجل بشكل صحيح.</p></template>
+    <template class="content-en"><p>The choice between Spanned and Unspanned is a classic space-time tradeoff. Unspanned wastes space (internal fragmentation) but guarantees that reading a record requires at most one block fetch (assuming record size < block size). Spanned saves space but might require two block fetches to read a single record if it crosses a block boundary.</p><p>For variable-length records, additional metadata is required within the block or record, such as separator characters or length fields, so the system can correctly parse the boundaries of fields and records.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>عامل التجميع (bfr) يساوي حجم الكتلة (B) مقسوماً على حجم السجل (R)، مقرباً للأسفل (في حالة السجلات غير الممتدة).</strong></template>
+      <template class="content-en"><strong>Blocking factor (bfr) equals Block size (B) divided by Record size (R), rounded down (for unspanned records).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$bfr = \lfloor \frac{B}{R} \rfloor$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان حجم الكتلة 512 بايت وحجم السجل 100 بايت، ما هو عامل التجميع (bfr) للسجلات غير الممتدة؟ وما مقدار المساحة المهدرة في كل كتلة؟</template>
+      <template class="content-en">If block size is 512 bytes and record size is 100 bytes, what is the bfr for unspanned records? How much space is wasted per block?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عامل التجميع = 512 / 100 = 5 سجلات. المساحة المستخدمة = 500 بايت. المساحة المهدرة = 12 بايت لكل كتلة.</p></template>
+      <template class="content-en"><p>bfr = floor(512 / 100) = 5 records. Used space = 500 bytes. Wasted space = 12 bytes per block.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="unordered-heap-files" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الملفات غير المرتبة (Heap Files)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Unordered Files (Heap Files)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ملف الكومة (Heap) يضيف السجلات الجديدة في نهاية الملف دون أي ترتيب، مما يجعل الإدراج سريعاً جداً ولكن البحث بطيء.</p></template>
+    <template class="content-en"><p>A Heap file appends new records at the end of the file without any order, making insertion very fast but searching slow.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرف أيضاً بملفات الكومة (Pile files). يتم إدراج السجلات الجديدة دائماً في نهاية الملف.</p><p>خصائص الأداء:</p><ul><li><b>الإدراج:</b> فعال جداً (O(1) من حيث الكتل)، فقط نحتاج لجلب الكتلة الأخيرة وإضافة السجل.</li><li><b>البحث:</b> يتطلب بحثاً خطياً (Linear Search). في المتوسط، يجب قراءة نصف كتل الملف (b/2) للعثور على سجل موجود. إذا لم يكن السجل موجوداً، يجب قراءة كل الكتل (b).</li><li><b>القراءة المرتبة:</b> تتطلب فرز جميع سجلات الملف أولاً، وهو أمر مكلف جداً.</li></ul></template>
+    <template class="content-en"><p>Also called a heap or a pile file. New records are always inserted at the end of the file.</p><p>Performance characteristics:</p><ul><li><b>Insertion:</b> Quite efficient. It only requires fetching the last block and appending the record.</li><li><b>Searching:</b> Requires a <span class="smart-term" data-term-en="Linear Search" data-ar="البحث الخطي" data-en-def="Scanning a file sequentially from the beginning to find a specific record.">linear search<span class="smart-term-tooltip"></span></span> through the file records. On average, this requires reading and searching half the file blocks (b/2). If the record is not found, all 'b' blocks must be read.</li><li><b>Ordered Reading:</b> Reading records in order of a particular field requires sorting the entire file, which is very expensive.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>متى نستخدم Heap Files؟ تُستخدم بشكل مثالي لجمع البيانات السريعة (Data Logging) أو تحميل البيانات بالجملة (Bulk Loading) حيث تكون سرعة الكتابة هي الأولوية القصوى، وسيتم فرز البيانات أو فهرستها لاحقاً في وضع عدم الاتصال (Offline).</p><p>عملية الحذف (DELETE) في ملفات Heap عادة ما تتم عن طريق وضع علامة (Marker) على السجل كـ 'محذوف' بدلاً من إزالته فعلياً لتجنب تكلفة نقل السجلات. هذا يتطلب عملية 'إعادة تنظيم' (REORGANIZE) دورية لاستعادة المساحة المهدرة.</p></template>
+    <template class="content-en"><p>When are Heap Files used? They are ideal for rapid data collection (e.g., logging, telemetry) or bulk data loading where write throughput is the absolute priority, and the data will be sorted or indexed later offline.</p><p>The DELETE operation in heap files is usually implemented using a 'deletion marker' (tombstone) rather than physically shifting records, which would be too costly. This necessitates a periodic REORGANIZE operation to compact the file and reclaim wasted space from deleted records.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>متوسط عدد الكتل التي يجب قراءتها للبحث عن سجل في ملف غير مرتب (حيث b هو إجمالي عدد الكتل).</strong></template>
+      <template class="content-en"><strong>Average number of blocks to read to find a record in a heap file (where b is total blocks).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Average\ Access\ Time = \frac{b}{2}$$</div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Heap (Unordered)</th><th>Ordered (Sequential)</th><th>Hashed</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">كفاءة الإدراج (Insertion)</template>
+          <template class="content-en">Insertion Efficiency</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع جداً (في النهاية)</template>
+          <template class="content-en">Very Fast (Append at end)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مكلف جداً (يتطلب إزاحة)</template>
+          <template class="content-en">Very Expensive (Requires shifting)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع (حساب الدالة والإدراج)</template>
+          <template class="content-en">Fast (Compute hash and insert)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">البحث عن سجل محدد (Search)</template>
+          <template class="content-en">Search for Specific Record</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">بطيء (بحث خطي b/2)</template>
+          <template class="content-en">Slow (Linear search b/2)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع (بحث ثنائي log2 b)</template>
+          <template class="content-en">Fast (Binary search log2 b)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع جداً (غالباً كتلة واحدة)</template>
+          <template class="content-en">Very Fast (Often 1 block)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القراءة المرتبة (Ordered Reading)</template>
+          <template class="content-en">Ordered Reading</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتطلب فرز كامل</template>
+          <template class="content-en">Requires full sort</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">فعال جداً (مفروز مسبقاً)</template>
+          <template class="content-en">Very Efficient (Pre-sorted)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتطلب فرز كامل</template>
+          <template class="content-en">Requires full sort</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نقوم بإزالة السجل المحذوف فوراً من ملف Heap ونقوم بإزاحة باقي السجلات لملء الفراغ؟</template>
+      <template class="content-en">Why don't we immediately remove a deleted record from a Heap file and shift the remaining records to fill the gap?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن إزاحة السجلات تتطلب قراءة وكتابة جميع الكتل التي تلي السجل المحذوف، مما يسبب عبئاً هائلاً على الإدخال/الإخراج (I/O). وضع علامة الحذف أسرع بكثير.</p></template>
+      <template class="content-en"><p>Because shifting records would require reading and rewriting all subsequent blocks in the file, causing massive I/O overhead. Using a deletion marker is an O(1) block write.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ordered-sequential-files" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الملفات المرتبة (Ordered / Sequential Files)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Ordered Files (Sequential Files)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحتفظ الملفات المرتبة بالسجلات مفروزة بناءً على حقل معين، مما يجعل البحث سريعاً جداً باستخدام البحث الثنائي، ولكن الإدراج يصبح مكلفاً.</p></template>
+    <template class="content-en"><p>Ordered files keep records sorted based on an ordering field, making searches very fast using binary search, but making insertions expensive.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرف أيضاً بالملفات المتسلسلة. يتم فرز السجلات فعلياً على القرص بناءً على قيم 'حقل الترتيب' (Ordering field).</p><p>خصائص الأداء:</p><ul><li><b>البحث:</b> فعال جداً. يمكن استخدام <span class="smart-term" data-term-en="Binary Search" data-ar="البحث الثنائي" data-en-def="A search algorithm that finds the position of a target value within a sorted array/file by repeatedly dividing the search interval in half.">البحث الثنائي<span class="smart-term-tooltip"></span></span> (Binary Search)، مما يقلل متوسط عدد الكتل المقروءة إلى log2(b).</li><li><b>القراءة المرتبة:</b> فعالة جداً إذا طلبنا البيانات بناءً على حقل الترتيب.</li><li><b>الإدراج:</b> مكلف جداً. يجب إدراج السجل في مكانه الصحيح للحفاظ على الترتيب، مما قد يتطلب إزاحة العديد من الكتل.</li></ul><p>لتحسين كفاءة الإدراج، يُحتفظ عادةً بملف فائض غير مرتب (Overflow/Transaction file) للسجلات الجديدة، ويتم دمجه (Merged) دورياً مع الملف المرتب الرئيسي.</p></template>
+    <template class="content-en"><p>Also called a sequential file. Records are kept physically sorted by the values of an ordering field.</p><p>Performance characteristics:</p><ul><li><b>Searching:</b> Very efficient. A <span class="smart-term" data-term-en="Binary Search" data-ar="البحث الثنائي" data-en-def="A search algorithm that finds the position of a target value within a sorted array/file by repeatedly dividing the search interval in half.">binary search<span class="smart-term-tooltip"></span></span> can be used, reducing the average blocks accessed to log2(b).</li><li><b>Ordered Reading:</b> Extremely efficient if reading in the order of the sorting field.</li><li><b>Insertion:</b> Expensive. Records must be inserted in the correct physical order, which may require shifting half the file's blocks on average.</li></ul><p>To mitigate insertion costs, it is common to keep a separate unordered overflow (or transaction) file for new records. This <span class="smart-term" data-term-en="Overflow File" data-ar="ملف الفائض" data-en-def="A temporary, usually unordered file used to store newly inserted records to avoid the high cost of inserting directly into a sorted file.">overflow file<span class="smart-term-tooltip"></span></span> is periodically merged with the main ordered file.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>البحث الثنائي على القرص يختلف قليلاً عن الذاكرة. نحن نبحث عن 'الكتلة' التي تحتوي على السجل، وليس السجل الفردي مباشرة. نقرأ الكتلة الوسطى، ونفحص السجل الأول والأخير فيها لتحديد ما إذا كان السجل المطلوب قبل هذه الكتلة، أو داخلها، أو بعدها.</p><p>استخدام <span class="smart-term" data-term-en="Overflow File" data-ar="ملف الفائض" data-en-def="A temporary, usually unordered file used to store newly inserted records to avoid the high cost of inserting directly into a sorted file.">ملف الفائض<span class="smart-term-tooltip"></span></span> (Overflow) يخلق تعقيداً في عملية البحث: للبحث عن سجل، يجب على النظام البحث في الملف المرتب (باستخدام البحث الثنائي) وأيضاً البحث في ملف الفائض (باستخدام البحث الخطي) لضمان العثور على أحدث نسخة من السجل.</p></template>
+    <template class="content-en"><p>Binary search on disk operates at the block level, not the record level.</p><p>We fetch the middle block, check its first and last records to determine if our target key falls within this block's range, or if we need to branch left or right.</p><p>The use of an overflow file complicates the FIND operation: to guarantee finding a record (or the most recent version of it), the system must search BOTH</p><ul><li><strong>the main ordered file</strong> (via binary search) AND</li><li><strong>the overflow file</strong> (via linear search).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>متوسط عدد الكتل للبحث في ملف مرتب باستخدام البحث الثنائي.</strong></template>
+      <template class="content-en"><strong>Average blocks to access using binary search on an ordered file.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Average\ Access\ Time = \log_2(b)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك ملف مرتب يحتوي على مليون كتلة، كم عدد الكتل التي ستحتاج لقراءتها في أسوأ الأحوال للعثور على سجل باستخدام البحث الثنائي؟</template>
+      <template class="content-en">If you have an ordered file with 1,000,000 blocks, how many blocks would you need to read in the worst case to find a record using binary search?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>حوالي 20 كتلة، لأن log2(1,000,000) ≈ 20.</p></template>
+      <template class="content-en"><p>Approximately 20 blocks, because log2(1,000,000) is roughly 20.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="hashed-files-external" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الملفات المقطعة (Hashed Files - External Hashing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Hashed Files (External Hashing)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التقطيع الخارجي يمرر مفتاح السجل عبر دالة رياضية لتحديد 'الدلو' (Bucket) أو الكتلة التي يجب تخزين السجل فيها مباشرة، مما يجعل البحث فائق السرعة.</p></template>
+    <template class="content-en"><p>External hashing passes a record's key through a mathematical function to directly compute the 'bucket' (disk block) where it is stored, enabling lightning-fast lookups.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التقطيع لملفات القرص يسمى التقطيع الخارجي (External Hashing). تُقسم كتل الملف إلى M <span class="smart-term" data-term-en="Bucket" data-ar="دلو" data-en-def="A unit of storage in hashing, typically corresponding to one disk block.">دلو<span class="smart-term-tooltip"></span></span> (Buckets) متساوية الحجم، مرقمة من 0 إلى M-1. عادة، يتوافق الدلو مع كتلة قرص واحدة.</p><p>يتم تعيين أحد حقول الملف ليكون مفتاح التقطيع (Hash key). يُخزن السجل ذو المفتاح K في الدلو i، حيث i = h(K)، و h هي دالة التقطيع. البحث فعال جداً (غالباً يتطلب قراءة كتلة واحدة فقط).</p><p>تحدث ال<span class="smart-term" data-term-en="Collision" data-ar="تصادم" data-en-def="Occurs when the hash function maps a new record to a bucket that is already full.">تصادم<span class="smart-term-tooltip"></span></span>ات (Collisions) عندما يتم تقطيع سجل جديد إلى دلو ممتلئ بالفعل. طرق حل التصادم تشمل:</p><ul><li><b>العنونة المفتوحة (Open addressing):</b> البحث عن الموضع (الدلو) التالي الفارغ.</li><li><b>التسلسل (Chaining):</b> الاحتفاظ بملف فائض (Overflow file) وربط السجلات الفائضة التي تنتمي لنفس الدلو باستخدام مؤشرات (Pointers).</li><li><b>التقطيع المتعدد (Multiple hashing):</b> تطبيق دالة تقطيع ثانية إذا حدث تصادم.</li></ul></template>
+    <template class="content-en"><p>Hashing for disk files is called External Hashing. File blocks are divided into M equal-sized <span class="smart-term" data-term-en="Bucket" data-ar="دلو" data-en-def="A unit of storage in hashing, typically corresponding to one disk block.">bucket<span class="smart-term-tooltip"></span></span>s, numbered 0 to M-1. Typically, a bucket corresponds to one disk block.</p><p>One field is designated as the hash key. A record with key K is stored in bucket i, where i = h(K). Search is highly efficient (often O(1) block access).</p><p><span class="smart-term" data-term-en="Collision" data-ar="تصادم" data-en-def="Occurs when the hash function maps a new record to a bucket that is already full.">Collision<span class="smart-term-tooltip"></span></span>s occur when a record hashes to a bucket that is already full. Resolution methods include:</p><ul><li><b>Open addressing:</b> Checking subsequent positions sequentially until an empty space is found.</li><li><b>Chaining:</b> Keeping an overflow file and linking overflow records for each bucket using pointers.</li><li><b>Multiple hashing:</b> Applying a second (or third) hash function if a collision occurs.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التقطيع الثابت (Static Hashing) له عيوب رئيسية: عدد الدلاء (M) ثابت. إذا نما الملف بشكل كبير، ستزداد التصادمات وسيمتلئ ملف الفائض، مما يدهور الأداء ليصبح قريباً من البحث الخطي. لتقليل ذلك، يُحتفظ عادة بملف التقطيع ممتلئاً بنسبة 70-80٪ فقط.</p><p>عيب آخر للتقطيع هو أن الوصول المرتب (Ordered access) بناءً على مفتاح التقطيع غير فعال تماماً، حيث توزع دالة التقطيع السجلات عشوائياً عبر الدلاء، مما يتطلب فرز الملف بالكامل لقراءته بالترتيب.</p><p>في قواعد البيانات، 'التسلسل' (Chaining) هو الطريقة الأكثر شيوعاً لحل التصادمات في التقطيع الخارجي لأن العنونة المفتوحة تتسبب في ترحيل السجلات بعيداً عن دلاءها الأصلية، مما يزيد من عمليات الإدخال/الإخراج.</p></template>
+    <template class="content-en"><p>Static Hashing has a major flaw: the number of buckets (M) is fixed. If the file grows significantly, collisions skyrocket, overflow chains become long, and performance degrades toward linear search. To mitigate this, hash files are typically kept only 70-80% full.</p><p>Another major disadvantage is that ordered access on the hash key is extremely inefficient. The hash function intentionally scatters records randomly, so retrieving them in sorted order requires a full file sort.</p><p>In DBMS implementations, 'Chaining' is the overwhelmingly preferred collision resolution technique for external hashing. Open addressing is poor for disks because it displaces records to adjacent blocks, causing clustering and increasing I/O for future searches.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة التقطيع الأساسية حيث K هو المفتاح، و M هو عدد الدلاء.</strong></template>
+      <template class="content-en"><strong>Basic hash function where K is the key and M is the number of buckets.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$i = h(K) \mod M$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Diagram showing External Hashing with Chaining. On the left, an array of 'Main Buckets' (0 to M-1). Arrows point from the buckets to disk blocks. Bucket 1 and Bucket 2 are full. Show an arrow from Bucket 1 to an 'Overflow Bucket' block, and another arrow from that overflow block to a second overflow block (Linked List / Chaining). Labels in English and Arabic. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrow Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+
+        <!-- Standard Disk Block (Bucket) -->
+        <g id="disk-block">
+            <rect x="0" y="0" width="200" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+            <line x1="50" y1="0" x2="50" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+            <line x1="100" y1="0" x2="100" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+            <line x1="150" y1="0" x2="150" y2="50" stroke="var(--border-color)" stroke-width="2"/>
+        </g>
+
+        <!-- Full Disk Block (Highlighted) -->
+        <g id="disk-block-full">
+            <rect x="0" y="0" width="200" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+            <line x1="50" y1="0" x2="50" y2="50" stroke="var(--brand-500)" stroke-width="2"/>
+            <line x1="100" y1="0" x2="100" y2="50" stroke="var(--brand-500)" stroke-width="2"/>
+            <line x1="150" y1="0" x2="150" y2="50" stroke="var(--brand-500)" stroke-width="2"/>
+        </g>
+
+        <!-- Null Pointer Symbol -->
+        <g id="null-ptr">
+            <line x1="-15" y1="15" x2="15" y2="-15" stroke="var(--text-muted)" stroke-width="2"/>
+        </g>
+
+        <!-- Active Pointer Dot -->
+        <g id="ptr-dot">
+            <circle cx="0" cy="0" r="5" fill="var(--brand-500)"/>
+        </g>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="460" y="35" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle">External Hashing with Chaining</text>
+    <text x="460" y="35" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle">الجدولة الخارجية مع السلسلة</text>
+
+    <!-- Subtitle / Context -->
+    <text x="460" y="60" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">Example: h(K) = K mod M (where M = 5)</text>
+    <text x="460" y="60" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">مثال: h(K) = K mod M (حيث M = 5)</text>
+
+    <!-- Column Headers -->
+    <text x="200" y="95" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Main Buckets (Disk Blocks)</text>
+    <text x="200" y="95" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">الدلاء الرئيسية (كتل القرص)</text>
+
+    <text x="620" y="95" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Overflow Buckets (Chained)</text>
+    <text x="620" y="95" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">دلاء الفائض (متسلسلة)</text>
+
+    <!-- Structure Labels -->
+    <text x="85" y="120" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="end">Bucket</text>
+    <text x="85" y="120" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="end">الدلو</text>
+
+    <text x="175" y="120" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle">Records</text>
+    <text x="175" y="120" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle">السجلات</text>
+
+    <text x="275" y="120" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle">Ptr</text>
+    <text x="275" y="120" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle">مؤشر</text>
+
+    <!-- ================= MAIN BUCKETS ================= -->
+
+    <!-- Bucket 0 -->
+    <text x="85" y="155" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">0</text>
+    <use href="#disk-block" x="100" y="130"/>
+    <text x="125" y="155" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">10</text>
+    <text x="175" y="155" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">25</text>
+    <use href="#null-ptr" x="275" y="155"/>
+
+    <!-- Bucket 1 (FULL) -->
+    <text x="85" y="225" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">1</text>
+    <use href="#disk-block-full" x="100" y="200"/>
+    <text x="125" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">11</text>
+    <text x="175" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">31</text>
+    <text x="225" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">56</text>
+    <use href="#ptr-dot" x="275" y="225"/>
+
+    <!-- Bucket 2 (FULL) -->
+    <text x="85" y="295" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">2</text>
+    <use href="#disk-block-full" x="100" y="270"/>
+    <text x="125" y="295" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">12</text>
+    <text x="175" y="295" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">22</text>
+    <text x="225" y="295" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">47</text>
+    <use href="#ptr-dot" x="275" y="295"/>
+
+    <!-- Bucket 3 -->
+    <text x="85" y="365" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">3</text>
+    <use href="#disk-block" x="100" y="340"/>
+    <text x="125" y="365" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">13</text>
+    <use href="#null-ptr" x="275" y="365"/>
+
+    <!-- Vertical Ellipsis -->
+    <circle cx="75" cy="410" r="2" fill="var(--text-muted)"/>
+    <circle cx="75" cy="420" r="2" fill="var(--text-muted)"/>
+    <circle cx="75" cy="430" r="2" fill="var(--text-muted)"/>
+    
+    <circle cx="200" cy="410" r="3" fill="var(--text-muted)"/>
+    <circle cx="200" cy="420" r="3" fill="var(--text-muted)"/>
+    <circle cx="200" cy="430" r="3" fill="var(--text-muted)"/>
+
+    <!-- Bucket M-1 -->
+    <text x="85" y="475" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="end" dominant-baseline="middle">4 (M-1)</text>
+    <use href="#disk-block" x="100" y="450"/>
+    <text x="125" y="475" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">14</text>
+    <text x="175" y="475" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">34</text>
+    <use href="#null-ptr" x="275" y="475"/>
+
+
+    <!-- ================= OVERFLOW BUCKETS ================= -->
+
+    <!-- Overflow 1 (for Bucket 1) -->
+    <use href="#disk-block-full" x="380" y="200"/>
+    <text x="405" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">21</text>
+    <text x="455" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">41</text>
+    <text x="505" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">76</text>
+    <use href="#ptr-dot" x="555" y="225"/>
+
+    <!-- Overflow 2 (for Bucket 1) -->
+    <use href="#disk-block" x="660" y="200"/>
+    <text x="685" y="225" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">81</text>
+    <use href="#null-ptr" x="835" y="225"/>
+
+    <!-- Overflow 3 (for Bucket 2) -->
+    <use href="#disk-block" x="380" y="270"/>
+    <text x="405" y="295" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">32</text>
+    <text x="455" y="295" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" text-anchor="middle" dominant-baseline="middle">52</text>
+    <use href="#null-ptr" x="555" y="295"/>
+
+
+    <!-- ================= POINTER ARROWS ================= -->
+
+    <!-- Arrow: Bucket 1 -> Overflow 1 -->
+    <path d="M 275 225 L 372 225" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="325" y="215" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Collision</text>
+    <text x="325" y="215" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle">تصادم</text>
+
+    <!-- Arrow: Overflow 1 -> Overflow 2 -->
+    <path d="M 555 225 L 652 225" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Arrow: Bucket 2 -> Overflow 3 -->
+    <path d="M 275 295 L 372 295" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="325" y="285" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Collision</text>
+    <text x="325" y="285" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle">تصادم</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُفضل الاحتفاظ بملف التقطيع ممتلئاً بنسبة 70-80٪ فقط؟</template>
+      <template class="content-en">Why is a hash file typically kept only 70-80% full?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لتقليل احتمالية حدوث التصادمات (Collisions). إذا اقترب الملف من الامتلاء 100٪، ستزداد السجلات الفائضة بشكل كبير، مما يبطئ عملية البحث.</p></template>
+      <template class="content-en"><p>To reduce the probability of collisions. If the file approaches 100% capacity, overflow records will increase dramatically, degrading search performance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dynamic-extendible-hashing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التقطيع الديناميكي والقابل للتوسعة (Dynamic &amp; Extendible Hashing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Dynamic and Extendible Hashing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التقطيع الديناميكي يحل مشكلة التقطيع الثابت من خلال السماح لعدد الدلاء بالنمو أو الانكماش ديناميكياً مع تغير حجم البيانات، باستخدام 'دليل' (Directory) يوجه إلى الكتل.</p></template>
+    <template class="content-en"><p>Dynamic hashing solves the static hashing problem by allowing the number of buckets to grow or shrink dynamically as data volume changes, using a 'directory' to point to blocks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم تكييف تقنيات التقطيع للسماح بالنمو الديناميكي لعدد السجلات دون تدهور الأداء. تشمل هذه التقنيات: التقطيع الديناميكي، التقطيع القابل للتوسعة (Extendible)، والتقطيع الخطي (Linear).</p><ul><li><b>التقطيع القابل للتوسعة (Extendible Hashing):</b> يستخدم التمثيل الثنائي لقيمة التقطيع h(K) للوصول إلى 'دليل' (Directory). <span class="smart-term" data-term-en="Directory" data-ar="الدليل" data-en-def="An array of pointers used in extendible hashing to map hash prefixes to physical disk blocks.">الدليل<span class="smart-term-tooltip"></span></span> عبارة عن مصفوفة بحجم \(2^d\)، حيث d يسمى '<span class="smart-term" data-term-en="Global Depth" data-ar="العمق العالمي" data-en-def="In extendible hashing, the number of bits used from the hash value to determine the directory size \((2^d)\).">العمق العالمي<span class="smart-term-tooltip"></span></span>' (Global depth).</li><li>تحتوي إدخالات الدليل على مؤشرات إلى كتل القرص.</li><li>عندما تمتلئ كتلة ويتم إدراج سجل جديد، تنقسم الكتلة إلى كتلتين، ويتم إعادة توزيع السجلات بينهما، ويتم تحديث الدليل (وقد يتضاعف حجمه إذا لزم الأمر).</li><li>لا تتطلب هذه التقنيات منطقة فائض (Overflow area).</li></ul></template>
+    <template class="content-en"><p>Hashing techniques adapted to allow dynamic growth and shrinking of file records. These include Dynamic hashing, Extendible hashing, and Linear hashing.</p><ul><li><b>Extendible Hashing:</b> Uses the binary representation of the hash value h(K) to access a <span class="smart-term" data-term-en="Directory" data-ar="الدليل" data-en-def="An array of pointers used in extendible hashing to map hash prefixes to physical disk blocks.">directory<span class="smart-term-tooltip"></span></span>. The directory is an array of size \(2^d\), where d is the '<span class="smart-term" data-term-en="Global Depth" data-ar="العمق العالمي" data-en-def="In extendible hashing, the number of bits used from the hash value to determine the directory size \((2^d)\).">global depth<span class="smart-term-tooltip"></span></span>'.</li><li>Directory entries point to disk blocks containing the records.</li><li>When a block is full and an insertion occurs, the block splits into two, records are redistributed, and the directory is updated (and may double in size by incrementing d).</li><li>Dynamic and extendible hashing do not require an overflow area.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين Extendible Hashing و Linear Hashing: التقطيع القابل للتوسعة يستخدم 'دليلاً' (Directory) يتضاعف حجمه عند الحاجة، مما قد يسبب تأخيراً مفاجئاً (Latency spike) عند تضاعف الدليل لملفات ضخمة. التقطيع الخطي (Linear Hashing) لا يستخدم دليلاً؛ بدلاً من ذلك، يقوم بتقسيم الدلاء بترتيب خطي صارم (دلو 0، ثم 1، ثم 2...) بغض النظر عن الدلو الذي فاض، ويستخدم منطقة فائض مؤقتة.</p><p>في Extendible Hashing، كل كتلة لها 'عمق محلي' (Local depth). ينقسم الدليل (يزداد العمق العالمي) فقط عندما تفيض كتلة عمقها المحلي يساوي العمق العالمي.</p></template>
+    <template class="content-en"><p>The core difference between Extendible and Linear Hashing: Extendible Hashing uses an in-memory/on-disk 'Directory' that doubles in size when needed. This doubling can cause a sudden latency spike for very large databases. Linear Hashing avoids the directory entirely; it splits buckets in a strict linear round-robin order (bucket 0, then 1, then 2...) regardless of which bucket actually overflowed, and it DOES use a temporary overflow area.</p><p>In Extendible Hashing, each block maintains a 'Local Depth'. The directory only doubles (Global Depth increments) when a block overflows AND its Local Depth equals the Global Depth.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حجم الدليل في التقطيع القابل للتوسعة، حيث d هو العمق العالمي.</strong></template>
+      <template class="content-en"><strong>Directory size in extendible hashing, where d is the global depth.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Directory\ Size = 2^d$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Diagram of Extendible Hashing. Show a 'Directory' array on the left with index 000, 001, 010... 111 (Global depth d=3). Pointers from the directory point to 'Data file buckets' on the right. Show multiple directory entries pointing to the same bucket if the bucket's local depth (d') is less than 3 (e.g., 000 and 001 pointing to a bucket with d'=2). -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" class="gsvg-en" font-size="20" font-weight="bold" fill="var(--text-primary)">Extendible Hashing Architecture</text>
+    <text x="400" y="35" text-anchor="middle" class="gsvg-ar" font-size="20" font-weight="bold" fill="var(--text-primary)">بنية الجدولة القابلة للتوسيع</text>
+
+    <!-- Headers -->
+    <text x="150" y="75" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">Directory <tspan fill="var(--brand-ink)">(Global d = 3)</tspan></text>
+    <text x="150" y="75" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">الدليل <tspan fill="var(--brand-ink)">(العمق العام d = 3)</tspan></text>
+
+    <text x="350" y="90" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-muted)">Pointers</text>
+    <text x="350" y="90" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-muted)">مؤشرات</text>
+
+    <text x="590" y="75" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">Data Buckets</text>
+    <text x="590" y="75" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">دلاء البيانات</text>
+
+    <!-- Directory Array -->
+    <g>
+        <rect x="100" y="100" width="100" height="320" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4" />
+        <line x1="100" y1="140" x2="200" y2="140" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="100" y1="180" x2="200" y2="180" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="100" y1="220" x2="200" y2="220" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="100" y1="260" x2="200" y2="260" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="100" y1="300" x2="200" y2="300" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="100" y1="340" x2="200" y2="340" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="100" y1="380" x2="200" y2="380" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Directory Entries (Highlighted bits show the prefix used for routing) -->
+        <text x="150" y="126" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">00</tspan>0</text>
+        <text x="150" y="166" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">00</tspan>1</text>
+        <text x="150" y="206" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">010</tspan></text>
+        <text x="150" y="246" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">011</tspan></text>
+        <text x="150" y="286" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">1</tspan>00</text>
+        <text x="150" y="326" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">1</tspan>01</text>
+        <text x="150" y="366" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">1</tspan>10</text>
+        <text x="150" y="406" text-anchor="middle" font-size="16" fill="var(--text-muted)"><tspan fill="var(--brand-ink-strong)" font-weight="bold">1</tspan>11</text>
+    </g>
+
+    <!-- Pointers (Curved Paths) -->
+    <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+        <!-- To Bucket A (d'=2) -->
+        <path d="M 200 120 C 350 120 350 125 498 125" />
+        <path d="M 200 160 C 350 160 350 145 498 145" />
+        
+        <!-- To Bucket B (d'=3) -->
+        <path d="M 200 200 C 350 200 350 215 498 215" />
+        
+        <!-- To Bucket C (d'=3) -->
+        <path d="M 200 240 C 350 240 350 295 498 295" />
+        
+        <!-- To Bucket D (d'=1) -->
+        <path d="M 200 280 C 350 280 350 350 498 350" />
+        <path d="M 200 320 C 350 320 350 365 498 365" />
+        <path d="M 200 360 C 350 360 350 380 498 380" />
+        <path d="M 200 400 C 350 400 350 395 498 395" />
+    </g>
+
+    <!-- Data Buckets -->
+    <!-- Bucket A -->
+    <g>
+        <rect x="500" y="100" width="180" height="70" rx="6" fill="var(--bg-elevated)" />
+        <path d="M 500 106 A 6 6 0 0 1 506 100 L 674 100 A 6 6 0 0 1 680 106 L 680 130 L 500 130 Z" fill="var(--brand-500)" />
+        <rect x="500" y="100" width="180" height="70" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <text x="590" y="120" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">Bucket A</text>
+        <text x="590" y="120" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">الدلو A</text>
+        
+        <text x="590" y="155" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-primary)">Local Depth (d' = 2)</text>
+        <text x="590" y="155" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-primary)">العمق المحلي (d' = 2)</text>
+    </g>
+
+    <!-- Bucket B -->
+    <g>
+        <rect x="500" y="180" width="180" height="70" rx="6" fill="var(--bg-elevated)" />
+        <path d="M 500 186 A 6 6 0 0 1 506 180 L 674 180 A 6 6 0 0 1 680 186 L 680 210 L 500 210 Z" fill="var(--brand-500)" />
+        <rect x="500" y="180" width="180" height="70" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <text x="590" y="200" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">Bucket B</text>
+        <text x="590" y="200" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">الدلو B</text>
+        
+        <text x="590" y="235" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-primary)">Local Depth (d' = 3)</text>
+        <text x="590" y="235" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-primary)">العمق المحلي (d' = 3)</text>
+    </g>
+
+    <!-- Bucket C -->
+    <g>
+        <rect x="500" y="260" width="180" height="70" rx="6" fill="var(--bg-elevated)" />
+        <path d="M 500 266 A 6 6 0 0 1 506 260 L 674 260 A 6 6 0 0 1 680 266 L 680 290 L 500 290 Z" fill="var(--brand-500)" />
+        <rect x="500" y="260" width="180" height="70" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <text x="590" y="280" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">Bucket C</text>
+        <text x="590" y="280" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">الدلو C</text>
+        
+        <text x="590" y="315" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-primary)">Local Depth (d' = 3)</text>
+        <text x="590" y="315" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-primary)">العمق المحلي (d' = 3)</text>
+    </g>
+
+    <!-- Bucket D -->
+    <g>
+        <rect x="500" y="340" width="180" height="70" rx="6" fill="var(--bg-elevated)" />
+        <path d="M 500 346 A 6 6 0 0 1 506 340 L 674 340 A 6 6 0 0 1 680 346 L 680 370 L 500 370 Z" fill="var(--brand-500)" />
+        <rect x="500" y="340" width="180" height="70" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <text x="590" y="360" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">Bucket D</text>
+        <text x="590" y="360" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">الدلو D</text>
+        
+        <text x="590" y="395" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-primary)">Local Depth (d' = 1)</text>
+        <text x="590" y="395" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-primary)">العمق المحلي (d' = 1)</text>
+    </g>
+
+    <!-- Educational Legend -->
+    <g>
+        <rect x="100" y="450" width="600" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+        <text x="400" y="480" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Bold bits in the directory indicate the prefix of length <tspan fill="var(--brand-ink)" font-weight="bold">d'</tspan> used to map entries to buckets.</text>
+        <text x="400" y="480" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">البتات العريضة في الدليل تمثل البادئة بطول <tspan fill="var(--brand-ink)" font-weight="bold">d'</tspan> المستخدمة لربط المداخل بالدلاء.</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في التقطيع القابل للتوسعة، إذا كان العمق العالمي (d) يساوي 3، فما هو عدد الإدخالات في الدليل؟</template>
+      <template class="content-en">In extendible hashing, if the global depth (d) is 3, how many entries are in the directory?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عدد الإدخالات = \(2^3 = 8\) إدخالات.</p></template>
+      <template class="content-en"><p>Number of entries = \(2^3 = 8\) entries.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="raid-technology" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تقنية مصفوفة الأقراص المستقلة (RAID Technology)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> RAID Technology</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية RAID تدمج عدة أقراص صلبة صغيرة لتعمل كقرص واحد كبير وسريع، وتوفر حماية للبيانات من التلف باستخدام التكرار (Redundancy).</p></template>
+    <template class="content-en"><p>RAID combines multiple small, independent disks into a single logical disk to improve performance (via striping) and reliability (via redundancy).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>RAID تعني (Redundant Arrays of Inexpensive/Independent Disks). الهدف الرئيسي هو موازنة معدلات تحسين الأداء بين الأقراص والمعالجات.</p><p>تستخدم تقنية <b><span class="smart-term" data-term-en="Data Striping" data-ar="تخطيط البيانات" data-en-def="Distributing data transparently over multiple disks to utilize parallelism and improve performance.">تخطيط البيانات<span class="smart-term-tooltip"></span></span> (Data Striping)</b> لتوزيع البيانات بشفافية عبر أقراص متعددة للاستفادة من التوازي (Parallelism) وتحسين الأداء.</p><p>مستويات RAID الشائعة:</p><ul><li><b>RAID 0:</b> تخطيط البيانات (Striping) بدون تكرار. أفضل أداء كتابة، لكن لا يوجد حماية للبيانات (إذا فشل قرص، تضيع البيانات).</li><li><b>RAID 1:</b> النسخ المتطابق (Mirroring). يتم نسخ البيانات على قرصين. ممتاز للموثوقية وسهل الاسترداد، يُستخدم للتطبيقات الحرجة مثل السجلات (Logs).</li><li><b>RAID 5:</b> تخطيط البيانات على مستوى الكتلة مع توزيع معلومات <span class="smart-term" data-term-en="Parity" data-ar="التكافؤ" data-en-def="Redundant information calculated from data blocks, used to reconstruct data if a disk fails.">التكافؤ<span class="smart-term-tooltip"></span></span> (Distributed Parity) عبر جميع الأقراص. يفضل للتخزين ذو الحجم الكبير.</li></ul></template>
+    <template class="content-en"><p>RAID stands for Redundant Arrays of Inexpensive (or Independent) Disks. The main goal is to even out the performance gap between disks and microprocessors.</p><p>It uses <b><span class="smart-term" data-term-en="Data Striping" data-ar="تخطيط البيانات" data-en-def="Distributing data transparently over multiple disks to utilize parallelism and improve performance.">Data Striping<span class="smart-term-tooltip"></span></span></b>, which distributes data transparently over multiple disks to make them appear as a single large, fast disk, utilizing parallelism.</p><p>Common RAID Levels:</p><ul><li><b>RAID 0:</b> Striping only, no redundancy. Best write performance, but high risk of data loss (no fault tolerance).</li><li><b>RAID 1:</b> Mirrored disks. Data is duplicated. Easiest for rebuilding a failed disk. Used for critical applications like logs.</li><li><b>RAID 5:</b> Block-level striping with distributed <span class="smart-term" data-term-en="Parity" data-ar="التكافؤ" data-en-def="Redundant information calculated from data blocks, used to reconstruct data if a disk fails.">parity<span class="smart-term-tooltip"></span></span> across all disks. Preferred for large volume storage.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا RAID 5 مفضل على RAID 3 أو 4؟ في RAID 3 و 4، يتم تخصيص قرص واحد بالكامل لحفظ بيانات التكافؤ (Parity disk). هذا القرص يصبح عنق زجاجة (Bottleneck) لأن كل عملية كتابة على أي قرص تتطلب تحديث قرص التكافؤ. RAID 5 يحل هذه المشكلة بتوزيع كتل التكافؤ بالتساوي عبر جميع الأقراص، مما يزيل عنق الزجاجة.</p><p>مستوى RAID 6 يضيف طبقة حماية إضافية (P + Q redundancy) باستخدام أكواد Reed-Solomon، مما يسمح للنظام بالبقاء متصلاً حتى لو فشل قرصان في نفس الوقت، وهو أمر بالغ الأهمية في مصفوفات التخزين الضخمة حيث يكون وقت إعادة بناء القرص طويلاً جداً.</p></template>
+    <template class="content-en"><p>Why is RAID 5 preferred over RAID 3 or 4?</p><p>In RAID 3 and 4, a single dedicated disk holds all parity information. This dedicated parity disk becomes a massive I/O bottleneck because EVERY write operation to ANY data disk requires a corresponding write to the parity disk.</p><p>RAID 5 solves this by distributing the parity blocks evenly across all disks in the array.</p><p>RAID 6 applies a P + Q redundancy scheme (often Reed-Solomon codes) to protect against up to TWO simultaneous disk failures.</p><p>This is increasingly critical in modern massive storage arrays where rebuilding a multi-terabyte disk takes days, during which a second disk failure would otherwise be catastrophic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Diagram comparing RAID 0, RAID 1, and RAID 5. RAID 0: Blocks A1, A2, A3, A4 distributed across 4 disks. RAID 1: Blocks A, B, C, D duplicated exactly on Disk 0 and Disk 1. RAID 5: Blocks distributed across 4 disks, with Parity blocks (Ap, Bp, Cp, Dp) staggered diagonally across the different disks. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      .gsvg-en { display: inline; }
+      .gsvg-ar { display: none; }
+      :root[lang="ar"] .gsvg-en { display: none; }
+      :root[lang="ar"] .gsvg-ar { display: inline; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Legend -->
+  <g transform="translate(0, 20)">
+    <rect x="500" y="0" width="260" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+    
+    <!-- Data Block Legend -->
+    <rect x="520" y="15" width="20" height="20" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="580" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Data Block</text>
+    <text x="580" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">كتلة بيانات</text>
+
+    <!-- Parity Block Legend -->
+    <rect x="640" y="15" width="20" height="20" rx="4" fill="var(--brand-600)" stroke="var(--brand-600)" stroke-width="1.5"/>
+    <text x="705" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Parity Block</text>
+    <text x="705" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">كتلة تكافؤ</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- RAID 0 (Striping)                          -->
+  <!-- ========================================== -->
+  <g transform="translate(0, 0)">
+    <!-- Title -->
+    <text x="250" y="70" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">RAID 0 (Striping)</text>
+    <text x="250" y="70" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">RAID 0 (تقسيم البيانات)</text>
+
+    <!-- Disks -->
+    <!-- Disk 0 -->
+    <rect x="40" y="100" width="90" height="140" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="40" y1="135" x2="130" y2="135" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="115" cy="118" r="3" fill="var(--brand-400)"/>
+    <text x="85" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 0</text>
+    <text x="85" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 0</text>
+    
+    <rect x="50" y="145" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="85" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A1</text>
+    
+    <rect x="50" y="185" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="85" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B1</text>
+
+    <!-- Disk 1 -->
+    <rect x="150" y="100" width="90" height="140" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="150" y1="135" x2="240" y2="135" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="225" cy="118" r="3" fill="var(--brand-400)"/>
+    <text x="195" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 1</text>
+    <text x="195" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 1</text>
+    
+    <rect x="160" y="145" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="195" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A2</text>
+    
+    <rect x="160" y="185" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="195" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B2</text>
+
+    <!-- Disk 2 -->
+    <rect x="260" y="100" width="90" height="140" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="260" y1="135" x2="350" y2="135" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="335" cy="118" r="3" fill="var(--brand-400)"/>
+    <text x="305" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 2</text>
+    <text x="305" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 2</text>
+    
+    <rect x="270" y="145" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="305" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A3</text>
+    
+    <rect x="270" y="185" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="305" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B3</text>
+
+    <!-- Disk 3 -->
+    <rect x="370" y="100" width="90" height="140" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="370" y1="135" x2="460" y2="135" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="445" cy="118" r="3" fill="var(--brand-400)"/>
+    <text x="415" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 3</text>
+    <text x="415" y="123" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 3</text>
+    
+    <rect x="380" y="145" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="415" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A4</text>
+    
+    <rect x="380" y="185" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="415" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B4</text>
+
+    <!-- Explanation Box -->
+    <rect x="500" y="100" width="260" height="140" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="6 4" stroke-width="2"/>
+    <text x="630" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Striping only, no redundancy</text>
+    <text x="630" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تقسيم البيانات فقط، بدون تكرار</text>
+    <text x="630" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Best performance, high risk</text>
+    <text x="630" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">أفضل أداء، مخاطرة عالية</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- RAID 1 (Mirroring)                         -->
+  <!-- ========================================== -->
+  <g transform="translate(0, 280)">
+    <!-- Title -->
+    <text x="250" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">RAID 1 (Mirroring)</text>
+    <text x="250" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">RAID 1 (النسخ المتطابق)</text>
+
+    <!-- Disks -->
+    <!-- Disk 0 -->
+    <rect x="120" y="70" width="90" height="210" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="120" y1="105" x2="210" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="195" cy="88" r="3" fill="var(--brand-400)"/>
+    <text x="165" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 0</text>
+    <text x="165" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 0</text>
+    
+    <rect x="130" y="115" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="165" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block A</text>
+    
+    <rect x="130" y="155" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="165" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block B</text>
+
+    <rect x="130" y="195" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="165" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block C</text>
+
+    <rect x="130" y="235" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="165" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block D</text>
+
+    <!-- Disk 1 -->
+    <rect x="290" y="70" width="90" height="210" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="290" y1="105" x2="380" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="365" cy="88" r="3" fill="var(--brand-400)"/>
+    <text x="335" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 1</text>
+    <text x="335" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 1</text>
+    
+    <rect x="300" y="115" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="335" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block A</text>
+    
+    <rect x="300" y="155" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="335" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block B</text>
+
+    <rect x="300" y="195" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="335" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block C</text>
+
+    <rect x="300" y="235" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="335" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">Block D</text>
+
+    <!-- Explanation Box -->
+    <rect x="500" y="70" width="260" height="210" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="6 4" stroke-width="2"/>
+    <text x="630" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Mirrored disks (Duplication)</text>
+    <text x="630" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">أقراص متطابقة (تكرار البيانات)</text>
+    <text x="630" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Fault tolerant, easy rebuild</text>
+    <text x="630" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تسامح مع الأخطاء، إعادة بناء سهلة</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- RAID 5 (Distributed Parity)                -->
+  <!-- ========================================== -->
+  <g transform="translate(0, 580)">
+    <!-- Title -->
+    <text x="250" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">RAID 5 (Distributed Parity)</text>
+    <text x="250" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">RAID 5 (التكافؤ الموزع)</text>
+
+    <!-- Disks -->
+    <!-- Disk 0 -->
+    <rect x="40" y="70" width="90" height="210" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="40" y1="105" x2="130" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="115" cy="88" r="3" fill="var(--brand-400)"/>
+    <text x="85" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 0</text>
+    <text x="85" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 0</text>
+    
+    <rect x="50" y="115" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="85" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A1</text>
+    
+    <rect x="50" y="155" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="85" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B1</text>
+
+    <rect x="50" y="195" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="85" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">C1</text>
+
+    <rect x="50" y="235" width="70" height="30" rx="4" fill="var(--brand-600)" stroke="var(--brand-600)" stroke-width="1.5"/>
+    <text x="85" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)">Dp</text>
+
+    <!-- Disk 1 -->
+    <rect x="150" y="70" width="90" height="210" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="150" y1="105" x2="240" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="225" cy="88" r="3" fill="var(--brand-400)"/>
+    <text x="195" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 1</text>
+    <text x="195" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 1</text>
+    
+    <rect x="160" y="115" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="195" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A2</text>
+    
+    <rect x="160" y="155" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="195" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B2</text>
+
+    <rect x="160" y="195" width="70" height="30" rx="4" fill="var(--brand-600)" stroke="var(--brand-600)" stroke-width="1.5"/>
+    <text x="195" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)">Cp</text>
+
+    <rect x="160" y="235" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="195" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">D1</text>
+
+    <!-- Disk 2 -->
+    <rect x="260" y="70" width="90" height="210" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="260" y1="105" x2="350" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="335" cy="88" r="3" fill="var(--brand-400)"/>
+    <text x="305" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 2</text>
+    <text x="305" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 2</text>
+    
+    <rect x="270" y="115" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="305" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">A3</text>
+    
+    <rect x="270" y="155" width="70" height="30" rx="4" fill="var(--brand-600)" stroke="var(--brand-600)" stroke-width="1.5"/>
+    <text x="305" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)">Bp</text>
+
+    <rect x="270" y="195" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="305" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">C2</text>
+
+    <rect x="270" y="235" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="305" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">D2</text>
+
+    <!-- Disk 3 -->
+    <rect x="370" y="70" width="90" height="210" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="370" y1="105" x2="460" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+    <circle cx="445" cy="88" r="3" fill="var(--brand-400)"/>
+    <text x="415" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Disk 3</text>
+    <text x="415" y="93" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القرص 3</text>
+    
+    <rect x="380" y="115" width="70" height="30" rx="4" fill="var(--brand-600)" stroke="var(--brand-600)" stroke-width="1.5"/>
+    <text x="415" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)">Ap</text>
+    
+    <rect x="380" y="155" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="415" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">B3</text>
+
+    <rect x="380" y="195" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="415" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">C3</text>
+
+    <rect x="380" y="235" width="70" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+    <text x="415" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">D3</text>
+
+    <!-- Explanation Box -->
+    <rect x="500" y="70" width="260" height="210" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="6 4" stroke-width="2"/>
+    <text x="630" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Block-level striping</text>
+    <text x="630" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تقسيم على مستوى الكتلة</text>
+    <text x="630" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">with distributed parity</text>
+    <text x="630" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">مع تكافؤ موزع</text>
+    <text x="630" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Tolerates 1 disk failure</text>
+    <text x="630" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يتحمل فشل قرص واحد</text>
+  </g>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>RAID 0</th><th>RAID 1</th><th>RAID 5</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التكرار / الموثوقية</template>
+          <template class="content-en">Redundancy / Reliability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يوجد</template>
+          <template class="content-en">None</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نسخ متطابق (عالي جداً)</template>
+          <template class="content-en">Mirroring (Very High)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تكافؤ موزع (عالي)</template>
+          <template class="content-en">Distributed Parity (High)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">كفاءة المساحة</template>
+          <template class="content-en">Space Efficiency</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">100%</template>
+          <template class="content-en">100%</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">50%</template>
+          <template class="content-en">50%</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية (يفقد قرص واحد فقط)</template>
+          <template class="content-en">High (Loses only 1 disk)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك 4 أقراص بحجم 1 تيرابايت لكل منها، ما هي السعة التخزينية القابلة للاستخدام إذا قمت بتكوينها كـ RAID 1؟ وماذا لو كانت RAID 5؟</template>
+      <template class="content-en">If you have four 1TB disks, what is the usable storage capacity if configured as RAID 1? What if configured as RAID 5?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في RAID 1 (النسخ المتطابق)، السعة هي النصف: 2 تيرابايت. في RAID 5، يُفقد ما يعادل قرص واحد للتكافؤ، فالسعة هي (4-1) = 3 تيرابايت.</p></template>
+      <template class="content-en"><p>In RAID 1 (Mirroring), usable capacity is half: 2TB. In RAID 5, one disk's worth of space is used for parity: (4-1) * 1TB = 3TB.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="storage-area-networks-san" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> شبكات منطقة التخزين (SANs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Storage Area Networks (SANs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>شبكة SAN هي شبكة عالية السرعة مخصصة لربط خوادم متعددة بأجهزة تخزين مشتركة، مما يوفر مرونة هائلة في إدارة التخزين.</p></template>
+    <template class="content-en"><p>A SAN is a dedicated high-speed network that connects multiple servers to shared storage devices, providing immense flexibility in storage management.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>مع زيادة الطلب على التخزين، تنتقل المؤسسات من التخزين الثابت المرتبط بخادم واحد إلى بنية تحتية مرنة وديناميكية تسمى شبكات منطقة التخزين (SANs).</p><p>في SAN، يتم تكوين الأجهزة الطرفية للتخزين كعقد (Nodes) على شبكة عالية السرعة. يمكن إرفاقها وفصلها من الخوادم بطريقة مرنة جداً.</p><p>مزايا SANs:</p><ul><li>اتصال مرن (Many-to-many) بين الخوادم وأجهزة التخزين باستخدام محولات الألياف الضوئية (Fiber channel switches).</li><li>تسمح بوضع أنظمة التخزين على مسافات أطول (حتى 10 كم) من الخوادم.</li><li>قدرات عزل أفضل تسمح بإضافة أجهزة جديدة دون تعطيل النظام (Non-disruptive addition).</li></ul></template>
+    <template class="content-en"><p>With rising storage demands, organizations are moving from static, server-bound storage to flexible, dynamic infrastructures called Storage Area Networks (SANs).</p><p>In a SAN, online storage peripherals are configured as nodes on a high-speed network. They can be attached and detached from servers in a very flexible manner.</p><p>Advantages of SANs:</p><ul><li>Flexible many-to-many connectivity among servers and storage devices using fiber channel hubs and switches.</li><li>Allows storage systems to be placed at longer distances (up to 10km) from servers using fiber optic cables.</li><li>Better isolation capabilities allowing non-disruptive addition of new peripherals and servers.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق بين SAN و NAS (Network Attached Storage): تعمل SAN على مستوى 'الكتلة' (Block-level access)، مما يجعلها تبدو لنظام التشغيل وكأنها قرص صلب محلي متصل مباشرة، وهو أمر ضروري لقواعد البيانات عالية الأداء. بينما تعمل NAS على مستوى 'الملف' (File-level access) عبر بروتوكولات مثل SMB/NFS.</p><p>التحدي الرئيسي في SANs هو قابلية التشغيل البيني (Interoperability) بين بائعين مختلفين وإدارة تعقيد الشبكة، حيث تتطلب برمجيات إدارة تخزين متقدمة لتعيين وحدات التخزين المنطقية (LUNs) للخوادم الصحيحة بأمان.</p></template>
+    <template class="content-en"><p>The critical distinction between SAN and NAS (Network Attached Storage): SAN provides 'Block-level access', making the storage appear to the server's OS as a locally attached raw hard drive. This is mandatory for high-performance enterprise databases. NAS provides 'File-level access' over network protocols (SMB/NFS).</p><p>The main challenge with SANs is vendor interoperability and management complexity. It requires sophisticated storage management software to securely map Logical Unit Numbers (LUNs) to the correct servers and prevent data corruption from unauthorized access.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تفضل قواعد البيانات الضخمة استخدام SAN بدلاً من الأقراص الداخلية المباشرة في الخادم؟</template>
+      <template class="content-en">Why do massive databases prefer using a SAN instead of direct internal disks in the server?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن SAN توفر قابلية توسع غير محدودة تقريباً، وتسمح لعدة خوادم (في بيئة عنقودية Cluster) بالوصول إلى نفس البيانات، وتسهل عمليات النسخ الاحتياطي والتعافي من الكوارث دون إثقال معالج الخادم.</p></template>
+      <template class="content-en"><p>Because SANs offer virtually limitless scalability, allow multiple servers (in a cluster) to access the same shared data, and facilitate hardware-level backups and disaster recovery without burdening the server's CPU.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أن المعالج هو سيارة سباق فورمولا 1، والقرص الصلب هو عربة يجرها حصان. هذه هي الفجوة في الأداء التي نحاول حلها هنا! بدأنا بفهم ميكانيكية القرص (وقت البحث والدوران)، ولأن القرص بطيء، تعلمنا أننا يجب أن نجلب البيانات في 'كتل' (Blocks) بدلاً من بايتات فردية. ثم سألنا أنفسنا: كيف نرتب هذه الكتل؟ إذا كنا نكتب بسرعة، نستخدم Heap. إذا كنا نبحث كثيراً، نستخدم Ordered. وإذا أردنا الوصول الفوري، نستخدم Hashing. لكن ماذا لو كبرت البيانات؟ هنا يأتي دور التقطيع الديناميكي. وأخيراً، لأن قرصاً واحداً لا يكفي للشركات الكبرى، دمجنا الأقراص معاً باستخدام RAID للسرعة والأمان، وربطناها بشبكات SAN. ركزوا في الامتحان على المقارنة بين هياكل الملفات ومستويات RAID، فهي موضع أسئلة دائم!</template>
+    <template class="content-en">Welcome friends to this crucial module. Imagine the CPU is an F1 race car, and the hard disk is a horse-drawn carriage. That's the performance gap we are solving! We started with disk mechanics (seek and latency). Because disks are slow, we fetch data in 'Blocks'. Then we asked: how do we organize these blocks? For fast writes, use Heap. For range searches, use Ordered. For instant lookups, use Hashing. But what if data grows? Enter Dynamic Hashing. Finally, since one disk isn't enough for enterprises, we combine them using RAID for speed and safety, and network them via SANs. For the exam, focus heavily on comparing file structures and RAID levels—they are guaranteed questions!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نقسم المسارات إلى كتل (Blocks) بدلاً من قراءة بايت واحد في كل مرة؟</template>
+          <template class="content-en">Why do we divide tracks into blocks instead of reading one byte at a time?</template>
+          <span class="content-target">لماذا نقسم المسارات إلى كتل (Blocks) بدلاً من قراءة بايت واحد في كل مرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التكلفة الميكانيكية للوصول للقرص عالية جداً. جلب كتلة كاملة (مثلاً 4 كيلوبايت) يستغرق تقريباً نفس وقت جلب بايت واحد، مما يقلل من عدد مرات الوصول للقرص.</template>
+          <template class="content-en">Because the mechanical cost of accessing the disk is extremely high. Fetching a whole block (e.g., 4KB) takes almost the same time as fetching one byte, drastically reducing the number of disk accesses.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نضطر لاستخدام السجلات الممتدة (Spanned Records)؟</template>
+          <template class="content-en">When are we forced to use Spanned Records?</template>
+          <span class="content-target">متى نضطر لاستخدام السجلات الممتدة (Spanned Records)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما يكون حجم السجل الواحد أكبر من حجم الكتلة بأكملها، أو عندما نريد تجنب إهدار المساحة (التجزئة الداخلية) مع السجلات متغيرة الطول.</template>
+          <template class="content-en">When a single record's size is larger than the entire block size, or when we want to avoid wasted space (internal fragmentation) with variable-length records.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر عملية الإدراج في الملفات المرتبة (Ordered Files) كابوساً للأداء؟</template>
+          <template class="content-en">Why is insertion in Ordered Files considered a performance nightmare?</template>
+          <span class="content-target">لماذا تعتبر عملية الإدراج في الملفات المرتبة (Ordered Files) كابوساً للأداء؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يجب الحفاظ على الترتيب المادي. إدراج سجل في المنتصف يتطلب قراءة وكتابة (إزاحة) نصف كتل الملف في المتوسط لتوفير مساحة.</template>
+          <template class="content-en">Because physical order must be maintained. Inserting a record in the middle requires reading and rewriting (shifting) half the file's blocks on average to make room.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحل مشكلة الإدراج البطيء في الملفات المرتبة؟</template>
+          <template class="content-en">How do we solve the slow insertion problem in Ordered Files?</template>
+          <span class="content-target">كيف نحل مشكلة الإدراج البطيء في الملفات المرتبة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام 'ملف فائض' (Overflow file) غير مرتب. ندرج السجلات الجديدة فيه بسرعة، ثم نقوم بدمجه (Merge) مع الملف الرئيسي بشكل دوري.</template>
+          <template class="content-en">By using an unordered 'Overflow file'. We insert new records there quickly, and periodically merge it with the main sorted file.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العيب القاتل للتقطيع الثابت (Static Hashing)؟</template>
+          <template class="content-en">What is the fatal flaw of Static Hashing?</template>
+          <span class="content-target">ما هو العيب القاتل للتقطيع الثابت (Static Hashing)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عدد الدلاء (Buckets) ثابت. إذا زاد حجم البيانات، ستكثر التصادمات (Collisions) وتطول سلاسل الفائض، مما يبطئ البحث ليصبح أشبه بالبحث الخطي.</template>
+          <template class="content-en">The number of buckets is fixed. If data volume grows, collisions increase and overflow chains become long, slowing search down to near linear time.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل التقطيع القابل للتوسعة (Extendible Hashing) مشكلة التقطيع الثابت؟</template>
+          <template class="content-en">How does Extendible Hashing solve the static hashing problem?</template>
+          <span class="content-target">كيف يحل التقطيع القابل للتوسعة (Extendible Hashing) مشكلة التقطيع الثابت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يستخدم 'دليلاً' (Directory) يحتوي على مؤشرات للكتل. عندما تمتلئ كتلة، تنقسم، ويتضاعف حجم الدليل (إذا لزم الأمر) لاستيعاب المؤشرات الجديدة دون الحاجة لملفات فائض.</template>
+          <template class="content-en">It uses a 'Directory' of pointers to blocks. When a block fills, it splits, and the directory doubles in size (if needed) to accommodate new pointers without needing overflow files.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو تخطيط البيانات (Data Striping) في RAID؟</template>
+          <template class="content-en">What is Data Striping in RAID?</template>
+          <span class="content-target">ما هو تخطيط البيانات (Data Striping) في RAID؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تقسيم البيانات إلى أجزاء وتوزيعها عبر أقراص متعددة. هذا يسمح بقراءة/كتابة الأجزاء في نفس الوقت (بالتوازي)، مما يضاعف السرعة.</template>
+          <template class="content-en">It's dividing data into chunks and distributing them across multiple disks. This allows reading/writing chunks simultaneously (in parallel), multiplying speed.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُفضل RAID 5 على RAID 1 في التخزين الضخم؟</template>
+          <template class="content-en">Why is RAID 5 preferred over RAID 1 for massive storage?</template>
+          <span class="content-target">لماذا يُفضل RAID 5 على RAID 1 في التخزين الضخم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">RAID 1 (النسخ المتطابق) يهدر 50% من المساحة. RAID 5 يوفر حماية للبيانات باستخدام 'التكافؤ الموزع' (Distributed Parity) ويهدر مساحة تعادل قرصاً واحداً فقط، مما يجعله أكثر كفاءة من حيث التكلفة.</template>
+          <template class="content-en">RAID 1 (Mirroring) wastes 50% of space. RAID 5 provides data protection using 'Distributed Parity' and only wastes the equivalent of one disk's space, making it far more cost-effective.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق الأساسي بين التخزين المحلي وشبكة SAN؟</template>
+          <template class="content-en">What is the fundamental difference between local storage and a SAN?</template>
+          <span class="content-target">ما الفرق الأساسي بين التخزين المحلي وشبكة SAN؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التخزين المحلي مقيد بخادم واحد. SAN هي شبكة مستقلة تسمح لعدة خوادم بالوصول إلى مصفوفات تخزين ضخمة بمرونة وسرعة عالية، وكأنها أقراص محلية.</template>
+          <template class="content-en">Local storage is bound to one server. A SAN is an independent network allowing multiple servers to access massive storage arrays flexibly and at high speeds, as if they were local disks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم التخزين المؤقت المزدوج (Double Buffering)؟</template>
+          <template class="content-en">Why do we use Double Buffering?</template>
+          <span class="content-target">لماذا نستخدم التخزين المؤقت المزدوج (Double Buffering)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">للسماح للمعالج بمعالجة كتلة بيانات في الذاكرة (Buffer 1) بينما يقوم متحكم القرص بجلب الكتلة التالية في نفس الوقت إلى (Buffer 2)، مما يمنع المعالج من التوقف لانتظار القرص.</template>
+          <template class="content-en">To allow the CPU to process a data block in memory (Buffer 1) while the disk controller concurrently fetches the next block into (Buffer 2), preventing the CPU from idling while waiting for the disk.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "وقت البحث (Seek Time)",
+      "en": "Seek Time"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوقت اللازم لتحريك رأس القراءة/الكتابة إلى المسار الصحيح على القرص.",
+        "en": "The time required to move the read-write head to the correct track on the disk."
+      },
+      "example": {
+        "ar": "يستغرق عادة من 3 إلى 4 مللي ثانية في الأقراص الحديثة.",
+        "en": "Typically takes 3 to 4 ms in modern high-end disks."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "تأخير الدوران (Rotational Delay / Latency)",
+      "en": "Rotational Delay (Latency)"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوقت اللازم لدوران القرص حتى تصل الكتلة المطلوبة تحت رأس القراءة/الكتابة.",
+        "en": "The time required for the disk to rotate the desired block under the read-write head."
+      },
+      "example": {
+        "ar": "متوسط التأخير حوالي 2 مللي ثانية لأقراص 15K RPM.",
+        "en": "Average latency is around 2 ms for 15K RPM disks."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "الأسطوانة (Cylinder)",
+      "en": "Cylinder"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة تخيلية من المسارات التي لها نفس نصف القطر عبر جميع أسطح الأقراص في الحزمة.",
+        "en": "An imaginary collection of tracks of the same radius from all recorded surfaces in a disk pack."
+      },
+      "example": {
+        "ar": "الوصول إلى البيانات في نفس الأسطوانة لا يتطلب وقت بحث (Seek time).",
+        "en": "Accessing data on the same cylinder requires zero seek time."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "عامل التجميع (Blocking Factor - bfr)",
+      "en": "Blocking Factor (bfr)"
+    },
+    "back": {
+      "definition": {
+        "ar": "متوسط عدد السجلات التي يمكن تخزينها في كتلة قرص واحدة.",
+        "en": "The average number of file records stored in a single disk block."
+      },
+      "example": {
+        "ar": "إذا كانت الكتلة 1000 بايت والسجل 200 بايت، فإن bfr = 5.",
+        "en": "If block is 1000 bytes and record is 200 bytes, bfr = 5."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "السجلات غير الممتدة (Unspanned Records)",
+      "en": "Unspanned Records"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تخزين لا تسمح لأي سجل بالامتداد عبر كتلتين، مما قد يترك مساحة مهدرة في نهاية الكتلة.",
+        "en": "A storage method where no record can span two blocks, potentially leaving wasted space at the end of a block."
+      },
+      "example": {
+        "ar": "تُستخدم عادة مع السجلات ذات الطول الثابت.",
+        "en": "Usually used with fixed-length records."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "السجلات الممتدة (Spanned Records)",
+      "en": "Spanned Records"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تخزين تسمح للسجل بأن يُخزن في أكثر من كتلة واحدة لتجنب إهدار المساحة.",
+        "en": "A storage method where a record can be stored in more than one block to avoid wasting space."
+      },
+      "example": {
+        "ar": "ضرورية للسجلات متغيرة الطول أو السجلات الأكبر من حجم الكتلة.",
+        "en": "Necessary for variable-length records or records larger than a block."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ملف الكومة (Heap File)",
+      "en": "Heap File (Unordered File)"
+    },
+    "back": {
+      "definition": {
+        "ar": "ملف تُدرج فيه السجلات الجديدة دائماً في النهاية دون أي ترتيب.",
+        "en": "A file where new records are always inserted at the end without any order."
+      },
+      "example": {
+        "ar": "البحث فيه يتطلب قراءة b/2 كتلة في المتوسط.",
+        "en": "Searching it requires reading b/2 blocks on average."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "الملف المرتب (Ordered / Sequential File)",
+      "en": "Ordered File (Sequential File)"
+    },
+    "back": {
+      "definition": {
+        "ar": "ملف تُحفظ فيه السجلات مفروزة بناءً على قيم حقل ترتيب معين.",
+        "en": "A file where records are kept sorted by the values of an ordering field."
+      },
+      "example": {
+        "ar": "يسمح باستخدام البحث الثنائي (Binary Search).",
+        "en": "Allows the use of Binary Search."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "التقطيع الخارجي (External Hashing)",
+      "en": "External Hashing"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيق تقنيات التقطيع على ملفات القرص، حيث تُقسم الكتل إلى دلاء (Buckets).",
+        "en": "Applying hashing techniques to disk files, where file blocks are divided into buckets."
+      },
+      "example": {
+        "ar": "يُخزن السجل في الدلو i حيث i = h(K).",
+        "en": "Record is stored in bucket i where i = h(K)."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "التصادم (Collision)",
+      "en": "Collision"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدث في التقطيع عندما يتم توجيه سجل جديد إلى دلو ممتلئ بالفعل.",
+        "en": "Occurs in hashing when a new record hashes to a bucket that is already full."
+      },
+      "example": {
+        "ar": "يُحل باستخدام التسلسل (Chaining) أو العنونة المفتوحة.",
+        "en": "Resolved using Chaining or Open Addressing."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "التسلسل (Chaining)",
+      "en": "Chaining"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لحل التصادمات عن طريق وضع السجلات الفائضة في مواقع فائض وربطها بمؤشرات.",
+        "en": "A collision resolution method that places overflow records in overflow locations and links them with pointers."
+      },
+      "example": {
+        "ar": "الطريقة الأكثر شيوعاً في قواعد البيانات.",
+        "en": "The most common method in databases."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "التقطيع القابل للتوسعة (Extendible Hashing)",
+      "en": "Extendible Hashing"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تقطيع ديناميكية تستخدم دليلاً (Directory) يتضاعف حجمه لاستيعاب نمو الملف.",
+        "en": "A dynamic hashing technique that uses a directory which doubles in size to accommodate file growth."
+      },
+      "example": {
+        "ar": "حجم الدليل هو \\(2^d\\) حيث d هو العمق العالمي.",
+        "en": "Directory size is \\(2^d\\) where d is the global depth."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "تخطيط البيانات (Data Striping)",
+      "en": "Data Striping"
+    },
+    "back": {
+      "definition": {
+        "ar": "توزيع البيانات بشفافية عبر أقراص متعددة لجعلها تبدو كقرص واحد سريع وكبير.",
+        "en": "Distributing data transparently over multiple disks to make them appear as a single large, fast disk."
+      },
+      "example": {
+        "ar": "المفهوم الأساسي وراء تقنية RAID.",
+        "en": "The core concept behind RAID technology."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "RAID 0",
+      "en": "RAID 0"
+    },
+    "back": {
+      "definition": {
+        "ar": "مستوى RAID يستخدم تخطيط البيانات فقط بدون أي تكرار أو حماية للبيانات.",
+        "en": "RAID level that uses data striping only, with no redundancy or data protection."
+      },
+      "example": {
+        "ar": "أفضل أداء ولكن أعلى خطر لفقدان البيانات.",
+        "en": "Best performance but highest risk of data loss."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "RAID 1",
+      "en": "RAID 1"
+    },
+    "back": {
+      "definition": {
+        "ar": "مستوى RAID يستخدم النسخ المتطابق (Mirroring) لتكرار البيانات على قرصين.",
+        "en": "RAID level that uses mirroring to duplicate data across two disks."
+      },
+      "example": {
+        "ar": "يُستخدم للتطبيقات الحرجة مثل سجلات قواعد البيانات (Logs).",
+        "en": "Used for critical applications like database logs."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "RAID 5",
+      "en": "RAID 5"
+    },
+    "back": {
+      "definition": {
+        "ar": "مستوى RAID يستخدم تخطيط البيانات مع توزيع معلومات التكافؤ (Parity) عبر جميع الأقراص.",
+        "en": "RAID level that uses block-level striping with distributed parity across all disks."
+      },
+      "example": {
+        "ar": "المفضل لتخزين الأحجام الكبيرة.",
+        "en": "Preferred for large volume storage."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "شبكة منطقة التخزين (SAN)",
+      "en": "Storage Area Network (SAN)"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة عالية السرعة تربط الخوادم بأجهزة التخزين الطرفية بشكل مرن.",
+        "en": "A high-speed network that flexibly connects servers to storage peripherals."
+      },
+      "example": {
+        "ar": "تسمح بفصل التخزين عن الخادم بمسافات تصل إلى 10 كم.",
+        "en": "Allows separating storage from servers by up to 10km."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+        <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <div id="quiz-content" class="quiz-card glass-card">
+          <div class="quiz-header">
+            <span id="quiz-counter">1 / 10</span>
+            <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+          </div>
+          <div class="quiz-question" id="quiz-question-text"></div>
+          <div class="quiz-options" id="quiz-options-container"></div>
+          <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+          <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+              <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+            </button>
+          </div>
+        </div>
+        <div id="quiz-results" class="quiz-results glass-card hidden">
+          <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+        </div>
+      </section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل المكونات الرئيسية للعنوان المادي لكتلة القرص؟",
+      "en": "Which of the following represents the main components of a physical disk block address?"
+    },
+    "options": {
+      "ar": [
+        "رقم المسار، رقم القطاع، ورقم البايت",
+        "رقم الأسطوانة، رقم المسار/السطح، ورقم الكتلة",
+        "رقم الملف، رقم السجل، ورقم الحقل",
+        "رقم الدلو، رقم الفائض، ورقم المؤشر"
+      ],
+      "en": [
+        "Track number, Sector number, and Byte number",
+        "Cylinder number, Track/Surface number, and Block number",
+        "File number, Record number, and Field number",
+        "Bucket number, Overflow number, and Pointer number"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "العنوان المادي (Hardware address) للقرص يتكون من رقم الأسطوانة، رقم السطح (المسار داخل الأسطوانة)، ورقم الكتلة داخل المسار.",
+      "en": "The physical hardware address consists of the cylinder number, surface/track number, and block number."
+    },
+    "hint": {
+      "ar": "تذكر الهيكل المادي للقرص: أسطوانات، ثم أسطح، ثم كتل.",
+      "en": "Remember the physical structure: cylinders, then surfaces, then blocks."
+    },
+    "difficulty": "easy",
+    "conceptId": "disk-storage-devices"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو متوسط عدد الكتل التي يجب قراءتها للبحث عن سجل في ملف غير مرتب (Heap File) يحتوي على b من الكتل؟",
+      "en": "What is the average number of blocks that must be read to search for a record in an unordered (Heap) file containing 'b' blocks?"
+    },
+    "options": {
+      "ar": [
+        "b",
+        "log2(b)",
+        "b / 2",
+        "1"
+      ],
+      "en": [
+        "b",
+        "log2(b)",
+        "b / 2",
+        "1"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في ملف Heap، يجب إجراء بحث خطي. في المتوسط، ستجد السجل بعد قراءة نصف الملف (b/2).",
+      "en": "In a Heap file, a linear search is required. On average, you will find the record after reading half the file (b/2)."
+    },
+    "hint": {
+      "ar": "البحث الخطي يمر عبر البيانات واحدة تلو الأخرى.",
+      "en": "Linear search goes through data one by one."
+    },
+    "difficulty": "easy",
+    "conceptId": "unordered-heap-files"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا تعتبر عملية الإدراج (Insertion) مكلفة جداً في الملفات المرتبة (Ordered Files)؟",
+      "en": "Why is the insertion operation very expensive in Ordered Files?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تتطلب إعادة حساب دالة التقطيع.",
+        "لأن السجلات يجب أن تُدرج في الترتيب الصحيح، مما يتطلب إزاحة السجلات الأخرى.",
+        "لأنها تتطلب تحديث الدليل (Directory) في كل مرة.",
+        "لأنها تتطلب كتابة البيانات على قرص التكافؤ (Parity disk)."
+      ],
+      "en": [
+        "Because it requires recalculating the hash function.",
+        "Because records must be inserted in the correct order, requiring shifting of other records.",
+        "Because it requires updating the directory every time.",
+        "Because it requires writing data to the parity disk."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "للحفاظ على الترتيب المادي، يجب إدراج السجل الجديد في مكانه الدقيق، مما يجبر النظام على إزاحة جميع السجلات والكتل اللاحقة لتوفير مساحة.",
+      "en": "To maintain physical order, a new record must be inserted in its exact spot, forcing the system to shift all subsequent records and blocks to make room."
+    },
+    "hint": {
+      "ar": "فكر في إدخال كتاب في منتصف رف كتب ممتلئ ومفروز أبجدياً.",
+      "en": "Think about inserting a book into the middle of a full, alphabetically sorted bookshelf."
+    },
+    "difficulty": "medium",
+    "conceptId": "ordered-sequential-files"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في التقطيع الخارجي (External Hashing)، ماذا يحدث عندما يتم توجيه سجل جديد إلى دلو (Bucket) ممتلئ بالفعل؟",
+      "en": "In External Hashing, what happens when a new record is hashed to a bucket that is already full?"
+    },
+    "options": {
+      "ar": [
+        "يتم حذف السجل القديم.",
+        "يحدث تصادم (Collision) ويجب حله باستخدام طرق مثل التسلسل (Chaining).",
+        "يتم إيقاف النظام وإصدار خطأ.",
+        "يتم تغيير حجم الكتلة (Block size) تلقائياً."
+      ],
+      "en": [
+        "The old record is deleted.",
+        "A collision occurs and must be resolved using methods like chaining.",
+        "The system halts and issues an error.",
+        "The block size is automatically changed."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذه الحالة تسمى تصادم (Collision). يتم التعامل معها عادة عن طريق إنشاء ملف فائض وربط السجلات (Chaining).",
+      "en": "This situation is called a collision. It is typically handled by creating an overflow file and linking records (Chaining)."
+    },
+    "hint": {
+      "ar": "نفس المصطلح يُستخدم في حوادث السيارات.",
+      "en": "The same term is used for car accidents."
+    },
+    "difficulty": "easy",
+    "conceptId": "hashed-files-external"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من تقنيات التقطيع التالية تستخدم 'دليلاً' (Directory) يتضاعف حجمه عند الحاجة؟",
+      "en": "Which of the following hashing techniques uses a 'directory' that doubles in size when needed?"
+    },
+    "options": {
+      "ar": [
+        "التقطيع الثابت (Static Hashing)",
+        "التقطيع الخطي (Linear Hashing)",
+        "التقطيع القابل للتوسعة (Extendible Hashing)",
+        "التقطيع المتعدد (Multiple Hashing)"
+      ],
+      "en": [
+        "Static Hashing",
+        "Linear Hashing",
+        "Extendible Hashing",
+        "Multiple Hashing"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التقطيع القابل للتوسعة (Extendible Hashing) يعتمد على دليل بحجم \\(2^d\\) (حيث d هو العمق العالمي) لتوجيه السجلات إلى الكتل.",
+      "en": "Extendible Hashing relies on a directory of size \\(2^d\\) (where d is the global depth) to route records to blocks."
+    },
+    "hint": {
+      "ar": "الاسم يوحي بالقدرة على التوسع من خلال دليل.",
+      "en": "The name implies the ability to extend via a directory."
+    },
+    "difficulty": "medium",
+    "conceptId": "dynamic-extendible-hashing"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الهدف الرئيسي من استخدام تقنية RAID؟",
+      "en": "What is the main goal of using RAID technology?"
+    },
+    "options": {
+      "ar": [
+        "تقليل حجم البيانات المخزنة.",
+        "موازنة معدلات تحسين الأداء بين الأقراص والمعالجات وتوفير الموثوقية.",
+        "تحويل الأقراص المغناطيسية إلى أقراص صلبة (SSD).",
+        "تشفير البيانات لمنع الوصول غير المصرح به."
+      ],
+      "en": [
+        "To reduce the size of stored data.",
+        "To even out performance improvement rates between disks and processors and provide reliability.",
+        "To convert magnetic disks into Solid State Drives (SSDs).",
+        "To encrypt data to prevent unauthorized access."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "RAID يهدف إلى سد الفجوة في الأداء بين المعالجات السريعة والأقراص البطيئة من خلال التوازي (Striping)، مع توفير حماية للبيانات (Redundancy).",
+      "en": "RAID aims to bridge the performance gap between fast CPUs and slow disks via parallelism (Striping), while providing data protection (Redundancy)."
+    },
+    "hint": {
+      "ar": "تذكر أن الأقراص ميكانيكية وبطيئة مقارنة بالمعالج.",
+      "en": "Remember that disks are mechanical and slow compared to the CPU."
+    },
+    "difficulty": "medium",
+    "conceptId": "raid-technology"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي مستوى من مستويات RAID يوفر أفضل أداء للكتابة ولكنه لا يوفر أي حماية للبيانات (لا يوجد تكرار)؟",
+      "en": "Which RAID level provides the best write performance but offers NO data protection (no redundancy)?"
+    },
+    "options": {
+      "ar": [
+        "RAID 0",
+        "RAID 1",
+        "RAID 3",
+        "RAID 5"
+      ],
+      "en": [
+        "RAID 0",
+        "RAID 1",
+        "RAID 3",
+        "RAID 5"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "RAID 0 يستخدم تخطيط البيانات (Striping) فقط بدون أي معلومات تكافؤ أو نسخ متطابق، مما يجعله الأسرع ولكن الأقل أماناً.",
+      "en": "RAID 0 uses data striping only without any parity or mirroring, making it the fastest but least secure."
+    },
+    "hint": {
+      "ar": "الرقم صفر يعني 'صفر' حماية.",
+      "en": "The number zero means 'zero' protection."
+    },
+    "difficulty": "easy",
+    "conceptId": "raid-technology"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لشبكات منطقة التخزين (SANs)؟",
+      "en": "What is the main advantage of Storage Area Networks (SANs)?"
+    },
+    "options": {
+      "ar": [
+        "أنها رخيصة جداً ولا تتطلب أجهزة خاصة.",
+        "أنها توفر اتصالاً مرناً (Many-to-many) بين الخوادم وأجهزة التخزين عبر شبكة عالية السرعة.",
+        "أنها تستخدم فقط للأقراص المرنة (Floppy disks).",
+        "أنها تلغي الحاجة إلى الذاكرة الرئيسية (RAM) في الخوادم."
+      ],
+      "en": [
+        "They are very cheap and require no special hardware.",
+        "They provide flexible many-to-many connectivity among servers and storage devices over a high-speed network.",
+        "They are only used for floppy disks.",
+        "They eliminate the need for RAM in servers."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "SANs تفصل التخزين عن الخوادم الفردية، مما يسمح لأي خادم بالاتصال بأي جهاز تخزين عبر شبكة ألياف ضوئية سريعة.",
+      "en": "SANs decouple storage from individual servers, allowing any server to connect to any storage device over a fast fiber network."
+    },
+    "hint": {
+      "ar": "فكر في كلمة 'شبكة' (Network) وكيف تسمح بالاتصال المرن.",
+      "en": "Think about the word 'Network' and how it allows flexible connectivity."
+    },
+    "difficulty": "medium",
+    "conceptId": "storage-area-networks-san"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "متى يكون استخدام السجلات الممتدة (Spanned Records) ضرورياً؟",
+      "en": "When is the use of Spanned Records necessary?"
+    },
+    "options": {
+      "ar": [
+        "عندما يكون حجم السجل أكبر من حجم الكتلة (Block size).",
+        "عندما نريد تسريع عملية البحث الخطي.",
+        "عند استخدام RAID 0 فقط.",
+        "عندما تكون جميع السجلات ذات طول ثابت وصغير."
+      ],
+      "en": [
+        "When the record size is larger than the block size.",
+        "When we want to speed up linear search.",
+        "When using RAID 0 only.",
+        "When all records are of fixed, small length."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "إذا كان السجل أكبر من الكتلة، فلا يمكن تخزينه في كتلة واحدة، ويجب أن 'يمتد' (Span) عبر كتلتين أو أكثر.",
+      "en": "If a record is larger than a block, it cannot fit in a single block and MUST span across two or more blocks."
+    },
+    "hint": {
+      "ar": "ماذا تفعل إذا كان لديك غرض أطول من الصندوق الذي تريد وضعه فيه؟",
+      "en": "What do you do if an item is longer than the box you want to put it in?"
+    },
+    "difficulty": "medium",
+    "conceptId": "buffering-and-blocking"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في التقطيع الخارجي، لماذا يعتبر الوصول المرتب (Ordered access) بناءً على مفتاح التقطيع غير فعال؟",
+      "en": "In external hashing, why is ordered access based on the hash key inefficient?"
+    },
+    "options": {
+      "ar": [
+        "لأن دالة التقطيع توزع السجلات بشكل عشوائي عبر الدلاء.",
+        "لأن التقطيع يستخدم البحث الثنائي.",
+        "لأن الدلاء تكون دائماً ممتلئة بنسبة 100%.",
+        "لأن التقطيع لا يدعم السجلات متغيرة الطول."
+      ],
+      "en": [
+        "Because the hash function distributes records randomly across buckets.",
+        "Because hashing uses binary search.",
+        "Because buckets are always 100% full.",
+        "Because hashing does not support variable-length records."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "الهدف من دالة التقطيع هو التوزيع العشوائي المتساوي لمنع التصادمات. هذا يعني أن السجلات المتتالية منطقياً ستكون مبعثرة فيزيائياً، مما يتطلب فرزاً كاملاً لقراءتها بالترتيب.",
+      "en": "The goal of a hash function is uniform random distribution to prevent collisions. This means logically sequential records are physically scattered, requiring a full sort to read in order."
+    },
+    "hint": {
+      "ar": "دالة التقطيع الجيدة تدمر الترتيب الأصلي للبيانات.",
+      "en": "A good hash function destroys the original order of the data."
+    },
+    "difficulty": "hard",
+    "conceptId": "hashed-files-external"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين وقت البحث (Seek Time) وتأخير الدوران (Rotational Delay). تذكر: البحث = حركة الذراع (الرأس)، الدوران = دوران القرص نفسه.</template>
+    <template class="content-en">Confusing Seek Time with Rotational Delay. Remember: Seek = Arm (head) movement, Rotational = the platter spinning.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عامل التجميع (Blocking Factor) هو المفتاح لفهم أداء الإدخال/الإخراج. كلما زاد bfr، قل عدد الكتل التي نحتاج لجلبها من القرص، مما يحسن الأداء بشكل كبير.</template>
+    <template class="content-en">Blocking Factor (bfr) is the key to understanding I/O performance. Higher bfr means fewer blocks to fetch from disk, drastically improving performance.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لماذا نستخدم Heap Files إذا كان البحث فيها بطيئاً؟ لأنها الأسرع على الإطلاق في إدراج البيانات (O(1)). تُستخدم لتسجيل الأحداث (Logs) حيث سرعة الكتابة أهم من سرعة القراءة.</template>
+    <template class="content-en">Why use Heap Files if searching is slow? Because they are the absolute fastest for insertion (O(1)). Used for logging where write speed is paramount.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن RAID 0 يوفر حماية للبيانات. RAID 0 يعني 'صفر' تكرار. إذا تعطل قرص واحد، تفقد كل البيانات في المصفوفة.</template>
+    <template class="content-en">Thinking RAID 0 provides data protection. RAID 0 means 'zero' redundancy. If one disk fails, ALL data in the array is lost.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في التقطيع القابل للتوسعة (Extendible Hashing)، الدليل (Directory) ينمو بأس قوى العدد \(2 (2^d)\). إذا زاد العمق العالمي من 3 إلى 4، فإن حجم الدليل يتضاعف من 8 إلى 16.</template>
+    <template class="content-en">In Extendible Hashing, the Directory grows in powers of \(2 (2^d)\). If global depth increases from 3 to 4, the directory size doubles from 8 to 16.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M02.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+  <script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

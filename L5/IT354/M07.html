@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT354" data-module="7" data-no-videos>
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تقنيات التحكم في التزامن · IT354 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+      var fs=localStorage.getItem('garden_font_size');
+      if(fs)document.documentElement.setAttribute('data-font-size',fs);
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT354" data-page-title-en="IT354">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M06.html" data-gh-next="M08.html" data-gh-card="../../hub/course.html?code=IT354"></header>
+
+  <div class="content-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+      <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#concurrency-control-purpose" class="toc-link" data-bilingual>
+        <template class="content-ar">الغرض من التحكم في التزامن</template>
+        <template class="content-en">Purpose of Concurrency Control</template>
+        <span class="content-target">الغرض من التحكم في التزامن</span>
+      </a>
+      <a href="#two-phase-locking" class="toc-link" data-bilingual>
+        <template class="content-ar">القفل ثنائي الطور (2PL)</template>
+        <template class="content-en">Two-Phase Locking (2PL)</template>
+        <span class="content-target">القفل ثنائي الطور (2PL)</span>
+      </a>
+      <a href="#deadlock-and-starvation" class="toc-link" data-bilingual>
+        <template class="content-ar">الجمود والمجاعة</template>
+        <template class="content-en">Deadlock and Starvation</template>
+        <span class="content-target">الجمود والمجاعة</span>
+      </a>
+      <a href="#timestamp-ordering" class="toc-link" data-bilingual>
+        <template class="content-ar">ترتيب الطوابع الزمنية</template>
+        <template class="content-en">Timestamp Ordering</template>
+        <span class="content-target">ترتيب الطوابع الزمنية</span>
+      </a>
+      <a href="#multiversion-concurrency-control" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم في التزامن متعدد الإصدارات</template>
+        <template class="content-en">Multiversion Concurrency Control</template>
+        <span class="content-target">التحكم في التزامن متعدد الإصدارات</span>
+      </a>
+      <a href="#optimistic-concurrency-control" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم المتفائل في التزامن (التحقق)</template>
+        <template class="content-en">Validation (Optimistic) Concurrency Control</template>
+        <span class="content-target">التحكم المتفائل في التزامن (التحقق)</span>
+      </a>
+      <a href="#lock-granularity" class="toc-link" data-bilingual>
+        <template class="content-ar">حبيبية الأقفال والقفل متعدد الحبيبيات</template>
+        <template class="content-en">Lock Granularity and Multiple Granularity Locking</template>
+        <span class="content-target">حبيبية الأقفال والقفل متعدد الحبيبيات</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+      <div class="sidebar-widget">
+        <div class="widget-number" id="fc-due-count">0</div>
+        <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 7</template>
+      <template class="content-en">Module 7</template>
+      <span class="content-target">الوحدة 7</span>
+    </span> · IT354
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تقنيات التحكم في التزامن</h1>
+      <p class="hero-description">دراسة شاملة لآليات التحكم في التزامن في قواعد البيانات، بما في ذلك القفل ثنائي الطور، الطوابع الزمنية، التحكم متعدد الإصدارات، والتحكم المتفائل.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Concurrency Control Techniques</h1>
+      <p class="hero-description">A comprehensive study of database concurrency control mechanisms, including Two-Phase Locking, Timestamp Ordering, Multiversion, and Optimistic control.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التحكم في التزامن</span>
+      <span class="tag">القفل ثنائي الطور</span>
+      <span class="tag">الجمود</span>
+      <span class="tag">الطوابع الزمنية</span>
+      <span class="tag">متعدد الإصدارات</span>
+      <span class="tag">التحكم المتفائل</span>
+      <span class="tag">حبيبية البيانات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Concurrency Control</span>
+      <span class="tag">Two-Phase Locking</span>
+      <span class="tag">Deadlock</span>
+      <span class="tag">Timestamp Ordering</span>
+      <span class="tag">Multiversion</span>
+      <span class="tag">Optimistic Control</span>
+      <span class="tag">Lock Granularity</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم الغرض من التحكم في التزامن لفرض العزل والحفاظ على اتساق قاعدة البيانات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات القفل ثنائي الطور (2PL) بأنواعها الأساسية والمحافظة والصارمة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحديد وحل مشاكل الجمود (Deadlock) والمجاعة (Starvation) في المعاملات المتزامنة.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام خوارزميات الطوابع الزمنية (Timestamp Ordering) لجدولة المعاملات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل تقنيات التحكم متعدد الإصدارات (Multiversion) والتحكم المتفائل (Optimistic).</span></li>
+      <li><span class="obj-icon">✦</span><span>تقييم تأثير حبيبية البيانات (Granularity) واستخدام أقفال النوايا (Intention Locks).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the purpose of concurrency control to enforce isolation and preserve database consistency.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply Two-Phase Locking (2PL) techniques including Basic, Conservative, and Strict variations.</span></li>
+      <li><span class="obj-icon">✦</span><span>Identify and resolve Deadlock and Starvation issues in concurrent transactions.</span></li>
+      <li><span class="obj-icon">✦</span><span>Utilize Timestamp Ordering algorithms for transaction scheduling.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze Multiversion and Optimistic (Validation) concurrency control techniques.</span></li>
+      <li><span class="obj-icon">✦</span><span>Evaluate the impact of data granularity and the use of Intention Locks.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="concurrency-control-purpose" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الغرض من التحكم في التزامن</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Purpose of Concurrency Control</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هو شرطي المرور الذي ينظم وصول المعاملات المتزامنة للبيانات لمنع التصادم.</p></template>
+    <template class="content-en"><p>The traffic cop that regulates concurrent transaction access to data to prevent collisions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يهدف التحكم في التزامن إلى:</p><ul><li>فرض <span class="smart-term" data-term-en="Isolation" data-ar="العزل" data-en-def="Ensuring concurrent transactions do not interfere with each other.">العزل<span class="smart-term-tooltip"></span></span> (Isolation) من خلال الاستبعاد المتبادل بين المعاملات المتعارضة.</li><li>الحفاظ على اتساق قاعدة البيانات (Consistency) من خلال تنفيذ المعاملات بشكل يحفظ الاتساق.</li><li>حل تعارضات القراءة-الكتابة (read-write) والكتابة-الكتابة (write-write).</li></ul><p>على سبيل المثال، إذا تعارضت المعاملة T1 مع T2 على عنصر البيانات A، يقرر التحكم في التزامن أيهما يحصل على A وأيهما ينتظر أو يتم التراجع عنه.</p></template>
+    <template class="content-en"><p>The purpose of Concurrency Control is to:</p><ul><li>Enforce <span class="smart-term" data-term-en="Isolation" data-ar="العزل" data-en-def="Ensuring concurrent transactions do not interfere with each other.">Isolation<span class="smart-term-tooltip"></span></span> (through mutual exclusion) among conflicting transactions.</li><li>Preserve database consistency through consistency-preserving execution of transactions.</li><li>Resolve read-write and write-write conflicts.</li></ul><p>For example, if T1 conflicts with T2 over data item A, the concurrency control decides if T1 or T2 should get A and if the other transaction is rolled-back or waits.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بدون التحكم في التزامن، ستعاني قواعد البيانات من مشاكل التحديث المفقود، والقراءة القذرة، والملخص غير الصحيح.</p><p>يعتمد النظام على مدير الأقفال (Lock Manager) وجدول الأقفال (Lock Table) لتتبع حالة كل عنصر بيانات والمعاملات التي تطلبه.</p></template>
+    <template class="content-en"><p>Without concurrency control, databases would suffer from lost updates, dirty reads, and incorrect summary problems.</p><p>The system relies on a Lock Manager and a Lock Table to track the state of each data item and the transactions requesting it.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا تم السماح لمعاملتين بكتابة نفس عنصر البيانات في نفس الوقت بدون تحكم؟</template>
+      <template class="content-en">What happens if two transactions are allowed to write to the same data item simultaneously without control?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيحدث تعارض 'الكتابة-الكتابة' مما يؤدي إلى مشكلة التحديث المفقود، حيث تلغي إحدى المعاملات تحديثات المعاملة الأخرى.</p></template>
+      <template class="content-en"><p>A 'write-write' conflict occurs, leading to the Lost Update problem, where one transaction overwrites the updates of the other.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="two-phase-locking" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> القفل ثنائي الطور (2PL)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Two-Phase Locking (2PL)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول يضمن القابلية للجدولة التسلسلية من خلال تقسيم المعاملة إلى مرحلة نمو (اكتساب الأقفال) ومرحلة انكماش (تحرير الأقفال).</p></template>
+    <template class="content-en"><p>A protocol that guarantees serializability by dividing a transaction into a growing phase (acquiring locks) and a shrinking phase (releasing locks).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتكون القفل ثنائي الطور من مرحلتين حصريتين:</p><ol><li><b>مرحلة القفل (النمو):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على عناصر البيانات المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش):</b> تقوم المعاملة بتحرير عناصر البيانات المقفلة واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: خلال مرحلة القفل، يجب ألا تبدأ مرحلة إلغاء القفل، وخلال مرحلة إلغاء القفل، يجب ألا تبدأ مرحلة القفل.</p><p>يوجد نوعان من الأقفال: قفل مشترك (Shared/Read) وقفل حصري (Exclusive/Write). يمكن تحويل الأقفال عبر الترقية (Upgrade) من قراءة لكتابة، أو التخفيض (Downgrade) من كتابة لقراءة.</p></template>
+    <template class="content-en"><p>Two-Phase Locking consists of two mutually exclusive phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: During the locking phase, the unlocking phase must not start, and during the unlocking phase, the locking phase must not begin.</p><p>There are two lock modes: Shared (Read) and Exclusive (Write). Locks can be converted via Upgrade (read to write) or Downgrade (write to read).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يضمن بروتوكول 2PL القابلية للجدولة التسلسلية (Serializability)، لكنه لا يمنع حدوث الجمود (Deadlock).</p><p>توجد خوارزميات مختلفة لـ 2PL: الأساسي (Basic)، المحافظ (Conservative) الذي يمنع الجمود بقفل كل شيء مسبقاً، والصارم (Strict) الذي يحرر الأقفال فقط بعد الإنهاء لمنع الإجهاض المتسلسل.</p></template>
+    <template class="content-en"><p>The 2PL protocol guarantees serializability, but it does not inherently prevent deadlocks.</p><p>There are variations of 2PL:</p><ul><li><strong>Basic</strong>,</li><li><strong>Conservative</strong> (prevents deadlock by locking all items before execution), and</li><li><strong>Strict</strong> (unlocks only after termination to prevent cascading aborts).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: A line graph showing the number of locks held by a transaction over time. The x-axis is Time, the y-axis is Number of Locks. The graph goes up in steps (Growing Phase), reaches a peak (Lock Point), and then goes down in steps (Shrinking Phase). Label the phases clearly in English and Arabic. Dark background #0d1117, accent color #58a6ff. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for Axes -->
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+        
+        <!-- Arrowheads for Phase Indicators -->
+        <marker id="arrow-brand-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-brand-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Gradient for Area Under Curve -->
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0.0"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold">Two-Phase Locking (2PL) Protocol</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold">بروتوكول القفل ثنائي الطور (2PL)</text>
+
+    <!-- Grid Lines (Horizontal) -->
+    <line x1="100" y1="340" x2="720" y2="340" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="100" y1="260" x2="720" y2="260" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="100" y1="180" x2="720" y2="180" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- Area Under Curve -->
+    <path d="M 100 420 L 160 420 L 160 340 L 230 340 L 230 260 L 300 260 L 300 180 L 440 180 L 440 260 L 510 260 L 510 340 L 580 340 L 580 420 L 710 420 Z" fill="url(#areaGrad)" />
+
+    <!-- 2PL Step Curve -->
+    <path d="M 100 420 L 160 420 L 160 340 L 230 340 L 230 260 L 300 260 L 300 180 L 440 180 L 440 260 L 510 260 L 510 340 L 580 340 L 580 420 L 710 420" stroke="var(--brand-500)" stroke-width="4" fill="none" stroke-linejoin="round" />
+
+    <!-- Start and End Points -->
+    <circle cx="100" cy="420" r="5" fill="var(--brand-500)" />
+    <circle cx="710" cy="420" r="5" fill="var(--brand-500)" />
+
+    <!-- Lock Point Indicator -->
+    <line x1="370" y1="180" x2="370" y2="420" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+    <circle cx="370" cy="180" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    
+    <rect x="310" y="130" width="120" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="370" y="150" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold">Lock Point</text>
+    <text x="370" y="150" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold">نقطة القفل</text>
+
+    <!-- Phase Indicators (Arrows & Labels) -->
+    <line x1="100" y1="100" x2="365" y2="100" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-brand-start)" marker-end="url(#arrow-brand-end)" />
+    <line x1="375" y1="100" x2="710" y2="100" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-brand-start)" marker-end="url(#arrow-brand-end)" />
+
+    <text x="235" y="85" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold">Growing Phase</text>
+    <text x="235" y="85" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold">مرحلة النمو</text>
+
+    <text x="540" y="85" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold">Shrinking Phase</text>
+    <text x="540" y="85" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold">مرحلة الانكماش</text>
+
+    <!-- Acquire / Release Labels -->
+    <!-- Acquire -->
+    <text x="150" y="385" text-anchor="end" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Acquire</text>
+    <text x="150" y="385" text-anchor="end" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">قفل</text>
+    
+    <text x="220" y="305" text-anchor="end" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Acquire</text>
+    <text x="220" y="305" text-anchor="end" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">قفل</text>
+    
+    <text x="290" y="225" text-anchor="end" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Acquire</text>
+    <text x="290" y="225" text-anchor="end" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">قفل</text>
+
+    <!-- Release -->
+    <text x="450" y="225" text-anchor="start" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Release</text>
+    <text x="450" y="225" text-anchor="start" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">تحرير</text>
+    
+    <text x="520" y="305" text-anchor="start" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Release</text>
+    <text x="520" y="305" text-anchor="start" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">تحرير</text>
+    
+    <text x="590" y="385" text-anchor="start" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Release</text>
+    <text x="590" y="385" text-anchor="start" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">تحرير</text>
+
+    <!-- Axes -->
+    <line x1="100" y1="420" x2="740" y2="420" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-axis)" />
+    <line x1="100" y1="420" x2="100" y2="120" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-axis)" />
+
+    <!-- Y-Axis Ticks -->
+    <text x="85" y="425" text-anchor="end" fill="var(--text-secondary)" font-size="14">0</text>
+    <text x="85" y="345" text-anchor="end" fill="var(--text-secondary)" font-size="14">1</text>
+    <text x="85" y="265" text-anchor="end" fill="var(--text-secondary)" font-size="14">2</text>
+    <text x="85" y="185" text-anchor="end" fill="var(--text-secondary)" font-size="14">3</text>
+
+    <!-- Axis Labels -->
+    <text x="50" y="270" transform="rotate(-90 50 270)" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Number of Locks</text>
+    <text x="50" y="270" transform="rotate(-90 50 270)" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">عدد الأقفال</text>
+
+    <text x="420" y="460" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Time</text>
+    <text x="420" y="460" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">الزمن</text>
+
+    <!-- Educational Rule Box -->
+    <rect x="530" y="125" width="230" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    
+    <text x="645" y="145" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">2PL Rule</text>
+    <text x="645" y="165" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Cannot acquire locks after</text>
+    <text x="645" y="185" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">first release begins.</text>
+
+    <text x="645" y="145" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">قاعدة 2PL</text>
+    <text x="645" y="165" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">لا يمكن الحصول على أقفال</text>
+    <text x="645" y="185" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">بعد بدء أول عملية تحرير.</text>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Basic 2PL</th><th>Conservative 2PL</th><th>Strict 2PL</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة القفل</template>
+          <template class="content-en">Locking Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تدريجي (Incremental)</template>
+          <template class="content-en">Incremental</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">قفل كل شيء قبل البدء</template>
+          <template class="content-en">Lock all before start</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تدريجي</template>
+          <template class="content-en">Incremental</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">احتمالية الجمود (Deadlock)</template>
+          <template class="content-en">Deadlock Probability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ممكن حدوثه</template>
+          <template class="content-en">Possible</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مستحيل (يمنع الجمود)</template>
+          <template class="content-en">Impossible (Prevents deadlock)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ممكن حدوثه</template>
+          <template class="content-en">Possible</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الإجهاض المتسلسل (Cascading Aborts)</template>
+          <template class="content-en">Cascading Aborts</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ممكن حدوثه</template>
+          <template class="content-en">Possible</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ممكن حدوثه</template>
+          <template class="content-en">Possible</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مستحيل (يمنعه)</template>
+          <template class="content-en">Impossible (Prevents it)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر القفل الصارم (Strict 2PL) الأكثر استخداماً رغم أنه يقلل من التزامن مقارنة بالأساسي؟</template>
+      <template class="content-en">Why is Strict 2PL the most commonly used despite reducing concurrency compared to Basic 2PL?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يمنع مشكلة الإجهاض المتسلسل (Cascading Aborts) من خلال عدم السماح لأي معاملة أخرى بقراءة أو كتابة البيانات حتى تنتهي المعاملة الحالية تماماً (بالتأكيد أو الإجهاض).</p></template>
+      <template class="content-en"><p>Because it prevents Cascading Aborts by not allowing any other transaction to read or write the data until the current transaction fully terminates (commits or aborts).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="deadlock-and-starvation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الجمود والمجاعة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Deadlock and Starvation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الجمود هو حلقة مفرغة من الانتظار بين المعاملات، بينما المجاعة هي تهميش معاملة معينة باستمرار لصالح معاملات أخرى.</p></template>
+    <template class="content-en"><p>Deadlock is a circular wait among transactions, while Starvation is the continuous bypassing of a specific transaction in favor of others.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الجمود (Deadlock):</b> يحدث عندما تنتظر المعاملة T1 المعاملة T2 لتحرير قفل، بينما تنتظر T2 المعاملة T1، مما يخلق حلقة مغلقة.</p><p>طرق التعامل مع الجمود:</p><ul><li><b>الوقاية (Prevention):</b> مثل 2PL المحافظ، حيث تقفل المعاملة كل ما تحتاجه قبل البدء.</li><li><b>الاكتشاف والحل (Detection and Resolution):</b> السماح بحدوث الجمود، واستخدام رسم بياني للانتظار (Wait-for-graph). إذا تم اكتشاف حلقة، يتم اختيار معاملة كضحية (Victim) وإجهاضها.</li><li><b>التجنب (Avoidance):</b> استخدام الطوابع الزمنية (مثل Wound-Wait و Wait-Die) لإجهاض المعاملات قبل اكتمال حلقة الجمود.</li></ul><p><b>المجاعة (Starvation):</b> تحدث عندما يتم اختيار نفس المعاملة باستمرار كضحية للإجهاض، أو تظل تنتظر للأبد. يمكن أن تحدث في خوارزمية Wound-Wait إذا تم إجهاض معاملة أحدث باستمرار بواسطة معاملة أقدم طويلة الأمد.</p></template>
+    <template class="content-en"><p><b>Deadlock:</b> Occurs when transaction T1 waits for T2 to release a lock, while T2 waits for T1, creating a circular wait.</p><p>Dealing with Deadlock:</p><ul><li><b>Prevention:</b> e.g., Conservative 2PL, where a transaction locks all needed items before starting.</li><li><b>Detection and Resolution:</b> Allow deadlocks to happen. Maintain a <span class="smart-term" data-term-en="Wait-for-graph" data-ar="رسم الانتظار البياني" data-en-def="A directed graph used by the scheduler to detect deadlock cycles.">wait-for-graph<span class="smart-term-tooltip"></span></span>. If a cycle exists, select a transaction as a <span class="smart-term" data-term-en="Victim" data-ar="الضحية" data-en-def="The transaction selected to be rolled back to break a deadlock.">victim<span class="smart-term-tooltip"></span></span> and roll it back.</li><li><b>Avoidance:</b> Use timestamps (e.g., Wound-Wait, Wait-Die) to abort transactions before a cycle completes.</li></ul><p><b>Starvation:</b> Occurs when a particular transaction consistently waits or is restarted and never gets a chance to proceed. It can happen in Wound-Wait if a younger transaction is always wounded by a long-running older transaction.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الرسم البياني للانتظار (Wait-for-graph) هو رسم موجه حيث تمثل العقد المعاملات، وتمثل الحواف حالة الانتظار. وجود دورة (Cycle) في هذا الرسم يعني وجود جمود مؤكد.</p><p>حل مشكلة المجاعة يتطلب عادةً نظام أولوية ديناميكي يزداد بمرور الوقت (Aging) لضمان حصول المعاملة المظلومة على فرصتها في النهاية.</p></template>
+    <template class="content-en"><p>A Wait-for-graph is a directed graph where nodes are transactions and edges represent waiting. A cycle in this graph indicates a definitive deadlock.</p><p>Solving starvation usually requires a dynamic priority system (Aging) that increases over time to ensure the starved transaction eventually gets its turn.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: A directed graph showing a deadlock cycle. Node T1 points to Node T2 (T1 waits for T2). Node T2 points to Node T3. Node T3 points back to Node T1, forming a closed loop. Label the edges 'waits for'. Dark background #0d1117, nodes in #238636, edges in #f85149. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead marker for directed edges -->
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 2 L 10 6 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Wait-For Graph: Deadlock Cycle</text>
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">رسم بياني للانتظار: دورة الاختناق</text>
+
+  <!-- Subtitle -->
+  <text x="400" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Transactions waiting on each other form a closed loop</text>
+  <text x="400" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">المعاملات التي تنتظر بعضها البعض تشكل حلقة مغلقة</text>
+
+  <!-- ========================================== -->
+  <!-- GRAPH SECTION (Left Side)                  -->
+  <!-- ========================================== -->
+
+  <!-- Edges (Paths with markers) -->
+  <!-- T1 to T2 -->
+  <path d="M 327.7 181.6 L 392.3 278.4" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+  <!-- T2 to T3 -->
+  <path d="M 370 320 L 230 320" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+  <!-- T3 to T1 -->
+  <path d="M 207.7 278.4 L 272.3 181.6" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+
+  <!-- Edge Labels -->
+  <!-- Label: T1 -> T2 -->
+  <rect x="345" y="215" width="90" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="390" y="234" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink-strong)" class="gsvg-en">waits for</text>
+  <text x="390" y="234" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink-strong)" class="gsvg-ar">ينتظر</text>
+
+  <!-- Label: T2 -> T3 -->
+  <rect x="255" y="335" width="90" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="300" y="354" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink-strong)" class="gsvg-en">waits for</text>
+  <text x="300" y="354" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink-strong)" class="gsvg-ar">ينتظر</text>
+
+  <!-- Label: T3 -> T1 -->
+  <rect x="165" y="215" width="90" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="210" y="234" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink-strong)" class="gsvg-en">waits for</text>
+  <text x="210" y="234" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink-strong)" class="gsvg-ar">ينتظر</text>
+
+  <!-- Cycle Indicator in the middle -->
+  <text x="300" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Cycle</text>
+  <text x="300" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">دورة</text>
+
+  <!-- Nodes -->
+  <!-- Node T1 -->
+  <circle cx="300" cy="140" r="45" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+  <text x="300" y="147" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">T1</text>
+  
+  <!-- Node T2 -->
+  <circle cx="420" cy="320" r="45" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+  <text x="420" y="327" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">T2</text>
+  
+  <!-- Node T3 -->
+  <circle cx="180" cy="320" r="45" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+  <text x="180" y="327" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">T3</text>
+
+
+  <!-- ========================================== -->
+  <!-- INFO PANELS SECTION (Right Side)           -->
+  <!-- ========================================== -->
+
+  <!-- Deadlock Panel -->
+  <rect x="520" y="110" width="250" height="135" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  
+  <text x="645" y="140" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Deadlock</text>
+  <text x="645" y="140" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الاختناق (Deadlock)</text>
+  
+  <text x="645" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Circular wait detected in graph</text>
+  <text x="645" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تم اكتشاف انتظار دائري في الرسم</text>
+  
+  <text x="645" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Resolution: Rollback a victim</text>
+  <text x="645" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الحل: التراجع عن إحدى المعاملات</text>
+  
+  <text x="645" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Prevention: Conservative 2PL</text>
+  <text x="645" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الوقاية: القفل المحافظ 2PL</text>
+
+  <!-- Starvation Panel -->
+  <rect x="520" y="265" width="250" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  
+  <text x="645" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Starvation</text>
+  <text x="645" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">المجاعة (Starvation)</text>
+  
+  <text x="645" y="320" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Transaction waits indefinitely</text>
+  <text x="645" y="320" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">المعاملة تنتظر إلى أجل غير مسمى</text>
+  
+  <text x="645" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Avoidance: Wait-Die / Wound-Wait</text>
+  <text x="645" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">التجنب: الانتظار-الموت / الجرح-الانتظار</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Prevention</th><th>Detection &amp; Resolution</th><th>Avoidance</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الآلية</template>
+          <template class="content-en">Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">قفل جميع البيانات مسبقاً</template>
+          <template class="content-en">Lock all data beforehand</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">استخدام رسم بياني للانتظار وإجهاض الضحية</template>
+          <template class="content-en">Use wait-for-graph, abort victim</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">استخدام الطوابع الزمنية (Wound-Wait / Wait-Die)</template>
+          <template class="content-en">Use timestamps (Wound-Wait / Wait-Die)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في خوارزمية Wait-Die، هل تنتظر المعاملة الأقدم المعاملة الأحدث أم العكس؟</template>
+      <template class="content-en">In the Wait-Die algorithm, does the older transaction wait for the younger one, or vice versa?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المعاملة الأقدم تنتظر (Wait) المعاملة الأحدث. إذا طلبت المعاملة الأحدث قفلاً تملكه المعاملة الأقدم، فإن المعاملة الأحدث تموت (Die/Abort).</p></template>
+      <template class="content-en"><p>The older transaction waits for the younger one. If a younger transaction requests a lock held by an older one, the younger transaction dies (aborts).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="timestamp-ordering" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> ترتيب الطوابع الزمنية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Timestamp Ordering</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية تستخدم رقماً متزايداً (الطابع الزمني) لتحديد عمر المعاملة وجدولة العمليات بناءً على هذا العمر بدلاً من الأقفال.</p></template>
+    <template class="content-en"><p>An algorithm that uses a monotonically increasing number (timestamp) to determine transaction age and schedule operations based on this age instead of locks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الطابع الزمني (Timestamp) هو متغير متزايد يشير إلى عمر المعاملة. القيمة الأكبر تعني معاملة أحدث.</p><p><b>الترتيب الأساسي للطوابع الزمنية (Basic TO):</b></p><ul><li>لكل عنصر بيانات X، نحتفظ بـ read_TS(X) و write_TS(X).</li><li>إذا حاولت معاملة T كتابة X وكان read_TS(X) > TS(T) أو write_TS(X) > TS(T)، فهذا يعني أن معاملة أحدث قد قرأت أو كتبت البيانات بالفعل، لذا يتم إجهاض T.</li><li>إذا حاولت T قراءة X وكان write_TS(X) > TS(T)، يتم إجهاض T لأن البيانات تم تحديثها بواسطة معاملة أحدث.</li></ul><p><b>قاعدة توماس للكتابة (Thomas's Write Rule):</b></p><p>استثناء للترتيب الأساسي: إذا حاولت T كتابة X وكان write_TS(X) > TS(T) (ولكن read_TS(X) ليس أكبر)، يتم تجاهل عملية الكتابة بدلاً من إجهاض T، لأن الكتابة الأحدث هي التي تهم.</p></template>
+    <template class="content-en"><p>A Timestamp is a monotonically increasing variable indicating the age of a transaction. A larger value indicates a more recent transaction.</p><p><b>Basic Timestamp Ordering:</b></p><ul><li>For each data item X, maintain <span class="smart-term" data-term-en="read_TS(X)" data-ar="طابع القراءة الزمني" data-en-def="The largest timestamp of any transaction that successfully read item X.">read_TS(X)<span class="smart-term-tooltip"></span></span> and <span class="smart-term" data-term-en="write_TS(X)" data-ar="طابع الكتابة الزمني" data-en-def="The timestamp of the transaction that wrote the current value of item X.">write_TS(X)<span class="smart-term-tooltip"></span></span>.</li><li>If T issues write_item(X) and read_TS(X) > TS(T) or write_TS(X) > TS(T), a younger transaction has already accessed it, so abort T.</li><li>If T issues read_item(X) and write_TS(X) > TS(T), a younger transaction has already written it, so abort T.</li></ul><p><b>Thomas's Write Rule:</b></p><p>An exception: If T issues write_item(X) and write_TS(X) > TS(T) (but read_TS(X) is not > TS(T)), just ignore the write operation and continue execution. The most recent write counts.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الترتيب الصارم للطوابع الزمنية (Strict TO) يضيف شرطاً بتأخير المعاملة T حتى تنتهي المعاملة T' التي كتبت أو قرأت X مسبقاً (بالتأكيد أو الإجهاض)، مما يمنع الإجهاض المتسلسل.</p><p>قاعدة توماس للكتابة تسمح بجداول غير قابلة للجدولة التسلسلية المتعارضة (Not Conflict Serializable) ولكنها قابلة للجدولة التسلسلية للعرض (View Serializable).</p></template>
+    <template class="content-en"><p>Strict Timestamp Ordering adds a condition to delay T until the transaction T' that wrote or read X has terminated, preventing cascading aborts.</p><p>Thomas's Write Rule allows schedules that are not conflict-serializable but are view-serializable by safely ignoring obsolete writes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تتجاهل قاعدة توماس الكتابة القديمة بدلاً من إجهاض المعاملة؟</template>
+      <template class="content-en">Why does Thomas's Write Rule ignore the obsolete write instead of aborting the transaction?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المعاملة الأحدث قد كتبت بالفعل القيمة النهائية المطلوبة. كتابة المعاملة الأقدم لن يقرأها أحد (لأن read_TS ليس أكبر)، لذا يمكن تجاهلها بأمان دون إهدار عمل المعاملة بإجهاضها.</p></template>
+      <template class="content-en"><p>Because a younger transaction has already written the final desired value. The older transaction's write will never be read (since read_TS is not greater), so it can be safely ignored without wasting the transaction's work by aborting it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multiversion-concurrency-control" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> التحكم في التزامن متعدد الإصدارات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Multiversion Concurrency Control</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية تحتفظ بنسخ متعددة من البيانات التاريخية، مما يضمن عدم رفض عمليات القراءة أبداً.</p></template>
+    <template class="content-en"><p>A technique that maintains multiple historical versions of data, ensuring that read operations are never rejected.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يحتفظ هذا النهج بعدد من الإصدارات (Versions) لعنصر البيانات (X1, X2, ..., Xn) ويخصص الإصدار الصحيح لعملية القراءة الخاصة بالمعاملة بناءً على الطوابع الزمنية.</p><ul><li><b>الميزة الرئيسية:</b> على عكس الآليات الأخرى، لا يتم رفض عملية القراءة أبداً في هذه الآلية.</li><li><b>الآثار الجانبية:</b> يتطلب مساحة تخزين أكبر بكثير (في الذاكرة والقرص) للحفاظ على الإصدارات المتعددة. يتطلب تشغيل '<span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage.">جمع القمامة<span class="smart-term-tooltip"></span></span>' (Garbage Collection) لحذف الإصدارات القديمة التي لم تعد مطلوبة.</li></ul><p><b>القفل ثنائي الطور متعدد الإصدارات باستخدام أقفال التصديق (Certify Locks):</b></p><p>يسمح للمعاملة T' بقراءة X بينما يتم قفله حصرياً (للكتابة) بواسطة T. يتم ذلك بالاحتفاظ بإصدارين: إصدار مؤكد (Committed) وإصدار جديد قيد التعديل. عند رغبة T في التأكيد، تطلب قفل تصديق (Certify Lock) على الإصدار الجديد.</p></template>
+    <template class="content-en"><p>This approach maintains a number of versions of a data item (X1, X2, ..., Xn) and allocates the right version to a read operation based on timestamps.</p><ul><li><b>Main Advantage:</b> Unlike other mechanisms, a read operation is never rejected.</li><li><b>Side Effects:</b> Significantly more storage (RAM and disk) is required. A <span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage.">garbage collection<span class="smart-term-tooltip"></span></span> process must run to check unlimited growth of versions.</li></ul><p><b>Multiversion 2PL Using <span class="smart-term" data-term-en="Certify Lock" data-ar="قفل التصديق" data-en-def="A lock obtained just before a transaction commits to make its new version the official committed version.">Certify Lock<span class="smart-term-tooltip"></span></span>s:</b></p><p>Allows transaction T' to read X while it is write-locked by conflicting transaction T. It maintains two versions: a committed version and a new version. When T is ready to commit, it obtains a Certify Lock on the new version.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في 2PL متعدد الإصدارات، مصفوفة التوافق للأقفال تتضمن (قراءة، كتابة، تصديق). قفل القراءة يتوافق مع قفل الكتابة (لأن القراءة تتم من الإصدار القديم المؤكد)، لكن <span class="smart-term" data-term-en="Certify Lock" data-ar="قفل التصديق" data-en-def="A lock obtained just before a transaction commits to make its new version the official committed version.">قفل التصديق<span class="smart-term-tooltip"></span></span> لا يتوافق مع أي قفل آخر.</p><p>هذا يحسن التزامن بشكل كبير ولكنه قد يؤخر تأكيد المعاملة حتى تحصل على أقفال التصديق لجميع كتاباتها.</p></template>
+    <template class="content-en"><p>In Multiversion 2PL, the lock compatibility matrix includes (Read, Write, Certify). A Read lock is compatible with a Write lock (reads go to the old committed version), but a Certify lock is incompatible with any other lock.</p><p>This improves concurrency but may delay transaction commit because it must obtain certify locks on all its writes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى قفل التصديق (Certify Lock) بدلاً من مجرد تحويل قفل الكتابة إلى تأكيد؟</template>
+      <template class="content-en">Why do we need a Certify Lock instead of just committing the write lock?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قفل التصديق يضمن عدم وجود معاملات أخرى تقرأ الإصدار القديم في اللحظة التي يتم فيها استبداله بالإصدار الجديد، مما يمنع القراءات غير المتسقة أثناء عملية التأكيد.</p></template>
+      <template class="content-en"><p>The Certify Lock ensures that no other transactions are currently reading the old version at the exact moment it is replaced by the new version, preventing inconsistent reads during the commit process.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="optimistic-concurrency-control" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التحكم المتفائل في التزامن (التحقق)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Validation (Optimistic) Concurrency Control</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يفترض أن التعارضات نادرة، فيسمح للمعاملات بالتنفيذ محلياً ثم يتحقق من صحتها فقط عند محاولة التأكيد (Commit).</p></template>
+    <template class="content-en"><p>Assumes conflicts are rare, allowing transactions to execute locally and only validating them at commit time.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في هذه التقنية، يتم التحقق من القابلية للجدولة التسلسلية فقط في وقت التأكيد (Commit). إذا كان الجدول غير تسلسلي، يتم إجهاض المعاملة.</p><p>تتكون من ثلاث مراحل:</p><ol><li><b>مرحلة القراءة (Read phase):</b> تقرأ المعاملة البيانات المؤكدة، وتطبق التحديثات على نسخ محلية (في ذاكرة التخزين المؤقت) فقط.</li><li><b><span class="smart-term" data-term-en="Validation Phase" data-ar="مرحلة التحقق" data-en-def="The phase where the system checks if applying the transaction&#x27;s local updates will violate serializability.">مرحلة التحقق<span class="smart-term-tooltip"></span></span> (Validation phase):</b> يتم التحقق من القابلية للجدولة التسلسلية قبل كتابة التحديثات إلى قاعدة البيانات. يتم فحص تقاطعات مجموعات القراءة والكتابة (read_set و write_set) مع المعاملات الأخرى.</li><li><b>مرحلة الكتابة (Write phase):</b> عند نجاح التحقق، يتم تطبيق التحديثات على قاعدة البيانات؛ وإلا يتم إعادة تشغيل المعاملة.</li></ol></template>
+    <template class="content-en"><p>In this technique, serializability is checked only at the time of commit. Transactions are aborted in case of non-serializable schedules.</p><p>It consists of three phases:</p><ol><li><b>Read phase:</b> A transaction reads committed data. Updates are applied only to local copies (in database cache).</li><li><b><span class="smart-term" data-term-en="Validation Phase" data-ar="مرحلة التحقق" data-en-def="The phase where the system checks if applying the transaction&#x27;s local updates will violate serializability.">Validation phase<span class="smart-term-tooltip"></span></span>:</b> Serializability is checked before writing updates to the database. It checks for intersections between the read_set and write_set of the transaction and others.</li><li><b>Write phase:</b> On successful validation, updates are applied to the database; otherwise, the transaction is restarted.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مرحلة التحقق للمعاملة Ti تفحص المعاملات Tj (المؤكدة أو في مرحلة التحقق) للتأكد من أحد الشروط: إما أن Tj أكملت كتابتها قبل بدء قراءة Ti، أو أن Ti بدأت كتابتها بعد اكتمال كتابة Tj ولا يوجد تقاطع بين read_set(Ti) و write_set(Tj).</p><p>هذا النظام ممتاز للبيئات التي تكثر فيها عمليات القراءة وتقل فيها التحديثات المتعارضة، لأنه يوفر نفقات إدارة الأقفال.</p></template>
+    <template class="content-en"><p>The validation phase for Ti checks against Tj (committed or validating) to ensure: Tj completed its write before Ti started its read, OR Ti started its write after Tj completed its write AND read_set(Ti) has no common items with write_set(Tj).</p><p>This scheme is excellent for read-heavy environments with few conflicting updates, as it saves the overhead of lock management.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون التحكم المتفائل أسوأ من القفل ثنائي الطور؟</template>
+      <template class="content-en">When is Optimistic Concurrency Control worse than Two-Phase Locking?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في البيئات ذات معدل التعارض العالي (تحديثات كثيرة لنفس البيانات)، حيث سيؤدي التحكم المتفائل إلى إجهاض وإعادة تشغيل المعاملات بشكل متكرر في مرحلة التحقق، مما يهدر موارد النظام.</p></template>
+      <template class="content-en"><p>In high-conflict environments (many updates to the same data), where optimistic control will lead to frequent transaction aborts and restarts during the validation phase, wasting system resources.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="lock-granularity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> حبيبية الأقفال والقفل متعدد الحبيبيات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Lock Granularity and Multiple Granularity Locking</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حجم عنصر البيانات الذي يتم قفله (من حقل صغير إلى قاعدة بيانات كاملة)؛ الحجم الكبير يقلل التزامن، والحجم الصغير يزيد العبء الإداري.</p></template>
+    <template class="content-en"><p>The size of the locked data item (from a small field to an entire database); coarse granularity reduces concurrency, while fine granularity increases management overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحدد وحدة البيانات القابلة للقفل حبيبيتها (Granularity). يمكن أن تكون خشنة (Coarse) مثل قاعدة البيانات بأكملها، أو دقيقة (Fine) مثل سجل أو حقل.</p><p>تؤثر الحبيبية بشكل كبير على الأداء: الحبيبية الخشنة تعني تزامناً منخفضاً (لأن قفل ملف يمنع الآخرين من قراءة أي سجل فيه)، بينما الحبيبية الدقيقة تعني تزامناً عالياً ولكن بعبء كبير على مدير الأقفال.</p><p><b>أقفال النوايا (Intention Locks) لإدارة التسلسل الهرمي:</b></p><ul><li><b>(IS) Intention-shared:</b> يشير إلى أنه سيتم طلب قفل مشترك على بعض العقد الفرعية.</li><li><b>(IX) Intention-exclusive:</b> يشير إلى أنه سيتم طلب قفل حصري على بعض العقد الفرعية.</li><li><b>(SIX) Shared-intention-exclusive:</b> العقدة الحالية مقفلة بشكل مشترك، ولكن سيتم طلب قفل حصري على بعض العقد الفرعية.</li></ul></template>
+    <template class="content-en"><p>A lockable unit of data defines its granularity. It can be coarse (entire database) or fine (a tuple or attribute).</p><p>Granularity significantly affects performance: coarse granularity means low concurrency, while fine granularity means high concurrency but high overhead for the lock manager.</p><p><b><span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">Intention Lock<span class="smart-term-tooltip"></span></span>s for managing hierarchy:</b></p><ul><li><b>(IS) Intention-shared:</b> Indicates a shared lock will be requested on some descendent node(s).</li><li><b>(IX) Intention-exclusive:</b> Indicates an exclusive lock will be requested on some descendent node(s).</li><li><b>(SIX) Shared-intention-exclusive:</b> Current node is locked in shared mode, but an exclusive lock will be requested on descendent node(s).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لإنتاج جدول زمني قابل للتسلسل في القفل متعدد الحبيبيات، يجب اتباع قواعد صارمة:</p><ul><li>يجب قفل جذر الشجرة أولاً.</li><li>لا يمكن قفل عقدة N بوضع S أو IX إلا إذا كان الأصل مقفلاً بوضع IS أو IX.</li><li>ولا يمكن قفل N بوضع X أو IX أو SIX إلا إذا كان الأصل مقفلاً بوضع IX أو SIX.</li></ul><p>يجب أيضاً تطبيق سياسة 2PL:</p><ul><li>لا يمكن للمعاملة قفل عقدة إذا كانت قد حررت أي عقدة أخرى،</li><li>ولا يمكن تحرير عقدة إلا إذا لم تكن أي من فروعها مقفلة حالياً.</li></ul></template>
+    <template class="content-en"><p>To produce a serializable schedule in multiple granularity locking, strict rules apply:</p><ul><li>The root must be locked first.</li><li>A node N can be locked in S or IX only if the parent is locked in IS or IX.</li><li>N can be locked in X, IX, or SIX only if the parent is locked in IX or SIX.</li></ul><p>The 2PL policy must also be enforced:</p><ul><li>T can lock a node only if it has not unlocked any node, and</li><li>T can unlock a node only if none of its children are currently locked by T.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: A hierarchical tree diagram showing Lock Granularity. Top node: DB (Database). Branches to f1, f2 (Files). f1 branches to p11, p12, p1n (Pages/Blocks). p11 branches to r111, r11j (Records). Show a path where DB has an IX lock, f1 has an IX lock, p11 has an IX lock, and r111 has an X lock. Dark background #0d1117, nodes in #c9d1d9, highlighted path in #d2a8ff. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Gradient for Exclusive (X) Lock -->
+        <linearGradient id="x-lock" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        
+        <!-- Arrow Markers -->
+        <marker id="arrow-normal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--border-color)" />
+        </marker>
+        <marker id="arrow-highlight" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title Section -->
+    <g id="title">
+        <text x="260" y="50" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Lock Granularity Hierarchy</text>
+        <text x="260" y="50" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التسلسل الهرمي لمستوى القفل</text>
+        
+        <text x="260" y="80" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Path showing Intention Locks (IX) leading to an Exclusive Lock (X)</text>
+        <text x="260" y="80" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">مسار يوضح أقفال النية (IX) التي تؤدي إلى قفل حصري (X)</text>
+    </g>
+
+    <!-- Legend -->
+    <g id="legend" transform="translate(920, 40)">
+        <rect width="240" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="120" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Lock Types</text>
+        <text x="120" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أنواع الأقفال</text>
+        
+        <!-- IX Lock -->
+        <rect x="15" y="40" width="20" height="20" rx="4" fill="var(--brand-500)" />
+        <text x="135" y="55" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">IX: Intention-Exclusive</text>
+        <text x="135" y="55" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">IX: نية حصرية</text>
+        
+        <!-- X Lock -->
+        <rect x="15" y="75" width="20" height="20" rx="4" fill="url(#x-lock)" />
+        <text x="135" y="90" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">X: Exclusive</text>
+        <text x="135" y="90" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">X: حصري</text>
+    </g>
+
+    <!-- Edges (Connections) -->
+    <g id="edges">
+        <!-- Level 1 to Level 2 -->
+        <path d="M 600 150 C 600 185, 400 185, 400 212" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-highlight)" />
+        <path d="M 600 150 C 600 185, 800 185, 800 212" fill="none" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow-normal)" />
+        
+        <!-- Level 2 to Level 3 (Under f1) -->
+        <path d="M 400 290 C 400 325, 200 325, 200 352" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-highlight)" />
+        <path d="M 400 290 C 400 325, 400 325, 400 352" fill="none" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow-normal)" />
+        <path d="M 400 290 C 400 325, 600 325, 600 352" fill="none" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow-normal)" />
+
+        <!-- Level 2 to Level 3 (Under f2 - Dashed context) -->
+        <path d="M 800 290 C 800 325, 720 325, 720 352" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)" />
+        <path d="M 800 290 C 800 325, 880 325, 880 352" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)" />
+
+        <!-- Level 3 to Level 4 (Under p11) -->
+        <path d="M 200 430 C 200 465, 100 465, 100 492" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-highlight)" />
+        <path d="M 200 430 C 200 465, 300 465, 300 492" fill="none" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow-normal)" />
+    </g>
+
+    <!-- Nodes -->
+    <g id="nodes">
+        <!-- Level 1: Database -->
+        <g transform="translate(520, 80)">
+            <rect width="160" height="70" rx="8" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Database (DB)</text>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">قاعدة البيانات (DB)</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">🔒 IX Lock</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">🔒 قفل IX</text>
+        </g>
+
+        <!-- Level 2: Files -->
+        <g transform="translate(320, 220)">
+            <rect width="160" height="70" rx="8" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">File (f1)</text>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">ملف (f1)</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">🔒 IX Lock</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">🔒 قفل IX</text>
+        </g>
+
+        <g transform="translate(720, 220)">
+            <rect width="160" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">File (f2)</text>
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">ملف (f2)</text>
+        </g>
+
+        <!-- Level 3: Pages/Blocks -->
+        <g transform="translate(120, 360)">
+            <rect width="160" height="70" rx="8" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Page (p11)</text>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">صفحة (p11)</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">🔒 IX Lock</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">🔒 قفل IX</text>
+        </g>
+
+        <g transform="translate(320, 360)">
+            <rect width="160" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Page (p12)</text>
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">صفحة (p12)</text>
+        </g>
+
+        <g transform="translate(520, 360)">
+            <rect width="160" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Page (p1n)</text>
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">صفحة (p1n)</text>
+        </g>
+
+        <!-- Level 3: Pages/Blocks (Under f2 - Dashed context) -->
+        <g transform="translate(640, 360)">
+            <rect width="160" height="70" rx="8" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Page (p21)</text>
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">صفحة (p21)</text>
+        </g>
+
+        <g transform="translate(800, 360)">
+            <rect width="160" height="70" rx="8" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Page (p2n)</text>
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">صفحة (p2n)</text>
+        </g>
+
+        <!-- Level 4: Records -->
+        <g transform="translate(20, 500)">
+            <rect width="160" height="70" rx="8" fill="url(#x-lock)" stroke="var(--brand-800)" stroke-width="2" />
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Record (r111)</text>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">سجل (r111)</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">🔒 X Lock</text>
+            <text x="80" y="52" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">🔒 قفل X</text>
+        </g>
+
+        <g transform="translate(220, 500)">
+            <rect width="160" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Record (r11j)</text>
+            <text x="80" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">سجل (r11j)</text>
+        </g>
+    </g>
+
+    <!-- Ellipses for omitted nodes -->
+    <g id="ellipses">
+        <text x="500" y="405" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-muted)">...</text>
+        <text x="800" y="405" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-muted)">...</text>
+        <text x="200" y="545" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-muted)">...</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى أقفال النوايا (Intention Locks)؟ ألا يكفي قفل السجل المطلوب مباشرة؟</template>
+      <template class="content-en">Why do we need Intention Locks? Isn't it enough to just lock the specific record directly?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بدون أقفال النوايا، إذا أرادت معاملة قفل ملف كامل (حبيبية خشنة)، سيتعين عليها فحص كل سجل داخل الملف للتأكد من عدم وجود أقفال عليه، وهو أمر مكلف جداً. قفل النية على الملف يخبر المعاملات الأخرى فوراً أن هناك سجلات مقفلة بالداخل.</p></template>
+      <template class="content-en"><p>Without intention locks, if a transaction wanted to lock an entire file (coarse granularity), it would have to scan every single record inside to check for existing locks, which is highly inefficient. An intention lock on the file immediately warns others that lower-level items are locked.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أبطال قواعد البيانات في الوحدة السابعة. تخيلوا قاعدة البيانات كمدينة مزدحمة، والمعاملات هي السيارات. بدون إشارات مرور، ستحدث حوادث (تعارضات). هنا يأتي دور 'التحكم في التزامن'. أداتنا الأولى هي 'القفل ثنائي الطور' (2PL)، وهو كشرطي يطلب منك أخذ كل التصاريح (مرحلة النمو) قبل أن تبدأ بإرجاعها (مرحلة الانكماش). لكن احذروا! هذا الشرطي قد يتسبب في زحام خانق حيث تنتظر سيارتان بعضهما البعض للأبد، وهذا ما نسميه 'الجمود' (Deadlock). لحل ذلك، لدينا بدائل: 'الطوابع الزمنية' التي تعطي أولوية للأقدم، أو 'التحكم متعدد الإصدارات' الذي يحتفظ بنسخ قديمة من البيانات لكي لا نرفض طلب قراءة أبداً. وفي المدن الهادئة، نستخدم 'التحكم المتفائل'، حيث نفترض عدم وجود حوادث ونتحقق فقط في النهاية. ركزوا جيداً على الفرق بين أنواع 2PL (خاصة الصارم) وكيفية اكتشاف الجمود، فهذه مواضيع مفضلة في الامتحانات!</template>
+    <template class="content-en">Welcome, database champions, to Module 7. Imagine the database as a busy city and transactions as cars. Without traffic lights, collisions (conflicts) happen. Enter 'Concurrency Control'. Our first tool is Two-Phase Locking (2PL), like a cop requiring you to get all permits (growing phase) before returning any (shrinking phase). But beware! This can cause a gridlock where two cars wait for each other forever—a 'Deadlock'. To fix this, we have alternatives: 'Timestamps' that prioritize older transactions, or 'Multiversion' control that keeps old copies so reads are never rejected. In quiet towns, we use 'Optimistic Control', assuming no crashes and only checking at the end. Focus heavily on the differences between 2PL variations (especially Strict) and deadlock detection—these are absolute exam favorites!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي بتنفيذ المعاملات بشكل تسلسلي واحد تلو الآخر بدلاً من كل هذا التعقيد؟</template>
+          <template class="content-en">Why don't we just execute transactions serially one by one instead of all this complexity?</template>
+          <span class="content-target">لماذا لا نكتفي بتنفيذ المعاملات بشكل تسلسلي واحد تلو الآخر بدلاً من كل هذا التعقيد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التنفيذ التسلسلي بطيء جداً ويهدر موارد النظام (CPU والقرص). التحكم في التزامن يسمح بتنفيذ المعاملات في نفس الوقت لزيادة الأداء، مع الحفاظ على وهم التنفيذ التسلسلي لضمان صحة البيانات.</template>
+          <template class="content-en">Serial execution is too slow and wastes system resources (CPU and Disk). Concurrency control allows simultaneous execution to maximize performance while maintaining the illusion of serial execution to ensure data correctness.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الدقيق بين مرحلة النمو ومرحلة الانكماش في 2PL؟</template>
+          <template class="content-en">What is the exact difference between the growing and shrinking phases in 2PL?</template>
+          <span class="content-target">ما هو الفرق الدقيق بين مرحلة النمو ومرحلة الانكماش في 2PL؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في مرحلة النمو، يمكنك فقط طلب أقفال جديدة ولا يمكنك تحرير أي قفل. بمجرد أن تحرر أول قفل، تدخل مرحلة الانكماش، وهنا يمكنك فقط تحرير الأقفال ولا يُسمح لك بطلب أي قفل جديد.</template>
+          <template class="content-en">In the growing phase, you can only acquire new locks and cannot release any. The moment you release your first lock, you enter the shrinking phase, where you can only release locks and are forbidden from acquiring new ones.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل Strict 2PL على Basic 2PL رغم أنه يقلل التزامن؟</template>
+          <template class="content-en">Why do we prefer Strict 2PL over Basic 2PL even though it reduces concurrency?</template>
+          <span class="content-target">لماذا نفضل Strict 2PL على Basic 2PL رغم أنه يقلل التزامن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن Basic 2PL قد يؤدي إلى 'الإجهاض المتسلسل' (Cascading Aborts)، حيث تقرأ معاملة بيانات كتبتها معاملة أخرى لم تتأكد بعد، ثم تفشل الأولى فتفشل الثانية. Strict 2PL يمنع ذلك بالاحتفاظ بالأقفال حتى النهاية.</template>
+          <template class="content-en">Because Basic 2PL can lead to 'Cascading Aborts', where a transaction reads data written by an uncommitted transaction, and if the first fails, the second must fail too. Strict 2PL prevents this by holding locks until termination.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يكتشف النظام الجمود (Deadlock) فعلياً؟</template>
+          <template class="content-en">How does the system actually detect a Deadlock?</template>
+          <span class="content-target">كيف يكتشف النظام الجمود (Deadlock) فعلياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يبني النظام 'رسم بياني للانتظار' (Wait-for-graph). إذا طلبت T1 قفلاً تملكه T2، يرسم سهماً من T1 إلى T2. إذا تشكلت حلقة مغلقة (دورة) في هذا الرسم، فهذا يعني وجود جمود مؤكد.</template>
+          <template class="content-en">The system builds a 'Wait-for-graph'. If T1 requests a lock held by T2, it draws an arrow from T1 to T2. If a closed loop (cycle) forms in this graph, a deadlock is confirmed.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين Wound-Wait و Wait-Die؟</template>
+          <template class="content-en">What is the difference between Wound-Wait and Wait-Die?</template>
+          <span class="content-target">ما الفرق بين Wound-Wait و Wait-Die؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">كلاهما يستخدم الطوابع الزمنية لتجنب الجمود. في Wound-Wait، المعاملة الأقدم 'تجرح' (تجهض) الأحدث لتأخذ القفل. في Wait-Die، المعاملة الأحدث 'تموت' (تجهض) إذا طلبت قفلاً تملكه الأقدم.</template>
+          <template class="content-en">Both use timestamps to avoid deadlock. In Wound-Wait, an older transaction 'wounds' (aborts) a younger one to take the lock. In Wait-Die, a younger transaction 'dies' (aborts) if it requests a lock held by an older one.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحل قاعدة توماس للكتابة مشكلة الطوابع الزمنية؟</template>
+          <template class="content-en">How does Thomas's Write Rule solve a timestamp problem?</template>
+          <span class="content-target">كيف تحل قاعدة توماس للكتابة مشكلة الطوابع الزمنية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في الطوابع الزمنية العادية، الكتابة المتأخرة لمعاملة قديمة تسبب إجهاضها. قاعدة توماس تدرك أن هذه الكتابة 'قديمة' ولن يقرأها أحد، لذا تتجاهلها ببساطة بدلاً من إهدار عمل المعاملة بإجهاضها.</template>
+          <template class="content-en">In basic TO, a late write by an older transaction causes it to abort. Thomas's rule realizes this write is 'obsolete' and will never be read, so it simply ignores it instead of wasting the transaction's work by aborting it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا تُرفض عمليات القراءة أبداً في التحكم متعدد الإصدارات؟</template>
+          <template class="content-en">Why are read operations never rejected in Multiversion Concurrency Control?</template>
+          <span class="content-target">لماذا لا تُرفض عمليات القراءة أبداً في التحكم متعدد الإصدارات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن النظام يحتفظ بنسخ قديمة من البيانات. إذا كانت البيانات الحالية مقفلة للكتابة، فإن النظام يوجه عملية القراءة ببساطة إلى أحدث نسخة 'مؤكدة' تاريخياً تناسب الطابع الزمني للمعاملة.</template>
+          <template class="content-en">Because the system keeps old copies of data. If the current data is write-locked, the system simply directs the read operation to the most recent historically 'committed' version that fits the transaction's timestamp.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يكون التحكم المتفائل (Optimistic) فكرة سيئة؟</template>
+          <template class="content-en">When is Optimistic Control a bad idea?</template>
+          <span class="content-target">متى يكون التحكم المتفائل (Optimistic) فكرة سيئة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في الأنظمة التي تكثر فيها عمليات التحديث المتعارضة (High Contention). لأن التحكم المتفائل سينفذ المعاملات ثم يكتشف التعارض في النهاية، مما يؤدي إلى إجهاضات وإعادات تشغيل كثيرة تهدر الموارد.</template>
+          <template class="content-en">In systems with many conflicting updates (High Contention). Optimistic control will execute transactions and only discover conflicts at the end, leading to massive aborts and restarts that waste resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي حبيبية الأقفال (Lock Granularity) ولماذا هي مهمة؟</template>
+          <template class="content-en">What is Lock Granularity and why does it matter?</template>
+          <span class="content-target">ما هي حبيبية الأقفال (Lock Granularity) ولماذا هي مهمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي حجم العنصر المقفل (قاعدة بيانات، ملف، صفحة، سجل). الحبيبية الخشنة (ملف) سهلة الإدارة لكنها تمنع الآخرين من العمل. الحبيبية الدقيقة (سجل) تسمح بعمل الكثيرين معاً لكنها ترهق مدير الأقفال.</template>
+          <template class="content-en">It's the size of the locked item (DB, file, page, record). Coarse granularity (file) is easy to manage but blocks others. Fine granularity (record) allows high concurrency but exhausts the lock manager.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفائدة من أقفال النوايا (IS, IX)؟</template>
+          <template class="content-en">What is the point of Intention Locks (IS, IX)?</template>
+          <span class="content-target">ما الفائدة من أقفال النوايا (IS, IX)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تمنع المعاملات من قفل عنصر كبير (مثل ملف) إذا كان هناك عنصر صغير داخله (مثل سجل) مقفل بالفعل. قفل النية يعمل كعلامة تحذير على الباب الخارجي توفر عناء تفتيش كل الغرف بالداخل.</template>
+          <template class="content-en">They prevent transactions from locking a large item (like a file) if a small item inside it (like a record) is already locked. An intention lock acts as a warning sign on the front door, saving the effort of checking every room inside.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض الأساسي من التحكم في التزامن؟",
+      "en": "What is the primary purpose of Concurrency Control?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فرض العزل بين المعاملات المتعارضة والحفاظ على اتساق قاعدة البيانات.",
+        "en": "To enforce isolation among conflicting transactions and preserve database consistency."
+      },
+      "example": {
+        "ar": "حل تعارضات القراءة-الكتابة والكتابة-الكتابة.",
+        "en": "Resolving read-write and write-write conflicts."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو القفل المشترك (Shared Lock)؟",
+      "en": "What is a Shared Lock (Read Lock)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قفل يسمح لعدة معاملات بقراءة عنصر البيانات في نفس الوقت، لكن يمنع أي معاملة من الكتابة عليه.",
+        "en": "A lock that allows multiple transactions to read a data item simultaneously, but prevents any transaction from writing to it."
+      },
+      "example": {
+        "ar": "Lock-S(X)",
+        "en": "Lock-S(X)"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو القفل الحصري (Exclusive Lock)؟",
+      "en": "What is an Exclusive Lock (Write Lock)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قفل يسمح لمعاملة واحدة فقط بكتابة (أو قراءة) عنصر البيانات، ويمنع أي معاملة أخرى من تطبيق أي قفل عليه.",
+        "en": "A lock that allows only one transaction to write (or read) a data item, preventing any other transaction from applying any lock to it."
+      },
+      "example": {
+        "ar": "Lock-X(X)",
+        "en": "Lock-X(X)"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي وظيفة مدير الأقفال (Lock Manager)؟",
+      "en": "What is the function of the Lock Manager?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إدارة الأقفال على عناصر البيانات باستخدام جدول الأقفال (Lock Table).",
+        "en": "Managing locks on data items using a Lock Table."
+      },
+      "example": {
+        "ar": "تتبع المعاملة التي تقفل البيانات، ونوع القفل، والمؤشرات للعناصر الأخرى.",
+        "en": "Tracking the transaction locking the data, lock mode, and pointers to other items."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "متى تعتبر المعاملة جيدة التكوين (Well-formed)؟",
+      "en": "When is a transaction considered Well-formed?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إذا كانت تقفل عنصر البيانات قبل قراءته أو كتابته، ولا تقفل عنصراً مقفلاً بالفعل، ولا تحاول تحرير عنصر غير مقفل.",
+        "en": "If it locks the data item before reading/writing, does not lock an already locked item, and does not try to unlock a free item."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو تحويل القفل (Lock Conversion)؟",
+      "en": "What is Lock Conversion?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغيير نوع القفل أثناء المعاملة، إما بالترقية (من قراءة لكتابة) أو التخفيض (من كتابة لقراءة).",
+        "en": "Changing the lock mode during a transaction, either by upgrading (read to write) or downgrading (write to read)."
+      },
+      "example": {
+        "ar": "ترقية قفل القراءة إلى قفل كتابة إذا لم تكن هناك معاملات أخرى تقرأ البيانات.",
+        "en": "Upgrading a read lock to a write lock if no other transactions are reading the data."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي مرحلة النمو (Growing Phase) في 2PL؟",
+      "en": "What is the Growing Phase in 2PL?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المرحلة التي تقوم فيها المعاملة بتطبيق الأقفال على البيانات المطلوبة واحداً تلو الآخر دون تحرير أي قفل.",
+        "en": "The phase where a transaction applies locks on desired data items one at a time without releasing any."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي مرحلة الانكماش (Shrinking Phase) في 2PL؟",
+      "en": "What is the Shrinking Phase in 2PL?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المرحلة التي تقوم فيها المعاملة بتحرير الأقفال واحداً تلو الآخر ولا يُسمح لها باكتساب أقفال جديدة.",
+        "en": "The phase where a transaction unlocks its locked data items one at a time and is not allowed to acquire new locks."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "كيف يمنع القفل ثنائي الطور المحافظ (Conservative 2PL) الجمود؟",
+      "en": "How does Conservative 2PL prevent deadlock?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق قفل جميع عناصر البيانات المطلوبة قبل أن تبدأ المعاملة في التنفيذ.",
+        "en": "By locking all desired data items before the transaction begins execution."
+      },
+      "example": {
+        "ar": "المعاملة لا تنتظر أبداً عنصراً أثناء التنفيذ.",
+        "en": "The transaction never waits for a data item during execution."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو القفل ثنائي الطور الصارم (Strict 2PL)؟",
+      "en": "What is Strict 2PL?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسخة من 2PL حيث يتم تحرير الأقفال فقط بعد انتهاء المعاملة (بالتأكيد أو الإجهاض).",
+        "en": "A version of 2PL where unlocking is performed only after a transaction terminates (commits or aborts)."
+      },
+      "example": {
+        "ar": "يمنع الإجهاض المتسلسل وهو الأكثر استخداماً.",
+        "en": "Prevents cascading aborts and is the most commonly used."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو الجمود (Deadlock)؟",
+      "en": "What is a Deadlock?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة تنتظر فيها معاملتان أو أكثر بعضها البعض لتحرير الأقفال، مما يخلق حلقة لا نهائية.",
+        "en": "A situation where two or more transactions are waiting for each other to release locks, creating an infinite loop."
+      },
+      "example": {
+        "ar": "T1 تنتظر T2، و T2 تنتظر T1.",
+        "en": "T1 waits for T2, and T2 waits for T1."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الرسم البياني للانتظار (Wait-for-graph)؟",
+      "en": "What is a Wait-for-graph?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رسم بياني يحتفظ به المجدول لاكتشاف دورات الجمود، حيث تمثل العقد المعاملات والحواف تمثل الانتظار.",
+        "en": "A graph maintained by the scheduler to detect deadlock cycles, where nodes are transactions and edges represent waiting."
+      },
+      "example": {
+        "ar": "وجود دورة في الرسم يعني وجود جمود.",
+        "en": "A cycle in the graph means a deadlock exists."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي المجاعة (Starvation) في قواعد البيانات؟",
+      "en": "What is Starvation in databases?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحدث عندما تنتظر معاملة معينة باستمرار أو يتم إعادة تشغيلها ولا تحصل أبداً على فرصة للمتابعة.",
+        "en": "Occurs when a particular transaction consistently waits or is restarted and never gets a chance to proceed."
+      },
+      "example": {
+        "ar": "اختيار نفس المعاملة كضحية للجمود بشكل متكرر.",
+        "en": "Consistently selecting the same transaction as a deadlock victim."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الطابع الزمني (Timestamp)؟",
+      "en": "What is a Timestamp?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير متزايد (رقم صحيح) يشير إلى عمر العملية أو المعاملة. القيمة الأكبر تعني حدثاً أحدث.",
+        "en": "A monotonically increasing variable (integer) indicating the age of an operation or transaction. Larger value = more recent."
+      },
+      "example": {
+        "ar": "يستخدم لجدولة المعاملات المتزامنة بدون أقفال.",
+        "en": "Used to serialize execution of concurrent transactions without locks."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي قاعدة توماس للكتابة (Thomas's Write Rule)؟",
+      "en": "What is Thomas's Write Rule?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قاعدة في الطوابع الزمنية تتجاهل عملية الكتابة القديمة بدلاً من إجهاض المعاملة إذا كانت هناك معاملة أحدث قد كتبت البيانات بالفعل.",
+        "en": "A timestamp rule that ignores an obsolete write operation instead of aborting the transaction if a younger transaction has already written the data."
+      },
+      "example": {
+        "ar": "إذا كان write_TS(X) > TS(T)، تجاهل الكتابة وأكمل.",
+        "en": "If write_TS(X) > TS(T), ignore the write and continue."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هي الميزة الرئيسية للتحكم متعدد الإصدارات (Multiversion)؟",
+      "en": "What is the main advantage of Multiversion Concurrency Control?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا يتم رفض عملية القراءة أبداً، حيث يتم توجيهها إلى الإصدار التاريخي المناسب.",
+        "en": "A read operation is never rejected, as it is directed to the appropriate historical version."
+      },
+      "example": {
+        "ar": "يسمح بقراءة البيانات حتى لو كانت مقفلة للكتابة بواسطة معاملة أخرى.",
+        "en": "Allows reading data even if it is write-locked by another transaction."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هو قفل التصديق (Certify Lock)؟",
+      "en": "What is a Certify Lock?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قفل يُستخدم في 2PL متعدد الإصدارات عند استعداد المعاملة للتأكيد، لتحويل الإصدار الجديد إلى الإصدار المؤكد.",
+        "en": "A lock used in Multiversion 2PL when a transaction is ready to commit, to make the new version the committed version."
+      },
+      "example": {
+        "ar": "لا يتوافق مع أي قفل آخر (قراءة أو كتابة).",
+        "en": "Incompatible with any other lock (read or write)."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هي مراحل التحكم المتفائل (Optimistic Control)؟",
+      "en": "What are the phases of Optimistic Concurrency Control?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ثلاث مراحل: القراءة (Read)، التحقق (Validation)، والكتابة (Write).",
+        "en": "Three phases: Read phase, Validation phase, and Write phase."
+      },
+      "example": {
+        "ar": "يتم فحص القابلية للجدولة التسلسلية فقط في مرحلة التحقق قبل التأكيد.",
+        "en": "Serializability is checked only in the validation phase before commit."
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "ما هو تأثير حبيبية البيانات (Granularity) على الأداء؟",
+      "en": "What is the impact of data Granularity on performance?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحبيبية الخشنة تقلل التزامن، بينما الحبيبية الدقيقة تزيد التزامن ولكنها تزيد العبء على مدير الأقفال.",
+        "en": "Coarse granularity reduces concurrency, while fine granularity increases concurrency but adds overhead to the lock manager."
+      },
+      "example": {
+        "ar": "قفل قاعدة البيانات بأكملها (خشن) مقابل قفل حقل واحد (دقيق).",
+        "en": "Locking the entire database (coarse) vs. locking a single field (fine)."
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "ما هو قفل النية المشترك (IS)؟",
+      "en": "What is an Intention-shared (IS) lock?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يشير إلى أن المعاملة ستطلب قفلاً مشتركاً (S) على بعض العقد الفرعية في التسلسل الهرمي.",
+        "en": "Indicates that a shared lock (S) will be requested on some descendent node(s) in the hierarchy."
+      },
+      "example": {
+        "ar": "وضع IS على ملف قبل قراءة سجل داخله.",
+        "en": "Placing an IS lock on a file before reading a record inside it."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+        <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <div id="quiz-content" class="quiz-card glass-card">
+          <div class="quiz-header">
+            <span id="quiz-counter">1 / 10</span>
+            <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+          </div>
+          <div class="quiz-question" id="quiz-question-text"></div>
+          <div class="quiz-options" id="quiz-options-container"></div>
+          <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+          <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+              <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+            </button>
+          </div>
+        </div>
+        <div id="quiz-results" class="quiz-results glass-card hidden">
+          <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+        </div>
+      </section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الخوارزميات التالية تمنع حدوث الجمود (Deadlock) تماماً؟",
+      "en": "Which of the following algorithms completely prevents Deadlock?"
+    },
+    "options": {
+      "ar": [
+        "القفل ثنائي الطور الأساسي (Basic 2PL)",
+        "القفل ثنائي الطور المحافظ (Conservative 2PL)",
+        "القفل ثنائي الطور الصارم (Strict 2PL)",
+        "التحكم المتفائل (Optimistic Control)"
+      ],
+      "en": [
+        "Basic 2PL",
+        "Conservative 2PL",
+        "Strict 2PL",
+        "Optimistic Control"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القفل المحافظ يطلب من المعاملة قفل جميع البيانات التي تحتاجها قبل بدء التنفيذ، مما يمنع أي انتظار دائري وبالتالي يمنع الجمود.",
+      "en": "Conservative 2PL requires a transaction to lock all needed data items before execution begins, preventing any circular wait and thus preventing deadlock."
+    },
+    "hint": {
+      "ar": "تذكر الخوارزمية التي تأخذ كل شيء مقدماً.",
+      "en": "Remember the algorithm that takes everything upfront."
+    },
+    "difficulty": "medium",
+    "conceptId": "two-phase-locking"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في مصفوفة توافق الأقفال الأساسية، أي من الحالات التالية مسموح بها (متوافقة)؟",
+      "en": "In the basic lock compatibility matrix, which of the following is allowed (compatible)?"
+    },
+    "options": {
+      "ar": [
+        "قفل قراءة مع قفل كتابة",
+        "قفل كتابة مع قفل كتابة",
+        "قفل قراءة مع قفل قراءة",
+        "قفل كتابة مع قفل قراءة"
+      ],
+      "en": [
+        "Read lock with Write lock",
+        "Write lock with Write lock",
+        "Read lock with Read lock",
+        "Write lock with Read lock"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "أقفال القراءة (Shared) متوافقة مع بعضها البعض، مما يسمح لعدة معاملات بقراءة نفس البيانات في نفس الوقت.",
+      "en": "Read (Shared) locks are compatible with each other, allowing multiple transactions to read the same data simultaneously."
+    },
+    "hint": {
+      "ar": "هل يمكن لعدة أشخاص قراءة نفس الكتاب في نفس الوقت؟",
+      "en": "Can multiple people read the same book at the same time?"
+    },
+    "difficulty": "easy",
+    "conceptId": "two-phase-locking"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الشرط الأساسي لبروتوكول القفل ثنائي الطور (2PL)؟",
+      "en": "What is the fundamental requirement of the Two-Phase Locking (2PL) protocol?"
+    },
+    "options": {
+      "ar": [
+        "يجب تحرير جميع الأقفال قبل التأكيد.",
+        "لا يمكن للمعاملة اكتساب أي قفل جديد بعد تحرير أي قفل.",
+        "يجب قفل قاعدة البيانات بأكملها أولاً.",
+        "يجب استخدام الطوابع الزمنية مع الأقفال."
+      ],
+      "en": [
+        "All locks must be released before commit.",
+        "A transaction cannot acquire any new lock after it releases any lock.",
+        "The entire database must be locked first.",
+        "Timestamps must be used with locks."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ينص 2PL على أن مرحلة النمو (اكتساب الأقفال) ومرحلة الانكماش (تحرير الأقفال) يجب أن تكونا حصريتين. بمجرد بدء التحرير، لا يمكن اكتساب أقفال جديدة.",
+      "en": "2PL states that the growing phase (acquiring locks) and shrinking phase (releasing locks) must be mutually exclusive. Once unlocking begins, no new locks can be acquired."
+    },
+    "hint": {
+      "ar": "فكر في المرحلتين: النمو والانكماش.",
+      "en": "Think about the two phases: growing and shrinking."
+    },
+    "difficulty": "medium",
+    "conceptId": "two-phase-locking"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي تقنية تستخدم الرسم البياني للانتظار (Wait-for-graph)؟",
+      "en": "Which technique uses a Wait-for-graph?"
+    },
+    "options": {
+      "ar": [
+        "الوقاية من الجمود",
+        "تجنب الجمود",
+        "اكتشاف الجمود وحله",
+        "التحكم المتفائل"
+      ],
+      "en": [
+        "Deadlock Prevention",
+        "Deadlock Avoidance",
+        "Deadlock Detection and Resolution",
+        "Optimistic Control"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يُستخدم الرسم البياني للانتظار لاكتشاف الدورات (Cycles) التي تشير إلى حدوث جمود، ليتم بعد ذلك حله بإجهاض معاملة ضحية.",
+      "en": "A wait-for-graph is used to detect cycles that indicate a deadlock has occurred, which is then resolved by aborting a victim transaction."
+    },
+    "hint": {
+      "ar": "الرسم البياني يكتشف المشكلة بعد حدوثها.",
+      "en": "The graph finds the problem after it happens."
+    },
+    "difficulty": "easy",
+    "conceptId": "deadlock-and-starvation"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ماذا تفعل قاعدة توماس للكتابة (Thomas's Write Rule) إذا حاولت معاملة كتابة بيانات تم تحديثها بالفعل بواسطة معاملة أحدث؟",
+      "en": "What does Thomas's Write Rule do if a transaction tries to write data that has already been updated by a younger transaction?"
+    },
+    "options": {
+      "ar": [
+        "تجهض المعاملة الأقدم.",
+        "تجهض المعاملة الأحدث.",
+        "تتجاهل عملية الكتابة وتستمر في التنفيذ.",
+        "تضع المعاملة في حالة انتظار."
+      ],
+      "en": [
+        "Aborts the older transaction.",
+        "Aborts the younger transaction.",
+        "Ignores the write operation and continues execution.",
+        "Puts the transaction in a wait state."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "قاعدة توماس تتجاهل الكتابة القديمة (Obsolete write) لأن المعاملة الأحدث قد كتبت القيمة النهائية، مما يوفر على النظام إجهاض المعاملة الأقدم.",
+      "en": "Thomas's rule ignores the obsolete write because the younger transaction has already written the final value, saving the system from aborting the older transaction."
+    },
+    "hint": {
+      "ar": "الكتابة الأحدث هي التي تهم.",
+      "en": "The most recent write is what counts."
+    },
+    "difficulty": "medium",
+    "conceptId": "timestamp-ordering"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في التحكم متعدد الإصدارات (Multiversion CC)، ما هي الميزة الرئيسية لعمليات القراءة؟",
+      "en": "In Multiversion CC, what is the main advantage for read operations?"
+    },
+    "options": {
+      "ar": [
+        "تتطلب أقفالاً حصرية.",
+        "لا يتم رفضها أبداً.",
+        "تقرأ دائماً أحدث إصدار غير مؤكد.",
+        "تتطلب قفل تصديق (Certify Lock)."
+      ],
+      "en": [
+        "They require exclusive locks.",
+        "They are never rejected.",
+        "They always read the latest uncommitted version.",
+        "They require a Certify Lock."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نظراً لوجود إصدارات تاريخية متعددة، يمكن دائماً توجيه عملية القراءة إلى الإصدار المناسب لطابعها الزمني، لذا لا يتم رفضها أبداً.",
+      "en": "Because multiple historical versions exist, a read operation can always be directed to the version appropriate for its timestamp, so it is never rejected."
+    },
+    "hint": {
+      "ar": "البيانات القديمة لا تزال موجودة.",
+      "en": "Old data is still available."
+    },
+    "difficulty": "easy",
+    "conceptId": "multiversion-concurrency-control"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "متى يتم التحقق من القابلية للجدولة التسلسلية في نظام التحكم المتفائل (Optimistic Control)؟",
+      "en": "When is serializability checked in an Optimistic Control scheme?"
+    },
+    "options": {
+      "ar": [
+        "قبل بدء المعاملة.",
+        "أثناء مرحلة القراءة.",
+        "فقط في وقت التأكيد (مرحلة التحقق).",
+        "بعد كتابة البيانات في قاعدة البيانات."
+      ],
+      "en": [
+        "Before the transaction starts.",
+        "During the read phase.",
+        "Only at commit time (Validation phase).",
+        "After writing data to the database."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التحكم المتفائل يفترض عدم وجود تعارض، لذا فهو ينفذ العمليات محلياً ويتحقق من صحتها فقط في مرحلة التحقق قبل التأكيد النهائي.",
+      "en": "Optimistic control assumes no conflicts, so it executes operations locally and only checks for validity during the validation phase right before final commit."
+    },
+    "hint": {
+      "ar": "الاسم 'متفائل' يعني أنه يأمل ألا تحدث مشكلة حتى النهاية.",
+      "en": "The name 'optimistic' means it hopes there's no problem until the very end."
+    },
+    "difficulty": "medium",
+    "conceptId": "optimistic-concurrency-control"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ماذا يعني قفل النية المشترك (IS) في القفل متعدد الحبيبيات؟",
+      "en": "What does an Intention-shared (IS) lock mean in multiple granularity locking?"
+    },
+    "options": {
+      "ar": [
+        "العقدة الحالية مقفلة حصرياً.",
+        "سيتم طلب قفل مشترك على بعض العقد الفرعية.",
+        "سيتم طلب قفل حصري على بعض العقد الفرعية.",
+        "قاعدة البيانات بأكملها مقفلة للقراءة."
+      ],
+      "en": [
+        "The current node is locked exclusively.",
+        "A shared lock will be requested on some descendent node(s).",
+        "An exclusive lock will be requested on some descendent node(s).",
+        "The entire database is locked for reading."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "قفل IS يوضع على عقدة أعلى (مثل ملف) للإشارة إلى أن المعاملة تنوي وضع قفل مشترك (S) على عقدة فرعية (مثل سجل).",
+      "en": "An IS lock is placed on a higher node (like a file) to indicate the transaction intends to place a shared (S) lock on a lower node (like a record)."
+    },
+    "hint": {
+      "ar": "النية (Intention) تعني التخطيط لشيء في الأسفل.",
+      "en": "Intention means planning for something below."
+    },
+    "difficulty": "medium",
+    "conceptId": "lock-granularity"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من خوارزميات 2PL التالية هي الأكثر استخداماً في أنظمة قواعد البيانات العملية؟",
+      "en": "Which of the following 2PL algorithms is most commonly used in practical database systems?"
+    },
+    "options": {
+      "ar": [
+        "Basic 2PL",
+        "Conservative 2PL",
+        "Strict 2PL",
+        "Optimistic 2PL"
+      ],
+      "en": [
+        "Basic 2PL",
+        "Conservative 2PL",
+        "Strict 2PL",
+        "Optimistic 2PL"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "Strict 2PL هو الأكثر استخداماً لأنه يمنع الإجهاض المتسلسل (Cascading Aborts) عن طريق الاحتفاظ بجميع الأقفال حتى تنتهي المعاملة.",
+      "en": "Strict 2PL is the most commonly used because it prevents cascading aborts by holding all locks until the transaction terminates."
+    },
+    "hint": {
+      "ar": "الأنظمة تفضل الصرامة لمنع تكرار الأخطاء.",
+      "en": "Systems prefer strictness to prevent cascading errors."
+    },
+    "difficulty": "easy",
+    "conceptId": "two-phase-locking"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في خوارزمية Wound-Wait لتجنب الجمود، ماذا يحدث إذا طلبت معاملة أقدم قفلاً تملكه معاملة أحدث؟",
+      "en": "In the Wound-Wait deadlock avoidance algorithm, what happens if an older transaction requests a lock held by a younger transaction?"
+    },
+    "options": {
+      "ar": [
+        "المعاملة الأقدم تنتظر (Wait).",
+        "المعاملة الأحدث تُجرح/تُجهض (Wound/Abort).",
+        "المعاملة الأقدم تموت (Die).",
+        "يتم تجاهل الطلب."
+      ],
+      "en": [
+        "The older transaction waits.",
+        "The younger transaction is wounded/aborted.",
+        "The older transaction dies.",
+        "The request is ignored."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في Wound-Wait، المعاملة الأقدم لها الأولوية. إذا كانت تحتاج قفلاً تملكه معاملة أحدث، فإنها 'تجرح' (تجهض) المعاملة الأحدث لتأخذ القفل.",
+      "en": "In Wound-Wait, the older transaction has priority. If it needs a lock held by a younger one, it 'wounds' (aborts) the younger one to take the lock."
+    },
+    "hint": {
+      "ar": "الأقدم أقوى، فهو يجرح الأصغر.",
+      "en": "The older is stronger, it wounds the younger."
+    },
+    "difficulty": "hard",
+    "conceptId": "deadlock-and-starvation"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن القفل ثنائي الطور (2PL) يمنع الجمود (Deadlock). هذا خطأ! 2PL يضمن القابلية للجدولة التسلسلية فقط، لكن الجمود لا يزال ممكناً (باستثناء النسخة المحافظة).</template>
+    <template class="content-en">Thinking that Two-Phase Locking (2PL) prevents deadlocks. This is false! 2PL only guarantees serializability, but deadlocks are still possible (except in Conservative 2PL).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين Strict 2PL و Basic 2PL هو متى يتم تحرير الأقفال. Strict 2PL يحتفظ بها حتى النهاية لمنع الإجهاض المتسلسل، وهو ما يجعله المعيار الصناعي.</template>
+    <template class="content-en">The core difference between Strict 2PL and Basic 2PL is when locks are released. Strict 2PL holds them until termination to prevent cascading aborts, making it the industry standard.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قاعدة توماس للكتابة (Thomas's Write Rule) هي حالة نادرة حيث يسمح النظام بجدول زمني غير قابل للجدولة التسلسلية المتعارضة (Not Conflict Serializable) ولكنه يظل صحيحاً لأنه قابل للجدولة التسلسلية للعرض (View Serializable).</template>
+    <template class="content-en">Thomas's Write Rule is a rare case where the system allows a schedule that is not conflict-serializable but remains correct because it is view-serializable.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الجمود (Deadlock) والمجاعة (Starvation). الجمود هو توقف تام للنظام بسبب انتظار دائري، بينما المجاعة هي معاناة معاملة واحدة فقط من التأجيل المستمر بينما النظام يعمل.</template>
+    <template class="content-en">Confusing Deadlock with Starvation. Deadlock is a system halt due to a circular wait, while Starvation is just one transaction suffering continuous delays while the system keeps working.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">أقفال النوايا (Intention Locks) لا تقفل البيانات فعلياً، بل تعمل كـ 'علامات تحذير' على المستويات العليا من الشجرة لتسريع عملية التحقق من الأقفال في المستويات السفلى.</template>
+    <template class="content-en">Intention Locks do not actually lock the data; they act as 'warning signs' at higher levels of the tree to speed up lock checking at lower levels.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M06.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M08.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+  <script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

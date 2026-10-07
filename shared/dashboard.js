@@ -815,7 +815,17 @@
     if (s) s.style.display = (prefs && prefs.hideLevelsSection) ? 'none' : '';
   }
 
-  var _cfg = null;
+  var _cfg = null, _maj = null;
+  /*@3.DASJ.154*/
+  function viewMajor() {
+    if (!_maj) return null;
+    var v = null;
+    try { v = localStorage.getItem('garden_view_major'); } catch (e) {}
+    if (_maj.majors[v]) return v;
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem('student_profile')); } catch (e) {}
+    return (p && p.program && _maj.slugs[p.program]) || null;
+  }
   function renderLevels() {
     var grids = [el('dash-levels'), el('dash-levels-full')].filter(Boolean);
     if (!grids.length || !_cfg) return;
@@ -834,6 +844,8 @@
       if (done && levelDone(lv)) return;   /*@3.DASJ.60*/
       var n = lid.replace('level', '');
       var count = (lv.subjects || []).length + (lv.electives || []).length;
+      var mj = viewMajor();
+      if (mj && mj !== 'CS') count = (_maj.majors[mj].levels[n] || []).length;
       html += '<a class="dash-level-card" href="L' + n + '/index.html" style="--level-color:' + colors[i % 6] + '" data-level="' + n + '">' +
         '<span class="dash-level-num">' + n + '</span>' +
         '<span class="dash-level-info">' +
@@ -848,7 +860,7 @@
         '<span class="dash-level-info">' +
           '<span class="dash-level-title">' + esc(tx('مقررات أخرى', 'Other courses')) + '</span>' +
           '<span class="dash-level-meta">' +
-            esc(smartCount((o.subjects || []).length, ['مادة', 'مادتين', 'مواد'], ['course', 'courses'])) + '</span>' +
+            esc(smartCount(viewMajor() ? _maj.majors[viewMajor()].general.length : (o.subjects || []).length, ['مادة', 'مادتين', 'مواد'], ['course', 'courses'])) + '</span>' +
         '</span></a>';
     }
     grids.forEach(function (g) { g.innerHTML = html; });
@@ -1814,6 +1826,8 @@
     loadPrefs();
 
     D.ready().then(function () {
+      fetch('shared/data/majors.json').then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (m) { if (m && m.majors) { _maj = m; renderLevels(); } }).catch(function () {});
       return fetch('config/project.json').then(function (r) { return r.json(); }).catch(function () { return null; });
     }).then(function (cfg) {
       _cfg = cfg;

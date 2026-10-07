@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT354" data-module="9" data-no-videos>
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أمن قواعد البيانات · IT354 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+      var fs=localStorage.getItem('garden_font_size');
+      if(fs)document.documentElement.setAttribute('data-font-size',fs);
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT354" data-page-title-en="IT354">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=IT354"></header>
+
+  <div class="content-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+      <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#database-security-threats" class="toc-link" data-bilingual>
+        <template class="content-ar">تهديدات أمن قواعد البيانات والتدابير المضادة</template>
+        <template class="content-en">Database Security Threats and Countermeasures</template>
+        <span class="content-target">تهديدات أمن قواعد البيانات والتدابير المضادة</span>
+      </a>
+      <a href="#discretionary-access-control" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم التقديري في الوصول (DAC)</template>
+        <template class="content-en">Discretionary Access Control (DAC)</template>
+        <span class="content-target">التحكم التقديري في الوصول (DAC)</span>
+      </a>
+      <a href="#mandatory-access-control" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم الإلزامي في الوصول (MAC)</template>
+        <template class="content-en">Mandatory Access Control (MAC)</template>
+        <span class="content-target">التحكم الإلزامي في الوصول (MAC)</span>
+      </a>
+      <a href="#role-based-access-control" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم في الوصول المبني على الأدوار (RBAC)</template>
+        <template class="content-en">Role-Based Access Control (RBAC)</template>
+        <span class="content-target">التحكم في الوصول المبني على الأدوار (RBAC)</span>
+      </a>
+      <a href="#statistical-database-security" class="toc-link" data-bilingual>
+        <template class="content-ar">أمن قواعد البيانات الإحصائية</template>
+        <template class="content-en">Statistical Database Security</template>
+        <span class="content-target">أمن قواعد البيانات الإحصائية</span>
+      </a>
+      <a href="#flow-control-covert-channels" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم في التدفق والقنوات السرية</template>
+        <template class="content-en">Flow Control and Covert Channels</template>
+        <span class="content-target">التحكم في التدفق والقنوات السرية</span>
+      </a>
+      <a href="#encryption-pki" class="toc-link" data-bilingual>
+        <template class="content-ar">التشفير والبنية التحتية للمفتاح العام</template>
+        <template class="content-en">Encryption and Public Key Infrastructures</template>
+        <span class="content-target">التشفير والبنية التحتية للمفتاح العام</span>
+      </a>
+      <a href="#digital-signatures" class="toc-link" data-bilingual>
+        <template class="content-ar">التواقيع الرقمية</template>
+        <template class="content-en">Digital Signatures</template>
+        <span class="content-target">التواقيع الرقمية</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+      <div class="sidebar-widget">
+        <div class="widget-number" id="fc-due-count">0</div>
+        <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 9</template>
+      <template class="content-en">Module 9</template>
+      <span class="content-target">الوحدة 9</span>
+    </span> · IT354
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أمن قواعد البيانات</h1>
+      <p class="hero-description">تغطي هذه الوحدة قضايا أمن قواعد البيانات، بما في ذلك التحكم التقديري والإلزامي في الوصول، أمن قواعد البيانات الإحصائية، التحكم في التدفق، والتشفير.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Database Security</h1>
+      <p class="hero-description">This module covers database security issues, including Discretionary and Mandatory Access Control, statistical database security, flow control, and encryption.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن قواعد البيانات</span>
+      <span class="tag">التحكم في الوصول</span>
+      <span class="tag">التشفير</span>
+      <span class="tag">التحكم الإلزامي في الوصول</span>
+      <span class="tag">التحكم التقديري في الوصول</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Database Security</span>
+      <span class="tag">Access Control</span>
+      <span class="tag">Encryption</span>
+      <span class="tag">MAC</span>
+      <span class="tag">DAC</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تحديد التهديدات الرئيسية لقواعد البيانات والتدابير المضادة المناسبة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق آليات التحكم التقديري في الوصول (DAC) باستخدام أوامر GRANT و REVOKE.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم نماذج التحكم الإلزامي في الوصول (MAC) مثل نموذج Bell-LaPadula.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح مفاهيم أمن قواعد البيانات الإحصائية ومشكلة الاستدلال.</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين تقنيات التشفير المتماثل وغير المتماثل (المفتاح العام).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Identify main threats to databases and appropriate countermeasures.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply Discretionary Access Control (DAC) mechanisms using GRANT and REVOKE commands.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand Mandatory Access Control (MAC) models such as the Bell-LaPadula model.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain statistical database security concepts and the inference problem.</span></li>
+      <li><span class="obj-icon">✦</span><span>Differentiate between symmetric and asymmetric (public key) encryption techniques.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="database-security-threats" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تهديدات أمن قواعد البيانات والتدابير المضادة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Database Security Threats and Countermeasures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حماية قاعدة البيانات من فقدان النزاهة، التوافر، والسرية تشبه حماية قلعة من التخريب، الحصار، والتجسس.</p></template>
+    <template class="content-en"><p>Protecting the database against loss of integrity, availability, and confidentiality is like protecting a castle from sabotage, siege, and espionage.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تواجه قواعد البيانات ثلاثة تهديدات رئيسية:</p><ul><li><b>فقدان النزاهة (Loss of integrity):</b> تعديل البيانات بشكل غير مصرح به.</li><li><b>فقدان التوافر (Loss of availability):</b> عدم قدرة المستخدمين الشرعيين على الوصول للبيانات.</li><li><b>فقدان السرية (Loss of confidentiality):</b> كشف البيانات لجهات غير مصرح لها.</li></ul><p>لحماية قواعد البيانات، يتم تنفيذ أربعة أنواع من التدابير المضادة: التحكم في الوصول (Access control)، التحكم في الاستدلال (Inference control)، التحكم في التدفق (Flow control)، والتشفير (Encryption).</p></template>
+    <template class="content-en"><p>Databases face three main threats:</p><ul><li><b>Loss of integrity:</b> Unauthorized modification of data.</li><li><b>Loss of availability:</b> Legitimate users cannot access data.</li><li><b>Loss of confidentiality:</b> Data disclosure to unauthorized entities.</li></ul><p>To protect databases, four kinds of countermeasures are implemented: Access control, Inference control, Flow control, and Encryption.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يلعب مسؤول قاعدة البيانات (DBA) دوراً محورياً في إدارة هذه التدابير من خلال حسابات النظام (Superuser) التي تتيح إنشاء الحسابات، منح/إلغاء الصلاحيات، وتعيين مستويات الأمان.</p><p>لضمان المساءلة، يتم استخدام سجلات التدقيق (Audit Trails) لتتبع جميع العمليات التي يقوم بها المستخدمون، مما يسمح باكتشاف أي تلاعب مشبوه بعد حدوثه.</p></template>
+    <template class="content-en"><p>The Database Administrator (DBA) plays a central role in managing these measures through system (superuser) accounts that allow account creation, privilege granting/revocation, and security level assignment.</p><p>To ensure accountability, <span class="smart-term" data-term-en="Audit Trail" data-ar="سجل التدقيق" data-en-def="A database log used mainly for security purposes to examine all accesses and operations during a certain time period.">Audit Trail<span class="smart-term-tooltip"></span></span>s are used to track all operations applied by users, allowing the detection of any suspected tampering after the fact.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لسجل التدقيق (Audit Trail) أن يساعد في استعادة 'النزاهة' بعد هجوم إلكتروني؟</template>
+      <template class="content-en">How can an Audit Trail help restore 'integrity' after a cyber attack?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يسمح سجل التدقيق للمسؤولين بتحديد التعديلات غير المصرح بها بدقة، مما يسهل التراجع عن تلك التغييرات المحددة واستعادة الحالة الصحيحة للبيانات.</p></template>
+      <template class="content-en"><p>An audit trail allows administrators to pinpoint exactly which unauthorized modifications were made, making it easier to roll back those specific changes and restore the correct data state.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="discretionary-access-control" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> التحكم التقديري في الوصول (DAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Discretionary Access Control (DAC)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نظام أمان مرن يعتمد على منح وإلغاء الصلاحيات للمستخدمين، يشبه إعطاء مفاتيح غرف معينة لأشخاص محددين.</p></template>
+    <template class="content-en"><p>A flexible security system based on granting and revoking privileges to users, akin to giving specific room keys to specific people.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التحكم التقديري في الوصول (DAC) هو الطريقة النموذجية في قواعد البيانات العلائقية. يتم تطبيقه على مستويين:</p><ol><li><b>مستوى الحساب (Account level):</b> صلاحيات مستقلة عن الجداول (مثل CREATE TABLE).</li><li><b>مستوى العلاقة (Relation level):</b> صلاحيات على جداول أو عروض محددة (مثل SELECT, MODIFY, REFERENCES).</li></ol><p>يتم استخدام أوامر <code>GRANT</code> و <code>REVOKE</code> في SQL لإدارة هذه الصلاحيات. يمكن لمالك الجدول تمرير الصلاحيات للآخرين باستخدام <code>WITH GRANT OPTION</code>.</p></template>
+    <template class="content-en"><p>Discretionary Access Control (DAC) is the typical method in relational databases. It applies at two levels:</p><ol><li><b>Account level:</b> Privileges independent of relations (e.g., CREATE TABLE).</li><li><b>Relation level:</b> Privileges on specific relations or views (e.g., SELECT, MODIFY, REFERENCES).</li></ol><p>SQL uses <code>GRANT</code> and <code>REVOKE</code> commands to manage these. The owner can pass privileges to others using the <code>WITH GRANT OPTION</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر العروض (Views) آلية أمان تقديرية هامة بحد ذاتها، حيث تسمح للمالك بإخفاء أعمدة أو صفوف معينة عن طريق منح صلاحية <code>SELECT</code> على العرض فقط بدلاً من الجدول الأساسي.</p><p>عند استخدام <code>GRANT OPTION</code>، يمكن أن تنتشر الصلاحيات (Propagation). إذا قام المالك الأصلي بإلغاء الصلاحية، يجب على نظام إدارة قواعد البيانات (DBMS) إلغاء جميع الصلاحيات التي انتشرت بناءً عليها تلقائياً (Cascading Revoke).</p><p>العيب الرئيسي لـ DAC هو ضعفه أمام الهجمات الخبيثة مثل حصان طروادة (Trojan horses) المضمنة في البرامج.</p></template>
+    <template class="content-en"><p>Views are an important discretionary authorization mechanism in their own right, allowing the owner to hide specific columns or rows by granting <code>SELECT</code> on the view instead of the base table.</p><p>When <code>GRANT OPTION</code> is used, privileges can propagate. If the original owner revokes the privilege, the DBMS must automatically revoke all privileges propagated based on it (Cascading Revoke).</p><p>The main drawback of DAC is its vulnerability to malicious attacks, such as Trojan horses embedded in application programs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>code</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>GRANT SELECT ON EMPLOYEE, DEPARTMENT TO A3 WITH GRANT OPTION;
+REVOKE SELECT ON EMPLOYEE FROM A3;</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>DAC</th><th>MAC</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المرونة وقابلية التطبيق</template>
+          <template class="content-en">Flexibility and Applicability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مرونة عالية، مناسب لمجموعة كبيرة من التطبيقات.</template>
+          <template class="content-en">High degree of flexibility, suitable for a large variety of applications.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">صارم جداً، قابل للتطبيق في بيئات محدودة فقط.</template>
+          <template class="content-en">Too rigid, only applicable in limited environments.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الحماية من الهجمات الخبيثة (مثل حصان طروادة)</template>
+          <template class="content-en">Protection against malicious attacks (e.g., Trojan horses)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ضعيف، عرضة للهجمات الخبيثة.</template>
+          <template class="content-en">Vulnerable to malicious attacks embedded in programs.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حماية عالية، يمنع التدفق غير القانوني للمعلومات.</template>
+          <template class="content-en">High degree of protection, prevents illegal flow of information.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر استخدام العروض (Views) أفضل من منح صلاحيات على أعمدة محددة في الجدول الأساسي؟</template>
+      <template class="content-en">Why is using Views often better than granting privileges on specific columns of a base table?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>توفر العروض مرونة أكبر، حيث يمكنها تقييد الوصول ليس فقط للأعمدة (تقييد عمودي) ولكن أيضاً للصفوف بناءً على شروط معينة (تقييد أفقي)، مما يوفر تحكماً أدق في البيانات.</p></template>
+      <template class="content-en"><p>Views offer greater flexibility, as they can restrict access not only to columns (vertical restriction) but also to rows based on specific conditions (horizontal restriction), providing finer-grained data control.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="mandatory-access-control" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التحكم الإلزامي في الوصول (MAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Mandatory Access Control (MAC)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نظام أمان صارم يصنف البيانات والمستخدمين إلى مستويات سرية (مثل: سري للغاية)، ويمنع تدفق المعلومات من المستويات العليا للأدنى.</p></template>
+    <template class="content-en"><p>A rigid security system that classifies data and users into clearance levels (e.g., Top Secret), preventing information flow from higher to lower levels.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يستخدم التحكم الإلزامي في الوصول (MAC) فئات أمان: سري للغاية (TS)، سري (S)، سري (C)، وغير مصنف (U). يعتمد على نموذج Bell-LaPadula الذي يفرض قيدين:</p><ol><li><b>خاصية الأمان البسيطة (Simple security property):</b> لا يُسمح للموضوع (المستخدم) بقراءة كائن (بيانات) إلا إذا كان تصنيف المستخدم أعلى من أو يساوي تصنيف البيانات (لا قراءة للأعلى).</li><li><b>خاصية النجمة (* property):</b> لا يُسمح للموضوع بكتابة كائن إلا إذا كان تصنيف المستخدم أقل من أو يساوي تصنيف البيانات (لا كتابة للأسفل).</li></ol></template>
+    <template class="content-en"><p>Mandatory Access Control (MAC) uses security classes: Top Secret (TS), Secret (S), Confidential (C), and Unclassified (U). It relies on the Bell-LaPadula model which enforces two restrictions:</p><ol><li><b>Simple security property:</b> A subject S cannot read object O unless class(S) >= class(O) (No read up).</li><li><b>Star property (* property):</b> A subject S cannot write object O unless class(S) <= class(O) (No write down).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الهدف الأساسي من خاصية النجمة هو منع برامج 'حصان طروادة' من قراءة بيانات سرية للغاية وكتابتها في ملفات ذات تصنيف أمني منخفض، مما يمنع التدفق غير القانوني للمعلومات.</p><p>في قواعد البيانات العلائقية، يؤدي MAC إلى مفهوم <b>التعددية (Polyinstantiation)</b>، حيث يمكن أن تحتوي العلاقة على عدة صفوف بنفس <span class="smart-term" data-term-en="Apparent Key" data-ar="المفتاح الظاهري" data-en-def="The set of attributes that would have formed the primary key in a regular (single-level) relation.">المفتاح الظاهري<span class="smart-term-tooltip"></span></span> (Apparent key) ولكن بقيم وتصنيفات أمنية مختلفة، لكي يرى كل مستخدم البيانات المناسبة لمستوى تصريحه فقط.</p></template>
+    <template class="content-en"><p>The primary goal of the star property is to prevent 'Trojan horse' programs from reading top-secret data and writing it to lower-classified files, thus preventing illegal information flow.</p><p>In relational databases, MAC leads to the concept of <b><span class="smart-term" data-term-en="Polyinstantiation" data-ar="التعددية / الاستنساخ المتعدد" data-en-def="A concept where several tuples can have the same apparent key value but different attribute values for users at different classification levels.">Polyinstantiation<span class="smart-term-tooltip"></span></span></b>, where a relation can have several tuples with the same <span class="smart-term" data-term-en="Apparent Key" data-ar="المفتاح الظاهري" data-en-def="The set of attributes that would have formed the primary key in a regular (single-level) relation.">apparent key<span class="smart-term-tooltip"></span></span> but different attribute values and security classifications, ensuring users only see data appropriate for their clearance level.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a diagram illustrating the Bell-LaPadula model. Show two rules: 'Simple Security Property' (Subject reading Object, arrow from Object to Subject, condition: Subject Clearance >= Object Classification) and 'Star Property' (Subject writing Object, arrow from Subject to Object, condition: Subject Clearance <= Object Classification). Use a dark background #0d1117, accent colors for arrows (green for allowed, red for denied). Include Arabic and English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrow Markers -->
+        <marker id="arrow-allowed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-denied" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+        
+        <!-- Gradients -->
+        <linearGradient id="subject-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="450" y="40" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Bell-LaPadula Model (Mandatory Access Control)</text>
+    <text x="450" y="40" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">نموذج بيل-لابادولا (التحكم الإلزامي في الوصول)</text>
+
+    <!-- Grouping Boxes for Properties -->
+    <!-- Simple Security Property Box -->
+    <rect x="160" y="70" width="340" height="470" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <!-- Star Property Box -->
+    <rect x="520" y="70" width="340" height="470" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+
+    <!-- Property Titles -->
+    <g text-anchor="middle">
+        <!-- Left Box -->
+        <text x="330" y="105" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Simple Security Property (No Read Up)</text>
+        <text x="330" y="105" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خاصية الأمان البسيطة (لا قراءة لأعلى)</text>
+        <!-- Right Box -->
+        <text x="690" y="105" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">* (Star) Property (No Write Down)</text>
+        <text x="690" y="105" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خاصية النجمة (لا كتابة لأسفل)</text>
+    </g>
+
+    <!-- Security Level Lines -->
+    <g stroke="var(--border-color)" stroke-dasharray="6,4" stroke-width="1.5">
+        <line x1="140" y1="160" x2="880" y2="160" />
+        <line x1="140" y1="280" x2="880" y2="280" />
+        <line x1="140" y1="400" x2="880" y2="400" />
+        <line x1="140" y1="520" x2="880" y2="520" />
+    </g>
+
+    <!-- Security Level Labels (Left Side) -->
+    <g text-anchor="middle">
+        <!-- Top Secret -->
+        <rect x="15" y="148" width="130" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="80" y="165" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Top Secret (TS)</text>
+        <text x="80" y="165" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">سري للغاية (TS)</text>
+        
+        <!-- Secret -->
+        <rect x="15" y="268" width="130" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="80" y="285" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Secret (S)</text>
+        <text x="80" y="285" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">سري (S)</text>
+        
+        <!-- Confidential -->
+        <rect x="15" y="388" width="130" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="80" y="405" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Confidential (C)</text>
+        <text x="80" y="405" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">خاص (C)</text>
+        
+        <!-- Unclassified -->
+        <rect x="15" y="508" width="130" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="80" y="525" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Unclassified (U)</text>
+        <text x="80" y="525" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">غير مصنف (U)</text>
+    </g>
+
+    <!-- ================= LEFT COLUMN: SIMPLE SECURITY PROPERTY ================= -->
+    <g>
+        <!-- Object TS -->
+        <rect x="210" y="140" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="270" y="165" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Object (TS)</text>
+        <text x="270" y="165" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">كائن (TS)</text>
+
+        <!-- Subject S -->
+        <rect x="210" y="260" width="120" height="40" rx="20" fill="url(#subject-grad)" />
+        <text x="270" y="285" font-size="15" font-weight="600" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Subject (S)</text>
+        <text x="270" y="285" font-size="15" font-weight="600" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">موضوع (S)</text>
+
+        <!-- Object C -->
+        <rect x="210" y="380" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="270" y="405" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Object (C)</text>
+        <text x="270" y="405" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">كائن (C)</text>
+
+        <!-- Arrows & Labels -->
+        <!-- Read Up (Denied) -->
+        <line x1="270" y1="185" x2="270" y2="252" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-denied)" />
+        <text x="390" y="225" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">✗ Read Up (Denied)</text>
+        <text x="390" y="225" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">✗ قراءة لأعلى (مرفوض)</text>
+
+        <!-- Read Down (Allowed) -->
+        <line x1="270" y1="375" x2="270" y2="308" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-allowed)" />
+        <text x="390" y="345" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">✓ Read Down (Allowed)</text>
+        <text x="390" y="345" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">✓ قراءة لأسفل (مسموح)</text>
+
+        <!-- Condition -->
+        <rect x="190" y="480" width="280" height="36" rx="18" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+        <text x="330" y="503" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Condition: Clearance(S) ≥ Class(O)</text>
+        <text x="330" y="503" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">الشرط: تصريح(S) ≥ تصنيف(O)</text>
+    </g>
+
+    <!-- ================= RIGHT COLUMN: STAR PROPERTY ================= -->
+    <g>
+        <!-- Object TS -->
+        <rect x="570" y="140" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="630" y="165" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Object (TS)</text>
+        <text x="630" y="165" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">كائن (TS)</text>
+
+        <!-- Subject S -->
+        <rect x="570" y="260" width="120" height="40" rx="20" fill="url(#subject-grad)" />
+        <text x="630" y="285" font-size="15" font-weight="600" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Subject (S)</text>
+        <text x="630" y="285" font-size="15" font-weight="600" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">موضوع (S)</text>
+
+        <!-- Object C -->
+        <rect x="570" y="380" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="630" y="405" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Object (C)</text>
+        <text x="630" y="405" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">كائن (C)</text>
+
+        <!-- Arrows & Labels -->
+        <!-- Write Up (Allowed) -->
+        <line x1="630" y1="255" x2="630" y2="188" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-allowed)" />
+        <text x="750" y="225" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">✓ Write Up (Allowed)</text>
+        <text x="750" y="225" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">✓ كتابة لأعلى (مسموح)</text>
+
+        <!-- Write Down (Denied) -->
+        <line x1="630" y1="305" x2="630" y2="372" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-denied)" />
+        <text x="750" y="345" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">✗ Write Down (Denied)</text>
+        <text x="750" y="345" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">✗ كتابة لأسفل (مرفوض)</text>
+
+        <!-- Condition -->
+        <rect x="550" y="480" width="280" height="36" rx="18" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+        <text x="690" y="503" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Condition: Clearance(S) ≤ Class(O)</text>
+        <text x="690" y="503" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">الشرط: تصريح(S) ≤ تصنيف(O)</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُسمح للمستخدم في نموذج Bell-LaPadula بالكتابة في مستوى أمني أعلى من مستواه (Write Up)؟</template>
+      <template class="content-en">Why does the Bell-LaPadula model allow a user to write to a higher security level (Write Up)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الكتابة في مستوى أعلى لا تسرب المعلومات إلى مستويات أقل. المستخدم يضيف بيانات لن يستطيع قراءتها لاحقاً، لكنه لا يخرق سرية البيانات الموجودة في مستواه.</p></template>
+      <template class="content-en"><p>Because writing to a higher level does not leak information to lower levels. The user adds data they won't be able to read later, but it doesn't compromise the confidentiality of data at their current level.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="role-based-access-control" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> التحكم في الوصول المبني على الأدوار (RBAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Role-Based Access Control (RBAC)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ربط الصلاحيات بالوظيفة (الدور) بدلاً من الشخص، مما يسهل إدارة الأمان في المؤسسات الكبيرة.</p></template>
+    <template class="content-en"><p>Associating permissions with a job function (role) rather than an individual, simplifying security management in large organizations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ظهر التحكم في الوصول المبني على الأدوار (RBAC) كبديل عملي للتحكم التقديري والإلزامي. الفكرة الأساسية هي أن الأذونات ترتبط بالأدوار، ويتم تعيين المستخدمين للأدوار المناسبة.</p><p>يتم إنشاء الأدوار باستخدام <code>CREATE ROLE</code>، وتُستخدم أوامر <code>GRANT</code> و <code>REVOKE</code> لتعيين الصلاحيات لهذه الأدوار. يدعم RBAC <span class="smart-term" data-term-en="Role Hierarchy" data-ar="التسلسل الهرمي للأدوار" data-en-def="A natural way of organizing roles to reflect the organization’s lines of authority and responsibility.">التسلسل الهرمي للأدوار<span class="smart-term-tooltip"></span></span> (Role hierarchy) ليعكس خطوط السلطة والمسؤولية في المؤسسة.</p></template>
+    <template class="content-en"><p>Role-Based Access Control (RBAC) emerged as a viable alternative to DAC and MAC. The basic notion is that permissions are associated with roles, and users are assigned to appropriate roles.</p><p>Roles are created using <code>CREATE ROLE</code>, and <code>GRANT</code>/<code>REVOKE</code> commands assign privileges to these roles. RBAC supports <span class="smart-term" data-term-en="Role Hierarchy" data-ar="التسلسل الهرمي للأدوار" data-en-def="A natural way of organizing roles to reflect the organization’s lines of authority and responsibility.">role hierarchy<span class="smart-term-tooltip"></span></span> to reflect an organization’s lines of authority and responsibility.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يتميز RBAC بدعم القيود الزمنية (Temporal constraints) على الأدوار، مثل وقت ومدة تنشيط الدور. هذا يجعله مناسباً جداً لتطبيقات الويب والتجارة الإلكترونية التي تتطلب سياسات معقدة.</p><p>في بيئات التجارة الإلكترونية، يتم استخدام 'بيانات الاعتماد' (Credentials) - مثل العمر أو المنصب - لدعم التحكم في الوصول القائم على المحتوى، وغالباً ما تلعب لغة XML دوراً رئيسياً في ذلك.</p></template>
+    <template class="content-en"><p>RBAC features support for temporal constraints on roles, such as time and duration of role activations. This makes it highly desirable for Web-based and e-commerce applications that require complex policies.</p><p>In e-commerce environments, 'credentials' (like age or position) are used to support content-based access control, with XML often playing a key role in implementation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يقلل RBAC من العبء الإداري مقارنة بـ DAC عند تغيير موظف لقسمه؟</template>
+      <template class="content-en">How does RBAC reduce administrative overhead compared to DAC when an employee changes departments?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في DAC، يجب إلغاء كل صلاحية فردية ومنح صلاحيات جديدة. في RBAC، يتم ببساطة إزالة المستخدم من دور القسم القديم وإضافته لدور القسم الجديد، وتنتقل جميع الصلاحيات تلقائياً.</p></template>
+      <template class="content-en"><p>In DAC, every individual privilege must be revoked and new ones granted. In RBAC, the user is simply removed from the old department's role and added to the new one, and all privileges transfer automatically.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="statistical-database-security" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> أمن قواعد البيانات الإحصائية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Statistical Database Security</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>السماح للمستخدمين بالحصول على إحصائيات عامة (مثل المتوسطات) دون كشف البيانات الفردية السرية.</p></template>
+    <template class="content-en"><p>Allowing users to get general statistics (like averages) without revealing confidential individual data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم قواعد البيانات الإحصائية لإنتاج إحصائيات عن مجموعات سكانية (Populations). يُسمح للمستخدمين بتنفيذ استعلامات إحصائية تستخدم دوال التجميع (مثل COUNT, SUM, MIN, MAX, AVERAGE).</p><p>يجب أن تمنع تقنيات الأمان استرجاع البيانات الفردية. ومع ذلك، تكمن المشكلة في <b>الاستدلال (Inference)</b>، حيث يمكن استنتاج قيم فردية من خلال سلسلة من الاستعلامات الإحصائية الذكية.</p></template>
+    <template class="content-en"><p>Statistical databases are used to produce statistics on populations. Users are permitted to execute statistical queries using aggregate functions (e.g., COUNT, SUM, MIN, MAX, AVERAGE).</p><p>Security techniques must prohibit the retrieval of individual data. However, the problem lies in <b>Inference</b>, where individual values can be deduced from a sequence of clever statistical queries.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يحدث الاستدلال عادة عندما تؤدي شروط الاستعلام إلى مجموعة سكانية تتكون من عدد صغير جداً من السجلات (Tuples). للحد من ذلك، تفرض أنظمة قواعد البيانات قيوداً تمنع تنفيذ الاستعلامات إذا كان حجم النتيجة أقل من حد معين، لحماية خصوصية الأفراد.</p></template>
+    <template class="content-en"><p>Inference typically occurs when query conditions result in a population consisting of a small number of tuples. To mitigate this, DBMSs enforce restrictions that prevent queries from executing if the result size is below a certain threshold, protecting individual privacy.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أعط مثالاً على كيفية حدوث 'الاستدلال' في قاعدة بيانات إحصائية.</template>
+      <template class="content-en">Give an example of how 'inference' can occur in a statistical database.</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا سأل مستخدم عن 'متوسط راتب الموظفين الذكور في قسم المبيعات' وكان هناك ذكر واحد فقط في ذلك القسم، فإن المتوسط سيكشف راتب ذلك الشخص الفردي.</p></template>
+      <template class="content-en"><p>If a user queries the 'average salary of male employees in the sales department' and there is only one male in that department, the average reveals that individual's exact salary.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="flow-control-covert-channels" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التحكم في التدفق والقنوات السرية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Flow Control and Covert Channels</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>منع تسرب المعلومات من الكائنات المحمية إلى الكائنات الأقل حماية عبر مسارات غير مرئية.</p></template>
+    <template class="content-en"><p>Preventing information leakage from protected objects to less protected ones via invisible pathways.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ينظم التحكم في التدفق (Flow Control) توزيع المعلومات بين الكائنات. يتحقق من أن المعلومات لا تتدفق بشكل صريح أو ضمني إلى كائنات أقل حماية.</p><p><b>القنوات السرية (Covert Channels):</b> هي مسارات تسمح بتدفق المعلومات بطرق تنتهك السياسة الأمنية. تنقسم إلى فئتين:</p><ul><li><b>قنوات التخزين (Storage channels):</b> نقل المعلومات عبر الوصول إلى معلومات النظام (لا تتطلب مزامنة زمنية).</li><li><b>قنوات التوقيت (Timing channels):</b> نقل المعلومات عبر توقيت الأحداث أو العمليات.</li></ul></template>
+    <template class="content-en"><p>Flow control regulates the distribution of information among objects. It checks that information does not flow explicitly or implicitly into less protected objects.</p><p><b><span class="smart-term" data-term-en="Covert Channel" data-ar="القناة السرية" data-en-def="A pathway that allows information to pass from a higher classification level to a lower classification level through improper means.">Covert Channel<span class="smart-term-tooltip"></span></span>s:</b> Pathways that allow information to flow implicitly in ways that violate security policy. They are classified into two categories:</p><ul><li><b>Storage channels:</b> Conveying info by accessing system information (no temporal synchronization required).</li><li><b>Timing channels:</b> Conveying info by the timing of events or processes.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر القنوات السرية خطيرة لأنها تتجاوز آليات التحكم في الوصول التقليدية (مثل DAC و MAC). على سبيل المثال، يمكن لبرنامج خبيث أن يرسل بيانات سرية عن طريق تعديل استخدام وحدة المعالجة المركزية (CPU) بنمط معين (قناة توقيت) يمكن لبرنامج آخر قراءته.</p></template>
+    <template class="content-en"><p>Covert channels are dangerous because they bypass traditional access control mechanisms (like DAC and MAC). For example, a malicious program could transmit secret data by modulating CPU usage in a specific pattern (a timing channel) that another program observes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لقفل ملف (File Lock) أن يُستخدم كقناة تخزين سرية؟</template>
+      <template class="content-en">How can a File Lock be used as a covert storage channel?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يمكن لعملية ذات تصنيف عالٍ قفل ملف لتمثيل البت '1' وفتحه لتمثيل البت '0'. يمكن لعملية ذات تصنيف منخفض محاولة الوصول للملف؛ إذا فشلت (مقفول) تسجل 1، وإذا نجحت تسجل 0، وبذلك تنتقل البيانات.</p></template>
+      <template class="content-en"><p>A high-clearance process can lock a file to represent bit '1' and unlock it for '0'. A low-clearance process tries to access the file; if it fails (locked) it records 1, if it succeeds it records 0, thus transferring data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="encryption-pki" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التشفير والبنية التحتية للمفتاح العام</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Encryption and Public Key Infrastructures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحويل البيانات المقروءة إلى رموز غير مفهومة لحمايتها أثناء النقل، باستخدام مفاتيح سرية أو عامة.</p></template>
+    <template class="content-en"><p>Scrambling readable data into incomprehensible codes to protect it during transmission, using secret or public keys.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التشفير هو وسيلة للحفاظ على أمان البيانات في بيئة غير آمنة. يتضمن تطبيق خوارزمية تشفير على البيانات (Plaintext) باستخدام مفتاح لإنتاج نص مشفر (Ciphertext).</p><p><b>معايير التشفير المتماثل:</b></p><ul><li><b>DES:</b> يستخدم كتل بحجم 64 بت، يعتمد على الاستبدال والتبديل (16 دورة).</li><li><b>AES:</b> معيار أحدث وأقوى، يستخدم كتل بحجم 128 بت.</li></ul><p><b>تشفير المفتاح العام (غير المتماثل):</b> يستخدم مفتاحين منفصلين: مفتاح عام (للتشفير) ومفتاح خاص (لفك التشفير). أشهر خوارزمية هي RSA.</p></template>
+    <template class="content-en"><p>Encryption maintains secure data in an insecure environment. It applies an algorithm to <span class="smart-term" data-term-en="Plaintext" data-ar="النص الأصلي / الواضح" data-en-def="The data or readable message that is fed into the encryption algorithm as input.">plaintext<span class="smart-term-tooltip"></span></span> using a key to produce <span class="smart-term" data-term-en="Ciphertext" data-ar="النص المشفر" data-en-def="The scrambled message produced as output by the encryption algorithm.">ciphertext<span class="smart-term-tooltip"></span></span>.</p><p><b>Symmetric Encryption Standards:</b></p><ul><li><b>DES:</b> Uses 64-bit blocks, relies on substitution and permutation (16 cycles).</li><li><b>AES:</b> Newer, stronger standard using 128-bit blocks.</li></ul><p><b>Public Key (Asymmetric) Encryption:</b> Uses two separate keys: a public key (for encryption) and a private key (for decryption). The most famous algorithm is RSA.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في تشفير المفتاح العام، إذا أراد المرسل إرسال رسالة خاصة، فإنه يشفرها باستخدام <b>المفتاح العام للمستلم</b>. المستلم فقط يمكنه فك تشفيرها باستخدام <b>مفتاحه الخاص</b>.</p><p>تعتمد خوارزمية RSA على نظرية الأعداد، وتحديداً صعوبة تحليل الأعداد الكبيرة إلى عواملها الأولية (Prime factors). يتم استخدام الحساب المعياري (Modular arithmetic) حيث يتم التشفير وفك التشفير باستخدام <code>mod n</code>.</p></template>
+    <template class="content-en"><p>In public key encryption, if a sender wishes to send a private message, they encrypt it using the <b>receiver's public key</b>. Only the receiver can decrypt it using their <b>private key</b>.</p><p>The RSA algorithm incorporates number theory, specifically the difficulty of determining the large prime factors of a large number. It operates with modular arithmetic where encryption and decryption use <code>mod n</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة التشفير وفك التشفير في خوارزمية RSA، حيث P هو النص الأصلي، C النص المشفر، e مفتاح التشفير، d مفتاح فك التشفير.</strong></template>
+      <template class="content-en"><strong>RSA encryption and decryption formulas, where P is plaintext, C is ciphertext, e is encryption key, d is decryption key.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$C = P^e \mod n \quad \text{and} \quad P = C^d \mod n$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Flowchart showing Public Key Encryption process. Sender has 'Plaintext', uses 'Receiver's Public Key' and 'Encryption Algorithm' to create 'Ciphertext'. Ciphertext travels over insecure network. Receiver uses 'Receiver's Private Key' and 'Decryption Algorithm' to recover 'Plaintext'. Dark background #0d1117, clear directional arrows, distinct icons for public (open padlock) and private (closed padlock) keys. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+        
+        <!-- Ciphertext Gradient -->
+        <linearGradient id="cipherGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--brand-800)"/>
+            <stop offset="100%" stop-color="var(--brand-600)"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="500" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Public Key (Asymmetric) Encryption</text>
+    <text x="500" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التشفير بالمفتاح العام (غير المتماثل)</text>
+
+    <!-- Sender Group -->
+    <rect x="30" y="90" width="360" height="420" rx="16" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8 4" />
+    <text x="210" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sender (Alice)</text>
+    <text x="210" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المرسل (أليس)</text>
+
+    <!-- Receiver Group -->
+    <rect x="610" y="90" width="360" height="420" rx="16" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8 4" />
+    <text x="790" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Receiver (Bob)</text>
+    <text x="790" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المستقبل (بوب)</text>
+
+    <!-- Network Group -->
+    <rect x="410" y="170" width="180" height="160" rx="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6 4" />
+    <text x="500" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Insecure Network</text>
+    <text x="500" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">شبكة غير آمنة</text>
+
+    <!-- ================= ARROWS ================= -->
+    
+    <!-- Main Flow Arrows -->
+    <line x1="180" y1="250" x2="222" y2="250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <line x1="380" y1="250" x2="422" y2="250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <line x1="570" y1="250" x2="612" y2="250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <line x1="770" y1="250" x2="812" y2="250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- Key Injection Arrows -->
+    <line x1="305" y1="370" x2="305" y2="293" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <line x1="695" y1="370" x2="695" y2="293" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- ================= NODES ================= -->
+
+    <!-- Plaintext 1 (Sender) -->
+    <rect x="60" y="215" width="120" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <g transform="translate(120, 235)">
+        <path d="M -8 -10 L 2 -10 L 8 -4 L 8 10 L -8 10 Z" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+        <path d="M 2 -10 L 2 -4 L 8 -4" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+    <text x="120" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Plaintext</text>
+    <text x="120" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نص صريح</text>
+
+    <!-- Encryption Algorithm -->
+    <rect x="230" y="215" width="150" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="305" y="256" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Encryption Algorithm</text>
+    <text x="305" y="256" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خوارزمية التشفير</text>
+
+    <!-- Ciphertext (Network) -->
+    <rect x="430" y="215" width="140" height="70" rx="8" fill="url(#cipherGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <g transform="translate(500, 235)">
+        <rect x="-7" y="-2" width="14" height="10" rx="2" fill="none" stroke="var(--on-brand-hi)" stroke-width="2"/>
+        <path d="M -4 -2 v -3 a 4 4 0 0 1 8 0 v 3" fill="none" stroke="var(--on-brand-hi)" stroke-width="2"/>
+    </g>
+    <text x="500" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Ciphertext</text>
+    <text x="500" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">نص مشفر</text>
+
+    <!-- Decryption Algorithm -->
+    <rect x="620" y="215" width="150" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="695" y="256" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Decryption Algorithm</text>
+    <text x="695" y="256" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خوارزمية فك التشفير</text>
+
+    <!-- Plaintext 2 (Receiver) -->
+    <rect x="820" y="215" width="120" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <g transform="translate(880, 235)">
+        <path d="M -8 -10 L 2 -10 L 8 -4 L 8 10 L -8 10 Z" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+        <path d="M 2 -10 L 2 -4 L 8 -4" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+    <text x="880" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Plaintext</text>
+    <text x="880" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نص صريح</text>
+
+    <!-- Public Key (Open Padlock) -->
+    <rect x="230" y="370" width="150" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <g transform="translate(305, 395)">
+        <rect x="-10" y="-2" width="20" height="14" rx="3" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <!-- Open Shackle: Right side disconnected -->
+        <path d="M -5 -2 v -5 a 5 5 0 0 1 10 0" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+        <circle cx="0" cy="5" r="2" fill="var(--brand-500)"/>
+        <path d="M 0 7 v 3" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+    <text x="305" y="435" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Receiver's Public Key</text>
+    <text x="305" y="435" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المفتاح العام للمستقبل</text>
+
+    <!-- Private Key (Closed Padlock) -->
+    <rect x="620" y="370" width="150" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <g transform="translate(695, 395)">
+        <rect x="-10" y="-2" width="20" height="14" rx="3" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <!-- Closed Shackle: Connects on both sides -->
+        <path d="M -5 -2 v -5 a 5 5 0 0 1 10 0 v 5" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+        <circle cx="0" cy="5" r="2" fill="var(--brand-500)"/>
+        <path d="M 0 7 v 3" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+    <text x="695" y="435" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Receiver's Private Key</text>
+    <text x="695" y="435" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المفتاح الخاص للمستقبل</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم تشفير المفتاح العام (RSA) لتشفير قواعد البيانات بالكامل بدلاً من AES؟</template>
+      <template class="content-en">Why don't we use Public Key Encryption (RSA) to encrypt entire databases instead of AES?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تشفير المفتاح العام (RSA) يتطلب عمليات رياضية معقدة جداً وبطيء مقارنة بالتشفير المتماثل (AES). عادة يُستخدم RSA لتشفير مفتاح AES، ثم يُستخدم AES لتشفير البيانات الضخمة.</p></template>
+      <template class="content-en"><p>Public Key Encryption (RSA) is computationally intensive and much slower than symmetric encryption (AES). Typically, RSA is used to securely exchange an AES key, and AES is used to encrypt the bulk data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="digital-signatures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التواقيع الرقمية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Digital Signatures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>علامة إلكترونية فريدة تثبت هوية مرسل الرسالة وتضمن عدم تزويرها.</p></template>
+    <template class="content-en"><p>A unique electronic mark that proves the sender's identity and ensures the message hasn't been forged.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التوقيع الرقمي هو مثال على استخدام تقنيات التشفير لتوفير خدمات <span class="smart-term" data-term-en="Authentication" data-ar="المصادقة" data-en-def="The process of verifying the identity of a user or system.">المصادقة<span class="smart-term-tooltip"></span></span> (Authentication) في تطبيقات التجارة الإلكترونية. يربط علامة فريدة للفرد بنص معين.</p><p>يجب أن يكون التوقيع غير قابل للتزوير (Unforgettable)، مما يعني أن الآخرين يمكنهم التحقق من أن التوقيع صادر من المنشئ الأصلي. يتكون من سلسلة من الرموز ويجب أن يكون مختلفاً في كل استخدام.</p></template>
+    <template class="content-en"><p>A digital signature is an example of using encryption techniques to provide <span class="smart-term" data-term-en="Authentication" data-ar="المصادقة" data-en-def="The process of verifying the identity of a user or system.">authentication<span class="smart-term-tooltip"></span></span> services in e-commerce applications. It associates a mark unique to an individual with a body of text.</p><p>The mark should be unforgettable (unforgeable), meaning others can check that the signature comes from the originator. It consists of a string of symbols and must be different for each use.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لضمان اختلاف التوقيع في كل مرة، يتم جعل التوقيع الرقمي دالة تعتمد على الرسالة نفسها بالإضافة إلى طابع زمني (Time stamp). تعتمد التواقيع الرقمية بشكل أساسي على تقنيات المفتاح العام (Public key techniques).</p></template>
+    <template class="content-en"><p>To ensure the signature is different for each use, it is made a function of the message being signed, together with a time stamp. Digital signatures rely fundamentally on public key techniques.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في التوقيع الرقمي، أي مفتاح يستخدمه المرسل لإنشاء التوقيع؟</template>
+      <template class="content-en">In a digital signature, which key does the sender use to create the signature?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يستخدم المرسل مفتاحه الخاص (Private Key) لإنشاء التوقيع، ويستخدم المستلم المفتاح العام للمرسل للتحقق منه.</p></template>
+      <template class="content-en"><p>The sender uses their own Private Key to create the signature, and the receiver uses the sender's Public Key to verify it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أبنائي في هذه الوحدة الحاسمة حول أمن قواعد البيانات. تخيلوا قاعدة البيانات كخزنة البنك؛ لا يكفي أن يكون لدينا باب قوي (التحكم في الوصول)، بل نحتاج لكاميرات مراقبة (سجلات التدقيق)، وتشفير للأموال أثناء نقلها. ركزوا جيداً في الامتحان على الفرق بين DAC (المرن الذي يعتمد على المستخدم) و MAC (الصارم الذي يعتمد على النظام). لا تنسوا خصائص Bell-LaPadula: لا تقرأ للأعلى (Simple)، ولا تكتب للأسفل (Star). أيضاً، مشكلة الاستدلال في قواعد البيانات الإحصائية هي فخ شائع في الأسئلة؛ تذكروا أنها تتعلق باستنتاج بيانات فردية من إحصائيات عامة. أخيراً، افهموا جيداً متى نستخدم المفتاح العام ومتى نستخدم المفتاح الخاص في التشفير والتواقيع الرقمية. بالتوفيق!</template>
+    <template class="content-en">Welcome to this critical module on Database Security. Imagine the database as a bank vault; a strong door (Access Control) isn't enough. We need security cameras (Audit Trails) and armored transport (Encryption). For the exam, focus heavily on the difference between DAC (flexible, user-driven) and MAC (rigid, system-driven). Do not forget the Bell-LaPadula properties: No read up (Simple), No write down (Star). Also, the inference problem in statistical DBs is a common exam trap; remember it's about deducing individual data from general stats. Finally, master when to use the public vs. private key in encryption and digital signatures. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي التهديدات الثلاثة الرئيسية لقواعد البيانات؟</template>
+          <template class="content-en">What are the three main threats to databases?</template>
+          <span class="content-target">ما هي التهديدات الثلاثة الرئيسية لقواعد البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">فقدان النزاهة (تعديل غير مصرح به)، فقدان التوافر (منع الوصول الشرعي)، وفقدان السرية (تسريب البيانات).</template>
+          <template class="content-en">Loss of integrity (unauthorized modification), loss of availability (blocking legitimate access), and loss of confidentiality (data leakage).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف DAC عن MAC؟</template>
+          <template class="content-en">How does DAC differ from MAC?</template>
+          <span class="content-target">كيف يختلف DAC عن MAC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">DAC مرن ويعتمد على منح المالك للصلاحيات (GRANT/REVOKE). MAC صارم وتفرضه سياسة النظام بناءً على مستويات سرية البيانات والمستخدمين.</template>
+          <template class="content-en">DAC is flexible and relies on the owner granting privileges (GRANT/REVOKE). MAC is rigid and enforced by system policy based on data and user clearance levels.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح خاصية النجمة (* property) في نموذج Bell-LaPadula ولماذا هي مهمة؟</template>
+          <template class="content-en">Explain the Star property in the Bell-LaPadula model and why it's important.</template>
+          <span class="content-target">اشرح خاصية النجمة (* property) في نموذج Bell-LaPadula ولماذا هي مهمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تمنع المستخدم من الكتابة في مستوى أمني أقل من مستواه (No write down). أهميتها تكمن في منع البرامج الخبيثة (حصان طروادة) من تسريب بيانات سرية إلى ملفات عامة.</template>
+          <template class="content-en">It prevents a user from writing to a lower security level (No write down). It's crucial for preventing malicious programs (Trojan horses) from leaking secret data to public files.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مفهوم التعددية (Polyinstantiation)؟</template>
+          <template class="content-en">What is the concept of Polyinstantiation?</template>
+          <span class="content-target">ما هو مفهوم التعددية (Polyinstantiation)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو السماح بوجود عدة صفوف بنفس المفتاح الأساسي الظاهري ولكن بمستويات أمان مختلفة، لكي يرى كل مستخدم النسخة المسموح له برؤيتها فقط.</template>
+          <template class="content-en">Allowing multiple tuples with the same apparent primary key but different security levels, so each user only sees the version they are cleared for.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم العروض (Views) في الأمان؟</template>
+          <template class="content-en">Why do we use Views in security?</template>
+          <span class="content-target">لماذا نستخدم العروض (Views) في الأمان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تسمح بتقييد الوصول إلى أعمدة محددة أو صفوف معينة بناءً على شروط، مما يوفر تحكماً دقيقاً دون إعطاء صلاحيات على الجدول الأساسي بالكامل.</template>
+          <template class="content-en">Because they allow restricting access to specific columns or rows based on conditions, providing fine-grained control without granting access to the entire base table.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مشكلة الاستدلال (Inference) في قواعد البيانات الإحصائية؟</template>
+          <template class="content-en">What is the Inference problem in statistical databases?</template>
+          <span class="content-target">ما هي مشكلة الاستدلال (Inference) في قواعد البيانات الإحصائية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي قدرة المستخدم على استنتاج معلومات فردية سرية من خلال تنفيذ سلسلة من الاستعلامات الإحصائية (مثل COUNT أو AVG) على مجموعات صغيرة جداً.</template>
+          <template class="content-en">The ability of a user to deduce confidential individual information by executing a series of statistical queries (like COUNT or AVG) on very small populations.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين قنوات التخزين وقنوات التوقيت السرية؟</template>
+          <template class="content-en">What is the difference between storage and timing covert channels?</template>
+          <span class="content-target">ما الفرق بين قنوات التخزين وقنوات التوقيت السرية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">قنوات التخزين تنقل البيانات عبر التلاعب بمعلومات النظام (مثل قفل الملفات)، بينما قنوات التوقيت تنقل البيانات عبر التلاعب بتوقيت العمليات (مثل استهلاك المعالج).</template>
+          <template class="content-en">Storage channels convey data by manipulating system info (like file locks), while timing channels convey data by manipulating the timing of processes (like CPU usage).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في تشفير المفتاح العام، كيف نضمن سرية الرسالة؟</template>
+          <template class="content-en">In public key encryption, how do we ensure message confidentiality?</template>
+          <span class="content-target">في تشفير المفتاح العام، كيف نضمن سرية الرسالة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم المرسل بتشفير الرسالة باستخدام المفتاح العام للمستلم. وبذلك، لا يمكن لأحد فك تشفيرها سوى المستلم باستخدام مفتاحه الخاص.</template>
+          <template class="content-en">The sender encrypts the message using the receiver's public key. Thus, only the receiver can decrypt it using their private key.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل التوقيع الرقمي؟</template>
+          <template class="content-en">How does a digital signature work?</template>
+          <span class="content-target">كيف يعمل التوقيع الرقمي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم المرسل بإنشاء توقيع باستخدام مفتاحه الخاص (غالباً بتشفير بصمة الرسالة). يتحقق المستلم من التوقيع باستخدام المفتاح العام للمرسل، مما يثبت هوية المرسل.</template>
+          <template class="content-en">The sender creates a signature using their private key (often encrypting a message hash). The receiver verifies it using the sender's public key, proving the sender's identity.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا تم إلغاء صلاحية تم منحها مسبقاً مع خيار GRANT OPTION؟</template>
+          <template class="content-en">What happens if a privilege previously granted with GRANT OPTION is revoked?</template>
+          <span class="content-target">ماذا يحدث إذا تم إلغاء صلاحية تم منحها مسبقاً مع خيار GRANT OPTION؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب على النظام أن يقوم بإلغاء متسلسل (Cascading Revoke) لجميع الصلاحيات التي تم تمريرها بناءً على تلك الصلاحية الأصلية.</template>
+          <template class="content-en">The system must perform a cascading revoke of all privileges that were propagated based on that original privilege.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "فقدان النزاهة (Loss of integrity)",
+      "en": "Loss of integrity"
+    },
+    "back": {
+      "definition": {
+        "ar": "تهديد يتمثل في تعديل البيانات بشكل غير مصرح به.",
+        "en": "A threat involving unauthorized modification of data."
+      },
+      "example": {
+        "ar": "تغيير رصيد حساب بنكي من قبل مخترق.",
+        "en": "A hacker changing a bank account balance."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "فقدان التوافر (Loss of availability)",
+      "en": "Loss of availability"
+    },
+    "back": {
+      "definition": {
+        "ar": "تهديد يمنع المستخدمين الشرعيين من الوصول إلى البيانات.",
+        "en": "A threat preventing legitimate users from accessing data."
+      },
+      "example": {
+        "ar": "هجوم حجب الخدمة (DDoS) يعطل خادم قاعدة البيانات.",
+        "en": "A DDoS attack crashing the database server."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "فقدان السرية (Loss of confidentiality)",
+      "en": "Loss of confidentiality"
+    },
+    "back": {
+      "definition": {
+        "ar": "تهديد يتمثل في كشف البيانات لجهات غير مصرح لها.",
+        "en": "A threat involving data disclosure to unauthorized entities."
+      },
+      "example": {
+        "ar": "تسريب أرقام بطاقات الائتمان للعملاء.",
+        "en": "Leaking customers' credit card numbers."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "سجل التدقيق (Audit Trail)",
+      "en": "Audit Trail"
+    },
+    "back": {
+      "definition": {
+        "ar": "سجل قاعدة بيانات يستخدم لأغراض أمنية لمراجعة جميع الوصول والعمليات خلال فترة زمنية.",
+        "en": "A database log used for security purposes to review all accesses and operations during a time period."
+      },
+      "example": {
+        "ar": "مراجعة السجل لمعرفة من قام بحذف جدول الموظفين أمس.",
+        "en": "Reviewing the log to see who deleted the employee table yesterday."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "التحكم التقديري في الوصول (DAC)",
+      "en": "Discretionary Access Control (DAC)"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية أمان تعتمد على منح وإلغاء الصلاحيات للمستخدمين.",
+        "en": "A security mechanism based on granting and revoking privileges to users."
+      },
+      "example": {
+        "ar": "استخدام أوامر GRANT و REVOKE في SQL.",
+        "en": "Using GRANT and REVOKE commands in SQL."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "خيار المنح (GRANT OPTION)",
+      "en": "GRANT OPTION"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسمح للمستخدم الذي مُنح صلاحية بتمريرها إلى حسابات أخرى.",
+        "en": "Allows an account given a privilege to grant that privilege to other accounts."
+      },
+      "example": {
+        "ar": "GRANT SELECT ON EMPLOYEE TO A3 WITH GRANT OPTION;",
+        "en": "GRANT SELECT ON EMPLOYEE TO A3 WITH GRANT OPTION;"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "التحكم الإلزامي في الوصول (MAC)",
+      "en": "Mandatory Access Control (MAC)"
+    },
+    "back": {
+      "definition": {
+        "ar": "سياسة أمان تصنف البيانات والمستخدمين بناءً على فئات أمنية (مثل سري للغاية).",
+        "en": "A security policy that classifies data and users based on security classes (e.g., Top Secret)."
+      },
+      "example": {
+        "ar": "نموذج Bell-LaPadula.",
+        "en": "The Bell-LaPadula model."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "خاصية الأمان البسيطة (Simple security property)",
+      "en": "Simple security property"
+    },
+    "back": {
+      "definition": {
+        "ar": "في MAC: لا يُسمح للمستخدم بقراءة كائن إلا إذا كان تصنيفه أعلى من أو يساوي تصنيف الكائن.",
+        "en": "In MAC: A subject S is not allowed read access to object O unless class(S) >= class(O)."
+      },
+      "example": {
+        "ar": "مستخدم بتصنيف 'سري' لا يمكنه قراءة ملف 'سري للغاية'.",
+        "en": "A 'Secret' user cannot read a 'Top Secret' file."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "خاصية النجمة (* property)",
+      "en": "Star property (* property)"
+    },
+    "back": {
+      "definition": {
+        "ar": "في MAC: لا يُسمح للمستخدم بكتابة كائن إلا إذا كان تصنيفه أقل من أو يساوي تصنيف الكائن.",
+        "en": "In MAC: A subject S is not allowed to write object O unless class(S) <= class(O)."
+      },
+      "example": {
+        "ar": "لمنع حصان طروادة من نسخ بيانات 'سرية للغاية' إلى ملف 'غير مصنف'.",
+        "en": "Preventing a Trojan horse from copying 'Top Secret' data to an 'Unclassified' file."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "التعددية (Polyinstantiation)",
+      "en": "Polyinstantiation"
+    },
+    "back": {
+      "definition": {
+        "ar": "وجود عدة صفوف بنفس المفتاح الظاهري ولكن بقيم وتصنيفات أمنية مختلفة للمستخدمين المختلفين.",
+        "en": "Several tuples having the same apparent key value but different attribute values for users at different classification levels."
+      },
+      "example": {
+        "ar": "سجلان للموظف 'أحمد'، أحدهما يظهر راتبه الحقيقي للمدير، والآخر يظهر راتباً وهمياً للموظف العادي.",
+        "en": "Two records for 'Ahmed', one showing real salary to the boss, another showing fake salary to a clerk."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "التحكم المبني على الأدوار (RBAC)",
+      "en": "Role-Based Access Control (RBAC)"
+    },
+    "back": {
+      "definition": {
+        "ar": "ربط الأذونات بالأدوار الوظيفية، وتعيين المستخدمين لهذه الأدوار.",
+        "en": "Associating permissions with roles, and assigning users to appropriate roles."
+      },
+      "example": {
+        "ar": "إنشاء دور 'مدير_مبيعات' ومنحه صلاحيات التعديل، ثم إضافة الموظفين لهذا الدور.",
+        "en": "Creating a 'Sales_Manager' role with update privileges, then adding employees to it."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "التحكم في الاستدلال (Inference control)",
+      "en": "Inference control"
+    },
+    "back": {
+      "definition": {
+        "ar": "تدابير مضادة لمنع استنتاج قيم فردية من خلال استعلامات إحصائية.",
+        "en": "Countermeasures to prevent deducing individual values from statistical queries."
+      },
+      "example": {
+        "ar": "منع استعلام COUNT إذا كانت النتيجة أقل من 5 أشخاص.",
+        "en": "Blocking a COUNT query if the result is fewer than 5 people."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "قناة سرية (Covert channel)",
+      "en": "Covert channel"
+    },
+    "back": {
+      "definition": {
+        "ar": "مسار يسمح بتدفق المعلومات ضمنياً بطرق تنتهك السياسة الأمنية.",
+        "en": "A pathway for information to flow implicitly in ways that violate security policy."
+      },
+      "example": {
+        "ar": "نقل البيانات عبر التلاعب بتوقيت استخدام المعالج (قناة توقيت).",
+        "en": "Transmitting data by manipulating CPU usage timing (timing channel)."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "معيار التشفير المتقدم (AES)",
+      "en": "Advanced Encryption Standard (AES)"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تشفير متماثل قوية تستخدم كتل بحجم 128 بت.",
+        "en": "A strong symmetric encryption algorithm with a block size of 128 bits."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "تشفير المفتاح العام (Public Key Encryption)",
+      "en": "Public Key Encryption"
+    },
+    "back": {
+      "definition": {
+        "ar": "نظام تشفير يستخدم مفتاحين منفصلين: عام للتشفير وخاص لفك التشفير.",
+        "en": "A cryptosystem using two separate keys: public for encryption and private for decryption."
+      },
+      "example": {
+        "ar": "خوارزمية RSA.",
+        "en": "The RSA algorithm."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "خوارزمية RSA",
+      "en": "RSA Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية مفتاح عام تعتمد على صعوبة تحليل الأعداد الكبيرة إلى عواملها الأولية.",
+        "en": "A public-key algorithm based on the difficulty of determining large prime factors of a large number."
+      },
+      "example": {
+        "ar": "استخدام الحساب المعياري (mod n) حيث n هو حاصل ضرب عددين أوليين كبيرين.",
+        "en": "Using modular arithmetic (mod n) where n is the product of two large primes."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "التوقيع الرقمي (Digital Signature)",
+      "en": "Digital Signature"
+    },
+    "back": {
+      "definition": {
+        "ar": "علامة فريدة غير قابلة للتزوير تربط الفرد بنص معين لتوفير المصادقة.",
+        "en": "An unforgettable unique mark associating an individual with text to provide authentication."
+      },
+      "example": {
+        "ar": "توقيع عقد إلكتروني باستخدام المفتاح الخاص للمرسل.",
+        "en": "Signing an e-contract using the sender's private key."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+        <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <div id="quiz-content" class="quiz-card glass-card">
+          <div class="quiz-header">
+            <span id="quiz-counter">1 / 10</span>
+            <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+          </div>
+          <div class="quiz-question" id="quiz-question-text"></div>
+          <div class="quiz-options" id="quiz-options-container"></div>
+          <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+          <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+              <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+            </button>
+          </div>
+        </div>
+        <div id="quiz-results" class="quiz-results glass-card hidden">
+          <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+        </div>
+      </section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من التهديدات التالية يمثل تعديلاً غير مصرح به للبيانات؟",
+      "en": "Which of the following threats represents unauthorized modification of data?"
+    },
+    "options": {
+      "ar": [
+        "فقدان السرية",
+        "فقدان التوافر",
+        "فقدان النزاهة",
+        "فقدان الاستدلال"
+      ],
+      "en": [
+        "Loss of confidentiality",
+        "Loss of availability",
+        "Loss of integrity",
+        "Loss of inference"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "فقدان النزاهة (Integrity) يعني أن البيانات قد تم العبث بها أو تعديلها من قبل شخص غير مصرح له.",
+      "en": "Loss of integrity means data has been tampered with or modified by an unauthorized person."
+    },
+    "hint": {
+      "ar": "فكر في 'صحة' و 'دقة' البيانات.",
+      "en": "Think about the 'correctness' and 'accuracy' of data."
+    },
+    "difficulty": "easy",
+    "conceptId": "database-security-threats"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في نموذج Bell-LaPadula، ماذا تمنع خاصية النجمة (* property)؟",
+      "en": "In the Bell-LaPadula model, what does the star property (* property) prevent?"
+    },
+    "options": {
+      "ar": [
+        "القراءة من مستوى أمني أعلى (Read Up)",
+        "الكتابة إلى مستوى أمني أقل (Write Down)",
+        "القراءة من مستوى أمني أقل (Read Down)",
+        "الكتابة إلى مستوى أمني أعلى (Write Up)"
+      ],
+      "en": [
+        "Reading from a higher security level (Read Up)",
+        "Writing to a lower security level (Write Down)",
+        "Reading from a lower security level (Read Down)",
+        "Writing to a higher security level (Write Up)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خاصية النجمة تنص على أن تصنيف المستخدم يجب أن يكون أقل من أو يساوي تصنيف الكائن للكتابة، مما يمنع الكتابة لأسفل (Write Down) لحماية البيانات من برامج حصان طروادة.",
+      "en": "The star property states subject class <= object class for writing, preventing Write Down to protect against Trojan horses."
+    },
+    "hint": {
+      "ar": "تمنع تسريب المعلومات السرية إلى ملفات عامة.",
+      "en": "It prevents leaking secret info to public files."
+    },
+    "difficulty": "medium",
+    "conceptId": "mandatory-access-control"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي آلية أمان تعتمد على أوامر GRANT و REVOKE؟",
+      "en": "Which security mechanism relies on GRANT and REVOKE commands?"
+    },
+    "options": {
+      "ar": [
+        "التحكم الإلزامي في الوصول (MAC)",
+        "التحكم التقديري في الوصول (DAC)",
+        "التحكم في التدفق (Flow Control)",
+        "التشفير (Encryption)"
+      ],
+      "en": [
+        "Mandatory Access Control (MAC)",
+        "Discretionary Access Control (DAC)",
+        "Flow Control",
+        "Encryption"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التحكم التقديري (DAC) يتيح لمالك البيانات منح وإلغاء الصلاحيات للمستخدمين الآخرين باستخدام هذه الأوامر.",
+      "en": "Discretionary Access Control (DAC) allows the data owner to grant and revoke privileges to other users using these commands."
+    },
+    "hint": {
+      "ar": "يعتمد على 'تقدير' مالك البيانات.",
+      "en": "It relies on the 'discretion' of the data owner."
+    },
+    "difficulty": "easy",
+    "conceptId": "discretionary-access-control"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الغرض من خيار GRANT OPTION في SQL؟",
+      "en": "What is the purpose of the GRANT OPTION in SQL?"
+    },
+    "options": {
+      "ar": [
+        "تشفير البيانات قبل إرسالها",
+        "السماح للمستخدم بإنشاء جداول جديدة",
+        "السماح للمستخدم بتمرير الصلاحية الممنوحة له إلى مستخدمين آخرين",
+        "إلغاء جميع الصلاحيات من المستخدم"
+      ],
+      "en": [
+        "Encrypting data before sending",
+        "Allowing the user to create new tables",
+        "Allowing the user to pass the granted privilege to other users",
+        "Revoking all privileges from the user"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خيار GRANT OPTION يسمح بانتشار الصلاحيات (Propagation) من مستخدم لآخر.",
+      "en": "The GRANT OPTION allows the propagation of privileges from one user to another."
+    },
+    "hint": {
+      "ar": "يتعلق بتفويض السلطة.",
+      "en": "It relates to delegating authority."
+    },
+    "difficulty": "medium",
+    "conceptId": "discretionary-access-control"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو المصطلح الذي يصف وجود عدة صفوف بنفس المفتاح الظاهري ولكن بتصنيفات أمنية مختلفة في MAC؟",
+      "en": "What term describes having several tuples with the same apparent key but different security classifications in MAC?"
+    },
+    "options": {
+      "ar": [
+        "الاستدلال (Inference)",
+        "التعددية (Polyinstantiation)",
+        "قناة التخزين (Storage channel)",
+        "التشفير المتماثل (Symmetric encryption)"
+      ],
+      "en": [
+        "Inference",
+        "Polyinstantiation",
+        "Storage channel",
+        "Symmetric encryption"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التعددية (Polyinstantiation) تحل مشكلة إخفاء وجود بيانات سرية عن المستخدمين ذوي التصنيف المنخفض دون كسر قواعد تكامل الكيان.",
+      "en": "Polyinstantiation solves the problem of hiding the existence of secret data from low-clearance users without breaking entity integrity rules."
+    },
+    "hint": {
+      "ar": "تعني حرفياً 'استنساخ متعدد'.",
+      "en": "Literally means 'multiple instances'."
+    },
+    "difficulty": "hard",
+    "conceptId": "mandatory-access-control"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي مما يلي يعتبر حلاً لمشكلة أمان قواعد البيانات الإحصائية؟",
+      "en": "Which of the following is a solution to the statistical database security problem?"
+    },
+    "options": {
+      "ar": [
+        "التحكم في الاستدلال (Inference control)",
+        "التشفير بالمفتاح العام (Public key encryption)",
+        "التسلسل الهرمي للأدوار (Role hierarchy)",
+        "قنوات التوقيت (Timing channels)"
+      ],
+      "en": [
+        "Inference control",
+        "Public key encryption",
+        "Role hierarchy",
+        "Timing channels"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "التحكم في الاستدلال يمنع المستخدمين من استنتاج بيانات فردية من خلال الاستعلامات الإحصائية.",
+      "en": "Inference control prevents users from deducing individual data through statistical queries."
+    },
+    "hint": {
+      "ar": "يمنع 'استنتاج' المعلومات المخفية.",
+      "en": "Prevents 'deducing' hidden info."
+    },
+    "difficulty": "medium",
+    "conceptId": "statistical-database-security"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "إذا أراد مرسل إرسال رسالة مشفرة خاصة إلى مستلم باستخدام تشفير المفتاح العام، فأي مفتاح يجب أن يستخدمه للتشفير؟",
+      "en": "If a sender wants to send a private encrypted message to a receiver using public key encryption, which key should they use to encrypt?"
+    },
+    "options": {
+      "ar": [
+        "المفتاح الخاص للمرسل",
+        "المفتاح العام للمرسل",
+        "المفتاح الخاص للمستلم",
+        "المفتاح العام للمستلم"
+      ],
+      "en": [
+        "Sender's private key",
+        "Sender's public key",
+        "Receiver's private key",
+        "Receiver's public key"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "يتم التشفير باستخدام المفتاح العام للمستلم، بحيث لا يمكن لأحد فك التشفير سوى المستلم باستخدام مفتاحه الخاص.",
+      "en": "Encryption is done using the receiver's public key, so only the receiver can decrypt it using their private key."
+    },
+    "hint": {
+      "ar": "يجب أن يكون المفتاح متاحاً للجميع، لكن فك التشفير حصري للمستلم.",
+      "en": "The key must be available to everyone, but decryption is exclusive to the receiver."
+    },
+    "difficulty": "hard",
+    "conceptId": "encryption-pki"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو حجم الكتلة (Block size) المستخدم في معيار التشفير المتقدم (AES)؟",
+      "en": "What is the block size used in the Advanced Encryption Standard (AES)?"
+    },
+    "options": {
+      "ar": [
+        "32 بت",
+        "64 بت",
+        "128 بت",
+        "256 بت"
+      ],
+      "en": [
+        "32 bits",
+        "64 bits",
+        "128 bits",
+        "256 bits"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يستخدم AES كتل بحجم 128 بت، بينما كان DES القديم يستخدم 64 بت.",
+      "en": "AES uses a block size of 128 bits, whereas the older DES used 64 bits."
+    },
+    "hint": {
+      "ar": "ضعف حجم كتلة DES.",
+      "en": "Double the block size of DES."
+    },
+    "difficulty": "easy",
+    "conceptId": "encryption-pki"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي مما يلي يصف 'القناة السرية' (Covert Channel)؟",
+      "en": "Which of the following describes a 'Covert Channel'?"
+    },
+    "options": {
+      "ar": [
+        "خوارزمية تشفير تستخدم مفتاحين",
+        "مسار لتدفق المعلومات ضمنياً ينتهك السياسة الأمنية",
+        "سجل تدقيق يتتبع عمليات قاعدة البيانات",
+        "طريقة لمنح الصلاحيات بناءً على الأدوار"
+      ],
+      "en": [
+        "An encryption algorithm using two keys",
+        "A pathway for implicit information flow violating security policy",
+        "An audit log tracking database operations",
+        "A method for granting privileges based on roles"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القنوات السرية هي طرق غير مقصودة في النظام (مثل التوقيت أو التخزين) يمكن استغلالها لتسريب البيانات.",
+      "en": "Covert channels are unintended system pathways (like timing or storage) that can be exploited to leak data."
+    },
+    "hint": {
+      "ar": "مسار 'خفي' أو 'سري'.",
+      "en": "A 'hidden' or 'secret' pathway."
+    },
+    "difficulty": "medium",
+    "conceptId": "flow-control-covert-channels"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في التوقيع الرقمي، كيف يتم ضمان أن التوقيع مختلف في كل استخدام؟",
+      "en": "In a digital signature, how is it ensured that the signature is different for each use?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام مفتاح عام مختلف كل مرة",
+        "بجعل التوقيع دالة تعتمد على الرسالة وطابع زمني",
+        "باستخدام خوارزمية تشفير متماثل",
+        "عن طريق إخفاء التوقيع في قناة سرية"
+      ],
+      "en": [
+        "By using a different public key each time",
+        "By making the signature a function of the message and a time stamp",
+        "By using a symmetric encryption algorithm",
+        "By hiding the signature in a covert channel"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لضمان عدم إعادة استخدام التوقيع (Replay attack)، يتم دمجه مع محتوى الرسالة وطابع زمني.",
+      "en": "To prevent replay attacks, the signature is combined with the message content and a time stamp."
+    },
+    "hint": {
+      "ar": "يعتمد على 'وقت' الإرسال ومحتوى الرسالة.",
+      "en": "Depends on the 'time' of sending and message content."
+    },
+    "difficulty": "medium",
+    "conceptId": "digital-signatures"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن 'خاصية النجمة' تمنع الكتابة في مستويات أعلى. الحقيقة: هي تمنع الكتابة في مستويات *أقل* (No write down) لمنع تسريب البيانات، لكنها تسمح بالكتابة في مستويات أعلى.</template>
+    <template class="content-en">Thinking the 'Star Property' prevents writing to higher levels. Fact: It prevents writing to *lower* levels (No write down) to stop data leaks, but allows writing to higher levels.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">العروض (Views) ليست مجرد استعلامات محفوظة، بل هي أداة أمان قوية في DAC. يمكنك إخفاء أعمدة (رواتب) أو صفوف (موظفي قسم آخر) عن طريق منح صلاحية SELECT على العرض فقط.</template>
+    <template class="content-en">Views aren't just saved queries; they are a powerful security tool in DAC. You can hide columns (salaries) or rows (other dept employees) by granting SELECT only on the view.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التعددية (Polyinstantiation) هي الحل العبقري لنموذج MAC للحفاظ على تكامل الكيان (Entity Integrity) مع إخفاء البيانات السرية. تسمح بوجود مفاتيح أساسية 'ظاهرية' مكررة بمستويات أمان مختلفة.</template>
+    <template class="content-en">Polyinstantiation is MAC's genius solution to maintain Entity Integrity while hiding secret data. It allows duplicate 'apparent' primary keys with different security levels.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين مفاتيح التشفير والتوقيع الرقمي. في التشفير: نستخدم المفتاح العام للمستلم. في التوقيع الرقمي: نستخدم المفتاح الخاص للمرسل.</template>
+    <template class="content-en">Confusing keys for encryption vs. digital signatures. For encryption: use receiver's public key. For digital signatures: use sender's private key.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+  <script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="MATH241">
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التفاضل والتكامل · MATH241 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+  <style>
+    /* ═══ SUBJECT HUB SCOPED STYLES ═══ */
+    [data-subject="MATH241"] { 
+      --brand-600: #c2553a; 
+      --brand-500: #e0704f; 
+      --brand-400: #f0957a; 
+      --brand-glow: rgba(224,112,79,0.12); 
+    }
+
+    .subject-hub { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+    /* ── Hub Hero ── */
+    .hub-hero {
+      position: relative;
+      padding: 4rem 2.5rem 3rem;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 3rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+    .hub-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .hub-hero-content { position: relative; z-index: 1; }
+    .hub-hero-badge {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 1.5rem;
+      background: var(--brand-glow);
+      border: 1px solid var(--brand-500);
+      border-radius: var(--radius-pill);
+      font-family: var(--display-font);
+      font-weight: 800; font-size: 1rem;
+      color: var(--brand-500);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+    .hub-hero-badge i { font-size: 1.1rem; }
+    .hub-hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    .hub-hero-metaphor {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      max-width: 600px;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .hub-stats {
+      display: flex; flex-wrap: wrap; gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .hub-stat {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-weight: 700; font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    .hub-stat strong {
+      color: var(--brand-500);
+      font-family: var(--display-font);
+      font-size: 1.25rem;
+    }
+
+    /* ── Progress Ring ── */
+    .hub-progress {
+      display: flex; align-items: center; gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius-xl);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2.5rem;
+    }
+    .progress-ring-container {
+      width: 80px; height: 80px; flex-shrink: 0;
+      position: relative;
+    }
+    .progress-ring-container svg { transform: rotate(-90deg); }
+    .progress-ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 6; }
+    .progress-ring-fill { fill: none; stroke: var(--brand-500); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+    .progress-ring-text {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display-font); font-weight: 900; font-size: 1.1rem;
+      color: var(--brand-500);
+    }
+    .progress-info h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .progress-info p { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+
+    /* ── Section Wrapper (divider + header + divider) ── */
+    .hub-section-wrapper {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin: 3rem 0 2rem;
+    }
+
+    /* ── Section Headers ── */
+    .hub-section-header {
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      padding: 0 1rem;
+      flex-shrink: 0;
+    }
+    .hub-section-header h2 {
+      font-size: 1.45rem; font-weight: 800; margin: 0;
+    }
+    .hub-section-header .section-count {
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-pill);
+    }
+
+    /* ── Module Grid — always 2 columns (1 on mobile) ── */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Module Card ── */
+    .module-card {
+      display: flex; flex-direction: column;
+      padding: 1.75rem;
+      border-radius: var(--radius-xl);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .module-card:hover {
+      border-color: var(--brand-500);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px -8px var(--brand-glow), 0 4px 10px -4px var(--shadow-base);
+    }
+    .module-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .module-card-number {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display-font);
+      font-weight: 900; font-size: 1rem;
+    }
+    .module-card-flavor {
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--display-font);
+      letter-spacing: 0.03em;
+    }
+    .module-card h3 {
+      font-size: 1.1rem; font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .module-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 1rem;
+    }
+    .module-card-meta {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .module-card-meta span {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    /* Completion checkmark overlay */
+    .module-card[data-completed="true"]::after {
+      content: '✓';
+      position: absolute; top: 1rem; inset-inline-end: 1rem;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #10b981;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 900;
+    }
+
+    /* ── Exam Hub Section ── */
+    .exam-hub {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .exam-card {
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    .exam-card:hover {
+      border-color: var(--brand-500);
+      box-shadow: 0 8px 20px -6px var(--brand-glow);
+    }
+    .exam-card-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .exam-card-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--brand-glow);
+      color: var(--brand-500);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .exam-card h3 { font-size: 1.15rem; font-weight: 800; }
+    .exam-card p {
+      font-size: 0.9rem; color: var(--text-secondary);
+      line-height: 1.7; margin-bottom: 1.25rem;
+    }
+    .exam-card-scope {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .exam-card-links {
+      display: flex; gap: 0.75rem;
+    }
+    .exam-link {
+      flex: 1;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem; font-weight: 700;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .exam-link--review {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    .exam-link--review:hover {
+      border-color: var(--brand-500);
+      color: var(--brand-500);
+      background: var(--brand-glow);
+    }
+    .exam-link--quiz {
+      background: var(--brand-500);
+      border: 1px solid var(--brand-500);
+      color: #fff;
+    }
+    .exam-link--quiz:hover {
+      background: var(--brand-600);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--brand-glow);
+    }
+
+    /* ── Motivational Footer Quote ── */
+    .hub-quote {
+      text-align: center;
+      padding: 1rem 1.5rem;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    /* ── Subject-specific hero patterns ── */
+    [data-subject="MATH241"] .hub-hero::before {
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 80 Q 40 0 80 80' stroke='%2306b6d4' stroke-width='0.5' fill='none'/%3E%3Cpath d='M0 40 Q 40 80 80 40' stroke='%2306b6d4' stroke-width='0.3' fill='none' stroke-dasharray='4 4'/%3E%3C/svg%3E");
+    }
+
+    /* ── Thematic divider ── */
+    .hub-divider {
+      height: 2px;
+      background: var(--border-color);
+      border-radius: var(--radius-pill);
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      margin: 0;
+    }
+    .hub-divider::after {
+      content: '';
+      position: absolute; top: 0;
+      width: 40px; height: 100%;
+      background: var(--brand-500);
+      border-radius: var(--radius-pill);
+    }
+
+    [data-subject="MATH241"] .hub-divider.dir-rtl::after { animation: raceLineRTL 4s ease-in-out infinite; }
+    [data-subject="MATH241"] .hub-divider.dir-ltr::after { animation: raceLineLTR 4s ease-in-out infinite; }
+
+    @keyframes raceLineRTL {
+      0%   { left: -40px; }
+      100% { left: 100%; }
+    }
+    @keyframes raceLineLTR {
+      0%   { right: -40px; }
+      100% { right: 100%; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .subject-hub { padding: 1rem 1rem 3rem; }
+      .hub-hero { padding: 2.5rem 1.5rem 2rem; }
+      .hub-hero h1 { font-size: 1.75rem; }
+      .module-grid { grid-template-columns: 1fr; }
+      .exam-hub { grid-template-columns: 1fr; }
+      .hub-progress { flex-direction: column; text-align: center; }
+      .exam-card-links { flex-direction: column; }
+      .hub-section-wrapper { gap: 0.75rem; }
+    }
+  </style>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="MATH241" data-page-title-en="MATH241">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="course" data-gh-up="../index.html" data-gh-card="../../hub/course.html?code=MATH241"></header>
+
+  <main class="subject-hub">
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hub-hero fade-up">
+      <div class="hub-hero-content">
+        <div class="hub-hero-badge">
+          <i class="fa-solid fa-infinity"></i>
+          <span>MATH241</span>
+        </div>
+        <h1 data-bilingual>
+          <template class="content-ar"><span class="text-gradient">التفاضل والتكامل</span></template>
+          <template class="content-en"><span class="text-gradient">Calculus</span></template>
+          <span class="content-target"><span class="text-gradient">التفاضل والتكامل</span></span>
+        </h1>
+        <div class="hub-hero-metaphor" data-bilingual>
+          <template class="content-ar">كلُّ تغيّرٍ له مشتقّة، وكلُّ تراكمٍ له تكامل</template>
+          <template class="content-en">Every change has a derivative, every accumulation an integral</template>
+          <span class="content-target">كلُّ تغيّرٍ له مشتقّة، وكلُّ تراكمٍ له تكامل</span>
+        </div>
+        <div class="hub-stats">
+          <div class="hub-stat">
+            <strong>13</strong>
+            <span data-bilingual>
+              <template class="content-ar">وحدة تعليمية</template>
+              <template class="content-en">Modules</template>
+              <span class="content-target">وحدة تعليمية</span>
+            </span>
+          </div>
+          <div class="hub-stat">
+            <strong>84</strong>
+            <span data-bilingual>
+              <template class="content-ar">مفهوم</template>
+              <template class="content-en">Concepts</template>
+              <span class="content-target">مفهوم</span>
+            </span>
+          </div>
+          <div class="hub-stat">
+            <strong>214</strong>
+            <span data-bilingual>
+              <template class="content-ar">بطاقة تعليمية</template>
+              <template class="content-en">Flashcards</template>
+              <span class="content-target">بطاقة تعليمية</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROGRESS RING ═══ -->
+    <div class="hub-progress fade-up" id="progress-section">
+      <div class="progress-ring-container">
+        <svg viewBox="0 0 80 80">
+          <circle class="progress-ring-bg" cx="40" cy="40" r="34"/>
+          <circle class="progress-ring-fill" cx="40" cy="40" r="34"
+                  stroke-dasharray="213.6"
+                  stroke-dashoffset="213.6"
+                  id="progress-ring"/>
+        </svg>
+        <div class="progress-ring-text" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-info">
+        <h3 data-bilingual>
+          <template class="content-ar">تقدمك في المادة</template>
+          <template class="content-en">Your Progress</template>
+          <span class="content-target">تقدمك في المادة</span>
+        </h3>
+        <p data-bilingual id="progress-detail">
+          <template class="content-ar">اكمل دراسة الوحدة واجراء الاختبار لاحتساب تقدمك</template>
+          <template class="content-en">Complete module study and take the quiz to track progress</template>
+          <span class="content-target">اكمل دراسة الوحدة واجراء الاختبار لاحتساب تقدمك</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ MODULE GRID — Modules 1–6 (Midterm Scope) ═══ -->
+    <div class="hub-section-wrapper">
+      <div class="hub-divider dir-ltr"></div>
+      <div class="hub-section-header">
+        <h2 data-bilingual>
+          <template class="content-ar"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 1–6 · نطاق الميدتيرم</template>
+          <template class="content-en"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Modules 1–6 · Midterm Scope</template>
+          <span class="content-target"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 1–6 · نطاق الميدتيرم</span>
+        </h2>
+        <span class="section-count">6 / 13</span>
+      </div>
+      <div class="hub-divider dir-rtl"></div>
+    </div>
+
+    <div class="module-grid">
+      <a href="M01.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">1</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 9 مفهوم · الدوال</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 9 concepts · Functions</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 9 مفهوم · الدوال</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">قبل التفاضل والتكامل: الدوال</template>
+          <template class="content-en">Before Calculus: Functions</template>
+          <span class="content-target">قبل التفاضل والتكامل: الدوال</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مراجعة شاملة للمفاهيم الأساسية للدوال، بما في ذلك المجال والمدى، العمليات الحسابية، التركيب، التحويلات الهندسية، وعائلات الدوال المختلفة استعداداً لدراسة التفاضل والتكامل.</template>
+          <template class="content-en">A comprehensive review of fundamental function concepts, including domain and range, arithmetic operations, composition, geometric transformations, and various families of functions in preparation for Calculus.</template>
+          <span class="content-target">مراجعة شاملة للمفاهيم الأساسية للدوال، بما في ذلك المجال والمدى، العمليات الحسابية، التركيب، التحويلات الهندسية، وعائلات الدوال المختلفة استعداداً لدراسة التفاضل والتكامل.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 9</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 18</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M02.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">2</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · الدوال العكسية</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 concepts · Inverse Functions</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · الدوال العكسية</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">قبل التفاضل والتكامل: الدوال العكسية، الأسية، واللوغاريتمية</template>
+          <template class="content-en">Before Calculus: Inverse, Exponential, and Logarithmic Functions</template>
+          <span class="content-target">قبل التفاضل والتكامل: الدوال العكسية، الأسية، واللوغاريتمية</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة المفاهيم الأساسية للدوال العكسية، بما في ذلك الدوال المثلثية العكسية، بالإضافة إلى خصائص وحل معادلات الدوال الأسية واللوغاريتمية.</template>
+          <template class="content-en">This module covers the fundamental concepts of inverse functions, including inverse trigonometric functions, as well as the properties and equation-solving techniques for exponential and logarithmic functions.</template>
+          <span class="content-target">تغطي هذه الوحدة المفاهيم الأساسية للدوال العكسية، بما في ذلك الدوال المثلثية العكسية، بالإضافة إلى خصائص وحل معادلات الدوال الأسية واللوغاريتمية.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M03.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">3</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · النهايات</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 concepts · Limits</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · النهايات</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الفصل الأول: النهايات (مقاربة بديهية وقوانين الحساب)</template>
+          <template class="content-en">Chapter 1: Limits (An Intuitive Approach and Computing Laws)</template>
+          <span class="content-target">الفصل الأول: النهايات (مقاربة بديهية وقوانين الحساب)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة لمفهوم النهايات في التفاضل والتكامل، بدءاً من مشكلة الخط المماس، مروراً بالنهايات من جانب واحد والنهايات عند اللانهاية، وصولاً إلى التطبيق الصارم لقوانين النهايات.</template>
+          <template class="content-en">A comprehensive introduction to the concept of limits in calculus, starting from the tangent line problem, moving through one-sided limits and limits at infinity, and concluding with the rigorous application of limit laws.</template>
+          <span class="content-target">مقدمة شاملة لمفهوم النهايات في التفاضل والتكامل، بدءاً من مشكلة الخط المماس، مروراً بالنهايات من جانب واحد والنهايات عند اللانهاية، وصولاً إلى التطبيق الصارم لقوانين النهايات.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M04.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">4</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 مفهوم · الاتصال</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 concepts · Continuity</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 مفهوم · الاتصال</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الفصل الأول: الاتصال (الاستمرارية)</template>
+          <template class="content-en">Chapter 1: Continuity</template>
+          <span class="content-target">الفصل الأول: الاتصال (الاستمرارية)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">يغطي هذا الأسبوع مفهوم الاتصال للدوال، أنواع عدم الاتصال، نظرية القيمة المتوسطة، ونهايات الدوال المثلثية والأسية والعكسية، بالإضافة إلى نظرية الحصر (الساندويتش).</template>
+          <template class="content-en">This week covers the concept of continuity for functions, types of discontinuities, the Intermediate Value Theorem, limits of trigonometric, exponential, and inverse functions, and the Squeezing Theorem.</template>
+          <span class="content-target">يغطي هذا الأسبوع مفهوم الاتصال للدوال، أنواع عدم الاتصال، نظرية القيمة المتوسطة، ونهايات الدوال المثلثية والأسية والعكسية، بالإضافة إلى نظرية الحصر (الساندويتش).</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 7</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M05.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">5</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 8 مفهوم · التفاضل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 8 concepts · Calculus</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 8 مفهوم · التفاضل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التفاضل: المشتقات وقواعدها</template>
+          <template class="content-en">Calculus: The Derivative and Differentiation Rules</template>
+          <span class="content-target">التفاضل: المشتقات وقواعدها</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة لمفهوم المشتقة، بدءاً من خطوط المماس ومعدلات التغير، مروراً بقواعد الاشتقاق الأساسية (الضرب، القسمة، السلسلة)، وصولاً إلى مشتقات الدوال المثلثية والمشتقات ذات الرتب العليا.</template>
+          <template class="content-en">A comprehensive introduction to the derivative, starting from tangent lines and rates of change, covering basic differentiation rules (product, quotient, chain), trigonometric derivatives, and higher-order derivatives.</template>
+          <span class="content-target">مقدمة شاملة لمفهوم المشتقة، بدءاً من خطوط المماس ومعدلات التغير، مروراً بقواعد الاشتقاق الأساسية (الضرب، القسمة، السلسلة)، وصولاً إلى مشتقات الدوال المثلثية والمشتقات ذات الرتب العليا.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 8</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M06.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">6</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · التفاضل الضمني</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 concepts · Implicit Differentiation</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · التفاضل الضمني</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">موضوعات في التفاضل</template>
+          <template class="content-en">Topics In Differentiation</template>
+          <span class="content-target">موضوعات في التفاضل</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">يغطي هذا الوحدة التفاضل الضمني، مشتقات الدوال اللوغاريتمية والأسية والمثلثية العكسية، المعدلات المرتبطة، التقريب الخطي المحلي، وقاعدة لوبيتال.</template>
+          <template class="content-en">This module covers implicit differentiation, derivatives of logarithmic, exponential, and inverse trigonometric functions, related rates, local linear approximation, and L'Hôpital's Rule.</template>
+          <span class="content-target">يغطي هذا الوحدة التفاضل الضمني، مشتقات الدوال اللوغاريتمية والأسية والمثلثية العكسية، المعدلات المرتبطة، التقريب الخطي المحلي، وقاعدة لوبيتال.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ═══ MIDTERM EXAM HUB ═══ -->
+    <div class="exam-hub">
+      <div class="exam-card fade-up">
+        <div class="exam-card-header">
+          <div class="exam-card-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></div>
+          <h3 data-bilingual>
+            <template class="content-ar">المراجعة الشاملة · ميدتيرم</template>
+            <template class="content-en">Comprehensive Review · Midterm</template>
+            <span class="content-target">المراجعة الشاملة · ميدتيرم</span>
+          </h3>
+        </div>
+        <p data-bilingual>
+          <template class="content-ar">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</template>
+          <template class="content-en">Complete review of all concepts, formulas, and algorithms from Modules 7–13</template>
+          <span class="content-target">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</span>
+        </p>
+        <div class="exam-card-links">
+          <a href="midterm-review.html" class="exam-link exam-link--review">
+            <i class="fa-solid fa-book-open"></i>
+            <span data-bilingual>
+              <template class="content-ar">مراجعة</template>
+              <template class="content-en">Review</template>
+              <span class="content-target">مراجعة</span>
+            </span>
+          </a>
+          <a href="midterm-quiz.html" class="exam-link exam-link--quiz">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-bilingual>
+              <template class="content-ar">اختبار</template>
+              <template class="content-en">Quiz</template>
+              <span class="content-target">اختبار</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODULE GRID — Modules 7–13 (Final Scope) ═══ -->
+    <div class="hub-section-wrapper">
+      <div class="hub-divider dir-ltr"></div>
+      <div class="hub-section-header">
+        <h2 data-bilingual>
+          <template class="content-ar"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 7–13 · نطاق الفاينل</template>
+          <template class="content-en"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Modules 7–13 · Final Scope</template>
+          <span class="content-target"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 7–13 · نطاق الفاينل</span>
+        </h2>
+        <span class="section-count">7 / 13</span>
+      </div>
+      <div class="hub-divider dir-rtl"></div>
+    </div>
+
+    <div class="module-grid">
+      <a href="M07.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">7</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 5 مفهوم · التفاضل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 5 concepts · Calculus</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 5 مفهوم · التفاضل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">المشتقة في الرسم البياني والتطبيقات</template>
+          <template class="content-en">The Derivative In Graphing And Applications</template>
+          <span class="content-target">المشتقة في الرسم البياني والتطبيقات</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تحليل الدوال باستخدام التفاضل لتحديد فترات التزايد والتناقص، التقعر، النقاط الحرجة، والقيم القصوى النسبية والمطلقة.</template>
+          <template class="content-en">Analyzing functions using calculus to determine intervals of increase and decrease, concavity, critical points, and relative/absolute extrema.</template>
+          <span class="content-target">تحليل الدوال باستخدام التفاضل لتحديد فترات التزايد والتناقص، التقعر، النقاط الحرجة، والقيم القصوى النسبية والمطلقة.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 5</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 18</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M08.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">8</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 مفهوم · التكامل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 concepts · Integration</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 مفهوم · التكامل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الفصل الخامس: التكامل (الأقسام 5.1 - 5.3)</template>
+          <template class="content-en">Chapter 5: Integration (Sections 5.1 - 5.3)</template>
+          <span class="content-target">الفصل الخامس: التكامل (الأقسام 5.1 - 5.3)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة لمشكلة المساحة، التكامل غير المحدد، وتقنيات التكامل بالتعويض.</template>
+          <template class="content-en">A comprehensive introduction to the area problem, the indefinite integral, and integration by substitution techniques.</template>
+          <span class="content-target">مقدمة شاملة لمشكلة المساحة، التكامل غير المحدد، وتقنيات التكامل بالتعويض.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 7</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M09.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">9</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 4 مفهوم · التفاضل والتكامل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 4 concepts · Calculus</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 4 مفهوم · التفاضل والتكامل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الفصل الخامس: التكامل (الأقسام 5.4 - 5.5)</template>
+          <template class="content-en">Chapter 5: Integration (Sections 5.4 - 5.5)</template>
+          <span class="content-target">الفصل الخامس: التكامل (الأقسام 5.4 - 5.5)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة في التكامل، تشمل رمز سيجما، تعريف المساحة كنهاية، مجاميع ريمان، التكامل المحدد، والتكامل غير المحدد.</template>
+          <template class="content-en">Introduction to integration, covering sigma notation, the definition of area as a limit, Riemann sums, the definite integral, and the indefinite integral.</template>
+          <span class="content-target">مقدمة في التكامل، تشمل رمز سيجما، تعريف المساحة كنهاية، مجاميع ريمان، التكامل المحدد، والتكامل غير المحدد.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 4</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M10.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">10</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · التفاضل والتكامل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 concepts · Calculus</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 6 مفهوم · التفاضل والتكامل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">المتتاليات والمتسلسلات اللانهائية</template>
+          <template class="content-en">Infinite Series and Sequences</template>
+          <span class="content-target">المتتاليات والمتسلسلات اللانهائية</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">دراسة شاملة للمتتاليات، التقارب والتباعد، المتتاليات المطردة، المتسلسلات اللانهائية، واختبارات التقارب بما في ذلك اختبار التباعد واختبار التكامل.</template>
+          <template class="content-en">A comprehensive study of sequences, convergence and divergence, monotone sequences, infinite series, and convergence tests including the divergence and integral tests.</template>
+          <span class="content-target">دراسة شاملة للمتتاليات، التقارب والتباعد، المتتاليات المطردة، المتسلسلات اللانهائية، واختبارات التقارب بما في ذلك اختبار التباعد واختبار التكامل.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 18</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M11.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">11</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 مفهوم · التفاضل والتكامل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 concepts · Calculus</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 7 مفهوم · التفاضل والتكامل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">المنحنيات الوسيطية والقطبية</template>
+          <template class="content-en">Parametric and Polar Curves</template>
+          <span class="content-target">المنحنيات الوسيطية والقطبية</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">دراسة المعادلات الوسيطية (البارامترية) والإحداثيات القطبية، بما في ذلك حساب خطوط المماس، طول القوس، والمساحات للمنحنيات القطبية.</template>
+          <template class="content-en">Study of parametric equations and polar coordinates, including calculating tangent lines, arc length, and areas for polar curves.</template>
+          <span class="content-target">دراسة المعادلات الوسيطية (البارامترية) والإحداثيات القطبية، بما في ذلك حساب خطوط المماس، طول القوس، والمساحات للمنحنيات القطبية.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 7</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 17</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M12.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">12</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 9 مفهوم · التفاضل والتكامل</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 9 concepts · Calculus</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 9 مفهوم · التفاضل والتكامل</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الفضاء ثلاثي الأبعاد والمتجهات</template>
+          <template class="content-en">Three-Dimensional Space and Vectors</template>
+          <span class="content-target">الفضاء ثلاثي الأبعاد والمتجهات</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة في نظام الإحداثيات ثلاثي الأبعاد، المسافات، الكرات، السطوح الأسطوانية، والعمليات الأساسية على المتجهات.</template>
+          <template class="content-en">Introduction to the 3D coordinate system, distances, spheres, cylindrical surfaces, and basic vector operations.</template>
+          <span class="content-target">مقدمة في نظام الإحداثيات ثلاثي الأبعاد، المسافات، الكرات، السطوح الأسطوانية، والعمليات الأساسية على المتجهات.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 9</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 19</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M13.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">13</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 4 مفهوم · الضرب النقطي</template>
+            <template class="content-en"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 4 concepts · Dot Product</template>
+            <span class="content-target"><i class="fa-solid fa-infinity" aria-hidden="true"></i> 4 مفهوم · الضرب النقطي</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الفصل 11: الفضاء ثلاثي الأبعاد؛ المتجهات (الضرب النقطي والاتجاهي)</template>
+          <template class="content-en">Chapter 11: Three-Dimensional Space; Vectors (Dot &amp; Cross Products)</template>
+          <span class="content-target">الفصل 11: الفضاء ثلاثي الأبعاد؛ المتجهات (الضرب النقطي والاتجاهي)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة العمليات الأساسية على المتجهات في الفضاء ثلاثي الأبعاد، بما في ذلك الضرب النقطي، الإسقاطات المتعامدة، الضرب الاتجاهي، وتطبيقاتها الهندسية مثل حساب المساحات والحجوم.</template>
+          <template class="content-en">This module covers fundamental vector operations in 3D space, including the dot product, orthogonal projections, cross product, and their geometric applications such as calculating areas and volumes.</template>
+          <span class="content-target">تغطي هذه الوحدة العمليات الأساسية على المتجهات في الفضاء ثلاثي الأبعاد، بما في ذلك الضرب النقطي، الإسقاطات المتعامدة، الضرب الاتجاهي، وتطبيقاتها الهندسية مثل حساب المساحات والحجوم.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 4</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ═══ FINAL EXAM HUB ═══ -->
+    <div class="exam-hub">
+      <div class="exam-card fade-up">
+        <div class="exam-card-header">
+          <div class="exam-card-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
+          <h3 data-bilingual>
+            <template class="content-ar">المراجعة الشاملة · فاينل</template>
+            <template class="content-en">Comprehensive Review · Final</template>
+            <span class="content-target">المراجعة الشاملة · فاينل</span>
+          </h3>
+        </div>
+        <p data-bilingual>
+          <template class="content-ar">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</template>
+          <template class="content-en">Complete review of all concepts, formulas, and algorithms from Modules 7–13</template>
+          <span class="content-target">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</span>
+        </p>
+        <div class="exam-card-links">
+          <a href="final-review.html" class="exam-link exam-link--review">
+            <i class="fa-solid fa-book-open"></i>
+            <span data-bilingual>
+              <template class="content-ar">مراجعة</template>
+              <template class="content-en">Review</template>
+              <span class="content-target">مراجعة</span>
+            </span>
+          </a>
+          <a href="final-quiz.html" class="exam-link exam-link--quiz">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-bilingual>
+              <template class="content-ar">اختبار</template>
+              <template class="content-en">Quiz</template>
+              <span class="content-target">اختبار</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MOTIVATIONAL QUOTE ═══ -->
+    <div class="hub-section-wrapper">
+      <div class="hub-divider dir-ltr"></div>
+      <div class="hub-quote fade-up" data-bilingual>
+        <template class="content-ar">النهايةُ ليست حيث نتوقّف، بل ما نقترب منه</template>
+        <template class="content-en">A limit is not where we stop, but what we approach</template>
+        <span class="content-target">النهايةُ ليست حيث نتوقّف، بل ما نقترب منه</span>
+      </div>
+      <div class="hub-divider dir-rtl"></div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> CS Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+
+<!-- Progress Ring: reads quiz scores from localStorage -->
+<script>
+(function(){
+  const code = document.documentElement.getAttribute('data-subject') || '';
+  const total = 12;
+  let done = 0;
+  for (let i = 1; i <= total; i++) {
+    const key = 'garden_' + code + '_m' + i + '_quiz';
+    try { if (parseInt(localStorage.getItem(key)) > 0) done++; } catch(e) {}
+  }
+  const pct = Math.round((done / total) * 100);
+  const ring = document.getElementById('progress-ring');
+  const text = document.getElementById('progress-pct');
+  if (ring) {
+    const circum = 213.6;
+    ring.style.strokeDashoffset = circum - (circum * pct / 100);
+  }
+  if (text) text.textContent = pct + '%';
+
+  // Mark completed modules
+  document.querySelectorAll('.module-card').forEach(card => {
+    const num = card.querySelector('.module-card-number')?.textContent?.trim();
+    if (num) {
+      const key = 'garden_' + code + '_m' + num + '_quiz';
+      try { if (parseInt(localStorage.getItem(key)) >= 7) card.setAttribute('data-completed', 'true'); } catch(e) {}
+    }
+  });
+})();
+</script>
+</body>
+</html>

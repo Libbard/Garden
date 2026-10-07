@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT354" data-module="4" data-no-videos>
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التصميم المادي لقاعدة البيانات وضبطها · IT354 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+      var fs=localStorage.getItem('garden_font_size');
+      if(fs)document.documentElement.setAttribute('data-font-size',fs);
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT354" data-page-title-en="IT354">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M03.html" data-gh-next="M05.html" data-gh-card="../../hub/course.html?code=IT354"></header>
+
+  <div class="content-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+      <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#factors-influencing-physical-design" class="toc-link" data-bilingual>
+        <template class="content-ar">العوامل المؤثرة في التصميم المادي</template>
+        <template class="content-en">Factors Influencing Physical Database Design</template>
+        <span class="content-target">العوامل المؤثرة في التصميم المادي</span>
+      </a>
+      <a href="#physical-design-decisions-denormalization" class="toc-link" data-bilingual>
+        <template class="content-ar">قرارات التصميم المادي وإلغاء التطبيع</template>
+        <template class="content-en">Physical Design Decisions and Denormalization</template>
+        <span class="content-target">قرارات التصميم المادي وإلغاء التطبيع</span>
+      </a>
+      <a href="#database-tuning-overview" class="toc-link" data-bilingual>
+        <template class="content-ar">نظرة عامة على ضبط قاعدة البيانات</template>
+        <template class="content-en">Overview of Database Tuning</template>
+        <span class="content-target">نظرة عامة على ضبط قاعدة البيانات</span>
+      </a>
+      <a href="#tuning-indexes" class="toc-link" data-bilingual>
+        <template class="content-ar">ضبط الفهارس</template>
+        <template class="content-en">Tuning Indexes</template>
+        <span class="content-target">ضبط الفهارس</span>
+      </a>
+      <a href="#tuning-database-design" class="toc-link" data-bilingual>
+        <template class="content-ar">ضبط تصميم قاعدة البيانات</template>
+        <template class="content-en">Tuning the Database Design</template>
+        <span class="content-target">ضبط تصميم قاعدة البيانات</span>
+      </a>
+      <a href="#tuning-queries" class="toc-link" data-bilingual>
+        <template class="content-ar">ضبط الاستعلامات</template>
+        <template class="content-en">Tuning Queries</template>
+        <span class="content-target">ضبط الاستعلامات</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+      <div class="sidebar-widget">
+        <div class="widget-number" id="fc-due-count">0</div>
+        <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 4</template>
+      <template class="content-en">Module 4</template>
+      <span class="content-target">الوحدة 4</span>
+    </span> · IT354
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التصميم المادي لقاعدة البيانات وضبطها</h1>
+      <p class="hero-description">تغطي هذه الوحدة العوامل المؤثرة في التصميم المادي لقواعد البيانات العلائقية، وقرارات الفهرسة، وإلغاء التطبيع، بالإضافة إلى استراتيجيات ضبط قواعد البيانات، والفهارس، والاستعلامات لتحسين الأداء.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Physical Database Design and Tuning</h1>
+      <p class="hero-description">This module covers factors influencing physical database design in relational databases, indexing decisions, denormalization, and strategies for tuning databases, indexes, and queries to optimize performance.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التصميم المادي</span>
+      <span class="tag">ضبط الأداء</span>
+      <span class="tag">الفهرسة</span>
+      <span class="tag">إلغاء التطبيع</span>
+      <span class="tag">تحسين الاستعلامات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Physical Design</span>
+      <span class="tag">Performance Tuning</span>
+      <span class="tag">Indexing</span>
+      <span class="tag">Denormalization</span>
+      <span class="tag">Query Optimization</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تحليل العوامل التي تؤثر على التصميم المادي لقاعدة البيانات مثل الاستعلامات والتردد والقيود الزمنية.</span></li>
+      <li><span class="obj-icon">✦</span><span>اتخاذ قرارات التصميم المادي المناسبة بما في ذلك استراتيجيات الفهرسة وإلغاء التطبيع.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم أهداف وعمليات ضبط قاعدة البيانات لتحسين وقت الاستجابة والإنتاجية.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات ضبط الفهارس وتصميم قاعدة البيانات والاستعلامات بناءً على إحصائيات الأداء.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Analyze factors that influence physical database design such as queries, frequency, and time constraints.</span></li>
+      <li><span class="obj-icon">✦</span><span>Make appropriate physical design decisions including indexing strategies and denormalization.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the goals and processes of database tuning to improve response time and throughput.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply techniques for tuning indexes, database design, and queries based on performance statistics.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="factors-influencing-physical-design" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> العوامل المؤثرة في التصميم المادي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Factors Influencing Physical Database Design</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحليل الاستعلامات، ومعدل التحديث، والقيود الزمنية لتحديد أفضل هيكل لتخزين البيانات.</p></template>
+    <template class="content-en"><p>Analyzing queries, update frequencies, and time constraints to determine the optimal physical storage structure.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتأثر التصميم المادي بعدة عوامل رئيسية يجب تحليلها:</p><ol><li><b>تحليل الاستعلامات والمعاملات:</b> معرفة الملفات التي سيتم الوصول إليها، والسمات المستخدمة في شروط التحديد (Selection) والربط (Join)، والسمات المسترجعة.</li><li><b>تحليل تكرار الاستدعاء:</b> استخدام <span class="smart-term" data-term-en="80-20 Rule" data-ar="قاعدة 80-20" data-en-def="A principle stating that 20% of the data is accessed 80% of the time.">قاعدة 80-20<span class="smart-term-tooltip"></span></span> (20% من البيانات يتم الوصول إليها 80% من الوقت).</li><li><b>القيود الزمنية:</b> إعطاء أولوية للسمات المستخدمة في الاستعلامات ذات القيود الزمنية الصارمة.</li><li><b>تكرار عمليات التحديث:</b> تقليل مسارات الوصول (الفهارس) للملفات التي تُحدث بكثرة.</li><li><b>قيود التفرد (Uniqueness):</b> تحديد مسارات وصول لجميع المفاتيح المرشحة.</li></ol></template>
+    <template class="content-en"><p>Physical design is influenced by several key factors that must be analyzed:</p><ol><li><b>Analyzing queries and transactions:</b> Identifying accessed files, attributes used in selection and join conditions, and retrieved attributes.</li><li><b>Expected frequency of invocation:</b> Applying the <span class="smart-term" data-term-en="80-20 Rule" data-ar="قاعدة 80-20" data-en-def="A principle stating that 20% of the data is accessed 80% of the time.">80-20 rule<span class="smart-term-tooltip"></span></span> (20% of data is accessed 80% of the time).</li><li><b>Time constraints:</b> Prioritizing attributes used in time-critical queries for primary access structures.</li><li><b>Update frequencies:</b> Minimizing access paths for frequently updated files.</li><li><b>Uniqueness constraints:</b> Specifying access paths on all candidate keys.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السمات المستخدمة في شروط التحديد والربط هي المرشح الأساسي لإنشاء الفهارس (Access Structures) لتسريع القراءة.</p><p>على النقيض، السمات التي تتغير قيمتها باستمرار عبر عمليات التحديث (Update) هي مرشحات لتجنب الفهرسة، لأن كل تحديث سيتطلب تحديث الفهرس أيضاً، مما يضيف عبئاً إضافياً.</p><p>قاعدة 80-20 توجه المصممين للتركيز على تحسين الجزء الصغير من البيانات الذي يتحمل العبء الأكبر من العمليات.</p></template>
+    <template class="content-en"><p>Attributes used in selection and join conditions are prime candidates for defining access structures (indexes) to speed up reads.</p><p>Conversely, attributes whose values are frequently changed by update operations are candidates for avoiding access structures, as maintaining the index adds significant overhead.</p><p>The 80-20 rule guides designers to focus optimization efforts on the small portion of the database that handles the vast majority of the workload.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نعتبر السمة التي يتم تحديثها بشكل متكرر مرشحاً لتجنب الفهرسة؟</template>
+      <template class="content-en">Why is a frequently updated attribute a candidate for avoiding an index?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كل عملية تحديث للبيانات ستتطلب أيضاً تحديثاً للفهرس، مما يزيد من وقت المعالجة ويقلل من أداء عمليات الكتابة.</p></template>
+      <template class="content-en"><p>Because every update to the data would also require an update to the index, increasing processing overhead and degrading write performance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="physical-design-decisions-denormalization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> قرارات التصميم المادي وإلغاء التطبيع</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Physical Design Decisions and Denormalization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>اتخاذ قرارات حول أنواع الفهارس، والتضحية ببعض قواعد التطبيع (Denormalization) لتسريع الاستعلامات الشائعة.</p></template>
+    <template class="content-en"><p>Making decisions about index types and intentionally breaking normalization rules (Denormalization) to speed up common queries.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتضمن قرارات التصميم المادي ما يلي:</p><ul><li><b>قرارات الفهرسة:</b> هل نُفهرس السمة؟ أي السمات؟ هل نستخدم فهرس مجمع (Clustered)؟ هل نستخدم فهرس شجري أم تجزئة (Hash)؟</li><li><b><span class="smart-term" data-term-en="Denormalization" data-ar="إلغاء التطبيع" data-en-def="Adding redundant data to a database to improve the performance of read queries by avoiding joins.">إلغاء التطبيع<span class="smart-term-tooltip"></span></span> (Denormalization):</b> هو قرار تصميمي لتسريع الاستعلامات. بينما يهدف التطبيع (Normalization) إلى تقليل التكرار وتجنب شذوذ التحديث، يهدف إلغاء التطبيع إلى تحسين أداء الاستعلامات المتكررة عن طريق إضافة سمات إلى جدول لتجنب عمليات الربط (Join) المكلفة.</li></ul></template>
+    <template class="content-en"><p>Physical design decisions include:</p><ul><li><b>Indexing decisions:</b> Whether to index? Which attributes? Clustered vs. non-clustered? Hash vs. tree index? Dynamic hashing?</li><li><b><span class="smart-term" data-term-en="Denormalization" data-ar="إلغاء التطبيع" data-en-def="Adding redundant data to a database to improve the performance of read queries by avoiding joins.">Denormalization<span class="smart-term-tooltip"></span></span>:</b> A design decision for speeding up queries. While normalization separates attributes to minimize redundancy and update anomalies, denormalization adds needed attributes to a table to avoid costly joins.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>إلغاء التطبيع يمثل مقايضة (Trade-off) كلاسيكية بين أداء التحديث وأداء الاستعلام.</p><p>عند دمج الجداول، تصبح الاستعلامات أسرع لأنها تقرأ من مكان واحد دون الحاجة لمطابقة المفاتيح، ولكن عمليات الإدخال والتحديث تصبح أبطأ وأكثر عرضة للأخطاء بسبب تكرار البيانات.</p><p>يُستخدم إلغاء التطبيع عادة في أنظمة مستودعات البيانات (Data Warehouses) حيث تكون القراءة هي العملية السائدة.</p></template>
+    <template class="content-en"><p>Denormalization represents a classic trade-off between update performance and query performance.</p><p>By combining tables, queries run faster because they read from a single location without needing to match keys (joins). However, inserts and updates become slower and more prone to anomalies due to data redundancy.</p><p>Denormalization is heavily utilized in read-heavy environments like Data Warehouses, where query speed is paramount.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Normalization</th><th>Denormalization</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أداء الاستعلام (القراءة)</template>
+          <template class="content-en">Query Performance (Read)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أبطأ (يتطلب عمليات ربط Joins)</template>
+          <template class="content-en">Slower (requires Joins)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أسرع (بيانات مجمعة مسبقاً)</template>
+          <template class="content-en">Faster (pre-combined data)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أداء التحديث (الكتابة)</template>
+          <template class="content-en">Update Performance (Write)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أسرع (تحديث في مكان واحد)</template>
+          <template class="content-en">Faster (update in one place)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أبطأ (تحديث بيانات مكررة)</template>
+          <template class="content-en">Slower (updating redundant data)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تكرار البيانات</template>
+          <template class="content-en">Data Redundancy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الحد الأدنى</template>
+          <template class="content-en">Minimal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع (مقصود)</template>
+          <template class="content-en">High (intentional)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون قرار إلغاء التطبيع (Denormalization) قراراً سيئاً؟</template>
+      <template class="content-en">When is denormalization a bad design decision?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تكون قاعدة البيانات تعتمد بشكل كبير على عمليات التحديث والإدخال (OLTP)، حيث سيؤدي التكرار إلى بطء شديد في التحديثات ومخاطر عدم اتساق البيانات.</p></template>
+      <template class="content-en"><p>When the database is highly transactional (OLTP) with frequent updates and inserts, as redundancy will cause slow updates and risk data inconsistency.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="database-tuning-overview" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> نظرة عامة على ضبط قاعدة البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Overview of Database Tuning</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية مستمرة لمراقبة وتعديل التصميم المادي لحل مشاكل الاختناق وتحسين سرعة النظام.</p></template>
+    <template class="content-en"><p>A continuous process of monitoring and adjusting the physical design to resolve bottlenecks and improve system speed.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الضبط (Tuning):</b> هو عملية مستمرة لمراقبة استخدام الموارد والمعالجة الداخلية لنظام إدارة قواعد البيانات (DBMS) للكشف عن الاختناقات (Bottlenecks) مثل التنافس على نفس البيانات أو الأجهزة، ومن ثم مراجعة التصميم المادي.</p><p><b>أهداف الضبط:</b></p><ul><li>جعل التطبيقات تعمل بشكل أسرع.</li><li>تقليل وقت الاستجابة للاستعلامات والمعاملات.</li><li>تحسين <span class="smart-term" data-term-en="Throughput" data-ar="الإنتاجية" data-en-def="The number of transactions completed in a given amount of time.">الإنتاجية<span class="smart-term-tooltip"></span></span> الإجمالية (Throughput) للمعاملات.</li></ul></template>
+    <template class="content-en"><p><b>Tuning:</b> The process of continuously monitoring resource utilization and internal DBMS processing to reveal <span class="smart-term" data-term-en="Bottleneck" data-ar="عنق الزجاجة / الاختناق" data-en-def="A point of congestion in a system that slows down the overall performance.">bottleneck<span class="smart-term-tooltip"></span></span>s (like contention for data/devices), and revising the physical database design accordingly.</p><p><b>Goals of Tuning:</b></p><ul><li>To make applications run faster.</li><li>To lower the response time of queries/transactions.</li><li>To improve the overall <span class="smart-term" data-term-en="Throughput" data-ar="الإنتاجية" data-en-def="The number of transactions completed in a given amount of time.">throughput<span class="smart-term-tooltip"></span></span> of transactions.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعتمد الضبط على الإحصائيات. يجمع الـ DBMS إحصائيات داخلية مثل حجم الجداول، وعدد القيم المميزة في عمود، وعدد مرات تنفيذ استعلام معين.</p><p>كما يتم الحصول على إحصائيات من المراقبة (Monitoring) مثل أداء الإدخال/الإخراج (I/O)، وإحصائيات الأقفال (Locking) والسجلات (Logging).</p><p>يحل الضبط مشاكل معقدة مثل: كيفية تجنب التنافس المفرط على الأقفال؟ وكيفية تحسين حجم الذاكرة المؤقتة (Buffer) وجدولة العمليات؟</p></template>
+    <template class="content-en"><p>Tuning relies heavily on statistics. The DBMS internally collects stats like</p><ul><li>table sizes,</li><li>number of distinct values in a column, and</li><li>execution frequencies of specific queries.</li></ul><p>Additional stats are obtained from monitoring, such as</p><ul><li>I/O performance,</li><li>locking/logging overhead, and</li><li>index usage.</li></ul><p>Tuning addresses complex problems:</p><ul><li>avoiding excessive lock contention,</li><li>minimizing logging overhead,</li><li>optimizing buffer sizes, and</li><li>efficiently allocating resources like RAM and disks.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تختلف إحصائيات الـ DBMS الداخلية عن إحصائيات المراقبة؟</template>
+      <template class="content-en">How do internal DBMS statistics differ from monitoring statistics?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الإحصائيات الداخلية تتعلق بالبيانات نفسها (حجم الجداول، القيم المميزة)، بينما إحصائيات المراقبة تتعلق بأداء النظام والموارد (الإدخال/الإخراج، الأقفال، الذاكرة).</p></template>
+      <template class="content-en"><p>Internal stats relate to the data itself (table sizes, distinct values), while monitoring stats relate to system performance and resource usage (I/O, locks, memory).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tuning-indexes" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> ضبط الفهارس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Tuning Indexes</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>إضافة أو حذف أو إعادة بناء الفهارس بناءً على استخدامها الفعلي وتأثيرها على الأداء.</p></template>
+    <template class="content-en"><p>Adding, dropping, or rebuilding indexes based on their actual usage and performance impact.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>أسباب ضبط الفهارس:</b></p><ul><li>بعض الاستعلامات تستغرق وقتاً طويلاً بسبب عدم وجود فهرس.</li><li>بعض الفهارس لا يتم استخدامها على الإطلاق (تهدر المساحة وتؤخر التحديثات).</li><li>بعض الفهارس تسبب عبئاً كبيراً لأنها مبنية على سمة تتغير بشكل متكرر.</li></ul><p><b>خيارات ضبط الفهارس:</b></p><ul><li>حذف الفهارس القديمة و/أو بناء فهارس جديدة.</li><li>تغيير الفهرس غير المجمع (Non-clustered) إلى فهرس مجمع (Clustered) والعكس.</li><li>إعادة بناء الفهرس (Rebuilding) لتحسين تنظيمه الداخلي.</li></ul></template>
+    <template class="content-en"><p><b>Reasons to tune indexes:</b></p><ul><li>Certain queries take too long to run for lack of an index.</li><li>Certain indexes may not get utilized at all (wasting space and slowing updates).</li><li>Certain indexes cause excessive overhead because they are on frequently updated attributes.</li></ul><p><b>Options for tuning indexes:</b></p><ul><li>Drop and/or build new indexes.</li><li>Change a non-<span class="smart-term" data-term-en="Clustered Index" data-ar="الفهرس المجمع" data-en-def="An index that dictates the physical order of data in a table.">clustered index<span class="smart-term-tooltip"></span></span> to a clustered index (and vice versa).</li><li>Rebuilding the index to optimize its internal structure.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفهارس ليست مجانية؛ فهي تسرع القراءة ولكنها تبطئ الكتابة (Insert/Update/Delete). لذلك، الفهرس الذي لا يستخدمه مُحسّن الاستعلامات (Query Optimizer) هو عبء صافٍ يجب حذفه.</p><p>إعادة بناء الفهرس (Rebuilding) ضرورية عندما تتجزأ البيانات (Fragmentation) بمرور الوقت بسبب عمليات الحذف والإضافة المستمرة، مما يعيد ترتيب البيانات فيزيائياً لتسريع الوصول.</p></template>
+    <template class="content-en"><p>Indexes are not free; they speed up reads but slow down writes (Insert/Update/Delete). Therefore, an index that the Query Optimizer never uses is a pure liability and should be dropped.</p><p>Rebuilding an index is necessary when data becomes fragmented over time due to continuous inserts and deletes. Rebuilding physically reorganizes the data to restore optimal access speeds.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا قد نقوم بتغيير فهرس من غير مجمع إلى مجمع؟</template>
+      <template class="content-en">Why might we change a non-clustered index to a clustered index?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا اكتشفنا أن الاستعلامات غالباً ما تسترجع نطاقات كبيرة من البيانات بناءً على هذا العمود، فالفهرس المجمع سيكون أسرع بكثير لأنه يرتب البيانات فيزيائياً.</p></template>
+      <template class="content-en"><p>If we discover that queries frequently retrieve large ranges of data based on this column, a clustered index will be much faster because it physically orders the data on disk.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tuning-database-design" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> ضبط تصميم قاعدة البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Tuning the Database Design</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تعديل المخطط المنطقي أو المادي، مثل دمج الجداول أو تقسيمها، لتلبية متطلبات المعالجة المتغيرة.</p></template>
+    <template class="content-en"><p>Modifying the logical or physical schema, such as merging or partitioning tables, to meet changing processing requirements.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>متطلبات المعالجة تتغير ديناميكياً، مما يستدعي تغييرات في المخطط المفاهيمي والمنطقي والمادي. التغييرات المحتملة تشمل:</p><ul><li><b>إلغاء التطبيع (Denormalization):</b> دمج الجداول الحالية لأن سمات معينة تُطلب معاً بشكل متكرر.</li><li><b>بدائل التصميم:</b> استبدال تصميم يحقق 3NF أو BCNF بتصميم بديل يحقق نفس المستوى ولكن بأداء أفضل للاستعلامات الحالية.</li><li><b>تكرار السمات:</b> تكرار سمة من جدول في جدول آخر لتجنب الربط، رغم ما يسببه من تكرار واحتمال شذوذ البيانات.</li><li><b>التقسيم (Partitioning):</b> تطبيق <span class="smart-term" data-term-en="Horizontal Partitioning" data-ar="التقسيم الأفقي" data-en-def="Dividing a table into multiple tables containing the same columns but fewer rows.">التقسيم الأفقي<span class="smart-term-tooltip"></span></span> (Horizontal) أو الرأسي (Vertical) للجداول الكبيرة.</li></ul></template>
+    <template class="content-en"><p>Processing requirements change dynamically, necessitating changes to the conceptual, logical, and physical schemas. Possible changes include:</p><ul><li><b>Denormalization:</b> Joining existing tables because certain attributes are frequently needed together.</li><li><b>Alternative Designs:</b> Replacing one 3NF/BCNF design with an alternative that better serves the current workload.</li><li><b>Attribute Replication:</b> Repeating an attribute from one table in another to avoid joins, despite creating redundancy and potential anomalies.</li><li><b>Partitioning:</b> Applying horizontal or <span class="smart-term" data-term-en="Vertical Partitioning" data-ar="التقسيم الرأسي" data-en-def="Dividing a table into multiple tables containing fewer columns, linked by a common key.">vertical partitioning<span class="smart-term-tooltip"></span></span> to large tables.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التقسيم الأفقي يوزع صفوف الجدول على ملفات مختلفة (مثلاً: تقسيم المبيعات حسب السنة)، مما يسرع الاستعلامات التي تستهدف فترة محددة.</p><p><span class="smart-term" data-term-en="Vertical Partitioning" data-ar="التقسيم الرأسي" data-en-def="Dividing a table into multiple tables containing fewer columns, linked by a common key.">التقسيم الرأسي<span class="smart-term-tooltip"></span></span> يوزع أعمدة الجدول (مثلاً: فصل الأعمدة الكبيرة التي نادراً ما تُقرأ عن الأعمدة الأساسية)، مما يقلل من حجم البيانات المقروءة في كل عملية إدخال/إخراج (I/O).</p><p>حتى العلاقات التي تكون في صيغة BCNF يمكن تقسيمها إلى جداول متعددة مع تكرار المفتاح الأساسي لتحسين الأداء.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Horizontal Partitioning" data-ar="التقسيم الأفقي" data-en-def="Dividing a table into multiple tables containing the same columns but fewer rows.">Horizontal partitioning<span class="smart-term-tooltip"></span></span> distributes table rows across different files (e.g., partitioning sales by year), speeding up queries targeting specific ranges.</p><p>Vertical partitioning distributes table columns (e.g., separating rarely accessed large text columns from core attributes), reducing the I/O payload for common queries.</p><p>Even relations strictly in BCNF might be physically stored as multiple tables with replicated keys to optimize specific access patterns.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون التقسيم الرأسي (Vertical Partitioning) مفيداً جداً؟</template>
+      <template class="content-en">When is vertical partitioning highly beneficial?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يحتوي الجدول على أعمدة كبيرة جداً (مثل الصور أو النصوص الطويلة) التي لا يتم الاستعلام عنها غالباً، ففصلها يسرع الوصول للأعمدة الأخرى.</p></template>
+      <template class="content-en"><p>When a table contains very large columns (like images or long text) that are rarely queried; separating them speeds up access to the frequently used columns.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tuning-queries" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> ضبط الاستعلامات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Tuning Queries</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>إعادة كتابة الاستعلامات لمساعدة مُحسّن قاعدة البيانات (Optimizer) على استخدام الفهارس وتقليل الوصول للقرص.</p></template>
+    <template class="content-en"><p>Rewriting queries to help the database optimizer use indexes and minimize disk access.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>مؤشرات الحاجة لضبط الاستعلام:</b></p><ul><li>الاستعلام يقوم بعدد كبير جداً من عمليات الوصول للقرص (Disk Accesses).</li><li><span class="smart-term" data-term-en="Query Plan" data-ar="خطة الاستعلام" data-en-def="The sequence of steps chosen by the database engine to execute a SQL query.">خطة الاستعلام<span class="smart-term-tooltip"></span></span> (Query Plan) تظهر عدم استخدام الفهارس ذات الصلة.</li></ul><p><b>حالات وإرشادات لضبط الاستعلامات:</b></p><ul><li>تجنب مقارنات السلاسل النصية (String comparisons) في شروط الربط، واستخدم الفهرس المجمع إن أمكن.</li><li>ترتيب الجداول في جملة FROM قد يؤثر على معالجة الربط.</li><li>استبدال الاستعلامات المتداخلة (Nested queries) بعمليات ربط (Joins) لأن بعض المُحسّنات تتعامل معها بشكل سيء.</li><li>الاستعلامات التي تحتوي على شروط OR متعددة قد تمنع استخدام الفهرس؛ يُفضل تقسيمها إلى استعلامات منفصلة ودمجها بـ UNION.</li><li>تحويل شروط NOT إلى تعبيرات إيجابية.</li><li>تكرار شرط النطاق (Range predicate) على كلا الجدولين في حالة الربط المتساوي (Equality join).</li></ul></template>
+    <template class="content-en"><p><b>Indications for tuning queries:</b></p><ul><li>A query issues too many disk accesses.</li><li>The <span class="smart-term" data-term-en="Query Plan" data-ar="خطة الاستعلام" data-en-def="The sequence of steps chosen by the database engine to execute a SQL query.">query plan<span class="smart-term-tooltip"></span></span> shows that relevant indexes are not being used.</li></ul><p><b>Instances and Guidelines for query tuning:</b></p><ul><li>Avoid string comparisons in join conditions; prefer clustering indexes.</li><li>The order of tables in the FROM clause may affect join processing.</li><li>Replace nested queries with joins (un-nesting), as some optimizers perform worse on nested queries.</li><li>Queries with multiple OR conditions might not use indexes; split them into a UNION of separate queries.</li><li>Transform NOT conditions into positive expressions.</li><li>In an equality join, repeat the range predicate from one table onto the other table.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مُحسّن الاستعلامات (Query Optimizer) ليس مثالياً. في بعض الأحيان، استخدام <code>OR</code> يجعله يقرر إجراء مسح كامل للجدول (Table Scan) بدلاً من استخدام الفهرس. تقسيم الاستعلام باستخدام <code>UNION</code> يجبر المُحسّن على استخدام الفهرس لكل جزء على حدة.</p><p>الاعتماد المفرط على العروض (Views) قد يكون ضاراً (Overkill). إذا كان التطبيق يستعلم عن View معقدة جداً للحصول على بيانات بسيطة، فإنه يهدر الموارد في عمليات ربط غير ضرورية.</p></template>
+    <template class="content-en"><p>The Query Optimizer is not perfect. Sometimes, using <code>OR</code> causes it to default to a full <span class="smart-term" data-term-en="Table Scan" data-ar="مسح الجدول" data-en-def="Reading every row in a table to find the requested data, usually indicating poor performance.">table scan<span class="smart-term-tooltip"></span></span> instead of using an index. Splitting the query with <code>UNION</code> forces the optimizer to use the index for each individual condition.</p><p>Over-reliance on Views can be an overkill. If an application queries a highly complex view just to extract simple data, it wastes resources executing unnecessary underlying joins defined in the view.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُنصح بتحويل شروط NOT إلى تعبيرات إيجابية؟</template>
+      <template class="content-en">Why is it recommended to transform NOT conditions into positive expressions?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الفهارس مصممة للبحث عن القيم الموجودة بسرعة، بينما البحث عن ما هو 'غير موجود' (NOT) غالباً ما يجبر النظام على فحص كل السجلات (Table Scan).</p></template>
+      <template class="content-en"><p>Because indexes are optimized to quickly find specific values. Searching for what is 'NOT' there often forces the database to scan all records (Table Scan) to verify.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه الوحدة الحاسمة. تخيلوا أن تصميم قاعدة البيانات المنطقي هو رسم المخطط المعماري للمنزل، بينما التصميم المادي وضبط الأداء هو اختيار مواد البناء وتوزيع الغرف لضمان عدم حدوث زحام في الممرات. في الامتحان، ركزوا جيداً على المقايضات (Trade-offs). لا يوجد حل سحري؛ الفهارس تسرع القراءة ولكنها تبطئ الكتابة. التطبيع يحمي البيانات من التكرار ولكنه يبطئ الاستعلامات المعقدة، وهنا نلجأ لـ 'إلغاء التطبيع' (Denormalization). تذكروا قاعدة 80-20، فهي مفتاح فهم أين يجب أن نضع جهودنا. وأخيراً، لا تنسوا حيل ضبط الاستعلامات: استبدال OR بـ UNION، وتجنب NOT، واستبدال الاستعلامات المتداخلة بـ Joins. هذه النقاط هي المفضلة في أسئلة الاختيار من متعدد!</template>
+    <template class="content-en">Welcome everyone to this crucial module. Imagine logical database design as drawing the blueprint of a house, while physical design and tuning are about choosing the building materials and arranging rooms to prevent hallway congestion. For the exam, focus heavily on the trade-offs. There is no silver bullet; indexes speed up reads but slow down writes. Normalization protects data from anomalies but slows down complex queries, which is why we use 'Denormalization'. Remember the 80-20 rule—it's the key to knowing where to focus our optimization efforts. Finally, don't forget the query tuning tricks: replacing OR with UNION, avoiding NOT, and un-nesting queries into Joins. These are absolute favorites for multiple-choice questions!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي العوامل الأساسية التي تحدد التصميم المادي لقاعدة البيانات؟</template>
+          <template class="content-en">What are the primary factors that determine the physical database design?</template>
+          <span class="content-target">ما هي العوامل الأساسية التي تحدد التصميم المادي لقاعدة البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحليل الاستعلامات (السمات المستخدمة في التحديد والربط)، تكرار الاستدعاء (قاعدة 80-20)، القيود الزمنية، ومعدل عمليات التحديث.</template>
+          <template class="content-en">Analyzing queries (attributes used in selection and joins), frequency of invocation (80-20 rule), time constraints, and update frequencies.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن نتجنب إنشاء فهرس على عمود معين؟</template>
+          <template class="content-en">When should we avoid creating an index on a specific column?</template>
+          <span class="content-target">متى يجب أن نتجنب إنشاء فهرس على عمود معين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما يتم تحديث قيم هذا العمود بشكل متكرر جداً، لأن تكلفة تحديث الفهرس ستكون أعلى من فائدته.</template>
+          <template class="content-en">When the values of that column are updated very frequently, because the overhead of updating the index will outweigh its benefits.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو إلغاء التطبيع (Denormalization) ولماذا نستخدمه؟</template>
+          <template class="content-en">What is Denormalization and why do we use it?</template>
+          <span class="content-target">ما هو إلغاء التطبيع (Denormalization) ولماذا نستخدمه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو دمج الجداول وإضافة بيانات مكررة عمداً. نستخدمه لتسريع الاستعلامات المتكررة عن طريق تجنب عمليات الربط (Joins) المكلفة.</template>
+          <template class="content-en">It is the intentional merging of tables and addition of redundant data. We use it to speed up frequent queries by avoiding costly joins.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين الإحصائيات الداخلية وإحصائيات المراقبة في الـ DBMS؟</template>
+          <template class="content-en">What is the difference between internal statistics and monitoring statistics in a DBMS?</template>
+          <span class="content-target">ما الفرق بين الإحصائيات الداخلية وإحصائيات المراقبة في الـ DBMS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الإحصائيات الداخلية تتعلق بالبيانات (حجم الجداول، القيم المميزة)، بينما إحصائيات المراقبة تتعلق بأداء النظام (I/O، الأقفال، السجلات).</template>
+          <template class="content-en">Internal stats relate to the data (table sizes, distinct values), while monitoring stats relate to system performance (I/O, locks, logs).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الخيارات المتاحة لضبط الفهارس (Tuning Indexes)؟</template>
+          <template class="content-en">What are the available options for tuning indexes?</template>
+          <span class="content-target">ما هي الخيارات المتاحة لضبط الفهارس (Tuning Indexes)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">حذف الفهارس غير المستخدمة، بناء فهارس جديدة، تحويل الفهرس غير المجمع إلى مجمع، أو إعادة بناء الفهرس (Rebuilding).</template>
+          <template class="content-en">Dropping unused indexes, building new ones, changing a non-clustered index to clustered, or rebuilding the index.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكننا ضبط استعلام يحتوي على شروط OR متعددة؟</template>
+          <template class="content-en">How can we tune a query that contains multiple OR conditions?</template>
+          <span class="content-target">كيف يمكننا ضبط استعلام يحتوي على شروط OR متعددة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بتقسيمه إلى استعلامات منفصلة وربطها باستخدام UNION، مما يسمح للمُحسّن باستخدام الفهارس لكل شرط.</template>
+          <template class="content-en">By splitting it into separate queries and combining them using UNION, allowing the optimizer to use indexes for each condition.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُعتبر استخدام العروض (Views) أحياناً عبئاً (Overkill)؟</template>
+          <template class="content-en">Why is the use of Views sometimes considered an overkill?</template>
+          <span class="content-target">لماذا يُعتبر استخدام العروض (Views) أحياناً عبئاً (Overkill)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التطبيق قد يستعلم عن عرض معقد جداً يحتوي على عمليات ربط كثيرة فقط للحصول على بيانات بسيطة، مما يهدر الموارد.</template>
+          <template class="content-en">Because an application might query a highly complex view with many joins just to get simple data, wasting resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التقسيم الأفقي (Horizontal Partitioning)؟</template>
+          <template class="content-en">What is Horizontal Partitioning?</template>
+          <span class="content-target">ما هو التقسيم الأفقي (Horizontal Partitioning)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تقسيم صفوف الجدول الكبير إلى جداول أصغر (مثلاً حسب السنة) لتسريع الاستعلامات التي تستهدف نطاقاً محدداً.</template>
+          <template class="content-en">It is dividing the rows of a large table into smaller tables (e.g., by year) to speed up queries targeting a specific range.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يجب أن نفعل بالاستعلامات المتداخلة (Nested Queries) لتحسين الأداء؟</template>
+          <template class="content-en">What should we do with nested queries to improve performance?</template>
+          <span class="content-target">ماذا يجب أن نفعل بالاستعلامات المتداخلة (Nested Queries) لتحسين الأداء؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب محاولة استبدالها بعمليات ربط (Joins)، لأن مُحسّن الاستعلامات غالباً ما يتعامل مع الربط بكفاءة أعلى.</template>
+          <template class="content-en">We should try to replace them with joins, because the query optimizer often handles joins more efficiently.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يجب تحويل شروط NOT إلى تعبيرات إيجابية؟</template>
+          <template class="content-en">Why should NOT conditions be transformed into positive expressions?</template>
+          <span class="content-target">لماذا يجب تحويل شروط NOT إلى تعبيرات إيجابية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الفهارس تبحث عن القيم الموجودة. استخدام NOT يجبر النظام غالباً على مسح الجدول بالكامل (Table Scan).</template>
+          <template class="content-en">Because indexes search for existing values. Using NOT often forces the system to perform a full table scan.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي قاعدة 80-20 في تصميم قواعد البيانات؟",
+      "en": "What is the 80-20 rule in database design?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قاعدة تنص على أن 20% من البيانات يتم الوصول إليها 80% من الوقت.",
+        "en": "A rule stating that 20% of the data is accessed 80% of the time."
+      },
+      "example": {
+        "ar": "التركيز على فهرسة الـ 20% من الجداول الأكثر استخداماً.",
+        "en": "Focusing indexing efforts on the 20% of tables that are most frequently queried."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الهدف الرئيسي من إلغاء التطبيع (Denormalization)؟",
+      "en": "What is the main goal of Denormalization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحسين أداء الاستعلامات المتكررة عن طريق تجنب عمليات الربط (Joins) المكلفة.",
+        "en": "To improve the performance of frequently occurring queries by avoiding costly joins."
+      },
+      "example": {
+        "ar": "إضافة اسم العميل إلى جدول الطلبات لتجنب ربطه بجدول العملاء.",
+        "en": "Adding the customer name to the orders table to avoid joining with the customers table."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو تأثير إلغاء التطبيع على عمليات التحديث؟",
+      "en": "What is the impact of denormalization on update operations?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يؤدي إلى إبطاء عمليات التحديث وزيادة العبء للحفاظ على اتساق البيانات بسبب التكرار.",
+        "en": "It slows down updates and causes extra processing overhead to maintain consistency due to redundancy."
+      },
+      "example": {
+        "ar": "تحديث عنوان العميل في عدة جداول بدلاً من جدول واحد.",
+        "en": "Updating a customer's address in multiple tables instead of just one."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي السمة التي تعتبر مرشحاً لتجنب الفهرسة؟",
+      "en": "Which attribute is a candidate for AVOIDING an index?"
+    },
+    "back": {
+      "definition": {
+        "ar": "السمة التي تتغير قيمتها بشكل متكرر عبر عمليات التحديث.",
+        "en": "An attribute whose values are frequently changed by update operations."
+      },
+      "example": {
+        "ar": "عمود 'آخر ظهور' للمستخدم الذي يتحدث كل دقيقة.",
+        "en": "A 'last_seen' column for a user that updates every minute."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو ضبط قاعدة البيانات (Database Tuning)؟",
+      "en": "What is Database Tuning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية مستمرة لمراقبة الموارد وتعديل التصميم المادي لحل الاختناقات.",
+        "en": "The continuous process of monitoring resources and revising the physical design to reveal and fix bottlenecks."
+      },
+      "example": {
+        "ar": "إضافة فهرس جديد بعد ملاحظة بطء في استعلام معين.",
+        "en": "Adding a new index after noticing a specific query is running slow."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "اذكر اثنين من أهداف ضبط قاعدة البيانات.",
+      "en": "Name two goals of database tuning."
+    },
+    "back": {
+      "definition": {
+        "ar": "1. تقليل وقت الاستجابة للاستعلامات. 2. تحسين الإنتاجية الإجمالية.",
+        "en": "1. Lower response time of queries. 2. Improve overall throughput."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي الإحصائيات الداخلية التي يجمعها الـ DBMS وتساعد في الضبط؟",
+      "en": "What internal statistics collected by the DBMS help in tuning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حجم الجداول، عدد القيم المميزة في عمود، وعدد مرات تنفيذ استعلام معين.",
+        "en": "Size of individual tables, number of distinct values in a column, and execution frequency of queries."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي المشاكل التي يعالجها الضبط (Tuning)؟",
+      "en": "What problems are considered in tuning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التنافس على الأقفال، عبء السجلات (Logging)، حجم الذاكرة المؤقتة، وتخصيص الموارد.",
+        "en": "Lock contention, logging overhead, buffer size optimization, and resource allocation."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "لماذا قد نقوم بحذف فهرس موجود؟",
+      "en": "Why might we drop an existing index?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنه لا يتم استخدامه، أو لأنه يسبب عبئاً كبيراً بسبب التحديثات المتكررة للسمة.",
+        "en": "Because it is not utilized at all, or it causes excessive overhead due to frequent updates on the attribute."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو التقسيم الأفقي (Horizontal Partitioning)؟",
+      "en": "What is Horizontal Partitioning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم صفوف الجدول إلى جداول أو ملفات متعددة بناءً على شرط معين.",
+        "en": "Dividing the rows of a table into multiple tables or files based on a condition."
+      },
+      "example": {
+        "ar": "تقسيم جدول المبيعات بحيث يكون لكل سنة جدول منفصل.",
+        "en": "Partitioning a sales table so each year has its own separate table."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو التقسيم الرأسي (Vertical Partitioning)؟",
+      "en": "What is Vertical Partitioning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم أعمدة الجدول إلى جداول متعددة مرتبطة بمفتاح أساسي.",
+        "en": "Dividing the columns of a table into multiple tables linked by a primary key."
+      },
+      "example": {
+        "ar": "فصل عمود 'السيرة الذاتية' الطويل عن جدول الموظفين الأساسي.",
+        "en": "Separating a long 'Biography' column from the main Employee table."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي مؤشرات الحاجة لضبط استعلام معين؟",
+      "en": "What are the indications for tuning a specific query?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الاستعلام يقوم بوصول مفرط للقرص، أو خطة الاستعلام تظهر عدم استخدام الفهارس.",
+        "en": "The query issues too many disk accesses, or the query plan shows relevant indexes are not used."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف يجب التعامل مع الاستعلامات التي تحتوي على شروط OR متعددة؟",
+      "en": "How should queries with multiple OR conditions be handled?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب تقسيمها إلى استعلامات منفصلة ودمجها باستخدام UNION لضمان استخدام الفهارس.",
+        "en": "They should be split up and expressed as a union of queries to ensure indexes are used."
+      },
+      "example": {
+        "ar": "بدلاً من SELECT * WHERE A=1 OR B=2، استخدم SELECT * WHERE A=1 UNION SELECT * WHERE B=2.",
+        "en": "Instead of SELECT * WHERE A=1 OR B=2, use SELECT * WHERE A=1 UNION SELECT * WHERE B=2."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الإجراء الموصى به للاستعلامات المتداخلة (Nested Queries) أثناء الضبط؟",
+      "en": "What is the recommended action for nested queries during tuning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استبدالها بعمليات ربط (Joins) لأن بعض المُحسّنات تؤدي بشكل أسوأ مع الاستعلامات المتداخلة.",
+        "en": "Replace them with joins, as some query optimizers perform worse on nested queries."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "لماذا يجب تحويل شروط NOT إلى تعبيرات إيجابية؟",
+      "en": "Why should NOT conditions be transformed into positive expressions?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن التعبيرات الإيجابية تسمح لمُحسّن الاستعلامات باستخدام الفهارس بكفاءة أكبر.",
+        "en": "Because positive expressions allow the query optimizer to use indexes more efficiently."
+      },
+      "example": {
+        "ar": "بدلاً من NOT (Status = 'Closed')، استخدم Status IN ('Open', 'Pending').",
+        "en": "Instead of NOT (Status = 'Closed'), use Status IN ('Open', 'Pending')."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+        <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <div id="quiz-content" class="quiz-card glass-card">
+          <div class="quiz-header">
+            <span id="quiz-counter">1 / 10</span>
+            <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+          </div>
+          <div class="quiz-question" id="quiz-question-text"></div>
+          <div class="quiz-options" id="quiz-options-container"></div>
+          <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+          <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+              <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+            </button>
+          </div>
+        </div>
+        <div id="quiz-results" class="quiz-results glass-card hidden">
+          <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+        </div>
+      </section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "وفقاً لقاعدة 80-20 في قواعد البيانات، أي من العبارات التالية صحيحة؟",
+      "en": "According to the 80-20 rule in databases, which of the following is true?"
+    },
+    "options": {
+      "ar": [
+        "80% من البيانات يتم الوصول إليها 20% من الوقت.",
+        "20% من البيانات يتم الوصول إليها 80% من الوقت.",
+        "80% من الاستعلامات تتطلب 20% من الفهارس.",
+        "20% من التحديثات تسبب 80% من الأخطاء."
+      ],
+      "en": [
+        "80% of the data is accessed 20% of the time.",
+        "20% of the data is accessed 80% of the time.",
+        "80% of queries require 20% of indexes.",
+        "20% of updates cause 80% of errors."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "قاعدة 80-20 تنص على أن نسبة صغيرة من البيانات (20%) تتحمل الجزء الأكبر من حركة المرور والاستعلامات (80%).",
+      "en": "The 80-20 rule states that a small portion of the data (20%) handles the vast majority of the traffic and queries (80%)."
+    },
+    "hint": {
+      "ar": "تذكر أن التركيز يكون دائماً على الأقلية الأكثر استخداماً.",
+      "en": "Remember that focus is always on the heavily used minority."
+    },
+    "difficulty": "easy",
+    "conceptId": "factors-influencing-physical-design"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الهدف الأساسي من إلغاء التطبيع (Denormalization)؟",
+      "en": "What is the primary goal of denormalization?"
+    },
+    "options": {
+      "ar": [
+        "تقليل تكرار البيانات.",
+        "تجنب شذوذ التحديث (Update Anomalies).",
+        "تحسين أداء الاستعلامات المتكررة بتجنب الربط.",
+        "تقليل حجم قاعدة البيانات على القرص."
+      ],
+      "en": [
+        "To minimize data redundancy.",
+        "To avoid update anomalies.",
+        "To improve the performance of frequently occurring queries by avoiding joins.",
+        "To reduce the database size on disk."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إلغاء التطبيع يضيف بيانات مكررة عمداً لتجنب عمليات الربط (Joins) المكلفة، مما يسرع الاستعلامات.",
+      "en": "Denormalization intentionally adds redundant data to avoid costly joins, thereby speeding up queries."
+    },
+    "hint": {
+      "ar": "إلغاء التطبيع هو عكس التطبيع الذي يهدف لتقليل التكرار.",
+      "en": "Denormalization is the opposite of normalization, which aims to reduce redundancy."
+    },
+    "difficulty": "medium",
+    "conceptId": "physical-design-decisions-denormalization"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي من السمات التالية تعتبر مرشحاً لتجنب إنشاء فهرس عليها؟",
+      "en": "Which of the following attributes is a candidate for AVOIDING an access structure (index)?"
+    },
+    "options": {
+      "ar": [
+        "السمات المستخدمة بكثرة في شروط التحديد (WHERE).",
+        "السمات المستخدمة بكثرة في شروط الربط (JOIN).",
+        "السمات التي تتغير قيمتها بشكل متكرر عبر عمليات التحديث.",
+        "السمات التي تمثل مفاتيح مرشحة (Candidate Keys)."
+      ],
+      "en": [
+        "Attributes frequently used in selection conditions (WHERE).",
+        "Attributes frequently used in join conditions (JOIN).",
+        "Attributes whose values are frequently changed by update operations.",
+        "Attributes that represent candidate keys."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "السمات التي تُحدث بكثرة تسبب عبئاً كبيراً إذا كانت مفهرسة، لأن الفهرس يجب أن يُحدث مع كل تغيير في البيانات.",
+      "en": "Frequently updated attributes cause high overhead if indexed, because the index must be updated with every data change."
+    },
+    "hint": {
+      "ar": "الفهارس تسرع القراءة ولكنها تبطئ الكتابة.",
+      "en": "Indexes speed up reads but slow down writes."
+    },
+    "difficulty": "medium",
+    "conceptId": "factors-influencing-physical-design"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي مما يلي ليس من أهداف ضبط قاعدة البيانات (Database Tuning)؟",
+      "en": "Which of the following is NOT a goal of database tuning?"
+    },
+    "options": {
+      "ar": [
+        "جعل التطبيقات تعمل بشكل أسرع.",
+        "تقليل وقت الاستجابة للاستعلامات.",
+        "زيادة التنافس على الأقفال (Lock Contention).",
+        "تحسين الإنتاجية الإجمالية (Throughput)."
+      ],
+      "en": [
+        "To make applications run faster.",
+        "To lower the response time of queries.",
+        "To increase lock contention.",
+        "To improve the overall throughput."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "زيادة التنافس على الأقفال هي مشكلة يحاول الضبط تجنبها، وليست هدفاً.",
+      "en": "Increasing lock contention is a problem that tuning tries to avoid, not a goal."
+    },
+    "hint": {
+      "ar": "التنافس على الأقفال يسبب بطء النظام.",
+      "en": "Lock contention causes system slowdowns."
+    },
+    "difficulty": "easy",
+    "conceptId": "database-tuning-overview"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الإجراء الموصى به لاستعلام يحتوي على شروط تحديد متعددة متصلة بـ OR ولا يستخدم الفهارس؟",
+      "en": "What is the recommended action for a query with multiple selection conditions connected via OR that is not using indexes?"
+    },
+    "options": {
+      "ar": [
+        "تحويل OR إلى AND.",
+        "تقسيم الاستعلام والتعبير عنه كاتحاد (UNION) لاستعلامات منفصلة.",
+        "استخدام استعلام متداخل (Nested Query).",
+        "إلغاء الفهارس الموجودة على تلك الأعمدة."
+      ],
+      "en": [
+        "Change OR to AND.",
+        "Split it up and express it as a UNION of separate queries.",
+        "Use a nested query.",
+        "Drop the existing indexes on those columns."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تقسيم الاستعلام باستخدام UNION يجبر مُحسّن الاستعلامات على استخدام الفهرس المناسب لكل شرط على حدة.",
+      "en": "Splitting the query using UNION forces the query optimizer to use the appropriate index for each individual condition."
+    },
+    "hint": {
+      "ar": "كيف يمكنك فصل الشروط بحيث يُعالج كل منها بشكل مستقل؟",
+      "en": "How can you separate the conditions so each is processed independently?"
+    },
+    "difficulty": "hard",
+    "conceptId": "tuning-queries"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من الإحصائيات التالية يتم جمعها داخلياً بواسطة نظام إدارة قواعد البيانات (DBMS)؟",
+      "en": "Which of the following statistics is internally collected by the DBMS?"
+    },
+    "options": {
+      "ar": [
+        "إحصائيات أداء أجهزة الإدخال والإخراج (I/O).",
+        "إحصائيات الأقفال (Locking).",
+        "عدد القيم المميزة في عمود (Distinct values).",
+        "إحصائيات السجلات (Logging)."
+      ],
+      "en": [
+        "I/O and device performance statistics.",
+        "Locking statistics.",
+        "Number of distinct values in a column.",
+        "Logging statistics."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "عدد القيم المميزة وحجم الجداول هي إحصائيات داخلية للبيانات، بينما I/O والأقفال والسجلات هي إحصائيات مراقبة (Monitoring).",
+      "en": "Number of distinct values and table sizes are internal data statistics, while I/O, locking, and logging are monitoring statistics."
+    },
+    "hint": {
+      "ar": "ابحث عن الإحصائية المتعلقة بالبيانات نفسها وليس بأداء النظام.",
+      "en": "Look for the statistic related to the data itself, not system performance."
+    },
+    "difficulty": "medium",
+    "conceptId": "database-tuning-overview"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو أحد الأسباب الصالحة لحذف فهرس (Drop Index)؟",
+      "en": "What is a valid reason to drop an index?"
+    },
+    "options": {
+      "ar": [
+        "الاستعلامات تعمل ببطء شديد بدونه.",
+        "الفهرس مبني على سمة تتغير بشكل متكرر ويسبب عبئاً.",
+        "الفهرس هو فهرس مجمع (Clustered).",
+        "الجدول يحتوي على ملايين السجلات."
+      ],
+      "en": [
+        "Queries run too slowly without it.",
+        "The index is on a frequently updated attribute and causes overhead.",
+        "The index is a clustered index.",
+        "The table has millions of records."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كان الفهرس يسبب عبئاً كبيراً بسبب التحديثات المستمرة ولا يقدم فائدة تذكر في القراءة، فيجب حذفه.",
+      "en": "If an index causes excessive overhead due to frequent updates and offers little read benefit, it should be dropped."
+    },
+    "hint": {
+      "ar": "متى يصبح الفهرس مشكلة بدلاً من حل؟",
+      "en": "When does an index become a problem rather than a solution?"
+    },
+    "difficulty": "easy",
+    "conceptId": "tuning-indexes"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في سياق ضبط الاستعلامات، ماذا يجب أن تفعل بالاستعلامات المتداخلة (Nested Queries)؟",
+      "en": "In the context of query tuning, what should you do with nested queries?"
+    },
+    "options": {
+      "ar": [
+        "زيادة مستوى التداخل لتحسين الأداء.",
+        "استبدالها بعمليات ربط (Joins) إن أمكن.",
+        "تحويلها إلى عروض (Views).",
+        "إضافة شروط OR داخلها."
+      ],
+      "en": [
+        "Increase the nesting level to improve performance.",
+        "Replace them by joins if possible.",
+        "Convert them into Views.",
+        "Add OR conditions inside them."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُفضل استبدال الاستعلامات المتداخلة بعمليات ربط لأن بعض مُحسّنات الاستعلامات تؤدي بشكل أسوأ مع الاستعلامات المتداخلة.",
+      "en": "It is preferred to replace nested queries with joins because some query optimizers perform worse on nested queries."
+    },
+    "hint": {
+      "ar": "المُحسّنات (Optimizers) تتعامل مع الجداول المسطحة بشكل أفضل.",
+      "en": "Optimizers handle flat table structures better."
+    },
+    "difficulty": "medium",
+    "conceptId": "tuning-queries"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو الإجراء الذي يوزع صفوف الجدول على ملفات مختلفة لتسريع الوصول؟",
+      "en": "What action distributes table rows across different files to speed up access?"
+    },
+    "options": {
+      "ar": [
+        "التقسيم الرأسي (Vertical Partitioning).",
+        "إلغاء التطبيع (Denormalization).",
+        "التقسيم الأفقي (Horizontal Partitioning).",
+        "إعادة بناء الفهرس (Rebuilding Index)."
+      ],
+      "en": [
+        "Vertical Partitioning.",
+        "Denormalization.",
+        "Horizontal Partitioning.",
+        "Rebuilding Index."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التقسيم الأفقي يقسم البيانات بناءً على الصفوف (مثلاً حسب السنة)، بينما الرأسي يقسمها بناءً على الأعمدة.",
+      "en": "Horizontal partitioning divides data based on rows (e.g., by year), while vertical divides by columns."
+    },
+    "hint": {
+      "ar": "الصفوف تمتد أفقياً في الجداول.",
+      "en": "Rows extend horizontally in tables."
+    },
+    "difficulty": "easy",
+    "conceptId": "tuning-database-design"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "عند وجود خيارات متعددة لشرط الربط (Join)، أي نوع من الفهارس يجب اختياره؟",
+      "en": "If multiple options for a join condition are possible, which type of index should be chosen?"
+    },
+    "options": {
+      "ar": [
+        "فهرس التجزئة (Hash Index).",
+        "الفهرس المجمع (Clustering Index).",
+        "الفهرس غير المجمع (Non-clustered Index).",
+        "فهرس يعتمد على مقارنات السلاسل النصية."
+      ],
+      "en": [
+        "Hash Index.",
+        "Clustering Index.",
+        "Non-clustered Index.",
+        "An index based on string comparisons."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُنصح باختيار شرط الربط الذي يستخدم فهرس مجمع (Clustering Index) وتجنب مقارنات السلاسل النصية.",
+      "en": "It is recommended to choose a join condition that uses a clustering index and avoid string comparisons."
+    },
+    "hint": {
+      "ar": "هذا الفهرس يحدد الترتيب المادي للبيانات.",
+      "en": "This index determines the physical order of the data."
+    },
+    "difficulty": "medium",
+    "conceptId": "tuning-queries"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن فهرسة كل عمود مستخدم في جملة WHERE هو ممارسة جيدة. الحقيقة: الأعمدة التي يتم تحديثها بكثرة يجب تجنب فهرستها لأن تكلفة تحديث الفهرس ستفوق فائدة سرعة القراءة.</template>
+    <template class="content-en">Believing that indexing every column used in a WHERE clause is good practice. Reality: Frequently updated columns should NOT be indexed, as the overhead of updating the index outweighs the read benefits.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قاعدة 80-20: 20% من البيانات يتم الوصول إليها 80% من الوقت. هذا المبدأ يوجه جهود الضبط للتركيز على الجداول والاستعلامات الأكثر أهمية بدلاً من محاولة تحسين كل شيء.</template>
+    <template class="content-en">The 80-20 Rule: 20% of the data is accessed 80% of the time. This principle directs tuning efforts to focus on the most critical tables and queries rather than optimizing everything.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام OR في الاستعلامات قد يخدع مُحسّن الاستعلامات (Optimizer) ويجعله يتجاهل الفهارس تماماً. الحل السري هو تقسيم الاستعلام باستخدام UNION.</template>
+    <template class="content-en">Using OR in queries can trick the Query Optimizer into ignoring indexes entirely. The secret workaround is to split the query using UNION.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن التطبيع (Normalization) العالي (مثل BCNF) هو دائماً الأفضل للأداء. الحقيقة: في الأنظمة التي تعتمد على القراءة بكثرة، إلغاء التطبيع (Denormalization) ضروري لتجنب عمليات الربط البطيئة.</template>
+    <template class="content-en">Assuming high Normalization (like BCNF) is always best for performance. Reality: In read-heavy systems, Denormalization is necessary to avoid slow joins.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الضبط (Tuning) ليس عملية تتم لمرة واحدة عند تصميم النظام، بل هو عملية مستمرة تعتمد على مراقبة الإحصائيات الفعلية للنظام أثناء تشغيله.</template>
+    <template class="content-en">Tuning is not a one-time setup during system design; it is a continuous process based on monitoring actual system statistics during operation.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+  <script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

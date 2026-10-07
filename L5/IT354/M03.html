@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT354" data-module="3" data-no-videos>
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>خوارزميات معالجة الاستعلامات وتحسينها · IT354 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+      var fs=localStorage.getItem('garden_font_size');
+      if(fs)document.documentElement.setAttribute('data-font-size',fs);
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT354" data-page-title-en="IT354">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M02.html" data-gh-next="M04.html" data-gh-card="../../hub/course.html?code=IT354"></header>
+
+  <div class="content-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+      <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#query-processing-intro" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في معالجة الاستعلامات</template>
+        <template class="content-en">Introduction to Query Processing</template>
+        <span class="content-target">مقدمة في معالجة الاستعلامات</span>
+      </a>
+      <a href="#translating-sql-to-ra" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويل استعلامات SQL إلى الجبر العلائقي</template>
+        <template class="content-en">Translating SQL Queries into Relational Algebra</template>
+        <span class="content-target">تحويل استعلامات SQL إلى الجبر العلائقي</span>
+      </a>
+      <a href="#external-sorting" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات الفرز الخارجي</template>
+        <template class="content-en">Algorithms for External Sorting</template>
+        <span class="content-target">خوارزميات الفرز الخارجي</span>
+      </a>
+      <a href="#select-algorithms" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات عملية التحديد (SELECT)</template>
+        <template class="content-en">Algorithms for SELECT Operations</template>
+        <span class="content-target">خوارزميات عملية التحديد (SELECT)</span>
+      </a>
+      <a href="#join-algorithms" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات عملية الربط (JOIN)</template>
+        <template class="content-en">Algorithms for JOIN Operations</template>
+        <span class="content-target">خوارزميات عملية الربط (JOIN)</span>
+      </a>
+      <a href="#project-and-set-algorithms" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات الإسقاط (PROJECT) وعمليات المجموعات (SET)</template>
+        <template class="content-en">Algorithms for PROJECT and SET Operations</template>
+        <span class="content-target">خوارزميات الإسقاط (PROJECT) وعمليات المجموعات (SET)</span>
+      </a>
+      <a href="#aggregates-and-outer-joins" class="toc-link" data-bilingual>
+        <template class="content-ar">تنفيذ عمليات التجميع والربط الخارجي</template>
+        <template class="content-en">Implementing Aggregate Operations and Outer Joins</template>
+        <span class="content-target">تنفيذ عمليات التجميع والربط الخارجي</span>
+      </a>
+      <a href="#pipelining" class="toc-link" data-bilingual>
+        <template class="content-ar">دمج العمليات باستخدام خطوط الأنابيب (Pipelining)</template>
+        <template class="content-en">Combining Operations using Pipelining</template>
+        <span class="content-target">دمج العمليات باستخدام خطوط الأنابيب (Pipelining)</span>
+      </a>
+      <a href="#heuristic-optimization" class="toc-link" data-bilingual>
+        <template class="content-ar">استخدام التوجيهات في تحسين الاستعلام (Heuristics)</template>
+        <template class="content-en">Using Heuristics in Query Optimization</template>
+        <span class="content-target">استخدام التوجيهات في تحسين الاستعلام (Heuristics)</span>
+      </a>
+      <a href="#cost-based-optimization" class="toc-link" data-bilingual>
+        <template class="content-ar">التحسين المبني على التكلفة والانتقائية</template>
+        <template class="content-en">Using Selectivity and Cost Estimates in Query Optimization</template>
+        <span class="content-target">التحسين المبني على التكلفة والانتقائية</span>
+      </a>
+      <a href="#semantic-query-optimization" class="toc-link" data-bilingual>
+        <template class="content-ar">التحسين الدلالي للاستعلام (Semantic Query Optimization)</template>
+        <template class="content-en">Semantic Query Optimization</template>
+        <span class="content-target">التحسين الدلالي للاستعلام (Semantic Query Optimization)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+      <div class="sidebar-widget">
+        <div class="widget-number" id="fc-due-count">0</div>
+        <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 3</template>
+      <template class="content-en">Module 3</template>
+      <span class="content-target">الوحدة 3</span>
+    </span> · IT354
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">خوارزميات معالجة الاستعلامات وتحسينها</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية تحويل استعلامات SQL إلى الجبر العلائقي، وخوارزميات تنفيذ العمليات (مثل الفرز، التحديد، والربط)، بالإضافة إلى استراتيجيات تحسين الاستعلامات باستخدام التوجيهات (Heuristics) والتكلفة (Cost-based).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Algorithms for Query Processing and Optimization</h1>
+      <p class="hero-description">This module covers translating SQL queries into relational algebra, algorithms for executing operations (Sorting, SELECT, JOIN), and query optimization strategies using heuristics and cost estimates.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة الاستعلامات</span>
+      <span class="tag">تحسين الاستعلامات</span>
+      <span class="tag">الجبر العلائقي</span>
+      <span class="tag">خوارزميات الربط</span>
+      <span class="tag">التوجيهات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Query Processing</span>
+      <span class="tag">Query Optimization</span>
+      <span class="tag">Relational Algebra</span>
+      <span class="tag">JOIN Algorithms</span>
+      <span class="tag">Heuristics</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>مناقشة أسباب تحويل استعلامات SQL إلى استعلامات الجبر العلائقي قبل عملية التحسين.</span></li>
+      <li><span class="obj-icon">✦</span><span>مناقشة التوجيهات (heuristics) الرئيسية المطبقة أثناء تحسين الاستعلام.</span></li>
+      <li><span class="obj-icon">✦</span><span>رسم أشجار الاستعلام (query trees) لاستعلامات SQL وتطوير دوال التكلفة لخوارزمية معينة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح ما إذا كان يمكن استخدام فهرس غير كثيف (nondense index) في تنفيذ معامل التجميع (aggregate operator).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Discuss the reasons for converting SQL queries into relational algebra queries prior to optimization.</span></li>
+      <li><span class="obj-icon">✦</span><span>Discuss the main heuristics applied during query optimization.</span></li>
+      <li><span class="obj-icon">✦</span><span>Draw query trees for SQL queries and develop cost functions for an algorithm.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain whether or not a nondense index be used in the implementation of an aggregate operator.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="query-processing-intro" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في معالجة الاستعلامات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to Query Processing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية اختيار استراتيجية التنفيذ الأنسب لمعالجة الاستعلام، تشبه اختيار أسرع طريق للوصول إلى وجهتك في زحام المرور.</p></template>
+    <template class="content-en"><p>The process of choosing a suitable execution strategy for processing a query, akin to finding the fastest route in traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Query Optimization" data-ar="تحسين الاستعلام" data-en-def="The process of choosing a suitable execution strategy for processing a query.">تحسين الاستعلام<span class="smart-term-tooltip"></span></span> (Query Optimization) هو العملية التي يقوم بها نظام إدارة قواعد البيانات لتحديد أفضل خطة لتنفيذ الاستعلام. يمر الاستعلام بعدة مراحل:</p><ol><li>المسح والتحليل والتحقق (Scanning, parsing, and validating).</li><li>التحويل إلى شكل وسيط (Immediate form of query).</li><li>مُحسّن الاستعلام (Query optimizer) الذي يولد خطة التنفيذ.</li><li>مُولد الكود (Query code generator) الذي ينشئ كود التنفيذ.</li><li>معالج قاعدة البيانات وقت التشغيل (Runtime database processor) الذي ينفذ الكود ويعيد النتيجة.</li></ol><p>يتم تمثيل الاستعلام داخلياً إما باستخدام <span class="smart-term" data-term-en="Query Tree" data-ar="شجرة الاستعلام" data-en-def="A tree data structure that corresponds to a relational algebra expression.">شجرة الاستعلام<span class="smart-term-tooltip"></span></span> (Query Tree) أو رسم الاستعلام (Query Graph).</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Query Optimization" data-ar="تحسين الاستعلام" data-en-def="The process of choosing a suitable execution strategy for processing a query.">Query Optimization<span class="smart-term-tooltip"></span></span> is the process of choosing a suitable execution strategy for processing a query. A high-level query goes through several steps:</p><ol><li>Scanning, parsing, and validating.</li><li>Conversion to an immediate form.</li><li>The Query Optimizer generates an execution plan.</li><li>The Query code generator creates the executable code.</li><li>The Runtime database processor executes the code and returns the result.</li></ol><p>Queries are represented internally using either a <span class="smart-term" data-term-en="Query Tree" data-ar="شجرة الاستعلام" data-en-def="A tree data structure that corresponds to a relational algebra expression.">Query Tree<span class="smart-term-tooltip"></span></span> or a Query Graph.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى التحسين؟ لأن استعلام SQL هو لغة تصريحية (Declarative) تخبر النظام بما تريده، وليس كيف يحصل عليه. قد يكون هناك آلاف الطرق لتنفيذ استعلام معقد، والفرق في الأداء بين خطة سيئة وخطة جيدة قد يكون من ثوانٍ إلى أيام.</p><p>التمثيل الداخلي باستخدام شجرة الاستعلام يسمح للنظام بتطبيق قواعد التحويل الجبرية (Algebraic transformations) بسهولة، حيث تمثل العقد الورقية الجداول، والعقد الداخلية تمثل العمليات (مثل SELECT و JOIN).</p><p>الكود المولد يمكن أن يكون إما مفسراً (Interpreted) للتنفيذ المباشر، أو مجمعاً (Compiled) ليتم تخزينه وتنفيذه لاحقاً عند الحاجة.</p></template>
+    <template class="content-en"><p>Why do we need optimization? Because SQL is a declarative language; it specifies *what* data to retrieve, not *how* to retrieve it. A complex query might have thousands of possible execution plans, and the performance difference can range from seconds to days.</p><p>Internal representation using a Query Tree allows the system to easily apply algebraic transformation rules. Leaf nodes represent base relations, and internal nodes represent relational algebra operations.</p><p>The generated code can be executed directly (interpreted mode) or stored and executed later whenever needed (compiled mode).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Flowchart showing the typical steps when processing a high-level query. Top to bottom flow: 'Query in a high-level language' -> 'Scanning, parsing, and validating' -> 'Immediate form of query' -> 'Query optimizer' -> 'Execution plan' -> 'Query code generator' -> 'Code to execute the query' -> 'Runtime database processor' -> 'Result of query'. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 600, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 1000" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Process Node Gradient -->
+    <linearGradient id="process-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+
+    <!-- Drop Shadow for Nodes -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Engine Bounding Box -->
+  <rect x="290" y="120" width="380" height="720" rx="12" fill="none" stroke="var(--brand-400)" stroke-dasharray="8 4" stroke-width="2" />
+  <text x="480" y="142" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">DBMS Query Processing Engine</text>
+  <text x="480" y="142" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">محرك معالجة الاستعلام في نظام إدارة قواعد البيانات</text>
+
+  <!-- ================= CONNECTIONS ================= -->
+  <!-- Main Flow Arrows -->
+  <path d="M 480 100 L 480 142" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 210 L 480 242" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 310 L 480 342" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 410 L 480 442" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 510 L 480 542" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 610 L 480 642" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 710 L 480 742" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 480 810 L 480 872" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Side Elements Arrows -->
+  <!-- Catalog to Parser -->
+  <path d="M 220 190 C 260 190, 260 180, 302 180" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow)" />
+  <!-- Catalog to Optimizer -->
+  <path d="M 220 370 C 260 370, 260 380, 302 380" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow)" />
+  
+  <!-- Database to Runtime Processor -->
+  <path d="M 220 765 L 302 765" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Runtime Processor to Database -->
+  <path d="M 302 795 L 220 795" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+
+  <!-- ================= SIDE ELEMENTS ================= -->
+  <!-- System Catalog -->
+  <g filter="url(#shadow)">
+    <path d="M 60 190 v 180 a 80 20 0 0 0 160 0 v -180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <ellipse cx="140" cy="190" rx="80" ry="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+  <text x="140" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">System Catalog</text>
+  <text x="140" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كتالوج النظام</text>
+  <text x="140" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Data Dictionary)</text>
+  <text x="140" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(قاموس البيانات)</text>
+
+  <!-- Database -->
+  <g filter="url(#shadow)">
+    <path d="M 60 740 v 70 a 80 20 0 0 0 160 0 v -70" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <ellipse cx="140" cy="740" rx="80" ry="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+  <text x="140" y="785" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Database</text>
+  <text x="140" y="785" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قاعدة البيانات</text>
+
+
+  <!-- ================= MAIN FLOW NODES ================= -->
+  
+  <!-- Step 1: Input Query -->
+  <rect x="310" y="40" width="340" height="60" rx="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+  <text x="480" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Query in a high-level language</text>
+  <text x="480" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">استعلام بلغة عالية المستوى</text>
+
+  <!-- Step 2: Scanner/Parser -->
+  <rect x="310" y="150" width="340" height="60" rx="6" fill="url(#process-grad)" stroke="var(--brand-500)" stroke-width="1" filter="url(#shadow)" />
+  <text x="480" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Scanning, parsing, and validating</text>
+  <text x="480" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المسح والإعراب والتحقق</text>
+  <text x="480" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" opacity="0.85" class="gsvg-en">Syntax &amp; semantics check</text>
+  <text x="480" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" opacity="0.85" class="gsvg-ar">التحقق من البنية والدلالة</text>
+
+  <!-- Step 3: Immediate Form -->
+  <rect x="310" y="250" width="340" height="60" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+  <text x="480" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Immediate form of query</text>
+  <text x="480" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الصيغة الوسيطة للاستعلام</text>
+  <text x="480" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Query Tree / Query Graph</text>
+  <text x="480" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">شجرة الاستعلام / رسم بياني للاستعلام</text>
+
+  <!-- Step 4: Query Optimizer -->
+  <rect x="310" y="350" width="340" height="60" rx="6" fill="url(#process-grad)" stroke="var(--brand-500)" stroke-width="1" filter="url(#shadow)" />
+  <text x="480" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Query Optimizer</text>
+  <text x="480" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">مُحسّن الاستعلام</text>
+  <text x="480" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" opacity="0.85" class="gsvg-en">Generates execution strategy</text>
+  <text x="480" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" opacity="0.85" class="gsvg-ar">يُنشئ استراتيجية التنفيذ</text>
+
+  <!-- Step 5: Execution Plan -->
+  <rect x="310" y="450" width="340" height="60" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+  <text x="480" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Execution plan</text>
+  <text x="480" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خطة التنفيذ</text>
+
+  <!-- Step 6: Code Generator -->
+  <rect x="310" y="550" width="340" height="60" rx="6" fill="url(#process-grad)" stroke="var(--brand-500)" stroke-width="1" filter="url(#shadow)" />
+  <text x="480" y="585" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Query code generator</text>
+  <text x="480" y="585" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">مُنشئ كود الاستعلام</text>
+
+  <!-- Step 7: Executable Code -->
+  <rect x="310" y="650" width="340" height="60" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+  <text x="480" y="685" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Code to execute the query</text>
+  <text x="480" y="685" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الكود التنفيذي للاستعلام</text>
+
+  <!-- Step 8: Runtime Processor -->
+  <rect x="310" y="750" width="340" height="60" rx="6" fill="url(#process-grad)" stroke="var(--brand-500)" stroke-width="1" filter="url(#shadow)" />
+  <text x="480" y="775" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Runtime database processor</text>
+  <text x="480" y="775" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">معالج قاعدة البيانات في وقت التشغيل</text>
+  <text x="480" y="795" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" opacity="0.85" class="gsvg-en">Executes operations on data</text>
+  <text x="480" y="795" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" opacity="0.85" class="gsvg-ar">ينفذ العمليات على البيانات</text>
+
+  <!-- Step 9: Output Result -->
+  <rect x="310" y="880" width="340" height="60" rx="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+  <text x="480" y="915" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Result of query</text>
+  <text x="480" y="915" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نتيجة الاستعلام</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يحدد المبرمج خطة التنفيذ بنفسه بدلاً من الاعتماد على مُحسّن الاستعلام؟</template>
+      <template class="content-en">Why doesn't the programmer specify the execution plan manually instead of relying on the query optimizer?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن حجم البيانات، والفهارس المتاحة، وتوزيع البيانات يتغير باستمرار. المُحسّن يمتلك إحصائيات حديثة تمكنه من اتخاذ قرارات أفضل ديناميكياً، مما يقلل العبء على المبرمج ويضمن أداءً مستداماً.</p></template>
+      <template class="content-en"><p>Because data volume, available indexes, and data distribution change constantly. The optimizer has up-to-date statistics to make better dynamic decisions, reducing the burden on the programmer and ensuring sustainable performance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="translating-sql-to-ra" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تحويل استعلامات SQL إلى الجبر العلائقي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Translating SQL Queries into Relational Algebra</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقسيم الاستعلام إلى كتل (Query Blocks) أساسية لتسهيل تحويلها إلى عمليات جبرية يمكن تحسينها.</p></template>
+    <template class="content-en"><p>Breaking down a query into basic Query Blocks to facilitate translation into algebraic operations that can be optimized.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Query Block" data-ar="كتلة الاستعلام" data-en-def="The basic unit containing a single SELECT-FROM-WHERE expression that can be translated into algebraic operators.">كتلة الاستعلام<span class="smart-term-tooltip"></span></span> (Query block) هي الوحدة الأساسية التي يمكن تحويلها إلى معاملات جبرية وتحسينها. تحتوي الكتلة على تعبير SELECT-FROM-WHERE واحد، بالإضافة إلى جمل GROUP BY و HAVING إذا كانت جزءاً من الكتلة.</p><p>يتم تحديد الاستعلامات المتداخلة (Nested queries) داخل الاستعلام ككتل استعلام منفصلة. كما يجب تضمين معاملات التجميع (Aggregate operators) في SQL ضمن الجبر الموسع (Extended algebra).</p></template>
+    <template class="content-en"><p>A <span class="smart-term" data-term-en="Query Block" data-ar="كتلة الاستعلام" data-en-def="The basic unit containing a single SELECT-FROM-WHERE expression that can be translated into algebraic operators.">Query block<span class="smart-term-tooltip"></span></span> is the basic unit that can be translated into algebraic operators and optimized. It contains a single SELECT-FROM-WHERE expression, as well as GROUP BY and HAVING clauses if they are part of the block.</p><p>Nested queries within a query are identified as separate query blocks. Aggregate operators in SQL must also be included in the extended algebra.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب الرئيسي لتحويل SQL إلى الجبر العلائقي هو أن الجبر يوفر أساساً رياضياً متيناً يسمح بإعادة ترتيب العمليات (مثل التبديل والتجميع) دون تغيير النتيجة النهائية. هذا يفتح الباب أمام التحسين الإرشادي (Heuristic optimization).</p><p>الاستعلامات المتداخلة تشكل تحدياً، لذا يتم فصلها إلى كتل، ويحاول المُحسّن أحياناً فك هذا التداخل (Unnesting) لتحويلها إلى عمليات ربط (JOIN) عادية، مما يسهل تحسينها ككتلة واحدة كبيرة بدلاً من كتل صغيرة معزولة.</p></template>
+    <template class="content-en"><p>The main reason for converting SQL to relational algebra is that algebra provides a solid mathematical foundation allowing operations to be reordered (commutativity, associativity) without changing the final result. This enables heuristic optimization.</p><p>Nested queries present a challenge, so they are separated into blocks. Optimizers often attempt to 'unnest' them, converting them into standard JOIN operations, which are easier to optimize globally rather than as isolated blocks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يتم التعامل مع دالة MAX() عند تحويل SQL إلى جبر علائقي؟</template>
+      <template class="content-en">How is the MAX() function handled when converting SQL to relational algebra?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم استخدام الجبر العلائقي الموسع (Extended Relational Algebra) الذي يتضمن معاملات التجميع، حيث تُمثل كعملية منفصلة تُطبق على نتيجة الاستعلام.</p></template>
+      <template class="content-en"><p>It is handled using Extended Relational Algebra, which includes aggregate operators, representing it as a distinct operation applied to the query result.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="external-sorting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> خوارزميات الفرز الخارجي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Algorithms for External Sorting</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>فرز الملفات الضخمة التي لا تتسع في الذاكرة الرئيسية (RAM) عن طريق تقسيمها، فرزها، ثم دمجها (Sort-Merge).</p></template>
+    <template class="content-en"><p>Sorting massive files that do not fit in main memory (RAM) by dividing, sorting, and then merging them (Sort-Merge).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="External Sorting" data-ar="الفرز الخارجي" data-en-def="Sorting algorithms for large files on disk that do not fit in main memory.">الفرز الخارجي<span class="smart-term-tooltip"></span></span> (External sorting) يشير إلى خوارزميات الفرز المناسبة لملفات السجلات الكبيرة المخزنة على القرص والتي لا تتسع بالكامل في الذاكرة الرئيسية.</p><p>الاستراتيجية الأكثر شيوعاً هي <b>الفرز والدمج (Sort-Merge)</b>:</p><ol><li><b>مرحلة الفرز (Sorting phase):</b> تبدأ بفرز ملفات فرعية صغيرة (تسمى runs) من الملف الرئيسي بحيث تتسع في الذاكرة.</li><li><b>مرحلة الدمج (Merging phase):</b> يتم دمج هذه الملفات الفرعية المفرزة لإنشاء ملفات فرعية مفرزة أكبر، وتتكرر العملية حتى يتم فرز الملف بالكامل.</li></ol></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="External Sorting" data-ar="الفرز الخارجي" data-en-def="Sorting algorithms for large files on disk that do not fit in main memory.">External sorting<span class="smart-term-tooltip"></span></span> refers to sorting algorithms suitable for large files of records stored on disk that do not fit entirely in main memory.</p><p>The most common strategy is <b>Sort-Merge</b>:</p><ol><li><b>Sorting phase:</b> Starts by sorting small subfiles (<span class="smart-term" data-term-en="Runs" data-ar="التشغيلات (الملفات الفرعية)" data-en-def="Small sorted subfiles created during the initial phase of the sort-merge algorithm.">runs<span class="smart-term-tooltip"></span></span>) of the main file that fit into available buffer space.</li><li><b>Merging phase:</b> Merges the sorted runs, creating larger sorted subfiles that are merged in turn until the entire file is sorted.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتمد كفاءة الفرز الخارجي بشكل كبير على عدد الكتل (Blocks) المتاحة في الذاكرة المؤقتة (Buffer space - nB). كلما زادت مساحة الذاكرة، قل عدد التمريرات (Passes) المطلوبة على القرص، مما يقلل من عمليات الإدخال والإخراج (I/O) البطيئة.</p><p>صيغ حساب التكلفة:</p><ul><li>عدد التشغيلات الأولية (Initial runs): nR = ⌈(b/nB)⌉</li><li>درجة الدمج (Degree of merging): dM = Min(nB - 1, nR)</li><li>عدد التمريرات (Number of passes): nP = ⌈(log_dM(nR))⌉</li></ul></template>
+    <template class="content-en"><p>The efficiency of external sorting heavily depends on the available buffer space (nB). More buffer space means fewer passes over the disk, significantly reducing slow I/O operations.</p><p>Cost formulas:</p><ul><li>Number of initial runs: nR = ⌈(b/nB)⌉</li><li>Degree of merging: dM = Min(nB - 1, nR)</li><li>Number of passes: nP = ⌈(log_dM(nR))⌉</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حساب عدد التشغيلات الأولية، درجة الدمج، وعدد التمريرات في الفرز الخارجي.</strong></template>
+      <template class="content-en"><strong>Calculating initial runs, degree of merging, and number of passes in external sorting.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$n_R = \lceil \frac{b}{n_B} \rceil, \quad d_M = \min(n_B - 1, n_R), \quad n_P = \lceil \log_{d_M}(n_R) \rceil$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم (nB - 1) في حساب درجة الدمج بدلاً من nB؟</template>
+      <template class="content-en">Why do we use (nB - 1) for the degree of merging instead of nB?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأننا نحتاج إلى كتلة واحدة (Block) في الذاكرة المؤقتة لتخزين مخرجات عملية الدمج قبل كتابتها على القرص، بينما تُستخدم الكتل المتبقية (nB - 1) لقراءة المدخلات.</p></template>
+      <template class="content-en"><p>Because one buffer block is needed to store the output of the merge process before writing it to disk, leaving (nB - 1) blocks for reading the input runs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="select-algorithms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> خوارزميات عملية التحديد (SELECT)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Algorithms for SELECT Operations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طرق البحث عن السجلات التي تطابق شرطاً معيناً، تتراوح من المسح الشامل البطيء إلى استخدام الفهارس السريعة.</p></template>
+    <template class="content-en"><p>Methods to find records matching a condition, ranging from slow full scans to fast index lookups.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتعدد طرق تنفيذ عملية التحديد بناءً على مسارات الوصول (Access paths) المتاحة:</p><ol><li><b><span class="smart-term" data-term-en="Linear Search" data-ar="البحث الخطي" data-en-def="Retrieving every record in the file to test the selection condition (brute force).">البحث الخطي<span class="smart-term-tooltip"></span></span> (Linear search):</b> استرجاع كل سجل واختباره (القوة الغاشمة).</li><li><b>البحث الثنائي (Binary search):</b> يستخدم إذا كان الملف مرتباً بناءً على سمة الشرط.</li><li><b>استخدام فهرس أساسي أو مفتاح تجزئة (Primary index / Hash key):</b> لاسترجاع سجل واحد بناءً على شرط مساواة.</li><li><b>استخدام فهرس أساسي لاسترجاع سجلات متعددة:</b> لشروط النطاق (>, <, >=).</li><li><b>استخدام فهرس تجميعي (Clustering index):</b> لاسترجاع سجلات متعددة لسمة غير مفتاحية.</li><li><b>استخدام فهرس ثانوي (B+-tree):</b> لاسترجاع سجل أو سجلات متعددة، ومفيد جداً لاستعلامات النطاق.</li></ol></template>
+    <template class="content-en"><p>Implementing the SELECT operation depends on available access paths:</p><ol><li><b><span class="smart-term" data-term-en="Linear Search" data-ar="البحث الخطي" data-en-def="Retrieving every record in the file to test the selection condition (brute force).">Linear search<span class="smart-term-tooltip"></span></span> (brute force):</b> Retrieve every record and test it.</li><li><b>Binary search:</b> Used if the file is ordered on the condition attribute.</li><li><b>Primary index or hash key:</b> To retrieve a single record on an equality condition.</li><li><b>Primary index for multiple records:</b> For range conditions (>, <, >=).</li><li><b>Clustering index:</b> To retrieve multiple records on a non-key attribute.</li><li><b>Secondary (B+-tree) index:</b> To retrieve single/multiple records, highly useful for range queries.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في حالة <b><span class="smart-term" data-term-en="Conjunctive Selection" data-ar="التحديد المترابط" data-en-def="A selection condition involving multiple simple conditions connected by AND.">التحديد المترابط<span class="smart-term-tooltip"></span></span> (Conjunctive selection - AND)</b>، إذا كان لأحد الشروط مسار وصول (فهرس)، نستخدمه لاسترجاع السجلات ثم نختبر الشروط الأخرى في الذاكرة. إذا كان هناك <b>فهرس مركب (Composite index)</b> على السمات معاً، نستخدمه مباشرة.</p><p>طريقة متقدمة هي <b>تقاطع مؤشرات السجلات (Intersection of record pointers)</b>: إذا كان لدينا فهارس ثانوية لعدة شروط، نسترجع مؤشرات السجلات من كل فهرس، ونقوم بعملية تقاطع (Intersection) لهذه المؤشرات، ثم نسترجع فقط السجلات التي حققت جميع الشروط من القرص، مما يقلل I/O بشكل هائل.</p></template>
+    <template class="content-en"><p>For <b><span class="smart-term" data-term-en="Conjunctive Selection" data-ar="التحديد المترابط" data-en-def="A selection condition involving multiple simple conditions connected by AND.">Conjunctive selection<span class="smart-term-tooltip"></span></span> (AND)</b>, if any single condition has an access path, we use it to retrieve records and check the remaining conditions in memory.</p><p>If a <b>composite index</b> exists on the combined fields, it is used directly.</p><p>An advanced method is <b>Conjunctive selection by intersection of record pointers</b>: If secondary indexes exist for multiple conditions, we retrieve the record pointers from each index, intersect these pointer sets, and only fetch the resulting records from disk.</p><p>This drastically reduces I/O.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون البحث الخطي (Linear Search) أسرع من استخدام الفهرس الثانوي؟</template>
+      <template class="content-en">When is a Linear Search faster than using a Secondary Index?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يكون شرط التحديد يطابق نسبة كبيرة جداً من السجلات في الجدول (Selectivity عالية). في هذه الحالة، استخدام الفهرس سيؤدي إلى قراءة عشوائية مكلفة للقرص، بينما المسح الخطي يقرأ الكتل بشكل متسلسل وهو أسرع.</p></template>
+      <template class="content-en"><p>When the selection condition matches a very large percentage of the records (high selectivity). In this case, using a secondary index causes expensive random disk I/O, whereas a linear scan performs faster sequential reads.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="join-algorithms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> خوارزميات عملية الربط (JOIN)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Algorithms for JOIN Operations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طرق دمج السجلات من جدولين مختلفين بناءً على شرط مشترك، وتعتبر العملية الأكثر تكلفة في قواعد البيانات.</p></template>
+    <template class="content-en"><p>Methods to combine records from two different tables based on a common condition; typically the most expensive database operation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>طرق تنفيذ الربط (JOIN):</p><ol><li><b>حلقة متداخلة (Nested-loop join):</b> لكل سجل في الجدول الخارجي، امسح كل سجل في الجدول الداخلي. (قوة غاشمة).</li><li><b>حلقة مفردة (Single-loop join):</b> استخدم فهرس للجدول الداخلي للبحث السريع عن السجلات المطابقة بدلاً من المسح الكامل.</li><li><b>الفرز والدمج (Sort-merge join):</b> إذا كان الجدولان مرتبين مسبقاً بناءً على سمة الربط، يتم مسح كل جدول مرة واحدة فقط بشكل متزامن.</li><li><b>ربط التجزئة (Hash-join):</b> يتم تجزئة (Hashing) سجلات الجدولين إلى نفس ملف التجزئة باستخدام نفس دالة التجزئة على سمة الربط.</li></ol></template>
+    <template class="content-en"><p>Methods for implementing joins:</p><ol><li><b><span class="smart-term" data-term-en="Nested-loop Join" data-ar="ربط الحلقة المتداخلة" data-en-def="A brute force join algorithm comparing every record of the outer relation with every record of the inner relation.">Nested-loop join<span class="smart-term-tooltip"></span></span> (brute force):</b> For each record in the outer relation, scan every record in the inner relation.</li><li><b>Single-loop join:</b> Use an index on the inner relation to directly retrieve matching records.</li><li><b><span class="smart-term" data-term-en="Sort-merge Join" data-ar="ربط الفرز والدمج" data-en-def="A highly efficient join method used when both relations are physically sorted by the join attribute.">Sort-merge join<span class="smart-term-tooltip"></span></span>:</b> If both relations are physically sorted by the join attribute, scan both files concurrently. Each file is scanned only once.</li><li><b>Hash-join:</b> Both relations are hashed to the same hash file using the same hashing function on the join attributes.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>أداء الربط يتأثر بـ: مساحة الذاكرة المؤقتة المتاحة، عامل اختيار الربط (Join selection factor)، واختيار أي جدول يكون الخارجي وأيها الداخلي.</p><p>في <b>Partition hash join</b>: يتم تقسيم الجدولين إلى M أقسام. ثم يتم ربط كل قسم Ri مع Si. التكلفة هي 3 * (bR + bS) + bRES.</p><p>في <b>Hybrid hash join</b>: يتم دمج مرحلة الربط لأحد الأقسام أثناء مرحلة التقسيم نفسها لتوفير عمليات I/O.</p></template>
+    <template class="content-en"><p>JOIN performance is affected by:</p><ul><li>available buffer space,</li><li>join selection factor, and</li><li>the choice of inner VS outer relation.</li></ul><p>In <b>Partition hash join</b>: Both files are partitioned into M partitions. Then, iteration i involves joining partitions Ri and Si.</p><p>Total Cost: 3 * (bR + bS) + bRES.</p><p>In <b>Hybrid hash join</b>: The joining phase of one of the partitions is included during the partitioning phase itself, saving disk I/O passes for that partition.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تكلفة ربط التجزئة المقسم، حيث bR و bS هي كتل الجداول، و bRES كتل النتيجة.</strong></template>
+      <template class="content-en"><strong>Cost of partition hash join, where bR and bS are blocks of relations, and bRES is result blocks.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Cost_{PartitionHashJoin} = 3 \times (b_R + b_S) + b_{RES}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في خوارزمية الحلقة المتداخلة (Nested-loop)، أي جدول يجب أن نختاره كجدول خارجي (Outer relation) لتقليل التكلفة؟</template>
+      <template class="content-en">In a Nested-loop join, which table should be chosen as the outer relation to minimize cost?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب اختيار الجدول الأصغر (من حيث عدد الكتل Blocks وليس السجلات) كجدول خارجي، لتقليل عدد مرات قراءة الجدول الداخلي بالكامل من القرص.</p></template>
+      <template class="content-en"><p>The smaller table (in terms of blocks, not necessarily records) should be chosen as the outer relation to minimize the number of times the inner table must be completely read from disk.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="project-and-set-algorithms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> خوارزميات الإسقاط (PROJECT) وعمليات المجموعات (SET)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Algorithms for PROJECT and SET Operations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنفيذ عمليات اختيار الأعمدة (PROJECT) وعمليات الاتحاد والتقاطع، والتحدي الأكبر هو إزالة التكرارات.</p></template>
+    <template class="content-en"><p>Implementing column selection (PROJECT) and set operations (UNION, INTERSECTION), where the main challenge is duplicate elimination.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>عملية الإسقاط (PROJECT):</b> إذا كانت قائمة السمات المطلوبة تحتوي على مفتاح أساسي، فلا يوجد تكرار. أما إذا لم تحتوِ على مفتاح، يجب إزالة السجلات المكررة باستخدام الفرز (Sorting) أو التجزئة (Hashing).</p><p><b>عمليات المجموعات (SET):</b></p><ul><li><b>UNION / INTERSECTION / SET DIFFERENCE:</b> يتم تنفيذها عادة بفرز كلا الجدولين أولاً، ثم مسحهما ودمجهما بشكل متزامن للاحتفاظ بالسجلات المطلوبة فقط.</li><li><b><span class="smart-term" data-term-en="Cartesian Product" data-ar="الضرب الديكارتي" data-en-def="A set operation that includes all possible combinations of records from two relations. Highly expensive.">الضرب الديكارتي<span class="smart-term-tooltip"></span></span> (CARTESIAN PRODUCT):</b> مكلف جداً. إذا كان R يحتوي n سجل و S يحتوي m سجل، النتيجة هي n*m سجل. يجب تجنبه قدر الإمكان.</li></ul></template>
+    <template class="content-en"><p><b>PROJECT Operation:</b> If the attribute list includes a key, extract tuples directly. If it does NOT include a key, duplicated tuples must be removed using Sorting or Hashing.</p><p><b>SET Operations:</b></p><ul><li><b>UNION / INTERSECTION / SET DIFFERENCE:</b> Typically implemented by sorting both relations on the same attributes, then scanning and merging them concurrently to keep the appropriate tuples.</li><li><b><span class="smart-term" data-term-en="Cartesian Product" data-ar="الضرب الديكارتي" data-en-def="A set operation that includes all possible combinations of records from two relations. Highly expensive.">CARTESIAN PRODUCT<span class="smart-term-tooltip"></span></span>:</b> Very expensive. If R has n records and S has m records, the result has n*m records. Should be avoided if possible.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في عمليات المجموعات، الفرز هو الأداة الأقوى. بمجرد فرز الجدولين، يمكن تنفيذ الاتحاد (أخذ نسخة واحدة من المتطابقين)، والتقاطع (أخذ المتطابقين فقط)، والفرق (أخذ الموجود في الأول وغير الموجود في الثاني) بتمريرة واحدة (Single pass) عبر البيانات المفرزة.</p><p>الضرب الديكارتي يُنتج انفجاراً في حجم البيانات. مُحسّن الاستعلامات الذكي يبحث دائماً عن شرط تحديد (SELECT) يتبع الضرب الديكارتي ليقوم بدمجهما معاً وتحويلهما إلى عملية ربط (JOIN) عادية، مما يقلل التكلفة بشكل جذري.</p></template>
+    <template class="content-en"><p>For SET operations, sorting is the most powerful tool. Once both relations are sorted, UNION (keep one of duplicates), INTERSECTION (keep only matches), and SET DIFFERENCE (keep records in R not in S) can be executed in a single concurrent pass.</p><p>CARTESIAN PRODUCT causes a data explosion. A smart query optimizer always looks for a SELECT condition following a Cartesian product to combine them into a standard JOIN operation, drastically reducing the cost.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل استخدام التجزئة (Hashing) أحياناً على الفرز (Sorting) لإزالة التكرارات في عملية الإسقاط؟</template>
+      <template class="content-en">Why might we prefer Hashing over Sorting to eliminate duplicates in a PROJECT operation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التجزئة يمكن أن تكون أسرع إذا كانت الذاكرة كافية لإنشاء جدول التجزئة، حيث تتطلب تعقيداً زمنياً O(N) مقارنة بـ O(N log N) للفرز. لكن الفرز مفيد إذا كانت النتيجة مطلوبة مرتبة لاحقاً.</p></template>
+      <template class="content-en"><p>Hashing can be faster (O(N) time complexity) if there is enough memory to build the hash table, compared to O(N log N) for sorting. However, sorting is preferred if the output needs to be ordered for subsequent operations.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="aggregates-and-outer-joins" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تنفيذ عمليات التجميع والربط الخارجي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Implementing Aggregate Operations and Outer Joins</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حساب الإحصائيات (مثل المجموع والمتوسط) باستخدام الفهارس، وتنفيذ الربط الذي يحتفظ بالسجلات غير المتطابقة (Outer Join).</p></template>
+    <template class="content-en"><p>Calculating statistics (SUM, AVG) using indexes, and executing joins that keep non-matching records (Outer Join).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>عمليات التجميع (Aggregate Operations):</b> مثل MIN, MAX, SUM, COUNT, AVG. يمكن تنفيذها عبر مسح الجدول (Table Scan) أو استخدام الفهرس (Index).</p><ul><li>لإيجاد MAX/MIN: يمكن تتبع الفهرس لأقصى اليمين/اليسار.</li><li>للفهرس الكثيف (Dense index): يمكن تطبيق الحساب مباشرة على قيم الفهرس.</li><li>للفهرس غير الكثيف (Non-dense index): يجب حساب العدد الفعلي للسجلات المرتبطة بكل إدخال فهرس.</li><li>مع GROUP BY: نستخدم الفرز أو التجزئة لتقسيم الملف إلى مجموعات ثم نطبق الدالة.</li></ul><p><b><span class="smart-term" data-term-en="Outer Join" data-ar="الربط الخارجي" data-en-def="A join operation that includes non-matching tuples from one or both relations, padded with null values.">الربط الخارجي<span class="smart-term-tooltip"></span></span> (Outer Join):</b> يحتفظ بالسجلات التي ليس لها تطابق (يضع NULL في الأعمدة المقابلة). يمكن تعديل خوارزميات Nested-Loop أو Sort-Merge لتنفيذه، أو تنفيذه كمزيج من عمليات الجبر العلائقي (JOIN ثم UNION مع السجلات غير المتطابقة المضاف لها NULL).</p></template>
+    <template class="content-en"><p><b>Aggregate Operations:</b> MIN, MAX, SUM, COUNT, AVG. Options include Table Scan or Index.</p><ul><li>For MAX/MIN: Traverse the index to the rightmost/leftmost leaf.</li><li><span class="smart-term" data-term-en="Dense Index" data-ar="الفهرس الكثيف" data-en-def="An index where each record in the data file has a corresponding index entry.">Dense index<span class="smart-term-tooltip"></span></span>: Apply computation directly to index values.</li><li>Non-dense index: Actual number of records associated with each index entry must be accounted for.</li><li>With GROUP BY: Use sorting or hashing to partition the file into groups, then compute.</li></ul><p><b><span class="smart-term" data-term-en="Outer Join" data-ar="الربط الخارجي" data-en-def="A join operation that includes non-matching tuples from one or both relations, padded with null values.">Outer Join<span class="smart-term-tooltip"></span></span>:</b> Keeps records without matches (padding with NULLs). Nested-Loop or Sort-Merge can be modified to implement it, or it can be executed as a combination of relational algebra operators (JOIN, then UNION with non-matching records padded with NULLs).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام الفهرس غير الكثيف (Non-dense index) لعمليات مثل COUNT أو SUM يمثل مشكلة لأن إدخال الفهرس الواحد يمثل كتلة (Block) كاملة من السجلات، ولا يحتوي على القيم الفردية لكل سجل.</p><p>لذلك، لا يمكن حساب المجموع الدقيق من الفهرس وحده، بل يجب قراءة الكتل الفعلية من القرص.</p><p>تنفيذ الربط الخارجي الأيسر (LEFT OUTER JOIN) جبرياً يتطلب ثلاث خطوات:</p><ol><li>حساب الربط الداخلي العادي.</li><li>إيجاد السجلات في الجدول الأيسر التي لم تظهر في الربط (باستخدام الفرق SET DIFFERENCE).</li><li>إضافة قيم NULL لهذه السجلات ثم عمل اتحاد (UNION) مع نتيجة الخطوة الأولى.</li></ol></template>
+    <template class="content-en"><p>Using a non-dense index for COUNT or SUM is problematic because a single index entry points to a block of records, not individual values.</p><p>Thus, the exact sum or count cannot be determined from the index alone; the actual data blocks must be fetched.</p><p>Executing a LEFT OUTER JOIN algebraically involves:</p><ol><li>Computing the standard JOIN.</li><li>Finding records in the left table not in the JOIN (using SET DIFFERENCE).</li><li>Padding these records with NULLs and UNIONing them with the JOIN result.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا فهرس تجميعي (Clustering index) على سمة التجميع (GROUP BY)، كيف يسهل ذلك العملية؟</template>
+      <template class="content-en">If we have a clustering index on the grouping attributes (GROUP BY), how does it facilitate the operation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الفهرس التجميعي يضمن أن جميع السجلات التي تنتمي لنفس المجموعة مخزنة فيزيائياً بجوار بعضها البعض على القرص. هذا يلغي الحاجة لفرز الجدول بالكامل، ويكفي مسح الجدول مرة واحدة لحساب التجميع لكل مجموعة.</p></template>
+      <template class="content-en"><p>A clustering index ensures that all records belonging to the same group are physically stored together on disk. This eliminates the need to sort the table; a single sequential scan is enough to compute the aggregate for each group.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pipelining" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> دمج العمليات باستخدام خطوط الأنابيب (Pipelining)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Combining Operations using Pipelining</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تمرير نتائج عملية واحدة مباشرة إلى العملية التالية دون حفظها على القرص، مما يوفر الوقت والمساحة.</p></template>
+    <template class="content-en"><p>Passing the results of one operation directly to the next without saving them to disk, saving time and space.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الدافع:</b> يتم تعيين الاستعلام إلى سلسلة من العمليات. التنفيذ العادي (Materialized) ينتج نتيجة مؤقتة لكل عملية ويحفظها على القرص، وهو أمر مستهلك للوقت ومكلف.</p><p><b>البديل (Pipelining):</b> تجنب بناء نتائج مؤقتة قدر الإمكان. يتم تمرير البيانات عبر عمليات متعددة كخط أنابيب (Pipeline) - تمرير نتيجة المعامل السابق إلى التالي دون انتظار اكتمال العملية السابقة بالكامل. يُعرف هذا أيضاً بالمعالجة القائمة على التدفق (Stream-based processing).</p></template>
+    <template class="content-en"><p><b>Motivation:</b> A query is mapped into a sequence of operations. Standard execution (Materialized) produces a temporary result for each operation and saves it to disk, which is time-consuming and expensive.</p><p><b>Alternative (<span class="smart-term" data-term-en="Pipelining" data-ar="خطوط الأنابيب (التدفق)" data-en-def="Passing the result of a previous operator to the next without waiting to complete the previous operation.">Pipelining<span class="smart-term-tooltip"></span></span>):</b> Avoid constructing temporary results. Pipeline the data through multiple operations - pass the result of a previous operator to the next without waiting to complete the previous operation. Also known as stream-based processing.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يتطلب الـ Pipelining توليد كود ديناميكي للسماح بتنفيذ عمليات متعددة معاً. على سبيل المثال، في عملية ربط ثنائية (2-way join)، يمكن دمج عمليتي تحديد (SELECT) على المدخلات وعملية إسقاط (PROJECT) واحدة على المخرجات داخل خوارزمية الربط نفسها.</p><p>الأشجار العميقة لليسار (Left-deep trees) مناسبة جداً للـ Pipelining لأن الجدول الداخلي (الابن الأيمن) يكون دائماً جدولاً أساسياً (Base relation)، مما يسمح بتدفق النتائج من عملية الربط السابقة (الابن الأيسر) مباشرة إلى عملية الربط الحالية دون الحاجة لتخزينها.</p></template>
+    <template class="content-en"><p>Pipelining requires dynamic generation of code to allow multiple operations to be executed together. For example, in a 2-way join, 2 selections on the input and one projection on the output can be combined directly within the Join algorithm.</p><p>Left-deep trees are highly amenable to pipelining because the inner relation (right child) is always a base relation. This allows the result of the previous join (left child) to stream directly into the current join without materialization.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Visual comparison of Materialized vs Pipelined evaluation. Left side (Materialized): Operation A outputs to a Disk icon (Temp File), which then inputs to Operation B. Right side (Pipelined): Operation A outputs a stream of data directly into Operation B (no disk icon). Style: educational, dark background #0d1117, accent colors #ef4444 (disk) and #10b981 (stream), viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Definitions for Markers -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Center Divider -->
+  <line x1="400" y1="60" x2="400" y2="360" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+  <!-- ========================================== -->
+  <!-- LEFT SIDE: MATERIALIZED EVALUATION         -->
+  <!-- ========================================== -->
+
+  <!-- Title -->
+  <text x="200" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Materialized Evaluation</text>
+  <text x="200" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التقييم المادي</text>
+
+  <!-- Operation A -->
+  <rect x="120" y="70" width="160" height="46" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="98" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Operation A</text>
+  <text x="200" y="98" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">العملية أ</text>
+
+  <!-- Arrow: Op A to Disk -->
+  <line x1="200" y1="116" x2="200" y2="142" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="190" y="135" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Write</text>
+  <text x="190" y="135" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">كتابة</text>
+
+  <!-- Disk Icon (Temp File) -->
+  <path d="M 155 165 L 155 215 A 45 15 0 0 0 245 215 L 245 165 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <ellipse cx="200" cy="165" rx="45" ry="15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="198" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Temp File</text>
+  <text x="200" y="198" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">ملف مؤقت</text>
+
+  <!-- Arrow: Disk to Op B -->
+  <line x1="200" y1="235" x2="200" y2="262" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="190" y="255" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Read</text>
+  <text x="190" y="255" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">قراءة</text>
+
+  <!-- Operation B -->
+  <rect x="120" y="270" width="160" height="46" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="298" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Operation B</text>
+  <text x="200" y="298" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">العملية ب</text>
+
+  <!-- Wait Note -->
+  <text x="200" y="338" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">(Waits for A to finish)</text>
+  <text x="200" y="338" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">(ينتظر انتهاء أ)</text>
+
+  <!-- Summary Note -->
+  <text x="200" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">High latency, uses disk space</text>
+  <text x="200" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">زمن انتقال عالٍ، يستهلك مساحة القرص</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SIDE: PIPELINED EVALUATION           -->
+  <!-- ========================================== -->
+
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Pipelined Evaluation</text>
+  <text x="600" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التقييم المتسلسل</text>
+
+  <!-- Operation A -->
+  <rect x="520" y="70" width="160" height="46" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="600" y="98" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Operation A</text>
+  <text x="600" y="98" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">العملية أ</text>
+
+  <!-- Arrow: Op A to Pipe -->
+  <line x1="600" y1="116" x2="600" y2="124" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Data Stream Pipe -->
+  <path d="M 570 130 L 570 250" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+  <path d="M 630 130 L 630 250" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+
+  <!-- Stream Packets (Tuples) -->
+  <rect x="580" y="135" width="40" height="20" rx="4" fill="var(--brand-500)" />
+  <line x1="586" y1="142" x2="614" y2="142" stroke="var(--on-brand-lo)" stroke-width="2" stroke-linecap="round" />
+  <line x1="586" y1="148" x2="604" y2="148" stroke="var(--on-brand-lo)" stroke-width="2" stroke-linecap="round" />
+
+  <rect x="580" y="175" width="40" height="20" rx="4" fill="var(--brand-500)" />
+  <line x1="586" y1="182" x2="614" y2="182" stroke="var(--on-brand-lo)" stroke-width="2" stroke-linecap="round" />
+  <line x1="586" y1="188" x2="604" y2="188" stroke="var(--on-brand-lo)" stroke-width="2" stroke-linecap="round" />
+
+  <rect x="580" y="215" width="40" height="20" rx="4" fill="var(--brand-500)" />
+  <line x1="586" y1="222" x2="614" y2="222" stroke="var(--on-brand-lo)" stroke-width="2" stroke-linecap="round" />
+  <line x1="586" y1="228" x2="604" y2="228" stroke="var(--on-brand-lo)" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Pipe Label -->
+  <text x="645" y="195" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Stream (Memory)</text>
+  <text x="645" y="195" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">تدفق (ذاكرة)</text>
+
+  <!-- Arrow: Pipe to Op B -->
+  <line x1="600" y1="250" x2="600" y2="262" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Operation B -->
+  <rect x="520" y="270" width="160" height="46" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="600" y="298" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Operation B</text>
+  <text x="600" y="298" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">العملية ب</text>
+
+  <!-- Concurrency Note -->
+  <text x="600" y="338" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">(Executes concurrently)</text>
+  <text x="600" y="338" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">(ينفذ بالتزامن)</text>
+
+  <!-- Summary Note -->
+  <text x="600" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Low latency, stream-based</text>
+  <text x="600" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">زمن انتقال منخفض، يعتمد على التدفق</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Materialized Evaluation</th><th>Pipelined Evaluation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تخزين النتائج المؤقتة</template>
+          <template class="content-en">Temporary Result Storage</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتم حفظها على القرص</template>
+          <template class="content-en">Saved to disk</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تمرر مباشرة في الذاكرة</template>
+          <template class="content-en">Passed directly in memory</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تكلفة الإدخال والإخراج (I/O)</template>
+          <template class="content-en">I/O Cost</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالية جداً</template>
+          <template class="content-en">Very high</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفضة</template>
+          <template class="content-en">Low</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوافق مع العمليات المانعة (كالفرز)</template>
+          <template class="content-en">Compatibility with Blocking Ops (e.g., Sort)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوافق تماماً</template>
+          <template class="content-en">Fully compatible</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير متوافق (يكسر التدفق)</template>
+          <template class="content-en">Incompatible (breaks pipeline)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن استخدام Pipelining مع خوارزمية الفرز (Sorting)؟</template>
+      <template class="content-en">Can Pipelining be used with a Sorting algorithm?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، الفرز هو عملية 'مانعة' (Blocking operation). لا يمكن لخوارزمية الفرز إخراج السجل الأول حتى تقرأ جميع السجلات وتقارنها. لذلك، تكسر عمليات الفرز خط الأنابيب وتتطلب تخزيناً مؤقتاً (Materialization).</p></template>
+      <template class="content-en"><p>No, sorting is a 'blocking operation'. A sort algorithm cannot output the first record until it has read and compared all input records. Therefore, sorting breaks the pipeline and requires materialization.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="heuristic-optimization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> استخدام التوجيهات في تحسين الاستعلام (Heuristics)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Using Heuristics in Query Optimization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق قواعد منطقية ثابتة (مثل تنفيذ SELECT قبل JOIN) لتقليل حجم البيانات المعالجة مبكراً.</p></template>
+    <template class="content-en"><p>Applying logical rules (like doing SELECT before JOIN) to reduce the size of processed data as early as possible.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>عملية التحسين الإرشادي (Heuristics):</b></p><ol><li>يولد المحلل (Parser) تمثيلاً داخلياً أولياً (شجرة استعلام).</li><li>تُطبق قواعد التوجيهات لتحسين هذا التمثيل.</li><li>تُولد خطة تنفيذ بناءً على مسارات الوصول المتاحة.</li></ol><p><b>التوجيه الرئيسي (Main Heuristic):</b> تطبيق العمليات التي تقلل حجم النتائج المؤقتة أولاً. مثال: تطبيق عمليات SELECT و PROJECT قبل تطبيق JOIN أو العمليات الثنائية الأخرى.</p><p><b>قواعد التحويل (Transformation Rules):</b></p><ul><li>تتالي التحديد (Cascade of $\sigma$): تقسيم شرط AND إلى عمليات تحديد متتالية.</li><li>تبديل التحديد (Commutativity of $\sigma$): يمكن تغيير ترتيب عمليات التحديد.</li><li>تبديل التحديد مع الربط: دفع عملية التحديد لأسفل شجرة الاستعلام لتُنفذ قبل الربط.</li></ul></template>
+    <template class="content-en"><p><b>Process for <span class="smart-term" data-term-en="Heuristics" data-ar="التوجيهات (القواعد الإرشادية)" data-en-def="Rule-of-thumb strategies applied to optimize a query, primarily by reducing intermediate result sizes early.">heuristics<span class="smart-term-tooltip"></span></span> optimization:</b></p><ol><li>The parser generates an initial internal representation (Query tree).</li><li>Apply heuristics rules to optimize the internal representation.</li><li>Generate an execution plan based on available access paths.</li></ol><p><b>The Main Heuristic:</b> Apply first the operations that reduce the size of intermediate results. E.g., Apply SELECT and PROJECT operations before applying JOIN or other binary operations.</p><p><b>Transformation Rules:</b></p><ul><li>Cascade of $\sigma$: Break a conjunctive (AND) condition into a cascade of $\sigma$ operations.</li><li>Commutativity of $\sigma$: $\sigma$ operations can be reordered.</li><li>Commuting $\sigma$ with JOIN: Push the selection condition down the tree to execute before the join.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>خوارزمية التحسين الجبري الإرشادي تقوم بـ 'دفع' (Pushing down) عمليات التحديد والإسقاط إلى أسفل شجرة الاستعلام قدر الإمكان.</p><p>هذا يضمن أن الجداول التي تدخل في عملية الربط (JOIN) - وهي العملية الأغلى - تكون بأصغر حجم ممكن (أقل عدد من السجلات وأقل عدد من الأعمدة).</p><p>كما تقوم الخوارزمية بتحويل الضرب الديكارتي (Cartesian Product) المتبوع بشرط تحديد إلى عملية ربط (JOIN)، وترتيب الأوراق (الجداول) بحيث تُنفذ الجداول ذات شروط التحديد الأكثر تقييداً (Most restrictive) أولاً.</p></template>
+    <template class="content-en"><p>The heuristic algebraic optimization algorithm 'pushes down' SELECT and PROJECT operations as far down the query tree as possible.</p><p>This ensures that the relations entering the JOIN operation (the most expensive one) are as small as possible (fewest tuples and fewest attributes).</p><p>The algorithm also converts a Cartesian product followed by a select condition into a JOIN operation, and rearranges leaf nodes so that relations with the most restrictive select operations are executed first.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>قاعدة تتالي التحديد: يمكن تقسيم شرط AND إلى عمليات تحديد متتالية.</strong></template>
+      <template class="content-en"><strong>Cascade of selection rule: A conjunctive condition can be broken into a cascade of selections.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\sigma_{c1 \land c2}(R) = \sigma_{c1}(\sigma_{c2}(R))$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Two query trees side by side. Left tree (Initial): Cartesian product (X) at the bottom, followed by a Selection (sigma) above it. Right tree (Optimized): The Selection is pushed down below the Join, and the Cartesian product is replaced by a Join symbol (bowtie). Style: educational, dark background #0d1117, accent color #8b5cf6, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-600)" />
+      <stop offset="100%" stop-color="var(--brand-500)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="400" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Heuristic Query Optimization</text>
+  <text x="400" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تحسين الاستعلام الإرشادي</text>
+
+  <!-- Subtitles -->
+  <text x="200" y="95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Initial Query Tree</text>
+  <text x="200" y="95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">شجرة الاستعلام الأولية</text>
+
+  <text x="600" y="95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Optimized Query Tree</text>
+  <text x="600" y="95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">شجرة الاستعلام المحسنة</text>
+
+  <!-- Edges -->
+  <g stroke="var(--border-color)" stroke-width="2" fill="none">
+    <!-- Left Tree Edges -->
+    <line x1="200" y1="185" x2="200" y2="215" />
+    <line x1="185" y1="280" x2="160" y2="340" />
+    <line x1="215" y1="280" x2="240" y2="340" />
+
+    <!-- Right Tree Edges -->
+    <line x1="578" y1="178" x2="542" y2="222" />
+    <line x1="615" y1="182" x2="680" y2="340" />
+    <line x1="520" y1="285" x2="520" y2="340" />
+  </g>
+
+  <!-- Transformation Arrow -->
+  <line x1="320" y1="240" x2="460" y2="240" stroke="var(--brand-400)" stroke-width="4" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+  
+  <text x="390" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Push Selection Down</text>
+  <text x="390" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">دفع التحديد لأسفل</text>
+  
+  <text x="390" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Replace &#215; with &#8904;</text>
+  <text x="390" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">استبدال &#215; بـ &#8904;</text>
+
+  <!-- Nodes -->
+  <g stroke-width="2">
+    <!-- Left Tree: Selection (Sigma) -->
+    <circle cx="200" cy="150" r="35" fill="url(#nodeGrad)" stroke="var(--brand-500)" />
+    <text x="200" y="158" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" fill="var(--on-brand-lo)">&#963;<tspan baseline-shift="sub" font-size="0.6em">cond</tspan></text>
+
+    <!-- Left Tree: Cartesian Product (X) -->
+    <circle cx="200" cy="250" r="35" fill="var(--bg-elevated)" stroke="var(--brand-500)" />
+    <text x="200" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="28" fill="var(--brand-ink)">&#215;</text>
+
+    <!-- Left Tree: Table A -->
+    <rect x="120" y="340" width="80" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="160" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table A</text>
+    <text x="160" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول أ</text>
+
+    <!-- Left Tree: Table B -->
+    <rect x="200" y="340" width="80" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="240" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table B</text>
+    <text x="240" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول ب</text>
+
+    <!-- Right Tree: Join -->
+    <circle cx="600" cy="150" r="35" fill="url(#nodeGrad)" stroke="var(--brand-500)" />
+    <text x="600" y="158" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="28" fill="var(--on-brand-lo)">&#8904;<tspan baseline-shift="sub" font-size="0.5em">cond</tspan></text>
+
+    <!-- Right Tree: Selection (Sigma) Pushed Down -->
+    <circle cx="520" cy="250" r="35" fill="url(#nodeGrad)" stroke="var(--brand-500)" />
+    <text x="520" y="258" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" fill="var(--on-brand-lo)">&#963;<tspan baseline-shift="sub" font-size="0.6em">cond</tspan></text>
+
+    <!-- Right Tree: Table A -->
+    <rect x="480" y="340" width="80" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="520" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table A</text>
+    <text x="520" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول أ</text>
+
+    <!-- Right Tree: Table B -->
+    <rect x="640" y="340" width="80" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="680" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table B</text>
+    <text x="680" y="366" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول ب</text>
+  </g>
+
+  <!-- Bottom Heuristic Explanation -->
+  <rect x="150" y="415" width="500" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="400" y="440" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">Heuristic: Apply SELECT before JOIN to reduce intermediate result size.</text>
+  <text x="400" y="440" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">قاعدة إرشادية: تطبيق التحديد قبل الصلة لتقليل حجم النتائج الوسيطة.</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Heuristic Optimization</th><th>Cost-based Optimization</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الأساس</template>
+          <template class="content-en">Basis</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قواعد جبرية ثابتة (Rule-of-thumb)</template>
+          <template class="content-en">Fixed algebraic rules (Rule-of-thumb)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقديرات إحصائية للبيانات والفهارس</template>
+          <template class="content-en">Statistical estimates of data and indexes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف الرئيسي</template>
+          <template class="content-en">Main Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقليل حجم النتائج المؤقتة مبكراً</template>
+          <template class="content-en">Reduce intermediate result size early</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">اختيار الخطة ذات أقل تكلفة (I/O و CPU)</template>
+          <template class="content-en">Choose plan with lowest cost (I/O &amp; CPU)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاعتماد على حالة البيانات</template>
+          <template class="content-en">Data Dependency</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يعتمد (يطبق نفس القواعد دائماً)</template>
+          <template class="content-en">Independent (applies same rules always)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يعتمد بشدة (يتغير بتغير حجم البيانات)</template>
+          <template class="content-en">Highly dependent (changes with data size)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نعتبر قاعدة 'دفع الإسقاط لأسفل' (Pushing PROJECT down) مفيدة؟</template>
+      <template class="content-en">Why is the rule 'Pushing PROJECT down' considered beneficial?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تزيل الأعمدة غير المطلوبة مبكراً، مما يقلل من حجم السجل (Record size). هذا يعني أن الكتل (Blocks) في الذاكرة ستتسع لعدد أكبر من السجلات، مما يقلل من عمليات الإدخال والإخراج (I/O) في العمليات اللاحقة مثل الربط.</p></template>
+      <template class="content-en"><p>Because it removes unneeded columns early, reducing the record size. This means memory blocks can hold more records, significantly reducing I/O operations for subsequent operations like JOIN.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cost-based-optimization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> التحسين المبني على التكلفة والانتقائية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Using Selectivity and Cost Estimates in Query Optimization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقدير تكلفة تنفيذ الاستعلام بطرق مختلفة (بناءً على حجم البيانات والفهارس) واختيار الخطة الأقل تكلفة.</p></template>
+    <template class="content-en"><p>Estimating the cost of executing a query using different strategies (based on data size and indexes) and choosing the cheapest plan.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التحسين المبني على التكلفة (Cost-based query optimization):</b> يقوم بتقدير ومقارنة تكاليف تنفيذ الاستعلام باستخدام استراتيجيات مختلفة واختيار الاستراتيجية ذات التكلفة الأقل.</p><p><b>مكونات التكلفة:</b></p><ol><li>تكلفة الوصول للتخزين الثانوي (Access cost to secondary storage) - وهي الأهم.</li><li>تكلفة التخزين (Storage cost).</li><li>تكلفة الحساب (Computation cost - CPU).</li><li>تكلفة استخدام الذاكرة (Memory usage cost).</li><li>تكلفة الاتصال (Communication cost - في القواعد الموزعة).</li></ol><p><b>معلومات الكتالوج المستخدمة:</b> حجم الملف (عدد السجلات r، حجم السجل R، عدد الكتل b)، معلومات الفهارس (مستويات الفهرس x، القيم المميزة d)، و<span class="smart-term" data-term-en="Selectivity" data-ar="الانتقائية" data-en-def="The ratio of the number of records that satisfy a condition to the total number of records in the file.">الانتقائية<span class="smart-term-tooltip"></span></span> (Selectivity - sl).</p></template>
+    <template class="content-en"><p><b>Cost-based query optimization:</b> Estimates and compares the costs of executing a query using different execution strategies and chooses the strategy with the lowest cost estimate.</p><p><b>Cost Components:</b></p><ol><li>Access cost to secondary storage (usually the dominant cost).</li><li>Storage cost.</li><li>Computation cost (CPU).</li><li>Memory usage cost.</li><li>Communication cost (in distributed databases).</li></ol><p><b>Catalog Information Used:</b> File size (records r, record size R, blocks b), Index info (levels x, distinct values d), and <span class="smart-term" data-term-en="Selectivity" data-ar="الانتقائية" data-en-def="The ratio of the number of records that satisfy a condition to the total number of records in the file.">Selectivity<span class="smart-term-tooltip"></span></span> (sl).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>الانتقائية (Selectivity - sl):</b> هي نسبة السجلات التي تحقق شرطاً معيناً. عدد السجلات المتوقعة (Selection cardinality - s) يساوي sl * r. إذا كانت الانتقائية عالية (الشرط يرجع بيانات كثيرة)، قد يكون المسح الشامل أرخص من استخدام الفهرس.</p><p><b>ترتيب الربط (Join Ordering):</b> استعلام يربط n جداول يمتلك n-1 عمليات ربط، مما يولد عدداً هائلاً من الترتيبات الممكنة. لتقليل مساحة البحث، تقيد مُحسّنات الاستعلام الحالية شكل الشجرة لتكون <b>أشجار عميقة لليسار (Left-deep trees)</b>، حيث يكون الابن الأيمن دائماً جدولاً أساسياً، مما يسهل الـ Pipelining واستخدام الفهارس.</p></template>
+    <template class="content-en"><p><b>Selectivity (sl):</b> The fraction of records satisfying a condition. Selection cardinality (s) = sl * r. If selectivity is high (returns many records), a full table scan might be cheaper than index lookups.</p><p><b>Join Ordering:</b> A query joining n relations has n-1 joins, creating a massive search space of possible orders. To limit this, current optimizers typically restrict the query tree structure to <b><span class="smart-term" data-term-en="Left-deep Tree" data-ar="الشجرة العميقة لليسار" data-en-def="A binary tree where the right child of each non-leaf node is always a base relation.">Left-deep tree<span class="smart-term-tooltip"></span></span>s</b>, where the right child is always a base relation, making it highly amenable to pipelining and index utilization.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حساب عدد السجلات المتوقعة (s) بضرب الانتقائية (sl) في إجمالي عدد السجلات (r).</strong></template>
+      <template class="content-en"><strong>Calculating selection cardinality (s) by multiplying selectivity (sl) by total records (r).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$s = sl \times r$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تحد المُحسّنات من مساحة البحث لتقتصر على الأشجار العميقة لليسار (Left-deep trees) فقط؟</template>
+      <template class="content-en">Why do optimizers limit the search space to only Left-deep trees?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن عدد الترتيبات الممكنة لربط الجداول ينمو بشكل أسي (مضروب N). قصر البحث على الأشجار العميقة لليسار يقلل وقت التحسين بشكل كبير، وهذه الأشجار ممتازة للتنفيذ المتدفق (Pipelining) وتسمح باستخدام فهارس الجداول الأساسية بكفاءة.</p></template>
+      <template class="content-en"><p>Because the number of possible join orders grows exponentially (factorial of N). Restricting to left-deep trees drastically reduces optimization time, and these trees are excellent for pipelining and efficiently using base relation indexes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="semantic-query-optimization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> التحسين الدلالي للاستعلام (Semantic Query Optimization)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Semantic Query Optimization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدام قواعد وقيود قاعدة البيانات (مثل: لا يمكن للموظف أن يكسب أكثر من مديره) لتخطي تنفيذ استعلامات مستحيلة.</p></template>
+    <template class="content-en"><p>Using database constraints (e.g., an employee cannot earn more than their manager) to skip executing impossible queries.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Semantic Query Optimization" data-ar="التحسين الدلالي للاستعلام" data-en-def="Using schema constraints to modify or skip queries based on the logical meaning of the data.">التحسين الدلالي للاستعلام<span class="smart-term-tooltip"></span></span> (Semantic Query Optimization):</b> يستخدم القيود (Constraints) المحددة في مخطط قاعدة البيانات (Database schema) لتعديل استعلام إلى استعلام آخر يكون تنفيذه أكثر كفاءة، أو حتى إلغاء تنفيذه بالكامل.</p><p><b>مثال:</b> استعلام يبحث عن الموظفين الذين رواتبهم أعلى من رواتب مدرائهم المباشرين. إذا كان هناك قيد في قاعدة البيانات ينص على أنه لا يمكن لأي موظف أن يكسب أكثر من مديره، فإن المُحسّن الدلالي يدرك أن النتيجة ستكون فارغة حتماً، ولن يقوم بتنفيذ الاستعلام على الإطلاق.</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Semantic Query Optimization" data-ar="التحسين الدلالي للاستعلام" data-en-def="Using schema constraints to modify or skip queries based on the logical meaning of the data.">Semantic Query Optimization<span class="smart-term-tooltip"></span></span>:</b> Uses constraints specified on the database schema to modify one query into another query that is more efficient to execute, or to skip execution entirely.</p><p><b>Example:</b> A query searching for employees earning more than their direct supervisor. If a schema constraint states that no employee can earn more than their supervisor, the semantic optimizer knows the result will be empty and will not execute the query at all.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعتمد التحسين الدلالي على تقنيات الذكاء الاصطناعي المعروفة بـ <b>إثبات النظريات (Theorem proving)</b>. يقوم النظام بتحليل شروط الاستعلام ومطابقتها مع القيود المنطقية (Integrity constraints) المخزنة في الكتالوج.</p><p>هذا النوع من التحسين لا يعتمد على حجم البيانات أو الفهارس (مثل التحسين المبني على التكلفة)، ولا على قواعد الجبر (مثل التحسين الإرشادي)، بل يعتمد بحتة على <b>معنى (Semantics)</b> البيانات والقيود المفروضة عليها.</p></template>
+    <template class="content-en"><p>Semantic optimization relies on AI techniques known as <b>Theorem proving</b>. The system analyzes the query conditions and matches them against the integrity constraints stored in the catalog.</p><p>This type of optimization does not depend on data size or indexes (like cost-based), nor on algebraic rules (like heuristics), but purely on the <b>meaning (semantics)</b> of the data and its constraints.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب المحتمل لتفعيل التحسين الدلالي للاستعلامات في نظام قواعد البيانات؟</template>
+      <template class="content-en">What is a potential drawback of enabling semantic query optimization in a DBMS?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عملية 'إثبات النظريات' ومطابقة الاستعلام مع جميع القيود قد تستهلك وقتاً طويلاً من وحدة المعالجة المركزية (CPU overhead) أثناء مرحلة التحسين، مما قد يبطئ الاستعلامات البسيطة التي لا تستفيد من هذا التحليل.</p></template>
+      <template class="content-en"><p>The 'theorem proving' process and matching queries against all constraints can consume significant CPU time (overhead) during the optimization phase, potentially slowing down simple queries that don't benefit from this analysis.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في قلب محرك قواعد البيانات! تخيل أنك مدير مطعم مزدحم، وتلقيت طلباً معقداً (استعلام SQL). لا يمكنك الطبخ بعشوائية؛ يجب أن تخطط. هذا ما يفعله 'مُحسّن الاستعلام'. نبدأ بتحويل الطلب إلى خطوات منطقية (الجبر العلائقي). ثم نطبق 'التوجيهات' (Heuristics) - وهي قواعد بديهية مثل: 'قم بتقطيع الخضار قبل خلطها' (أي نفذ SELECT قبل JOIN لتقليل حجم البيانات). بعد ذلك، نستخدم 'التحسين المبني على التكلفة' لحساب الوقت والجهد (I/O و CPU) لكل خطة ممكنة، ونختار الأرخص. تذكروا جيداً في الامتحان: عمليات الربط (JOIN) هي الأغلى، والضرب الديكارتي هو الكابوس الذي نتجنبه. التدفق (Pipelining) هو صديقنا السري لتجنب حفظ الملفات المؤقتة على القرص البطيء. ركزوا على فهم كيف ولماذا ندفع عمليات التحديد لأسفل الشجرة، وكيف تعمل الأشجار العميقة لليسار. بالتوفيق!</template>
+    <template class="content-en">Welcome to the heart of the database engine! Imagine you're a chef in a busy restaurant receiving a complex order (an SQL query). You can't just cook randomly; you need a plan. That's what the 'Query Optimizer' does. We start by translating the order into logical steps (Relational Algebra). Then we apply 'Heuristics'—rule-of-thumb strategies like 'chop vegetables before mixing' (i.e., do SELECT before JOIN to reduce data size). Next, we use 'Cost-based Optimization' to estimate the time and effort (I/O and CPU) for each possible plan, picking the cheapest. For the exam, remember: JOINs are the most expensive, and Cartesian Products are nightmares to avoid. Pipelining is our secret weapon to avoid saving temporary files on the slow disk. Focus on understanding why we push selections down the tree and how left-deep trees facilitate pipelining. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نقوم بتحويل استعلامات SQL إلى الجبر العلائقي قبل تحسينها؟</template>
+          <template class="content-en">Why do we convert SQL queries into relational algebra before optimizing them?</template>
+          <span class="content-target">لماذا نقوم بتحويل استعلامات SQL إلى الجبر العلائقي قبل تحسينها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الجبر العلائقي يوفر أساساً رياضياً يسمح بتطبيق قواعد التحويل (مثل التبديل والتجميع) لإعادة ترتيب العمليات دون تغيير النتيجة، مما يسهل إيجاد خطة تنفيذ أفضل.</template>
+          <template class="content-en">Because relational algebra provides a mathematical foundation that allows applying transformation rules (like commutativity and associativity) to reorder operations without changing the result, making it easier to find a better execution plan.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التوجيه (Heuristic) الأهم في تحسين الاستعلامات؟</template>
+          <template class="content-en">What is the most important heuristic in query optimization?</template>
+          <span class="content-target">ما هو التوجيه (Heuristic) الأهم في تحسين الاستعلامات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تنفيذ العمليات التي تقلل من حجم النتائج المؤقتة في أسرع وقت ممكن، وتحديداً دفع عمليات التحديد (SELECT) والإسقاط (PROJECT) لأسفل شجرة الاستعلام لتُنفذ قبل عمليات الربط (JOIN).</template>
+          <template class="content-en">Executing operations that reduce the size of intermediate results as early as possible, specifically pushing SELECT and PROJECT operations down the query tree to execute before JOIN operations.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل خوارزمية الفرز والدمج (Sort-Merge) في الفرز الخارجي؟</template>
+          <template class="content-en">How does the Sort-Merge algorithm work in external sorting?</template>
+          <span class="content-target">كيف تعمل خوارزمية الفرز والدمج (Sort-Merge) في الفرز الخارجي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم أولاً بفرز أجزاء صغيرة من الملف (تسمى runs) تتسع في الذاكرة الرئيسية، ثم تقوم بدمج هذه الأجزاء المفرزة تدريجياً لإنشاء أجزاء أكبر حتى يتم فرز الملف بالكامل.</template>
+          <template class="content-en">It first sorts small subfiles (runs) that fit into main memory, then iteratively merges these sorted runs to create larger sorted subfiles until the entire file is sorted.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم خوارزمية ربط الفرز والدمج (Sort-merge join)؟</template>
+          <template class="content-en">When do we use the Sort-merge join algorithm?</template>
+          <span class="content-target">متى نستخدم خوارزمية ربط الفرز والدمج (Sort-merge join)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمها عندما تكون سجلات كلا الجدولين مرتبة فيزيائياً مسبقاً بناءً على سمة الربط. في هذه الحالة، تكون الخوارزمية فعالة جداً لأنها تمسح كل جدول مرة واحدة فقط.</template>
+          <template class="content-en">We use it when the records of both relations are already physically sorted by the join attribute. In this case, it's highly efficient as it scans each table only once.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التدفق (Pipelining) ولماذا هو مفيد؟</template>
+          <template class="content-en">What is Pipelining and why is it useful?</template>
+          <span class="content-target">ما هو التدفق (Pipelining) ولماذا هو مفيد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التدفق هو تمرير نتائج عملية ما مباشرة إلى العملية التالية في الذاكرة دون حفظها كملف مؤقت على القرص. يفيد في توفير مساحة التخزين وتقليل عمليات الإدخال والإخراج (I/O) البطيئة.</template>
+          <template class="content-en">Pipelining is passing the results of one operation directly to the next in memory without saving them as a temporary file on disk. It saves storage space and reduces slow I/O operations.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تفضل مُحسّنات الاستعلام الأشجار العميقة لليسار (Left-deep trees)؟</template>
+          <template class="content-en">Why do query optimizers prefer Left-deep trees?</template>
+          <span class="content-target">لماذا تفضل مُحسّنات الاستعلام الأشجار العميقة لليسار (Left-deep trees)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تقلل من مساحة البحث الهائلة لترتيبات الربط، ولأن الابن الأيمن يكون دائماً جدولاً أساسياً، مما يسهل استخدام الفهارس ويدعم عملية التدفق (Pipelining) بكفاءة.</template>
+          <template class="content-en">Because they reduce the massive search space of join orders, and since the right child is always a base relation, it facilitates the use of indexes and efficiently supports pipelining.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مكونات التكلفة التي يحسبها المُحسّن المبني على التكلفة؟</template>
+          <template class="content-en">What cost components are calculated by a cost-based optimizer?</template>
+          <span class="content-target">ما هي مكونات التكلفة التي يحسبها المُحسّن المبني على التكلفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تكلفة الوصول للقرص (I/O) وهي الأهم، تكلفة التخزين، تكلفة المعالجة (CPU)، تكلفة الذاكرة، وتكلفة الاتصال (في القواعد الموزعة).</template>
+          <template class="content-en">Disk access cost (I/O) which is the most important, storage cost, computation cost (CPU), memory usage cost, and communication cost (in distributed databases).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم التعامل مع الضرب الديكارتي (Cartesian Product) أثناء التحسين؟</template>
+          <template class="content-en">How is a Cartesian Product handled during optimization?</template>
+          <span class="content-target">كيف يتم التعامل مع الضرب الديكارتي (Cartesian Product) أثناء التحسين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يحاول المُحسّن دائماً دمجه مع عملية تحديد (SELECT) تتبعه مباشرة لتحويله إلى عملية ربط (JOIN) عادية، لتجنب الانفجار في حجم البيانات.</template>
+          <template class="content-en">The optimizer always tries to combine it with a subsequent SELECT operation to convert it into a standard JOIN operation, avoiding a data explosion.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن استخدام فهرس غير كثيف (Non-dense index) لحساب دالة COUNT؟</template>
+          <template class="content-en">Can a non-dense index be used to compute the COUNT function?</template>
+          <span class="content-target">هل يمكن استخدام فهرس غير كثيف (Non-dense index) لحساب دالة COUNT؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا يمكن استخدامه مباشرة، لأن كل إدخال في الفهرس يشير إلى كتلة بيانات قد لا تكون ممتلئة. يجب قراءة الكتل الفعلية من القرص لمعرفة العدد الدقيق.</template>
+          <template class="content-en">It cannot be used directly, because each index entry points to a data block that might not be full. The actual blocks must be read from disk to know the exact count.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التحسين الدلالي للاستعلام (Semantic Query Optimization)؟</template>
+          <template class="content-en">What is Semantic Query Optimization?</template>
+          <span class="content-target">ما هو التحسين الدلالي للاستعلام (Semantic Query Optimization)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو استخدام القيود المنطقية المحددة في مخطط قاعدة البيانات (مثل: لا يمكن أن يكون الراتب سالباً) لتعديل الاستعلام أو تخطي تنفيذه بالكامل إذا كان من المستحيل أن يرجع أي بيانات.</template>
+          <template class="content-en">It is the use of logical constraints defined in the database schema (e.g., salary cannot be negative) to modify a query or skip its execution entirely if it's impossible to return any data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو تحسين الاستعلام (Query Optimization)؟",
+      "en": "What is Query Optimization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية اختيار استراتيجية التنفيذ الأنسب لمعالجة الاستعلام.",
+        "en": "The process of choosing a suitable execution strategy for processing a query."
+      },
+      "example": {
+        "ar": "الاختيار بين استخدام الفهرس أو المسح الشامل للجدول.",
+        "en": "Choosing between using an index or a full table scan."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي كتلة الاستعلام (Query Block)؟",
+      "en": "What is a Query Block?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوحدة الأساسية التي يمكن تحويلها إلى معاملات جبرية وتحسينها، وتحتوي على تعبير SELECT-FROM-WHERE واحد.",
+        "en": "The basic unit that can be translated into algebraic operators and optimized, containing a single SELECT-FROM-WHERE expression."
+      },
+      "example": {
+        "ar": "الاستعلامات المتداخلة تعتبر كتل استعلام منفصلة.",
+        "en": "Nested queries are identified as separate query blocks."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي استراتيجية الفرز والدمج (Sort-Merge)؟",
+      "en": "What is the Sort-Merge strategy in external sorting?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فرز ملفات فرعية صغيرة (runs) في الذاكرة، ثم دمجها لإنشاء ملفات مفرزة أكبر تدريجياً.",
+        "en": "Sorting small subfiles (runs) in memory, then merging them to create larger sorted subfiles iteratively."
+      },
+      "example": {
+        "ar": "فرز ملف بحجم 10 جيجابايت باستخدام ذاكرة 1 جيجابايت.",
+        "en": "Sorting a 10GB file using 1GB of RAM."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "متى نستخدم البحث الثنائي (Binary Search) في عملية SELECT؟",
+      "en": "When do we use Binary Search for a SELECT operation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إذا كان شرط التحديد يتضمن مقارنة مساواة على سمة مفتاحية والملف مرتب بناءً عليها.",
+        "en": "If the selection condition involves an equality comparison on a key attribute on which the file is ordered."
+      },
+      "example": {
+        "ar": "البحث عن رقم موظف في ملف مرتب حسب أرقام الموظفين.",
+        "en": "Searching for an SSN in a file ordered by SSN."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو التحديد المترابط (Conjunctive selection)؟",
+      "en": "What is Conjunctive selection?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شرط تحديد يتكون من عدة شروط بسيطة مرتبطة بـ AND.",
+        "en": "A selection condition involving multiple simple conditions connected by AND."
+      },
+      "example": {
+        "ar": "SELECT * FROM EMP WHERE DNO=5 AND SALARY>30000",
+        "en": "SELECT * FROM EMP WHERE DNO=5 AND SALARY>30000"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي خوارزمية ربط الحلقة المتداخلة (Nested-loop join)؟",
+      "en": "What is the Nested-loop join algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لكل سجل في الجدول الخارجي، يتم استرجاع كل سجل من الجدول الداخلي واختبار شرط الربط.",
+        "en": "For each record in the outer loop, retrieve every record from the inner loop and test the join condition."
+      },
+      "example": {
+        "ar": "طريقة القوة الغاشمة (Brute force) للربط.",
+        "en": "The brute force method for joining."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "متى تكون خوارزمية ربط الفرز والدمج (Sort-merge join) فعالة جداً؟",
+      "en": "When is the Sort-merge join highly efficient?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما تكون سجلات كلا الجدولين مرتبة فيزيائياً بناءً على قيم سمات الربط.",
+        "en": "If the records of both relations are physically sorted by the value of the join attributes."
+      },
+      "example": {
+        "ar": "يتم مسح كلا الملفين مرة واحدة فقط.",
+        "en": "Both files are scanned only once."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي تكلفة الضرب الديكارتي (CARTESIAN PRODUCT)؟",
+      "en": "What is the cost of a CARTESIAN PRODUCT?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكلفة جداً. إذا كان R به n سجل و S به m سجل، النتيجة هي n*m سجل.",
+        "en": "Very expensive. If R has n records and S has m records, the result has n*m records."
+      },
+      "example": {
+        "ar": "جدول بـ 1000 صف وجدول بـ 1000 صف ينتج مليون صف.",
+        "en": "1000 rows x 1000 rows = 1,000,000 rows."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "كيف يتم تنفيذ عمليات الاتحاد والتقاطع (UNION, INTERSECTION) بكفاءة؟",
+      "en": "How are UNION and INTERSECTION operations executed efficiently?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق فرز كلا الجدولين أولاً، ثم مسحهما ودمجهما بشكل متزامن.",
+        "en": "By sorting the two relations first, then scanning and merging both sorted files concurrently."
+      },
+      "example": {
+        "ar": "في الاتحاد، يتم الاحتفاظ بنسخة واحدة فقط عند وجود تطابق.",
+        "en": "In UNION, only one copy is kept when the same tuple exists in both."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي مشكلة استخدام الفهرس غير الكثيف (Non-dense index) مع دوال التجميع (Aggregates)؟",
+      "en": "What is the issue with using a non-dense index for Aggregate operations?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب حساب العدد الفعلي للسجلات المرتبطة بكل إدخال فهرس، مما يتطلب قراءة البيانات من القرص.",
+        "en": "The actual number of records associated with each index entry must be accounted for, requiring disk reads."
+      },
+      "example": {
+        "ar": "لا يمكن حساب COUNT مباشرة من الفهرس غير الكثيف.",
+        "en": "Cannot compute COUNT directly from a non-dense index."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو التقييم المتدفق (Pipelining)؟",
+      "en": "What is Pipelining (Stream-based processing)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمرير نتيجة المعامل السابق إلى التالي دون انتظار اكتمال العملية السابقة، لتجنب حفظ ملفات مؤقتة.",
+        "en": "Passing the result of a previous operator to the next without waiting to complete the previous operation, avoiding temporary files."
+      },
+      "example": {
+        "ar": "دمج عمليتي SELECT و JOIN في نفس الوقت.",
+        "en": "Combining SELECT and JOIN operations simultaneously."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو التوجيه الرئيسي (Main Heuristic) في تحسين الاستعلام؟",
+      "en": "What is the Main Heuristic in query optimization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيق العمليات التي تقلل حجم النتائج المؤقتة أولاً (مثل SELECT و PROJECT قبل JOIN).",
+        "en": "Apply first the operations that reduce the size of intermediate results (e.g., SELECT and PROJECT before JOIN)."
+      },
+      "example": {
+        "ar": "دفع عملية SELECT لأسفل شجرة الاستعلام.",
+        "en": "Pushing a SELECT operation down the query tree."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي الشجرة العميقة لليسار (Left-deep tree)؟",
+      "en": "What is a Left-deep tree?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شجرة ثنائية يكون فيها الابن الأيمن لكل عقدة غير ورقية دائماً جدولاً أساسياً.",
+        "en": "A binary tree where the right child of each non-leaf node is always a base relation."
+      },
+      "example": {
+        "ar": "تستخدم بكثرة لأنها مناسبة جداً للـ Pipelining.",
+        "en": "Widely used because it is highly amenable to pipelining."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو التحسين الدلالي للاستعلام (Semantic Query Optimization)؟",
+      "en": "What is Semantic Query Optimization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام القيود المحددة في مخطط قاعدة البيانات لتعديل أو إلغاء استعلام لجعله أكثر كفاءة.",
+        "en": "Using constraints specified on the database schema to modify or skip a query to make it more efficient."
+      },
+      "example": {
+        "ar": "تخطي استعلام يبحث عن موظف راتبه أعلى من مديره إذا كان هناك قيد يمنع ذلك.",
+        "en": "Skipping a query for an employee earning more than their manager if a constraint forbids it."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي الانتقائية (Selectivity)؟",
+      "en": "What is Selectivity?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة السجلات التي تحقق شرطاً معيناً من إجمالي السجلات.",
+        "en": "The ratio of records satisfying a condition to the total number of records."
+      },
+      "example": {
+        "ar": "انتقائية عالية تعني أن الشرط يرجع بيانات كثيرة.",
+        "en": "High selectivity means the condition returns many records."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما الفرق بين Partition hash join و Hybrid hash join؟",
+      "en": "What is the difference between Partition hash join and Hybrid hash join?"
+    },
+    "back": {
+      "definition": {
+        "ar": "في Hybrid، يتم دمج مرحلة الربط لأحد الأقسام أثناء مرحلة التقسيم نفسها لتوفير عمليات I/O.",
+        "en": "In Hybrid, the joining phase of one partition is included during the partitioning phase to save I/O."
+      },
+      "example": {
+        "ar": "Hybrid أسرع لأنه يقلل الكتابة والقراءة من القرص للقسم الأول.",
+        "en": "Hybrid is faster as it reduces disk read/writes for the first partition."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+        <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+        <div id="quiz-content" class="quiz-card glass-card">
+          <div class="quiz-header">
+            <span id="quiz-counter">1 / 10</span>
+            <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+          </div>
+          <div class="quiz-question" id="quiz-question-text"></div>
+          <div class="quiz-options" id="quiz-options-container"></div>
+          <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+          <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+          <div class="quiz-nav">
+            <div></div>
+            <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+              <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+            </button>
+          </div>
+        </div>
+        <div id="quiz-results" class="quiz-results glass-card hidden">
+          <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+        </div>
+      </section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو الهدف الرئيسي من التوجيهات (Heuristics) في تحسين الاستعلام؟",
+      "en": "What is the main goal of Heuristics in query optimization?"
+    },
+    "options": {
+      "ar": [
+        "تقليل حجم النتائج المؤقتة مبكراً",
+        "زيادة استخدام الذاكرة العشوائية",
+        "تحويل جميع عمليات الربط إلى ضرب ديكارتي",
+        "تأخير عمليات التحديد (SELECT) إلى نهاية الاستعلام"
+      ],
+      "en": [
+        "Reduce the size of intermediate results early",
+        "Increase RAM usage",
+        "Convert all JOINs to Cartesian products",
+        "Delay SELECT operations to the end of the query"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "القاعدة الإرشادية الرئيسية هي تطبيق العمليات التي تقلل حجم البيانات (مثل SELECT و PROJECT) في أسرع وقت ممكن قبل العمليات المكلفة مثل JOIN.",
+      "en": "The main heuristic is to apply operations that reduce data size (like SELECT and PROJECT) as early as possible before expensive operations like JOIN."
+    },
+    "hint": {
+      "ar": "فكر في كيفية تقليل العمل للعمليات اللاحقة.",
+      "en": "Think about how to minimize work for subsequent operations."
+    },
+    "difficulty": "easy",
+    "conceptId": "heuristic-optimization"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من خوارزميات الربط التالية تتطلب أن تكون الجداول مرتبة فيزيائياً مسبقاً؟",
+      "en": "Which of the following JOIN algorithms requires the tables to be physically sorted beforehand?"
+    },
+    "options": {
+      "ar": [
+        "ربط التجزئة (Hash-join)",
+        "ربط الحلقة المتداخلة (Nested-loop join)",
+        "ربط الفرز والدمج (Sort-merge join)",
+        "ربط الحلقة المفردة (Single-loop join)"
+      ],
+      "en": [
+        "Hash-join",
+        "Nested-loop join",
+        "Sort-merge join",
+        "Single-loop join"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خوارزمية الفرز والدمج تفترض أن السجلات مرتبة بناءً على سمة الربط، مما يسمح بمسح كل جدول مرة واحدة فقط.",
+      "en": "Sort-merge join assumes records are sorted by the join attribute, allowing each table to be scanned only once."
+    },
+    "hint": {
+      "ar": "الاسم يحمل الإجابة.",
+      "en": "The name gives it away."
+    },
+    "difficulty": "easy",
+    "conceptId": "join-algorithms"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لاستخدام خطوط الأنابيب (Pipelining)؟",
+      "en": "What is the main advantage of using Pipelining?"
+    },
+    "options": {
+      "ar": [
+        "تسهيل كتابة استعلامات SQL",
+        "تجنب إنشاء وحفظ نتائج مؤقتة على القرص",
+        "زيادة دقة النتائج",
+        "السماح باستخدام الفهارس غير الكثيفة"
+      ],
+      "en": [
+        "Making SQL queries easier to write",
+        "Avoiding the creation and saving of temporary results on disk",
+        "Increasing result accuracy",
+        "Allowing the use of non-dense indexes"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التدفق (Pipelining) يمرر البيانات مباشرة من عملية لأخرى في الذاكرة، مما يوفر تكلفة الإدخال والإخراج (I/O) الباهظة لتخزين النتائج المؤقتة.",
+      "en": "Pipelining passes data directly from one operation to the next in memory, saving the expensive I/O cost of materializing temporary results."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بتقليل استخدام القرص الصلب.",
+      "en": "It relates to reducing hard drive usage."
+    },
+    "difficulty": "medium",
+    "conceptId": "pipelining"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في التحسين المبني على التكلفة، أي من المكونات التالية يعتبر عادة التكلفة الأكبر؟",
+      "en": "In cost-based optimization, which of the following components is usually the dominant cost?"
+    },
+    "options": {
+      "ar": [
+        "تكلفة الحساب (CPU)",
+        "تكلفة استخدام الذاكرة",
+        "تكلفة الوصول للتخزين الثانوي (I/O)",
+        "تكلفة الاتصال"
+      ],
+      "en": [
+        "Computation cost (CPU)",
+        "Memory usage cost",
+        "Access cost to secondary storage (I/O)",
+        "Communication cost"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الوصول إلى القرص (I/O) أبطأ بكثير من العمليات في الذاكرة أو المعالج، لذا فهو العامل الحاسم في تقدير التكلفة.",
+      "en": "Disk access (I/O) is orders of magnitude slower than memory or CPU operations, making it the dominant factor in cost estimation."
+    },
+    "hint": {
+      "ar": "أي جزء من الحاسوب هو الأبطأ في استرجاع البيانات؟",
+      "en": "Which part of the computer is the slowest at retrieving data?"
+    },
+    "difficulty": "medium",
+    "conceptId": "cost-based-optimization"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو نوع الشجرة الذي تفضله مُحسّنات الاستعلام لتقليل مساحة البحث وتسهيل التدفق (Pipelining)؟",
+      "en": "Which type of tree do query optimizers prefer to reduce search space and facilitate pipelining?"
+    },
+    "options": {
+      "ar": [
+        "الشجرة المتوازنة (Balanced tree)",
+        "الشجرة العميقة لليمين (Right-deep tree)",
+        "الشجرة العميقة لليسار (Left-deep tree)",
+        "شجرة B+ (B+-tree)"
+      ],
+      "en": [
+        "Balanced tree",
+        "Right-deep tree",
+        "Left-deep tree",
+        "B+-tree"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الأشجار العميقة لليسار تضمن أن الابن الأيمن دائماً جدول أساسي، مما يسهل التدفق واستخدام الفهارس.",
+      "en": "Left-deep trees ensure the right child is always a base relation, facilitating pipelining and index usage."
+    },
+    "hint": {
+      "ar": "الابن الأيمن دائماً جدول أساسي.",
+      "en": "The right child is always a base relation."
+    },
+    "difficulty": "hard",
+    "conceptId": "cost-based-optimization"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "كيف يتم تنفيذ التحسين الدلالي للاستعلام (Semantic Query Optimization)؟",
+      "en": "How is Semantic Query Optimization implemented?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام إحصائيات حجم البيانات",
+        "بدفع عمليات التحديد لأسفل الشجرة",
+        "باستخدام القيود (Constraints) المحددة في مخطط قاعدة البيانات",
+        "بتحويل الاستعلام إلى كود مجمع (Compiled code)"
+      ],
+      "en": [
+        "Using data size statistics",
+        "By pushing selection operations down the tree",
+        "Using constraints specified on the database schema",
+        "By converting the query to compiled code"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التحسين الدلالي يعتمد على معنى البيانات والقيود (مثل المفاتيح الأجنبية وقواعد الأعمال) لتعديل أو تخطي الاستعلامات.",
+      "en": "Semantic optimization relies on the meaning of data and constraints (like foreign keys and business rules) to modify or skip queries."
+    },
+    "hint": {
+      "ar": "يتعلق بمعنى البيانات والقواعد المنطقية.",
+      "en": "It relates to the meaning of data and logical rules."
+    },
+    "difficulty": "medium",
+    "conceptId": "semantic-query-optimization"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "لماذا يعتبر استخدام الفهرس غير الكثيف (Non-dense index) مشكلة عند حساب دالة COUNT؟",
+      "en": "Why is using a non-dense index a problem when computing the COUNT function?"
+    },
+    "options": {
+      "ar": [
+        "لأنه لا يحتوي على قيم رقمية",
+        "لأن إدخال الفهرس الواحد يمثل كتلة كاملة ولا يحدد العدد الفعلي للسجلات",
+        "لأنه أبطأ من المسح الخطي دائماً",
+        "لأنه لا يدعم عمليات التجميع"
+      ],
+      "en": [
+        "Because it does not contain numeric values",
+        "Because a single index entry represents a whole block and doesn't specify the exact number of records",
+        "Because it is always slower than a linear scan",
+        "Because it does not support aggregate operations"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الفهرس غير الكثيف يؤشر إلى كتل البيانات، والكتلة قد لا تكون ممتلئة بالكامل، لذا يجب قراءة الكتلة لمعرفة العدد الدقيق للسجلات.",
+      "en": "A non-dense index points to data blocks, which might not be completely full, so the block must be read to know the exact record count."
+    },
+    "hint": {
+      "ar": "هل كل إدخال في الفهرس يمثل سجلاً واحداً؟",
+      "en": "Does every index entry represent exactly one record?"
+    },
+    "difficulty": "hard",
+    "conceptId": "aggregates-and-outer-joins"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي العملية الجبرية التي يجب تجنبها قدر الإمكان بسبب تكلفتها العالية جداً؟",
+      "en": "Which algebraic operation should be avoided as much as possible due to its extremely high cost?"
+    },
+    "options": {
+      "ar": [
+        "التقاطع (INTERSECTION)",
+        "الربط الخارجي (OUTER JOIN)",
+        "الضرب الديكارتي (CARTESIAN PRODUCT)",
+        "الإسقاط (PROJECT)"
+      ],
+      "en": [
+        "INTERSECTION",
+        "OUTER JOIN",
+        "CARTESIAN PRODUCT",
+        "PROJECT"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الضرب الديكارتي يدمج كل سجل في الجدول الأول مع كل سجل في الجدول الثاني، مما ينتج حجماً هائلاً من البيانات (n * m).",
+      "en": "Cartesian product combines every record in the first table with every record in the second, producing a massive amount of data (n * m)."
+    },
+    "hint": {
+      "ar": "عملية تنتج n * m سجل.",
+      "en": "An operation that produces n * m records."
+    },
+    "difficulty": "easy",
+    "conceptId": "project-and-set-algorithms"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في خوارزمية الفرز الخارجي، ما الذي يحدد عدد التمريرات (Passes) المطلوبة؟",
+      "en": "In the external sorting algorithm, what determines the number of passes required?"
+    },
+    "options": {
+      "ar": [
+        "سرعة المعالج (CPU)",
+        "مساحة الذاكرة المؤقتة المتاحة (Buffer space)",
+        "نوع الفهرس المستخدم",
+        "عدد الأعمدة في الجدول"
+      ],
+      "en": [
+        "CPU speed",
+        "Available buffer space",
+        "Type of index used",
+        "Number of columns in the table"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "كلما زادت مساحة الذاكرة المؤقتة (nB)، زادت درجة الدمج (dM)، مما يقلل من عدد التمريرات (nP) المطلوبة لفرز الملف.",
+      "en": "The more buffer space (nB) available, the higher the degree of merging (dM), which reduces the number of passes (nP) required to sort the file."
+    },
+    "hint": {
+      "ar": "أين يتم تخزين الملفات الفرعية أثناء دمجها؟",
+      "en": "Where are the subfiles stored while being merged?"
+    },
+    "difficulty": "medium",
+    "conceptId": "external-sorting"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي كتلة الاستعلام (Query Block)؟",
+      "en": "What is a Query Block?"
+    },
+    "options": {
+      "ar": [
+        "مجموعة من الاستعلامات المنفذة معاً",
+        "الوحدة الأساسية التي تحتوي على تعبير SELECT-FROM-WHERE واحد",
+        "كتلة من البيانات المخزنة على القرص",
+        "جزء من الذاكرة مخصص للاستعلامات"
+      ],
+      "en": [
+        "A group of queries executed together",
+        "The basic unit containing a single SELECT-FROM-WHERE expression",
+        "A block of data stored on disk",
+        "A portion of memory dedicated to queries"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "كتلة الاستعلام هي الوحدة الأساسية للتحليل والتحسين، وتمثل تعبير SELECT-FROM-WHERE واحد (مع GROUP BY و HAVING إن وجدوا).",
+      "en": "A query block is the basic unit for parsing and optimization, representing a single SELECT-FROM-WHERE expression (with GROUP BY and HAVING if present)."
+    },
+    "hint": {
+      "ar": "هي الوحدة الأساسية التي يتم تحويلها للجبر العلائقي.",
+      "en": "It is the basic unit translated into relational algebra."
+    },
+    "difficulty": "easy",
+    "conceptId": "translating-sql-to-ra"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن المُحسّن المبني على التكلفة (Cost-based) يجد دائماً الخطة 'المثالية'. في الواقع، هو يجد خطة 'جيدة بما فيه الكفاية' لأن البحث في كل الخطط الممكنة (خاصة مع جداول كثيرة) سيستغرق وقتاً أطول من تنفيذ الاستعلام نفسه.</template>
+    <template class="content-en">Believing that a Cost-based optimizer always finds the 'perfect' plan. In reality, it finds a 'good enough' plan because searching all possible plans (especially with many joins) would take longer than executing the query itself.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">القاعدة الذهبية في تحسين الاستعلامات: قلل حجم البيانات في أسرع وقت ممكن. ادفع عمليات SELECT و PROJECT لأسفل شجرة الاستعلام لتنفذ قبل عمليات JOIN المكلفة.</template>
+    <template class="content-en">The Golden Rule of Query Optimization: Reduce data size as early as possible. Push SELECT and PROJECT operations down the query tree to execute before expensive JOIN operations.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الضرب الديكارتي (Cartesian Product) ليس دائماً خطأ. المُحسّن الذكي يبحث عن شرط التحديد (SELECT) الذي يليه مباشرة، ويقوم بدمجهما معاً لتحويلهما إلى عملية ربط (JOIN) عادية وفعالة.</template>
+    <template class="content-en">A Cartesian Product isn't always a mistake. A smart optimizer looks for the SELECT condition immediately following it and combines them into a standard, efficient JOIN operation.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين شجرة الاستعلام (Query Tree) ورسم الاستعلام (Query Graph). الشجرة تحدد ترتيباً معيناً للعمليات (تُنفذ من الأسفل للأعلى)، بينما الرسم يمثل الاستعلام دون تحديد ترتيب التنفيذ.</template>
+    <template class="content-en">Confusing a Query Tree with a Query Graph. A tree specifies a specific order of operations (executed bottom-up), while a graph represents the query without indicating an execution order.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الأشجار العميقة لليسار (Left-deep trees) هي المفتاح لعملية التدفق (Pipelining). لأن الابن الأيمن دائماً جدول أساسي، يمكننا استخدام فهارسه مباشرة وتمرير نتائج الربط السابق دون كتابتها على القرص.</template>
+    <template class="content-en">Left-deep trees are the key to Pipelining. Because the right child is always a base relation, we can use its indexes directly and stream the results of the previous join without writing to disk.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M02.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M04.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 5 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+  <script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

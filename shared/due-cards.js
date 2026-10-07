@@ -531,15 +531,12 @@
     return g >= 4 ? 'fc-exit-away' : g === 3 ? 'fc-exit-slide' : 'fc-exit-back';
   }
   var EXIT_MS = 420;
-  function reducedMotion() {
-    try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
-  }
 
   function grade(g) {
     if (S.phase !== 'review' || !S.flipped) return;
     var c = dlg.querySelector('#dcx-card');
     if (c && c.getAttribute('data-exiting') === '1') return;
-    if (!c || reducedMotion()) { gradeNow(g); next(); return; }
+    if (!c) { gradeNow(g); next(); return; }
 
     /*@3.DUCJ.34*/
     c.setAttribute('data-exiting', '1');

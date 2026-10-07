@@ -1349,16 +1349,13 @@
     return g >= 4 ? 'fc-exit-away' : g === 3 ? 'fc-exit-slide' : 'fc-exit-back';
   }
   const EXIT_MS = 420;
-  function _reduced() {
-    try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
-  }
 
   /*@3.GARJ.68*/
   function gradeCard(grade) {
     const c = document.getElementById('fc-card');
     /*@3.GARJ.69*/
     if (c && c.dataset.exiting === '1') return;
-    if (!c || _reduced()) { _gradeCardNow(grade); return; }
+    if (!c) { _gradeCardNow(grade); return; }
 
     const fc = window._gardenFC;
     c.dataset.exiting = '1';
@@ -6917,7 +6914,8 @@ ${baseRules}`) + regenSuffix;
     if (!el) return;
     var p = location.pathname;
     var m = p.match(/\/L(\d+)\//);
-    var label = m ? 'CS Level ' + m[1] : (/\/others\//.test(p) ? 'General Courses' : null);
+    var major = ((document.documentElement.getAttribute('data-subject') || '').match(/^(IT|DS)\d/) || [0, 'CS'])[1];
+    var label = m ? major + ' Level ' + m[1] : (/\/others\//.test(p) ? 'General Courses' : null);
     if (!label) return;                       /*@3.GARJ.443*/
     el.innerHTML = '<i class="fa-solid fa-seedling" aria-hidden="true"></i> <span></span> · Digital Garden';
       el.querySelector('span').textContent = label;

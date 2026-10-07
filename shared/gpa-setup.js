@@ -12,6 +12,8 @@
   var MAX_LEVEL = 12;                 /*@3.GPSJ.3*/
   var CAP_REG = 18, CAP_SUM = 9;
   var FULL_SUPPORT = 'bachelor-of-computer-science';
+  /*@3.GPSJ.182*/
+  var GROWING = { 'bachelor-of-science-in-information-technology': 1, 'bachelor-of-data-science': 1 };
 
   var PLANS = null, W = null, MOVING = null, MODE = 'setup';
 
@@ -638,6 +640,7 @@
         /*@3.GPSJ.50*/
         var full = pr.slug === FULL_SUPPORT, deg = degreeOf(pr);
         var tag = full ? '<span class="gp-badge" data-kind="on">' + esc(L('مدعوم كاملاً', 'Full support')) + '</span>'
+                : GROWING[pr.slug] ? '<span class="gp-badge" data-kind="done">' + esc(L('موادُّه تُضاف تباعاً', 'Courses being added')) + '</span>'
                 : deg ? '<em class="gs-deg">' + esc(deg) + '</em>'
                 : '';
         h += '<button class="gs-prog' + (W.program === pr.slug ? ' is-on' : '') + '" data-gs="prog" data-v="' + esc(pr.slug) + '">' +
