@@ -542,7 +542,7 @@
     if (!/^#[0-9a-f]{6}$/i.test(hex)) return;
     this.color = hex.toLowerCase();
     this.root.style.setProperty('--c', this.color);
-    if (fromUser) this.savePrefs();
+    if (fromUser) { this._pickedColor = true; this.savePrefs(); }
     var self = this;
     this.root.querySelectorAll('.mrs-c[data-c]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.c === self.color)); });
     this.$('.mrs-cname').textContent = this.colorName(this.color);
@@ -711,6 +711,10 @@
         }
         if (!self.families || !self.families.length) { self.families = null; if (self.cat === 'orig') self.cat = 'basic'; }
         else if (self.tool !== 'graphite' && !self._pickedCat) self.cat = 'orig';
+        if (self.families && !self._pickedColor && self.tool !== 'graphite') {
+          var lead = self.families.filter(function (f) { var c = hexRgb(f.shades[f.shades.length >> 1]); return Math.max(c[0], c[1], c[2]) - Math.min(c[0], c[1], c[2]) > 40; })[0] || self.families[0];
+          self.color = lead.shades[lead.shades.length >> 1].toLowerCase();
+        }
         self.paintChrome(); self.paintPalette(); self.kick();
         if (ref && self.opts.onRef) self.opts.onRef(self);
         return ref;
@@ -840,10 +844,11 @@
       var e = self.$(s); if (!e || e.hidden || !e.getClientRects().length) return;
       var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
       if (s === '.mrs-side' && narrow) return;
-      var dT = b.top - r.top, dB = r.bottom - b.bottom, dL = b.left - r.left, dR = r.right - b.right;
-      var vert = b.width > r.width * .6 || Math.min(dT, dB) < Math.min(dL, dR);
-      if (vert) { if (dT < dB) y0 = Math.max(y0, b.bottom); else y1 = Math.min(y1, b.top); }
-      else if (dL < dR) x0 = Math.max(x0, b.right); else x1 = Math.min(x1, b.left);
+      if (b.right <= x0 || b.left >= x1 || b.bottom <= y0 || b.top >= y1) return;
+      var cuts = [[x0, Math.max(y0, b.bottom), x1, y1], [x0, y0, x1, Math.min(y1, b.top)], [Math.max(x0, b.right), y0, x1, y1], [x0, y0, Math.min(x1, b.left), y1]];
+      var best = cuts[0], ba = -1;
+      cuts.forEach(function (c) { var ar = Math.max(0, c[2] - c[0]) * Math.max(0, c[3] - c[1]); if (ar > ba) { ba = ar; best = c; } });
+      x0 = best[0]; y0 = best[1]; x1 = best[2]; y1 = best[3];
     });
     return { x: x0 - r.left + pad, y: y0 - r.top + pad, w: Math.max(80, x1 - x0 - pad * 2), h: Math.max(80, y1 - y0 - pad * 2) };
   };
@@ -851,9 +856,9 @@
   Studio.prototype.layout = function (refit) {
     var r = this.root.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    var narrow = r.width <= 640 || r.height <= 480;
+    var narrow = r.width <= 640 || (r.height <= 480 && r.width < r.height * 1.3);
     this.root.classList.toggle('is-narrow', narrow);
-    this.root.classList.toggle('is-wide', !narrow && r.width >= 900 && r.height >= 540);
+    this.root.classList.toggle('is-wide', !narrow && ((r.width >= 900 && r.height >= 540) || r.width >= r.height * 1.3));
     var dk = this.$('.mrs-dock'); if (dk) this.root.style.setProperty('--dock-h', (narrow ? dk.offsetHeight : 0) + 'px');
     if (!this.S) return;
     var dpr = this.dpr();
@@ -1080,8 +1085,13 @@
     var t = BYID[tool]; if (!t || !t.eng) return null;
     this.prevColor = this.prevColor || this.color;
     var mask = tool === 'eraser' || tool === 'blend' ? (this.lock ? this.region(p.x, p.y) : null) : this.region(p.x, p.y);
-    this.S.setMask(mask);
     var k = .4 + .9 * this.strength;
+    if (!mask && this.lock && this.regions) { this.live = { pend: 1, tool: tool, ptype: ptype, k: k }; return this.live; }
+    return this.open(tool, mask, p, ptype, k);
+  };
+  Studio.prototype.open = function (tool, mask, p, ptype, k) {
+    var t = BYID[tool];
+    this.S.setMask(mask);
     var st = this.S.stroke(t.eng, this.color, this.radius(tool), {
       mask: !!mask, grade: this.grade, load: tool === 'wash' ? .5 + .5 * this.strength : 1, flow: tool === 'marker' || tool === 'airbrush' ? .35 + .75 * this.strength : 1, nib: .6
     });
@@ -1095,6 +1105,12 @@
 
   Studio.prototype.move = function (s, p) {
     if (!s || s.done || s.tap) return;
+    if (s.pend) {
+      var m0 = this.region(p.x, p.y); if (!m0) return;
+      var o = this.open(s.tool, m0, p, s.ptype, s.k);
+      for (var key in o) s[key] = o[key];
+      delete s.pend; this.live = s; return;
+    }
     p = this.pp(p, s.k);
     var c = s.ctrl || s.last, r = s.st.r;
     if (Math.hypot(p.x - c.x, p.y - c.y) < Math.max(.35, r * .04)) return;
@@ -1123,6 +1139,7 @@
   Studio.prototype.finish = function (s, keep) {
     if (!s || s.done) { this.live = null; return; }
     if (s.tap) { if (keep) this.fillAt(s.tap.x, s.tap.y); this.live = null; return; }
+    if (s.pend) { this.live = null; return; }
     if (s.ctrl) { this.S.dab(s.st, s.last, s.ctrl); }
     if (!keep && s.ptype === 'touch') this.S.abort(s.st);
     else { this.S.endStroke(s.st); this.changed++; this.addRecent(this.color); }
