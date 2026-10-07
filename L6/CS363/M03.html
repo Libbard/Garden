@@ -104,6 +104,31 @@
         <template class="content-en">Enumeration Types</template>
         <span class="content-target">الأنواع المسرودة (Enumeration)</span>
       </a>
+      <a href="#variable-scope-and-hiding" class="toc-link" data-bilingual>
+        <template class="content-ar">سمات المتغيرات: النطاق والإخفاء</template>
+        <template class="content-en">Variable Attributes: Scope and Hiding</template>
+        <span class="content-target">سمات المتغيرات: النطاق والإخفاء</span>
+      </a>
+      <a href="#declaration-order" class="toc-link" data-bilingual>
+        <template class="content-ar">ترتيب الإعلان عن المتغيرات</template>
+        <template class="content-en">Declaration Order</template>
+        <span class="content-target">ترتيب الإعلان عن المتغيرات</span>
+      </a>
+      <a href="#global-scope-handling" class="toc-link" data-bilingual>
+        <template class="content-ar">التعامل مع النطاق العام في اللغات المختلفة</template>
+        <template class="content-en">Handling Global Scope in Different Languages</template>
+        <span class="content-target">التعامل مع النطاق العام في اللغات المختلفة</span>
+      </a>
+      <a href="#scope-vs-lifetime" class="toc-link" data-bilingual>
+        <template class="content-ar">النطاق مقابل دورة الحياة</template>
+        <template class="content-en">Scope vs. Lifetime</template>
+        <span class="content-target">النطاق مقابل دورة الحياة</span>
+      </a>
+      <a href="#data-type-definitions" class="toc-link" data-bilingual>
+        <template class="content-ar">مفاهيم أنواع البيانات</template>
+        <template class="content-en">Data Type Concepts</template>
+        <span class="content-target">مفاهيم أنواع البيانات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -215,8 +240,28 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><ul><li><b>النطاق الثابت (Static Scope):</b> يعتمد على كيفية كتابة الكود. للبحث عن متغير، يبحث المترجم محليًا أولاً، ثم في النطاقات الأكبر المحيطة (<span class="smart-term" data-term-en="Static Ancestor" data-ar="السلف الثابت" data-en-def="Enclosing static scopes to a specific scope.">الأسلاف الثابتة<span class="smart-term-tooltip"></span></span>) حتى يجده.</li><li><b>النطاق الديناميكي (Dynamic Scope):</b> يعتمد على تسلسل استدعاء البرامج الفرعية أثناء التشغيل. يتم البحث عن المتغيرات بالرجوع عبر سلسلة الاستدعاءات.</li></ul></template>
-    <template class="content-en"><ul><li><b>Static Scope:</b> Based on program text. To connect a name to a variable, the compiler searches locally, then in increasingly larger enclosing scopes (<span class="smart-term" data-term-en="Static Ancestor" data-ar="السلف الثابت" data-en-def="Enclosing static scopes to a specific scope.">static ancestors<span class="smart-term-tooltip"></span></span>).</li><li><b>Dynamic Scope:</b> Based on calling sequences. References are connected by searching back through the chain of subprogram calls.</li></ul></template>
+    <template class="content-ar"><ul><li><b>النطاق الثابت (Static Scope):</b> يعتمد على كيفية كتابة الكود. للبحث عن متغير، يبحث المترجم محليًا أولاً، ثم في النطاقات الأكبر المحيطة (<span class="smart-term" data-term-en="Static Ancestor" data-ar="السلف الثابت" data-en-def="Enclosing static scopes to a specific scope.">الأسلاف الثابتة<span class="smart-term-tooltip"></span></span>) حتى يجده.</li><li><b>النطاق الديناميكي (Dynamic Scope):</b> يعتمد على تسلسل استدعاء البرامج الفرعية أثناء التشغيل. يتم البحث عن المتغيرات بالرجوع عبر سلسلة الاستدعاءات.</li></ul><ul><li><b>النطاق الثابت (Static Scope):</b> يعتمد على كيفية كتابة الكود. للبحث عن متغير، يبحث المترجم محليًا أولاً، ثم في النطاقات الأكبر المحيطة (الأسلاف الثابتة) حتى يجده.</li><li><b>النطاق الديناميكي (Dynamic Scope):</b> يعتمد على تسلسل استدعاء البرامج الفرعية أثناء التشغيل. يتم البحث عن المتغيرات بالرجوع عبر سلسلة الاستدعاءات.</li></ul><p><b>مثال عملي لتتبع النطاق:</b></p><pre><code>function big() {
+  var x = 3;
+  function sub1() {
+    var x = 7;
+    sub2();
+  }
+  function sub2() {
+    var y = x; // أي 'x' سيتم استخدامها؟
+  }
+  sub1();
+}</code></pre><p>عند تنفيذ الكود، تستدعي <code>big</code> الدالة <code>sub1</code>، والتي بدورها تستدعي <code>sub2</code>. كيف يتم تحديد قيمة <code>x</code> داخل <code>sub2</code>؟</p><ol><li><b>في النطاق الثابت:</b> تبحث <code>sub2</code> عن <code>x</code> محلياً فلا تجدها. تنتقل إلى النطاق الأب المحيط بها <i>في النص البرمجي</i> (وهو دالة <code>big</code>). تجد <code>x = 3</code>، فتكون النتيجة 3.</li><li><b>في النطاق الديناميكي:</b> تبحث <code>sub2</code> محلياً فلا تجدها. تنتقل إلى الدالة التي <i>استدعتها وقت التشغيل</i> (وهي دالة <code>sub1</code>). تجد <code>x = 7</code>، فتكون النتيجة 7.</li></ol></template>
+    <template class="content-en"><ul><li><b>Static Scope:</b> Based on program text. To connect a name to a variable, the compiler searches locally, then in increasingly larger enclosing scopes (<span class="smart-term" data-term-en="Static Ancestor" data-ar="السلف الثابت" data-en-def="Enclosing static scopes to a specific scope.">static ancestors<span class="smart-term-tooltip"></span></span>).</li><li><b>Dynamic Scope:</b> Based on calling sequences. References are connected by searching back through the chain of subprogram calls.</li></ul><ul><li><b>Static Scope:</b> Based on program text. To connect a name to a variable, the compiler searches locally, then in increasingly larger enclosing scopes (static ancestors).</li><li><b>Dynamic Scope:</b> Based on calling sequences. References are connected by searching back through the chain of subprogram calls.</li></ul><p><b>Worked Example:</b></p><pre><code>function big() {
+  var x = 3;
+  function sub1() {
+    var x = 7;
+    sub2();
+  }
+  function sub2() {
+    var y = x; // Which 'x' is used?
+  }
+  sub1();
+}</code></pre><p>During execution, <code>big</code> calls <code>sub1</code>, which calls <code>sub2</code>. How is <code>x</code> resolved inside <code>sub2</code>?</p><ol><li><b>Under Static Scoping:</b> <code>sub2</code> searches locally and fails. It then searches its <i>textual parent</i> (the enclosing function <code>big</code>). It finds <code>x = 3</code>, so the result is 3.</li><li><b>Under Dynamic Scoping:</b> <code>sub2</code> searches locally and fails. It then searches the function that <i>called it at runtime</i> (the caller <code>sub1</code>). It finds <code>x = 7</code>, so the result is 7.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -834,6 +879,156 @@
       <div class="content-target"></div>
     </div>
   </details>
+</section>
+
+<section id="variable-scope-and-hiding" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> سمات المتغيرات: النطاق والإخفاء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Variable Attributes: Scope and Hiding</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نطاق المتغير هو نطاق العبارات التي يكون فيها مرئياً. يمكن إخفاء المتغيرات إذا تم تعريف متغير بنفس الاسم في نطاق أقرب.</p></template>
+    <template class="content-en"><p>The scope of a variable is the range of statements where it is visible. Variables can be hidden if a closer variable is declared with the same name.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُصنف المتغيرات بناءً على مكان تعريفها ورؤيتها:</p><ul><li><b>المتغيرات المحلية (Local Variables):</b> هي تلك المُعرفة داخل وحدة البرنامج (Program Unit) الحالية.</li><li><b>المتغيرات غير المحلية (Nonlocal Variables):</b> هي المتغيرات المرئية داخل الوحدة ولكنها غير مُعرفة بداخلها.</li><li><b>المتغيرات العامة (Global Variables):</b> هي فئة خاصة من المتغيرات غير المحلية، تكون مرئية عبر وحدات متعددة أو البرنامج بأكمله.</li></ul><p><b>إخفاء المتغيرات (Variable Hiding):</b> يمكن إخفاء متغير من وحدة معينة إذا تم تعريف متغير آخر بنفس الاسم في نطاق "أقرب" (Closer) أو داخلي. في هذه الحالة، يشير الاسم إلى المتغير الأقرب، ويصبح المتغير الخارجي غير مرئي مباشرة بنفس الاسم.</p></template>
+    <template class="content-en"><p>Variables are categorized based on where they are declared and visible:</p><ul><li><b>Local Variables:</b> Declared within the current program unit.</li><li><b>Nonlocal Variables:</b> Visible within the unit but not declared there.</li><li><b>Global Variables:</b> A special category of nonlocal variables visible across multiple units or the entire program.</li></ul><p><b>Variable Hiding:</b> A variable can be hidden from a unit by having a "closer" (more local) variable declared with the exact same name. References to that name will resolve to the closer variable.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>قواعد النطاق (Scope Rules) في أي لغة برمجة هي التي تحدد بدقة كيف يتم ربط الإشارات إلى الأسماء (Name References) بالمتغيرات الفعلية في الذاكرة، خاصة عند وجود إخفاء للمتغيرات.</p></template>
+    <template class="content-en"><p>The scope rules of a language strictly determine how references to names are associated with variables in memory, especially resolving ambiguities when variable hiding occurs.</p></template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="declaration-order" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> ترتيب الإعلان عن المتغيرات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Declaration Order</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في اللغات الحديثة، يمكن الإعلان عن المتغيرات في أي مكان، ويبدأ نطاقها من نقطة الإعلان. المتغيرات المعلنة داخل حلقة <code>for</code> يقتصر نطاقها على تلك الحلقة.</p></template>
+    <template class="content-en"><p>In modern languages, variables can be declared anywhere, with scope starting from the declaration. Variables declared in a <code>for</code> loop are restricted to that loop.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تسمح لغات مثل C99 و C++ و Java و C# بظهور إعلانات المتغيرات في أي مكان يمكن أن تظهر فيه عبارة برمجية (Statement).</p><ul><li><b>نطاق الكتلة (Block Scope):</b> في C99 و C++ و Java، يمتد نطاق المتغيرات المحلية من نقطة الإعلان عنها وحتى نهاية الكتلة البرمجية التي تحتويها.</li><li><b>حلقات التكرار (For Statements):</b> في C++ و Java و C#، يمكن الإعلان عن المتغيرات مباشرة داخل عبارة <code>for</code>. في هذه الحالة، يكون نطاق هذه المتغيرات مقصوراً حصرياً على بنية الحلقة ولا يمكن الوصول إليها خارجها.</li></ul></template>
+    <template class="content-en"><p>Languages like C99, C++, Java, and C# allow variable declarations to appear anywhere a statement can appear.</p><ul><li><b>Block Scope:</b> In C99, C++, and Java, the scope of local variables runs from the point of declaration to the end of the enclosing block.</li><li><b>For Statements:</b> In C++, Java, and C#, variables can be declared directly within the initialization of a <code>for</code> statement. The scope of such variables is strictly restricted to the <code>for</code> construct itself.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>فخ شائع في C#:</b> ينص التوثيق الرسمي لـ C# على أن نطاق أي متغير يُعلن داخل كتلة هو الكتلة بأكملها. هذا الوصف مضلل؛ لأنه على الرغم من ذلك، لا يزال المترجم يفرض قاعدة أنه يجب الإعلان عن المتغير قبل استخدامه نصياً.</p></template>
+    <template class="content-en"><p><b>A common trap in C#:</b> The official documentation states that the scope of a variable declared in a block is the entire block. This is misleading because the compiler still strictly enforces that a variable must be textually declared before it can be used.</p></template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="global-scope-handling" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> التعامل مع النطاق العام في اللغات المختلفة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Handling Global Scope in Different Languages</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تختلف اللغات في التعامل مع المتغيرات العامة؛ C/C++ تفصل بين الإعلان والتعريف، بينما تتطلب PHP و Python كلمات مفتاحية صريحة (مثل <code>global</code>) لتعديلها داخل الدوال.</p></template>
+    <template class="content-en"><p>Languages handle globals differently; C/C++ separate declaration and definition, while PHP and Python require explicit keywords (like <code>global</code>) to modify them inside functions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تدعم العديد من اللغات هيكل برنامج يتكون من سلسلة من تعريفات الدوال في ملف، مما يسمح بوجود متغيرات عامة خارجها:</p><ul><li><b>C و C++:</b> تفرق بين <b>الإعلان (Declaration)</b> الذي يحدد السمات فقط (ويشير إلى أن المتغير مُعرف في ملف آخر)، و<b>التعريف (Definition)</b> الذي يحدد السمات ويحجز الذاكرة.</li><li><b>PHP:</b> نطاق المتغير المُعلن ضمنياً خارج الدوال يمتد لنهاية البرنامج، لكنه <b>يتخطى</b> الدوال الوسيطة. للوصول لمتغير عام داخل دالة، يجب استخدام مصفوفة <code>$GLOBALS</code> أو الإعلان عنه باستخدام الكلمة المفتاحية <code>global</code>.</li><li><b>Python:</b> يمكن قراءة المتغير العام داخل الدالة مباشرة، ولكن <b>لتعديل قيمته</b> (تعيين قيمة جديدة)، يجب الإعلان عنه صراحة باستخدام <code>global</code> داخل الدالة، وإلا ستقوم Python بإنشاء متغير محلي جديد بنفس الاسم.</li></ul></template>
+    <template class="content-en"><p>Many languages support a program structure of sequential function definitions, allowing variable declarations outside them:</p><ul><li><b>C and C++:</b> Distinguish between <b>declarations</b> (specifying attributes only, often indicating definition in another file) and <b>definitions</b> (specifying attributes and allocating storage).</li><li><b>PHP:</b> A variable implicitly declared outside functions has a scope to the end of the program but <b>skips over</b> intervening functions. To access it inside a function, you must use the <code>$GLOBALS</code> array or the <code>global</code> keyword.</li><li><b>Python:</b> A global variable can be referenced (read) inside a function. However, to <b>assign</b> a new value to it, it must be explicitly declared with <code>global</code> in the function; otherwise, Python creates a new local variable.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التصميم في PHP و Python يهدف إلى حماية المتغيرات العامة من التعديل غير المقصود. من خلال إجبار المبرمج على التصريح بنيته في تعديل المتغير العام، تقل احتمالية الأخطاء الناتجة عن تداخل أسماء المتغيرات المحلية مع العامة.</p></template>
+    <template class="content-en"><p>The design choice in PHP and Python aims to protect global variables from accidental modification. By forcing the programmer to explicitly state their intention to modify a global, it reduces bugs caused by local variable names shadowing globals unintentionally.</p></template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="scope-vs-lifetime" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> النطاق مقابل دورة الحياة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Scope vs. Lifetime</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>النطاق هو مفهوم مكاني (أين يمكن رؤية المتغير في الكود)، بينما دورة الحياة هي مفهوم زماني (متى يكون المتغير موجوداً في الذاكرة).</p></template>
+    <template class="content-en"><p>Scope is a spatial concept (where the variable is visible in code), while lifetime is a temporal concept (when the variable exists in memory).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>على الرغم من ارتباط النطاق (Scope) ودورة الحياة (Lifetime) ببعضهما أحياناً، إلا أنهما مفهومان مختلفان تماماً:</p><ul><li><b>النطاق (Scope):</b> يحدد الأجزاء من النص البرمجي التي يمكن فيها استخدام اسم المتغير بشكل قانوني.</li><li><b>دورة الحياة (Lifetime):</b> تحدد الفترة الزمنية أثناء تشغيل البرنامج التي يكون فيها المتغير مرتبطاً بموقع فعلي في الذاكرة.</li></ul><p><b>مثال توضيحي:</b> المتغير المُعلن كـ <code>static</code> داخل دالة في لغة C أو C++. نطاق هذا المتغير <b>محلي</b> (لا يمكن الوصول إليه إلا داخل تلك الدالة)، لكن دورة حياته <b>عالمية</b> (يحتفظ بقيمته في الذاكرة طوال فترة تشغيل البرنامج، ولا يتم تدميره عند انتهاء الدالة).</p></template>
+    <template class="content-en"><p>Although scope and lifetime are sometimes closely related, they are fundamentally different concepts:</p><ul><li><b>Scope:</b> Determines the textual regions of the program where a variable's name can be legally referenced (spatial).</li><li><b>Lifetime:</b> Determines the time during program execution when the variable is bound to a specific memory location (temporal).</li></ul><p><b>Illustrative Example:</b> Consider a <code>static</code> variable declared inside a C or C++ function. Its scope is strictly <b>local</b> (it can only be accessed within that specific function), but its lifetime is <b>global</b> (it remains in memory and retains its value for the entire duration of the program's execution).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخلط بين المفهومين يحدث غالباً مع المتغيرات المحلية العادية، حيث يتطابق نطاقها (الكتلة) مع دورة حياتها (يتم إنشاؤها عند دخول الكتلة وتدميرها عند الخروج منها). المتغيرات الثابتة (Static) تكسر هذه القاعدة لتوضيح الفرق.</p></template>
+    <template class="content-en"><p>Confusion often arises because for standard local variables, scope and lifetime overlap perfectly (created on block entry, destroyed on exit). Static local variables break this overlap, making them the perfect example to distinguish the two concepts.</p></template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="data-type-definitions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">12</span> مفاهيم أنواع البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">12</span> Data Type Concepts</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نوع البيانات يحدد مجموعة القيم والعمليات المسموحة. الواصف يخزن سمات المتغير، والكائن هو نسخة من نوع بيانات.</p></template>
+    <template class="content-en"><p>A data type defines allowed values and operations. A descriptor stores variable attributes, and an object is an instance of a type.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لفهم أنواع البيانات في لغات البرمجة، يجب التمييز بين ثلاثة مصطلحات أساسية:</p><ul><li><b>نوع البيانات (Data Type):</b> يُعرّف بأنه مجموعة من كائنات البيانات (Data Objects) بالإضافة إلى مجموعة من العمليات المُعرفة مسبقاً التي يمكن إجراؤها على تلك الكائنات. (القضية التصميمية الأهم هي: ما هي العمليات المتاحة وكيف يتم تحديدها؟)</li><li><b>الواصف (Descriptor):</b> هو مجموعة من سمات المتغير (Attributes) التي يحتفظ بها المترجم أو بيئة التشغيل لإدارة المتغير (مثل نوعه، طوله، وموقعه في الذاكرة).</li><li><b>الكائن (Object):</b> يمثل نسخة فعلية (Instance) من نوع بيانات مُعرف بواسطة المستخدم (نوع بيانات مجرد - Abstract Data Type).</li></ul></template>
+    <template class="content-en"><p>To understand data types in programming languages, three core terms must be defined:</p><ul><li><b>Data Type:</b> Defined as a collection of data objects paired with a set of predefined operations that can be performed on those objects. (A key design issue is: What operations are defined and how are they specified?)</li><li><b>Descriptor:</b> The collection of a variable's attributes (like type, length, memory location) maintained by the compiler or runtime environment.</li><li><b>Object:</b> Represents a specific instance of a user-defined (abstract data) type in memory.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الواصفات (Descriptors) قد تكون موجودة فقط وقت الترجمة (Compile-time) للأنواع الثابتة، أو قد تمتد إلى وقت التشغيل (Run-time) للأنواع الديناميكية التي تتغير سماتها أثناء تنفيذ البرنامج.</p></template>
+    <template class="content-en"><p>Descriptors can be purely compile-time constructs for static types, or they may exist at run-time for dynamic types whose attributes (like length or specific type) can change during program execution.</p></template>
+    <div class="content-target"></div>
+  </div>
 </section>
 
 <section id="professor" class="professor-card glass-card fade-up">

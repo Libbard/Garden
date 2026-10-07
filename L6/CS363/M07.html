@@ -103,6 +103,16 @@
         <template class="content-en">Local Referencing Environments</template>
         <span class="content-target">بيئات الإشارة المحلية (Local Referencing Environments)</span>
       </a>
+      <a href="#loop-control-mechanisms" class="toc-link" data-bilingual>
+        <template class="content-ar">آليات التحكم في الحلقات (Loop Control Mechanisms)</template>
+        <template class="content-en">Loop Control Mechanisms</template>
+        <span class="content-target">آليات التحكم في الحلقات (Loop Control Mechanisms)</span>
+      </a>
+      <a href="#unconditional-branching" class="toc-link" data-bilingual>
+        <template class="content-ar">التفرع غير المشروط (Unconditional Branching)</template>
+        <template class="content-en">Unconditional Branching</template>
+        <span class="content-target">التفرع غير المشروط (Unconditional Branching)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -225,8 +235,30 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>تنفيذ الاختيار المتعدد يمكن أن يتم عبر عدة طرق:</p><ul><li><strong>فروع شرطية متعددة،</strong></li><li><strong>بحث خطي في جدول،</strong></li><li><strong>جداول التجزئة (Hash tables)</strong> إذا زادت الحالات عن 10،</li><li><strong>أو مصفوفات</strong> إذا كانت الحالات متقاربة.</li></ul><p>في اللغات الوظيفية مثل F# و Lisp، الاختيار هو 'تعبير' يرجع قيمة، ويجب أن ترجع كل من then و else نفس نوع القيمة.</p></template>
-    <template class="content-en"><p>Implementing multiple selectors can be done via multiple conditional branches, linear search tables, hash tables (for >10 cases), or arrays of labels (for dense case values).</p><p>In functional languages like F# and Lisp, the selector is an expression that returns a value, enforcing that both 'then' and 'else' clauses return the same type.</p></template>
+    <template class="content-ar"><p>تنفيذ الاختيار المتعدد يمكن أن يتم عبر عدة طرق:</p><ul><li><strong>فروع شرطية متعددة،</strong></li><li><strong>بحث خطي في جدول،</strong></li><li><strong>جداول التجزئة (Hash tables)</strong> إذا زادت الحالات عن 10،</li><li><strong>أو مصفوفات</strong> إذا كانت الحالات متقاربة.</li></ul><p>في اللغات الوظيفية مثل F# و Lisp، الاختيار هو 'تعبير' يرجع قيمة، ويجب أن ترجع كل من then و else نفس نوع القيمة.</p><p>تختلف اللغات في قيود تعبير التحكم (Control Expression):</p>
+<ul>
+<li>في لغات مثل C89 و C99 و C++ و Python، يمكن أن يكون التعبير حسابياً (Arithmetic).</li>
+<li>في معظم اللغات الأخرى (مثل Java و C#)، يجب أن يكون التعبير منطقياً (Boolean) حصراً.</li>
+</ul>
+<p>بالنسبة للاختيار المتعدد (Multiple-way Selection):</p>
+<ul>
+<li><strong>في لغة C:</strong> تعليمة <code>switch</code> تقبل فقط القيم الصحيحة (Integer). لا يوجد تفرع ضمني في نهاية كل حالة، مما يعني أن التنفيذ سيستمر للحالة التالية (Fall-through) ما لم يُستخدم <code>break</code>. تُستخدم <code>default</code> للقيم غير الممثلة.</li>
+<li><strong>في لغة C#:</strong> تُمنع خاصية الاستمرار التلقائي (Fall-through) ويجب إنهاء كل حالة بتفرع غير مشروط (مثل <code>break</code> أو <code>goto</code>). كما تسمح باستخدام السلاسل النصية (Strings) كتعبير تحكم.</li>
+<li><strong>في لغة Scheme:</strong> تُستخدم الدالة <code>COND</code> التي تأخذ أزواجاً من (شرط، تعبير). تُرجع قيمة التعبير المرتبط بأول شرط يتحقق (True). الكلمة <code>ELSE</code> تُستخدم كمرادف للقيمة المنطقية True لتغطية الحالات المتبقية.</li>
+</ul>
+<p>يمكن تنفيذ الاختيار المتعدد برمجياً عبر فروع شرطية متعددة، أو بحث خطي، أو جداول التجزئة (Hash tables) إذا زادت الحالات عن 10، أو مصفوفات إذا كانت القيم متقاربة.</p></template>
+    <template class="content-en"><p>Implementing multiple selectors can be done via multiple conditional branches, linear search tables, hash tables (for >10 cases), or arrays of labels (for dense case values).</p><p>In functional languages like F# and Lisp, the selector is an expression that returns a value, enforcing that both 'then' and 'else' clauses return the same type.</p><p>Languages differ in their control expression constraints:</p>
+<ul>
+<li>In C89, C99, C++, and Python, the expression can be arithmetic.</li>
+<li>In most other languages (like Java and C#), it must be strictly Boolean.</li>
+</ul>
+<p>Regarding multiple-way selection:</p>
+<ul>
+<li><strong>In C:</strong> The <code>switch</code> statement only accepts integer types. There is no implicit branch at the end of a case, meaning execution falls through to the next case unless a <code>break</code> is used. The <code>default</code> clause handles unrepresented values.</li>
+<li><strong>In C#:</strong> Implicit fall-through is disallowed; each case must end with an unconditional branch (like <code>break</code> or <code>goto</code>). It also allows strings as control expressions.</li>
+<li><strong>In Scheme:</strong> The <code>COND</code> function takes pairs of (predicate, expression). It returns the value of the expression associated with the first true predicate. The keyword <code>ELSE</code> acts as a synonym for true to catch remaining cases.</li>
+</ul>
+<p>Multiple selection can be implemented via conditional branches, linear searches, hash tables (for >10 cases), or arrays (for dense values).</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -400,8 +432,18 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>تصميم حلقة for في لغة C مرن جداً؛ لا يوجد متغير حلقة صريح، ويمكن تغيير أي شيء داخل الحلقة، ويتم تقييم التعبيرات مع كل تكرار.</p><p>هذا يزيد من قوة اللغة ولكنه يقلل من الموثوقية.</p><p>لغات مثل Python تستخدم كائنات النطاق (range) للتحكم في التكرار، مما يجعله أكثر أماناً.</p></template>
-    <template class="content-en"><p>The design of C's 'for' loop is highly flexible; there is no explicit loop variable, everything can be changed inside the loop, and expressions are evaluated with each iteration.</p><p>This increases writability but decreases reliability.</p><p>Languages like Python use range objects for iteration control, making it safer.</p></template>
+    <template class="content-ar"><p>تصميم حلقة for في لغة C مرن جداً؛ لا يوجد متغير حلقة صريح، ويمكن تغيير أي شيء داخل الحلقة، ويتم تقييم التعبيرات مع كل تكرار.</p><p>هذا يزيد من قوة اللغة ولكنه يقلل من الموثوقية.</p><p>لغات مثل Python تستخدم كائنات النطاق (range) للتحكم في التكرار، مما يجعله أكثر أماناً.</p><p>تختلف مرونة الحلقات التكرارية بشكل كبير بين اللغات:</p>
+<ul>
+<li><strong>عائلة لغة C (C, C++):</strong> حلقة <code>for</code> مرنة للغاية؛ لا تتطلب متغيراً صريحاً للحلقة، ويمكن تغيير أي قيمة بداخلها، وتُقيّم التعبيرات مع كل تكرار. يمكن أن يحتوي التعبير الأول على عدة جمل مفصولة بفواصل. إذا غاب التعبير الثاني (الشرط)، تتحول لحلقة لانهائية. كما يُسمح بالتفرع (Branching) إلى داخل جسم الحلقة (سواء <code>for</code> أو <code>while</code>).</li>
+<li><strong>لغات C++ و Java و C#:</strong> في C++، يمكن تعريف متغيرات داخل التعبير الأول لحلقة <code>for</code>، ويمكن أن يكون تعبير التحكم منطقياً. أما في Java و C#، <strong>يجب</strong> أن يكون تعبير التحكم منطقياً (Boolean)، وتمنع Java التفرع إلى داخل الحلقة لعدم دعمها لتعليمة <code>goto</code>.</li>
+<li><strong>لغة Python:</strong> في حلقة <code>for</code>، يأخذ متغير الحلقة قيمه من كائن (مثل <code>range</code>). بعد انتهاء الحلقة، يحتفظ المتغير بآخر قيمة أُسندت إليه. كما توفر Python جملة <code>else</code> اختيارية تُنفذ فقط إذا انتهت الحلقة بشكل طبيعي (بدون <code>break</code>).</li>
+</ul></template>
+    <template class="content-en"><p>The design of C's 'for' loop is highly flexible; there is no explicit loop variable, everything can be changed inside the loop, and expressions are evaluated with each iteration.</p><p>This increases writability but decreases reliability.</p><p>Languages like Python use range objects for iteration control, making it safer.</p><p>The flexibility of iterative loops varies significantly across languages:</p>
+<ul>
+<li><strong>C-based languages (C, C++):</strong> The <code>for</code> loop is highly flexible; it doesn't require an explicit loop variable, anything can be modified inside, and expressions are evaluated per iteration. The first expression can contain multiple statements separated by commas. If the second expression is missing, it creates an infinite loop. Branching into the body of a loop is also legal.</li>
+<li><strong>C++, Java, and C#:</strong> In C++, the initial expression can include variable definitions, and the control expression can be Boolean. In Java and C#, the control expression <strong>must</strong> be Boolean. Java prohibits branching into a loop body since it lacks a <code>goto</code> statement.</li>
+<li><strong>Python:</strong> The <code>for</code> loop variable iterates over an object (like <code>range</code>). Upon termination, the variable retains its last assigned value. Python also provides an optional <code>else</code> clause that executes only if the loop terminates normally (without a <code>break</code>).</li>
+</ul></template>
     <div class="content-target"></div>
   </div>
 
@@ -1013,6 +1055,74 @@
       <div class="content-target"></div>
     </div>
   </details>
+</section>
+
+<section id="loop-control-mechanisms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> آليات التحكم في الحلقات (Loop Control Mechanisms)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Loop Control Mechanisms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>آليات تتيح للمبرمج الخروج من الحلقة أو تخطي التكرار الحالي قبل الوصول إلى شرط النهاية الطبيعي.</p></template>
+    <template class="content-en"><p>Mechanisms that allow the programmer to exit a loop or skip the current iteration before reaching the normal termination condition.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أحياناً يكون من الضروري التحكم في مسار الحلقة من داخلها، وهناك آليتان رئيسيتان لذلك:</p>
+<ul>
+<li><strong>الخروج غير المشروط (Unconditional Exit):</strong> يُنهي الحلقة بالكامل. تستخدم لغات مثل C و C++ و Python و Ruby و C# تعليمة <code>break</code> (خروج غير مُسمى). بينما توفر لغات مثل Java و Perl خروجاً مُسمى (Labeled Exit) مثل <code>break label;</code> في Java أو <code>last label;</code> في Perl، مما يسمح بالخروج من حلقات متداخلة متعددة دفعة واحدة.</li>
+<li><strong>تخطي التكرار (Skip Iteration):</strong> يتخطى ما تبقى من جسم الحلقة في التكرار الحالي ويبدأ التكرار التالي. تُستخدم تعليمة <code>continue</code> غير المُسماة في C و C++ و Python. وتوفر Java و Perl نسخاً مُسماة منها للتحكم في الحلقات المتداخلة.</li>
+</ul></template>
+    <template class="content-en"><p>Sometimes it is necessary to control the flow from within a loop. There are two main mechanisms for this:</p>
+<ul>
+<li><strong>Unconditional Exit:</strong> Terminates the loop entirely. Languages like C, C++, Python, Ruby, and C# use the unlabeled <code>break</code> statement. Java and Perl offer labeled exits (e.g., <code>break label;</code> in Java or <code>last label;</code> in Perl), allowing control to transfer out of multiple nested loops at once.</li>
+<li><strong>Skip Iteration:</strong> Skips the remainder of the loop body in the current iteration and proceeds to the next. The unlabeled <code>continue</code> statement is used in C, C++, and Python. Java and Perl provide labeled versions of <code>continue</code> for nested loop control.</li>
+</ul></template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="unconditional-branching" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> التفرع غير المشروط (Unconditional Branching)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Unconditional Branching</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نقل التحكم في التنفيذ إلى مكان محدد في البرنامج، غالباً باستخدام تعليمة goto.</p></template>
+    <template class="content-en"><p>Transferring execution control to a specific place in the program, typically using the goto statement.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التفرع غير المشروط ينقل مسار التنفيذ مباشرة إلى نقطة أخرى في الكود. الأداة الأشهر لذلك هي تعليمة <code>goto</code>.</p>
+<p>أثارت هذه التعليمة جدلاً واسعاً في الستينيات والسبعينيات لأن الإفراط في استخدامها يؤدي إلى كود متشابك يصعب قراءته وتتبعه (يُعرف بـ Spaghetti code). ونتيجة لذلك:</p>
+<ul>
+<li>بعض اللغات الحديثة مثل Java لا تدعم تعليمة <code>goto</code> إطلاقاً.</li>
+<li>لغات أخرى مثل C# توفرها ولكن بقيود (مثلاً تُستخدم بشكل شائع داخل جمل <code>switch</code> للانتقال بين الحالات).</li>
+<li>تُعتبر تعليمات التحكم في الحلقات (مثل <code>break</code> و <code>continue</code>) بمثابة تفرع غير مشروط مُقيد ومُقنّع (Camouflaged) لتحسين المقروئية.</li>
+</ul></template>
+    <template class="content-en"><p>Unconditional branching transfers the execution path directly to another point in the code, most famously using the <code>goto</code> statement.</p>
+<p>This statement sparked major debates in the 1960s and 70s because its overuse leads to tangled, hard-to-read code (Spaghetti code). Consequently:</p>
+<ul>
+<li>Some modern languages, like Java, do not support the <code>goto</code> statement at all.</li>
+<li>Others, like C#, offer it with restrictions (e.g., it is commonly used within <code>switch</code> statements to jump between cases).</li>
+<li>Loop control statements (like <code>break</code> and <code>continue</code>) are essentially restricted and camouflaged forms of unconditional branching designed to improve readability.</li>
+</ul></template>
+    <div class="content-target"></div>
+  </div>
 </section>
 
 <section id="professor" class="professor-card glass-card fade-up">

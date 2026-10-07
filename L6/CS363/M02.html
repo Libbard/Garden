@@ -115,6 +115,21 @@
         <template class="content-en">Variable Lifetimes</template>
         <span class="content-target">فترات حياة المتغيرات (Variable Lifetimes)</span>
       </a>
+      <a href="#denotational-semantics-constructs" class="toc-link" data-bilingual>
+        <template class="content-ar">تطبيق الدلالات التقريرية على هياكل اللغة</template>
+        <template class="content-en">Applying Denotational Semantics to Language Constructs</template>
+        <span class="content-target">تطبيق الدلالات التقريرية على هياكل اللغة</span>
+      </a>
+      <a href="#axiomatic-semantics-rules" class="toc-link" data-bilingual>
+        <template class="content-ar">قواعد الاستدلال في الدلالات البديهية</template>
+        <template class="content-en">Axiomatic Semantics Inference Rules</template>
+        <span class="content-target">قواعد الاستدلال في الدلالات البديهية</span>
+      </a>
+      <a href="#type-declarations" class="toc-link" data-bilingual>
+        <template class="content-ar">الإعلان عن الأنواع واستنتاجها</template>
+        <template class="content-en">Type Declarations and Inferencing</template>
+        <span class="content-target">الإعلان عن الأنواع واستنتاجها</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -232,8 +247,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>تكمن أهميتها في قدرتها على فرض قيود لا يمكن لـ CFGs التعبير عنها بسهولة، مثل التحقق من توافق الأنواع (Type Checking) قبل التشغيل.</p><ul><li>إذا كانت جميع السمات موروثة، تُزيّن الشجرة من أعلى لأسفل،</li><li>وإذا كانت مُجمّعة، تُزيّن من أسفل لأعلى.</li></ul><p>في الواقع، تُستخدم مجموعة من الاثنين معاً.</p></template>
-    <template class="content-en"><p>Their primary value lies in enforcing rules that CFGs cannot easily express, such as type checking before runtime.</p><ul><li>If all attributes are inherited, the tree is decorated top-down;</li><li>if synthesized, bottom-up.</li></ul><p>In practice, a combination of both is used.</p></template>
+    <template class="content-ar"><p>تكمن أهميتها في قدرتها على فرض قيود لا يمكن لـ CFGs التعبير عنها بسهولة، مثل التحقق من توافق الأنواع (Type Checking) قبل التشغيل.</p><ul><li>إذا كانت جميع السمات موروثة، تُزيّن الشجرة من أعلى لأسفل،</li><li>وإذا كانت مُجمّعة، تُزيّن من أسفل لأعلى.</li></ul><p>في الواقع، تُستخدم مجموعة من الاثنين معاً.</p><p>تكمن أهميتها في قدرتها على فرض قيود لا يمكن لـ CFGs التعبير عنها بسهولة، مثل التحقق من توافق الأنواع (Type Checking) قبل التشغيل.</p><p><strong>مثال عملي:</strong> لنفترض أن لدينا قاعدة لتعيين قيمة: <code>&lt;assign&gt; &rarr; &lt;var&gt; = &lt;expr&gt;</code> وقاعدة لجمع متغيرين: <code>&lt;expr&gt; &rarr; &lt;var&gt;[1] + &lt;var&gt;[2]</code>.</p><ul><li><strong>القواعد الدلالية (Semantic Rules):</strong> نحدد نوع التعبير بناءً على المتغير الأول: <code>&lt;expr&gt;.actual_type &larr; &lt;var&gt;[1].actual_type</code>.</li><li><strong>المسندات (Predicates):</strong> نتحقق من تطابق نوعي المتغيرين: <code>&lt;var&gt;[1].actual_type == &lt;var&gt;[2].actual_type</code>، ونتحقق من أن النوع الفعلي يطابق النوع المتوقع: <code>&lt;expr&gt;.expected_type == &lt;expr&gt;.actual_type</code>.</li></ul><p>تُحسب قيم السمات إما من أعلى لأسفل (للسمات الموروثة) أو من أسفل لأعلى (للسمات المُجمّعة)، وفي كثير من الحالات يُستخدم مزيج من الطريقتين لتزيين شجرة الإعراب بالكامل.</p></template>
+    <template class="content-en"><p>Their primary value lies in enforcing rules that CFGs cannot easily express, such as type checking before runtime.</p><ul><li>If all attributes are inherited, the tree is decorated top-down;</li><li>if synthesized, bottom-up.</li></ul><p>In practice, a combination of both is used.</p><p>Their primary value lies in enforcing rules that CFGs cannot easily express, such as type checking before runtime.</p><p><strong>Worked Example:</strong> Consider an assignment rule <code>&lt;assign&gt; &rarr; &lt;var&gt; = &lt;expr&gt;</code> and an addition rule <code>&lt;expr&gt; &rarr; &lt;var&gt;[1] + &lt;var&gt;[2]</code>.</p><ul><li><strong>Semantic Rules:</strong> The expression's type is derived from the first variable: <code>&lt;expr&gt;.actual_type &larr; &lt;var&gt;[1].actual_type</code>.</li><li><strong>Predicates:</strong> We check if both variables have the same type: <code>&lt;var&gt;[1].actual_type == &lt;var&gt;[2].actual_type</code>, and if the actual type matches the expected type: <code>&lt;expr&gt;.expected_type == &lt;expr&gt;.actual_type</code>.</li></ul><p>Attribute values are computed top-down (for inherited) or bottom-up (for synthesized). In practice, a combination of both is used to fully decorate the parse tree.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -491,7 +506,7 @@
       <template class="content-en"><strong>Program state (s) is a set of (variable, value) pairs.</strong></template>
       <div class="content-target"></div>
     </div>
-    <div class="math-block">$$s = \{<i_1, v_1>, <i_2, v_2>, \dots, <i_n, v_n>\}$$</div>
+    <div class="math-block">$$s = \{\langle i_1, v_1\rangle, \langle i_2, v_2\rangle, \dots, \langle i_n, v_n\rangle\}$$</div>
   </div>
 
   <details class="thinking-question">
@@ -910,6 +925,105 @@ list = 17.3; // Type changes dynamically at runtime</code></pre>
       <div class="content-target"></div>
     </div>
   </details>
+</section>
+
+<section id="denotational-semantics-constructs" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> تطبيق الدلالات التقريرية على هياكل اللغة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Applying Denotational Semantics to Language Constructs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كيفية استخدام الدوال الرياضية لتعريف دلالات الأرقام، التعبيرات، جمل التعيين، والحلقات التكرارية.</p></template>
+    <template class="content-en"><p>How mathematical functions are used to define the semantics of numbers, expressions, assignments, and loops.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرّف الدلالات التقريرية هياكل اللغة باستخدام دوال رياضية صارمة:</p><ul><li><strong>الأرقام العشرية:</strong> تُعرّف قيمتها بشكل عودي. مثلاً، قيمة الرقم المكون من خانتين هي 10 أضعاف قيمة الخانة الأولى زائد قيمة الخانة الثانية: <code>M_dec(&lt;dec_num&gt; '9') = 10 * M_dec(&lt;dec_num&gt;) + 9</code>.</li><li><strong>التعبيرات (Expressions):</strong> تُربط بمجموعة الأعداد الصحيحة بالإضافة إلى حالة الخطأ <code>Z &cup; {error}</code>. إذا كان أي من المعاملين غير معرف (undef) أو خطأ، يكون الناتج خطأ.</li><li><strong>جمل التعيين (Assignments):</strong> دالة <code>M_a(x := E, s)</code> تأخذ حالة البرنامج <code>s</code> وتُرجع حالة جديدة <code>s'</code> حيث تتغير قيمة المتغير <code>x</code> لتصبح نتيجة تقييم التعبير <code>E</code>، بينما تبقى باقي المتغيرات كما هي.</li></ul></template>
+    <template class="content-en"><p>Denotational semantics defines language constructs using rigorous mathematical functions:</p><ul><li><strong>Decimal Numbers:</strong> Evaluated recursively. For example, the value of a multi-digit number ending in '9' is 10 times the prefix plus 9: <code>M_dec(&lt;dec_num&gt; '9') = 10 * M_dec(&lt;dec_num&gt;) + 9</code>.</li><li><strong>Expressions:</strong> Mapped onto integers and an error state <code>Z &cup; {error}</code>. If any operand evaluates to <code>undef</code> or <code>error</code>, the whole expression results in an error.</li><li><strong>Assignment Statements:</strong> The function <code>M_a(x := E, s)</code> maps a state <code>s</code> to a new state <code>s'</code> where the value of variable <code>x</code> is updated to the evaluated result of <code>E</code>, while all other variables remain unchanged.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><strong>الحلقات التكرارية (Loops):</strong> تُعتبر التحدي الأكبر، حيث تُحوّل من تكرار (Iteration) إلى عودية (Recursion). دالة الحلقة <code>M_l(while B do L, s)</code> تعمل كالتالي:</p><ol><li>إذا كان تقييم الشرط <code>B</code> غير معرف، تُرجع خطأ.</li><li>إذا كان الشرط <code>B</code> خاطئاً (false)، تنتهي الحلقة وتُرجع الحالة الحالية <code>s</code>.</li><li>إذا كان تنفيذ جسم الحلقة <code>L</code> يُنتج خطأ، تُرجع خطأ.</li><li>عدا ذلك، تُستدعى دالة الحلقة عودياً مع الحالة الجديدة الناتجة عن تنفيذ جسم الحلقة: <code>M_l(while B do L, M_sl(L, s))</code>.</li></ol></template>
+    <template class="content-en"><p><strong>Logical Pretest Loops:</strong> These are converted from iteration to recursion for mathematical rigor. The loop function <code>M_l(while B do L, s)</code> works as follows:</p><ol><li>If the boolean condition <code>B</code> is undefined, it returns an error.</li><li>If <code>B</code> is false, the loop terminates and returns the current state <code>s</code>.</li><li>If executing the loop body <code>L</code> results in an error, it returns an error.</li><li>Otherwise, it recursively calls the loop function with the new state produced by the loop body: <code>M_l(while B do L, M_sl(L, s))</code>.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="axiomatic-semantics-rules" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> قواعد الاستدلال في الدلالات البديهية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Axiomatic Semantics Inference Rules</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القواعد الرياضية المستخدمة لاشتقاق الشروط المسبقة واللاحقة لجمل التعيين، التتابعات، الاختيار، والحلقات.</p></template>
+    <template class="content-en"><p>The mathematical rules used to derive preconditions and postconditions for assignments, sequences, selections, and loops.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد الدلالات البديهية على قواعد استدلال محددة لكل هيكل برمجي:</p><ul><li><strong>جملة التعيين (Assignment):</strong> البديهية هي <code>{Q_{x&rarr;E}} x = E {Q}</code>. هذا يعني أن الشرط المسبق يُحسب باستبدال كل ظهور للمتغير <code>x</code> في الشرط اللاحق <code>Q</code> بالتعبير <code>E</code>. <em>مثال:</em> إذا كان لدينا <code>a = b + 1 {a &gt; 1}</code>، فإن أضعف شرط مسبق هو <code>b + 1 &gt; 1</code> أي <code>{b &gt; 0}</code>.</li><li><strong>قاعدة النتيجة (Rule of Consequence):</strong> تسمح بتوسيع أو تضييق الشروط. إذا كان <code>{P} S {Q}</code> صحيحاً، وكان <code>P' &rArr; P</code> (أي P' أقوى من P) و <code>Q &rArr; Q'</code> (أي Q' أضعف من Q)، فإن <code>{P'} S {Q'}</code> صحيح أيضاً.</li><li><strong>التتابعات (Sequences):</strong> لربط جملتين <code>S1; S2</code>، يجب أن يكون الشرط اللاحق للأولى هو الشرط المسبق للثانية: <code>{P1} S1 {P2}</code> و <code>{P2} S2 {P3}</code> يؤديان إلى <code>{P1} S1; S2 {P3}</code>.</li><li><strong>الاختيار (Selection - if/else):</strong> يجب إثبات صحة كلا المسارين. نستنتج <code>{P} if B then S1 else S2 {Q}</code> إذا أثبتنا أن <code>{B and P} S1 {Q}</code> صحيح، وأن <code>{(not B) and P} S2 {Q}</code> صحيح أيضاً.</li></ul></template>
+    <template class="content-en"><p>Axiomatic semantics relies on specific inference rules for each construct:</p><ul><li><strong>Assignment:</strong> The axiom is <code>{Q_{x&rarr;E}} x = E {Q}</code>. The precondition is computed by replacing all instances of variable <code>x</code> in the postcondition <code>Q</code> with the expression <code>E</code>. <em>Example:</em> For <code>a = b + 1 {a &gt; 1}</code>, the weakest precondition is <code>b + 1 &gt; 1</code>, which simplifies to <code>{b &gt; 0}</code>.</li><li><strong>Rule of Consequence:</strong> Allows strengthening preconditions or weakening postconditions. If <code>{P} S {Q}</code> is true, and <code>P' &rArr; P</code> (P' implies P) and <code>Q &rArr; Q'</code>, then <code>{P'} S {Q'}</code> is valid.</li><li><strong>Sequences:</strong> For <code>S1; S2</code>, the postcondition of S1 must be the precondition of S2: <code>{P1} S1 {P2}</code> and <code>{P2} S2 {P3}</code> implies <code>{P1} S1; S2 {P3}</code>.</li><li><strong>Selection (if/else):</strong> Both branches must be proven. We infer <code>{P} if B then S1 else S2 {Q}</code> if we can prove both <code>{B and P} S1 {Q}</code> and <code>{(not B) and P} S2 {Q}</code>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><strong>الحلقات التكرارية (Loops):</strong> قاعدة الاستدلال للحلقة <code>while B do S end</code> تتطلب إيجاد <strong>ثابت الحلقة (Loop Invariant - I)</strong>. القاعدة هي: <code>{I and B} S {I}</code> تؤدي إلى <code>{I} while B do S {I and (not B)}</code>.</p><p>يجب أن يحقق ثابت الحلقة <code>I</code> الشروط التالية:</p><ol><li><code>P &rArr; I</code>: يجب أن يكون صحيحاً قبل بدء الحلقة (بناءً على الشرط المسبق P).</li><li><code>{I} B {I}</code>: تقييم شرط الحلقة لا يغير من صحة I.</li><li><code>{I and B} S {I}</code>: تنفيذ جسم الحلقة لا يغير من صحة I.</li><li><code>(I and (not B)) &rArr; Q</code>: عندما تنتهي الحلقة (B يصبح خاطئاً)، يجب أن يضمن I تحقق الشرط اللاحق Q.</li><li>يجب إثبات أن الحلقة ستنتهي فعلياً.</li></ol></template>
+    <template class="content-en"><p><strong>Loops:</strong> The inference rule for a <code>while B do S end</code> loop requires finding a <strong>Loop Invariant (I)</strong>. The rule is: <code>{I and B} S {I}</code> infers <code>{I} while B do S {I and (not B)}</code>.</p><p>The loop invariant <code>I</code> must meet these strict characteristics:</p><ol><li><code>P &rArr; I</code>: It must be true initially (implied by the precondition P).</li><li><code>{I} B {I}</code>: Evaluating the boolean condition does not change the validity of I.</li><li><code>{I and B} S {I}</code>: Executing the loop body does not change I.</li><li><code>(I and (not B)) &rArr; Q</code>: When the loop terminates (B is false), I must be strong enough to imply the postcondition Q.</li><li>The loop must be proven to terminate.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>قاعدة الاستدلال للتتابعات (Sequences).</strong></template>
+      <template class="content-en"><strong>Inference rule for sequences.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\frac{\{P_1\} S_1 \{P_2\}, \{P_2\} S_2 \{P_3\}}{\{P_1\} S_1; S_2 \{P_3\}}$$</div>
+  </div>
+</section>
+
+<section id="type-declarations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> الإعلان عن الأنواع واستنتاجها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Type Declarations and Inferencing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الطرق المختلفة التي تحدد بها لغات البرمجة أنواع المتغيرات: صراحةً، ضمناً، أو عبر الاستنتاج من السياق.</p></template>
+    <template class="content-en"><p>The different ways programming languages specify variable types: explicitly, implicitly, or by inferencing from context.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحديد نوع المتغير (Type Binding) يمكن أن يتم بعدة طرق إذا كان الربط ثابتاً (Static):</p><ul><li><strong>الإعلان الصريح (Explicit Declaration):</strong> استخدام عبارة برمجية مخصصة لتعريف نوع المتغير (مثل <code>int x;</code> في C++).</li><li><strong>الإعلان الضمني (Implicit Declaration):</strong> آلية افتراضية تحدد النوع بناءً على اصطلاحات معينة (مثل الحرف الأول من اسم المتغير) بدلاً من عبارة صريحة. لغات مثل Perl و Ruby و PHP تستخدم هذه الطريقة. ميزتها أنها تزيد من سهولة الكتابة (Writability)، لكن عيبها الرئيسي هو تقليل الموثوقية (Reliability) لأن الأخطاء الإملائية في أسماء المتغيرات قد تُنشئ متغيرات جديدة دون قصد.</li></ul></template>
+    <template class="content-en"><p>If type binding is static, it can be specified in different ways:</p><ul><li><strong>Explicit Declaration:</strong> A program statement specifically used to declare the type of a variable (e.g., <code>int x;</code> in C++).</li><li><strong>Implicit Declaration:</strong> A default mechanism that specifies types through conventions (like the first character of the variable name) rather than declaration statements. Languages like Perl, Ruby, and PHP use this. Its advantage is writability (a minor convenience), but its major disadvantage is reduced reliability (e.g., typos in variable names can accidentally create new variables).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><strong>استنتاج النوع (Type Inferencing):</strong> بعض اللغات الحديثة تحدد نوع المتغير بناءً على سياق استخدامه أو قيمته الابتدائية، دون الحاجة لإعلان صريح بالنوع.</p><ul><li>في <strong>C#</strong>، يمكن الإعلان عن متغير باستخدام الكلمة <code>var</code>، ويقوم المترجم بتحديد نوعه بناءً على القيمة الابتدائية المسندة إليه.</li><li>لغات مثل <strong>ML, Haskell, F#</strong> تعتمد بشكل كبير على استنتاج النوع من خلال سياق ظهور المتغير في الكود، مما يجمع بين أمان الكتابة القوية (Strong typing) وسهولة الكتابة.</li></ul></template>
+    <template class="content-en"><p><strong>Type Inferencing:</strong> Some modern languages determine the type of a variable based on its context or initial value, without an explicit type name.</p><ul><li>In <strong>C#</strong>, a variable can be declared with <code>var</code>, and the compiler sets its type based on the initial value assigned to it.</li><li>Languages like <strong>ML, Haskell, and F#</strong> heavily use type inferencing based on the context of the variable's appearance, combining the safety of strong typing with the convenience of less boilerplate code.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
 </section>
 
 <section id="professor" class="professor-card glass-card fade-up">

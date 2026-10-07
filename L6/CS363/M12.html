@@ -114,6 +114,16 @@
         <template class="content-en">Statement-Level Concurrency (HPF)</template>
         <span class="content-target">التزامن على مستوى الجملة (HPF)</span>
       </a>
+      <a href="#task-vs-subprogram" class="toc-link" data-bilingual>
+        <template class="content-ar">المهام مقابل البرامج الفرعية</template>
+        <template class="content-en">Tasks vs. Subprograms</template>
+        <span class="content-target">المهام مقابل البرامج الفرعية</span>
+      </a>
+      <a href="#ada-95-protected-objects" class="toc-link" data-bilingual>
+        <template class="content-ar">كائنات أدا 95 المحمية</template>
+        <template class="content-en">Ada 95 Protected Objects</template>
+        <span class="content-target">كائنات أدا 95 المحمية</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -689,8 +699,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>في تزامن التعاون (مثل المخزن المؤقت المشترك)، نستخدم سيمافورين: `emptyspots` و `fullspots`. في تزامن التنافس، نستخدم سيمافورًا ثالثًا يسمى `access` بقيم 0 و 1 فقط (يُعرف ب<span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization.">السيمافور الثنائي<span class="smart-term-tooltip"></span></span> - Binary Semaphore) لضمان الوصول الحصري.</p><p>من عيوب السيمافورات أن سوء استخدامها (مثل نسيان استدعاء wait أو release) يمكن أن يؤدي إلى أخطاء فادحة مثل طفح المخزن المؤقت (overflow) أو الجمود (deadlock).</p></template>
-    <template class="content-en"><p>For cooperation (e.g., shared buffer), we use two semaphores: `emptyspots` and `fullspots`. For competition, a third semaphore named `access` is used, which only takes values 0 and 1 (called a <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization.">Binary Semaphore<span class="smart-term-tooltip"></span></span>) to ensure mutual exclusion.</p><p>A major evaluation point is that misuse of semaphores causes catastrophic failures: leaving out a `wait` can cause buffer overflow, and leaving out a `release` can cause program deadlock.</p></template>
+    <template class="content-ar"><p>في تزامن التعاون (مثل المخزن المؤقت المشترك)، نستخدم سيمافورين: `emptyspots` و `fullspots`. في تزامن التنافس، نستخدم سيمافورًا ثالثًا يسمى `access` بقيم 0 و 1 فقط (يُعرف ب<span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization.">السيمافور الثنائي<span class="smart-term-tooltip"></span></span> - Binary Semaphore) لضمان الوصول الحصري.</p><p>من عيوب السيمافورات أن سوء استخدامها (مثل نسيان استدعاء wait أو release) يمكن أن يؤدي إلى أخطاء فادحة مثل طفح المخزن المؤقت (overflow) أو الجمود (deadlock).</p><p>تعمل عمليات السيمافور داخليًا وفق المنطق التالي لضمان المزامنة:</p><ul><li><strong>عملية <code>wait(s)</code>:</strong> إذا كان العداد أكبر من 0، يتم إنقاصه بواحد ويستمر التنفيذ. أما إذا كان 0، يتم وضع المهمة المستدعية في طابور السيمافور وتُحظر (Blocked) حتى تصبح جاهزة.</li><li><strong>عملية <code>release(s)</code>:</strong> إذا كان طابور السيمافور فارغًا، يتم زيادة العداد بواحد. أما إذا كان هناك مهام تنتظر في الطابور، يتم نقل إحداها إلى طابور المهام الجاهزة (Ready queue) لتستأنف عملها.</li></ul></template>
+    <template class="content-en"><p>For cooperation (e.g., shared buffer), we use two semaphores: `emptyspots` and `fullspots`. For competition, a third semaphore named `access` is used, which only takes values 0 and 1 (called a <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization.">Binary Semaphore<span class="smart-term-tooltip"></span></span>) to ensure mutual exclusion.</p><p>A major evaluation point is that misuse of semaphores causes catastrophic failures: leaving out a `wait` can cause buffer overflow, and leaving out a `release` can cause program deadlock.</p><p>The internal logic of semaphore operations ensures synchronization as follows:</p><ul><li><strong><code>wait(s)</code>:</strong> If the counter is > 0, it is decremented and execution continues. Otherwise, the calling task is placed in the semaphore's queue and blocked.</li><li><strong><code>release(s)</code>:</strong> If the queue is empty, the counter is incremented. Otherwise, a task from the queue is moved to the ready queue to resume execution.</li></ul></template>
     <div class="content-target"></div>
   </div>
 
@@ -957,8 +967,8 @@ release(aSemaphore)
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>في لغة Ada، يتم دعم ذلك عبر جمل `accept`. المهمة التي تحتوي على جمل `accept` تسمى <b>مهمة خادم (Server task)</b>، بينما المهمة التي لا تحتوي عليها تسمى <b>مهمة ممثل (Actor task)</b>.</p><p>التواصل غير متماثل: يجب أن يعرف المرسل اسم نقطة الدخول (entry name) للمستقبل، ولكن ليس العكس. يمكن للمهام أن تمتلك نقاط دخول متعددة باستخدام جملة `select` (الانتظار الانتقائي - selective wait)، ويمكن حمايتها بشروط تسمى الحراس (Guarded accept clauses) باستخدام `when`.</p></template>
-    <template class="content-en"><p>In Ada, this is supported via `accept` clauses. A task with `accept` clauses is a <b>server task</b>; one without is an <b>actor task</b>.</p><p>Communication is asymmetric: the sender must know the entry name of the receiver, but not vice versa. Tasks can have multiple entry points using a `select` clause (selective wait), and these can be guarded using `when` clauses (Guarded accept clauses) to control cooperation synchronization.</p></template>
+    <template class="content-ar"><p>في لغة Ada، يتم دعم ذلك عبر جمل `accept`. المهمة التي تحتوي على جمل `accept` تسمى <b>مهمة خادم (Server task)</b>، بينما المهمة التي لا تحتوي عليها تسمى <b>مهمة ممثل (Actor task)</b>.</p><p>التواصل غير متماثل: يجب أن يعرف المرسل اسم نقطة الدخول (entry name) للمستقبل، ولكن ليس العكس. يمكن للمهام أن تمتلك نقاط دخول متعددة باستخدام جملة `select` (الانتظار الانتقائي - selective wait)، ويمكن حمايتها بشروط تسمى الحراس (Guarded accept clauses) باستخدام `when`.</p><p>عند استخدام جملة <code>select</code> مع حراس (Guarded accept clauses) باستخدام <code>when</code>، تكون الدلالات كالتالي:</p><ol><li>يتم التحقق من جميع الحراس أولاً. الجملة التي يكون حارسها صحيحًا (True) تُسمى <strong>مفتوحة (Open)</strong>، وإلا فهي <strong>مغلقة (Closed)</strong>.</li><li>إذا كانت جملة واحدة فقط مفتوحة، يتم فحص طابورها بحثًا عن رسائل.</li><li>إذا كان هناك أكثر من جملة مفتوحة، يتم اختيار إحداها <strong>بشكل غير حتمي (Non-deterministically)</strong> للتحقق من رسائلها.</li><li>إذا كانت جميع الجمل مغلقة، يحدث خطأ في وقت التشغيل (Runtime error)، إلا إذا كانت جملة <code>select</code> تحتوي على قسم <code>else</code>، وحينها يتم تنفيذ الـ <code>else</code> وتتكرر الحلقة لتجنب الخطأ.</li></ol></template>
+    <template class="content-en"><p>In Ada, this is supported via `accept` clauses. A task with `accept` clauses is a <b>server task</b>; one without is an <b>actor task</b>.</p><p>Communication is asymmetric: the sender must know the entry name of the receiver, but not vice versa. Tasks can have multiple entry points using a `select` clause (selective wait), and these can be guarded using `when` clauses (Guarded accept clauses) to control cooperation synchronization.</p><p>When using a <code>select</code> statement with guarded accept clauses (using <code>when</code>), the semantics are:</p><ol><li>All guards are evaluated first. A clause with a true guard is <strong>open</strong>; otherwise, it is <strong>closed</strong>.</li><li>If exactly one is open, its queue is checked for messages.</li><li>If more than one are open, one is chosen <strong>non-deterministically</strong> to check for messages.</li><li>If all are closed, a runtime error occurs, unless the <code>select</code> includes an <code>else</code> clause. If an <code>else</code> clause is present, it executes and the loop repeats, avoiding the error.</li></ol></template>
     <div class="content-target"></div>
   </div>
 
@@ -1268,6 +1278,86 @@ FORALL (index = 1:1000)
     <div data-bilingual>
       <template class="content-ar"><p>في HPF، يركز المبرمج فقط على وصف كيفية توزيع البيانات (Declarative)، ويترك للمترجم مهمة إنشاء الخيوط وإدارتها والمزامنة بينها، بينما في جافا يجب على المبرمج إدارة كل تفاصيل الخيوط والأقفال يدوياً.</p></template>
       <template class="content-en"><p>In HPF, the programmer only declaratively specifies how data should be distributed, leaving the complex task of thread creation, management, and synchronization to the compiler. In Java, the programmer must manually manage all thread details and locks.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="task-vs-subprogram" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> المهام مقابل البرامج الفرعية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Tasks vs. Subprograms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المهام تختلف عن البرامج الفرعية العادية في أنها قد تبدأ ضمنيًا، ولا تعلق المستدعي بالضرورة، وقد لا تعيد التحكم إليه عند الانتهاء.</p></template>
+    <template class="content-en"><p>Tasks differ from ordinary subprograms in that they may start implicitly, do not necessarily suspend the caller, and may not return control upon completion.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تختلف المهام (Tasks) عن البرامج الفرعية العادية (Subprograms) في عدة جوانب رئيسية تحدد طبيعتها المتزامنة:</p><ol><li><strong>بدء التشغيل:</strong> قد يتم بدء تشغيل المهمة ضمنيًا (Implicitly started) بواسطة النظام، بينما يجب استدعاء البرنامج الفرعي صراحةً في الكود.</li><li><strong>تعليق المستدعي:</strong> عندما تبدأ وحدة برمجية في تنفيذ مهمة، فإنها لا تتوقف (Suspended) بالضرورة، بل يمكن أن يستمر المستدعي والمهمة في العمل بشكل متزامن. في المقابل، استدعاء البرنامج الفرعي يوقف المستدعي تمامًا حتى ينتهي البرنامج الفرعي.</li><li><strong>إعادة التحكم:</strong> عند اكتمال تنفيذ المهمة، قد لا يعود التحكم إلى الوحدة التي استدعتها، على عكس البرنامج الفرعي الذي يعود دائمًا لنقطة الاستدعاء.</li></ol><p>بسبب هذه الخصائص، عادةً ما تُصمم المهام لتعمل معًا وتتواصل لتحقيق هدف مشترك.</p></template>
+    <template class="content-en"><p>Tasks differ from ordinary subprograms in several key aspects that define their concurrent nature:</p><ol><li><strong>Invocation:</strong> A task may be implicitly started by the system, whereas a subprogram must be explicitly called.</li><li><strong>Caller Suspension:</strong> When a program unit starts the execution of a task, it is not necessarily suspended; both the caller and the task can run concurrently. In contrast, calling a subprogram halts the caller until the subprogram finishes.</li><li><strong>Return of Control:</strong> When a task's execution is completed, control may not return to the caller, unlike a subprogram which always returns to the point of invocation.</li></ol><p>Because of these characteristics, tasks usually work together and communicate to achieve a common goal.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يعود التحكم دائمًا إلى المستدعي عند انتهاء المهمة؟</template>
+      <template class="content-en">Why might control not return to the caller when a task completes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المهمة تعمل كخيط تنفيذ مستقل (Thread of control) موازٍ للمستدعي، وليست مجرد قفزة في نفس الخيط كما في البرامج الفرعية.</p></template>
+      <template class="content-en"><p>Because a task operates as an independent thread of control parallel to the caller, rather than a jump within the same thread like a subprogram.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ada-95-protected-objects" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> كائنات أدا 95 المحمية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Ada 95 Protected Objects</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في Ada 95، توفر الكائنات المحمية طريقة أكثر كفاءة لمزامنة البيانات المشتركة بدون الحاجة لنقاط التقاء (Rendezvous)، باستخدام إجراءات للقراءة/الكتابة ودوال للقراءة فقط.</p></template>
+    <template class="content-en"><p>In Ada 95, protected objects provide a more efficient way to synchronize shared data without rendezvous, using procedures for read-write and functions for read-only access.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أضافت لغة Ada 95 ميزات جديدة للتزامن، أبرزها <strong>الكائنات المحمية (Protected Objects)</strong>. تُعد هذه الكائنات مشابهة لأنواع البيانات المجردة (ADTs) وتوفر طريقة أكثر كفاءة لتنفيذ البيانات المشتركة مقارنة بتمرير الرسائل، حيث تسمح بالوصول للبيانات دون الحاجة إلى عملية نقطة الالتقاء (Rendezvous) المعقدة.</p><p>يتم الوصول إلى الكائن المحمي إما عبر الرسائل (كما في المهام) أو من خلال برامج فرعية محمية:</p><ul><li><strong>الإجراءات المحمية (Protected procedures):</strong> توفر وصولاً حصريًا متبادلاً (Mutually exclusive) لعمليات القراءة والكتابة على الكائن.</li><li><strong>الدوال المحمية (Protected functions):</strong> توفر وصولاً متزامنًا (Concurrent) لعمليات القراءة فقط، مما يسمح لعدة مهام بقراءة البيانات في نفس الوقت دون تداخل.</li></ul></template>
+    <template class="content-en"><p>Ada 95 introduced new concurrency features, notably <strong>Protected Objects</strong>. Similar to Abstract Data Types (ADTs), they provide a more efficient way of implementing shared data than message passing, allowing access without the overhead of a rendezvous.</p><p>Access to a protected object is either through messages (like tasks) or through protected subprograms:</p><ul><li><strong>Protected procedures:</strong> Provide mutually exclusive read-write access to the object.</li><li><strong>Protected functions:</strong> Provide concurrent read-only access, allowing multiple tasks to read simultaneously without interference.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُعد نموذج تمرير الرسائل قويًا وعامًا، ولكن الكائنات المحمية تُعتبر طريقة أفضل وأسرع لتوفير بيانات مشتركة متزامنة في الأنظمة التي لا تعتمد على معالجات موزعة (Distributed processors). أما في الأنظمة الموزعة، يظل تمرير الرسائل هو النموذج الأفضل للتزامن.</p></template>
+    <template class="content-en"><p>While the message passing model is powerful and general, protected objects are a better and faster way to provide synchronized shared data in the absence of distributed processors. For distributed systems, however, message passing remains the superior model for concurrency.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُسمح بالوصول المتزامن في الدوال المحمية ولكن ليس في الإجراءات المحمية؟</template>
+      <template class="content-en">Why is concurrent access allowed in protected functions but not in protected procedures?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الدوال مخصصة للقراءة فقط، وقراءة البيانات من قبل مهام متعددة في نفس الوقت لا يسبب تعارضًا. أما الإجراءات فتعدل البيانات، لذا تتطلب وصولاً حصريًا لمنع تلف البيانات.</p></template>
+      <template class="content-en"><p>Because functions are read-only, and multiple tasks reading data simultaneously does not cause conflicts. Procedures modify data, requiring exclusive access to prevent data corruption.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
