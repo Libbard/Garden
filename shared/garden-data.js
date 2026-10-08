@@ -2242,7 +2242,8 @@
         completed: !!e.completed_at, all_day: !!e.all_day,
         course: e.course_code || null, title: '', type: e.exam_type || 'exam',
         /*@3.GADJ.178*/
-        label: e.notes || '',
+        /*@3.GADJ.192*/
+        label: (e.sx_crn && /^(شعبة|Section) \d+$/.test(e.notes || '')) ? '' : (e.notes || ''),
         /*@3.GADJ.172*/
         due: due, done: !!e.completed_at || (d !== null && d < 0),
         note: e.room || '',

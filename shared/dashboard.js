@@ -1857,6 +1857,9 @@
       /*@3.DASJ.123*/
       if (!hasVisibleSwitcher(v)) v = 'overview';
       showView(v);
+      /*@3.DASJ.161*/
+      var dm = document.querySelector('.dash-main.is-booting');
+      if (dm) dm.classList.remove('is-booting');
     });
 
     document.addEventListener('click', onAction);

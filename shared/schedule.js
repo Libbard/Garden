@@ -4557,6 +4557,8 @@
       var mw = document.getElementById('month-wrapper');
       var aw = document.getElementById('agenda-wrap');
       gw.style.display = 'none'; mw.style.display = 'none'; aw.style.display = 'none';
+      /*@3.SCHJ.335*/
+      document.getElementById('day-strip').style.display = 'none';
 
       updateNavLabel();
       updateFocusBanner();
@@ -4573,7 +4575,6 @@
         renderPulse(scopeDates());
         renderMonthView();
       } else if (currentView === 'day') {
-        document.getElementById('day-strip').style.display = 'none';
         renderPulse([new Date(currentDayDate)]);
         renderGrid([new Date(currentDayDate)]);
         wireDrag();

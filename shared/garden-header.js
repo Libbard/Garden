@@ -599,6 +599,23 @@
     /*@3.GAHJ.55*/
     mountSidebarToggle();
 
+    /*@3.GAHJ.105*/
+    try {
+      if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules') && !document.querySelector('script[data-g-pre]')) {
+        var sr = document.createElement('script');
+        sr.type = 'speculationrules';
+        sr.setAttribute('data-g-pre', '');
+        sr.textContent = JSON.stringify({ prerender: [{
+          where: { and: [
+            { selector_matches: '.dash-side-item, .bottom-nav-item' },
+            { not: { href_matches: { pathname: location.pathname } } }
+          ] },
+          eagerness: 'moderate'
+        }] });
+        document.head.appendChild(sr);
+      }
+    } catch (e) {}
+
     if (window.Garden && Garden.applyTheme) {
       Garden.applyTheme(localStorage.getItem('garden_theme') || 'dark');
 
