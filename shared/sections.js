@@ -1863,6 +1863,36 @@
     } catch (e) { return ''; }
   }
 
+  /*@3.SECJ.493*/
+  var MEET_LBL = { MEXM: ['ميد', 'Mid'], FEXM: ['فاينل', 'Final'], CLAS: ['حضوري', 'On campus'], VRTL: ['عن بعد', 'Remote'] };
+  function meetTxt(m, exam) {
+    if (!m) return '';
+    if (exam) return dt(m.start_date) + (m.begin ? ' · ' + examWord(m.begin) : '');
+    return dayList(m.days) + ' ' + hhmm(m.begin) + '–' + hhmm(m.end);
+  }
+  function meetDiff(kind, b, a) {
+    var exam = kind === 'exam';
+    var types = [];
+    b.concat(a).forEach(function (m) { if (m && m.type && types.indexOf(m.type) < 0) types.push(m.type); });
+    var out = types.map(function (ty) {
+      var bs = b.filter(function (m) { return m && m.type === ty; }).map(function (m) { return meetTxt(m, exam); });
+      var as = a.filter(function (m) { return m && m.type === ty; }).map(function (m) { return meetTxt(m, exam); });
+      var gone = bs.filter(function (x) { return as.indexOf(x) < 0; });
+      var added = as.filter(function (x) { return bs.indexOf(x) < 0; });
+      if (!gone.length && !added.length) return '';
+      var l = MEET_LBL[ty];
+      var row = '<span class="sx-tl-diff"><em>' + esc(l ? t(l[0], l[1]) : ty) + '</em> ';
+      if (gone.length) row += '<s>' + esc(gone.join('، ')) + '</s>';
+      if (gone.length && added.length) row += ' ← ';
+      if (added.length) row += '<b>' + esc(added.join('، ')) + '</b>';
+      if (!added.length) row += ' <i>' + esc(t('أُزيل', 'removed')) + '</i>';
+      else if (!b.length) row += ' <i>' + esc(t('أوّلُ نشر', 'first published')) + '</i>';
+      else if (!gone.length) row += ' <i>' + esc(t('جديد', 'new')) + '</i>';
+      return row + '</span>';
+    }).join('');
+    return out;
+  }
+
   function detail(e) {
     var b = e.before, a = e.after;
     if (e.kind === 'seats' && a) return ' — ' + t('المتاح', 'available') + ': ' + esc(a.avail);
@@ -1883,6 +1913,10 @@
       var lbl = a.move === 'assigned' ? t('تعيّنت', 'assigned')
               : a.move === 'cleared'  ? t('رُفعت', 'cleared') : t('تبدّلت', 'changed');
       return ' — ' + lbl + (rr.length ? ': ' + esc(rr.join('، ')) : '');
+    }
+    /*@3.SECJ.494*/
+    if ((e.kind === 'exam' || e.kind === 'class') && (Array.isArray(b) || Array.isArray(a))) {
+      return meetDiff(e.kind, Array.isArray(b) ? b : [], Array.isArray(a) ? a : []);
     }
     return '';
   }

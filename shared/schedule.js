@@ -4712,6 +4712,9 @@
     if (badge) { badge.textContent = n ? String(n) : ''; badge.hidden = !n; }
     var all = document.getElementById('cf-all');
     if (all) all.disabled = !n;
+    /*@3.SCHJ.336*/
+    var none = document.getElementById('cf-none');
+    if (none) none.disabled = n >= codes.length;
   }
 
   /*@3.SCHJ.206*/
@@ -4771,6 +4774,12 @@
     on('cf-all', 'click', function (ev) {
       ev.stopPropagation();
       schedule.settings.course_filter = [];
+      save(); render();
+    });
+    /*@3.SCHJ.337*/
+    on('cf-none', 'click', function (ev) {
+      ev.stopPropagation();
+      schedule.settings.course_filter = scheduleCourseCodes().slice();
       save(); render();
     });
 
