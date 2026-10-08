@@ -763,6 +763,140 @@
     return (n <= 10 ? n + ' ساعات' : n + ' ساعة');
   }
 
+  /*@3.DASJ.162*/
+  function isLift() { return document.documentElement.getAttribute('data-look') !== 'classic'; }
+  var EXAM_NAME = {
+    quiz:    ['اختبار قصير', 'Quiz'],
+    midterm: ['اختبار نصفي', 'Midterm'],
+    final:   ['اختبار نهائي', 'Final exam'],
+    exam:    ['اختبار', 'Exam']
+  };
+  function hm12(t) {
+    var p = String(t || '').split(':');
+    if (p.length < 2) return '';
+    return new Date(2000, 0, 1, +p[0] || 0, +p[1] || 0)
+      .toLocaleTimeString(tkLoc(), { hour: 'numeric', minute: '2-digit' });
+  }
+  /*@3.DASJ.163*/
+  function courseUpcoming(courses, horizon) {
+    var out = {}, codes = {};
+    courses.forEach(function (c) { codes[c.code] = 1; out[c.code] = []; });
+    var exams = {};
+    (D.allDeadlines() || []).forEach(function (t) { if (t.source === 'exam') exams[t.id] = t; });
+    var d0 = new Date(); d0.setHours(0, 0, 0, 0);
+    for (var i = 0; i < (horizon || 28); i++) {
+      var d = new Date(d0); d.setDate(d.getDate() + i);
+      (D.dayEvents(d, true) || []).forEach(function (e) {
+        if (!e || !codes[e.code] || e.past || e.done || e.spill) return;
+        if (e.kind !== 'lecture' && e.kind !== 'exam' && e.kind !== 'task' && e.kind !== 'general') return;
+        var name, isExam = e.kind === 'exam';
+        if (isExam) {
+          var x = exams[e.id] || {};
+          var n = EXAM_NAME[x.type] || EXAM_NAME.exam;
+          name = x.label || tx(n[0], n[1]);
+        } else if (e.kind === 'lecture') {
+          name = tx('محاضرة', 'Lecture');
+        } else {
+          name = e.label || typeLabel(e.type);
+        }
+        out[e.code].push({ days: i, date: new Date(d), time: e.time || '', name: name,
+          room: e.kind === 'lecture' ? (e.label || '') : '', exam: isExam, lec: e.kind === 'lecture', min: e.start === null ? -1 : e.start });
+      });
+    }
+    Object.keys(out).forEach(function (k) {
+      out[k].sort(function (a, b) { return a.days - b.days || a.min - b.min; });
+    });
+    return out;
+  }
+  function upDay(u) {
+    if (u.days === 0) return tx('اليوم', 'Today');
+    if (u.days === 1) return tx('غداً', 'Tomorrow');
+    if (u.days <= 6) return u.date.toLocaleDateString(tkLoc(), { weekday: 'long' });
+    return u.date.toLocaleDateString(tkLoc(), { day: 'numeric', month: 'long' });
+  }
+  function upWhen(u) {
+    var parts = [];
+    if (u.days > 1) parts.push(upDay(u));
+    if (u.time) parts.push(hm12(u.time));
+    if (u.room) parts.push(u.room);
+    return parts.join(' · ');
+  }
+  function upPill(u) {
+    var cls = u.days === 0 ? 'is-today' : (u.days <= 3 ? 'is-soon' : '');
+    return '<span class="dnx-pill ' + cls + '">' + esc(dueLabel(u.days)) + '</span>';
+  }
+  function courseMenu(c) {
+    var real = D.isRealCourse(c.code);
+    return '<details class="dnx-menu"><summary aria-label="' + esc(tx('خيارات المادة', 'Course options')) + '" ' +
+      'data-ar-title="خيارات المادة" data-en-title="Course options"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></summary>' +
+      '<div class="dnx-pop">' +
+        (real ? '<a href="hub/course.html?code=' + encodeURIComponent(c.code) + '"><i class="fa-solid fa-id-card" aria-hidden="true"></i>' + esc(tx('بطاقة المادة', 'Course card')) + '</a>' +
+                '<a href="hub/sections.html?q=' + encodeURIComponent(c.code) + '"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>' + esc(tx('الشعب', 'Sections')) + '</a>' : '') +
+        '<button type="button" data-act="course-style" data-id="' + esc(c.code) + '"><i class="fa-solid fa-palette" aria-hidden="true"></i>' + esc(tx('لون المادة وأيقونتها', 'Course color & icon')) + '</button>' +
+      '</div></details>';
+  }
+  /*@3.DASJ.164*/
+  function nxCard(c, ups) {
+    var st = courseStyle(c.code, { brand_color: c.color });
+    var href = c.path || 'hub/index.html';
+    var name = isAr() ? c.name_ar : c.name_en;
+    var sub = (c.custom ? esc(tx('مخصّصة', 'Custom')) : '<bdi>' + esc(c.code) + '</bdi>') + ' · ' + esc(creditsText(c.credits)) +
+      (c.completed ? ' · ' + esc(tx('مكتملة', 'Completed')) : '');
+    var a = ups[0];
+    var b = ups.slice(1).filter(function (u) { return !u.lec; })[0] || ups[1];
+    var body = a
+      ? '<div class="dnx-next"><span class="dnx-what">' + esc(a.name) + '</span>' + upPill(a) + '</div>' +
+        (upWhen(a) ? '<div class="dnx-when">' + esc(upWhen(a)) + '</div>' : '') +
+        (b ? '<div class="dnx-then">' + esc(tx('ثم: ', 'Then: ')) + '<b>' + esc(b.name) + '</b> · ' + esc(upDay(b)) + '</div>' : '')
+      : '<div class="dnx-empty">' + esc(tx('لا شيء في جدولك لهذه المادة خلال أربعة أسابيع', 'Nothing on your schedule for this course in the next four weeks')) + '</div>';
+    return '<div class="dash-course-card dnx" style="--course-color:' + esc(st.color) + '" data-course="' + esc(c.code) + '" ' +
+      'tabindex="0" role="link" aria-label="' + esc(name) + '">' +
+      '<div class="dnx-head"><span class="dash-course-icon"><i class="' + esc(st.icon) + '"></i></span>' +
+        '<div class="dnx-nm"><a class="dash-course-name" href="' + esc(href) + '">' + esc(name) + '</a><small>' + sub + '</small></div>' +
+        courseMenu(c) + '</div>' +
+      body +
+      '<div class="dnx-foot' + (c.pct > 0 ? '' : ' is-zero') + '"><i style="inline-size:' + (c.pct || 0) + '%"></i></div></div>';
+  }
+  /*@3.DASJ.165*/
+  function dcCard(c, ups, dueN) {
+    var st = courseStyle(c.code, { brand_color: c.color });
+    var href = c.path || 'hub/index.html';
+    var name = isAr() ? c.name_ar : c.name_en;
+    var meta = D.courseMeta(c.code) || {};
+    var ins = (meta.instructors || [])[0];
+    var crn = '';
+    ((D.scheduleRaw().lectures) || []).some(function (l) { if (l && l.course_code === c.code && l.sx_crn) { crn = l.sx_crn; return true; } return false; });
+    var sub = [c.custom ? esc(tx('مخصّصة', 'Custom')) : '<bdi>' + esc(c.code) + '</bdi>', esc(creditsText(c.credits))];
+    if (crn) sub.push(esc(tx('شعبة ', 'Section ')) + '<bdi>' + esc(crn) + '</bdi>');
+    if (ins && ins.name) sub.push(esc(ins.name));
+    var open = (D.allDeadlines() || []).filter(function (t) { return t.course === c.code && !t.done && t.source !== 'exam'; }).length;
+    var a = ups[0];
+    var week = ups.filter(function (u) { return u.days <= 6; }).slice(0, 4);
+    var rows = week.length
+      ? week.map(function (u) {
+          return '<li class="' + (u.exam ? 'is-exam' : '') + '"><span class="dnx-k"></span><span class="dnx-li">' + esc(u.name + (u.room ? ' · ' + u.room : '')) + '</span>' +
+            '<span class="dnx-tm">' + esc(upDay(u) + (u.time ? ' ' + hm12(u.time) : '')) + '</span></li>';
+        }).join('')
+      : '<li class="is-none">' + esc(a ? tx('لا شيء هذا الأسبوع · التالي ', 'Nothing this week · next ') + upDay(a) : tx('لا شيء في جدولك لهذه المادة بعد', 'Nothing on your schedule for this course yet')) + '</li>';
+    var real = D.isRealCourse(c.code);
+    return '<div class="dash-course-card dnc" style="--course-color:' + esc(st.color) + '" data-course="' + esc(c.code) + '" ' +
+      'tabindex="0" role="link" aria-label="' + esc(name) + '">' +
+      '<div class="dnx-head"><span class="dash-course-icon"><i class="' + esc(st.icon) + '"></i></span>' +
+        '<div class="dnx-nm"><a class="dash-course-name" href="' + esc(href) + '">' + esc(name) + '</a><small>' + sub.join(' · ') + '</small></div>' +
+        courseMenu(c) + '</div>' +
+      '<div class="dnc-st">' +
+        '<div><small>' + esc(tx('التالي', 'Next')) + '</small><b>' + esc(a ? upDay(a) + (a.time ? ' ' + hm12(a.time) : '') : '—') + '</b></div>' +
+        '<div><small>' + esc(tx('مستحقّات', 'Open items')) + '</small><b>' + open + '</b></div>' +
+        '<div><small>' + esc(tx('للمراجعة', 'To review')) + '</small><b>' + (dueN || 0) + '</b></div>' +
+      '</div>' +
+      '<ul class="dnc-week">' + rows + '</ul>' +
+      '<div class="dnc-acts">' +
+        '<a class="dnc-act" href="' + esc(href) + '"><i class="fa-solid fa-book-open" aria-hidden="true"></i>' + esc(tx('المحتوى', 'Content')) + '</a>' +
+        (real ? '<button type="button" class="dnc-act" data-act="due-open" data-id="' + esc(c.code) + '"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>' + esc(tx('المراجعة', 'Review')) + '</button>' +
+                '<a class="dnc-act" href="hub/sections.html?q=' + encodeURIComponent(c.code) + '"><i class="fa-solid fa-users" aria-hidden="true"></i>' + esc(tx('الشعب', 'Sections')) + '</a>' : '') +
+      '</div></div>';
+  }
+
   function renderCourses() {
     var grids = [el('dash-courses'), el('dash-courses-full')].filter(Boolean);
     if (!grids.length) return;
@@ -772,6 +906,14 @@
         emptyState('<i class="fa-solid fa-graduation-cap"></i>', tx('لا مواد في فصلك بعد', 'No courses in your semester yet'),
                    tx('أنشئ فصلك', 'Create semester'), 'go-hub') + '</div>';
       grids.forEach(function (g) { g.innerHTML = empty; });
+      return;
+    }
+    /*@3.DASJ.166*/
+    if (isLift()) {
+      var ups = courseUpcoming(p.courses);
+      var home = el('dash-courses'), full = el('dash-courses-full');
+      if (home) { home.classList.add('is-nx'); home.innerHTML = p.courses.map(function (c) { return nxCard(c, ups[c.code] || []); }).join(''); }
+      if (full) { full.classList.add('is-dc'); full.innerHTML = p.courses.map(function (c) { return dcCard(c, ups[c.code] || [], c.due); }).join(''); }
       return;
     }
     /*@3.DASJ.53*/
@@ -932,6 +1074,8 @@
   }
 
   function dlTitle(t) {
+    /*@3.DASJ.170*/
+    if (!t.title && !t.label && t.source === 'exam') { var en = EXAM_NAME[t.type] || EXAM_NAME.exam; return tx(en[0], en[1]); }
     return t.title || t.label || (t.course ? t.course + ' · ' + typeLabel(t.type) : typeLabel(t.type));
   }
   function autoDone(t) { return t.source === 'exam' && t.done && !t.completed; }
@@ -1064,6 +1208,63 @@
     });
   }
 
+  /*@3.DASJ.168*/
+  var tkLaterAll = false;
+  function tkWeekStart(due) {
+    var p = String(due).split('T')[0].split('-');
+    var d = new Date(+p[0], (+p[1] || 1) - 1, +p[2] || 1);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+  }
+  function tkNowLater(list) {
+    var now = [], week = [], later = [], none = [], late = 0;
+    list.forEach(function (t) {
+      var d = D.daysUntil(t.due);
+      if (d === null) none.push(t);
+      else if (d <= 0) { now.push(t); if (d < 0) late++; }
+      else if (d <= 7) week.push(t);
+      else later.push(t);
+    });
+    var rows = function (a) { return a.map(function (t) { return taskRow(t); }).join(''); };
+    var head = function (ar, en, n) {
+      return '<strong class="tk-card-t">' + esc(tx(ar, en)) + '</strong><span class="tk-card-n">' + n + '</span>';
+    };
+    var out = '';
+    if (now.length || week.length) {
+      out += '<div class="tk-now">' +
+        (now.length ? tkCard(late ? head('متأخرة واليوم', 'Late & today', now.length) : head('اليوم', 'Today', now.length),
+                             rows(now), late ? 'is-late' : 'is-today') : '') +
+        (week.length ? tkCard(head('هذا الأسبوع', 'This week', week.length), rows(week), 'is-week') : '') +
+        '</div>';
+    }
+    if (later.length) {
+      var groups = [], byKey = {};
+      later.forEach(function (t) {
+        var ws = tkWeekStart(t.due), k = ws.toDateString();
+        if (!byKey[k]) { byKey[k] = { start: ws, items: [] }; groups.push(byKey[k]); }
+        byKey[k].items.push(t);
+      });
+      var shown = tkLaterAll ? groups : groups.slice(0, 2);
+      var hidden = 0;
+      groups.slice(shown.length).forEach(function (g) { hidden += g.items.length; });
+      var body = shown.map(function (g) {
+        var end = new Date(g.start); end.setDate(end.getDate() + 6);
+        var o = { day: 'numeric', month: 'long' };
+        var lbl = tx('أسبوع ', 'Week of ') + g.start.toLocaleDateString(tkLoc(), o) + ' – ' + end.toLocaleDateString(tkLoc(), o);
+        return '<div class="tk-wk">' + esc(lbl) + '<span>' + g.items.length + '</span></div>' + rows(g.items);
+      }).join('');
+      if (hidden) {
+        body += '<button type="button" class="tk-more" data-act="tk-later-all">' +
+          esc(tx('عرض الكل · ' + hidden + ' أخرى', 'Show all · ' + hidden + ' more')) + '</button>';
+      } else if (tkLaterAll && groups.length > 2) {
+        body += '<button type="button" class="tk-more" data-act="tk-later-all">' + esc(tx('أقلّ', 'Show less')) + '</button>';
+      }
+      out += tkCard(head('لاحقاً', 'Later', later.length), body, 'tk-later');
+    }
+    if (none.length) out += tkCard(head('بلا تاريخ', 'No date', none.length), rows(none), 'is-none');
+    return out;
+  }
+
   function renderTasks() {
     var box = el('dash-tasks-list');
     if (!box) return;
@@ -1090,6 +1291,9 @@
         done.map(function (t) { return taskRow(t); }).join(''), 'is-done') + '</div>';
       return;
     }
+
+    /*@3.DASJ.169*/
+    if (isLift() && tkFilter === 'all') { box.innerHTML = tkNowLater(list); return; }
 
     var by = {};
     list.forEach(function (t) {
@@ -1657,7 +1861,7 @@
     if (href) location.href = href;
   }
   function onCardNav(e) {
-    if (e.target.closest('a, button, input, select, textarea, label')) return;
+    if (e.target.closest('a, button, input, select, textarea, label, details')) return;
     var card = e.target.closest('.dash-course-card');
     if (card) { var link = cardMainLink(card); if (link) location.href = link.getAttribute('href'); return; }
     /*@3.DASJ.107*/
@@ -1667,7 +1871,7 @@
   }
   function onCardKey(e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    if (e.target.closest('a, button, input, select, textarea')) return;
+    if (e.target.closest('a, button, input, select, textarea, details')) return;
     var card = e.target.closest && e.target.closest('.dash-course-card');
     if (card && card === document.activeElement) { var link = cardMainLink(card); if (link) { e.preventDefault(); location.href = link.getAttribute('href'); } return; }
     var w = e.target.closest && e.target.closest('.widget[data-widget]');
@@ -1716,6 +1920,7 @@
     }
     /*@3.DASJ.133*/
     if (act === 'course-style') { openCourseStyle(id); return; }
+    if (act === 'tk-later-all') { tkLaterAll = !tkLaterAll; renderTasks(); return; }
     if (act === 'go-hub') location.href = 'hub/index.html';
     else if (act === 'go-gpa') location.href = 'hub/gpa.html';
     else if (act === 'go-schedule') location.href = 'hub/schedule.html';
@@ -1864,6 +2069,12 @@
 
     document.addEventListener('click', onAction);
     document.addEventListener('click', onCardNav);
+    /*@3.DASJ.167*/
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('.dnx-menu[open]').forEach(function (m) {
+        if (!m.contains(e.target) || e.target.closest('.dnx-pop')) m.removeAttribute('open');
+      });
+    });
     document.addEventListener('keydown', onCardKey);
     bindStyleModal();
 
