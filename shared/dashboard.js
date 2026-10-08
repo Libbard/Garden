@@ -289,23 +289,25 @@
     tasks: {
       ar: 'المهام', en: 'Tasks',
       render: function () {
-        var t = D.tasks();
-        var open = (t || []).filter(function (x) { return x && !x.done; });
+        /*@3.DASJ.171*/
+        var open = (D.allDeadlines() || []).filter(function (x) { return x && !x.done; });
         if (!open.length) {
           return head('<i class="fa-solid fa-clock"></i>', tx('القادم', 'Upcoming')) +
             emptyState('<i class="fa-solid fa-clock"></i>', tx('لا مهام قادمة', 'No upcoming tasks'), tx('أضف مهمة', 'Add task'), 'new-task');
         }
-        open.sort(function (a, b) { return String(a.due || '').localeCompare(String(b.due || '')); });
         /*@3.DASJ.27*/
         var list = open.slice(0, TODAY_ROWS).map(function (x) {
           var days = D.daysUntil(x.due);
           var u = urgency(days, false);
           var label = dueLabel(days);
+          var title = dlTitle(x);
           return '<div class="widget-item">' +
-            '<button data-act="done-task" data-id="' + esc(x.id) + '" ' +
-              'style="background:none;border:1px solid var(--border-color);border-radius:4px;width:15px;height:15px;cursor:pointer;flex-shrink:0" ' +
-              'aria-label="' + esc(tx('إكمال', 'Complete')) + '"></button>' +
-            '<span class="widget-item-name">' + esc(x.title || '') + '</span>' +
+            (x.editable && !autoDone(x)
+              ? '<button data-act="tk-toggle"' + dlAttrs(x) + ' ' +
+                'style="background:none;border:1px solid var(--border-color);border-radius:4px;width:15px;height:15px;cursor:pointer;flex-shrink:0" ' +
+                'aria-label="' + esc(tx('إتمام: ', 'Complete: ') + title) + '"></button>'
+              : '<span style="width:15px;flex-shrink:0"></span>') +
+            '<span class="widget-item-name">' + (x.course ? '<bdi class="dash-up-code">' + esc(x.course) + '</bdi> ' : '') + esc(title) + '</span>' +
             '<span style="color:' + u.color + ';font-size:.66rem;font-weight:800">' + esc(label) + '</span></div>';
         }).join('');
         /*@3.DASJ.160*/
@@ -844,11 +846,13 @@
       (c.completed ? ' · ' + esc(tx('مكتملة', 'Completed')) : '');
     var a = ups[0];
     var b = ups.slice(1).filter(function (u) { return !u.lec; })[0] || ups[1];
+    /*@3.DASJ.172*/
     var body = a
-      ? '<div class="dnx-next"><span class="dnx-what">' + esc(a.name) + '</span>' + upPill(a) + '</div>' +
-        (upWhen(a) ? '<div class="dnx-when">' + esc(upWhen(a)) + '</div>' : '') +
-        (b ? '<div class="dnx-then">' + esc(tx('ثم: ', 'Then: ')) + '<b>' + esc(b.name) + '</b> · ' + esc(upDay(b)) + '</div>' : '')
-      : '<div class="dnx-empty">' + esc(tx('لا شيء في جدولك لهذه المادة خلال أربعة أسابيع', 'Nothing on your schedule for this course in the next four weeks')) + '</div>';
+      ? '<div class="dnx-next"><span class="dnx-what"><bdi>' + esc(a.name) + '</bdi></span>' + upPill(a) + '</div>' +
+        '<div class="dnx-when">' + esc(upWhen(a)) + '</div>' +
+        '<div class="dnx-then">' + (b ? esc(tx('ثم: ', 'Then: ')) + '<b><bdi>' + esc(b.name) + '</bdi></b> · ' + esc(upDay(b)) : '') + '</div>'
+      : '<div class="dnx-next"><span class="dnx-what is-empty">' + esc(tx('لا شيء قريب في جدولك', 'Nothing coming up')) + '</span></div>' +
+        '<div class="dnx-when"></div><div class="dnx-then"></div>';
     return '<div class="dash-course-card dnx" style="--course-color:' + esc(st.color) + '" data-course="' + esc(c.code) + '" ' +
       'tabindex="0" role="link" aria-label="' + esc(name) + '">' +
       '<div class="dnx-head"><span class="dash-course-icon"><i class="' + esc(st.icon) + '"></i></span>' +
@@ -874,7 +878,7 @@
     var week = ups.filter(function (u) { return u.days <= 6; }).slice(0, 4);
     var rows = week.length
       ? week.map(function (u) {
-          return '<li class="' + (u.exam ? 'is-exam' : '') + '"><span class="dnx-k"></span><span class="dnx-li">' + esc(u.name + (u.room ? ' · ' + u.room : '')) + '</span>' +
+          return '<li class="' + (u.exam ? 'is-exam' : '') + '"><span class="dnx-k"></span><span class="dnx-li"><bdi>' + esc(u.name) + '</bdi>' + esc(u.room ? ' · ' + u.room : '') + '</span>' +
             '<span class="dnx-tm">' + esc(upDay(u) + (u.time ? ' ' + hm12(u.time) : '')) + '</span></li>';
         }).join('')
       : '<li class="is-none">' + esc(a ? tx('لا شيء هذا الأسبوع · التالي ', 'Nothing this week · next ') + upDay(a) : tx('لا شيء في جدولك لهذه المادة بعد', 'Nothing on your schedule for this course yet')) + '</li>';
@@ -975,6 +979,80 @@
     try { p = JSON.parse(localStorage.getItem('student_profile')); } catch (e) {}
     return (p && p.program && _maj.slugs[p.program]) || null;
   }
+  /*@3.DASJ.173*/
+  var lvlQuery = '';
+  var LVL_COLORS = { '3': '#3b82f6', '4': '#10b981', '5': '#a78bfa', '6': '#f59e0b', '7': '#f43f5e', '8': '#06b6d4', 'gen': '#8b5cf6' };
+  function normQ(s) {
+    return String(s || '').toLowerCase().replace(/[ً-ْ]/g, '').replace(/[أإآ]/g, 'ا')
+      .replace(/[یى]/g, 'ي').replace(/ک/g, 'ك').replace(/ة/g, 'ه').replace(/\s+/g, ' ').trim();
+  }
+  function libGroups() {
+    var mj = viewMajor() || 'CS';
+    var M = _maj.majors[mj] || _maj.majors.CS;
+    var elect = {};
+    ['level7', 'level8'].forEach(function (k) {
+      var lv = _cfg && _cfg.levels && _cfg.levels[k];
+      ((lv && lv.electives) || []).forEach(function (c) { elect[c] = 1; });
+    });
+    var out = [];
+    ['3', '4', '5', '6', '7', '8'].forEach(function (n) {
+      out.push({ key: n, title: tx('المستوى ' + n, 'Level ' + n), href: 'L' + n + '/index.html', items: M.levels[n] || [], elect: elect });
+    });
+    out.push({ key: 'gen', title: tx('مواد عامة', 'General courses'), href: 'others/index.html', items: M.general || [], elect: {} });
+    return out;
+  }
+  function libTile(c, g) {
+    var name = isAr() ? (c.ar || c.en) : (c.en || c.ar);
+    var mc = (D.moduleCount && D.moduleCount(c.code)) || c.modules || 0;
+    var u = mc ? smartCount(mc, ['وحدة', 'وحدتان', 'وحدات'], ['unit', 'units']) : tx('قريباً', 'Coming soon');
+    return '<a class="lib-ct" href="' + esc(c.path || '#') + '" style="--c:' + esc(c.color || LVL_COLORS[g.key]) + '">' +
+      '<span class="lib-cd"><bdi>' + esc(c.code) + '</bdi>' + (g.elect[c.code] ? '<em>' + esc(tx('اختياريّة', 'Elective')) + '</em>' : '') + '</span>' +
+      '<b>' + esc(name) + '</b><small>' + esc(u) + '</small></a>';
+  }
+  function libResults() {
+    var q = normQ(lvlQuery), any = false;
+    var html = libGroups().map(function (g) {
+      var items = g.items.filter(function (c) {
+        return !q || normQ(c.code + ' ' + c.ar + ' ' + c.en).indexOf(q) > -1;
+      });
+      if (!items.length) return '';
+      any = true;
+      return '<section class="lib-lv" id="lib-' + g.key + '" style="--c:' + LVL_COLORS[g.key] + '">' +
+        '<header class="lib-lvh"><span class="lib-n">' + (g.key === 'gen' ? '<i class="fa-solid fa-layer-group" aria-hidden="true"></i>' : g.key) + '</span>' +
+          '<b>' + esc(g.title) + '</b><small>' + esc(smartCount(items.length, ['مادة', 'مادتين', 'مواد'], ['course', 'courses'])) + '</small>' +
+          '<a href="' + esc(g.href) + '">' + esc(tx('صفحة المستوى', 'Level page')) + ' ›</a></header>' +
+        '<div class="lib-grid">' + items.map(function (c) { return libTile(c, g); }).join('') + '</div></section>';
+    }).join('');
+    return any ? html : '<p class="lib-none">' + esc(tx('لا مادّةَ تطابق بحثك', 'No course matches your search')) + '</p>';
+  }
+  function renderLibrary(box) {
+    var mj = viewMajor() || 'CS';
+    var chips = Object.keys(_maj.majors).map(function (k) {
+      var m = _maj.majors[k];
+      return '<button type="button" class="lib-chip' + (k === mj ? ' on' : '') + '" data-act="lib-major" data-id="' + esc(k) + '" aria-pressed="' + (k === mj) + '">' +
+        esc(isAr() ? m.ar : m.en) + '</button>';
+    }).join('');
+    var jump = libGroups().map(function (g) {
+      return '<a href="#lib-' + g.key + '" data-act="lib-jump" data-id="' + g.key + '">' + esc(g.key === 'gen' ? tx('عامة', 'General') : g.key) + '</a>';
+    }).join('');
+    if (!box.querySelector('.lib-q')) {
+      box.innerHTML = '<div class="lib-tools">' +
+          '<label class="lib-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>' +
+          '<input type="search" class="lib-q" placeholder="' + esc(tx('ابحث بالرمز أو الاسم…', 'Search by code or name…')) + '" ' +
+            'aria-label="' + esc(tx('ابحث في المواد', 'Search courses')) + '"></label>' +
+          '<div class="lib-chips" role="group" aria-label="' + esc(tx('التخصّص', 'Major')) + '"></div></div>' +
+        '<nav class="lib-jump" aria-label="' + esc(tx('انتقل إلى مستوى', 'Jump to level')) + '"></nav>' +
+        '<div class="lib-res"></div>';
+      box.querySelector('.lib-q').addEventListener('input', function () {
+        lvlQuery = this.value;
+        box.querySelector('.lib-res').innerHTML = libResults();
+      });
+    }
+    box.querySelector('.lib-chips').innerHTML = chips;
+    box.querySelector('.lib-jump').innerHTML = jump;
+    box.querySelector('.lib-res').innerHTML = libResults();
+  }
+
   function renderLevels() {
     var grids = [el('dash-levels'), el('dash-levels-full')].filter(Boolean);
     if (!grids.length || !_cfg) return;
@@ -1011,6 +1089,15 @@
           '<span class="dash-level-meta">' +
             esc(smartCount(viewMajor() ? _maj.majors[viewMajor()].general.length : (o.subjects || []).length, ['مادة', 'مادتين', 'مواد'], ['course', 'courses'])) + '</span>' +
         '</span></a>';
+    }
+    /*@3.DASJ.174*/
+    var full = el('dash-levels-full');
+    if (isLift() && full && _maj) {
+      full.classList.add('is-lib');
+      var home = el('dash-levels');
+      if (home) home.innerHTML = html;
+      renderLibrary(full);
+      return;
     }
     grids.forEach(function (g) { g.innerHTML = html; });
   }
@@ -1921,6 +2008,16 @@
     /*@3.DASJ.133*/
     if (act === 'course-style') { openCourseStyle(id); return; }
     if (act === 'tk-later-all') { tkLaterAll = !tkLaterAll; renderTasks(); return; }
+    if (act === 'lib-major') {
+      try { localStorage.setItem('garden_view_major', id); } catch (e2) {}
+      renderLevels(); return;
+    }
+    if (act === 'lib-jump') {
+      e.preventDefault();
+      var tg = document.getElementById('lib-' + id);
+      if (tg) tg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     if (act === 'go-hub') location.href = 'hub/index.html';
     else if (act === 'go-gpa') location.href = 'hub/gpa.html';
     else if (act === 'go-schedule') location.href = 'hub/schedule.html';
