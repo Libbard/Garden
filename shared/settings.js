@@ -411,9 +411,37 @@
     segSet($('#p-lang'), isAr() ? 'ar' : 'en');
     swSet($('#p-sidebar'), document.documentElement.classList.contains('sb-collapsed'));
     swSet($('#p-3d'), localStorage.getItem('garden_mobile_3d') !== '0');
+    swSet($('#p-lift'), document.documentElement.getAttribute('data-look') !== 'classic');
+  }
+
+  /*@3.SETJ.47*/
+  function mountLookRow() {
+    var sw3d = $('#p-3d');
+    if (!sw3d || $('#p-lift')) return;
+    var ar = isAr();
+    var n = ['المظهر الحديث', 'Modern look'];
+    var h = ['بطاقاتٌ مرفوعةٌ بظلٍّ ناعم، ومواعيدُ بخطٍّ مستقيم، وانتقالٌ هادئٌ بين الصفحات. أطفئه لتعود إلى المظهر السابق كما كان.',
+             'Raised cards with soft shadows, straight-line schedules and calm page transitions. Turn it off to return to the previous look exactly.'];
+    var row = document.createElement('div');
+    row.className = 'set-row';
+    row.setAttribute('data-k', 'المظهر الحديث الكلاسيكي السابق look modern classic');
+    row.innerHTML =
+      '<div class="set-row-t"><div class="set-row-n"><span data-ar="' + esc(n[0]) + '" data-en="' + esc(n[1]) + '">' + esc(ar ? n[0] : n[1]) + '</span></div>' +
+      '<div class="set-row-h" data-ar="' + esc(h[0]) + '" data-en="' + esc(h[1]) + '">' + esc(ar ? h[0] : h[1]) + '</div></div>' +
+      '<div class="set-row-c"><button class="rem-switch" id="p-lift" type="button" role="switch" aria-checked="true" ' +
+        'aria-label="' + esc(ar ? n[0] : n[1]) + '" data-ar-title="' + esc(n[0]) + '" data-en-title="' + esc(n[1]) + '"></button></div>';
+    sw3d.closest('.set-row').after(row);
+    $('#p-lift').addEventListener('click', function () {
+      var on = !swOn($('#p-lift'));
+      try { if (on) localStorage.removeItem('garden_look'); else localStorage.setItem('garden_look', 'classic'); } catch (e) {}
+      if (on) document.documentElement.removeAttribute('data-look');
+      else document.documentElement.setAttribute('data-look', 'classic');
+      swSet($('#p-lift'), on);
+    });
   }
 
   function bindLook() {
+    mountLookRow();
     $('#p-themes').addEventListener('click', function (e) {
       var b = e.target.closest('.set-theme');
       if (!b) return;
