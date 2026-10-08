@@ -1938,7 +1938,7 @@
     }
 
     if (scheduleIsEmpty()) {
-      return { color: 'var(--st-action, #a78bfa)', icon: 'fa-wand-magic-sparkles',
+      return { color: 'var(--st-accent, #a78bfa)', icon: 'fa-wand-magic-sparkles',
                kick: A ? 'ابدأْ من هنا' : 'START HERE',
                title: A ? 'جدولُك فارغ' : 'Your schedule is empty',
                sub: line(A ? 'اضغطْ على أيِّ فراغٍ في الشبكةِ لتضيفَ أوّلَ حدث'
@@ -2684,8 +2684,8 @@
     var sheet = ov.querySelector('.sch-sheet');
     sheet.style.setProperty('--event-color', ev.color);
     sheet.style.setProperty('--kind-color', ({
-      lecture:'var(--g-bloom)', study:'var(--g-leaf)', exam:'var(--g-berry)', general:'var(--g-sun)', intensive:'var(--g-sky)'
-    })[ev.kind] || 'var(--g-bloom)');
+      lecture:'#a78bfa', study:'#10b981', exam:'#ef4444', general:'#f59e0b', intensive:'#7c3aed'
+    })[ev.kind] || '#a78bfa');
 
     document.getElementById('sheet-kind').innerHTML =
       '<i class="fa-solid ' + kindIcon(ev) + '"></i> ' + escapeH(subLabel(ev));
@@ -3279,7 +3279,7 @@
   }
 
   var ADD_TYPES = [
-    { k: 'add-lec',   i: 'fa-chalkboard-user', tone: 'var(--st-action, #a78bfa)',
+    { k: 'add-lec',   i: 'fa-chalkboard-user', tone: 'var(--st-accent, #a78bfa)',
       ar: 'محاضرة', en: 'Lecture' },
     { k: 'add-study', i: 'fa-book-open',       tone: 'var(--st-ok, #10b981)',
       ar: 'مذاكرة', en: 'Study' },

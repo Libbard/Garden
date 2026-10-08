@@ -1167,7 +1167,6 @@
       var b = hm(x.end_time);
       if (!allDay && (b === null || b <= a)) b = a + 90;
       push({ src: 'exam', id: x.id, kind: 'exam', code: x.course_code || '', label: '',
-             type: x.exam_type || '',
              time: allDay ? '' : (x.start_time || '15:00'),
              start: allDay ? null : a, end: allDay ? null : b, allDay: allDay });
     });
@@ -1232,25 +1231,6 @@
 
   function todayEvents(date) {
     return dayEvents(date ? new Date(date) : new Date(), false);
-  }
-
-  /*@3.GADJ.191*/
-  function courseNextMap(horizon) {
-    var first = {}, due = {}, map = {};
-    var d = new Date(); d.setHours(0, 0, 0, 0);
-    for (var i = 0; i <= (horizon || 14); i++) {
-      dayEvents(d, true).forEach(function (e) {
-        if (!e.code || e.done || e.past) return;
-        if (e.kind === 'study' || e.kind === 'intensive') return;
-        var o = { kind: e.kind, type: e.type || '', label: e.label || '',
-                  time: e.allDay ? '' : (e.time || ''), date: new Date(d), daysAway: i };
-        if (!first[e.code]) first[e.code] = o;
-        if (e.kind !== 'lecture' && !due[e.code] && i <= 7) due[e.code] = o;
-      });
-      d.setDate(d.getDate() + 1);
-    }
-    Object.keys(first).forEach(function (c) { map[c] = (first[c].daysAway === 0 || !due[c]) ? first[c] : due[c]; });
-    return map;
   }
 
   /*@3.GADJ.67*/
@@ -2411,7 +2391,6 @@
     courseTitle: courseTitle,
     todaySchedule: todaySchedule,
     todayEvents: todayEvents,
-    courseNextMap: courseNextMap,
     dayEvents: dayEvents,
     todaySessions: todaySessions,
 
