@@ -297,7 +297,7 @@
         }
         open.sort(function (a, b) { return String(a.due || '').localeCompare(String(b.due || '')); });
         /*@3.DASJ.27*/
-        var list = open.slice(0, 5).map(function (x) {
+        var list = open.slice(0, TODAY_ROWS).map(function (x) {
           var days = D.daysUntil(x.due);
           var u = urgency(days, false);
           var label = dueLabel(days);
@@ -308,8 +308,15 @@
             '<span class="widget-item-name">' + esc(x.title || '') + '</span>' +
             '<span style="color:' + u.color + ';font-size:.66rem;font-weight:800">' + esc(label) + '</span></div>';
         }).join('');
+        /*@3.DASJ.160*/
+        var more = open.length > TODAY_ROWS ? '+' + (open.length - TODAY_ROWS) + ' ' + tx('أخرى', 'more') : '';
+        var foot = '<div class="dash-today-foot">' +
+          '<span class="dash-today-cnt">' + esc(more) + '</span>' +
+          '<button type="button" class="dash-today-more" data-act="tasks-open">' +
+            esc(tx('كل المهام', 'All tasks')) + '</button>' +
+          '</div>';
         return head('<i class="fa-solid fa-clock"></i>', tx('القادم', 'Upcoming')) +
-          '<div class="widget-body"><div class="widget-list">' + list + '</div></div>';
+          '<div class="widget-body"><div class="widget-list">' + list + '</div>' + foot + '</div>';
       }
     },
 
@@ -1692,6 +1699,7 @@
     }
 
     if (act === 'day-open') { e.preventDefault(); openDay(); return; }
+    if (act === 'tasks-open') { e.preventDefault(); showView('tasks'); return; }
     if (act === 'day-close') { e.preventDefault(); closeDay(); return; }
     if (act === 'day-scope') {
       e.preventDefault();
